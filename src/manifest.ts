@@ -88,6 +88,38 @@ export const manifestSchema = z.object({
    */
   version: z.string().min(1).max(LIMITS.VERSION).default('0'),
   summary: z.string().max(LIMITS.SUMMARY).default(''),
+  /**
+   * What an agent should do about this module, given that it is here.
+   *
+   * ## Not the same thing as `summary`, and not the same thing as a prompt
+   *
+   * `summary` says what a module IS, and it is written for a person choosing
+   * whether to put it on a canvas. This says what its PRESENCE IMPLIES, and it
+   * is written for an agent that has just been told the module is there:
+   * "every issue on this canvas has a checklist, and the work is not done until
+   * its items are ticked" is guidance; "the checklist for a merge request" is a
+   * summary. The two are often confused and produce very different sentences.
+   *
+   * It is also not `context.prompt`. That is written by a PERSON, on a canvas,
+   * aimed at one pane, and changes as they change their mind. This is written
+   * by the module's AUTHOR, ships with the module, and is the same on every
+   * canvas the module is ever placed on. A host composes both — the standing
+   * notes from what is present, then the instructions somebody wrote — and the
+   * order matters, because context comes before orders.
+   *
+   * ## Why it is a claim and not an instruction
+   *
+   * A module writes this about itself, so it is a module's own account of what
+   * it is for. A host relays it and must not dress it up as its own: an agent
+   * reading composed guidance should be able to tell which module said what,
+   * which is why a host that concatenates these attributes each one. The same
+   * argument as `selection` carrying refs and not kinds — a host can vouch that
+   * a module said something, never that it is true.
+   *
+   * Empty by default. A module with nothing to say to an agent says nothing,
+   * which is better than a sentence written to fill the field.
+   */
+  guidance: z.string().max(LIMITS.GUIDANCE).default(''),
   /** The page a host would frame. Relative to the module's own origin. */
   entry: url,
   icon: z.string().max(LIMITS.URL).optional(),

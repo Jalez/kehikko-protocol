@@ -248,6 +248,18 @@ export declare const LIMITS: {
      * every context change.
      */
     readonly PROMPT: number;
+    /**
+     * A module's standing note about what its presence implies.
+     *
+     * A kilobyte, which is a paragraph — deliberately much smaller than a
+     * `PROMPT`. A person writing a prompt is instructing one agent about one
+     * piece of work and may need room. A module author is saying one thing, once,
+     * to every agent that will ever see this module on a canvas, and it has to
+     * survive being concatenated with four others without becoming the whole of
+     * what an agent reads. The bound is the design: if it does not fit in a
+     * paragraph it is documentation, and documentation goes behind a link.
+     */
+    readonly GUIDANCE: 1024;
     /** As much of a manifest as anyone should read from a stranger on a port. */
     readonly MANIFEST_BYTES: number;
 };
