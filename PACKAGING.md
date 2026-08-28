@@ -38,24 +38,37 @@ where the protocol is needed — `WELL_KNOWN` for the manifest route, the manife
 itself for the middleware that serves it — so shipping source made the package
 unusable in the one file every module author has to write.
 
-## 3. `dist/`, built by `prepare`
+## 3. `dist/`, built by `prepare` on install
 
-Which is what it does now, and it is the only one of the three with no stale
-artifact anywhere in it:
+The arrangement that would have had no artifact in the repository AND no
+type-stripping problem: gitignore `dist/`, and let `prepare` build it on the
+consumer's machine from whatever commit they pinned.
 
-- **Not committed.** `dist/` stays gitignored. There is no build output in the
-  repository to drift away from the source beside it.
-- **Not absent.** `prepare` runs on install, including for a git dependency, so
-  a consumer that pinned commit `abc123` gets `dist/` compiled from `abc123`.
-- **Real JavaScript with real declarations**, so Node can load it, which means a
-  `vite.config.ts` can import it.
+It does not run. A git dependency is installed without devDependencies, so
+there is no `typescript` in it, so there is no `tsc` for `prepare` to call. The
+install completes cleanly and the package arrives with no `dist/` at all —
+which is failure mode 1 again, this time on the consumer's disk.
 
-Staleness is the failure this codebase keeps paying for — a stale `dist` in the
-host, a stale `dist` in a module, a route that resolved to compiled JavaScript
-instead of a page. Every one of them answered confidently with the wrong bytes
-and none of them errored. Building at install time is what removes the window in
-which that can happen: there is never a moment where the built thing and the
-source it came from are two different versions.
+## 4. `dist/`, committed
+
+Which is what it does now. Consumed straight from git, **the repository has to
+be the artifact** — there is nothing on the consumer's side able to build it.
+
+The objection to this is real and is the thing this codebase keeps paying for: a
+checked-in build goes stale silently. A stale `dist` in the host, a stale `dist`
+in a module, a route resolving to compiled JavaScript instead of a page — every
+one answered confidently with the wrong bytes and none of them errored.
+
+So staleness is made loud rather than trusted away. `bun test` is `tsc && bun
+test`: it rebuilds `dist/` before running a single test. Edit `src/`, run the
+tests as you would anyway, and a `dist/` that no longer matches shows up
+immediately as a dirty working tree. Committing a stale build now requires
+never having run the suite.
+
+That is weaker than a guarantee and it is the strongest thing available at this
+size. The real fix is publishing to npm, where `prepublishOnly` builds and the
+consumer receives a compiled package with no git in the path at all — and this
+is ready for that day without changes.
 
 ## For a real npm release
 

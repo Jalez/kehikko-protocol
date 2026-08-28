@@ -1,0 +1,364 @@
+import { z } from 'zod';
+import { LIMITS } from './constants.js';
+import { EPIC_SLUG } from './ids.js';
+/**
+ * The questions a module can ask, by name and by shape.
+ *
+ * A method name is a spelling two programs have to agree on exactly as much as
+ * a message type is — a module calling `epics.get` at a host that answers
+ * `epic.get` gets a refusal it cannot debug from the inside — so the names are
+ * written down once, here, and both sides import them.
+ *
+ * What is NOT here is any of the answering. There is no dispatch table, no
+ * handler and no default implementation. A host answers these out of its own
+ * material by its own rules, and two hosts may answer the same question with
+ * different amounts of the same epic. The request side is a contract because a
+ * caller has to construct it; the CONTENT of a response is `unknown` on
+ * purpose, because a client that assumed a shape for it would be asserting
+ * something no host promised.
+ *
+ * ## Epics, and the word that is not here
+ *
+ * An **epic** belongs to a project and is what a host holds: the steps, their
+ * order, the references they name, and what the last refresh read from the
+ * trackers about them. A **journey** is a different idea, and it lives in a
+ * module app of its own rather than in the host — so this package does not
+ * name one, does not bound one, and has no method that returns one. A module
+ * that wants journeys talks to whatever program owns them, which from this
+ * protocol's side is not a special arrangement at all: it is just a program.
+ *
+ * These files inherited a codebase where the two words meant one thing. Every
+ * method, field, capability and pattern that carried the conflation is renamed
+ * rather than aliased, and `PROTOCOL` went to 2 for it. See the essay there.
+ *
+ * ## Two answers ARE described, and the line is not where you would guess
+ *
+ * `methodResults` below gives a shape to exactly two of these answers, which
+ * looks at first like the rule above being broken. It is not, and the
+ * distinction is worth stating because it decides what may be added later.
+ *
+ * An answer is **material** when it is a host's own holdings — what an epic
+ * says, what a tracker last reported, how much of it this host chose to hand
+ * over. Two honest hosts differ there, and a shape imposed on it would be this
+ * package legislating what a host must hold.
+ *
+ * An answer is an **outcome** when it reports what happened to an act this
+ * protocol itself defines. Nothing about a host's holdings varies there. If
+ * `view.goto` came back as `unknown`, the caller could not tell "you are now
+ * looking at it" from "I would rather not" from "there is nothing by that
+ * name" without parsing English, and those three send a person to three
+ * different places. An unspecified outcome is not modesty; it is a request
+ * that cannot be acted on.
+ *
+ * `epics.list` is the third case, and the argument for it is different again —
+ * see `epicsListResult`.
+ */
+/**
+ * The areas of a host's material these methods touch.
+ *
+ * They are names for a KIND of question, not permissions — nothing grants one,
+ * nothing checks one, and a module that declares none and calls everything is
+ * treated exactly like a module that declared honestly. They exist so that
+ * `declares.uses` can say something a person can read at a glance: "this
+ * program reads the epics and reports where work is" is a sentence; a list of
+ * seven method names is not.
+ *
+ * The colons in the spellings are a leftover from when these were permissions,
+ * and they are kept rather than tidied: the punctuation was never the confusing
+ * part, and a module author reading `epics:read` reads a subject and a verb,
+ * which is all it ever really was. (The WORDS did change — `journeys:read` is
+ * `epics:read` now — but that is the epic rename, which had a reason, and not a
+ * tidy-up, which does not.)
+ */
+export const CAPABILITIES = {
+    'epics:read': 'Read which epics exist, and their titles, ledes and projects.',
+    'steps:read': "Read an epic's steps: their titles, bodies and the references they name.",
+    'live:read': 'Read what the last refresh found in the trackers for an epic.',
+    'stage:report': "Say where work is — working, in review, or blocked — into the host's database.",
+    'events:emit': 'Send an extension payload: a notification, a report of its own calls.',
+    /**
+     * The one capability that does not read or write anything — it asks the host
+     * to MOVE. See `view.goto`. Named for the area rather than for the method,
+     * like the rest of these, so that the sentence a person reads before
+     * installing a program is "reads the epics and asks to navigate" rather than
+     * a list of method names.
+     */
+    'view:navigate': 'Ask the roadmap to show a particular epic, step or reference. The roadmap decides.',
+};
+export const CAPABILITY_NAMES = Object.keys(CAPABILITIES);
+/**
+ * Every method, and the capability it belongs to.
+ *
+ * A plain object, and therefore a lookup hazard: `METHODS[method]` where
+ * `method` is a string out of a frame answers with something inherited when the
+ * string is `constructor`. Use `own()` from `./ids.js`, or a `Map`. The essay
+ * on `MODULE_ID` is about exactly this and it applies here too — the method
+ * name arrives from the same place the module id does.
+ */
+export const METHODS = {
+    'epics.list': 'epics:read',
+    'epic.get': 'epics:read',
+    'steps.list': 'steps:read',
+    'live.get': 'live:read',
+    'stage.report': 'stage:report',
+    'events.emit': 'events:emit',
+    'view.goto': 'view:navigate',
+};
+export const METHOD_NAMES = Object.keys(METHODS);
+/**
+ * An epic slug, as it arrives from somebody else's program.
+ *
+ * Shape and length, not membership. A membership check — is this one of the
+ * epics that exist? — cannot be fooled by a spelling nobody thought of, which
+ * is the real argument for it, and it is still the wrong check at this door: it
+ * answers "no such epic" and "not an epic name" differently, and kept apart
+ * those two answers are a way for a module holding the cheapest question on the
+ * list to enumerate what is here. The shape refuses the same way whether or not
+ * the epic exists, and there is no character in the class that can leave a
+ * directory.
+ *
+ * A host still has the last word, one layer down, and should take care that the
+ * word is not a roll-call: a "no such epic" that lists the ones that do exist
+ * has enumerated anyway, in the error message.
+ */
+const epic = z.string().regex(EPIC_SLUG, 'an epic slug is lowercase letters, digits and dashes');
+/** A reference like `gh#41`, `gl#340`, `gh:owner/repo#12`. */
+const ref = z.string().min(1).max(LIMITS.REF);
+/**
+ * The three stages a module may report.
+ *
+ * Three of a longer line, because these are the three nothing else can see.
+ * Whether somebody is working, whether they have handed a change over, whether
+ * they are stuck — no tracker has an opinion, and the report is the only source
+ * there will be. Everything else on the line is read from a tracker, and a
+ * module writing it would be a second answer to a question that already has
+ * one.
+ */
+export const REPORTED_STAGES = ['working', 'in-review', 'blocked'];
+export const methodParams = {
+    'epics.list': z.object({}),
+    'epic.get': z.object({ epic }),
+    'steps.list': z.object({ epic }),
+    'live.get': z.object({ epic }),
+    /**
+     * Ask the roadmap to show something. See the essay on `navigationResult`.
+     *
+     * The same triple `roadmap.goto` carries, and named the same way on purpose:
+     * a module that can receive a walk and a module that can ask for one are
+     * describing the same act from two ends, and two spellings of it would be two
+     * things to get wrong.
+     *
+     * One difference, and it is deliberate. `gotoSchema` refuses a message that
+     * names only an epic, because a host with nothing to say but "this epic" says
+     * it as context and has no reason to send a walk. Here, an epic alone is the
+     * commonest ask there is — a module showing everything on the machine wants
+     * "open that one", with no step and no reference in mind — so it is allowed,
+     * and what is refused is a call that names nothing at all. A `view.goto` with
+     * no target is not a request for anything; it is a call with a typo in it,
+     * and the sooner the author sees that the better.
+     */
+    'view.goto': z
+        .object({
+        epic: epic.optional(),
+        step: z.number().int().min(1).max(999).optional(),
+        /**
+         * Bounded at `GOTO_REF` rather than `REF`, and REFUSED rather than
+         * clipped. The receiver that exists today clips its inbound ref to 200
+         * characters, which is the wrong half of the rule: a clipped sentence is
+         * still the sentence, but a clipped ref is a DIFFERENT ref, and walking
+         * somebody confidently to the wrong place is worse than telling them the
+         * ask was malformed.
+         */
+        ref: z.string().min(1).max(LIMITS.GOTO_REF).optional(),
+    })
+        .refine((g) => g.epic !== undefined || g.step !== undefined || g.ref !== undefined, {
+        message: 'view.goto has to name an epic, a step or a ref; a call that names nothing asks for nothing',
+    }),
+    'stage.report': z.object({
+        ref,
+        stage: z.enum(REPORTED_STAGES),
+        /**
+         * A line a person reads beside the report. Bounded, and REFUSED rather than
+         * clipped when it is too long — which is the opposite of what happens to
+         * text merely crossing back in a refusal, and the difference matters: a
+         * clipped sentence is still the sentence, while a clipped ref is a
+         * DIFFERENT ref, silently filed against work nobody meant, and a clipped
+         * note is one that ends mid-word with nobody told it was cut. What is
+         * stored has to be what was sent, or refused outright.
+         */
+        note: z.string().max(LIMITS.MESSAGE).default(''),
+    }),
+    'events.emit': z.object({
+        extension: z.string().min(1).max(LIMITS.EXTENSION),
+        /**
+         * Unknown here, and checked against the named extension's own schema by
+         * whoever routes it — see `./extensions.js`. Typing it as a union of every
+         * known payload would mean this method could not carry an extension this
+         * version of the package has never heard of, which is the one thing a
+         * versioned format registry is supposed to allow.
+         */
+        payload: z.unknown(),
+    }),
+};
+/* ------------------------------------------------------------------------ *
+ * The answers that are outcomes rather than material
+ * ------------------------------------------------------------------------ */
+/**
+ * What became of a `view.goto`.
+ *
+ * ## The wall this removes
+ *
+ * Until now a module could be walked and could not walk. `roadmap.goto` goes
+ * one way, and the module → host words were `ready`, `request`, `resize`,
+ * `went` — none of which moves anybody. So a program that shows a person every
+ * project and epic on the machine could draw the whole map and never travel on
+ * it: press a row, and the best it could do was describe where you would have
+ * gone.
+ *
+ * ## Why a method and not a ninth message
+ *
+ * A new top-level `roadmap.navigate` was the other candidate, and it loses on
+ * three counts.
+ *
+ * The first is that it would need an answer, and an answer needs correlation,
+ * and correlation is a thing `request`/`response` already has, tested, with an
+ * id and a timeout discipline and a refusal envelope carrying both a word and a
+ * sentence. A second answered pair would be that machinery again, differently,
+ * for one act. `went` exists as its own message only because `goto` is the host
+ * speaking, and the host has no request channel; a module does.
+ *
+ * The second is legibility. `declares.uses` is a sentence somebody reads before
+ * installing a program. A method belongs to a capability, so "this program
+ * reads the epics and asks to navigate" is a sentence that writes itself. A
+ * top-level message belongs to nothing and appears in no declaration.
+ *
+ * The third is the tone of the thing, which matters most. Look at what the
+ * module's messages are: three statements and one unanswerable ask. `resize` is
+ * the closest to a demand and it is deliberately fire-and-forget — the host
+ * clamps it, may ignore it, and never replies. A module posting
+ * `roadmap.navigate` at a host would read like `resize`: a thing done rather
+ * than a thing asked, with no place for a no. Two programs both believing they
+ * decide what is on screen is the defect this whole arrangement exists to
+ * prevent. A REQUEST is a question with an answer, and the answer may be no.
+ *
+ * ## The three outcomes, and why refusing is not `ok: false`
+ *
+ * `moved` — the reader is now looking at what was asked for.
+ *
+ * `declined` — the host will not, right now. The target may well exist. A
+ * reader may be mid-edit, the module may not be the surface with the person's
+ * attention, a host may simply not let framed programs move anybody. No reason
+ * is enumerated, for the same reason `responseFailureReasons` enumerates none:
+ * a list of hosts' policies is a list that cannot be kept and reads as the set
+ * of policies allowed.
+ *
+ * `no-such-target` — there is no such epic, no such step, nothing naming that
+ * ref. The host looked and there is nothing there.
+ *
+ * The three are apart because they send a person somewhere different. `moved`:
+ * say nothing, the screen already said it. `declined`: leave the row pressable
+ * and perhaps offer an ordinary link, because trying again later is sensible.
+ * `no-such-target`: say so — a dead reference is worth showing as dead, and a
+ * module that retries it forever is a module lying about a map.
+ *
+ * Now the part that is easy to get wrong. A declined navigation comes back
+ * `ok: true`. It is not a failed call: the host understood the question,
+ * considered it, and answered no. `ok: false` stays what it was — the call
+ * itself did not happen (no such method, no such module, something broke) —
+ * and collapsing "the answer is no" into "the question failed" would leave a
+ * caller unable to tell a host that refuses from a host too old to have been
+ * asked. Those are the two futures the whole refusal design is built to keep
+ * apart, so: **the question succeeded; the navigation did not.**
+ *
+ * `epic` is where the reader ended up, and it is here for the mode that would
+ * otherwise have no way to know. A `global` mode is never sent context — that
+ * is what `global` means — so after moving somebody it would be drawing a map
+ * with no marker on it until the next thing happened to tell it. A
+ * epic-scoped mode gets a `roadmap.context` too and can ignore this. Null
+ * when the host did not move, and null is also honest for a move within the
+ * epic already open.
+ *
+ * `why` is the sentence, for the person writing the module and sometimes for
+ * the person reading it: "nothing in this epic names gh#41" is worth showing,
+ * and a module that only knew `no-such-target` would have to invent a sentence
+ * that might be wrong about which part was missing.
+ */
+export const NAVIGATION_OUTCOMES = ['moved', 'declined', 'no-such-target'];
+export const navigationResult = z.object({
+    outcome: z.enum(NAVIGATION_OUTCOMES),
+    epic: z.string().regex(EPIC_SLUG).nullable().default(null),
+    why: z.string().max(LIMITS.REASON).default(''),
+});
+/**
+ * The least an `epics.list` can answer with and still be an answer.
+ *
+ * ## Why this one gets a shape when `epic.get` does not
+ *
+ * The argument for leaving responses unspecified is a good one and it is about
+ * CONTENT: two hosts hold different amounts of an epic, and a schema over that
+ * would be this package deciding what a host keeps. That argument covers
+ * `epic.get`, `steps.list` and `live.get` completely, and they stay unspecified
+ * here.
+ *
+ * It had gone too far by one method. Every other question on the list takes an
+ * epic slug, and `epics.list` is the only way to obtain one. If its answer may
+ * be anything, then a module cannot rely on an epic having a name, and a
+ * protocol whose entry point returns an unknown shape is a protocol with one
+ * reachable method. That is not modesty about a host's material; it is the
+ * front door being unspecified.
+ *
+ * So the spine is the smallest thing that makes the rest reachable, and no
+ * more:
+ *
+ * - `slug` is required, because it is the argument to every other call.
+ * - `title` and `project` are optional and bounded. Optional because a host
+ *   that has no title for something is not malformed; bounded because if it
+ *   sends one, a module is about to draw it.
+ * - Everything else passes through untouched. A host with ledes, counts,
+ *   owners, dates or anything else hands them over and this schema keeps them.
+ *   The spine says what a field MEANS if it is there; it does not say the set
+ *   of fields.
+ *
+ * That is the line: the package names the fields without which the question
+ * cannot be answered usefully, and says nothing about what a host holds.
+ *
+ * There is no bound on how many epics come back, and that is not an oversight.
+ * The bounds elsewhere exist because a stranger's text was about to reach the
+ * host's own screen; this is the host's own material going the other way, at
+ * the module's own request, and a host that decides to answer with a page at a
+ * time is deciding that for itself and can say so with a field of its own.
+ */
+export const epicSpine = z
+    .object({
+    slug: z.string().regex(EPIC_SLUG),
+    title: z.string().max(LIMITS.TITLE).optional(),
+    project: z.string().max(LIMITS.PROJECT).nullable().optional(),
+})
+    .passthrough();
+export const epicsListResult = z.object({ epics: z.array(epicSpine) }).passthrough();
+/**
+ * The answers this package describes, by method.
+ *
+ * Partial on purpose, and absence means UNSPECIFIED rather than empty: a method
+ * with no entry here answers with a host's own material, and a module reading
+ * it is reading something no host promised the shape of. Do not write a
+ * fallback that treats a missing schema as "expects nothing".
+ *
+ * A plain object, so the same lookup hazard as everywhere else — a method name
+ * arrives from a stranger's program and `methodResults['constructor']` finds
+ * something on the prototype. Use `resultSchemaFor`, which asks properly.
+ *
+ * And, like every schema here: running this is a convenience, not the check.
+ * A module validating what a host sent it is doing the same thing the host does
+ * in the other direction, and for the same reason — it is the only side that
+ * can.
+ */
+export const methodResults = {
+    'epics.list': epicsListResult,
+    'view.goto': navigationResult,
+};
+/** The schema for one method's answer, or nothing — which means unspecified. */
+export function resultSchemaFor(method) {
+    return Object.hasOwn(methodResults, method) ? methodResults[method] : undefined;
+}
+//# sourceMappingURL=methods.js.map

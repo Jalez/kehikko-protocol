@@ -1,7 +1,7 @@
 {
   "name": "roadmap-module-protocol",
   "version": "0.2.0",
-  "description": "The shapes a roadmap host and a module it frames agree on: the manifest, the wire, and the extension payloads. Shapes only — no I/O, no state, no decisions.",
+  "description": "The shapes a roadmap host and a module it frames agree on: the manifest, the wire, and the extension payloads. Shapes only \u2014 no I/O, no state, no decisions.",
   "keywords": [
     "roadmap",
     "module",
@@ -35,8 +35,7 @@
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
-    "test": "bun test",
-    "prepare": "tsc",
+    "test": "tsc && bun test",
     "prepublishOnly": "bun run build"
   },
   "peerDependencies": {

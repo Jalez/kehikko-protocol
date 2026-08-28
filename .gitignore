@@ -1,4 +1,4 @@
-# No trailing slash on either of these, deliberately.
+# No trailing slash, deliberately.
 #
 # `node_modules/` matches a DIRECTORY called node_modules and nothing else. A
 # symlink called node_modules — which is what a linked local dependency is, and
@@ -7,4 +7,12 @@
 # once already: a symlink pointing at its own parent went into a commit, and
 # every checkout afterwards failed with ELOOP.
 node_modules
-dist
+
+# `dist` is NOT here, and that is deliberate too — see PACKAGING.md. This
+# package is consumed straight from git, a git dependency gets no
+# devDependencies, so there is no `tsc` on the consumer's side to build it with.
+# The build is committed because the repository has to BE the artifact.
+#
+# `bun test` rebuilds it before it runs a single test, so drift shows up as a
+# dirty working tree rather than as a consumer quietly compiling against last
+# week's contract.
