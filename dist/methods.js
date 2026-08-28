@@ -84,6 +84,24 @@ export const CAPABILITIES = {
      * a list of method names.
      */
     'view:navigate': 'Ask the roadmap to show a particular epic, step or reference. The roadmap decides.',
+    /**
+     * Say which references the person has picked out.
+     *
+     * A write, and a SHARED one: the selection goes into the context every framed
+     * module receives, so a module declaring this is asking to change what its
+     * neighbours are looking at. That belongs in the sentence somebody reads
+     * before running the program, which is why it is spelled out here rather than
+     * left as "sets the selection".
+     */
+    'selection:set': 'Say which references the person has picked out. Every module on the canvas is told.',
+    /**
+     * Keep a little state of its own, and get it back next time.
+     *
+     * Named for what the module gets rather than for what the host does, because
+     * from the host's side this is not storage of anything in particular — it is
+     * a string it never reads.
+     */
+    'state:keep': 'Keep a small amount of its own state between sessions. The roadmap does not read it.',
 };
 export const CAPABILITY_NAMES = Object.keys(CAPABILITIES);
 /**
@@ -103,6 +121,8 @@ export const METHODS = {
     'stage.report': 'stage:report',
     'events.emit': 'events:emit',
     'view.goto': 'view:navigate',
+    'selection.set': 'selection:set',
+    'state.set': 'state:keep',
 };
 export const METHOD_NAMES = Object.keys(METHODS);
 /**
@@ -173,6 +193,65 @@ export const methodParams = {
     })
         .refine((g) => g.epic !== undefined || g.step !== undefined || g.ref !== undefined, {
         message: 'view.goto has to name an epic, a step or a ref; a call that names nothing asks for nothing',
+    }),
+    /**
+     * Say which references the person has picked out.
+     *
+     * ## Refs, and deliberately nothing else
+     *
+     * A module sending this knows more than it puts in the call — References
+     * knows `gh#131` is an issue and `gh#105` is a pull request, because it read
+     * them out of four differently-named bags and the bag is the only thing that
+     * says which. It is tempting to carry that along so the next module does not
+     * have to look it up.
+     *
+     * It must not. The host relays this into the context every module receives,
+     * and context is the host's own knowledge or it is a rumour with a protocol's
+     * name on it — the same argument that took `slug` out of context when it
+     * meant a journey. A host can vouch that these are the refs somebody picked;
+     * it cannot vouch that one of them is an issue, because it was told that and
+     * never checked. A module that needs the kind asks `live.get` and reads it
+     * from the source the sender read it from.
+     *
+     * An empty list is how a selection is CLEARED, and it is a real call rather
+     * than an absence — "nothing is selected" is a state a module has to be able
+     * to move into, the same reason `epic` is nullable rather than optional.
+     */
+    'selection.set': z.object({
+        refs: z.array(z.string().min(1).max(LIMITS.REF)).max(LIMITS.REFS),
+    }),
+    /**
+     * Keep a small amount of this module's own state.
+     *
+     * ## The host does not read it, and that is the whole design
+     *
+     * A module framed without `allow-same-origin` runs on an opaque origin, where
+     * `localStorage` does not merely return nothing — it throws. So a module has
+     * nowhere of its own to remember which filter was on, and the alternatives
+     * were both bad: declare storage and weaken the sandbox in order to remember
+     * a toggle, or put the toggle in the URL, which does not survive the host
+     * rebuilding the frame from `entry` on the next load.
+     *
+     * So the host keeps a string for it. An OPAQUE string: the host does not
+     * parse it, does not validate its contents beyond a length, and has no
+     * opinion about what is in it. That is what keeps this from becoming a
+     * settings API the protocol would then have to describe — the moment the host
+     * knows that a module has "filters", every module's preferences are the
+     * protocol's business.
+     *
+     * ## Per module, not per pane
+     *
+     * A module's page is loaded once and shown on whichever canvas asks for it, so
+     * one module is one document with one set of filters. State attached to a
+     * PANE would need the document to be told it had moved between canvases, and
+     * there is no message for that and should not be: a page cannot re-render its
+     * own controls in response to something it is never told.
+     *
+     * It comes back in the greeting rather than being fetched, so a module has it
+     * before its first render and does not draw the wrong filter first.
+     */
+    'state.set': z.object({
+        state: z.string().max(LIMITS.MODULE_STATE),
     }),
     'stage.report': z.object({
         ref,

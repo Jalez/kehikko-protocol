@@ -63,6 +63,39 @@ export const contextSchema = z.object({
     epic: z.string().regex(EPIC_SLUG).nullable().default(null),
     project: z.string().max(LIMITS.PROJECT).nullable().default(null),
     theme: z.enum(['light', 'dark']).default('light'),
+    /**
+     * What the person has picked out, if anything.
+     *
+     * ## Why a selection is context and not a message between modules
+     *
+     * The case that produced this: one module lists an epic's references, another
+     * shows a journey, and picking a reference in the first should show it in the
+     * second. The obvious build is a channel from one to the other — and that
+     * ends modularity, because the first module then has to know the second
+     * exists, and a canvas without the second is a canvas where the first is
+     * sending into nothing.
+     *
+     * A selection is the same KIND of fact as the open epic: it is what this
+     * canvas is looking at. So it travels the way the epic travels. A module asks
+     * the host to set it, the host tells everyone, and no module ever learns
+     * which other module is listening — or whether any is. Each works alone, and
+     * two of them work together without either having been written for the other.
+     *
+     * ## Refs and nothing else
+     *
+     * The sender knows more than this carries — which of these is an issue and
+     * which a pull request — and that knowledge deliberately does not travel. See
+     * `selection.set` in `methods.ts`: a host can vouch that these are the refs
+     * somebody picked, and cannot vouch for what they ARE, because it was told
+     * and never checked. Context is the host's own knowledge or it is a rumour
+     * with a protocol's name on it, which is the same reason `slug` is not here.
+     *
+     * Empty rather than absent, for the reason `epic` is nullable rather than
+     * optional: "nothing is selected" is a state a module has to be able to move
+     * INTO, and a field that simply vanished would leave a module showing the
+     * last selection forever.
+     */
+    selection: z.array(z.string().min(1).max(LIMITS.REF)).max(LIMITS.REFS).default([]),
 });
 /** The id correlating a question with its answer, or a `goto` with its `went`. */
 const correlation = z.string().min(1).max(LIMITS.CORRELATION);
@@ -103,6 +136,29 @@ export const helloSchema = z.object({
     protocol: z.number().int().min(1),
     session: z.string().min(1).max(LIMITS.SESSION),
     context: contextSchema,
+    /**
+     * Whatever this module last asked the host to keep for it, verbatim.
+     *
+     * Beside the context rather than inside it, and that placement is the whole
+     * point: context is broadcast to every framed module, and this belongs to one
+     * of them. A module's remembered state travelling in a shared message would
+     * be every module reading every other module's preferences.
+     *
+     * `null` when the host keeps nothing for it — a first run, a host that does
+     * not answer `state.set`, a module that has never written any. It is not
+     * optional, because a module has to be able to tell "nothing kept" from "the
+     * field is missing because this host is older than the idea", and only one of
+     * those means it should draw its defaults with confidence.
+     *
+     * In the GREETING rather than fetched, so a module has it before its first
+     * render. Asking for it afterwards would mean drawing the wrong filter first
+     * and correcting it, which is the visible-flicker failure in a different
+     * costume.
+     *
+     * Opaque. The host stored a string and hands the same string back; see
+     * `state.set` in `methods.ts` for why it must never learn what is in it.
+     */
+    state: z.string().max(LIMITS.MODULE_STATE).nullable().default(null),
 });
 /**
  * Which epic is open now.

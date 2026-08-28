@@ -227,8 +227,20 @@ export const LIMITS = {
     EXTENSIONS: 16,
     /** How many capabilities it may declare. */
     CAPABILITIES: 32,
-    /** How many refs one payload may carry. */
+    /** How many refs one payload may carry, and how many may be selected at once. */
     REFS: 32,
+    /**
+     * A module's own state, which the host keeps and never reads.
+     *
+     * Four kilobytes is far more than the thing it is for — which filter is on,
+     * which column is sorted — and far less than somewhere to put a document.
+     * The bound does two jobs and the second is the interesting one: it says what
+     * this is FOR. A module that finds four kilobytes tight is keeping something
+     * that belongs in its own store, on its own port, where it can be queried and
+     * backed up and read by its author. The host is not a database for modules,
+     * and this number is where that is said out loud.
+     */
+    MODULE_STATE: 4 * 1024,
     /** As much of a manifest as anyone should read from a stranger on a port. */
     MANIFEST_BYTES: 64 * 1024,
 };

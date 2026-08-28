@@ -61,14 +61,49 @@ export declare const contextSchema: z.ZodObject<{
     epic: z.ZodDefault<z.ZodNullable<z.ZodString>>;
     project: z.ZodDefault<z.ZodNullable<z.ZodString>>;
     theme: z.ZodDefault<z.ZodEnum<["light", "dark"]>>;
+    /**
+     * What the person has picked out, if anything.
+     *
+     * ## Why a selection is context and not a message between modules
+     *
+     * The case that produced this: one module lists an epic's references, another
+     * shows a journey, and picking a reference in the first should show it in the
+     * second. The obvious build is a channel from one to the other — and that
+     * ends modularity, because the first module then has to know the second
+     * exists, and a canvas without the second is a canvas where the first is
+     * sending into nothing.
+     *
+     * A selection is the same KIND of fact as the open epic: it is what this
+     * canvas is looking at. So it travels the way the epic travels. A module asks
+     * the host to set it, the host tells everyone, and no module ever learns
+     * which other module is listening — or whether any is. Each works alone, and
+     * two of them work together without either having been written for the other.
+     *
+     * ## Refs and nothing else
+     *
+     * The sender knows more than this carries — which of these is an issue and
+     * which a pull request — and that knowledge deliberately does not travel. See
+     * `selection.set` in `methods.ts`: a host can vouch that these are the refs
+     * somebody picked, and cannot vouch for what they ARE, because it was told
+     * and never checked. Context is the host's own knowledge or it is a rumour
+     * with a protocol's name on it, which is the same reason `slug` is not here.
+     *
+     * Empty rather than absent, for the reason `epic` is nullable rather than
+     * optional: "nothing is selected" is a state a module has to be able to move
+     * INTO, and a field that simply vanished would leave a module showing the
+     * last selection forever.
+     */
+    selection: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
 }, "strip", z.ZodTypeAny, {
     epic: string | null;
     project: string | null;
     theme: "light" | "dark";
+    selection: string[];
 }, {
     epic?: string | null | undefined;
     project?: string | null | undefined;
     theme?: "light" | "dark" | undefined;
+    selection?: string[] | undefined;
 }>;
 export type ModuleContext = z.infer<typeof contextSchema>;
 /**
@@ -108,23 +143,83 @@ export declare const helloSchema: z.ZodObject<{
         epic: z.ZodDefault<z.ZodNullable<z.ZodString>>;
         project: z.ZodDefault<z.ZodNullable<z.ZodString>>;
         theme: z.ZodDefault<z.ZodEnum<["light", "dark"]>>;
+        /**
+         * What the person has picked out, if anything.
+         *
+         * ## Why a selection is context and not a message between modules
+         *
+         * The case that produced this: one module lists an epic's references, another
+         * shows a journey, and picking a reference in the first should show it in the
+         * second. The obvious build is a channel from one to the other — and that
+         * ends modularity, because the first module then has to know the second
+         * exists, and a canvas without the second is a canvas where the first is
+         * sending into nothing.
+         *
+         * A selection is the same KIND of fact as the open epic: it is what this
+         * canvas is looking at. So it travels the way the epic travels. A module asks
+         * the host to set it, the host tells everyone, and no module ever learns
+         * which other module is listening — or whether any is. Each works alone, and
+         * two of them work together without either having been written for the other.
+         *
+         * ## Refs and nothing else
+         *
+         * The sender knows more than this carries — which of these is an issue and
+         * which a pull request — and that knowledge deliberately does not travel. See
+         * `selection.set` in `methods.ts`: a host can vouch that these are the refs
+         * somebody picked, and cannot vouch for what they ARE, because it was told
+         * and never checked. Context is the host's own knowledge or it is a rumour
+         * with a protocol's name on it, which is the same reason `slug` is not here.
+         *
+         * Empty rather than absent, for the reason `epic` is nullable rather than
+         * optional: "nothing is selected" is a state a module has to be able to move
+         * INTO, and a field that simply vanished would leave a module showing the
+         * last selection forever.
+         */
+        selection: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
     }, "strip", z.ZodTypeAny, {
         epic: string | null;
         project: string | null;
         theme: "light" | "dark";
+        selection: string[];
     }, {
         epic?: string | null | undefined;
         project?: string | null | undefined;
         theme?: "light" | "dark" | undefined;
+        selection?: string[] | undefined;
     }>;
+    /**
+     * Whatever this module last asked the host to keep for it, verbatim.
+     *
+     * Beside the context rather than inside it, and that placement is the whole
+     * point: context is broadcast to every framed module, and this belongs to one
+     * of them. A module's remembered state travelling in a shared message would
+     * be every module reading every other module's preferences.
+     *
+     * `null` when the host keeps nothing for it — a first run, a host that does
+     * not answer `state.set`, a module that has never written any. It is not
+     * optional, because a module has to be able to tell "nothing kept" from "the
+     * field is missing because this host is older than the idea", and only one of
+     * those means it should draw its defaults with confidence.
+     *
+     * In the GREETING rather than fetched, so a module has it before its first
+     * render. Asking for it afterwards would mean drawing the wrong filter first
+     * and correcting it, which is the visible-flicker failure in a different
+     * costume.
+     *
+     * Opaque. The host stored a string and hands the same string back; see
+     * `state.set` in `methods.ts` for why it must never learn what is in it.
+     */
+    state: z.ZodDefault<z.ZodNullable<z.ZodString>>;
 }, "strip", z.ZodTypeAny, {
     type: "roadmap.hello";
     protocol: number;
+    state: string | null;
     session: string;
     context: {
         epic: string | null;
         project: string | null;
         theme: "light" | "dark";
+        selection: string[];
     };
 }, {
     type: "roadmap.hello";
@@ -134,7 +229,9 @@ export declare const helloSchema: z.ZodObject<{
         epic?: string | null | undefined;
         project?: string | null | undefined;
         theme?: "light" | "dark" | undefined;
+        selection?: string[] | undefined;
     };
+    state?: string | null | undefined;
 }>;
 /**
  * Which epic is open now.
@@ -152,6 +249,39 @@ export declare const contextMessageSchema: z.ZodObject<{
     epic: z.ZodDefault<z.ZodNullable<z.ZodString>>;
     project: z.ZodDefault<z.ZodNullable<z.ZodString>>;
     theme: z.ZodDefault<z.ZodEnum<["light", "dark"]>>;
+    /**
+     * What the person has picked out, if anything.
+     *
+     * ## Why a selection is context and not a message between modules
+     *
+     * The case that produced this: one module lists an epic's references, another
+     * shows a journey, and picking a reference in the first should show it in the
+     * second. The obvious build is a channel from one to the other — and that
+     * ends modularity, because the first module then has to know the second
+     * exists, and a canvas without the second is a canvas where the first is
+     * sending into nothing.
+     *
+     * A selection is the same KIND of fact as the open epic: it is what this
+     * canvas is looking at. So it travels the way the epic travels. A module asks
+     * the host to set it, the host tells everyone, and no module ever learns
+     * which other module is listening — or whether any is. Each works alone, and
+     * two of them work together without either having been written for the other.
+     *
+     * ## Refs and nothing else
+     *
+     * The sender knows more than this carries — which of these is an issue and
+     * which a pull request — and that knowledge deliberately does not travel. See
+     * `selection.set` in `methods.ts`: a host can vouch that these are the refs
+     * somebody picked, and cannot vouch for what they ARE, because it was told
+     * and never checked. Context is the host's own knowledge or it is a rumour
+     * with a protocol's name on it, which is the same reason `slug` is not here.
+     *
+     * Empty rather than absent, for the reason `epic` is nullable rather than
+     * optional: "nothing is selected" is a state a module has to be able to move
+     * INTO, and a field that simply vanished would leave a module showing the
+     * last selection forever.
+     */
+    selection: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
 } & {
     type: z.ZodLiteral<"roadmap.context">;
     protocol: z.ZodNumber;
@@ -161,12 +291,14 @@ export declare const contextMessageSchema: z.ZodObject<{
     protocol: number;
     project: string | null;
     theme: "light" | "dark";
+    selection: string[];
 }, {
     type: "roadmap.context";
     protocol: number;
     epic?: string | null | undefined;
     project?: string | null | undefined;
     theme?: "light" | "dark" | undefined;
+    selection?: string[] | undefined;
 }>;
 /**
  * The answer to exactly one request.
@@ -454,23 +586,83 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         epic: z.ZodDefault<z.ZodNullable<z.ZodString>>;
         project: z.ZodDefault<z.ZodNullable<z.ZodString>>;
         theme: z.ZodDefault<z.ZodEnum<["light", "dark"]>>;
+        /**
+         * What the person has picked out, if anything.
+         *
+         * ## Why a selection is context and not a message between modules
+         *
+         * The case that produced this: one module lists an epic's references, another
+         * shows a journey, and picking a reference in the first should show it in the
+         * second. The obvious build is a channel from one to the other — and that
+         * ends modularity, because the first module then has to know the second
+         * exists, and a canvas without the second is a canvas where the first is
+         * sending into nothing.
+         *
+         * A selection is the same KIND of fact as the open epic: it is what this
+         * canvas is looking at. So it travels the way the epic travels. A module asks
+         * the host to set it, the host tells everyone, and no module ever learns
+         * which other module is listening — or whether any is. Each works alone, and
+         * two of them work together without either having been written for the other.
+         *
+         * ## Refs and nothing else
+         *
+         * The sender knows more than this carries — which of these is an issue and
+         * which a pull request — and that knowledge deliberately does not travel. See
+         * `selection.set` in `methods.ts`: a host can vouch that these are the refs
+         * somebody picked, and cannot vouch for what they ARE, because it was told
+         * and never checked. Context is the host's own knowledge or it is a rumour
+         * with a protocol's name on it, which is the same reason `slug` is not here.
+         *
+         * Empty rather than absent, for the reason `epic` is nullable rather than
+         * optional: "nothing is selected" is a state a module has to be able to move
+         * INTO, and a field that simply vanished would leave a module showing the
+         * last selection forever.
+         */
+        selection: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
     }, "strip", z.ZodTypeAny, {
         epic: string | null;
         project: string | null;
         theme: "light" | "dark";
+        selection: string[];
     }, {
         epic?: string | null | undefined;
         project?: string | null | undefined;
         theme?: "light" | "dark" | undefined;
+        selection?: string[] | undefined;
     }>;
+    /**
+     * Whatever this module last asked the host to keep for it, verbatim.
+     *
+     * Beside the context rather than inside it, and that placement is the whole
+     * point: context is broadcast to every framed module, and this belongs to one
+     * of them. A module's remembered state travelling in a shared message would
+     * be every module reading every other module's preferences.
+     *
+     * `null` when the host keeps nothing for it — a first run, a host that does
+     * not answer `state.set`, a module that has never written any. It is not
+     * optional, because a module has to be able to tell "nothing kept" from "the
+     * field is missing because this host is older than the idea", and only one of
+     * those means it should draw its defaults with confidence.
+     *
+     * In the GREETING rather than fetched, so a module has it before its first
+     * render. Asking for it afterwards would mean drawing the wrong filter first
+     * and correcting it, which is the visible-flicker failure in a different
+     * costume.
+     *
+     * Opaque. The host stored a string and hands the same string back; see
+     * `state.set` in `methods.ts` for why it must never learn what is in it.
+     */
+    state: z.ZodDefault<z.ZodNullable<z.ZodString>>;
 }, "strip", z.ZodTypeAny, {
     type: "roadmap.hello";
     protocol: number;
+    state: string | null;
     session: string;
     context: {
         epic: string | null;
         project: string | null;
         theme: "light" | "dark";
+        selection: string[];
     };
 }, {
     type: "roadmap.hello";
@@ -480,11 +672,46 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         epic?: string | null | undefined;
         project?: string | null | undefined;
         theme?: "light" | "dark" | undefined;
+        selection?: string[] | undefined;
     };
+    state?: string | null | undefined;
 }>, z.ZodObject<{
     epic: z.ZodDefault<z.ZodNullable<z.ZodString>>;
     project: z.ZodDefault<z.ZodNullable<z.ZodString>>;
     theme: z.ZodDefault<z.ZodEnum<["light", "dark"]>>;
+    /**
+     * What the person has picked out, if anything.
+     *
+     * ## Why a selection is context and not a message between modules
+     *
+     * The case that produced this: one module lists an epic's references, another
+     * shows a journey, and picking a reference in the first should show it in the
+     * second. The obvious build is a channel from one to the other — and that
+     * ends modularity, because the first module then has to know the second
+     * exists, and a canvas without the second is a canvas where the first is
+     * sending into nothing.
+     *
+     * A selection is the same KIND of fact as the open epic: it is what this
+     * canvas is looking at. So it travels the way the epic travels. A module asks
+     * the host to set it, the host tells everyone, and no module ever learns
+     * which other module is listening — or whether any is. Each works alone, and
+     * two of them work together without either having been written for the other.
+     *
+     * ## Refs and nothing else
+     *
+     * The sender knows more than this carries — which of these is an issue and
+     * which a pull request — and that knowledge deliberately does not travel. See
+     * `selection.set` in `methods.ts`: a host can vouch that these are the refs
+     * somebody picked, and cannot vouch for what they ARE, because it was told
+     * and never checked. Context is the host's own knowledge or it is a rumour
+     * with a protocol's name on it, which is the same reason `slug` is not here.
+     *
+     * Empty rather than absent, for the reason `epic` is nullable rather than
+     * optional: "nothing is selected" is a state a module has to be able to move
+     * INTO, and a field that simply vanished would leave a module showing the
+     * last selection forever.
+     */
+    selection: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
 } & {
     type: z.ZodLiteral<"roadmap.context">;
     protocol: z.ZodNumber;
@@ -494,12 +721,14 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     protocol: number;
     project: string | null;
     theme: "light" | "dark";
+    selection: string[];
 }, {
     type: "roadmap.context";
     protocol: number;
     epic?: string | null | undefined;
     project?: string | null | undefined;
     theme?: "light" | "dark" | undefined;
+    selection?: string[] | undefined;
 }>, z.ZodDiscriminatedUnion<"ok", [z.ZodObject<{
     type: z.ZodLiteral<"roadmap.response">;
     id: z.ZodString;
