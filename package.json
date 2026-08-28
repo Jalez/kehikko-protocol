@@ -1,6 +1,6 @@
 {
   "name": "roadmap-module-protocol",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "The shapes a roadmap host and a module it frames agree on: the manifest, the wire, and the extension payloads. Shapes only \u2014 no I/O, no state, no decisions.",
   "keywords": [
     "roadmap",
