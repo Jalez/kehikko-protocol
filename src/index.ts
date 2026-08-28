@@ -1,0 +1,99 @@
+/**
+ * The contract between a host and a module it frames.
+ *
+ * Shapes, and nothing else. Everything exported here is a type, a schema, a
+ * constant, or a pure function over one of those. Nothing in this package reads
+ * a file, opens a socket, holds state, or decides anything — see the README for
+ * why that rule is load-bearing rather than tidy.
+ */
+
+export {
+  PROTOCOL,
+  WELL_KNOWN,
+  MANIFEST_KIND,
+  MESSAGE,
+  MESSAGE_PREFIX,
+  HOST_MESSAGES,
+  MODULE_MESSAGES,
+  MIN_HEIGHT,
+  MAX_HEIGHT,
+  clampHeight,
+  LIMITS,
+  type MessageType,
+} from './constants.js'
+
+export { MODULE_ID, MODE_ID, EPIC_SLUG, own } from './ids.js'
+
+export {
+  manifestSchema,
+  speaks,
+  MODULE_CONDITIONS,
+  type Manifest,
+  type ManifestInput,
+  type ModuleMode,
+  type ModuleCondition,
+} from './manifest.js'
+
+export {
+  CAPABILITIES,
+  CAPABILITY_NAMES,
+  METHODS,
+  METHOD_NAMES,
+  methodParams,
+  methodResults,
+  resultSchemaFor,
+  navigationResult,
+  NAVIGATION_OUTCOMES,
+  epicSpine,
+  epicsListResult,
+  REPORTED_STAGES,
+  type Capability,
+  type Method,
+  type MethodParams,
+  type NavigationOutcome,
+  type NavigationResult,
+  type EpicSpine,
+  type EpicsListResult,
+  type ReportedStage,
+} from './methods.js'
+
+export {
+  contextSchema,
+  helloSchema,
+  contextMessageSchema,
+  responseSchema,
+  responseFailureReasons,
+  gotoSchema,
+  readySchema,
+  requestSchema,
+  resizeSchema,
+  wentSchema,
+  hostMessageSchema,
+  moduleMessageSchema,
+  looksLikeWireMessage,
+  type ModuleContext,
+  type ResponseFailureReason,
+  type HostMessage,
+  type ModuleMessage,
+  type WireMessage,
+  type Hello,
+  type ContextMessage,
+  type Response,
+  type Goto,
+  type Ready,
+  type Request,
+  type Resize,
+  type Went,
+} from './wire.js'
+
+export {
+  notificationPayload,
+  callPayload,
+  EXTENSIONS,
+  EXTENSION_NAMES,
+  known,
+  schemaFor,
+  type NotificationPayload,
+  type CallPayload,
+  type ExtensionFormat,
+} from './extensions.js'
