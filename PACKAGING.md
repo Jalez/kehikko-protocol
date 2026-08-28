@@ -1,42 +1,64 @@
-# Why this package ships TypeScript source
+# How this package is consumed, and why it took three tries
 
-`main`, `types` and `exports` all point at `src/index.ts`. There is no build
-step between this repository and the programs that depend on it.
+`exports` points at `dist/`. `dist/` is **not** in the repository. It is built
+by `prepare`, which runs when a consumer installs this package — so what a
+consumer gets is compiled from the exact commit it pinned, every time.
 
-## What it replaced
+Three arrangements were tried. The two that failed are worth writing down,
+because each looked correct until something specific broke.
 
-They used to point at `dist/`, which was correct for a package published to npm
-and wrong for this one, because `dist/` is in `.gitignore` and nothing ever
-built it. Inside one repository that was invisible: every consumer had a Vite
-alias and a `tsconfig` path mapping aimed at `src/`, so the fields nothing read
-could say anything at all. The moment the consumers became separate
-repositories, those aliases had to go, and the package's real entry points were
-three paths to a directory that does not exist.
+## 1. `exports` pointing at a `dist/` nobody built
 
-## Why source rather than a committed build
+The original. `main`, `types` and `exports` all named `./dist/index.js` and
+friends, `dist/` was gitignored, and no build ever ran. Inside the monorepo this
+was invisible: every consumer had a Vite alias and a `tsconfig` path aimed at
+`src/`, so the package's own entry points were never read by anything. Three
+paths to a directory that does not exist, and a green test suite.
 
-The obvious fix is to build `dist/` and commit it, which is the usual shape for
-a package consumed straight from git. It was rejected, and for a reason this
-project has now paid for three times: a checked-in build artifact goes stale
-silently. It is served with a 200, it typechecks, it looks exactly like a
-working dependency, and it is last week's contract. Every hour lost on this
-codebase so far has been lost to something that answered confidently with the
-wrong bytes — a stale `dist/` in the host, a stale `dist/` in a module, a path
-that resolved to compiled JavaScript instead of a page.
+It surfaced the moment the consumers became separate repositories and the
+aliases had to go.
 
-Shipping source removes the artifact, and with it the possibility of the
-artifact disagreeing with the source next to it. There is exactly one copy of
-the contract and everything reads that copy.
+## 2. `exports` pointing at `src/`
 
-## What it costs
+The obvious correction: ship TypeScript, let Bun and Vite compile it, delete the
+build artifact and with it any chance of the artifact disagreeing with the
+source. Every consumer here is Bun or Vite. Both do read TypeScript.
 
-A consumer has to be able to read TypeScript. Every consumer here is Bun or
-Vite, and both do natively. A plain Node program could not `require` this
-without a loader — which is a real limitation and an acceptable one, because no
-such consumer exists and the day one does is the day this gets published to npm
-properly.
+It broke on something neither of those compiles: **`vite.config.ts` is loaded by
+Node**, and Node refuses to strip types from anything under `node_modules`.
 
-`bun run build` still exists and still emits `dist/`. It is for that day:
-`prepublishOnly` runs it, so an `npm publish` produces a conventional package
-with declarations, and the `exports` above would be switched back as part of
-that release rather than kept permanently pointing at a directory nobody builds.
+```
+ERR_UNSUPPORTED_NODE_MODULES_TYPE_STRIPPING: Stripping types is currently
+unsupported for files under node_modules, for
+".../node_modules/roadmap-module-protocol/src/index.ts"
+```
+
+That is not an edge case for this package. A module's Vite config is exactly
+where the protocol is needed — `WELL_KNOWN` for the manifest route, the manifest
+itself for the middleware that serves it — so shipping source made the package
+unusable in the one file every module author has to write.
+
+## 3. `dist/`, built by `prepare`
+
+Which is what it does now, and it is the only one of the three with no stale
+artifact anywhere in it:
+
+- **Not committed.** `dist/` stays gitignored. There is no build output in the
+  repository to drift away from the source beside it.
+- **Not absent.** `prepare` runs on install, including for a git dependency, so
+  a consumer that pinned commit `abc123` gets `dist/` compiled from `abc123`.
+- **Real JavaScript with real declarations**, so Node can load it, which means a
+  `vite.config.ts` can import it.
+
+Staleness is the failure this codebase keeps paying for — a stale `dist` in the
+host, a stale `dist` in a module, a route that resolved to compiled JavaScript
+instead of a page. Every one of them answered confidently with the wrong bytes
+and none of them errored. Building at install time is what removes the window in
+which that can happen: there is never a moment where the built thing and the
+source it came from are two different versions.
+
+## For a real npm release
+
+`prepublishOnly` runs the same build, so `npm publish` produces a conventional
+package. Nothing here has to change for that; `files` already carries `dist` and
+`src`, the latter so source maps resolve for anybody debugging into it.
