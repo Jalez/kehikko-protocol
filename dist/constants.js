@@ -241,6 +241,16 @@ export const LIMITS = {
      * and this number is where that is said out loud.
      */
     MODULE_STATE: 4 * 1024,
+    /**
+     * A prompt a person wrote on a canvas for one module to work from.
+     *
+     * Larger than a note and smaller than a document. Eight kilobytes holds a
+     * paragraph of instruction, a house style, a list of things to watch for —
+     * and does not hold a specification, which belongs in a file the prompt can
+     * point at rather than in a field the host has to carry to every frame on
+     * every context change.
+     */
+    PROMPT: 8 * 1024,
     /** As much of a manifest as anyone should read from a stranger on a port. */
     MANIFEST_BYTES: 64 * 1024,
 };

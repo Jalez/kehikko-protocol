@@ -241,14 +241,32 @@ export declare const manifestSchema: z.ZodObject<{
          * rather than by `'*'`. That is a consequence, not a second field.
          */
         storage: z.ZodDefault<z.ZodBoolean>;
+        /**
+         * Whether this module has a use for a prompt somebody writes for it.
+         *
+         * A declaration, not a demand. It is how a host knows to OFFER one — to
+         * list this module among the panes a prompt can be aimed at, and to show
+         * that a prompt is expected here and has not been written yet. A host
+         * that offers nothing is still a conforming host, so a module declaring
+         * this must work with `context.prompt` null, because on such a host it
+         * always will be.
+         *
+         * Declared rather than inferred from behaviour, for the reason every
+         * other declaration here exists: somebody deciding whether to run a
+         * program should be able to read what it expects before it runs, and a
+         * host should not have to watch a module to find out what it wants.
+         */
+        prompt: z.ZodDefault<z.ZodBoolean>;
     }, "strip", z.ZodTypeAny, {
         protocol: string;
         uses: string[];
         storage: boolean;
+        prompt: boolean;
     }, {
         protocol?: string | undefined;
         uses?: string[] | undefined;
         storage?: boolean | undefined;
+        prompt?: boolean | undefined;
     }>>;
 }, "strip", z.ZodTypeAny, {
     id: string;
@@ -271,6 +289,7 @@ export declare const manifestSchema: z.ZodObject<{
         protocol: string;
         uses: string[];
         storage: boolean;
+        prompt: boolean;
     };
     icon?: string | undefined;
     health?: string | undefined;
@@ -307,6 +326,7 @@ export declare const manifestSchema: z.ZodObject<{
         protocol?: string | undefined;
         uses?: string[] | undefined;
         storage?: boolean | undefined;
+        prompt?: boolean | undefined;
     } | undefined;
 }>;
 export type Manifest = z.infer<typeof manifestSchema>;

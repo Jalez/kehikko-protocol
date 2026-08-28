@@ -129,6 +129,39 @@ export const contextSchema = z.object({
      * field exists to prevent.
      */
     pinned: z.boolean().default(false),
+    /**
+     * What this canvas has been told to tell this module, or null.
+     *
+     * ## A prompt is a thing a person wrote, aimed at one pane
+     *
+     * Some modules do work that has to be described before it can be done —
+     * "review these for security", "the house style is in CONTRIBUTING.md" — and
+     * the description belongs to the person, not to the program. So it is written
+     * on the canvas and delivered here, the same way the selection is: a module
+     * declaring `prompt` in its manifest is saying it has a use for one, and a
+     * host that has one for it puts it in the context.
+     *
+     * ## Why the host composes it, and a module receives one string
+     *
+     * Several panes on a canvas may each have something to say to the same
+     * module. The obvious shape is a list of fragments with their authors, and it
+     * is wrong here: it makes every module that reads a prompt responsible for
+     * merging fragments, ordering them, and deciding what happens when two
+     * contradict — which is a policy question about somebody's own canvas, and
+     * three modules would answer it three ways.
+     *
+     * The host already knows what is on the canvas, who aimed what at whom, and
+     * in what order they were written. So it composes, and hands over the result
+     * as text. A module's job is to use it, and its author should be able to read
+     * the whole of what they were given in one place — which is also what makes
+     * it reviewable by the person who wrote it, in the host, before it is sent.
+     *
+     * Null rather than empty for the reason `epic` is nullable: "there is no
+     * prompt for you" is a state a module must be able to move into, and a module
+     * that kept the last one forever would be working from instructions somebody
+     * deleted.
+     */
+    prompt: z.string().max(LIMITS.PROMPT).nullable().default(null),
 });
 /** The id correlating a question with its answer, or a `goto` with its `went`. */
 const correlation = z.string().min(1).max(LIMITS.CORRELATION);

@@ -238,6 +238,16 @@ export declare const LIMITS: {
      * and this number is where that is said out loud.
      */
     readonly MODULE_STATE: number;
+    /**
+     * A prompt a person wrote on a canvas for one module to work from.
+     *
+     * Larger than a note and smaller than a document. Eight kilobytes holds a
+     * paragraph of instruction, a house style, a list of things to watch for —
+     * and does not hold a specification, which belongs in a file the prompt can
+     * point at rather than in a field the host has to carry to every frame on
+     * every context change.
+     */
+    readonly PROMPT: number;
     /** As much of a manifest as anyone should read from a stranger on a port. */
     readonly MANIFEST_BYTES: number;
 };
