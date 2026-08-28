@@ -98,6 +98,39 @@ export const contextSchema = z.object({
    * last selection forever.
    */
   selection: z.array(z.string().min(1).max(LIMITS.REF)).max(LIMITS.REFS).default([]),
+  /**
+   * Whether this module has been pinned, and will stop being re-pointed.
+   *
+   * ## The field that makes pinning honest
+   *
+   * A person may want two panes on two different epics — last quarter's beside
+   * this one, to compare — or a module holding still while they move the canvas
+   * around it. Nothing stops a host doing that: it simply sends one frame a
+   * different context, or stops sending it new ones.
+   *
+   * What stopped it being allowed was the other side. A module pinned by a host
+   * that never said so has no way to tell a person's pin from the canvas not
+   * having moved. It goes on describing itself as showing "the open epic" when
+   * it is showing a remembered one; it cannot explain itself; and a module
+   * written against one host's silent pinning behaves differently there in a
+   * way its author cannot discover. That is a host-only convention, and this
+   * package's whole position is that a module must be able to see what it is
+   * subject to.
+   *
+   * So the pin is said out loud. `true` means: what you were last told is what
+   * you keep, and further changes to this canvas will not reach you until this
+   * goes false again. A module that ignores the field is exactly as correct as
+   * it was before — it simply stops receiving updates, which is the behaviour a
+   * host could always have chosen. A module that reads it can say "held" in its
+   * own words, which is the whole point.
+   *
+   * The context carrying it is still sent when the pin CHANGES, in both
+   * directions, and that is not a contradiction of "you will receive nothing":
+   * the message announcing the freeze is the last one through, and the message
+   * lifting it is the first. A pin nobody was told about is the thing this
+   * field exists to prevent.
+   */
+  pinned: z.boolean().default(false),
 })
 export type ModuleContext = z.infer<typeof contextSchema>
 
