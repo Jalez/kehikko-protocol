@@ -164,6 +164,21 @@ export const contextSchema = z.object({
    * deleted.
    */
   prompt: z.string().max(LIMITS.PROMPT).nullable().default(null),
+  /**
+   * Which kehikko this context is about.
+   *
+   * A module's page is loaded once and shown on whichever canvas asks for it,
+   * so a module genuinely cannot tell where it is standing — and it needs to
+   * the moment anything else on the wire says where IT came from. An event
+   * carries the kehikko it happened on; this says the one being looked at; and
+   * near-or-far becomes a comparison the module makes rather than a rule the
+   * host imposes.
+   *
+   * Nullable because a host need not have canvases at all. A module that finds
+   * it null can still show everything it is sent — it simply cannot sort near
+   * from far, which is a smaller loss than being handed a wrong answer.
+   */
+  kehikko: z.object({ id: z.number().int(), name: z.string().max(80) }).nullable().default(null),
 })
 export type ModuleContext = z.infer<typeof contextSchema>
 
@@ -470,7 +485,77 @@ export const wentSchema = z.object({
  * more to parse and reports its failures less precisely; it is the honest shape
  * of a wire where one message type has two forms.
  */
-export const hostMessageSchema = z.union([helloSchema, contextMessageSchema, responseSchema, gotoSchema])
+
+/**
+ * An extension payload one module emitted, delivered to a module that consumes
+ * that format.
+ *
+ * ## Why the host is in the middle at all
+ *
+ * The sender does not name a recipient and cannot: a module has no way to know
+ * what else is on the canvas, and giving it one would end modularity. It names
+ * a FORMAT — `roadmap.notifications@1` — and the host works out who has said,
+ * in their manifest, that they consume it. So a module emits into the room and
+ * the room decides who hears, which is why either can be removed without the
+ * other noticing.
+ *
+ * ## What the host vouches for, and what it does not
+ *
+ * `extension` and `payload` were checked before this was sent: the host knew
+ * the format and validated the payload against that format's own schema, so a
+ * receiver is entitled to assume the shape.
+ *
+ * `from` is the id of the module that emitted it, taken from the host's own
+ * registry rather than from anything the sender said, so it cannot be forged by
+ * a module claiming to be another. It is the one field a receiver may safely
+ * attribute by.
+ *
+ * The CONTENTS are the sender's claim and nothing more. A notification saying
+ * "the tests passed" is one module's word for it; a host relaying it has not
+ * checked that any test ran. A receiver drawing it should attribute it, for the
+ * same reason `selection` carries refs and not kinds.
+ *
+ * ## Not answered, ever
+ *
+ * No correlation id and no reply. A module that ignores every event it is sent
+ * is a conforming module, and a host that waited for acknowledgement could be
+ * hung by a pane nobody is looking at. Delivery is best-effort by design: an
+ * event sent to a module that is still loading is lost, and a receiver that
+ * needs history should keep its own rather than expect the wire to hold it.
+ */
+export const eventSchema = z.object({
+  type: z.literal(MESSAGE.EVENT),
+  protocol: z.number().int().min(1),
+  /** The format, e.g. `roadmap.notifications@1`. Known to the host, or unsent. */
+  extension: z.string().min(1).max(LIMITS.EXTENSION),
+  /** Whatever that format says. Validated by the host before it left. */
+  payload: z.unknown(),
+  /** The module that emitted it, named by the host from its own registry. */
+  from: z.string().regex(MODULE_ID),
+  /**
+   * When the host accepted it, ISO 8601. A receiver ordering by arrival would
+   * be ordering by its own scheduler instead.
+   */
+  at: z.string().min(1).max(40),
+  /**
+   * The kehikko it happened on, so a receiver can tell near from far.
+   *
+   * A module is loaded once and shown on whichever canvas asks for it, so "this
+   * kehikko" is a question it cannot answer alone. `context.kehikko` says where
+   * the receiver is standing and this says where the event came from; comparing
+   * the two is the whole of a near/far filter, and it is a comparison rather
+   * than a rule so a module can present it however it likes.
+   */
+  kehikko: z.object({ id: z.number().int(), name: z.string().max(80) }).nullable().default(null),
+})
+
+export const hostMessageSchema = z.union([
+  helloSchema,
+  contextMessageSchema,
+  responseSchema,
+  gotoSchema,
+  eventSchema,
+])
 export type HostMessage = z.infer<typeof hostMessageSchema>
 
 export const moduleMessageSchema = z.union([readySchema, requestSchema, resizeSchema, wentSchema])
@@ -482,6 +567,7 @@ export type Hello = z.infer<typeof helloSchema>
 export type ContextMessage = z.infer<typeof contextMessageSchema>
 export type Response = z.infer<typeof responseSchema>
 export type Goto = z.infer<typeof gotoSchema>
+export type ModuleEvent = z.infer<typeof eventSchema>
 export type Ready = z.infer<typeof readySchema>
 export type Request = z.infer<typeof requestSchema>
 export type Resize = z.infer<typeof resizeSchema>

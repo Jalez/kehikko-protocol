@@ -98,12 +98,29 @@ export declare const MESSAGE: {
     readonly GOTO: "roadmap.goto";
     /** Module → host. "I went" — or "there is nothing here by that name." */
     readonly WENT: "roadmap.went";
+    /**
+     * Host → module. An extension payload another module emitted.
+     *
+     * The ninth message, and it exists because the eight before it left
+     * `events.emit` with nowhere to land. A module could emit a notification, a
+     * host could check the extension was one it knew and validate the payload
+     * against that format's schema and read from every manifest which modules
+     * `consume` the name — and then had no way to say it. One host's own comment
+     * called that its principal piece of feedback on this protocol.
+     *
+     * A module receives one of these because its manifest CONSUMES the extension.
+     * It is not a request, carries no correlation id, and is not answered: a
+     * module that ignores every event it is sent is a conforming module, and a
+     * host that waited for acknowledgement would be a host that can be hung by a
+     * pane nobody is looking at.
+     */
+    readonly EVENT: "roadmap.event";
 };
 export type MessageType = (typeof MESSAGE)[keyof typeof MESSAGE];
 /** The prefix every message type carries, so a listener can drop the rest cheaply. */
 export declare const MESSAGE_PREFIX = "roadmap.";
 /** What the host says, and only the host. A module sending one of these is confused. */
-export declare const HOST_MESSAGES: readonly ["roadmap.hello", "roadmap.context", "roadmap.response", "roadmap.goto"];
+export declare const HOST_MESSAGES: readonly ["roadmap.hello", "roadmap.context", "roadmap.response", "roadmap.goto", "roadmap.event"];
 /** And what the module says. */
 export declare const MODULE_MESSAGES: readonly ["roadmap.ready", "roadmap.request", "roadmap.resize", "roadmap.went"];
 /**

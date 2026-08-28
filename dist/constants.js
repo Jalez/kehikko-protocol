@@ -98,11 +98,34 @@ export const MESSAGE = {
     GOTO: 'roadmap.goto',
     /** Module → host. "I went" — or "there is nothing here by that name." */
     WENT: 'roadmap.went',
+    /**
+     * Host → module. An extension payload another module emitted.
+     *
+     * The ninth message, and it exists because the eight before it left
+     * `events.emit` with nowhere to land. A module could emit a notification, a
+     * host could check the extension was one it knew and validate the payload
+     * against that format's schema and read from every manifest which modules
+     * `consume` the name — and then had no way to say it. One host's own comment
+     * called that its principal piece of feedback on this protocol.
+     *
+     * A module receives one of these because its manifest CONSUMES the extension.
+     * It is not a request, carries no correlation id, and is not answered: a
+     * module that ignores every event it is sent is a conforming module, and a
+     * host that waited for acknowledgement would be a host that can be hung by a
+     * pane nobody is looking at.
+     */
+    EVENT: 'roadmap.event',
 };
 /** The prefix every message type carries, so a listener can drop the rest cheaply. */
 export const MESSAGE_PREFIX = 'roadmap.';
 /** What the host says, and only the host. A module sending one of these is confused. */
-export const HOST_MESSAGES = [MESSAGE.HELLO, MESSAGE.CONTEXT, MESSAGE.RESPONSE, MESSAGE.GOTO];
+export const HOST_MESSAGES = [
+    MESSAGE.HELLO,
+    MESSAGE.CONTEXT,
+    MESSAGE.RESPONSE,
+    MESSAGE.GOTO,
+    MESSAGE.EVENT,
+];
 /** And what the module says. */
 export const MODULE_MESSAGES = [MESSAGE.READY, MESSAGE.REQUEST, MESSAGE.RESIZE, MESSAGE.WENT];
 /**

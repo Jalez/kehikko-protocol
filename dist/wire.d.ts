@@ -160,6 +160,30 @@ export declare const contextSchema: z.ZodObject<{
      * deleted.
      */
     prompt: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+    /**
+     * Which kehikko this context is about.
+     *
+     * A module's page is loaded once and shown on whichever canvas asks for it,
+     * so a module genuinely cannot tell where it is standing — and it needs to
+     * the moment anything else on the wire says where IT came from. An event
+     * carries the kehikko it happened on; this says the one being looked at; and
+     * near-or-far becomes a comparison the module makes rather than a rule the
+     * host imposes.
+     *
+     * Nullable because a host need not have canvases at all. A module that finds
+     * it null can still show everything it is sent — it simply cannot sort near
+     * from far, which is a smaller loss than being handed a wrong answer.
+     */
+    kehikko: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+        id: z.ZodNumber;
+        name: z.ZodString;
+    }, "strip", z.ZodTypeAny, {
+        id: number;
+        name: string;
+    }, {
+        id: number;
+        name: string;
+    }>>>;
 }, "strip", z.ZodTypeAny, {
     epic: string | null;
     prompt: string | null;
@@ -167,6 +191,10 @@ export declare const contextSchema: z.ZodObject<{
     theme: "light" | "dark";
     selection: string[];
     pinned: boolean;
+    kehikko: {
+        id: number;
+        name: string;
+    } | null;
 }, {
     epic?: string | null | undefined;
     prompt?: string | null | undefined;
@@ -174,6 +202,10 @@ export declare const contextSchema: z.ZodObject<{
     theme?: "light" | "dark" | undefined;
     selection?: string[] | undefined;
     pinned?: boolean | undefined;
+    kehikko?: {
+        id: number;
+        name: string;
+    } | null | undefined;
 }>;
 export type ModuleContext = z.infer<typeof contextSchema>;
 /**
@@ -312,6 +344,30 @@ export declare const helloSchema: z.ZodObject<{
          * deleted.
          */
         prompt: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+        /**
+         * Which kehikko this context is about.
+         *
+         * A module's page is loaded once and shown on whichever canvas asks for it,
+         * so a module genuinely cannot tell where it is standing — and it needs to
+         * the moment anything else on the wire says where IT came from. An event
+         * carries the kehikko it happened on; this says the one being looked at; and
+         * near-or-far becomes a comparison the module makes rather than a rule the
+         * host imposes.
+         *
+         * Nullable because a host need not have canvases at all. A module that finds
+         * it null can still show everything it is sent — it simply cannot sort near
+         * from far, which is a smaller loss than being handed a wrong answer.
+         */
+        kehikko: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+            id: z.ZodNumber;
+            name: z.ZodString;
+        }, "strip", z.ZodTypeAny, {
+            id: number;
+            name: string;
+        }, {
+            id: number;
+            name: string;
+        }>>>;
     }, "strip", z.ZodTypeAny, {
         epic: string | null;
         prompt: string | null;
@@ -319,6 +375,10 @@ export declare const helloSchema: z.ZodObject<{
         theme: "light" | "dark";
         selection: string[];
         pinned: boolean;
+        kehikko: {
+            id: number;
+            name: string;
+        } | null;
     }, {
         epic?: string | null | undefined;
         prompt?: string | null | undefined;
@@ -326,6 +386,10 @@ export declare const helloSchema: z.ZodObject<{
         theme?: "light" | "dark" | undefined;
         selection?: string[] | undefined;
         pinned?: boolean | undefined;
+        kehikko?: {
+            id: number;
+            name: string;
+        } | null | undefined;
     }>;
     /**
      * Whatever this module last asked the host to keep for it, verbatim.
@@ -362,6 +426,10 @@ export declare const helloSchema: z.ZodObject<{
         theme: "light" | "dark";
         selection: string[];
         pinned: boolean;
+        kehikko: {
+            id: number;
+            name: string;
+        } | null;
     };
 }, {
     type: "roadmap.hello";
@@ -374,6 +442,10 @@ export declare const helloSchema: z.ZodObject<{
         theme?: "light" | "dark" | undefined;
         selection?: string[] | undefined;
         pinned?: boolean | undefined;
+        kehikko?: {
+            id: number;
+            name: string;
+        } | null | undefined;
     };
     state?: string | null | undefined;
 }>;
@@ -492,6 +564,30 @@ export declare const contextMessageSchema: z.ZodObject<{
      * deleted.
      */
     prompt: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+    /**
+     * Which kehikko this context is about.
+     *
+     * A module's page is loaded once and shown on whichever canvas asks for it,
+     * so a module genuinely cannot tell where it is standing — and it needs to
+     * the moment anything else on the wire says where IT came from. An event
+     * carries the kehikko it happened on; this says the one being looked at; and
+     * near-or-far becomes a comparison the module makes rather than a rule the
+     * host imposes.
+     *
+     * Nullable because a host need not have canvases at all. A module that finds
+     * it null can still show everything it is sent — it simply cannot sort near
+     * from far, which is a smaller loss than being handed a wrong answer.
+     */
+    kehikko: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+        id: z.ZodNumber;
+        name: z.ZodString;
+    }, "strip", z.ZodTypeAny, {
+        id: number;
+        name: string;
+    }, {
+        id: number;
+        name: string;
+    }>>>;
 } & {
     type: z.ZodLiteral<"roadmap.context">;
     protocol: z.ZodNumber;
@@ -504,6 +600,10 @@ export declare const contextMessageSchema: z.ZodObject<{
     theme: "light" | "dark";
     selection: string[];
     pinned: boolean;
+    kehikko: {
+        id: number;
+        name: string;
+    } | null;
 }, {
     type: "roadmap.context";
     protocol: number;
@@ -513,6 +613,10 @@ export declare const contextMessageSchema: z.ZodObject<{
     theme?: "light" | "dark" | undefined;
     selection?: string[] | undefined;
     pinned?: boolean | undefined;
+    kehikko?: {
+        id: number;
+        name: string;
+    } | null | undefined;
 }>;
 /**
  * The answer to exactly one request.
@@ -792,6 +896,99 @@ export declare const wentSchema: z.ZodObject<{
  * more to parse and reports its failures less precisely; it is the honest shape
  * of a wire where one message type has two forms.
  */
+/**
+ * An extension payload one module emitted, delivered to a module that consumes
+ * that format.
+ *
+ * ## Why the host is in the middle at all
+ *
+ * The sender does not name a recipient and cannot: a module has no way to know
+ * what else is on the canvas, and giving it one would end modularity. It names
+ * a FORMAT — `roadmap.notifications@1` — and the host works out who has said,
+ * in their manifest, that they consume it. So a module emits into the room and
+ * the room decides who hears, which is why either can be removed without the
+ * other noticing.
+ *
+ * ## What the host vouches for, and what it does not
+ *
+ * `extension` and `payload` were checked before this was sent: the host knew
+ * the format and validated the payload against that format's own schema, so a
+ * receiver is entitled to assume the shape.
+ *
+ * `from` is the id of the module that emitted it, taken from the host's own
+ * registry rather than from anything the sender said, so it cannot be forged by
+ * a module claiming to be another. It is the one field a receiver may safely
+ * attribute by.
+ *
+ * The CONTENTS are the sender's claim and nothing more. A notification saying
+ * "the tests passed" is one module's word for it; a host relaying it has not
+ * checked that any test ran. A receiver drawing it should attribute it, for the
+ * same reason `selection` carries refs and not kinds.
+ *
+ * ## Not answered, ever
+ *
+ * No correlation id and no reply. A module that ignores every event it is sent
+ * is a conforming module, and a host that waited for acknowledgement could be
+ * hung by a pane nobody is looking at. Delivery is best-effort by design: an
+ * event sent to a module that is still loading is lost, and a receiver that
+ * needs history should keep its own rather than expect the wire to hold it.
+ */
+export declare const eventSchema: z.ZodObject<{
+    type: z.ZodLiteral<"roadmap.event">;
+    protocol: z.ZodNumber;
+    /** The format, e.g. `roadmap.notifications@1`. Known to the host, or unsent. */
+    extension: z.ZodString;
+    /** Whatever that format says. Validated by the host before it left. */
+    payload: z.ZodUnknown;
+    /** The module that emitted it, named by the host from its own registry. */
+    from: z.ZodString;
+    /**
+     * When the host accepted it, ISO 8601. A receiver ordering by arrival would
+     * be ordering by its own scheduler instead.
+     */
+    at: z.ZodString;
+    /**
+     * The kehikko it happened on, so a receiver can tell near from far.
+     *
+     * A module is loaded once and shown on whichever canvas asks for it, so "this
+     * kehikko" is a question it cannot answer alone. `context.kehikko` says where
+     * the receiver is standing and this says where the event came from; comparing
+     * the two is the whole of a near/far filter, and it is a comparison rather
+     * than a rule so a module can present it however it likes.
+     */
+    kehikko: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+        id: z.ZodNumber;
+        name: z.ZodString;
+    }, "strip", z.ZodTypeAny, {
+        id: number;
+        name: string;
+    }, {
+        id: number;
+        name: string;
+    }>>>;
+}, "strip", z.ZodTypeAny, {
+    at: string;
+    type: "roadmap.event";
+    protocol: number;
+    extension: string;
+    kehikko: {
+        id: number;
+        name: string;
+    } | null;
+    from: string;
+    payload?: unknown;
+}, {
+    at: string;
+    type: "roadmap.event";
+    protocol: number;
+    extension: string;
+    from: string;
+    payload?: unknown;
+    kehikko?: {
+        id: number;
+        name: string;
+    } | null | undefined;
+}>;
 export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     type: z.ZodLiteral<"roadmap.hello">;
     protocol: z.ZodNumber;
@@ -899,6 +1096,30 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
          * deleted.
          */
         prompt: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+        /**
+         * Which kehikko this context is about.
+         *
+         * A module's page is loaded once and shown on whichever canvas asks for it,
+         * so a module genuinely cannot tell where it is standing — and it needs to
+         * the moment anything else on the wire says where IT came from. An event
+         * carries the kehikko it happened on; this says the one being looked at; and
+         * near-or-far becomes a comparison the module makes rather than a rule the
+         * host imposes.
+         *
+         * Nullable because a host need not have canvases at all. A module that finds
+         * it null can still show everything it is sent — it simply cannot sort near
+         * from far, which is a smaller loss than being handed a wrong answer.
+         */
+        kehikko: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+            id: z.ZodNumber;
+            name: z.ZodString;
+        }, "strip", z.ZodTypeAny, {
+            id: number;
+            name: string;
+        }, {
+            id: number;
+            name: string;
+        }>>>;
     }, "strip", z.ZodTypeAny, {
         epic: string | null;
         prompt: string | null;
@@ -906,6 +1127,10 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         theme: "light" | "dark";
         selection: string[];
         pinned: boolean;
+        kehikko: {
+            id: number;
+            name: string;
+        } | null;
     }, {
         epic?: string | null | undefined;
         prompt?: string | null | undefined;
@@ -913,6 +1138,10 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         theme?: "light" | "dark" | undefined;
         selection?: string[] | undefined;
         pinned?: boolean | undefined;
+        kehikko?: {
+            id: number;
+            name: string;
+        } | null | undefined;
     }>;
     /**
      * Whatever this module last asked the host to keep for it, verbatim.
@@ -949,6 +1178,10 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         theme: "light" | "dark";
         selection: string[];
         pinned: boolean;
+        kehikko: {
+            id: number;
+            name: string;
+        } | null;
     };
 }, {
     type: "roadmap.hello";
@@ -961,6 +1194,10 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         theme?: "light" | "dark" | undefined;
         selection?: string[] | undefined;
         pinned?: boolean | undefined;
+        kehikko?: {
+            id: number;
+            name: string;
+        } | null | undefined;
     };
     state?: string | null | undefined;
 }>, z.ZodObject<{
@@ -1066,6 +1303,30 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
      * deleted.
      */
     prompt: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+    /**
+     * Which kehikko this context is about.
+     *
+     * A module's page is loaded once and shown on whichever canvas asks for it,
+     * so a module genuinely cannot tell where it is standing — and it needs to
+     * the moment anything else on the wire says where IT came from. An event
+     * carries the kehikko it happened on; this says the one being looked at; and
+     * near-or-far becomes a comparison the module makes rather than a rule the
+     * host imposes.
+     *
+     * Nullable because a host need not have canvases at all. A module that finds
+     * it null can still show everything it is sent — it simply cannot sort near
+     * from far, which is a smaller loss than being handed a wrong answer.
+     */
+    kehikko: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+        id: z.ZodNumber;
+        name: z.ZodString;
+    }, "strip", z.ZodTypeAny, {
+        id: number;
+        name: string;
+    }, {
+        id: number;
+        name: string;
+    }>>>;
 } & {
     type: z.ZodLiteral<"roadmap.context">;
     protocol: z.ZodNumber;
@@ -1078,6 +1339,10 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     theme: "light" | "dark";
     selection: string[];
     pinned: boolean;
+    kehikko: {
+        id: number;
+        name: string;
+    } | null;
 }, {
     type: "roadmap.context";
     protocol: number;
@@ -1087,6 +1352,10 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     theme?: "light" | "dark" | undefined;
     selection?: string[] | undefined;
     pinned?: boolean | undefined;
+    kehikko?: {
+        id: number;
+        name: string;
+    } | null | undefined;
 }>, z.ZodDiscriminatedUnion<"ok", [z.ZodObject<{
     type: z.ZodLiteral<"roadmap.response">;
     id: z.ZodString;
@@ -1163,6 +1432,61 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     epic?: string | undefined;
     step?: number | undefined;
     ref?: string | undefined;
+}>, z.ZodObject<{
+    type: z.ZodLiteral<"roadmap.event">;
+    protocol: z.ZodNumber;
+    /** The format, e.g. `roadmap.notifications@1`. Known to the host, or unsent. */
+    extension: z.ZodString;
+    /** Whatever that format says. Validated by the host before it left. */
+    payload: z.ZodUnknown;
+    /** The module that emitted it, named by the host from its own registry. */
+    from: z.ZodString;
+    /**
+     * When the host accepted it, ISO 8601. A receiver ordering by arrival would
+     * be ordering by its own scheduler instead.
+     */
+    at: z.ZodString;
+    /**
+     * The kehikko it happened on, so a receiver can tell near from far.
+     *
+     * A module is loaded once and shown on whichever canvas asks for it, so "this
+     * kehikko" is a question it cannot answer alone. `context.kehikko` says where
+     * the receiver is standing and this says where the event came from; comparing
+     * the two is the whole of a near/far filter, and it is a comparison rather
+     * than a rule so a module can present it however it likes.
+     */
+    kehikko: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+        id: z.ZodNumber;
+        name: z.ZodString;
+    }, "strip", z.ZodTypeAny, {
+        id: number;
+        name: string;
+    }, {
+        id: number;
+        name: string;
+    }>>>;
+}, "strip", z.ZodTypeAny, {
+    at: string;
+    type: "roadmap.event";
+    protocol: number;
+    extension: string;
+    kehikko: {
+        id: number;
+        name: string;
+    } | null;
+    from: string;
+    payload?: unknown;
+}, {
+    at: string;
+    type: "roadmap.event";
+    protocol: number;
+    extension: string;
+    from: string;
+    payload?: unknown;
+    kehikko?: {
+        id: number;
+        name: string;
+    } | null | undefined;
 }>]>;
 export type HostMessage = z.infer<typeof hostMessageSchema>;
 export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
@@ -1229,6 +1553,7 @@ export type Hello = z.infer<typeof helloSchema>;
 export type ContextMessage = z.infer<typeof contextMessageSchema>;
 export type Response = z.infer<typeof responseSchema>;
 export type Goto = z.infer<typeof gotoSchema>;
+export type ModuleEvent = z.infer<typeof eventSchema>;
 export type Ready = z.infer<typeof readySchema>;
 export type Request = z.infer<typeof requestSchema>;
 export type Resize = z.infer<typeof resizeSchema>;
