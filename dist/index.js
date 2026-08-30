@@ -10,6 +10,6 @@ export { PROTOCOL, WELL_KNOWN, MANIFEST_KIND, MESSAGE, MESSAGE_PREFIX, HOST_MESS
 export { MODULE_ID, MODE_ID, EPIC_SLUG, own } from './ids.js';
 export { manifestSchema, speaks, MODULE_CONDITIONS, } from './manifest.js';
 export { CAPABILITIES, CAPABILITY_NAMES, METHODS, METHOD_NAMES, methodParams, methodResults, resultSchemaFor, navigationResult, NAVIGATION_OUTCOMES, epicSpine, epicsListResult, REPORTED_STAGES, } from './methods.js';
-export { contextSchema, helloSchema, contextMessageSchema, responseSchema, responseFailureReasons, gotoSchema, eventSchema, readySchema, requestSchema, resizeSchema, wentSchema, hostMessageSchema, moduleMessageSchema, looksLikeWireMessage, } from './wire.js';
+export { contextSchema, passageSchema, helloSchema, contextMessageSchema, responseSchema, responseFailureReasons, gotoSchema, eventSchema, readySchema, requestSchema, resizeSchema, wentSchema, hostMessageSchema, moduleMessageSchema, looksLikeWireMessage, } from './wire.js';
 export { notificationPayload, callPayload, EXTENSIONS, EXTENSION_NAMES, known, schemaFor, } from './extensions.js';
 //# sourceMappingURL=index.js.map

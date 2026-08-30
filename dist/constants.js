@@ -39,6 +39,12 @@
  *   `unknown-method`, which is the refusal that already exists and the one a
  *   caller is already told to expect. A module built against a host without it
  *   loses a feature and keeps a page.
+ * - `passage` is a new CONTEXT FIELD, and `passage.set` a new method for
+ *   filling it. It defaults to `null`, which is exactly what a module reading
+ *   it against an older host would have found there anyway: "nobody is pointing
+ *   at anything". A module that never reads it is untouched, and a module that
+ *   does reads a real state rather than an absence. Nothing that already had a
+ *   shape changed shape.
  *
  * What did raise it is a rename. **Epics are not journeys**: an epic belongs to
  * a project and is the host's own material; a journey is a different idea
@@ -259,6 +265,37 @@ export const LIMITS = {
     TITLE: 200,
     /** A line of prose a person will read: a notification, a note. */
     MESSAGE: 2000,
+    /**
+     * The words of the passage a reader is pointing at, carried in the context.
+     *
+     * ## Why a quote travels at all, when offsets already say where it is
+     *
+     * A byte range names a place in a file and says nothing about what is there,
+     * and the file is being edited while all of this is running. A module that
+     * received only `from` and `to` and wanted to show the passage would have to
+     * open the file — which most modules cannot, and none should have to in order
+     * to draw a line of text — and would read whatever is at those offsets NOW,
+     * which after one edit above them is a different sentence with nothing to say
+     * so. The quote is the reader's own evidence, taken at the moment they
+     * pointed, and it is what lets anything downstream NOTICE that the offsets
+     * have rotted rather than confidently naming the wrong prose.
+     *
+     * ## Why it is bounded far below a document
+     *
+     * This rides in `roadmap.context`, which is broadcast to every framed module
+     * on the canvas every time the reader moves. Unbounded, a reader who selected
+     * a chapter would push a chapter through every frame on every change of
+     * selection. Two kilobytes is several paragraphs — more than anybody
+     * highlights to make a point about — and is nowhere near somewhere to put a
+     * document.
+     *
+     * A sender with more than this is REFUSED rather than clipped, by the rule
+     * `stage.report`'s note follows: a clipped quote is a quote of something
+     * nobody said, and a consumer comparing it against a file would then call a
+     * good anchor rotten. Shorten the selection before sending it, so that the
+     * side which knows it shortened something is the side that says so.
+     */
+    QUOTE: 2000,
     /** A sentence explaining a refusal, going back to whoever asked. */
     REASON: 400,
     /** How many modes one module may offer. */

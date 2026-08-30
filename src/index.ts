@@ -59,6 +59,7 @@ export {
 
 export {
   contextSchema,
+  passageSchema,
   helloSchema,
   contextMessageSchema,
   responseSchema,
@@ -73,6 +74,7 @@ export {
   moduleMessageSchema,
   looksLikeWireMessage,
   type ModuleContext,
+  type Passage,
   type ResponseFailureReason,
   type HostMessage,
   type ModuleMessage,

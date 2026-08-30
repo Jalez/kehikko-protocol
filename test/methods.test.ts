@@ -8,6 +8,7 @@ import {
   MESSAGE,
   NAVIGATION_OUTCOMES,
   PROTOCOL,
+  contextSchema,
   epicSpine,
   epicsListResult,
   gotoSchema,
@@ -205,5 +206,60 @@ describe('the word that is not in this package', () => {
 
   test('a rename of an existing method and field is what the protocol number is for', () => {
     expect(PROTOCOL).toBe(2)
+  })
+})
+
+/* --------------------------------------------------------------------- *
+ * passage.set — pointing at a place in a document
+ *
+ * These are aimed at the two ways this addition could quietly go wrong:
+ * a caller with no way to say "nothing is open any more", and a shape
+ * that the method accepts and the context then drops.
+ * --------------------------------------------------------------------- */
+
+describe('passage.set — a module saying where somebody is pointing', () => {
+  test('it is a method under a capability of its own, so a declaration names it', () => {
+    expect(METHOD_NAMES).toContain('passage.set')
+    expect(METHODS['passage.set']).toBe('passage:set')
+    expect(Object.hasOwn(CAPABILITIES, 'passage:set')).toBe(true)
+  })
+
+  test('the capability sentence warns that the neighbours are told', () => {
+    expect(CAPABILITIES['passage:set']).toContain('Every module on the canvas is told')
+  })
+
+  test('the three states of the ladder all travel', () => {
+    expect(methodParams['passage.set'].safeParse({ passage: null }).success).toBe(true)
+    expect(methodParams['passage.set'].safeParse({ passage: { path: 'a.tex', page: 4 } }).success).toBe(true)
+    expect(
+      methodParams['passage.set'].safeParse({ passage: { path: 'a.tex', page: 4, from: 10, to: 40, quoted: 'x' } })
+        .success,
+    ).toBe(true)
+  })
+
+  test('clearing is a call and not an omission', () => {
+    /* `{}` is a caller that misspelled the field, and reading it as "clear it"
+       would turn a typo into a silent reset of what every pane is looking at. */
+    expect(methodParams['passage.set'].safeParse({}).success).toBe(false)
+  })
+
+  test('what the method accepts is exactly what the context will carry', () => {
+    /* One definition, read from both sides. If these ever diverge, a passage
+       validates on the way in and vanishes on the way out with nothing saying
+       so — see the note on this method. */
+    const half = { path: 'a.tex', from: 10 }
+    expect(methodParams['passage.set'].safeParse({ passage: half }).success).toBe(false)
+    expect(contextSchema.safeParse({ passage: half }).success).toBe(false)
+
+    const whole = { path: 'a.tex', from: 10, to: 40, quoted: 'x' }
+    expect(methodParams['passage.set'].safeParse({ passage: whole }).success).toBe(true)
+    expect(contextSchema.safeParse({ passage: whole }).success).toBe(true)
+  })
+
+  test('its answer is unspecified, because there is no outcome to report', () => {
+    /* Unlike `view.goto`, nothing here can come back "declined" in a way a
+       caller acts on differently — the host either relayed it or refused the
+       call. So it stays out of `methodResults` with the material answers. */
+    expect(resultSchemaFor('passage.set')).toBeUndefined()
   })
 })

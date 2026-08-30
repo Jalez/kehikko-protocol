@@ -93,6 +93,17 @@ export declare const CAPABILITIES: {
      */
     readonly 'selection:set': "Say which references the person has picked out. Every module on the canvas is told.";
     /**
+     * Say where in a document the person is pointing.
+     *
+     * A write, and a SHARED one, exactly like `selection:set` — and one that
+     * carries more. A passage names a file on the host's machine, a place in it,
+     * and a paragraph of what was there. A module declaring this is asking to put
+     * all of that in front of every other pane on the canvas, and somebody
+     * deciding whether to run the program should read that in the sentence rather
+     * than discover it from a field name.
+     */
+    readonly 'passage:set': "Say where in a document the person is pointing, and quote it. Every module on the canvas is told.";
+    /**
      * Keep a little state of its own, and get it back next time.
      *
      * Named for what the module gets rather than for what the host does, because
@@ -121,6 +132,7 @@ export declare const METHODS: {
     readonly 'events.emit': "events:emit";
     readonly 'view.goto': "view:navigate";
     readonly 'selection.set': "selection:set";
+    readonly 'passage.set': "passage:set";
     readonly 'state.set': "state:keep";
 };
 export type Method = keyof typeof METHODS;
@@ -235,6 +247,96 @@ export declare const methodParams: {
         refs: string[];
     }, {
         refs: string[];
+    }>;
+    /**
+     * Say where in a document the person is pointing.
+     *
+     * ## The same act `selection.set` performs, on a different kind of thing
+     *
+     * A module asks; the host relays into the context every framed module
+     * receives; no module ever learns which of its neighbours was listening, or
+     * whether any was. The whole argument is in `contextSchema.passage` and in
+     * the `selection` essay above it, and it is not repeated here.
+     *
+     * ## `null` is a real call, not an omission
+     *
+     * The reader closed the document, or moved to a pane that is not a document
+     * at all. That has to be sendable, for the reason an empty `refs` array has
+     * to be: a consumer holding the last passage forever would show the notes on
+     * a chapter nobody has open. So `passage` is required and nullable rather
+     * than optional — a call that simply left it out would be indistinguishable
+     * from a caller with a typo in the field name, and one of those means "clear
+     * it" while the other means nothing at all.
+     *
+     * ## The shape is imported rather than restated
+     *
+     * `selection.set` spells its own `refs` array out again, and that is fine for
+     * an array of bounded strings. This is five fields with two cross-field rules
+     * on them, and two copies of those rules is a wire where the host accepts
+     * what the context schema will later drop, or the reverse — a passage that
+     * validates on the way in and vanishes on the way out, with nothing anywhere
+     * saying so. One definition, in `wire.ts`, read by both.
+     */
+    readonly 'passage.set': z.ZodObject<{
+        passage: z.ZodNullable<z.ZodEffects<z.ZodEffects<z.ZodObject<{
+            path: z.ZodString;
+            page: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+            from: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+            to: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+            quoted: z.ZodDefault<z.ZodString>;
+        }, "strip", z.ZodTypeAny, {
+            path: string;
+            page: number | null;
+            from: number | null;
+            to: number | null;
+            quoted: string;
+        }, {
+            path: string;
+            page?: number | null | undefined;
+            from?: number | null | undefined;
+            to?: number | null | undefined;
+            quoted?: string | undefined;
+        }>, {
+            path: string;
+            page: number | null;
+            from: number | null;
+            to: number | null;
+            quoted: string;
+        }, {
+            path: string;
+            page?: number | null | undefined;
+            from?: number | null | undefined;
+            to?: number | null | undefined;
+            quoted?: string | undefined;
+        }>, {
+            path: string;
+            page: number | null;
+            from: number | null;
+            to: number | null;
+            quoted: string;
+        }, {
+            path: string;
+            page?: number | null | undefined;
+            from?: number | null | undefined;
+            to?: number | null | undefined;
+            quoted?: string | undefined;
+        }>>;
+    }, "strip", z.ZodTypeAny, {
+        passage: {
+            path: string;
+            page: number | null;
+            from: number | null;
+            to: number | null;
+            quoted: string;
+        } | null;
+    }, {
+        passage: {
+            path: string;
+            page?: number | null | undefined;
+            from?: number | null | undefined;
+            to?: number | null | undefined;
+            quoted?: string | undefined;
+        } | null;
     }>;
     /**
      * Keep a small amount of this module's own state.

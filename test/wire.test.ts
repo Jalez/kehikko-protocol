@@ -10,6 +10,7 @@ import {
   hostMessageSchema,
   looksLikeWireMessage,
   moduleMessageSchema,
+  passageSchema,
   responseSchema,
   wentSchema,
 } from '../src/index.js'
@@ -226,5 +227,96 @@ describe('height', () => {
   test('nonsense is a height too, and it is the smallest one', () => {
     expect(clampHeight(Number.NaN)).toBe(MIN_HEIGHT)
     expect(clampHeight(Number.POSITIVE_INFINITY)).toBe(MIN_HEIGHT)
+  })
+})
+
+/* --------------------------------------------------------------------- *
+ * A passage: where the reader is pointing, at whatever precision
+ *
+ * The ladder is the whole point of the shape, so it is the whole point of
+ * these: three states, each distinguishable from the other two by reading
+ * one field, and nothing in between that parses.
+ * --------------------------------------------------------------------- */
+
+describe('a passage says where somebody is pointing, and how precisely', () => {
+  test('no document open is null, and that is the default a module finds', () => {
+    expect(contextSchema.parse({}).passage).toBe(null)
+    expect(contextSchema.parse({ passage: null }).passage).toBe(null)
+  })
+
+  test('a page open with nothing selected is a passage with no range', () => {
+    const context = contextSchema.parse({
+      passage: { path: '/w/paper/chapters/bridge.tex', page: 7 },
+    })
+    expect(context.passage?.path).toBe('/w/paper/chapters/bridge.tex')
+    expect(context.passage?.page).toBe(7)
+    expect(context.passage?.from).toBe(null)
+    expect(context.passage?.to).toBe(null)
+    expect(context.passage?.quoted).toBe('')
+  })
+
+  test('a selection is the same field with two more numbers in it', () => {
+    const context = contextSchema.parse({
+      passage: { path: 'chapters/bridge.tex', page: 7, from: 4120, to: 4180, quoted: 'a passage' },
+    })
+    expect(context.passage?.from).toBe(4120)
+    expect(context.passage?.to).toBe(4180)
+    expect(context.passage?.quoted).toBe('a passage')
+  })
+
+  test('a reader that does not paginate still says which document is open', () => {
+    expect(passageSchema.parse({ path: 'notes.md' }).page).toBe(null)
+  })
+
+  test('half a range is refused, because the missing end would have to be invented', () => {
+    expect(passageSchema.safeParse({ path: 'a.tex', from: 10 }).success).toBe(false)
+    expect(passageSchema.safeParse({ path: 'a.tex', to: 10 }).success).toBe(false)
+  })
+
+  test('a range that ends where it starts, or before, names nothing', () => {
+    expect(passageSchema.safeParse({ path: 'a.tex', from: 10, to: 10 }).success).toBe(false)
+    expect(passageSchema.safeParse({ path: 'a.tex', from: 10, to: 9 }).success).toBe(false)
+    expect(passageSchema.safeParse({ path: 'a.tex', from: 10, to: 11 }).success).toBe(true)
+  })
+
+  test('a document with no name is not a document', () => {
+    expect(passageSchema.safeParse({ path: '' }).success).toBe(false)
+    expect(passageSchema.safeParse({}).success).toBe(false)
+  })
+
+  test('pages count from one, and offsets from zero', () => {
+    expect(passageSchema.safeParse({ path: 'a.tex', page: 0 }).success).toBe(false)
+    expect(passageSchema.safeParse({ path: 'a.tex', page: 1.5 }).success).toBe(false)
+    expect(passageSchema.safeParse({ path: 'a.tex', from: 0, to: 1 }).success).toBe(true)
+    expect(passageSchema.safeParse({ path: 'a.tex', from: -1, to: 1 }).success).toBe(false)
+  })
+
+  test('a quote is refused rather than clipped, so nobody quotes what was not said', () => {
+    const long = 'x'.repeat(LIMITS.QUOTE + 1)
+    expect(passageSchema.safeParse({ path: 'a.tex', from: 0, to: 1, quoted: long }).success).toBe(false)
+    const fits = 'x'.repeat(LIMITS.QUOTE)
+    expect(passageSchema.parse({ path: 'a.tex', from: 0, to: 1, quoted: fits }).quoted).toHaveLength(LIMITS.QUOTE)
+  })
+
+  test('a context message carries it like every other field', () => {
+    const message = hostMessageSchema.parse({
+      type: MESSAGE.CONTEXT,
+      protocol: 2,
+      epic: 'modes-are-modules',
+      passage: { path: 'chapters/wire.tex', page: 3 },
+    })
+    expect(message.type).toBe(MESSAGE.CONTEXT)
+    if (message.type === MESSAGE.CONTEXT) expect(message.passage?.page).toBe(3)
+  })
+
+  test('and it arrives in the greeting, so a module has it before its first render', () => {
+    const hello = hostMessageSchema.parse({
+      type: MESSAGE.HELLO,
+      protocol: 2,
+      session: 'abc',
+      context: { passage: { path: 'chapters/wire.tex', from: 12, to: 40, quoted: 'so' } },
+    })
+    expect(hello.type).toBe(MESSAGE.HELLO)
+    if (hello.type === MESSAGE.HELLO) expect(hello.context.passage?.quoted).toBe('so')
   })
 })
