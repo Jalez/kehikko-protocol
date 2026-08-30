@@ -76,7 +76,7 @@ Eight messages. Four each way, across a frame, by `postMessage`.
 | Host → module | |
 |---|---|
 | `roadmap.hello` | The greeting, on every frame load. Carries the protocol both sides settled on, a session name, and the current context. |
-| `roadmap.context` | Which epic is open, which project it belongs to, which theme. Sent on every switch. |
+| `roadmap.context` | Which epic is open, which project it belongs to and where that project is on disk, which theme. Sent on every switch. |
 | `roadmap.response` | The answer to exactly one request. |
 | `roadmap.goto` | Go to this reference. |
 
@@ -131,6 +131,25 @@ It is just a program.
 `EPIC_SLUG` describes an epic slug and only that. If a journey slug turns out to
 be spelled differently, nothing here changes, because a host is not the
 authority on that name.
+
+## A project is named and a project is somewhere
+
+`context.project` says what the project is called. `context.projectPath` says
+where it is: an absolute folder on the host's machine, or `null` when the host
+has no filesystem to point at.
+
+Two fields rather than one object, and the argument is on `projectPath` in
+`wire.ts`. In short: a name is what a module PRINTS and a path is what a module
+OPENS, one string cannot do both jobs well, and nesting them would have changed
+the shape of a field that already exists — which is the one thing `PROTOCOL` is
+supposed to go up for. Adding a field is not. A module that never reads
+`projectPath` is exactly as correct as it was before it existed.
+
+What it replaces is an environment variable per module, set at launch by
+whoever started the program. Under that arrangement a host could move a person
+to another project and every module would go on reading the first one,
+correctly, from the root it was handed — nothing erroring, and every module
+describing a different project from the one the host had named.
 
 ## Asking the host to move
 

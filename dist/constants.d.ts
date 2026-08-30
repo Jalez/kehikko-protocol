@@ -86,7 +86,7 @@ export declare const MESSAGE: {
     readonly HELLO: "roadmap.hello";
     /** Module → host. "I heard you, and here is the protocol I answered in." */
     readonly READY: "roadmap.ready";
-    /** Host → module. Which epic is open, which project it belongs to, and which theme. */
+    /** Host → module. Which epic is open, which project it belongs to and where that project is, and which theme. */
     readonly CONTEXT: "roadmap.context";
     /** Module → host. One question, with an id the answer will carry back. */
     readonly REQUEST: "roadmap.request";
@@ -192,6 +192,23 @@ export declare const LIMITS: {
     readonly EPIC_SLUG: 80;
     /** A project name, as read off the page. */
     readonly PROJECT: 80;
+    /**
+     * An absolute path to a folder on the machine the host is running on.
+     *
+     * 4096 because that is Linux's `PATH_MAX`, and it is the larger of the two
+     * numbers a host is likely to be standing on — macOS imposes 1024. Taking the
+     * larger means this bound never refuses a path the operating system was
+     * willing to hand out; a module that finds one too long for its own platform
+     * finds out from the platform, which is the thing that actually knows.
+     *
+     * It is a bound and not a validation. This package does no I/O: it cannot say
+     * whether a path exists, is a directory, or is even absolute, and a regex
+     * pretending otherwise would be a check that passes for `../../etc` on every
+     * host in the world. What the bound does is stop a host putting a document in
+     * a field a module is about to render, which is the same job every other
+     * number here does.
+     */
+    readonly PATH: 4096;
     /** The name of one conversation with one frame. */
     readonly SESSION: 128;
     /** The id correlating a request with its response, or a goto with its answer. */

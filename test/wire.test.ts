@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import {
   MAX_HEIGHT,
   MESSAGE,
+  LIMITS,
   MIN_HEIGHT,
   clampHeight,
   contextSchema,
@@ -113,8 +114,37 @@ describe('context says what the host is in a position to know', () => {
     const empty = contextSchema.parse({})
     expect(empty.epic).toBe(null)
     expect(empty.project).toBe(null)
+    expect(empty.projectPath).toBe(null)
     expect(empty.theme).toBe('light')
     expect(contextSchema.parse({ epic: null }).epic).toBe(null)
+  })
+
+  test('a project is named and a project is somewhere, and they are two fields', () => {
+    const context = contextSchema.parse({
+      epic: 'modes-are-modules',
+      project: 'roadmap',
+      projectPath: '/Users/somebody/Projects/roadmap',
+    })
+    expect(context.project).toBe('roadmap')
+    expect(context.projectPath).toBe('/Users/somebody/Projects/roadmap')
+  })
+
+  test('a host that only knows the name still parses, because the path is nullable', () => {
+    /* The whole reason this is an addition and not a shape change: a message
+       written before `projectPath` existed is still a valid context, and what
+       comes out says the host has no folder to point at — which is the truth
+       about what that message conveyed. */
+    const named = contextSchema.parse({ project: 'roadmap' })
+    expect(named.project).toBe('roadmap')
+    expect(named.projectPath).toBe(null)
+  })
+
+  test('a path is bounded, and an empty one is not a path', () => {
+    expect(contextSchema.safeParse({ projectPath: '/' + 'a'.repeat(LIMITS.PATH) }).success).toBe(false)
+    expect(contextSchema.safeParse({ projectPath: '' }).success).toBe(false)
+    /* Null is a state a module has to be able to move INTO — a host that
+       stopped having a filesystem under it, or a project a person cleared. */
+    expect(contextSchema.parse({ projectPath: null }).projectPath).toBe(null)
   })
 
   test('a journey is somebody else\'s material, and naming one here does not make it context', () => {

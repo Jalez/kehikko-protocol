@@ -51,6 +51,11 @@ import { EPIC_SLUG, MODULE_ID } from './ids.js';
  * journey a person is reading asks the program that owns journeys, and gets an
  * answer from something that can actually answer.
  *
+ * The project arrives as two fields — what it is called, and where it is on
+ * disk — for reasons argued at each of them below. The short version is that a
+ * module has to be able to both NAME the project and OPEN it, and one string
+ * cannot do both jobs well.
+ *
  * `epic` is null when none is open, and it is nullable rather than absent
  * because "no epic" is a state a module has to be able to move INTO. A field
  * that simply disappeared would leave the module showing the last epic it heard
@@ -61,7 +66,73 @@ import { EPIC_SLUG, MODULE_ID } from './ids.js';
  */
 export const contextSchema = z.object({
     epic: z.string().regex(EPIC_SLUG).nullable().default(null),
+    /**
+     * What the project is CALLED. Unchanged, and deliberately still a name.
+     *
+     * This is the string a module puts on screen. A path is a bad label — it is
+     * long, it is the same for its first forty characters as every other project
+     * on the machine, and its last segment is a folder name somebody chose for
+     * their disk rather than a name they chose for their work. A host that sent
+     * only a path would make every module invent a display name by splitting a
+     * string, and eleven modules would split it eleven ways.
+     */
     project: z.string().max(LIMITS.PROJECT).nullable().default(null),
+    /**
+     * Where the project IS: an absolute folder path on the host's machine.
+     *
+     * ## Why a name was not enough
+     *
+     * A name is something to print. Everything a module actually wants to DO with
+     * a project needs somewhere to open: read the epics under it, run a command
+     * in it, show its history, list its chapters. Until this field existed each of
+     * those modules had to be told its own root separately — an environment
+     * variable per module, set by whoever started it — so a host could move a
+     * person to another project and every module would go on reading the first
+     * one, correctly, from the root it was given at launch. Nothing errored. The
+     * modules simply described a different project from the one the host named.
+     *
+     * Absolute, and the host is the only one in a position to vouch for that.
+     * This package does no I/O and cannot check it — see `LIMITS.PATH`. A module
+     * receiving a relative path here has been handed something its host could not
+     * have meant, and should treat it as it treats any other field it was lied
+     * to about.
+     *
+     * Null is a real state and not an oversight. A host with no filesystem of its
+     * own — a hosted one, a demo, a test harness — knows the name of the project
+     * a person is looking at and has no folder to point at. A module handed a
+     * name and no path can still say which project it is showing and must not
+     * pretend it can open it.
+     *
+     * ## Why this is a second field and not `project: { name, path }`
+     *
+     * The tidier shape is the object: two facts about one thing, atomically
+     * consistent, impossible to have a path without a name — and it is the shape
+     * this package already uses for `kehikko`. It was rejected here for one
+     * reason, and the reason is `PROTOCOL`.
+     *
+     * `PROTOCOL` goes up when an existing field CHANGES SHAPE, and stays put when
+     * the wire merely learns a new word — see the essay on it in `constants.ts`,
+     * which is emphatic that a number going up for additions is a number nobody
+     * can act on. Turning `project` into an object is exactly a shape change: a
+     * module rendering `context.project` in a span prints a project name today
+     * and `[object Object]` afterwards, with no version signal to tell it why.
+     * That module is not degraded, it is broken, and the protocol's own rule says
+     * it should have been told it was INCOMPATIBLE rather than left to find out
+     * on screen.
+     *
+     * So the choice was: bump the protocol and make every module in the world
+     * incompatible in order to nest two strings, or add a field and break
+     * nothing. The second is what the rule is for. `project` still means what it
+     * meant, still parses as what it parsed as, and a module that never reads
+     * `projectPath` is exactly as correct as it was yesterday — which is the test
+     * this package applies to every addition.
+     *
+     * The cost is honest and worth naming: two nullable fields can disagree, and
+     * nothing here prevents a host sending a path with no name. A host should
+     * fill them in one place, from one project, so that they cannot; this package
+     * can say that and cannot enforce it.
+     */
+    projectPath: z.string().min(1).max(LIMITS.PATH).nullable().default(null),
     theme: z.enum(['light', 'dark']).default('light'),
     /**
      * What the person has picked out, if anything.
