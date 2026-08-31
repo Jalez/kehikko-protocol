@@ -1,6 +1,6 @@
 {
   "name": "roadmap-module-protocol",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "description": "The shapes a roadmap host and a module it frames agree on: the manifest, the wire, and the extension payloads. Shapes only \u2014 no I/O, no state, no decisions.",
   "keywords": [
     "roadmap",
@@ -28,6 +28,10 @@
     "./client/react": {
       "types": "./dist/client/react.d.ts",
       "default": "./dist/client/react.js"
+    },
+    "./serve": {
+      "types": "./dist/serve/index.d.ts",
+      "default": "./dist/serve/index.js"
     },
     "./package.json": "./package.json"
   },

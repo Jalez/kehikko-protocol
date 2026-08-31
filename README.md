@@ -534,12 +534,106 @@ modules already disagree about the first two and every one of those differences
 may be load-bearing. Adopting the client should not quietly change what a module
 does on the wire.
 
+## `/serve`, which is a fourth entry point and the only one that touches the disk
+
+```ts
+// vite.config.ts
+import { serves } from 'roadmap-module-protocol/serve'
+import { ID } from './manifest.ts'
+
+export default defineConfig({
+  plugins: [serves({ id: ID, prefer: 7960 }), doors(), react()],
+})
+```
+
+That line is a module's whole port story. `run.sh` passes no `--port` and no
+`--strictPort`; `register.ts` hardcodes no number; the preference is stated once,
+beside the id, in the file that already knows both.
+
+### What it does, and the one case where it refuses to be clever
+
+If the preferred port is free it is taken, with no probe, no search and no
+message. That case is the common one and it is deliberately untouched: somebody
+who types `curl 127.0.0.1:7960` after starting a module by hand must get their
+module, and a system that sometimes moved for reasons of its own would have
+thrown that away to solve a collision that had not happened.
+
+If something is listening there, it is asked
+`GET /.well-known/roadmap-module.json` with a short deadline, and what happens
+next depends on **who** answered.
+
+- **The same module id.** This module is already running. It exits 0 with a
+  sentence naming the address, and starts nothing. A second copy is not a
+  fallback — it is two stores writing the same files, two MCP doors a client can
+  be pointed at, and a host framing whichever one the registry happens to name.
+  That state's symptom is data disappearing, not an error. It is also the most
+  common collision here now, because the host starts modules on its own *and* a
+  person runs `./run.sh` in a terminal.
+- **A different module, a non-module, or silence.** It moves to the next free
+  port, says so on stdout naming both numbers, and registers where it landed.
+
+The drift steps over ports other modules have *registered* even when nothing is
+listening on them. Modules here sit ten apart, and most of them are not running
+most of the time; a drifter that took a neighbour's number would hand that
+neighbour a collision it did not cause, days later, in a module nobody changed.
+
+### The bound port, not the requested one
+
+`strictPort` is turned **off**, which reads like a regression and is not.
+`--strictPort` was the only honest thing to do when nothing handled a collision:
+a server that silently moved was a server nobody could find. Now the move is
+decided before Vite starts, said out loud, and written into the registry the host
+actually reads — so Vite's own fallback is a second net under a first one,
+catching only the race between releasing a probe socket and binding it.
+
+And the number written down is read off `server.httpServer.address()` after
+`listening`, not the number that was asked for. That is the whole reason this is
+a plugin rather than a wrapper script: a script can claim a port and pass it to
+Vite, but the registration it then writes says the port it *hoped* for, and the
+gap between hoped and bound is exactly where a stale registration comes from.
+
+### `claim` returns; it does not exit
+
+Including in the already-running case. A library that calls `process.exit` is a
+library whose most important branch cannot be tested, and that branch has a suite
+aimed at it. `serves()` is where the exit lives, because it knows it is a program
+rather than a test.
+
+### It is node-only, and that is what the subpath is for
+
+Everything here binds sockets, reads a port, and writes into somebody's home
+directory. One line of it behind the front door would make
+`import { WELL_KNOWN } from 'roadmap-module-protocol'` an import of `node:fs`, in
+a browser bundle, in every module that renders a page. So it stands beside the
+front door the way `/client` does and for the mirror reason: `/client` exists so
+a server with no `window` can import this package, `/serve` exists so a page with
+no filesystem can.
+
+It is absent from `sideEffects` on purpose. Nothing in `src/serve/` does anything
+at module scope — the side effects are all inside functions somebody calls — so
+there is no bare import for a bundler to be wrong about deleting, which is the
+exact thing the two client files are listed for.
+
+### And it is still not a decision the host imports
+
+The rule at the top of this README is unbroken, which is worth saying because a
+file that decides a port looks like a counterexample. Nothing in `/serve` is ever
+run by the host. The host reads the registry and asks each address what it is,
+and would reach identical conclusions about a module that had never heard of this
+file. What is here is a *module's* own housekeeping — where to bind, what to
+write down about itself — and both of those were already the module's to decide.
+Fourteen modules were deciding them fourteen times, in two files each, with the
+port literal duplicated between them.
+
 ## Development
 
 ```
 bun test        # what a bound refuses, what a bad id refuses, that a version is part of a name,
                 # that a caller can tell a decline from a dead reference from a broken call,
-                # and — for the client — that a greeting already in the backlog reaches a page
-                # that has stored its connection, which a one-step connect fails by construction
+                # for the client — that a greeting already in the backlog reaches a page
+                # that has stored its connection, which a one-step connect fails by construction,
+                # and for /serve — the table over who is on a port, the walk that steps over a
+                # neighbour's claim, and the same decisions again against a listener the suite
+                # starts and stops, because injected probes cannot show that the real ones agree
 bun run build   # tsc to dist/
 ```
