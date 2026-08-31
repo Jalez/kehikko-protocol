@@ -8,7 +8,7 @@
  */
 export { PROTOCOL, WELL_KNOWN, MANIFEST_KIND, MESSAGE, MESSAGE_PREFIX, HOST_MESSAGES, MODULE_MESSAGES, MIN_HEIGHT, MAX_HEIGHT, clampHeight, LIMITS, type MessageType, } from './constants.js';
 export { MODULE_ID, MODE_ID, EPIC_SLUG, own } from './ids.js';
-export { KEHIKKO_DIR, DATA_FILE, KEHIKKO_IGNORE, kehikkoDir, kehikkoFile, within, ignoresKehikko, withKehikkoIgnored, } from './project.js';
+export { KEHIKOT_DIR, DATA_FILE, MODULE_FOLDER, KEHIKOT_IGNORE, moduleFolder, kehikotDir, moduleDir, moduleFile, within, ignoresKehikot, withKehikotIgnored, } from './project.js';
 export { manifestSchema, speaks, MODULE_CONDITIONS, type Manifest, type ManifestInput, type ModuleMode, type ModuleCondition, } from './manifest.js';
 export { CAPABILITIES, CAPABILITY_NAMES, METHODS, METHOD_NAMES, methodParams, methodResults, resultSchemaFor, navigationResult, NAVIGATION_OUTCOMES, epicSpine, epicsListResult, REPORTED_STAGES, type Capability, type Method, type MethodParams, type NavigationOutcome, type NavigationResult, type EpicSpine, type EpicsListResult, type ReportedStage, } from './methods.js';
 export { contextSchema, passageSchema, helloSchema, contextMessageSchema, responseSchema, responseFailureReasons, gotoSchema, eventSchema, readySchema, requestSchema, resizeSchema, wentSchema, hostMessageSchema, moduleMessageSchema, looksLikeWireMessage, type ModuleContext, type Passage, type ResponseFailureReason, type HostMessage, type ModuleMessage, type WireMessage, type Hello, type ContextMessage, type Response, type Goto, type ModuleEvent, type Ready, type Request, type Resize, type Went, } from './wire.js';

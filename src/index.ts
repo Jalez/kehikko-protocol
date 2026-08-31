@@ -25,14 +25,17 @@ export {
 export { MODULE_ID, MODE_ID, EPIC_SLUG, own } from './ids.js'
 
 export {
-  KEHIKKO_DIR,
+  KEHIKOT_DIR,
   DATA_FILE,
-  KEHIKKO_IGNORE,
-  kehikkoDir,
-  kehikkoFile,
+  MODULE_FOLDER,
+  KEHIKOT_IGNORE,
+  moduleFolder,
+  kehikotDir,
+  moduleDir,
+  moduleFile,
   within,
-  ignoresKehikko,
-  withKehikkoIgnored,
+  ignoresKehikot,
+  withKehikotIgnored,
 } from './project.js'
 
 export {

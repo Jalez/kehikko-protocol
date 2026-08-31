@@ -68,8 +68,8 @@ Concretely, the things this package deliberately does not do:
 | `methodResults`, `resultSchemaFor` | The two answers that are outcomes rather than material, and so have a shape. |
 | `navigationResult`, `epicsListResult`, `epicSpine` | Those two answers. |
 | `MODULE_ID`, `MODE_ID`, `EPIC_SLUG`, `own` | The name patterns, and one lookup that does not fall through a prototype. |
-| `KEHIKKO_DIR`, `kehikkoDir`, `kehikkoFile`, `within` | Where a module keeps this project's data, given `context.projectPath`. |
-| `KEHIKKO_IGNORE`, `ignoresKehikko`, `withKehikkoIgnored` | The lines that project's `.gitignore` gains, added once. |
+| `KEHIKOT_DIR`, `moduleFolder`, `moduleDir`, `moduleFile`, `within` | Where a module keeps this project's data, given `context.projectPath`. |
+| `KEHIKOT_IGNORE`, `ignoresKehikot`, `withKehikotIgnored` | The lines that project's `.gitignore` gains, added once. |
 
 ## The wire
 
@@ -153,39 +153,73 @@ to another project and every module would go on reading the first one,
 correctly, from the root it was handed — nothing erroring, and every module
 describing a different project from the one the host had named.
 
-## And a module's data lives in the project, at `.kehikko/`
+## And a module's data lives in the project, at `.kehikot/`
 
-`kehikkoFile(context.projectPath, 'notes')` is
-`<projectPath>/.kehikko/notes.json`, and that is the whole convention.
+`moduleFile(context.projectPath, 'roadmap.notes', 'notes')` is
+`<projectPath>/.kehikot/notes/notes.json`, and that is the whole convention:
+one folder for the app, one folder per module inside it, and the module's own
+files in there.
+
+    <projectPath>/.kehikot/
+        checklist/checklists.json
+        checklist/papers.json
+        notes/notes.json
+        learning/questions.json
+        journeys/journeys.json
 
 It is here rather than in each module because it is the same class of thing as
 `roadmap.hello`: a spelling two programs have to share, whose disagreement has
-no symptom. A module writing `.kehikko/` and one writing `kehikko/` both work,
+no symptom. A module writing `.kehikot/` and one writing `kehikot/` both work,
 both look right, and the person who opens their project finds half their work
 in one folder and half in another with nothing on any screen to say why.
 
-Three things follow from it, and they are why this is worth a section:
+`kehikot` and not `kehikko`, deliberately. **Kehikot is the app; a kehikko is
+one canvas inside it.** The folder holds the app's data for a project, which
+belongs to every canvas that person has rather than to one of them. It is
+spelled in exactly one constant, `KEHIKOT_DIR`, so renaming it is one edit.
+
+A **folder per module** rather than a flat directory of files, for two reasons
+that are the whole of what the extra level buys:
+
+- **A module may keep more than one file** without inventing a prefix.
+  Checklist keeps two, and under a flat directory the second would have needed
+  a name saying whose it was — which is a folder spelled badly.
+- **One module's data can be deleted, copied or read on its own.** That is most
+  of what "transparent, and usable by others in the project" actually buys
+  somebody. `rm -r .kehikot/notes` is a sentence.
+
+The folder's name is `moduleFolder(id)`: the module's id with `roadmap.` taken
+off, because a directory called `roadmap.checklist` in somebody's own
+repository carries a prefix that means nothing to the person reading it. That
+derivation is a PATH BUILT FROM DATA — the id came off a manifest on a port —
+so it is checked against a rule of its own and throws rather than falling back.
+An id with no `roadmap.` prefix is used whole; this package does not get to
+decide somebody else's namespace is noise.
+
+Three more things follow, and they are why this is worth a section:
 
 - **The path is the partition.** A module does not key its store by project.
   The file it opened is already that project's, so switching project is opening
   a different file rather than filtering a bigger one — and a store that has
   never heard of a project cannot leak one project's rows into another's view.
 - **`null` in, `null` out.** No project open, or a host too old to send a path,
-  and `kehikkoDir` answers `null`. A module then has nowhere to read and nowhere
+  and `kehikotDir` answers `null`. A module then has nowhere to read and nowhere
   to write, and says so. What it must not do is fall back to its own directory:
-  that is somebody's notes written into a folder they will never look in, under
-  a screen that says they were saved.
+  that is somebody's notes written into a folder they will never open, under a
+  screen that says they were saved.
 - **The path arrived over the wire, so the module still owns the fence.**
   `within()` is a string comparison, offered because `startsWith` gets it wrong
-  for `/p/.kehikko-elsewhere`. It is not the check. A module writing under a
-  path a host handed it has to `realpath` both sides and compare the results,
+  for `/p/.kehikot/notes-elsewhere`. It is not the check. A module writing under
+  a path a host handed it has to `realpath` both sides and compare the results,
   in its own process, where the filesystem is — this package does no I/O and
   cannot do it for you.
 
-`withKehikkoIgnored()` is the last piece: the text a project's `.gitignore`
+`withKehikotIgnored()` is the last piece: the text a project's `.gitignore`
 should have once that folder exists. Append-only, idempotent, and it carries a
 comment explaining what the folder is and that deleting the rule is how you
-share it — because a rule somebody cannot explain is a rule they delete.
+share it — because a rule somebody cannot explain is a rule they delete. It
+ignores the whole `.kehikot/`, not one module's folder, so adding a module
+never means editing somebody's ignore file again.
 
 ## Asking the host to move
 
