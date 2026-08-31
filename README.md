@@ -71,6 +71,13 @@ Concretely, the things this package deliberately does not do:
 | `KEHIKOT_DIR`, `moduleFolder`, `moduleDir`, `moduleFile`, `within` | Where a module keeps this project's data, given `context.projectPath`. |
 | `KEHIKOT_IGNORE`, `ignoresKehikot`, `withKehikotIgnored` | The lines that project's `.gitignore` gains, added once. |
 
+And behind two subpaths, which are not shapes and say so:
+
+| | |
+|---|---|
+| `roadmap-module-protocol/client` | `connect`, `mailbox`, `HostRefused` — the module half of the wire, for a page that would rather not write it again. Browser code, kept out of the front door so a Bun process can import shapes without it. **A convenience: a module may hand-roll its wire and be perfectly conforming.** |
+| `roadmap-module-protocol/client/react` | `useRoadmap`. Optional; `react` is an optional peer dependency and `client` does not import it. |
+
 ## The wire
 
 Eight messages. Four each way, across a frame, by `postMessage`.
@@ -426,10 +433,113 @@ world depends on this package yet, and because doing it at 2 is free where doing
 it at 3 would not be — but if you are adding a result schema for a method that
 already has consumers, that is a bump of its own.
 
+## The client, which is a second entry point and an optional one
+
+```
+import { connect } from 'roadmap-module-protocol/client'
+import { useRoadmap } from 'roadmap-module-protocol/client/react'   // optional again
+```
+
+Twelve modules wrote the same `postMessage` handshake by hand — 7,519 lines of
+`mailbox.ts`, `host.ts` and `use-roadmap.ts` between them — and two bugs turned
+up in several of those copies INDEPENDENTLY, months apart:
+
+- **The replayed greeting nobody was there for.** The host greets on the frame's
+  `load` event; a React effect runs strictly after that. A listener installed in
+  `useEffect` is installed after the greeting has come and gone, and nothing
+  retries. The remedy is a listener at module scope with a backlog — and the
+  remedy has its own race, because that backlog replays SYNCHRONOUSLY inside
+  `subscribe`, so `onHello` fires before the caller has stored the connection.
+  Two modules hit that second one and each spent an afternoon on a symptom that
+  reads "the module will not speak" while the host sees a module that answered
+  `ready`.
+- **The context rebuilt field by field.** A module that lists the fields it
+  copies out of `roadmap.context` silently drops every field the protocol later
+  adds. No error; just that module's settled belief that the host said nothing
+  about it. Five modules had it, and it was fixed five times with the same
+  one-liner: `const { type, protocol, ...context } = message`.
+
+So the client is here, once, with the reasoning attached. It knows how to be
+greeted, how to answer `ready` on **every** hello, how to correlate a request
+with its answer and time it out, how to turn a refusal into a `HostRefused`
+rather than a bare string, and how to guarantee `goto` is answered exactly once
+even when the module finds nothing — because `goto` is the one place a host
+WAITS on a module, and silence there makes every reference pointing at that
+module sit out the host's whole timeout.
+
+**It is a separate entry point, and that is not packaging trivia.** The front
+door of this package is shapes and nothing else, and a host's server or a
+module's server imports it from a Bun process where `window` does not exist.
+`roadmap-module-protocol/client` is where the browser code lives, so that rule
+stays true of `roadmap-module-protocol`.
+
+**The React hook is a third entry point, and optional twice over.** Not every
+module is a React app and none is obliged to be, so `client` imports no React;
+`client/react` is where the hook lives, `react` is an optional peer dependency,
+and everything the hook does can be done by hand with `connect`.
+
+### It is a convenience, and never a requirement
+
+The sentence about the schemas above is true of this too, and it matters more
+here than it does there.
+
+**A module that hand-rolls its own `postMessage` handshake is exactly as
+conforming as one that imports `connect`.** Nothing a host does looks at whether
+this package was imported, no manifest field records it, and no check will ever
+be added that does. What the client saves is not correctness — it is the twelfth
+author rediscovering the two races above.
+
+This is the whole design standing on one sentence, so it is worth saying the
+failure out loud: the moment the client reads as mandatory, *a module is an
+independent program somebody else could have written* has quietly become *a
+module is a program that imports our client*. Those are different projects. This
+package is the first one.
+
+### The two steps, which are the point
+
+```ts
+// main.tsx — for its side effect, from the ENTRY, before React renders anything.
+import 'roadmap-module-protocol/client'
+
+const live = connect('roadmap.example', {
+  onHello: (context, state) => { … },
+  onContext: (context) => { … },
+  onGoto: (message, answer) => answer(false, 'nothing here to walk to'),
+})
+held.current = live   // store it FIRST
+live.listen()         // then let the backlog replay
+```
+
+`connect` builds the conversation and hears nothing. `listen` subscribes, which
+is when a greeting already in the backlog is delivered — synchronously, inside
+that call. Splitting them is the only thing that makes the ordering the caller's
+to get right rather than the library's to get wrong silently.
+
+### `sideEffects`, and why it is no longer `false`
+
+This package declared `"sideEffects": false` for its whole life, correctly: a set
+of schemas has none. `src/client/mailbox.ts` has exactly one, and it is the
+entire point of the file — importing it installs a `message` listener at module
+scope, which is what catches a greeting posted before React has rendered.
+
+A bundler told `"sideEffects": false` is entitled to delete a bare
+`import 'roadmap-module-protocol/client'` that binds no names, and it would be
+right to. That deletion produces precisely the bug this client exists to prevent,
+in production only, silently. So `sideEffects` now names the two client files
+rather than saying `false`, and everything else in the package stays as
+shakeable as it was.
+
+`connect` also takes `answerWithin`, `gotoBackstop` and `source`, because the
+modules already disagree about the first two and every one of those differences
+may be load-bearing. Adopting the client should not quietly change what a module
+does on the wire.
+
 ## Development
 
 ```
 bun test        # what a bound refuses, what a bad id refuses, that a version is part of a name,
-                # and that a caller can tell a decline from a dead reference from a broken call
+                # that a caller can tell a decline from a dead reference from a broken call,
+                # and — for the client — that a greeting already in the backlog reaches a page
+                # that has stored its connection, which a one-step connect fails by construction
 bun run build   # tsc to dist/
 ```

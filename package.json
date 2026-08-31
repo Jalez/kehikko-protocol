@@ -1,6 +1,6 @@
 {
   "name": "roadmap-module-protocol",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "description": "The shapes a roadmap host and a module it frames agree on: the manifest, the wire, and the extension payloads. Shapes only \u2014 no I/O, no state, no decisions.",
   "keywords": [
     "roadmap",
@@ -21,6 +21,14 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./client": {
+      "types": "./dist/client/index.d.ts",
+      "default": "./dist/client/index.js"
+    },
+    "./client/react": {
+      "types": "./dist/client/react.d.ts",
+      "default": "./dist/client/react.js"
+    },
     "./package.json": "./package.json"
   },
   "files": [
@@ -28,7 +36,12 @@
     "src",
     "README.md"
   ],
-  "sideEffects": false,
+  "sideEffects": [
+    "./dist/client/mailbox.js",
+    "./dist/client/index.js",
+    "./src/client/mailbox.ts",
+    "./src/client/index.ts"
+  ],
   "engines": {
     "node": ">=18"
   },
@@ -39,11 +52,22 @@
     "prepublishOnly": "bun run build"
   },
   "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@happy-dom/global-registrator": "^20.12.0",
     "@types/bun": "latest",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.5",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
     "typescript": "^5.7.0",
     "zod": "^3.25.76"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
   }
 }
