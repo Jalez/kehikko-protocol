@@ -1,8 +1,9 @@
 import { get as httpGet } from 'node:http'
 import { createServer } from 'node:net'
+import { join } from 'node:path'
 
 import { MANIFEST_KIND, WELL_KNOWN } from '../constants.js'
-import { neighbourPorts, registryDir } from './registry.js'
+import { neighbourPorts, portOf, readRegistration, registryDir } from './registry.js'
 
 /**
  * Which port this module binds, decided rather than assumed.
@@ -308,6 +309,43 @@ export async function claim({
      re-derives — if a fourth occupant is ever added, the compiler asks about it
      there and this keeps drifting rather than crashing. */
   const because = said.take === 'another' ? said.because : `something is listening on ${prefer}`
+
+  /**
+   * Before drifting: is this module already answering where it last said it was?
+   *
+   * This was found by running the thing rather than by thinking about it, and it
+   * is the second start after a first one has already drifted. The squatter is
+   * still on 7960, so the preferred port is occupied by a stranger, so the
+   * already-running check above never fires — and the module walks past its own
+   * running copy on 7961 to start a SECOND one on 7962. Two stores, two MCP
+   * doors, two committers, which is precisely the state that check exists to
+   * make impossible, arriving through the one door it did not cover.
+   *
+   * So the module's own registration is consulted, and only in the drift path.
+   * It costs one file read and one request in a case that is already going
+   * slowly, and it costs the common case nothing at all.
+   *
+   * The registration is a hint and never an authority. It is asked the same
+   * question the preferred port was asked, and only an answer carrying THIS id
+   * stops the start — a stale file naming a port somebody else now holds says
+   * nothing about whether this module is running, and treating it as if it did
+   * would be a module refusing to start because of a line in a file.
+   */
+  const mine = portOf(readRegistration(join(registry, `${id}.json`))?.url ?? '')
+  if (mine !== null && mine !== prefer && !(await isFree(mine))) {
+    const there = await ask(mine, timeoutMs)
+    if (there.at === 'module' && there.id === id) {
+      return {
+        status: 'already-running',
+        id,
+        prefer,
+        port: mine,
+        origin: originFor(mine),
+        moved: false,
+        why: `${id} is already answering at ${originFor(mine)}, where it moved to last time`,
+      }
+    }
+  }
 
   const reserved = neighbourPorts(id, registry)
   let port: number | null = null

@@ -188,6 +188,61 @@ describe('claiming, against probes that answer on demand', () => {
   /* The registry is consulted for the DRIFT and never for the preference: a
      module is entitled to the port it registered even though its own file names
      it, and `neighbourPorts` excludes it by id for exactly that reason. */
+  /**
+   * The second start after a first one has already drifted, which is the case
+   * that got past the check above in real use.
+   *
+   * The squatter still holds 7960, so the preferred port is a stranger and
+   * "already running" never fires there — and without this the module walks past
+   * its own copy on 7961 to start a second one on 7962.
+   */
+  test('its own copy on the port it drifted to last time is found before drifting again', async () => {
+    const where = mkdtempSync(join(tmpdir(), 'roadmap-modules-'))
+    writeFileSync(join(where, `${ID}.json`), JSON.stringify({ url: 'http://127.0.0.1:7961', dir: '/x' }))
+
+    const got = await claim({
+      id: ID,
+      prefer: 7960,
+      registry: where,
+      probes: {
+        free: (port) => Promise.resolve(port !== 7960 && port !== 7961),
+        identify: (port) =>
+          Promise.resolve(
+            port === 7961 ? { at: 'module', id: ID } : { at: 'stranger', why: 'a squatter is still there' },
+          ),
+      },
+    })
+
+    expect(got.status).toBe('already-running')
+    expect(got.origin).toBe('http://127.0.0.1:7961')
+    expect(sayClaim(got)).toContain('7961')
+  })
+
+  /* A registration is a hint and never an authority. A stale file naming a port
+     somebody else now holds says nothing about whether this module is running,
+     and a module that refused to start because of a line in a file would be one
+     nobody could start again after a crash. */
+  test('a stale registration pointing at somebody else does not stop the start', async () => {
+    const where = mkdtempSync(join(tmpdir(), 'roadmap-modules-'))
+    writeFileSync(join(where, `${ID}.json`), JSON.stringify({ url: 'http://127.0.0.1:7961', dir: '/x' }))
+
+    const got = await claim({
+      id: ID,
+      prefer: 7960,
+      registry: where,
+      probes: {
+        free: (port) => Promise.resolve(port !== 7960 && port !== 7961),
+        identify: (port) =>
+          Promise.resolve(
+            port === 7961 ? { at: 'module', id: 'roadmap.notes' } : { at: 'stranger', why: 'a squatter' },
+          ),
+      },
+    })
+
+    expect(got.status).toBe('claimed')
+    expect(got.status === 'claimed' && got.port).toBe(7962)
+  })
+
   test('a neighbour’s registered port is stepped over while drifting', async () => {
     const where = mkdtempSync(join(tmpdir(), 'roadmap-modules-'))
     writeFileSync(join(where, 'roadmap.notes.json'), JSON.stringify({ url: 'http://127.0.0.1:7961', dir: '/x' }))

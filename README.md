@@ -572,6 +572,15 @@ next depends on **who** answered.
 - **A different module, a non-module, or silence.** It moves to the next free
   port, says so on stdout naming both numbers, and registers where it landed.
 
+Before it drifts, it also asks the port its own registration names, when that is
+somewhere else. That case was found by running the thing rather than by thinking
+about it: with a squatter still on 7960, a second `./run.sh` sees a stranger on
+the preferred port, never reaches the already-running check, and walks past its
+own copy on 7961 to start a second one on 7962 — the exact state that check
+exists to prevent, arriving through the one door it did not cover. The
+registration is a hint and never an authority: it is asked the same question, and
+only an answer carrying this module's own id stops the start.
+
 The drift steps over ports other modules have *registered* even when nothing is
 listening on them. Modules here sit ten apart, and most of them are not running
 most of the time; a drifter that took a neighbour's number would hand that
