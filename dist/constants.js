@@ -45,6 +45,14 @@
  *   at anything". A module that never reads it is untouched, and a module that
  *   does reads a real state rather than an absence. Nothing that already had a
  *   shape changed shape.
+ * - `roadmap.filters` is a new MESSAGE and `context.filters` a new context
+ *   field, and both pass the same test. A module message a host has never heard
+ *   of is dropped, which is what any unrecognised message has always produced,
+ *   and the module is left drawing its own control exactly as it did — it loses
+ *   a place to put the control, not the control. The context field defaults to
+ *   `{}`, which is precisely what a module reading it against an older host
+ *   would have found: nothing has been chosen for it, because nothing there can
+ *   choose. Nothing gets a second meaning and nothing changes shape.
  *
  * What did raise it is a rename. **Epics are not journeys**: an epic belongs to
  * a project and is the host's own material; a journey is a different idea
@@ -121,6 +129,47 @@ export const MESSAGE = {
      * pane nobody is looking at.
      */
     EVENT: 'roadmap.event',
+    /**
+     * Module → host. "Here is what I can be narrowed by."
+     *
+     * The tenth message, and the first one where a module offers the host
+     * something to DRAW rather than something to do. Everything else a module
+     * says is either a question (`request`), an answer (`went`), an announcement
+     * about itself (`ready`) or a wish about its own box (`resize`). This is a
+     * module handing over a small piece of its own interface, because the place
+     * that interface belongs is a strip the module cannot reach.
+     *
+     * ## Why a message and not a manifest field
+     *
+     * What a module can be narrowed by is not a fact about the program; it is a
+     * fact about what the program is showing right now. A file tree offers "hide
+     * ignored" and the label on it is `hide 3 ignored` in one directory and
+     * `hide 41 ignored` in the next. A manifest is read once, before the module
+     * runs, and could carry neither the count nor the fact that a particular
+     * project has nothing ignored in it at all.
+     *
+     * That is also what keeps this from becoming a third declaration beside
+     * `declares.uses` and `reacts`. Those two are written in a document a person
+     * reads BEFORE running the program, and the whole discipline around them is
+     * that nothing is granted by them. This is not in the manifest, is not read
+     * by anything before the module runs, and gates nothing: a module that never
+     * sends one is a module the host draws no control for, which is exactly what
+     * every module looked like the day before this existed.
+     *
+     * ## Fire and forget, like `resize` and for the same reason
+     *
+     * No id, no answer. The host may draw the offer, may draw part of it, may
+     * ignore it entirely; a module that needed to know can watch what arrives
+     * back in `context.filters`. A module posting this at a host that has never
+     * heard of it gets silence, which is what an unrecognised message has always
+     * produced in both directions.
+     *
+     * The offer REPLACES whatever was last offered, whole. An empty `groups` is
+     * how a module withdraws — it has nothing to be narrowed by any more, and the
+     * host takes the control away rather than leaving a menu of options that no
+     * longer mean anything.
+     */
+    FILTERS: 'roadmap.filters',
 };
 /** The prefix every message type carries, so a listener can drop the rest cheaply. */
 export const MESSAGE_PREFIX = 'roadmap.';
@@ -133,7 +182,13 @@ export const HOST_MESSAGES = [
     MESSAGE.EVENT,
 ];
 /** And what the module says. */
-export const MODULE_MESSAGES = [MESSAGE.READY, MESSAGE.REQUEST, MESSAGE.RESIZE, MESSAGE.WENT];
+export const MODULE_MESSAGES = [
+    MESSAGE.READY,
+    MESSAGE.REQUEST,
+    MESSAGE.RESIZE,
+    MESSAGE.WENT,
+    MESSAGE.FILTERS,
+];
 /**
  * How tall a frame may be asked to be.
  *
@@ -327,6 +382,76 @@ export const LIMITS = {
      * nonsense it is rather than drawn as a module that reacts to everything.
      */
     REACTIONS: 8,
+    /**
+     * The id of a filter group or of one of its options.
+     *
+     * Sixty-four, the same as `CAPABILITY`, `EXTENSION` and `REACTION`, and the
+     * sameness is the same argument: these are short machine words a module
+     * author invents once and then copies about, and an author made to remember
+     * four different ceilings for four kinds of short word will get one of them
+     * wrong.
+     *
+     * It is a bound and not a grammar. A host uses these as keys — in a stored
+     * record, in a React list, in a lookup — and the protocol deliberately does
+     * not say what they may contain, because a module's own vocabulary for its
+     * own filters is none of this package's business. What a host must NOT do is
+     * index a plain object with one; see `own()` in `ids.ts`, which exists for
+     * exactly this class of string.
+     */
+    FILTER_ID: 64,
+    /**
+     * The words a person reads on one filter group, or on one of its options.
+     *
+     * Forty-eight, which is deliberately twice `LABEL` and nowhere near
+     * `SUMMARY`, and both halves of that are load-bearing.
+     *
+     * Twice `LABEL` because these labels COUNT things. The five filters this was
+     * designed against are spelled `hide resolved`, `show ignored`, `hide
+     * preamble comments`, `this kehikko` — none of which needs the room — but the
+     * one that mattered most is `show 41 ignored`, where the number is the whole
+     * reason the label is worth reading. A label that had to be a fixed word
+     * could not say how much is being hidden, and hiding things quietly is the
+     * failure the modules that grew these controls were most careful about.
+     *
+     * Nowhere near `SUMMARY` because this is a string a stranger's program wrote
+     * that a host is about to lay out inside its own chrome. Forty-eight
+     * characters is a phrase; two hundred is a sentence that would have to wrap
+     * or truncate in a menu attached to a container that is often 220 pixels
+     * wide. A host should truncate anyway — and the host this was built for does,
+     * with the full text in a `title`, because a nowrap element carrying a
+     * variable string once put an 1187-pixel min-content floor under a 220-pixel
+     * container in this workspace. The bound is what keeps the truncation from
+     * ever having a document to do it to.
+     */
+    FILTER_LABEL: 48,
+    /**
+     * How many groups one module may offer at once.
+     *
+     * Four, and this is the number most likely to be argued with later, so here
+     * is the reasoning. Six of the seven filters in the workspace this was
+     * designed for are ONE group — a single choice from a single list. The
+     * seventh offers two independent groups that combine (a kind and a state),
+     * which is why the facility takes a list of groups at all rather than a list
+     * of options. Four leaves that module room to grow one more axis and still
+     * refuses the shape this control cannot be: a menu hanging off a
+     * twenty-four-pixel button in a container header is not somewhere to put a
+     * settings screen. A module with five axes has a settings screen, and it
+     * belongs in the module's own page where there is room for it.
+     */
+    FILTER_GROUPS: 4,
+    /**
+     * How many options one group may offer.
+     *
+     * Twelve, against the four the longest real one uses (all files → this file →
+     * this section → this selection). The room is for a group whose options are
+     * DISCOVERED rather than written — the branches in a repository, the people
+     * who wrote something — which is the obvious next thing somebody will want
+     * and the obvious way to hand a host a list of nine hundred. Twelve is more
+     * than a menu of this kind should hold and far less than a list that has to
+     * be scrolled, searched or paged, and a module whose options genuinely run to
+     * hundreds is a module that needs a control this one is not.
+     */
+    FILTER_OPTIONS: 12,
     /** How many refs one payload may carry, and how many may be selected at once. */
     REFS: 32,
     /**

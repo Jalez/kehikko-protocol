@@ -7,6 +7,7 @@ import {
 import {
   hostMessageSchema,
   looksLikeWireMessage,
+  type FilterGroup,
   type Goto,
   type ModuleContext,
   type ModuleEvent,
@@ -223,6 +224,34 @@ export interface Connection {
   request: (method: string, params?: Record<string, unknown>) => Promise<unknown>
   /** Say how tall we would like to be. Fire and forget, by design. */
   resize: (height: number) => void
+  /**
+   * Say what this page can be narrowed by, so the host can draw the control.
+   *
+   * Fire and forget, like `resize`, and for the same reason: the host may draw
+   * it, may draw part of it, or may not have heard of the idea. What comes back
+   * is not an answer but a `roadmap.context` with `filters` in it, which is
+   * where a page reads the choice — including the first time, out of the
+   * greeting, before it has drawn anything.
+   *
+   * ## Remembered, and re-sent on every greeting
+   *
+   * The offer is held here and posted again whenever the host greets. That is
+   * not a convenience; without it the feature has a silent failure with the
+   * shape this package keeps finding.
+   *
+   * A page normally announces its offer from an effect after its first render,
+   * and the greeting normally arrived before that — that is the entire reason
+   * `mailbox` exists — so the ordinary case is fine. The case that is not is a
+   * frame that RELOADS: the host greets again, and a page whose offer had not
+   * changed since would have no reason to send anything, so the host would
+   * carry an offer from a conversation that no longer exists, or none at all.
+   * Neither errors. The control simply goes missing, or stops matching what is
+   * on screen, on a page that looks entirely normal.
+   *
+   * So the last offer is replayed after `ready`, every time. A page that calls
+   * this once at mount and never again is correct across every reload.
+   */
+  filters: (groups: FilterGroup[]) => void
   /** Whether anything has greeted us yet. */
   greeted: () => boolean
   /** Stop listening. Every question still waiting is refused rather than left hanging. */
@@ -245,6 +274,11 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
   let origin = '*'
   let live = true
   let listening = false
+  /* The last offer, replayed on every greeting. See `filters` above for the
+     reload this exists to survive. `null` means nothing has been offered, which
+     is not the same as an empty offer: an empty one is a module saying it has
+     nothing to be narrowed by now, and has to be sent. */
+  let offered: FilterGroup[] | null = null
 
   /** Correlation id -> the promise waiting on it. A `Map`, per the protocol's note on lookups. */
   const waiting = new Map<
@@ -300,6 +334,11 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
       host = (ev.source as Window | null) ?? source.parent ?? null
       origin = ev.origin && ev.origin !== 'null' ? ev.origin : '*'
       send({ type: MESSAGE.READY, id, protocol: message.protocol ?? PROTOCOL })
+      /* After `ready` and before the page is told, so that a host which reads
+         the offer while composing what to draw has it, and so that a handler
+         which announces a NEW offer from `onHello` overwrites the replay rather
+         than being overwritten by it. */
+      if (offered !== null) send({ type: MESSAGE.FILTERS, groups: offered })
       events.onHello?.(message.context, message.state)
       return
     }
@@ -414,6 +453,15 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
          ask for is what we will get. The host runs its own copy over the raw
          number regardless — this is prediction, not enforcement. */
       send({ type: MESSAGE.RESIZE, height: clampHeight(height) })
+    },
+
+    filters(groups) {
+      /* Kept before it is sent, so that an offer made before the greeting is
+         not lost — it goes out with the replay instead. `send` is a no-op
+         without a host, and a page that announced early and never again would
+         otherwise have a control that never appears. */
+      offered = groups
+      send({ type: MESSAGE.FILTERS, groups })
     },
 
     greeted: () => host !== null,

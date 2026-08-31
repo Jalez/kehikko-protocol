@@ -183,6 +183,199 @@ export const passageSchema = z.object({
 /** Where the reader is pointing, at whatever precision they have. */
 export type Passage = z.infer<typeof passageSchema>
 
+/* ------------------------------------------------------------------------ *
+ * Filters: what a module offers to be narrowed by, and what was chosen
+ * ------------------------------------------------------------------------ */
+
+/**
+ * The id of a filter group, or of one option within one.
+ *
+ * ## Three spellings a module may not use, and why the refusal is here
+ *
+ * A choice travels as a RECORD keyed by group id, and a record is a plain
+ * object. `__proto__`, `constructor` and `prototype` are the three keys that do
+ * not behave like keys: assigning `__proto__` on an object literal re-parents
+ * it rather than storing anything, and reading `constructor` off one finds
+ * something inherited that was never written. A host that stored a choice under
+ * one of those and read it back would get an answer it never put there — which
+ * is the same hazard `own()` in `ids.ts` exists for, arriving from a new
+ * direction, and this time in a key the module chose.
+ *
+ * `own()` remains the rule for READING these — a host must not index a plain
+ * object with a string a stranger sent, whatever this schema says. The refusal
+ * here is the second half of the defence rather than a substitute for it: it
+ * means the three names never reach storage in the first place, so a host that
+ * gets a lookup wrong somewhere has nothing to get it wrong with.
+ *
+ * Nothing else is legislated. A module's own vocabulary for its own filters is
+ * not this package's business, and a regex over it would be this file deciding
+ * what a program may call the thing it hides.
+ */
+const RESERVED_IDS = new Set(['__proto__', 'constructor', 'prototype'])
+
+const filterId = z
+  .string()
+  .min(1)
+  .max(LIMITS.FILTER_ID)
+  .refine((id) => !RESERVED_IDS.has(id), {
+    message: '__proto__, constructor and prototype are not usable as filter ids',
+  })
+
+const filterLabel = z.string().min(1).max(LIMITS.FILTER_LABEL)
+
+/**
+ * One value a module can be narrowed to.
+ *
+ * An id and a word, and there is deliberately nothing else. No icon, no colour,
+ * no count field, no "kind", no hint about whether this option means more or
+ * less of anything.
+ *
+ * ## The host must not understand what a filter MEANS
+ *
+ * This is the whole discipline of the feature and it is easy to erode one
+ * helpful-looking field at a time. A host that knew `resolved` from `ignored`
+ * would be a host to be updated every time a module has a new idea, and the
+ * modules this was designed against have six different ideas between them —
+ * resolved, ignored, preamble comments, which kehikko an event came from, what
+ * kind a reference is, what state it is in. Enumerating those in a protocol
+ * would freeze somebody else's vocabulary into a package they do not own.
+ *
+ * So the host's entire knowledge is: there are some options, one of them is
+ * current, and here are the words to print. It draws a menu and reports a
+ * press. The meaning stays where the meaning is, which is in the module that
+ * wrote the label.
+ *
+ * ## The count rides in the label, on purpose
+ *
+ * `hide 3 ignored` is one string, not a label and a number. A separate count
+ * field would be the host deciding how a count is phrased and where it goes,
+ * for a module that knows both far better — and it would be wrong immediately
+ * for the modules whose interesting number is a fraction (`12 of 40 shown`) or
+ * is not a number at all. A module re-announces its offer whenever the words
+ * change, which it has to do anyway when its options change, so the count is
+ * live for free.
+ *
+ * What a host cannot do is count anything itself. It sees rows it does not
+ * render, in a document it cannot read, in a frame on another origin. A module
+ * for which the exact number must be visible without a press should go on
+ * drawing it in its own page; a header control can say THAT something is
+ * narrowed, not how much.
+ */
+export const filterOptionSchema = z.object({
+  id: filterId,
+  label: filterLabel,
+})
+export type FilterOption = z.infer<typeof filterOptionSchema>
+
+/**
+ * One axis a module can be narrowed along, and the options on it.
+ *
+ * ## Why groups, plural, rather than one list of options
+ *
+ * Six of the seven filters this was designed against are a single choice from a
+ * single list, and a facility taking one list would have fitted them all. The
+ * seventh — a module that lists an epic's references — narrows by KIND and by
+ * STATE at the same time, and the two are independent: issue-and-open is a
+ * combination somebody actually wants, and it cannot be spelled as one choice
+ * from one list without multiplying the two lists together into twelve options
+ * that a person then has to read as a grid.
+ *
+ * So the shape is a list of groups, each with its own current value, and the
+ * one-group case is a list of length one. Two axes cost that module one more
+ * entry and cost every other module nothing.
+ *
+ * ## What this cannot express, said plainly
+ *
+ * **Free text.** The same references module also narrows by a typed query, and
+ * there is no shape here for one. That is a decision rather than an oversight:
+ * a text input in a container header is a much worse idea than a button in one
+ * — it needs room a 220-pixel header does not have, it needs focus, it needs a
+ * keyboard, and a host cannot debounce or interpret somebody else's search.
+ *
+ * The honest consequence is that such a module would have its filtering in two
+ * places, and it may well decide that is worse than having it in one. Nothing
+ * here obliges a module to hand over the enumerated part of its filtering just
+ * because it can, and a module that keeps all of it is a conforming module.
+ *
+ * ## `fallback` is what makes a stale choice recoverable
+ *
+ * It names the option this group is on when nobody has chosen — the wide one,
+ * the unnarrowed one, whatever the module considers its resting state. It does
+ * three jobs, and each would otherwise need its own field or its own
+ * convention:
+ *
+ * - it is the choice for a container nobody has ever pressed this on;
+ * - it is what a host returns to when a remembered choice names an option the
+ *   module no longer offers, which is the difference between a filter degrading
+ *   to normal and a container narrowed by a value nobody can see or clear;
+ * - it is how a host can offer one press that puts everything back, without
+ *   knowing which of the options means "everything".
+ *
+ * It must name one of this group's own options, and the schema checks that,
+ * because a fallback pointing at nothing would turn the recovery path into a
+ * second broken state.
+ */
+export const filterGroupSchema = z
+  .object({
+    id: filterId,
+    /** What this axis is called: `ignored`, `kind`, `scope`. A person reads it. */
+    label: filterLabel,
+    options: z.array(filterOptionSchema).min(1).max(LIMITS.FILTER_OPTIONS),
+    /** Which option this group is on when nobody has chosen. One of `options`. */
+    fallback: filterId,
+  })
+  .refine((group) => group.options.some((option) => option.id === group.fallback), {
+    message: "a group's fallback has to be one of its own options",
+  })
+  .refine((group) => new Set(group.options.map((o) => o.id)).size === group.options.length, {
+    message: 'two options in one group cannot share an id',
+  })
+export type FilterGroup = z.infer<typeof filterGroupSchema>
+
+/**
+ * What a module currently offers to be narrowed by. The whole offer, every time.
+ *
+ * Replacing rather than merging, and the difference is the one that matters
+ * when a module's options CHANGE: a merge could never remove a group, so a
+ * module that stopped offering something would leave a control behind it that a
+ * person could press and nothing would answer. An empty array is a real message
+ * — "nothing here can be narrowed now" — and a host that receives one takes the
+ * control away.
+ *
+ * A module sends this whenever the answer changes, which includes whenever the
+ * words change. See `filterOptionSchema` on why the count lives in the label.
+ */
+export const filtersSchema = z.object({
+  type: z.literal(MESSAGE.FILTERS),
+  groups: z
+    .array(filterGroupSchema)
+    .max(LIMITS.FILTER_GROUPS)
+    .refine((groups) => new Set(groups.map((g) => g.id)).size === groups.length, {
+      message: 'two groups cannot share an id',
+    }),
+})
+export type Filters = z.infer<typeof filtersSchema>
+
+/**
+ * Which option is current in each group: group id → option id.
+ *
+ * This is the half that travels back, and it travels in `roadmap.context` — see
+ * the field there for why it is context rather than a message of its own.
+ *
+ * Bounded to `FILTER_GROUPS` entries, so the record cannot be larger than the
+ * offer that produced it. A host filling this in from its own store should also
+ * drop anything the module is not currently offering, so that a module never
+ * receives a choice it does not recognise; a module should nevertheless fall
+ * back to its own default for an option id it does not know, because both
+ * halves of a disagreement have to be able to survive it alone.
+ */
+export const filterChoiceSchema = z
+  .record(filterId, filterId)
+  .refine((chosen) => Object.keys(chosen).length <= LIMITS.FILTER_GROUPS, {
+    message: `no more than ${LIMITS.FILTER_GROUPS} filter groups can be chosen at once`,
+  })
+export type FilterChoice = z.infer<typeof filterChoiceSchema>
+
 export const contextSchema = z.object({
   epic: z.string().regex(EPIC_SLUG).nullable().default(null),
   /**
@@ -404,6 +597,55 @@ export const contextSchema = z.object({
    * from far, which is a smaller loss than being handed a wrong answer.
    */
   kehikko: z.object({ id: z.number().int(), name: z.string().max(80) }).nullable().default(null),
+  /**
+   * Which of the filters this module offered are currently chosen for it.
+   *
+   * ## Why the choice is context and not a message of its own
+   *
+   * The offer goes one way as `roadmap.filters`, so the obvious symmetry is a
+   * `roadmap.chose` coming back. It is the wrong shape, for three reasons that
+   * all point the same way.
+   *
+   * The first is that a module has to have this BEFORE it draws. A page told
+   * which filter it is on a beat after it mounted renders the unnarrowed list
+   * and then narrows it, in front of somebody watching — the visible-flicker
+   * failure `state` in `helloSchema` exists to prevent, and the greeting is the
+   * only thing that arrives before the first render. A message of its own would
+   * either have to be duplicated into the greeting anyway, or arrive too late.
+   *
+   * The second is that it is not an event. A filter is TRUE for as long as it
+   * is set, and a module can arrive late to it — reloaded, restarted hours
+   * later by a host that had stopped it, framed for the first time on a canvas
+   * where somebody chose something last week. That is exactly the argument
+   * `passage` makes a few fields up: state is what a module can arrive late to,
+   * and a message sent at the moment of pressing is gone by then.
+   *
+   * The third is that it is per-CONTAINER, and this is the message that already
+   * carries per-container facts. `pinned` and `prompt` are both here for the
+   * same reason: a module's page is loaded once and shown on whichever canvas
+   * asks for it, so anything that differs between two places the same module is
+   * shown has to arrive on the channel the host re-sends when the canvas moves.
+   * A separate message would need its own copy of that discipline.
+   *
+   * ## What a module should do with an id it does not recognise
+   *
+   * Use its own default for that group, and say nothing. A host is expected to
+   * drop a choice naming an option the module is not currently offering — see
+   * `fallback` on `filterGroupSchema` — but a host cannot do that before the
+   * module has said what it offers, and the greeting goes out first. So the
+   * first choice a module ever receives may name an option from a version of
+   * itself that no longer exists, and a module that trusted it would narrow by
+   * a value nobody can see, choose, or clear.
+   *
+   * Both halves defend it, deliberately. Two programs that each assume the
+   * other got it right is how a stale value survives.
+   *
+   * Empty rather than absent, for the reason every other field here is: "nothing
+   * is narrowed" is a state a module has to be able to move back into, and a
+   * module reading this against a host that has never heard of filters finds
+   * `{}`, which is the true answer there.
+   */
+  filters: filterChoiceSchema.default({}),
 })
 export type ModuleContext = z.infer<typeof contextSchema>
 
@@ -783,7 +1025,13 @@ export const hostMessageSchema = z.union([
 ])
 export type HostMessage = z.infer<typeof hostMessageSchema>
 
-export const moduleMessageSchema = z.union([readySchema, requestSchema, resizeSchema, wentSchema])
+export const moduleMessageSchema = z.union([
+  readySchema,
+  requestSchema,
+  resizeSchema,
+  wentSchema,
+  filtersSchema,
+])
 export type ModuleMessage = z.infer<typeof moduleMessageSchema>
 
 export type WireMessage = HostMessage | ModuleMessage
@@ -797,6 +1045,7 @@ export type Ready = z.infer<typeof readySchema>
 export type Request = z.infer<typeof requestSchema>
 export type Resize = z.infer<typeof resizeSchema>
 export type Went = z.infer<typeof wentSchema>
+
 
 /**
  * Is this worth parsing at all?

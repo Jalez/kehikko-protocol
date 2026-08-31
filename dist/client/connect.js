@@ -60,6 +60,11 @@ export function connect(id, events = {}, options = {}) {
     let origin = '*';
     let live = true;
     let listening = false;
+    /* The last offer, replayed on every greeting. See `filters` above for the
+       reload this exists to survive. `null` means nothing has been offered, which
+       is not the same as an empty offer: an empty one is a module saying it has
+       nothing to be narrowed by now, and has to be sent. */
+    let offered = null;
     /** Correlation id -> the promise waiting on it. A `Map`, per the protocol's note on lookups. */
     const waiting = new Map();
     let counter = 0;
@@ -113,6 +118,12 @@ export function connect(id, events = {}, options = {}) {
             host = ev.source ?? source.parent ?? null;
             origin = ev.origin && ev.origin !== 'null' ? ev.origin : '*';
             send({ type: MESSAGE.READY, id, protocol: message.protocol ?? PROTOCOL });
+            /* After `ready` and before the page is told, so that a host which reads
+               the offer while composing what to draw has it, and so that a handler
+               which announces a NEW offer from `onHello` overwrites the replay rather
+               than being overwritten by it. */
+            if (offered !== null)
+                send({ type: MESSAGE.FILTERS, groups: offered });
             events.onHello?.(message.context, message.state);
             return;
         }
@@ -222,6 +233,14 @@ export function connect(id, events = {}, options = {}) {
                ask for is what we will get. The host runs its own copy over the raw
                number regardless — this is prediction, not enforcement. */
             send({ type: MESSAGE.RESIZE, height: clampHeight(height) });
+        },
+        filters(groups) {
+            /* Kept before it is sent, so that an offer made before the greeting is
+               not lost — it goes out with the replay instead. `send` is a no-op
+               without a host, and a page that announced early and never again would
+               otherwise have a control that never appears. */
+            offered = groups;
+            send({ type: MESSAGE.FILTERS, groups });
         },
         greeted: () => host !== null,
         stop() {

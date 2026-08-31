@@ -646,3 +646,63 @@ describe('after stopping', () => {
     expect(host.said).toEqual([])
   })
 })
+
+describe('the offer of what this page can be narrowed by', () => {
+  test('goes out as a module message, and is not answered', () => {
+    const { source, deliver } = fakeWindow()
+    const host = speaker()
+    const live = attach({}, { source })
+    deliver(hello(host))
+    live.filters([
+      { id: 'ignored', label: 'ignored files', fallback: 'hide', options: [{ id: 'hide', label: 'hide 3 ignored' }] },
+    ])
+    expect(host.said).toHaveLength(2)
+    expect((host.said[1] as { type: string }).type).toBe(MESSAGE.FILTERS)
+  })
+
+  /*
+   * A page announces its offer from an effect after its first render, and the
+   * greeting has almost always already arrived by then. The case that is not
+   * fine is a frame that RELOADS: the host greets again, and a page whose offer
+   * has not changed since has no reason to send anything — so without the
+   * replay the host is left carrying an offer from a conversation that no
+   * longer exists, or none at all. Neither errors; the control simply goes
+   * missing on a page that looks entirely normal.
+   */
+  test('is replayed on every greeting, so a reload does not lose the control', () => {
+    const { source, deliver } = fakeWindow()
+    const host = speaker()
+    const live = attach({}, { source })
+    deliver(hello(host))
+    live.filters([
+      { id: 'ignored', label: 'ignored files', fallback: 'hide', options: [{ id: 'hide', label: 'hide' }] },
+    ])
+    host.said.length = 0
+
+    deliver(hello(host))
+    expect(host.said.map((m) => (m as { type: string }).type)).toEqual([MESSAGE.READY, MESSAGE.FILTERS])
+  })
+
+  test('an offer made before the greeting is kept rather than lost', () => {
+    const { source, deliver } = fakeWindow()
+    const host = speaker()
+    const live = attach({}, { source })
+    /* Nothing has greeted us, so this cannot be sent anywhere. It must not
+       simply evaporate: a page that announced early and never again would have
+       a control that never appears. */
+    live.filters([{ id: 'scope', label: 'scope', fallback: 'all', options: [{ id: 'all', label: 'all' }] }])
+    expect(host.said).toHaveLength(0)
+
+    deliver(hello(host))
+    expect(host.said.map((m) => (m as { type: string }).type)).toEqual([MESSAGE.READY, MESSAGE.FILTERS])
+  })
+
+  test('a page that never offers anything sends nothing at all', () => {
+    const { source, deliver } = fakeWindow()
+    const host = speaker()
+    attach({}, { source })
+    deliver(hello(host))
+    deliver(hello(host))
+    expect(host.said.every((m) => (m as { type: string }).type === MESSAGE.READY)).toBe(true)
+  })
+})

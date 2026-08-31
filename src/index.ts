@@ -87,6 +87,10 @@ export {
   requestSchema,
   resizeSchema,
   wentSchema,
+  filtersSchema,
+  filterGroupSchema,
+  filterOptionSchema,
+  filterChoiceSchema,
   hostMessageSchema,
   moduleMessageSchema,
   looksLikeWireMessage,
@@ -105,6 +109,10 @@ export {
   type Request,
   type Resize,
   type Went,
+  type Filters,
+  type FilterGroup,
+  type FilterOption,
+  type FilterChoice,
 } from './wire.js'
 
 export {

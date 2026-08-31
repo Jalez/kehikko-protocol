@@ -1,4 +1,4 @@
-import type { ModuleContext } from '../wire.js';
+import type { FilterGroup, ModuleContext } from '../wire.js';
 import { type Connection, type ConnectOptions, type HostEvents } from './connect.js';
 /**
  * The bridge as one React value — and it is OPTIONAL, twice over.
@@ -61,6 +61,16 @@ export interface Roadmap {
     request: (method: string, params?: Record<string, unknown>) => Promise<unknown>;
     /** Say how tall this page would like its frame to be. Silent when nothing is framing it. */
     resize: (height: number) => void;
+    /**
+     * Say what this page can be narrowed by. The host draws the control; the
+     * choice comes back in `context.filters`.
+     *
+     * Stable across renders, so it can be called from an effect whose only other
+     * dependency is whatever made the offer change — which is the ordinary
+     * pattern, because a label that carries a count changes whenever the count
+     * does.
+     */
+    filters: (groups: FilterGroup[]) => void;
     /**
      * The live connection, or null between mounts.
      *

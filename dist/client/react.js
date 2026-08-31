@@ -137,7 +137,8 @@ export function useRoadmap(id, events = {}, options = {}) {
         return Promise.reject(new HostRefused({ reason: 'silent', error: NOBODY_TO_ASK }));
     }, []);
     const resize = useCallback((height) => held.current?.resize(height), []);
+    const filters = useCallback((groups) => held.current?.filters(groups), []);
     const connection = useCallback(() => held.current, []);
-    return useMemo(() => ({ where, context, state, request, resize, connection }), [where, context, state, request, resize, connection]);
+    return useMemo(() => ({ where, context, state, request, resize, filters, connection }), [where, context, state, request, resize, filters, connection]);
 }
 //# sourceMappingURL=react.js.map

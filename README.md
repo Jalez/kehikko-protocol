@@ -80,7 +80,7 @@ And behind two subpaths, which are not shapes and say so:
 
 ## The wire
 
-Eight messages. Four each way, across a frame, by `postMessage`.
+Ten messages, across a frame, by `postMessage`.
 
 | Host → module | |
 |---|---|
@@ -88,6 +88,7 @@ Eight messages. Four each way, across a frame, by `postMessage`.
 | `roadmap.context` | Which epic is open, which project it belongs to and where that project is on disk, which theme. Sent on every switch. |
 | `roadmap.response` | The answer to exactly one request. |
 | `roadmap.goto` | Go to this reference. |
+| `roadmap.event` | An extension payload another module emitted. |
 
 | Module → host | |
 |---|---|
@@ -95,6 +96,7 @@ Eight messages. Four each way, across a frame, by `postMessage`.
 | `roadmap.request` | One question, with an id the answer carries back. |
 | `roadmap.resize` | How tall it would like to be. |
 | `roadmap.went` | Whether the `goto` found anything. |
+| `roadmap.filters` | What this module can be narrowed by, so the host can draw the control. |
 
 `goto` and `went` are the new pair, and `went` is the piece the protocol has
 always lacked. Everything else the host says is fire-and-forget. `goto` cannot
@@ -367,6 +369,86 @@ The open epic is deliberately not in the vocabulary: `modes[].scope` already
 says whether a module follows the reader, and `declares.prompt` already says
 whether it wants a prompt. The rule for adding a word is that no other field in
 the manifest already says it.
+
+## A filter the host draws and the module means
+
+Five modules in the workspace this was distilled from had each built the same
+control: a toggle spelled `hide resolved`, or `show 3 ignored`, or `hide
+preamble comments`, or `all / this kehikko / no kehikko`, each drawn inside a
+module's own page, each eating a row in a column that is often 220 pixels wide.
+A sixth was about to grow two more. They are the same idea seven times, and none
+of them could be put anywhere but inside the module, because the strip around a
+module belongs to the host.
+
+So a module can hand the host the values and let the host draw the control.
+
+```ts
+live.filters([
+  {
+    id: 'ignored',
+    label: 'ignored files',
+    fallback: 'hide',
+    options: [
+      { id: 'hide', label: 'hide 3 ignored' },
+      { id: 'show', label: 'show them' },
+    ],
+  },
+])
+```
+
+`roadmap.filters` goes module → host and replaces the whole offer every time; an
+empty `groups` withdraws it. The choice comes back the other way in
+`context.filters`, a record of group id → option id.
+
+**The host must not understand what a filter means.** An option is an id and a
+short label, and there is deliberately no icon, no count field, no kind and no
+hint about whether one option means more of anything than another. A host that
+knew `resolved` from `ignored` would be a host to be updated every time a module
+has a new idea, and the modules this was built for have six different ideas
+between them. The host draws a menu and reports a press; the meaning stays in
+the program that wrote the label.
+
+**It is a third thing, and not a third declaration.** `declares.uses` is what a
+module asks the host FOR. `reacts` is what a module says it DOES with what it is
+already given. Both are written in a manifest, read before the program runs, by
+a person deciding whether to run it. This is none of those: it is not in the
+manifest, is sent by a running module about what it is showing right now, and
+gates nothing. A module that never sends one is a module the host draws no
+control for — which is what every module looked like the day before this
+existed, and is still what most of them look like.
+
+**Groups, plural, because two axes can be live at once.** Six of the seven real
+filters are one choice from one list. The seventh narrows by kind and by state
+independently, which cannot be spelled as one list without multiplying the two
+together. The one-group case is a list of length one.
+
+**Free text is not expressible, and that is a decision.** A text input in a
+container header needs room a 220-pixel header does not have, needs focus, needs
+a keyboard, and cannot be debounced or interpreted by a host that does not know
+what it is searching. A module with a query box keeps it in its own page — and
+may reasonably decide that having its filtering in two places is worse than
+having it in one, in which case it keeps all of it.
+
+**`fallback` is what makes a stale choice recoverable.** It names the option a
+group is on when nobody has chosen. It is also what a host returns to when a
+remembered choice names an option the module no longer offers, and what lets a
+host offer one press that puts everything back without knowing which option
+means "everything". A module should ALSO fall back to its own default for an id
+it does not recognise: a host cannot prune a stored choice before the module has
+said what it offers, and the greeting goes out first. Both halves have to be
+able to survive the disagreement alone.
+
+**The count rides in the label.** `hide 3 ignored` is one string. A separate
+count field would be the protocol deciding how a count is phrased, for a module
+that knows better and whose interesting number is sometimes a fraction. A host
+cannot count anything itself — it sees rows it does not render, in a document it
+cannot read, in a frame on another origin. A module for which the exact number
+must be visible without a press should go on drawing it in its own page.
+
+Where the choice is REMEMBERED is the host's business and not this package's.
+The one thing the shapes insist on is that it arrives in the greeting, so a
+module never draws its defaults and corrects them a moment later — the same
+argument `state` makes, and the same flicker.
 
 ## Every string is bounded
 

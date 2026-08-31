@@ -1,4 +1,4 @@
-import { type Goto, type ModuleContext, type ModuleEvent, type ResponseFailureReason } from '../wire.js';
+import { type FilterGroup, type Goto, type ModuleContext, type ModuleEvent, type ResponseFailureReason } from '../wire.js';
 import { type MessageSource } from './mailbox.js';
 /**
  * The bridge, and nothing about any one module.
@@ -201,6 +201,34 @@ export interface Connection {
     request: (method: string, params?: Record<string, unknown>) => Promise<unknown>;
     /** Say how tall we would like to be. Fire and forget, by design. */
     resize: (height: number) => void;
+    /**
+     * Say what this page can be narrowed by, so the host can draw the control.
+     *
+     * Fire and forget, like `resize`, and for the same reason: the host may draw
+     * it, may draw part of it, or may not have heard of the idea. What comes back
+     * is not an answer but a `roadmap.context` with `filters` in it, which is
+     * where a page reads the choice — including the first time, out of the
+     * greeting, before it has drawn anything.
+     *
+     * ## Remembered, and re-sent on every greeting
+     *
+     * The offer is held here and posted again whenever the host greets. That is
+     * not a convenience; without it the feature has a silent failure with the
+     * shape this package keeps finding.
+     *
+     * A page normally announces its offer from an effect after its first render,
+     * and the greeting normally arrived before that — that is the entire reason
+     * `mailbox` exists — so the ordinary case is fine. The case that is not is a
+     * frame that RELOADS: the host greets again, and a page whose offer had not
+     * changed since would have no reason to send anything, so the host would
+     * carry an offer from a conversation that no longer exists, or none at all.
+     * Neither errors. The control simply goes missing, or stops matching what is
+     * on screen, on a page that looks entirely normal.
+     *
+     * So the last offer is replayed after `ready`, every time. A page that calls
+     * this once at mount and never again is correct across every reload.
+     */
+    filters: (groups: FilterGroup[]) => void;
     /** Whether anything has greeted us yet. */
     greeted: () => boolean;
     /** Stop listening. Every question still waiting is refused rather than left hanging. */
