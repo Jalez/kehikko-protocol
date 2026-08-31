@@ -69,6 +69,80 @@ export type ModuleMode = z.infer<typeof modeSchema>
  */
 const url = z.string().min(1).max(LIMITS.URL)
 
+/**
+ * The context kinds a module can say it REACTS to.
+ *
+ * ## What this is, and the one thing it is not
+ *
+ * It is documentation a module writes about itself, for a person reading a
+ * registry. Nothing else. A host must not gate, filter, withhold or route
+ * anything on the strength of it: the context goes to every framed module on
+ * the canvas, unchanged, whether or not the module said a word here. A module
+ * that declares nothing keeps working exactly as it did, and a module that
+ * declares everything gets nothing it did not already have — it is merely wrong
+ * in a list, which is the whole of the penalty and should stay that way.
+ *
+ * The next person to read this will be tempted to make it mean something, and
+ * the temptation has a shape: it looks like it would be cheap to skip the
+ * broadcast to frames that did not declare an interest. Do not. `context.ts`
+ * composes ONE context per canvas on purpose, a host that composed a different
+ * one per container would be deciding what each module may know, and the module
+ * that gets an empty `passage` because it forgot a word in its manifest fails
+ * silently and unfixably from inside. The saving is a `postMessage`; the cost
+ * is a permission nobody agreed to build.
+ *
+ * ## Why it is NOT beside `declares.uses`
+ *
+ * `declares.uses` is what a module intends to ASK THE HOST FOR. This is what a
+ * module says it DOES WITH WHAT IT IS ALREADY GIVEN. Those two point in
+ * opposite directions and would look identical as two arrays of short lowercase
+ * words in the same object — which is exactly how, six months from now, a host
+ * comes to check one of them the way it checks the other. Keeping this at the
+ * top level, under a verb rather than under `declares`, is the cheapest
+ * available defence against that confusion. See `CAPABILITIES` in `methods.ts`,
+ * where every single entry is a request; there is deliberately no entry there
+ * for reading a context, and there must not be.
+ *
+ * ## Why "reacts" and not "consumes"
+ *
+ * Every framed module RECEIVES the whole context, so "consumes" is true of all
+ * of them and would be worth writing down by none of them. What is worth
+ * writing down is that this module DOES SOMETHING when the field changes — it
+ * narrows, it scrolls, it re-queries. A module author reading "consumes" ticks
+ * every box, because every box is factually being handed to them; an author
+ * reading "reacts to" has to think about whether their program actually moves.
+ * A host is free to render the word as "Consumes" in a list where that reads
+ * better to a person browsing; the word in the manifest is chosen for the
+ * author writing it.
+ *
+ * ## Why these two and not more
+ *
+ * `passage` and `selection` are the context fields a module can genuinely
+ * choose to ignore, and each has a matching capability — `passage:set`,
+ * `selection:set` — on the other side, which is what lets a registry name both
+ * ends of one relationship instead of one and a half.
+ *
+ * The obvious third, the open epic, is NOT here, and the reason is that it is
+ * already declared: a mode with `scope: 'epic'` is a module saying it follows
+ * the reader, and one with `scope: 'global'` is a module saying it does not. A
+ * second field meaning the same thing is a second field that will disagree with
+ * the first. `prompt` is out for the same reason — `declares.prompt` says it.
+ * The rule for adding a word here is that no other field already says it.
+ *
+ * Free strings on the wire rather than an enum, for the reason `extensions` is
+ * free: a module built against a host that broadcasts more than yours is not a
+ * malformed module. A host that does not know a word shows it or drops it, and
+ * either way frames the module.
+ */
+export const REACTS_TO = {
+  passage:
+    'Does something when the reader points at a passage — a file, a place in it, and the words that were there.',
+  selection: 'Does something when the references somebody picked out change.',
+} as const
+
+export type Reaction = keyof typeof REACTS_TO
+export const REACTION_NAMES = Object.keys(REACTS_TO) as Reaction[]
+
 export const manifestSchema = z.object({
   /**
    * The word that makes this a claim rather than a hopeful GET. Something else
@@ -198,6 +272,34 @@ export const manifestSchema = z.object({
       consumes: z.array(z.string().min(1).max(LIMITS.EXTENSION)).max(LIMITS.EXTENSIONS).default([]),
     })
     .default({ emits: [], consumes: [] }),
+  /**
+   * The parts of the context this module says it REACTS to. See `REACTS_TO`.
+   *
+   * ## Why this is not a third entry in `extensions`
+   *
+   * `extensions.consumes` already names things a module receives, so folding
+   * `passage` in beside `roadmap.notifications@1` would have cost one field and
+   * looked tidier. It would also have destroyed the only distinction a registry
+   * has worth drawing. An extension is CARRIED: a host reads `emits` on one
+   * manifest and `consumes` on another and posts the payload into the second
+   * module's frame, so the host performed the delivery and may vouch for both
+   * ends of it. A context is BROADCAST: it goes to everybody, and what a module
+   * writes here is its own account of what it does with it, which the host
+   * cannot check and must not pretend to.
+   *
+   * Two claims of different strength in one array become one claim of the
+   * weaker strength, and the weaker one is the one a host would then be quoting
+   * about its own event bus. Two fields, and a host that wants to show them
+   * under one heading can join them where the joining is a rendering decision
+   * rather than a loss of what it knew.
+   *
+   * ## What a module author should put here
+   *
+   * Only what the program actually moves for. You are SENT the whole context
+   * regardless; ticking a word here buys you nothing and costs the next person
+   * a list they cannot trust. Empty is the honest and common answer.
+   */
+  reacts: z.array(z.string().min(1).max(LIMITS.REACTION)).max(LIMITS.REACTIONS).default([]),
   modes: z.array(modeSchema).min(1).max(LIMITS.MODES),
   /**
    * What the module says about itself and its host, as distinct from what it

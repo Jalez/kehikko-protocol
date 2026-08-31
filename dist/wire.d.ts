@@ -525,11 +525,6 @@ export declare const contextSchema: z.ZodObject<{
     }>>>;
 }, "strip", z.ZodTypeAny, {
     epic: string | null;
-    prompt: string | null;
-    project: string | null;
-    projectPath: string | null;
-    theme: "light" | "dark";
-    selection: string[];
     passage: {
         path: string;
         page: number | null;
@@ -537,6 +532,11 @@ export declare const contextSchema: z.ZodObject<{
         to: number | null;
         quoted: string;
     } | null;
+    selection: string[];
+    prompt: string | null;
+    project: string | null;
+    projectPath: string | null;
+    theme: "light" | "dark";
     pinned: boolean;
     kehikko: {
         id: number;
@@ -544,11 +544,6 @@ export declare const contextSchema: z.ZodObject<{
     } | null;
 }, {
     epic?: string | null | undefined;
-    prompt?: string | null | undefined;
-    project?: string | null | undefined;
-    projectPath?: string | null | undefined;
-    theme?: "light" | "dark" | undefined;
-    selection?: string[] | undefined;
     passage?: {
         path: string;
         page?: number | null | undefined;
@@ -556,6 +551,11 @@ export declare const contextSchema: z.ZodObject<{
         to?: number | null | undefined;
         quoted?: string | undefined;
     } | null | undefined;
+    selection?: string[] | undefined;
+    prompt?: string | null | undefined;
+    project?: string | null | undefined;
+    projectPath?: string | null | undefined;
+    theme?: "light" | "dark" | undefined;
     pinned?: boolean | undefined;
     kehikko?: {
         id: number;
@@ -915,11 +915,6 @@ export declare const helloSchema: z.ZodObject<{
         }>>>;
     }, "strip", z.ZodTypeAny, {
         epic: string | null;
-        prompt: string | null;
-        project: string | null;
-        projectPath: string | null;
-        theme: "light" | "dark";
-        selection: string[];
         passage: {
             path: string;
             page: number | null;
@@ -927,6 +922,11 @@ export declare const helloSchema: z.ZodObject<{
             to: number | null;
             quoted: string;
         } | null;
+        selection: string[];
+        prompt: string | null;
+        project: string | null;
+        projectPath: string | null;
+        theme: "light" | "dark";
         pinned: boolean;
         kehikko: {
             id: number;
@@ -934,11 +934,6 @@ export declare const helloSchema: z.ZodObject<{
         } | null;
     }, {
         epic?: string | null | undefined;
-        prompt?: string | null | undefined;
-        project?: string | null | undefined;
-        projectPath?: string | null | undefined;
-        theme?: "light" | "dark" | undefined;
-        selection?: string[] | undefined;
         passage?: {
             path: string;
             page?: number | null | undefined;
@@ -946,6 +941,11 @@ export declare const helloSchema: z.ZodObject<{
             to?: number | null | undefined;
             quoted?: string | undefined;
         } | null | undefined;
+        selection?: string[] | undefined;
+        prompt?: string | null | undefined;
+        project?: string | null | undefined;
+        projectPath?: string | null | undefined;
+        theme?: "light" | "dark" | undefined;
         pinned?: boolean | undefined;
         kehikko?: {
             id: number;
@@ -981,11 +981,6 @@ export declare const helloSchema: z.ZodObject<{
     session: string;
     context: {
         epic: string | null;
-        prompt: string | null;
-        project: string | null;
-        projectPath: string | null;
-        theme: "light" | "dark";
-        selection: string[];
         passage: {
             path: string;
             page: number | null;
@@ -993,6 +988,11 @@ export declare const helloSchema: z.ZodObject<{
             to: number | null;
             quoted: string;
         } | null;
+        selection: string[];
+        prompt: string | null;
+        project: string | null;
+        projectPath: string | null;
+        theme: "light" | "dark";
         pinned: boolean;
         kehikko: {
             id: number;
@@ -1006,11 +1006,6 @@ export declare const helloSchema: z.ZodObject<{
     session: string;
     context: {
         epic?: string | null | undefined;
-        prompt?: string | null | undefined;
-        project?: string | null | undefined;
-        projectPath?: string | null | undefined;
-        theme?: "light" | "dark" | undefined;
-        selection?: string[] | undefined;
         passage?: {
             path: string;
             page?: number | null | undefined;
@@ -1018,6 +1013,11 @@ export declare const helloSchema: z.ZodObject<{
             to?: number | null | undefined;
             quoted?: string | undefined;
         } | null | undefined;
+        selection?: string[] | undefined;
+        prompt?: string | null | undefined;
+        project?: string | null | undefined;
+        projectPath?: string | null | undefined;
+        theme?: "light" | "dark" | undefined;
         pinned?: boolean | undefined;
         kehikko?: {
             id: number;
@@ -1361,12 +1361,6 @@ export declare const contextMessageSchema: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     type: "roadmap.context";
     epic: string | null;
-    protocol: number;
-    prompt: string | null;
-    project: string | null;
-    projectPath: string | null;
-    theme: "light" | "dark";
-    selection: string[];
     passage: {
         path: string;
         page: number | null;
@@ -1374,6 +1368,12 @@ export declare const contextMessageSchema: z.ZodObject<{
         to: number | null;
         quoted: string;
     } | null;
+    selection: string[];
+    protocol: number;
+    prompt: string | null;
+    project: string | null;
+    projectPath: string | null;
+    theme: "light" | "dark";
     pinned: boolean;
     kehikko: {
         id: number;
@@ -1383,11 +1383,6 @@ export declare const contextMessageSchema: z.ZodObject<{
     type: "roadmap.context";
     protocol: number;
     epic?: string | null | undefined;
-    prompt?: string | null | undefined;
-    project?: string | null | undefined;
-    projectPath?: string | null | undefined;
-    theme?: "light" | "dark" | undefined;
-    selection?: string[] | undefined;
     passage?: {
         path: string;
         page?: number | null | undefined;
@@ -1395,6 +1390,11 @@ export declare const contextMessageSchema: z.ZodObject<{
         to?: number | null | undefined;
         quoted?: string | undefined;
     } | null | undefined;
+    selection?: string[] | undefined;
+    prompt?: string | null | undefined;
+    project?: string | null | undefined;
+    projectPath?: string | null | undefined;
+    theme?: "light" | "dark" | undefined;
     pinned?: boolean | undefined;
     kehikko?: {
         id: number;
@@ -2095,11 +2095,6 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         }>>>;
     }, "strip", z.ZodTypeAny, {
         epic: string | null;
-        prompt: string | null;
-        project: string | null;
-        projectPath: string | null;
-        theme: "light" | "dark";
-        selection: string[];
         passage: {
             path: string;
             page: number | null;
@@ -2107,6 +2102,11 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             to: number | null;
             quoted: string;
         } | null;
+        selection: string[];
+        prompt: string | null;
+        project: string | null;
+        projectPath: string | null;
+        theme: "light" | "dark";
         pinned: boolean;
         kehikko: {
             id: number;
@@ -2114,11 +2114,6 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         } | null;
     }, {
         epic?: string | null | undefined;
-        prompt?: string | null | undefined;
-        project?: string | null | undefined;
-        projectPath?: string | null | undefined;
-        theme?: "light" | "dark" | undefined;
-        selection?: string[] | undefined;
         passage?: {
             path: string;
             page?: number | null | undefined;
@@ -2126,6 +2121,11 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             to?: number | null | undefined;
             quoted?: string | undefined;
         } | null | undefined;
+        selection?: string[] | undefined;
+        prompt?: string | null | undefined;
+        project?: string | null | undefined;
+        projectPath?: string | null | undefined;
+        theme?: "light" | "dark" | undefined;
         pinned?: boolean | undefined;
         kehikko?: {
             id: number;
@@ -2161,11 +2161,6 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     session: string;
     context: {
         epic: string | null;
-        prompt: string | null;
-        project: string | null;
-        projectPath: string | null;
-        theme: "light" | "dark";
-        selection: string[];
         passage: {
             path: string;
             page: number | null;
@@ -2173,6 +2168,11 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             to: number | null;
             quoted: string;
         } | null;
+        selection: string[];
+        prompt: string | null;
+        project: string | null;
+        projectPath: string | null;
+        theme: "light" | "dark";
         pinned: boolean;
         kehikko: {
             id: number;
@@ -2186,11 +2186,6 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     session: string;
     context: {
         epic?: string | null | undefined;
-        prompt?: string | null | undefined;
-        project?: string | null | undefined;
-        projectPath?: string | null | undefined;
-        theme?: "light" | "dark" | undefined;
-        selection?: string[] | undefined;
         passage?: {
             path: string;
             page?: number | null | undefined;
@@ -2198,6 +2193,11 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             to?: number | null | undefined;
             quoted?: string | undefined;
         } | null | undefined;
+        selection?: string[] | undefined;
+        prompt?: string | null | undefined;
+        project?: string | null | undefined;
+        projectPath?: string | null | undefined;
+        theme?: "light" | "dark" | undefined;
         pinned?: boolean | undefined;
         kehikko?: {
             id: number;
@@ -2528,12 +2528,6 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     type: "roadmap.context";
     epic: string | null;
-    protocol: number;
-    prompt: string | null;
-    project: string | null;
-    projectPath: string | null;
-    theme: "light" | "dark";
-    selection: string[];
     passage: {
         path: string;
         page: number | null;
@@ -2541,6 +2535,12 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         to: number | null;
         quoted: string;
     } | null;
+    selection: string[];
+    protocol: number;
+    prompt: string | null;
+    project: string | null;
+    projectPath: string | null;
+    theme: "light" | "dark";
     pinned: boolean;
     kehikko: {
         id: number;
@@ -2550,11 +2550,6 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     type: "roadmap.context";
     protocol: number;
     epic?: string | null | undefined;
-    prompt?: string | null | undefined;
-    project?: string | null | undefined;
-    projectPath?: string | null | undefined;
-    theme?: "light" | "dark" | undefined;
-    selection?: string[] | undefined;
     passage?: {
         path: string;
         page?: number | null | undefined;
@@ -2562,6 +2557,11 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         to?: number | null | undefined;
         quoted?: string | undefined;
     } | null | undefined;
+    selection?: string[] | undefined;
+    prompt?: string | null | undefined;
+    project?: string | null | undefined;
+    projectPath?: string | null | undefined;
+    theme?: "light" | "dark" | undefined;
     pinned?: boolean | undefined;
     kehikko?: {
         id: number;

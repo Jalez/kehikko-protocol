@@ -203,6 +203,17 @@ export const LIMITS = {
     EXTENSION: 64,
     /** A capability a module declares it will use. */
     CAPABILITY: 64,
+    /**
+     * The name of a context kind a module says it reacts to. See `reacts`.
+     *
+     * The same 64 as `CAPABILITY` and `EXTENSION`, and the sameness is deliberate
+     * rather than lazy: all three are short registry words a module copies out of
+     * a document, and an author made to remember three different ceilings for
+     * three lists of short words will get one of them wrong. The words this
+     * version knows are `passage` and `selection`; the room is for the ones a
+     * later host broadcasts.
+     */
+    REACTION: 64,
     /** An epic slug, everywhere one appears. */
     EPIC_SLUG: 80,
     /** A project name, as read off the page. */
@@ -304,6 +315,18 @@ export const LIMITS = {
     EXTENSIONS: 16,
     /** How many capabilities it may declare. */
     CAPABILITIES: 32,
+    /**
+     * How many context kinds it may say it reacts to.
+     *
+     * Eight, against `CAPABILITIES`' thirty-two, and the smaller number is an
+     * argument rather than an economy. A context has a handful of fields and
+     * always will: this version broadcasts two things a module can meaningfully
+     * choose to ignore, so a manifest listing eight is already claiming to react
+     * to six kinds that do not exist yet. The bound sits where an honest list
+     * stops, which means a manifest with thirty entries here is refused as the
+     * nonsense it is rather than drawn as a module that reacts to everything.
+     */
+    REACTIONS: 8,
     /** How many refs one payload may carry, and how many may be selected at once. */
     REFS: 32,
     /**

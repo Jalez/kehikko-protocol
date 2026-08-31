@@ -329,6 +329,45 @@ verdict: `ready`, `incompatible`, `silent`. `silent` earns its place in a list â
 a module that silently fails to appear is indistinguishable from one that was
 never installed.
 
+## What a module says it reacts to
+
+`reacts` is the other half of the registry sentence, and it is the half that had
+been missing. A host reading manifests can already say who SENDS: `emits` names
+a format, and `passage:set` and `selection:set` in `declares.uses` name a module
+that can put something in front of every framed pane on a canvas. It could not
+say who RECEIVES a context, because nothing in a manifest said so â€” every framed
+module is handed the whole context, so receiving one distinguished nobody.
+
+So `reacts` is a top-level array of context kinds, and `REACTS_TO` is the
+vocabulary this version knows: `passage` and `selection`. A registry can now put
+"Consumes: X, Y" beside "Provides to: Z, W" and mean something by both.
+
+Three things about it, and each is load-bearing:
+
+**It is not a permission, and must never become one.** A context is broadcast to
+every framed module. A host that skipped the broadcast to frames which had not
+declared an interest would have invented a permission over something it was
+already sending, and would have made a forgotten word in a manifest into a
+module that fails silently from the inside. A module that declares nothing here
+behaves exactly as it did; a module that declares everything gains nothing. The
+penalty for lying is being wrong in a list.
+
+**It is not beside `declares.uses`, on purpose.** A capability is what a module
+asks the host FOR. This is what a module says it DOES with what it is already
+given. Two arrays of short lowercase words in one object, pointing in opposite
+directions, is how one of them eventually gets checked the way the other is.
+
+**It is not folded into `extensions.consumes`.** An extension is *carried*: the
+host reads both manifests and posts the payload into a frame, so the host may
+vouch for both ends. A context is *broadcast*, and what a module writes here is
+its own account of itself, which no host can check. Merging the two arrays would
+merge a claim a host can stand behind with one it cannot.
+
+The open epic is deliberately not in the vocabulary: `modes[].scope` already
+says whether a module follows the reader, and `declares.prompt` already says
+whether it wants a prompt. The rule for adding a word is that no other field in
+the manifest already says it.
+
 ## Every string is bounded
 
 Not hygiene. A manifest is a document a stranger wrote, and most of its fields

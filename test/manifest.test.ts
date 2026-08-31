@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { LIMITS, MODULE_ID, manifestSchema, own, speaks } from '../src/index.js'
+import { LIMITS, MODULE_ID, REACTION_NAMES, REACTS_TO, manifestSchema, own, speaks } from '../src/index.js'
 
 /**
  * What is tested here is what would actually break somebody.
@@ -29,6 +29,11 @@ describe('a manifest at its smallest', () => {
     expect(m.declares.uses).toEqual([])
     expect(m.declares.storage).toBe(false)
     expect(m.extensions).toEqual({ emits: [], consumes: [] })
+    /* Empty, and that is the honest and expected answer. A manifest written
+       before this field existed parses to a module that says it reacts to
+       nothing, which is a true reading of a document that says nothing — and
+       it is why the field could be added without moving `PROTOCOL`. */
+    expect(m.reacts).toEqual([])
   })
 
   test('a manifest without the word is not a manifest', () => {
@@ -142,5 +147,39 @@ describe('speaks', () => {
     expect(speaks('~1', 1)).toBe(false)
     expect(speaks('>=1 || <3', 1)).toBe(false)
     expect(speaks('latest', 1)).toBe(false)
+  })
+})
+
+describe('what a module says it reacts to', () => {
+  test('is carried through, in the order it was written', () => {
+    const m = manifestSchema.parse({ ...minimal, reacts: ['passage', 'selection'] })
+    expect(m.reacts).toEqual(['passage', 'selection'])
+  })
+
+  test('is not checked against the words this version knows', () => {
+    /* The same rule `extensions` follows. A module built against a host that
+       broadcasts something this version has never heard of is not a malformed
+       module, and refusing the whole manifest for one unrecognised word would
+       mean nobody can name a context kind until every host has been upgraded.
+       A host that does not know the word does not draw it. */
+    expect(manifestSchema.safeParse({ ...minimal, reacts: ['weather'] }).success).toBe(true)
+  })
+
+  test('is bounded in both directions, like every other list here', () => {
+    expect(manifestSchema.safeParse({ ...minimal, reacts: ['x'.repeat(65)] }).success).toBe(false)
+    const nine = Array.from({ length: 9 }, (_, i) => `kind-${i}`)
+    expect(manifestSchema.safeParse({ ...minimal, reacts: nine }).success).toBe(false)
+    expect(LIMITS.REACTIONS).toBe(8)
+  })
+
+  test('the vocabulary names the two context fields a module can ignore', () => {
+    /* Deliberately NOT the open epic, and deliberately not the prompt: both are
+       already declared elsewhere in this same document — `modes[].scope` and
+       `declares.prompt` — and a second field meaning the same thing is a second
+       field that will eventually disagree with the first. If this list grows,
+       the test that should fail first is this one. */
+    expect(REACTION_NAMES).toEqual(['passage', 'selection'])
+    expect(REACTS_TO).not.toHaveProperty('epic')
+    expect(REACTS_TO).not.toHaveProperty('prompt')
   })
 })
