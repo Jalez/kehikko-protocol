@@ -8,6 +8,7 @@
  */
 export { PROTOCOL, WELL_KNOWN, MANIFEST_KIND, MESSAGE, MESSAGE_PREFIX, HOST_MESSAGES, MODULE_MESSAGES, MIN_HEIGHT, MAX_HEIGHT, clampHeight, LIMITS, } from './constants.js';
 export { MODULE_ID, MODE_ID, EPIC_SLUG, own } from './ids.js';
+export { KEHIKKO_DIR, DATA_FILE, KEHIKKO_IGNORE, kehikkoDir, kehikkoFile, within, ignoresKehikko, withKehikkoIgnored, } from './project.js';
 export { manifestSchema, speaks, MODULE_CONDITIONS, } from './manifest.js';
 export { CAPABILITIES, CAPABILITY_NAMES, METHODS, METHOD_NAMES, methodParams, methodResults, resultSchemaFor, navigationResult, NAVIGATION_OUTCOMES, epicSpine, epicsListResult, REPORTED_STAGES, } from './methods.js';
 export { contextSchema, passageSchema, helloSchema, contextMessageSchema, responseSchema, responseFailureReasons, gotoSchema, eventSchema, readySchema, requestSchema, resizeSchema, wentSchema, hostMessageSchema, moduleMessageSchema, looksLikeWireMessage, } from './wire.js';

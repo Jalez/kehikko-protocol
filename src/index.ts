@@ -25,6 +25,17 @@ export {
 export { MODULE_ID, MODE_ID, EPIC_SLUG, own } from './ids.js'
 
 export {
+  KEHIKKO_DIR,
+  DATA_FILE,
+  KEHIKKO_IGNORE,
+  kehikkoDir,
+  kehikkoFile,
+  within,
+  ignoresKehikko,
+  withKehikkoIgnored,
+} from './project.js'
+
+export {
   manifestSchema,
   speaks,
   MODULE_CONDITIONS,
