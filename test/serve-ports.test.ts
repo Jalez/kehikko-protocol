@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { createServer, type Server } from 'node:http'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -380,6 +380,53 @@ describe('writing down where it answers', () => {
         url: 'http://127.0.0.1:7961',
         dir: '/Users/x/Projects/example',
       })
+    })
+  })
+
+  /*
+   * The one that would have cost somebody a running shell.
+   *
+   * `keep: true` is how a person tells the host it may NOT stop a module. The
+   * terminal carries it, and a terminal is holding a live shell. Writing
+   * `{url, dir}` over that file returns the host's permission to kill it, and
+   * says nothing: the module keeps working until the day it is reaped
+   * mid-command.
+   *
+   * This function owns the address and the checkout. Everything else in the
+   * file is somebody's decision and is not its to delete on the way past.
+   *
+   * Synchronous throughout, and that is not a style choice: `withRegistry`
+   * restores the environment when its callback RETURNS, and an async callback
+   * returns at its first `await`. A test that began with one would run
+   * `registerAt` after the registry path had already been put back, against a
+   * directory it never wrote to — which is exactly how this test first failed,
+   * on working code.
+   */
+  test('a keep flag somebody wrote is not deleted by a restart', () => {
+    withRegistry((where) => {
+      const file = join(where, 'roadmap.example.json')
+      writeFileSync(file, JSON.stringify({ url: 'http://127.0.0.1:7960', dir: '/Users/x/old', keep: true }, null, 2))
+
+      const written = registerAt({ id: ID, origin: 'http://127.0.0.1:7961', dir: '/Users/x/new' })
+      expect(JSON.parse(readFileSync(written.file, 'utf8'))).toEqual({
+        url: 'http://127.0.0.1:7961',
+        dir: '/Users/x/new',
+        keep: true,
+      })
+    })
+  })
+
+  /* And anything else, including a field no version of this package has heard
+     of — which is what makes adding one safe while older modules are running. */
+  test('an unknown field survives too', () => {
+    withRegistry((where) => {
+      const file = join(where, 'roadmap.example.json')
+      writeFileSync(file, JSON.stringify({ url: 'http://127.0.0.1:7960', somethingLater: ['a'] }))
+
+      const written = registerAt({ id: ID, origin: 'http://127.0.0.1:7961', dir: '/Users/x/new' })
+      const back = JSON.parse(readFileSync(written.file, 'utf8')) as Record<string, unknown>
+      expect(back.somethingLater).toEqual(['a'])
+      expect(back.url).toBe('http://127.0.0.1:7961')
     })
   })
 

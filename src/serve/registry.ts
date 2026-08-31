@@ -108,11 +108,52 @@ export function registerAt({ id, origin, dir }: { id: string; origin: string; di
   const file = join(where, `${id}.json`)
   const before = readRegistration(file)
 
+  /*
+   * Everything already in the file that this function does not manage.
+   *
+   * This owns exactly two fields: where the module answers, and which checkout
+   * to start. Every other key belongs to whoever wrote the file, and a start
+   * script is not entitled to delete somebody's decision on its way past.
+   *
+   * `keep: true` is the one that makes this urgent rather than tidy. It is how
+   * a person tells the host it may NOT stop a module — see the lifecycle essay
+   * in the host, which argues at length that stopping is not the mirror of
+   * starting because it destroys what the program was holding. The terminal
+   * carries it, and a terminal is holding a live shell. Rewriting `{url, dir}`
+   * over that file would have quietly returned the host's permission to kill
+   * it, and nothing anywhere would have said so — the module would keep working
+   * until the day it was reaped mid-command.
+   *
+   * So the file is merged, not replaced. Unknown keys survive by default, which
+   * is also what makes a field added to this format later safe from every
+   * module still running the version before it.
+   */
+  const kept = readAll(file)
+
   mkdirSync(where, { recursive: true })
-  writeFileSync(file, `${JSON.stringify({ url: origin, dir }, null, 2)}\n`)
+  writeFileSync(file, `${JSON.stringify({ ...kept, url: origin, dir }, null, 2)}\n`)
 
   const was = before && (before.url !== origin || before.dir !== dir) ? before : null
   return { id, url: origin, dir, file, was }
+}
+
+/**
+ * The whole registration object as it stands on disk, unnarrowed.
+ *
+ * `readRegistration` answers what this package UNDERSTANDS — a url and a dir —
+ * and that is the right shape for deciding anything. This answers what is
+ * actually in the file, which is the only shape that can be written back
+ * without losing what nobody here knows about. See `registerAt`.
+ */
+function readAll(file: string): Record<string, unknown> {
+  let parsed: unknown
+  try {
+    parsed = JSON.parse(readFileSync(file, 'utf8'))
+  } catch {
+    return {}
+  }
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {}
+  return parsed as Record<string, unknown>
 }
 
 /** One registration file, or `null` for anything that is not one. Never throws. */
