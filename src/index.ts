@@ -91,6 +91,8 @@ export {
   filterGroupSchema,
   filterOptionSchema,
   filterChoiceSchema,
+  clearableSchema,
+  clearSchema,
   hostMessageSchema,
   moduleMessageSchema,
   looksLikeWireMessage,
@@ -113,6 +115,8 @@ export {
   type FilterGroup,
   type FilterOption,
   type FilterChoice,
+  type Clearable,
+  type Clear,
 } from './wire.js'
 
 export {

@@ -86,6 +86,19 @@ export interface Roadmap {
    */
   filters: (groups: FilterGroup[]) => void
   /**
+   * Say that what this page shows can be cleared, and what to call it. `null`
+   * takes the control away.
+   *
+   * Stable across renders like `filters`, and for the same reason: the ordinary
+   * call site is an effect whose only real dependency is whatever the label
+   * counts, so this must not be one of the things that changed.
+   *
+   * The press arrives at `onClear` in the `events` given to this hook. Nothing
+   * comes back through the context and there is no state to read here — the
+   * host relays a press and learns nothing about what went.
+   */
+  clearable: (label: string | null) => void
+  /**
    * The live connection, or null between mounts.
    *
    * Here because a page with its own machinery — a poll that emits, a store that
@@ -208,10 +221,11 @@ export function useRoadmap(id: string, events: HostEvents = {}, options: UseRoad
 
   const resize = useCallback((height: number) => held.current?.resize(height), [])
   const filters = useCallback((groups: FilterGroup[]) => held.current?.filters(groups), [])
+  const clearable = useCallback((label: string | null) => held.current?.clearable(label), [])
   const connection = useCallback(() => held.current, [])
 
   return useMemo(
-    () => ({ where, context, state, request, resize, filters, connection }),
-    [where, context, state, request, resize, filters, connection],
+    () => ({ where, context, state, request, resize, filters, clearable, connection }),
+    [where, context, state, request, resize, filters, clearable, connection],
   )
 }

@@ -706,3 +706,106 @@ describe('the offer of what this page can be narrowed by', () => {
     expect(host.said.every((m) => (m as { type: string }).type === MESSAGE.READY)).toBe(true)
   })
 })
+
+describe('the offer to clear what this page shows', () => {
+  test('goes out as a module message, and is not answered', () => {
+    const { source, deliver } = fakeWindow()
+    const host = speaker()
+    const live = attach({}, { source })
+    deliver(hello(host))
+    live.clearable('clear 12 shown')
+    expect(host.said).toHaveLength(2)
+    expect(host.said[1]).toEqual({ type: MESSAGE.CLEARABLE, label: 'clear 12 shown' })
+  })
+
+  /* The same reload this feature's twin survives, and it has to survive it the
+     same way: a frame that reloads is greeted again, and a page whose offer has
+     not changed has no reason to send anything. */
+  test('is replayed on every greeting', () => {
+    const { source, deliver } = fakeWindow()
+    const host = speaker()
+    const live = attach({}, { source })
+    deliver(hello(host))
+    live.clearable('clear 3 shown')
+    host.said.length = 0
+
+    deliver(hello(host))
+    expect(host.said.map((m) => (m as { type: string }).type)).toEqual([MESSAGE.READY, MESSAGE.CLEARABLE])
+  })
+
+  /*
+   * `null` is a value and not an absence, which is why the replay holds an
+   * object rather than a bare string. A page that withdrew its offer before the
+   * greeting has SAID something, and a host that never heard it would draw a
+   * control for a page with nothing to clear.
+   */
+  test('a withdrawal made before the greeting is still a thing that was said', () => {
+    const { source, deliver } = fakeWindow()
+    const host = speaker()
+    const live = attach({}, { source })
+    live.clearable(null)
+    expect(host.said).toHaveLength(0)
+
+    deliver(hello(host))
+    expect(host.said).toEqual([
+      { type: MESSAGE.READY, id: ID, protocol: PROTOCOL },
+      { type: MESSAGE.CLEARABLE, label: null },
+    ])
+  })
+
+  test('a page that never offers to clear anything sends nothing at all', () => {
+    const { source, deliver } = fakeWindow()
+    const host = speaker()
+    attach({}, { source })
+    deliver(hello(host))
+    deliver(hello(host))
+    expect(host.said.every((m) => (m as { type: string }).type === MESSAGE.READY)).toBe(true)
+  })
+
+  /* The other half: the press arrives, and it arrives with nothing in it,
+     because the module is the only side that knows what "shown" means. */
+  test('a press reaches the page and is not answered', () => {
+    const { source, deliver } = fakeWindow()
+    const host = speaker()
+    let pressed = 0
+    attach({ onClear: () => (pressed += 1) }, { source })
+    deliver(hello(host))
+    host.said.length = 0
+
+    deliver({ data: { type: MESSAGE.CLEAR, protocol: PROTOCOL }, origin: 'null', source: host })
+    expect(pressed).toBe(1)
+    /* Nothing goes back. A host that received an acknowledgement would be a
+       host tempted to report a number it did not count. */
+    expect(host.said).toEqual([])
+  })
+
+  /* A page with no handler is a page that does nothing, rather than a page that
+     throws inside the host's message listener. */
+  test('a press at a page with no handler is silence, not an error', () => {
+    const { source, deliver } = fakeWindow()
+    const host = speaker()
+    attach({}, { source })
+    deliver(hello(host))
+    expect(() =>
+      deliver({ data: { type: MESSAGE.CLEAR, protocol: PROTOCOL }, origin: 'null', source: host }),
+    ).not.toThrow()
+  })
+
+  /*
+   * The identity check this file exists for, applied to the one message that
+   * destroys something. A second window posting a `clear` at a page is a second
+   * window deleting somebody's records, and the window handle is the only thing
+   * that cannot be forged — see the essay at the top of `connect.ts`.
+   */
+  test('and a press from a window that never greeted us is ignored', () => {
+    const { source, deliver } = fakeWindow()
+    const host = speaker()
+    const stranger = speaker()
+    let pressed = 0
+    attach({ onClear: () => (pressed += 1) }, { source })
+    deliver(hello(host))
+
+    deliver({ data: { type: MESSAGE.CLEAR, protocol: PROTOCOL }, origin: 'null', source: stranger })
+    expect(pressed).toBe(0)
+  })
+})

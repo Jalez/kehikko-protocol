@@ -490,6 +490,80 @@ export declare const filtersSchema: z.ZodObject<{
 }>;
 export type Filters = z.infer<typeof filtersSchema>;
 /**
+ * What a module offers to clear, in its own words. The whole offer, every time.
+ *
+ * A `label` and nothing else, and the emptiness of that is the same discipline
+ * `filterOptionSchema` keeps: no count field, no icon, no severity, no "kind",
+ * and above all no list of what would go. The host draws a control and reports
+ * a press. What "shown" means, what is behind it, and how much of it there is
+ * are the module's business, and a host that was told any of it would be a host
+ * that could be updated every time a module has a new idea about its own data.
+ *
+ * ## The count rides in the label, as it does for a filter
+ *
+ * `clear 12 shown` is one string. It has to be one string, because the number
+ * is the whole reason a person reads this control before pressing it — it is
+ * how they discover that their filter narrowed things to three rather than
+ * thirty, which is the difference between the press they meant and the press
+ * they did not. A separate count field would be this package deciding how a
+ * count is phrased, for a module that knows better and whose interesting
+ * number is sometimes not a number (`everything from this run`).
+ *
+ * ## `null` is a real message, and it is the withdrawal
+ *
+ * It says there is nothing on screen to clear now. The host takes the control
+ * away rather than leaving a button that deletes nothing — a button whose press
+ * has no effect teaches a person that the button does not work, which they will
+ * remember on the day it would have. It is the exact counterpart of `filters`
+ * sending an empty `groups`, and it exists for the same reason: whole
+ * replacement is what lets an offer be taken back.
+ *
+ * A module re-announces whenever the words change, which — because the words
+ * carry a count — is whenever what it shows changes. Including immediately
+ * after it has been asked to clear, which is the only feedback loop this
+ * feature has and the only one it needs.
+ */
+export declare const clearableSchema: z.ZodObject<{
+    type: z.ZodLiteral<"roadmap.clearable">;
+    /** The words on the control, or `null` to take the control away. */
+    label: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+}, "strip", z.ZodTypeAny, {
+    type: "roadmap.clearable";
+    label: string | null;
+}, {
+    type: "roadmap.clearable";
+    label?: string | null | undefined;
+}>;
+export type Clearable = z.infer<typeof clearableSchema>;
+/**
+ * The press, relayed. "Clear what you are showing."
+ *
+ * Deliberately empty apart from its type, and every field somebody will want to
+ * add to it is a field that would break the feature.
+ *
+ * **Not a list of what to delete**, because the host does not know and must not
+ * find out. **Not the filter choice**, because the module already has that from
+ * `roadmap.context` and a second copy would be a second answer to one question,
+ * arriving on its own schedule and disagreeing after any race. **Not a
+ * correlation id**, because there is no answer: see `MESSAGE.CLEAR` for why an
+ * acknowledgement would only tempt a host into reporting a number it did not
+ * count.
+ *
+ * `protocol` rides along as it does on every other host message, so a module
+ * can tell which host it is talking to without keeping the greeting.
+ */
+export declare const clearSchema: z.ZodObject<{
+    type: z.ZodLiteral<"roadmap.clear">;
+    protocol: z.ZodNumber;
+}, "strip", z.ZodTypeAny, {
+    type: "roadmap.clear";
+    protocol: number;
+}, {
+    type: "roadmap.clear";
+    protocol: number;
+}>;
+export type Clear = z.infer<typeof clearSchema>;
+/**
  * Which option is current in each group: group id → option id.
  *
  * This is the half that travels back, and it travels in `roadmap.context` — see
@@ -3255,6 +3329,15 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         name: string;
     } | null | undefined;
     payload?: unknown;
+}>, z.ZodObject<{
+    type: z.ZodLiteral<"roadmap.clear">;
+    protocol: z.ZodNumber;
+}, "strip", z.ZodTypeAny, {
+    type: "roadmap.clear";
+    protocol: number;
+}, {
+    type: "roadmap.clear";
+    protocol: number;
 }>]>;
 export type HostMessage = z.infer<typeof hostMessageSchema>;
 export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
@@ -3419,6 +3502,16 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         label: string;
         fallback: string;
     }[];
+}>, z.ZodObject<{
+    type: z.ZodLiteral<"roadmap.clearable">;
+    /** The words on the control, or `null` to take the control away. */
+    label: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+}, "strip", z.ZodTypeAny, {
+    type: "roadmap.clearable";
+    label: string | null;
+}, {
+    type: "roadmap.clearable";
+    label?: string | null | undefined;
 }>]>;
 export type ModuleMessage = z.infer<typeof moduleMessageSchema>;
 export type WireMessage = HostMessage | ModuleMessage;

@@ -65,6 +65,16 @@ export function connect(id, events = {}, options = {}) {
        is not the same as an empty offer: an empty one is a module saying it has
        nothing to be narrowed by now, and has to be sent. */
     let offered = null;
+    /* And the last clear offer, replayed for the same reason.
+  
+       Wrapped in an object rather than held as a bare `string | null`, because
+       for this offer `null` is a REAL value — it is how a module says there is
+       nothing to clear — so it cannot also be the sentinel for "never said
+       anything". A bare null would make a module that withdrew its offer before
+       the greeting indistinguishable from one that never had a clear control, and
+       the two produce the same drawing today but would diverge the moment the
+       replay meant anything more than "post this again". */
+    let clearing = null;
     /** Correlation id -> the promise waiting on it. A `Map`, per the protocol's note on lookups. */
     const waiting = new Map();
     let counter = 0;
@@ -124,6 +134,8 @@ export function connect(id, events = {}, options = {}) {
                than being overwritten by it. */
             if (offered !== null)
                 send({ type: MESSAGE.FILTERS, groups: offered });
+            if (clearing !== null)
+                send({ type: MESSAGE.CLEARABLE, label: clearing.label });
             events.onHello?.(message.context, message.state);
             return;
         }
@@ -172,6 +184,16 @@ export function connect(id, events = {}, options = {}) {
         }
         if (message.type === MESSAGE.EVENT) {
             events.onEvent?.(message);
+            return;
+        }
+        if (message.type === MESSAGE.CLEAR) {
+            /* Nothing is unwrapped and nothing is passed on, because there is nothing
+               in it — see `clearSchema`. A page that never registered `onClear` does
+               nothing, which is correct rather than a dropped message: the host only
+               draws the control for a page that announced `clearable`, so a module
+               with a handler and no offer and one with an offer and no handler are
+               both modules that asked for this to do nothing. */
+            events.onClear?.();
             return;
         }
         if (message.type === MESSAGE.GOTO) {
@@ -241,6 +263,13 @@ export function connect(id, events = {}, options = {}) {
                otherwise have a control that never appears. */
             offered = groups;
             send({ type: MESSAGE.FILTERS, groups });
+        },
+        clearable(label) {
+            /* Kept before it is sent, for the same reason as the filter offer: an
+               offer made before the greeting goes out with the replay rather than
+               being lost. */
+            clearing = { label };
+            send({ type: MESSAGE.CLEARABLE, label });
         },
         greeted: () => host !== null,
         stop() {

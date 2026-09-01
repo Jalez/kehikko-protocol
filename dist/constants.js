@@ -53,6 +53,21 @@
  *   `{}`, which is precisely what a module reading it against an older host
  *   would have found: nothing has been chosen for it, because nothing there can
  *   choose. Nothing gets a second meaning and nothing changes shape.
+ * - `roadmap.clearable` and `roadmap.clear` are two new MESSAGES, one in each
+ *   direction, and they pass the same test from both ends. A host that has
+ *   never heard of `clearable` drops it and draws no control, which is what
+ *   every module's header looked like the day before — the module loses a place
+ *   to put a control, not the ability to clear anything, since a module that
+ *   wants a button in its own page has always been free to draw one. A module
+ *   that has never heard of `clear` drops it, and a host whose press produced
+ *   nothing is a host that never had the control to press, because it only
+ *   draws one for a module that announced itself. There is no version of this
+ *   where one side acts on a half-understanding of the other.
+ *
+ *   It is worth saying out loud that a DESTRUCTIVE addition does not earn a
+ *   bump either, tempting as it is to raise the number to mark the occasion. A
+ *   version is not a warning label. It says whether two programs can speak, and
+ *   these two can speak to every host and module that already existed.
  *
  * What did raise it is a rename. **Epics are not journeys**: an epic belongs to
  * a project and is the host's own material; a journey is a different idea
@@ -170,6 +185,101 @@ export const MESSAGE = {
      * longer mean anything.
      */
     FILTERS: 'roadmap.filters',
+    /**
+     * Module → host. "What I am showing can be cleared, and here is what to call it."
+     *
+     * The eleventh message, and the second one where a module hands the host a
+     * piece of its own interface to draw. `filters` is the model and this follows
+     * it deliberately rather than inventing a second shape: an announcement about
+     * what the module is showing RIGHT NOW, fire and forget, replacing whatever
+     * was last said, absent by default, and gating nothing.
+     *
+     * ## Why this is a second message and not a field on `filters`
+     *
+     * They looked like one thing — two little controls a module offers for the
+     * header — and folding them together would have saved a message type. It is
+     * the wrong shape for three reasons, and the third is the one that would have
+     * bitten.
+     *
+     * They are INDEPENDENT. Most modules that can be narrowed cannot clear
+     * anything: a paper cannot delete a paper, a file tree cannot delete a
+     * repository. Some future module will be able to clear and have nothing to
+     * narrow by. One message means every module has to state both facts to state
+     * either.
+     *
+     * They CHANGE FOR DIFFERENT REASONS. A filter offer changes when the options
+     * or their counts change; a clear offer changes when what is on screen
+     * becomes empty or non-empty. Folded together, each would re-announce the
+     * other constantly, and the host's own "is this worth a write" comparison
+     * would be comparing two unrelated facts.
+     *
+     * And the WITHDRAWAL would become ambiguous, which is the failure. `filters`
+     * withdraws by sending an empty `groups`, whole-replacement being the entire
+     * point of that message. A module that had nothing to narrow by and sent
+     * `{ groups: [] }` would, under one message, have silently withdrawn its
+     * clear control too — with nothing erroring and a button simply gone. That is
+     * exactly the class of silent failure this protocol keeps designing against,
+     * and the cost of avoiding it is one more string in this object.
+     *
+     * ## The offer, whole, every time
+     *
+     * `label` is the module's own words for what would go, and `null` is how a
+     * module withdraws — there is nothing on screen to clear, so the host takes
+     * the control away rather than leaving a button that deletes nothing. It is
+     * the exact counterpart of an empty `groups`.
+     */
+    CLEARABLE: 'roadmap.clearable',
+    /**
+     * Host → module. "Clear what you are showing."
+     *
+     * The twelfth, and the one message in this protocol that asks a module to
+     * DESTROY something. So it is worth being exact about what it does and does
+     * not say.
+     *
+     * ## The host never touches the data and never learns what went
+     *
+     * This carries no ids, no filter, no count, and gets no answer. It is a
+     * press, relayed. The module does the deleting, out of its own store, and the
+     * host is not told what was in it — which is the same discipline as
+     * `filterOptionSchema`: the host draws a control and reports that it was
+     * pressed, and the meaning stays where the meaning is.
+     *
+     * ## "What you are showing" is the MODULE's determination
+     *
+     * Under whatever narrowing is in force — its own filters, this protocol's
+     * filters, a search box in its own page, a scroll position, anything. Only
+     * the module knows what is on screen, and that is the whole reason this is a
+     * message rather than a method with parameters: a host that named what to
+     * delete would be a host deciding what "shown" means for somebody else's
+     * page, and it would get it wrong the first time a module narrowed by
+     * something the protocol has no word for.
+     *
+     * The practical consequence is the one that makes the control worth having:
+     * it COMPOSES with the filter beside it. Narrow to one file, press clear, and
+     * one file's worth goes. Nothing in this message says so; it falls out of the
+     * module being the one that answers the question.
+     *
+     * ## Not answered, and not correlated
+     *
+     * Like `roadmap.event` and for a sharpened version of the same reason. There
+     * is nothing for the host to do with an acknowledgement except display it,
+     * and displaying it would mean the host reporting a number it did not count
+     * about data it cannot see. What a module says afterwards is a new
+     * `roadmap.clearable` — with a smaller count in the label, or `null` because
+     * there is nothing left — which is feedback the module wrote and the host
+     * merely draws.
+     *
+     * ## The two-press arm is the HOST's, and it has to be
+     *
+     * A host that sends this on a single press has built a button that deletes
+     * somebody's notes because they were aiming at the fold beside it. A host
+     * cannot delegate the guard to the module either: `confirm()` inside a framed
+     * page is silently `false` in any sandbox without `allow-modals`, which is
+     * every sensible one. So the host arms, and this message is sent only by the
+     * second press. Nothing here can enforce that, which is why it is written
+     * down.
+     */
+    CLEAR: 'roadmap.clear',
 };
 /** The prefix every message type carries, so a listener can drop the rest cheaply. */
 export const MESSAGE_PREFIX = 'roadmap.';
@@ -180,6 +290,7 @@ export const HOST_MESSAGES = [
     MESSAGE.RESPONSE,
     MESSAGE.GOTO,
     MESSAGE.EVENT,
+    MESSAGE.CLEAR,
 ];
 /** And what the module says. */
 export const MODULE_MESSAGES = [
@@ -188,6 +299,7 @@ export const MODULE_MESSAGES = [
     MESSAGE.RESIZE,
     MESSAGE.WENT,
     MESSAGE.FILTERS,
+    MESSAGE.CLEARABLE,
 ];
 /**
  * How tall a frame may be asked to be.
@@ -424,6 +536,27 @@ export const LIMITS = {
      * ever having a document to do it to.
      */
     FILTER_LABEL: 48,
+    /**
+     * The words a person reads on the control that clears what a module shows.
+     *
+     * Forty-eight, the same as `FILTER_LABEL`, and for the same two arguments:
+     * this label COUNTS things (`12 shown`, `everything from this run`) so it
+     * cannot be a fixed word, and it is a stranger's string that a host is about
+     * to put on its own chrome, so it must be nowhere near `SUMMARY`.
+     *
+     * It is a separate NAME at the same NUMBER, deliberately. A host that read
+     * `FILTER_LABEL` when bounding a clear label would have tied two features
+     * together that have nothing to do with each other, and the day somebody
+     * changed one for a reason that belonged to filters, the other would move
+     * with it. The sameness of the number is an argument that the two labels are
+     * alike; sharing the constant would be a claim that they are the same thing.
+     *
+     * A host must truncate anyway, and this one does — with the full text in a
+     * tooltip and in the accessible name, because the header is a flex row where
+     * a `whitespace-nowrap` element carrying a variable string once put an
+     * 1187-pixel min-content floor under a 220-pixel container.
+     */
+    CLEAR_LABEL: 48,
     /**
      * How many groups one module may offer at once.
      *

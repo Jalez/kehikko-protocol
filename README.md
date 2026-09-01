@@ -89,6 +89,7 @@ Ten messages, across a frame, by `postMessage`.
 | `roadmap.response` | The answer to exactly one request. |
 | `roadmap.goto` | Go to this reference. |
 | `roadmap.event` | An extension payload another module emitted. |
+| `roadmap.clear` | "Clear what you are showing." The press, relayed — no ids, no answer. |
 
 | Module → host | |
 |---|---|
@@ -97,6 +98,7 @@ Ten messages, across a frame, by `postMessage`.
 | `roadmap.resize` | How tall it would like to be. |
 | `roadmap.went` | Whether the `goto` found anything. |
 | `roadmap.filters` | What this module can be narrowed by, so the host can draw the control. |
+| `roadmap.clearable` | That what it shows can be cleared, and what to call the control. `null` withdraws it. |
 
 `goto` and `went` are the new pair, and `went` is the piece the protocol has
 always lacked. Everything else the host says is fire-and-forget. `goto` cannot
@@ -449,6 +451,57 @@ Where the choice is REMEMBERED is the host's business and not this package's.
 The one thing the shapes insist on is that it arrives in the greeting, so a
 module never draws its defaults and corrects them a moment later — the same
 argument `state` makes, and the same flicker.
+
+## And a control that clears what a module is showing
+
+The same shape a second time, for the other control a module cannot draw in a
+strip it does not own. A module says that what it shows can be cleared and what
+to call it; the host draws one button; a press comes back as `roadmap.clear`;
+**the module does the deleting**.
+
+```ts
+live.clearable(`clear ${shown.length} shown`)   // and `null` to withdraw it
+```
+
+```ts
+useRoadmap(id, {
+  onClear: () => forget(shown.map((one) => one.id)),   // exactly what is on screen
+})
+```
+
+**The host never touches the data and never learns what went.** `roadmap.clear`
+carries no ids, no filter, no count, and gets no answer. It is a press, relayed.
+What a module says afterwards is a new `clearable` — with a smaller count, or
+`null` because there is nothing left — which is feedback the module wrote and
+the host merely draws.
+
+**"Showing" is the module's determination, and it composes with the filter.**
+Only the module knows what is on screen: under this protocol's filters, under a
+search box in its own page, under whatever narrowing it invented. A person who
+narrowed to one file and pressed clear means that file, and that falls out of
+the module being the side that answers the question rather than out of anything
+in the message. A module that cleared its whole store in `onClear` would delete
+a hundred records while somebody could see three, which is the worst thing this
+feature can do and the easiest to do by accident.
+
+**Two messages, not one field on `filters`.** They looked like one thing. They
+are independent — most modules that can be narrowed cannot delete anything, and
+a paper cannot delete a paper — they change for different reasons, and their
+withdrawals collide: `filters` withdraws by sending an empty `groups`, so a
+module with nothing to narrow by would have silently taken its clear button away
+at the same time, with nothing erroring and a control simply gone.
+
+**The two-press arm is the host's.** This is a destructive control with no modal
+behind it, and it cannot have one: `confirm()` inside a framed page returns
+`false` silently under any sandbox without `allow-modals`, so a module that
+guarded its own `onClear` would have built a guard that always says no. A host
+drawing this button arms on the first press and sends on the second. Nothing in
+these schemas can enforce that, which is why it is said here and on
+`MESSAGE.CLEAR`.
+
+**Absent by default, like everything else here.** A module that never calls
+`clearable` gets no button, which is what every module's header looked like the
+day before this existed.
 
 ## Every string is bounded
 

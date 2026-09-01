@@ -149,6 +149,38 @@ export interface HostEvents {
      * one, which is the same as before it existed.
      */
     onEvent?: (event: ModuleEvent) => void;
+    /**
+     * The host's clear control was pressed, twice, and this page should delete
+     * what it is showing.
+     *
+     * Only ever reaches a module that announced `clearable`, because that is what
+     * makes the host draw a control at all — so a page that never calls
+     * `clearable` never registers this and never hears one.
+     *
+     * ## What "showing" means is yours to decide, and nobody else can decide it
+     *
+     * There are no parameters and there will not be. The host does not know what
+     * is on this page, what its filter narrowed it to, what a search box in the
+     * corner is doing, or what any of the rows are. It knows a button was pressed
+     * twice. Everything about WHICH records go is decided here, by the code that
+     * drew them.
+     *
+     * That is also what makes the control compose with the filter beside it. A
+     * person who narrowed to one file and pressed clear means that file, and the
+     * only reason that works is that this handler applies the same narrowing the
+     * render did. A page that cleared its whole store here would delete a hundred
+     * records while somebody could see three, which is the worst thing this
+     * feature could do and the one it is easiest to do by accident.
+     *
+     * ## Say what happened by re-announcing
+     *
+     * There is no reply. The host learns nothing and reports nothing of its own.
+     * Call `clearable` again when the work is done — with a smaller count in the
+     * label, or `null` because there is nothing left — and the control updates or
+     * disappears. That is the whole of the feedback, and it is in the module's
+     * own words.
+     */
+    onClear?: () => void;
 }
 export interface ConnectOptions {
     /**
@@ -229,6 +261,30 @@ export interface Connection {
      * this once at mount and never again is correct across every reload.
      */
     filters: (groups: FilterGroup[]) => void;
+    /**
+     * Say that what this page is showing can be cleared, and what to call it.
+     *
+     * Fire and forget like `filters`, remembered like `filters`, and replayed on
+     * every greeting for exactly the reason given above — a frame that reloads is
+     * greeted again, and a page whose offer had not changed since would have no
+     * reason to send anything, leaving the host with a control from a
+     * conversation that no longer exists.
+     *
+     * `null` withdraws it: there is nothing on screen to clear, so the host takes
+     * the button away rather than leaving one that deletes nothing. Send it
+     * whenever the words change — which, because the words carry a count, is
+     * whenever what is shown changes, including right after `onClear` has run.
+     *
+     * ## A page still has to guard nothing
+     *
+     * The two-press arm is the host's, and it is on the host's side of the frame
+     * where it can be drawn. A page does not need its own confirmation before
+     * `onClear` and should not add one: `confirm()` in a framed page is silently
+     * `false` under any sandbox without `allow-modals`, so the guard would not
+     * merely be redundant — it would be a guard that always says no, on a control
+     * that then appears to do nothing.
+     */
+    clearable: (label: string | null) => void;
     /** Whether anything has greeted us yet. */
     greeted: () => boolean;
     /** Stop listening. Every question still waiting is refused rather than left hanging. */

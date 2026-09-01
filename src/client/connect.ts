@@ -170,6 +170,38 @@ export interface HostEvents {
    * one, which is the same as before it existed.
    */
   onEvent?: (event: ModuleEvent) => void
+  /**
+   * The host's clear control was pressed, twice, and this page should delete
+   * what it is showing.
+   *
+   * Only ever reaches a module that announced `clearable`, because that is what
+   * makes the host draw a control at all — so a page that never calls
+   * `clearable` never registers this and never hears one.
+   *
+   * ## What "showing" means is yours to decide, and nobody else can decide it
+   *
+   * There are no parameters and there will not be. The host does not know what
+   * is on this page, what its filter narrowed it to, what a search box in the
+   * corner is doing, or what any of the rows are. It knows a button was pressed
+   * twice. Everything about WHICH records go is decided here, by the code that
+   * drew them.
+   *
+   * That is also what makes the control compose with the filter beside it. A
+   * person who narrowed to one file and pressed clear means that file, and the
+   * only reason that works is that this handler applies the same narrowing the
+   * render did. A page that cleared its whole store here would delete a hundred
+   * records while somebody could see three, which is the worst thing this
+   * feature could do and the one it is easiest to do by accident.
+   *
+   * ## Say what happened by re-announcing
+   *
+   * There is no reply. The host learns nothing and reports nothing of its own.
+   * Call `clearable` again when the work is done — with a smaller count in the
+   * label, or `null` because there is nothing left — and the control updates or
+   * disappears. That is the whole of the feedback, and it is in the module's
+   * own words.
+   */
+  onClear?: () => void
 }
 
 export interface ConnectOptions {
@@ -252,6 +284,30 @@ export interface Connection {
    * this once at mount and never again is correct across every reload.
    */
   filters: (groups: FilterGroup[]) => void
+  /**
+   * Say that what this page is showing can be cleared, and what to call it.
+   *
+   * Fire and forget like `filters`, remembered like `filters`, and replayed on
+   * every greeting for exactly the reason given above — a frame that reloads is
+   * greeted again, and a page whose offer had not changed since would have no
+   * reason to send anything, leaving the host with a control from a
+   * conversation that no longer exists.
+   *
+   * `null` withdraws it: there is nothing on screen to clear, so the host takes
+   * the button away rather than leaving one that deletes nothing. Send it
+   * whenever the words change — which, because the words carry a count, is
+   * whenever what is shown changes, including right after `onClear` has run.
+   *
+   * ## A page still has to guard nothing
+   *
+   * The two-press arm is the host's, and it is on the host's side of the frame
+   * where it can be drawn. A page does not need its own confirmation before
+   * `onClear` and should not add one: `confirm()` in a framed page is silently
+   * `false` under any sandbox without `allow-modals`, so the guard would not
+   * merely be redundant — it would be a guard that always says no, on a control
+   * that then appears to do nothing.
+   */
+  clearable: (label: string | null) => void
   /** Whether anything has greeted us yet. */
   greeted: () => boolean
   /** Stop listening. Every question still waiting is refused rather than left hanging. */
@@ -279,6 +335,16 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
      is not the same as an empty offer: an empty one is a module saying it has
      nothing to be narrowed by now, and has to be sent. */
   let offered: FilterGroup[] | null = null
+  /* And the last clear offer, replayed for the same reason.
+
+     Wrapped in an object rather than held as a bare `string | null`, because
+     for this offer `null` is a REAL value — it is how a module says there is
+     nothing to clear — so it cannot also be the sentinel for "never said
+     anything". A bare null would make a module that withdrew its offer before
+     the greeting indistinguishable from one that never had a clear control, and
+     the two produce the same drawing today but would diverge the moment the
+     replay meant anything more than "post this again". */
+  let clearing: { label: string | null } | null = null
 
   /** Correlation id -> the promise waiting on it. A `Map`, per the protocol's note on lookups. */
   const waiting = new Map<
@@ -339,6 +405,7 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
          which announces a NEW offer from `onHello` overwrites the replay rather
          than being overwritten by it. */
       if (offered !== null) send({ type: MESSAGE.FILTERS, groups: offered })
+      if (clearing !== null) send({ type: MESSAGE.CLEARABLE, label: clearing.label })
       events.onHello?.(message.context, message.state)
       return
     }
@@ -388,6 +455,17 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
 
     if (message.type === MESSAGE.EVENT) {
       events.onEvent?.(message)
+      return
+    }
+
+    if (message.type === MESSAGE.CLEAR) {
+      /* Nothing is unwrapped and nothing is passed on, because there is nothing
+         in it — see `clearSchema`. A page that never registered `onClear` does
+         nothing, which is correct rather than a dropped message: the host only
+         draws the control for a page that announced `clearable`, so a module
+         with a handler and no offer and one with an offer and no handler are
+         both modules that asked for this to do nothing. */
+      events.onClear?.()
       return
     }
 
@@ -462,6 +540,14 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
          otherwise have a control that never appears. */
       offered = groups
       send({ type: MESSAGE.FILTERS, groups })
+    },
+
+    clearable(label) {
+      /* Kept before it is sent, for the same reason as the filter offer: an
+         offer made before the greeting goes out with the replay rather than
+         being lost. */
+      clearing = { label }
+      send({ type: MESSAGE.CLEARABLE, label })
     },
 
     greeted: () => host !== null,
