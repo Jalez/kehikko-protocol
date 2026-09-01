@@ -809,3 +809,121 @@ describe('the offer to clear what this page shows', () => {
     expect(pressed).toBe(0)
   })
 })
+
+describe('the offer to read this page’s material again', () => {
+  test('goes out whole, however little of it the caller stated', () => {
+    const { source, deliver } = fakeWindow()
+    const host = speaker()
+    const live = attach({}, { source })
+    deliver(hello(host))
+    live.refreshable({ at: '2026-09-01T10:49:48Z' })
+    expect(host.said[1]).toEqual({
+      type: MESSAGE.REFRESHABLE,
+      can: true,
+      at: '2026-09-01T10:49:48Z',
+      busy: false,
+    })
+  })
+
+  /*
+   * The whole point of the merge: a page says `busy: true` on the way into a
+   * read without restating a timestamp it has not changed, and the host still
+   * receives a complete state.
+   */
+  test('a later announcement keeps what it did not mention', () => {
+    const { source, deliver } = fakeWindow()
+    const host = speaker()
+    const live = attach({}, { source })
+    deliver(hello(host))
+    live.refreshable({ at: '2026-09-01T10:49:48Z' })
+    live.refreshable({ busy: true })
+    expect(host.said[2]).toEqual({
+      type: MESSAGE.REFRESHABLE,
+      can: true,
+      at: '2026-09-01T10:49:48Z',
+      busy: true,
+    })
+  })
+
+  /*
+   * And the one field that does NOT carry forward, which is the asymmetry worth
+   * a test: `can` and `at` stay true until something changes them, and `busy`
+   * is true for the length of one read. Carried forward, a page that forgot to
+   * say `busy: false` would leave a spinner turning forever.
+   */
+  test('busy is off again unless it is said again', () => {
+    const { source, deliver } = fakeWindow()
+    const host = speaker()
+    const live = attach({}, { source })
+    deliver(hello(host))
+    live.refreshable({ busy: true })
+    live.refreshable({ at: '2026-09-01T10:50:00Z' })
+    expect((host.said[2] as { busy: boolean }).busy).toBe(false)
+  })
+
+  /*
+   * Replayed like the other two offers, and here the replay does something
+   * stronger than keep a control on screen: what it carries is a TIME. A frame
+   * that reloads without this leaves the host drawing a "last read" from a
+   * conversation that no longer exists — and a missing control is a thing
+   * somebody notices, where a stale timestamp is a thing they believe.
+   */
+  test('is replayed on every greeting, timestamp and all', () => {
+    const { source, deliver } = fakeWindow()
+    const host = speaker()
+    const live = attach({}, { source })
+    deliver(hello(host))
+    live.refreshable({ at: '2026-09-01T10:49:48Z' })
+    host.said.length = 0
+
+    deliver(hello(host))
+    expect(host.said.map((m) => (m as { type: string }).type)).toEqual([MESSAGE.READY, MESSAGE.REFRESHABLE])
+    expect((host.said[1] as { at: string }).at).toBe('2026-09-01T10:49:48Z')
+  })
+
+  test('a page that never offers it sends nothing at all', () => {
+    const { source, deliver } = fakeWindow()
+    const host = speaker()
+    attach({}, { source })
+    deliver(hello(host))
+    deliver(hello(host))
+    expect(host.said.every((m) => (m as { type: string }).type === MESSAGE.READY)).toBe(true)
+  })
+
+  test('a press reaches the page, carries nothing, and is not answered', () => {
+    const { source, deliver } = fakeWindow()
+    const host = speaker()
+    let asked = 0
+    attach({ onRefresh: () => (asked += 1) }, { source })
+    deliver(hello(host))
+    host.said.length = 0
+
+    deliver({ data: { type: MESSAGE.REFRESH, protocol: PROTOCOL }, origin: 'null', source: host })
+    expect(asked).toBe(1)
+    expect(host.said).toEqual([])
+  })
+
+  test('a press at a page with no handler is silence, not an error', () => {
+    const { source, deliver } = fakeWindow()
+    const host = speaker()
+    attach({}, { source })
+    deliver(hello(host))
+    expect(() =>
+      deliver({ data: { type: MESSAGE.REFRESH, protocol: PROTOCOL }, origin: 'null', source: host }),
+    ).not.toThrow()
+  })
+
+  /* The same identity check the clear press gets. A second window posting a
+     refresh at a page is a stranger spending somebody's rate limit. */
+  test('and a press from a window that never greeted us is ignored', () => {
+    const { source, deliver } = fakeWindow()
+    const host = speaker()
+    const stranger = speaker()
+    let asked = 0
+    attach({ onRefresh: () => (asked += 1) }, { source })
+    deliver(hello(host))
+
+    deliver({ data: { type: MESSAGE.REFRESH, protocol: PROTOCOL }, origin: 'null', source: stranger })
+    expect(asked).toBe(0)
+  })
+})

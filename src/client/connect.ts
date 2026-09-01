@@ -202,6 +202,30 @@ export interface HostEvents {
    * own words.
    */
   onClear?: () => void
+  /**
+   * The host's refresh control was pressed, or the interval somebody set for
+   * this container has elapsed. Read your material again.
+   *
+   * Only ever reaches a module that announced `refreshable`, on the same
+   * arrangement `onClear` has: the offer is what makes the host draw a control
+   * at all, so a page that never calls `refreshable` never hears one.
+   *
+   * ## You are not told which of the two it was, and that is deliberate
+   *
+   * There are no parameters and there will not be. A flag saying "this one was
+   * automatic" would be used to behave differently — to take a cache on one and
+   * not on the other — which is a module deciding policy from a fact about
+   * somebody else's timer. Whatever a deliberate press should do here is what a
+   * tick should do.
+   *
+   * ## Say what happened by re-announcing
+   *
+   * There is no reply. Call `refreshable` on the way in with `busy: true`, and
+   * again on the way out with a new `at` — or with the SAME `at`, if the read
+   * failed and what is on screen is still the old one, which is the case a host
+   * dating the data from its own message would have got wrong.
+   */
+  onRefresh?: () => void
 }
 
 export interface ConnectOptions {
@@ -308,6 +332,31 @@ export interface Connection {
    * that then appears to do nothing.
    */
   clearable: (label: string | null) => void
+  /**
+   * Say that this page can read its material again, and when it last did.
+   *
+   * Fire and forget like `filters` and `clearable`, remembered like both, and
+   * replayed on every greeting for the reason given two entries up: a frame
+   * that reloads is greeted again, and a page whose state had not changed since
+   * would have no reason to send anything, leaving the host with a control from
+   * a conversation that no longer exists — or with a "last read" time from
+   * before the reload, which is worse, because it is wrong rather than missing.
+   *
+   * Send it whenever any of the three fields changes, which is at least twice
+   * per refresh: `busy: true` on the way in, and a new `at` on the way out.
+   *
+   * ## `at` is yours, and nobody else can supply it
+   *
+   * The host knows when it asked. It does not know whether you answered out of
+   * a cache, whether the read failed over a reading you are still showing, or
+   * whether you refreshed yourself for a reason it has no view of. So it prints
+   * what you say here and nothing else, and `null` — "I cannot say" — makes it
+   * print no time at all rather than invent one. See `refreshableSchema`.
+   *
+   * `can: false` withdraws the control, the way `clearable(null)` does: there is
+   * nothing this page could read again right now.
+   */
+  refreshable: (state: { can?: boolean; at?: string | null; busy?: boolean }) => void
   /** Whether anything has greeted us yet. */
   greeted: () => boolean
   /** Stop listening. Every question still waiting is refused rather than left hanging. */
@@ -345,6 +394,12 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
      the two produce the same drawing today but would diverge the moment the
      replay meant anything more than "post this again". */
   let clearing: { label: string | null } | null = null
+  /* And the last refresh state, replayed for the same reason and with one of
+     its own: what is replayed carries `at`, so a frame that reloads without
+     this would leave the host drawing a "last read" time from a conversation
+     that no longer exists. A missing control is a thing somebody notices; a
+     stale timestamp is a thing they believe. */
+  let refreshing: { can: boolean; at: string | null; busy: boolean } | null = null
 
   /** Correlation id -> the promise waiting on it. A `Map`, per the protocol's note on lookups. */
   const waiting = new Map<
@@ -406,6 +461,7 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
          than being overwritten by it. */
       if (offered !== null) send({ type: MESSAGE.FILTERS, groups: offered })
       if (clearing !== null) send({ type: MESSAGE.CLEARABLE, label: clearing.label })
+      if (refreshing !== null) send({ type: MESSAGE.REFRESHABLE, ...refreshing })
       events.onHello?.(message.context, message.state)
       return
     }
@@ -466,6 +522,14 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
          with a handler and no offer and one with an offer and no handler are
          both modules that asked for this to do nothing. */
       events.onClear?.()
+      return
+    }
+
+    if (message.type === MESSAGE.REFRESH) {
+      /* Nothing to unwrap, for the same reason and with the same consequence
+         as `MESSAGE.CLEAR` above: a page with no handler does nothing, which is
+         what a page that never announced `refreshable` asked for. */
+      events.onRefresh?.()
       return
     }
 
@@ -548,6 +612,27 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
          being lost. */
       clearing = { label }
       send({ type: MESSAGE.CLEARABLE, label })
+    },
+
+    refreshable(state) {
+      /* Merged onto what was last said rather than replacing it, so a page can
+         call `refreshable({ busy: true })` on the way into a read without
+         restating a timestamp it has not changed. The whole state still goes on
+         the wire — the message is an offer, whole, every time — and this is
+         only about what a caller has to type.
+
+         `busy` is the one field that does NOT carry forward, and the asymmetry
+         is the point: `can` and `at` are facts that stay true until something
+         changes them, and busy is true for the length of one read. Carried
+         forward, a page that forgot to say `busy: false` on the way out would
+         leave a spinner turning forever; defaulted off, a page that forgets is
+         a page that merely did not show one. */
+      refreshing = {
+        can: state.can ?? refreshing?.can ?? true,
+        at: state.at !== undefined ? state.at : (refreshing?.at ?? null),
+        busy: state.busy ?? false,
+      }
+      send({ type: MESSAGE.REFRESHABLE, ...refreshing })
     },
 
     greeted: () => host !== null,

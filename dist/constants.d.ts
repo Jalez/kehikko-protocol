@@ -280,14 +280,106 @@ export declare const MESSAGE: {
      * down.
      */
     readonly CLEAR: "roadmap.clear";
+    /**
+     * Module → host. "I can be refreshed, and this is when I last was."
+     *
+     * The thirteenth, and the third control a module can put in its own
+     * container's header. It is `clearable`'s shape — an offer, whole, every
+     * time, withdrawable — with one field that is unlike anything else in this
+     * protocol and is the reason the message exists at all.
+     *
+     * ## `at` is the MODULE's fact, and a host must never infer it
+     *
+     * "Last refreshed" looks like something a host could work out for itself: it
+     * sent `roadmap.refresh` at 10:04, so the data is from 10:04. That is wrong
+     * in every case anybody cares about, and wrong silently:
+     *
+     *  - the module answered out of its own cache and the reading is an hour old;
+     *  - the refresh failed and what is on screen is the last good one;
+     *  - the module refreshed itself, on its own, for a reason the host has no
+     *    view of — a project changed under it, somebody pressed something inside
+     *    the page;
+     *  - the host has never asked at all, and the module has been running for a
+     *    day with a reading from when it started.
+     *
+     * In all four the host would print a time that is not when the data was read,
+     * beside data that is older than it says. A freshness line that can be wrong
+     * is worse than no freshness line, because the entire reason to draw one is
+     * that a stale list and a short list look identical. So the module says when,
+     * in its own words about its own data, and the host formats what it was told
+     * and nothing else. `null` is a real answer and means "I cannot say" — a host
+     * draws no time rather than inventing one.
+     *
+     * ## `busy` is here so that the host's control can be honest for the second
+     * a refresh takes
+     *
+     * The module knows whether a read is in flight; the host knows only that it
+     * posted a message into a frame. Two presses racing is two subprocesses and
+     * one answer that wins for no reason anybody could predict, and the cheapest
+     * place to prevent it is the button.
+     *
+     * ## What it does NOT carry
+     *
+     * No interval. How often to refresh is the person's setting about one
+     * container, the host stores it beside the filter choice, and the host runs
+     * the clock — see `MESSAGE.REFRESH`. A module told the interval would be a
+     * module tempted to run a second timer, and two timers on one list is a
+     * program spending somebody's rate limit twice.
+     *
+     * No error, and no result. A refresh that failed is the module's to draw, in
+     * its own page, in its own words, with whatever remedy it can offer. The most
+     * a host can honestly say is when the data is from, which is `at`.
+     */
+    readonly REFRESHABLE: "roadmap.refreshable";
+    /**
+     * Host → module. "Read your material again."
+     *
+     * The fourteenth, and `MESSAGE.CLEAR`'s twin in shape: a press, relayed,
+     * carrying nothing and answered by nothing. What comes back is not a reply
+     * but a new `roadmap.refreshable` — `busy: true` while it runs, then a new
+     * `at` — which is the module reporting on its own work in its own words, the
+     * only reporting anybody here is entitled to.
+     *
+     * ## One message for two causes, deliberately
+     *
+     * A person pressed refresh, or an interval elapsed. The module cannot tell
+     * which and must not need to: what it is being asked to do is identical, and
+     * a flag saying "this one was automatic" would immediately be used to behave
+     * differently — to skip a cache on one and not the other — which is the
+     * module deciding policy from a fact about somebody else's timer.
+     *
+     * ## The interval belongs to the host, and it is stored per CONTAINER
+     *
+     * "Every five minutes" is a person's setting about one container on one
+     * canvas, in the same family as the filter choice and stored the same way. It
+     * has to outlive the module's next reload, and a module cannot promise that:
+     * its page is loaded once and shown wherever it is asked for, so a module
+     * holding the interval would give every container of it the same one — which
+     * is the exact failure `filters` on the placement schema exists to avoid.
+     *
+     * So the host owns the clock. That also puts the timer where the facts are:
+     * only the host knows whether the container is on the canvas somebody is
+     * looking at, whether it is folded, and whether it is pinned — and an
+     * interval that goes on spending a rate limit for a container nobody has open
+     * is the thing this feature is most likely to become.
+     *
+     * ## Not sent to a module that has not offered
+     *
+     * A host draws this control only for a module that announced
+     * `roadmap.refreshable`, so a press or a tick for a module that never did is
+     * a press on a button that should not exist. The bound on how often it may be
+     * sent is `REFRESH_EVERY_MIN`: a host must not run this faster than the
+     * person asked for, and must not run it at all when nobody asked.
+     */
+    readonly REFRESH: "roadmap.refresh";
 };
 export type MessageType = (typeof MESSAGE)[keyof typeof MESSAGE];
 /** The prefix every message type carries, so a listener can drop the rest cheaply. */
 export declare const MESSAGE_PREFIX = "roadmap.";
 /** What the host says, and only the host. A module sending one of these is confused. */
-export declare const HOST_MESSAGES: readonly ["roadmap.hello", "roadmap.context", "roadmap.response", "roadmap.goto", "roadmap.event", "roadmap.clear"];
+export declare const HOST_MESSAGES: readonly ["roadmap.hello", "roadmap.context", "roadmap.response", "roadmap.goto", "roadmap.event", "roadmap.clear", "roadmap.refresh"];
 /** And what the module says. */
-export declare const MODULE_MESSAGES: readonly ["roadmap.ready", "roadmap.request", "roadmap.resize", "roadmap.went", "roadmap.filters", "roadmap.clearable"];
+export declare const MODULE_MESSAGES: readonly ["roadmap.ready", "roadmap.request", "roadmap.resize", "roadmap.went", "roadmap.filters", "roadmap.clearable", "roadmap.refreshable"];
 /**
  * How tall a frame may be asked to be.
  *
@@ -302,6 +394,35 @@ export declare const MODULE_MESSAGES: readonly ["roadmap.ready", "roadmap.reques
  */
 export declare const MIN_HEIGHT = 200;
 export declare const MAX_HEIGHT = 20000;
+/**
+ * How often a host may be asked to refresh one container, in MINUTES.
+ *
+ * Here rather than in a host for the same reason the height bounds are: the
+ * number is part of what the two sides have agreed, so a module reading this
+ * package knows what a person can do to it, and a second host written against
+ * this protocol does not have to guess.
+ *
+ * Both ends are for a specific failure.
+ *
+ * **One minute at the fast end**, and not seconds. Every module this exists for
+ * spends something to refresh — a subprocess, a rate limit, somebody else's
+ * API — and a control offering "every 10 seconds" is a control that will be set
+ * to every 10 seconds by somebody who then goes to lunch. A minute is already
+ * far more often than any of these lists actually change; the interesting
+ * settings are five and fifteen.
+ *
+ * **A day at the slow end**, because past that the setting is not really an
+ * interval any more: a container refreshed every three days is one nobody is
+ * watching, and the honest answer for that container is the button. The bound
+ * keeps a number that cannot be reasoned about — a year, a random large
+ * integer out of a database somebody hand-edited — out of a timer.
+ *
+ * `null` rather than zero is how "not on a clock" is said, wherever this is
+ * stored. Zero would be an interval of no length, which a program will one day
+ * divide by or loop on.
+ */
+export declare const REFRESH_EVERY_MIN = 1;
+export declare const REFRESH_EVERY_MAX = 1440;
 /**
  * What a host will make of a height a module asked for.
  *
@@ -568,6 +689,54 @@ export declare const LIMITS: {
      * hundreds is a module that needs a control this one is not.
      */
     readonly FILTER_OPTIONS: 12;
+    /**
+     * What somebody TYPED into a filter, which is the newest thing in this list
+     * and the first value here that is not an identifier.
+     *
+     * ## Why there is a text kind at all, having refused one twice
+     *
+     * `filterGroupSchema` said, in its own words, that free text was refused by
+     * design: a text input in a container header needs room a 220-pixel header
+     * does not have, it needs focus, it needs a keyboard, and a host cannot
+     * debounce or interpret somebody else's search. Every clause of that was
+     * about a text box laid out IN the header strip beside six icon buttons, and
+     * every clause of it is still true of that.
+     *
+     * What the argument never examined is that the header strip is not where the
+     * filter lives. It is one twenty-four-pixel button that opens a MENU, and a
+     * menu is a floating layer with its own width, its own focus scope and as
+     * many rows as it likes. An input in there costs the header nothing, takes
+     * focus because a menu already does, and is dismissed the way every other
+     * menu is. The refusal was right about the strip and wrong about the feature.
+     *
+     * The module that forced it is the one this whole facility was shaped around
+     * — a list of references narrowed by kind, by state, and by a typed query.
+     * Two of its three axes moved to the header and the third stayed behind,
+     * which left one module drawing a row of chrome for the sake of one control,
+     * and a person looking in two places for one filter.
+     *
+     * ## Two hundred, and what the number is protecting
+     *
+     * This is stored per container in a host's database, echoed back in every
+     * `roadmap.context`, and rendered inside somebody else's chrome — the same
+     * three exposures `FILTER_LABEL` has, and one more: a module can WRITE it
+     * with `filters.set`, so it is the one value here that a program rather than
+     * a person can produce at speed.
+     *
+     * Two hundred is `SUMMARY`, deliberately: it is the length this package has
+     * already decided is "a sentence somebody wrote, not a document". Nobody
+     * types two hundred characters into a search box on purpose, and a paste that
+     * would have is clipped by the module rather than refused by the wire — a
+     * clipped query is still a query, where a refused one is a filter that
+     * silently stops working the first time somebody pastes a stack trace into
+     * it.
+     *
+     * A host must not use this as a key, index anything with it, or read meaning
+     * into it. It is what somebody typed. The KEY beside it is still a
+     * `FILTER_ID` and still refuses the three spellings that are not really keys;
+     * see the essay there, which is what this bound does not weaken.
+     */
+    readonly FILTER_TEXT: 200;
     /** How many refs one payload may carry, and how many may be selected at once. */
     readonly REFS: 32;
     /**

@@ -99,6 +99,18 @@ export interface Roadmap {
    */
   clearable: (label: string | null) => void
   /**
+   * Say that this page can read its material again, and when it last did.
+   *
+   * Stable across renders like `filters` and `clearable`, and the ordinary call
+   * site is the same shape: an effect whose dependency is the reading, calling
+   * this with a new `at` whenever one arrives.
+   *
+   * The press arrives at `onRefresh` in the `events` given to this hook. `at` is
+   * the module's fact about its own data, and a host never infers one — see
+   * `refreshableSchema` for the four ways such a guess is wrong.
+   */
+  refreshable: (state: { can?: boolean; at?: string | null; busy?: boolean }) => void
+  /**
    * The live connection, or null between mounts.
    *
    * Here because a page with its own machinery — a poll that emits, a store that
@@ -222,10 +234,14 @@ export function useRoadmap(id: string, events: HostEvents = {}, options: UseRoad
   const resize = useCallback((height: number) => held.current?.resize(height), [])
   const filters = useCallback((groups: FilterGroup[]) => held.current?.filters(groups), [])
   const clearable = useCallback((label: string | null) => held.current?.clearable(label), [])
+  const refreshable = useCallback(
+    (state: { can?: boolean; at?: string | null; busy?: boolean }) => held.current?.refreshable(state),
+    [],
+  )
   const connection = useCallback(() => held.current, [])
 
   return useMemo(
-    () => ({ where, context, state, request, resize, filters, clearable, connection }),
-    [where, context, state, request, resize, filters, clearable, connection],
+    () => ({ where, context, state, request, resize, filters, clearable, refreshable, connection }),
+    [where, context, state, request, resize, filters, clearable, refreshable, connection],
   )
 }

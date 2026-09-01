@@ -271,18 +271,29 @@ export const filterOptionSchema = z.object({
  * one-group case is a list of length one. Two axes cost that module one more
  * entry and cost every other module nothing.
  *
- * ## What this cannot express, said plainly
+ * ## Free text, which this used to refuse and now has a kind for
  *
- * **Free text.** The same references module also narrows by a typed query, and
- * there is no shape here for one. That is a decision rather than an oversight:
- * a text input in a container header is a much worse idea than a button in one
- * — it needs room a 220-pixel header does not have, it needs focus, it needs a
- * keyboard, and a host cannot debounce or interpret somebody else's search.
+ * What stood here said there was no shape for a typed query, that it was a
+ * decision rather than an oversight, and that a module wanting one would have
+ * its filtering in two places and might well prefer to keep all of it. The
+ * reason given was that a text input in a container header needs room a
+ * 220-pixel header does not have, needs focus, needs a keyboard, and cannot be
+ * debounced or interpreted by a host.
  *
- * The honest consequence is that such a module would have its filtering in two
- * places, and it may well decide that is worse than having it in one. Nothing
- * here obliges a module to hand over the enumerated part of its filtering just
- * because it can, and a module that keeps all of it is a conforming module.
+ * That was an argument about a text box in the header STRIP, and it is still
+ * correct about one. It was applied to the whole feature, and the feature is a
+ * twenty-four-pixel button that opens a MENU — a floating layer with its own
+ * width and its own focus scope, where an input costs the header nothing.
+ *
+ * So there is a `kind` now, `text` is the second value, and the consequence the
+ * old paragraph called honest turned out to be the thing worth removing: the
+ * module this was designed against had two of its three axes in a header and
+ * the third in a row of its own chrome, and a person looking for one filter had
+ * to know to look in two places. `LIMITS.FILTER_TEXT` carries the rest of the
+ * argument and the bound.
+ *
+ * A module is still not obliged to hand over anything, and one that keeps all
+ * of its own filtering is still a conforming module.
  *
  * ## `fallback` is what makes a stale choice recoverable
  *
@@ -305,14 +316,70 @@ export const filterOptionSchema = z.object({
 export const filterGroupSchema = z
     .object({
     id: filterId,
-    /** What this axis is called: `ignored`, `kind`, `scope`. A person reads it. */
+    /** What this axis is called: `ignored`, `kind`, `scope`, `search`. A person reads it. */
     label: filterLabel,
-    options: z.array(filterOptionSchema).min(1).max(LIMITS.FILTER_OPTIONS),
-    /** Which option this group is on when nobody has chosen. One of `options`. */
-    fallback: filterId,
+    /**
+     * Whether this axis is chosen FROM or typed INTO.
+     *
+     * Absent means `choice`, and that is load-bearing rather than a convenience:
+     * every module written before this field existed sends a group without it,
+     * and every one of them meant a list of options. A required field with a
+     * default would have been a breaking change dressed as an addition.
+     *
+     * `text` is one input. It has no options and no fallback — its resting state
+     * is the empty string, which is not a value anybody stores — and what comes
+     * back in `filterChoiceSchema` under this group's id is what somebody typed.
+     * The essay on `LIMITS.FILTER_TEXT` is why this exists after being refused
+     * twice, and the short version is that the refusal was about a text box in
+     * a header STRIP and the control is a MENU.
+     *
+     * A host that has never heard of `text` draws nothing for such a group,
+     * which is the correct degradation: a group with no options renders as an
+     * empty section rather than as a broken one, and the module goes on
+     * receiving `{}` for it — which is what "nothing typed" means anyway.
+     */
+    kind: z.enum(['choice', 'text']).optional(),
+    /**
+     * What can be chosen. Empty for a `text` group, at least one for a choice.
+     *
+     * Defaulted so that a text group may leave it out entirely, and still an
+     * array on the way out so that every host already written — `group.options.
+     * some(...)` — goes on compiling and goes on being right.
+     */
+    options: z.array(filterOptionSchema).max(LIMITS.FILTER_OPTIONS).default([]),
+    /**
+     * Which option this group is on when nobody has chosen. One of `options`.
+     *
+     * Optional only because a `text` group has none: the resting state of an
+     * input is empty, and a fallback naming a value would be a search box that
+     * starts with something in it. The refinement below still requires it for
+     * every choice group, which is every group anybody has written so far.
+     */
+    fallback: filterId.optional(),
 })
-    .refine((group) => group.options.some((option) => option.id === group.fallback), {
-    message: "a group's fallback has to be one of its own options",
+    .superRefine((group, ctx) => {
+    if (group.kind === 'text') {
+        /* Both of these are a module confusing the two kinds, and both would
+           produce a control nobody could operate: options nothing draws, or a
+           fallback that no press can return the input to. */
+        if (group.options.length) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'a text group cannot have options' });
+        }
+        if (group.fallback !== undefined) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'a text group cannot have a fallback: its resting state is empty',
+            });
+        }
+        return;
+    }
+    if (!group.options.length) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'a choice group needs at least one option' });
+        return;
+    }
+    if (group.fallback === undefined || !group.options.some((option) => option.id === group.fallback)) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "a group's fallback has to be one of its own options" });
+    }
 })
     .refine((group) => new Set(group.options.map((o) => o.id)).size === group.options.length, {
     message: 'two options in one group cannot share an id',
@@ -402,8 +469,83 @@ export const clearSchema = z.object({
     type: z.literal(MESSAGE.CLEAR),
     protocol: z.number().int().min(1),
 });
+/* ------------------------------------------------------------------------ *
+ * Refreshing: a module offering to read its material again
+ * ------------------------------------------------------------------------ */
 /**
- * Which option is current in each group: group id → option id.
+ * What a module says about being refreshed. The whole state, every time.
+ *
+ * Three fields and no fourth, and the discipline is `clearableSchema`'s: no
+ * count of what would be read, no description of where from, no error, no
+ * interval. The host draws a control, reports a press, and formats one
+ * timestamp it was handed.
+ *
+ * ## `at` is the only fact in this protocol a host would otherwise guess
+ *
+ * The essay on `MESSAGE.REFRESHABLE` is the long form and it is worth having
+ * the short one here, beside the field: the host knows when it ASKED, and when
+ * it asked is not when the data is from. A module may answer out of a cache, a
+ * refresh may fail over a reading it keeps showing, and a module may refresh
+ * itself for a reason the host has no view of. In all three a host that dated
+ * the data from its own message would print a time that is wrong beside data
+ * that is older than it says.
+ *
+ * So it is an ISO 8601 instant, with an offset, from the module — and `null` is
+ * a real answer meaning "I cannot say", for which a host draws no time at all
+ * rather than inventing one. A module that has never successfully read anything
+ * sends `null` and keeps sending it.
+ *
+ * ## `can` is how the control is withdrawn, and it is not `busy`
+ *
+ * `false` takes the control away: there is nothing to refresh right now — no
+ * project, no document, nothing this module could read again — and a button
+ * that cannot work teaches a person that the button does not work, which they
+ * will remember on the day it would have. It is the counterpart of `clearable`
+ * sending `null` and of `filters` sending an empty `groups`.
+ *
+ * `busy` leaves the control there and says a read is in flight. Two presses
+ * racing is two subprocesses and one answer that wins for no reason anybody
+ * could predict, and the module is the only side that knows.
+ *
+ * A module re-announces whenever any of the three changes, which is at least
+ * twice per refresh — `busy: true` on the way in, a new `at` on the way out —
+ * and that is the whole of the feedback this feature has.
+ */
+export const refreshableSchema = z.object({
+    type: z.literal(MESSAGE.REFRESHABLE),
+    /** Whether there is anything to read again right now. `false` withdraws the control. */
+    can: z.boolean().default(true),
+    /** When this module's material was last read, as the MODULE knows it. */
+    at: z.string().datetime({ offset: true }).nullable().default(null),
+    /** Whether a read is in flight this second. */
+    busy: z.boolean().default(false),
+});
+/**
+ * The press, relayed. "Read your material again."
+ *
+ * Empty apart from its envelope, exactly like `clearSchema`, and every field
+ * somebody will want to add is one that would break it.
+ *
+ * **Not why.** A person pressed the button, or an interval elapsed; the module
+ * cannot tell and must not need to, because a flag saying "this one was
+ * automatic" would be used to behave differently and that is the module setting
+ * policy from a fact about somebody else's timer.
+ *
+ * **Not the interval**, because the host runs the clock — see `MESSAGE.REFRESH`
+ * — and a module told the number would be a module tempted to run a second
+ * timer beside it.
+ *
+ * **Not a correlation id**, because there is no answer. What comes back is a
+ * new `roadmap.refreshable`: `busy` while it runs, then a new `at`. An
+ * acknowledgement would only tempt a host into reporting on work it cannot see.
+ */
+export const refreshSchema = z.object({
+    type: z.literal(MESSAGE.REFRESH),
+    protocol: z.number().int().min(1),
+});
+/**
+ * What each group is currently set to: group id → an option id, or what
+ * somebody typed.
  *
  * This is the half that travels back, and it travels in `roadmap.context` — see
  * the field there for why it is context rather than a message of its own.
@@ -414,9 +556,34 @@ export const clearSchema = z.object({
  * receives a choice it does not recognise; a module should nevertheless fall
  * back to its own default for an option id it does not know, because both
  * halves of a disagreement have to be able to survive it alone.
+ *
+ * ## The key is still an id. The value is not, any more.
+ *
+ * It was `filterId` on both sides when every group was a list of options, and
+ * the value is now `FILTER_TEXT` — long enough for what somebody types into a
+ * `text` group, and comfortably long enough for every option id there has ever
+ * been, since `FILTER_ID` is a third of it.
+ *
+ * Which half was widened matters, and this one is the safe half. The essay on
+ * `filterId` is about strings a host uses as KEYS: `stored['constructor']`
+ * finds something on the prototype that nobody put there, so the three
+ * spellings that are not really keys are refused at the wire. Every one of
+ * those defences is on the left-hand side of this record and none of them
+ * moved. A value is looked at, compared against an offer, and drawn; it is
+ * never used to index anything, and a host that indexes something with it has
+ * a bug this bound was never going to prevent.
+ *
+ * What the wider bound costs is precision on the choice half of a CHOICE group:
+ * a stored `{kind: <a 190-character string>}` now validates where it used to be
+ * refused at 64. It reaches nothing: a host reconciles every stored value
+ * against the offer the module is making right now and drops anything that is
+ * not one of that group's options, and the module falls back again on its own
+ * side. Two programs already had to survive a value neither of them recognises,
+ * because that is what a module shipping new options means; this makes the set
+ * of such values slightly larger and changes nothing about what happens to one.
  */
 export const filterChoiceSchema = z
-    .record(filterId, filterId)
+    .record(filterId, z.string().min(1).max(LIMITS.FILTER_TEXT))
     .refine((chosen) => Object.keys(chosen).length <= LIMITS.FILTER_GROUPS, {
     message: `no more than ${LIMITS.FILTER_GROUPS} filter groups can be chosen at once`,
 });
@@ -1049,6 +1216,7 @@ export const hostMessageSchema = z.union([
     gotoSchema,
     eventSchema,
     clearSchema,
+    refreshSchema,
 ]);
 export const moduleMessageSchema = z.union([
     readySchema,
@@ -1057,6 +1225,7 @@ export const moduleMessageSchema = z.union([
     wentSchema,
     filtersSchema,
     clearableSchema,
+    refreshableSchema,
 ]);
 /**
  * Is this worth parsing at all?

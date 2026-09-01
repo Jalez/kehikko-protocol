@@ -169,15 +169,28 @@ describe('the refusals, which are what stop a host drawing nonsense', () => {
 
   /*
    * A choice is stored and read back as a record, and a record is a plain
-   * object. These three do not behave like keys — see the essay on `filterId`
+   * object. These three do not behave like KEYS — see the essay on `filterId`
    * in `wire.ts` — and a host that stored one and read it back would get an
    * answer it never wrote.
+   *
+   * The key half is the whole of that defence, and none of it moved when the
+   * value half was widened for typed text. A value is compared against an offer
+   * and drawn; it indexes nothing.
    */
-  test('the three ids that are not really keys are refused on both halves', () => {
+  test('the three ids that are not really keys are refused as ids and as keys', () => {
     for (const bad of ['__proto__', 'constructor', 'prototype']) {
       expect(filterGroupSchema.safeParse({ ...ignored, id: bad }).success).toBe(false)
       expect(filterChoiceSchema.safeParse({ [bad]: 'hide' }).success).toBe(false)
-      expect(filterChoiceSchema.safeParse({ ignored: bad }).success).toBe(false)
+    }
+  })
+
+  test('and are accepted as VALUES, because somebody may have typed one', () => {
+    /* The deliberate half of the same change. A `text` group's value is what
+       was typed, and `__proto__` is an ordinary thing to search a codebase for.
+       Refusing it would be a search box that silently stops working on one
+       word, which is a stranger failure than any it prevents. */
+    for (const typed of ['__proto__', 'constructor', 'prototype']) {
+      expect(filterChoiceSchema.safeParse({ search: typed }).success).toBe(true)
     }
   })
 
@@ -230,5 +243,53 @@ describe('the offer is a module message, alongside ready, request, resize and we
     expect(hostMessageSchema.safeParse({ type: MESSAGE.FILTERS, groups: [ignored] }).success).toBe(
       false,
     )
+  })
+})
+
+/**
+ * The second kind of group, which this schema refused twice before it had one.
+ *
+ * The refusal was about a text box in the header STRIP and the control is a
+ * MENU — `LIMITS.FILTER_TEXT` carries the argument. What the tests are for is
+ * the seam between the two kinds, because a module that confuses them produces
+ * a control nobody can operate rather than an error anybody can see.
+ */
+describe('a group can be typed into rather than chosen from', () => {
+  const search = { id: 'search', label: 'search', kind: 'text' as const }
+
+  test('no options and no fallback, which is what "the resting state is empty" means', () => {
+    const group = filterGroupSchema.parse(search)
+    expect(group.kind).toBe('text')
+    expect(group.options).toEqual([])
+    expect(group.fallback).toBeUndefined()
+  })
+
+  test('a text group carrying either of them is refused, because it would draw wrong', () => {
+    /* Options nothing renders, or a fallback no press can put the input back
+       to. Both are a module meaning `choice` and saying `text`. */
+    expect(filterGroupSchema.safeParse({ ...search, options: [{ id: 'a', label: 'a' }] }).success).toBe(false)
+    expect(filterGroupSchema.safeParse({ ...search, fallback: 'a' }).success).toBe(false)
+  })
+
+  test('a group with no kind is still a choice group, and still needs both', () => {
+    /* The compatibility that makes `kind` optional rather than defaulted: every
+       module written before this field existed sends a group without it and
+       meant a list of options. */
+    expect(filterGroupSchema.parse(ignored).kind).toBeUndefined()
+    expect(filterGroupSchema.safeParse({ id: 'k', label: 'k' }).success).toBe(false)
+    expect(filterGroupSchema.safeParse({ id: 'k', label: 'k', options: [], fallback: 'x' }).success).toBe(false)
+  })
+
+  test('what somebody typed travels back in the same record as the pressed options', () => {
+    const chosen = filterChoiceSchema.parse({ ignored: 'show', search: 'rbac jaakko' })
+    expect(chosen.search).toBe('rbac jaakko')
+  })
+
+  test('and is bounded, so that nobody stores a document in a container’s settings', () => {
+    expect(filterChoiceSchema.safeParse({ search: 'x'.repeat(LIMITS.FILTER_TEXT) }).success).toBe(true)
+    expect(filterChoiceSchema.safeParse({ search: 'x'.repeat(LIMITS.FILTER_TEXT + 1) }).success).toBe(false)
+    /* An empty string is not a value: "nothing typed" is the group being absent
+       from the record, which is how every other group says it is at rest. */
+    expect(filterChoiceSchema.safeParse({ search: '' }).success).toBe(false)
   })
 })

@@ -395,7 +395,7 @@ export declare const methodParams: {
      * rather than assuming it got what it asked for.
      */
     readonly 'filters.set': z.ZodObject<{
-        filters: z.ZodEffects<z.ZodRecord<z.ZodEffects<z.ZodString, string, string>, z.ZodEffects<z.ZodString, string, string>>, Record<string, string>, Record<string, string>>;
+        filters: z.ZodEffects<z.ZodRecord<z.ZodEffects<z.ZodString, string, string>, z.ZodString>, Record<string, string>, Record<string, string>>;
     }, "strip", z.ZodTypeAny, {
         filters: Record<string, string>;
     }, {

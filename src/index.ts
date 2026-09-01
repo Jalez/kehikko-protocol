@@ -17,6 +17,8 @@ export {
   MODULE_MESSAGES,
   MIN_HEIGHT,
   MAX_HEIGHT,
+  REFRESH_EVERY_MIN,
+  REFRESH_EVERY_MAX,
   clampHeight,
   LIMITS,
   type MessageType,
@@ -94,6 +96,8 @@ export {
   filterChoiceSchema,
   clearableSchema,
   clearSchema,
+  refreshableSchema,
+  refreshSchema,
   hostMessageSchema,
   moduleMessageSchema,
   looksLikeWireMessage,
@@ -118,6 +122,8 @@ export {
   type FilterChoice,
   type Clearable,
   type Clear,
+  type Refreshable,
+  type Refresh,
 } from './wire.js'
 
 export {

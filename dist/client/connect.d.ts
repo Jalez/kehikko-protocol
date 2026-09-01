@@ -181,6 +181,30 @@ export interface HostEvents {
      * own words.
      */
     onClear?: () => void;
+    /**
+     * The host's refresh control was pressed, or the interval somebody set for
+     * this container has elapsed. Read your material again.
+     *
+     * Only ever reaches a module that announced `refreshable`, on the same
+     * arrangement `onClear` has: the offer is what makes the host draw a control
+     * at all, so a page that never calls `refreshable` never hears one.
+     *
+     * ## You are not told which of the two it was, and that is deliberate
+     *
+     * There are no parameters and there will not be. A flag saying "this one was
+     * automatic" would be used to behave differently — to take a cache on one and
+     * not on the other — which is a module deciding policy from a fact about
+     * somebody else's timer. Whatever a deliberate press should do here is what a
+     * tick should do.
+     *
+     * ## Say what happened by re-announcing
+     *
+     * There is no reply. Call `refreshable` on the way in with `busy: true`, and
+     * again on the way out with a new `at` — or with the SAME `at`, if the read
+     * failed and what is on screen is still the old one, which is the case a host
+     * dating the data from its own message would have got wrong.
+     */
+    onRefresh?: () => void;
 }
 export interface ConnectOptions {
     /**
@@ -285,6 +309,35 @@ export interface Connection {
      * that then appears to do nothing.
      */
     clearable: (label: string | null) => void;
+    /**
+     * Say that this page can read its material again, and when it last did.
+     *
+     * Fire and forget like `filters` and `clearable`, remembered like both, and
+     * replayed on every greeting for the reason given two entries up: a frame
+     * that reloads is greeted again, and a page whose state had not changed since
+     * would have no reason to send anything, leaving the host with a control from
+     * a conversation that no longer exists — or with a "last read" time from
+     * before the reload, which is worse, because it is wrong rather than missing.
+     *
+     * Send it whenever any of the three fields changes, which is at least twice
+     * per refresh: `busy: true` on the way in, and a new `at` on the way out.
+     *
+     * ## `at` is yours, and nobody else can supply it
+     *
+     * The host knows when it asked. It does not know whether you answered out of
+     * a cache, whether the read failed over a reading you are still showing, or
+     * whether you refreshed yourself for a reason it has no view of. So it prints
+     * what you say here and nothing else, and `null` — "I cannot say" — makes it
+     * print no time at all rather than invent one. See `refreshableSchema`.
+     *
+     * `can: false` withdraws the control, the way `clearable(null)` does: there is
+     * nothing this page could read again right now.
+     */
+    refreshable: (state: {
+        can?: boolean;
+        at?: string | null;
+        busy?: boolean;
+    }) => void;
     /** Whether anything has greeted us yet. */
     greeted: () => boolean;
     /** Stop listening. Every question still waiting is refused rather than left hanging. */

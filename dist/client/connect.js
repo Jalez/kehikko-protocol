@@ -75,6 +75,12 @@ export function connect(id, events = {}, options = {}) {
        the two produce the same drawing today but would diverge the moment the
        replay meant anything more than "post this again". */
     let clearing = null;
+    /* And the last refresh state, replayed for the same reason and with one of
+       its own: what is replayed carries `at`, so a frame that reloads without
+       this would leave the host drawing a "last read" time from a conversation
+       that no longer exists. A missing control is a thing somebody notices; a
+       stale timestamp is a thing they believe. */
+    let refreshing = null;
     /** Correlation id -> the promise waiting on it. A `Map`, per the protocol's note on lookups. */
     const waiting = new Map();
     let counter = 0;
@@ -136,6 +142,8 @@ export function connect(id, events = {}, options = {}) {
                 send({ type: MESSAGE.FILTERS, groups: offered });
             if (clearing !== null)
                 send({ type: MESSAGE.CLEARABLE, label: clearing.label });
+            if (refreshing !== null)
+                send({ type: MESSAGE.REFRESHABLE, ...refreshing });
             events.onHello?.(message.context, message.state);
             return;
         }
@@ -194,6 +202,13 @@ export function connect(id, events = {}, options = {}) {
                with a handler and no offer and one with an offer and no handler are
                both modules that asked for this to do nothing. */
             events.onClear?.();
+            return;
+        }
+        if (message.type === MESSAGE.REFRESH) {
+            /* Nothing to unwrap, for the same reason and with the same consequence
+               as `MESSAGE.CLEAR` above: a page with no handler does nothing, which is
+               what a page that never announced `refreshable` asked for. */
+            events.onRefresh?.();
             return;
         }
         if (message.type === MESSAGE.GOTO) {
@@ -270,6 +285,26 @@ export function connect(id, events = {}, options = {}) {
                being lost. */
             clearing = { label };
             send({ type: MESSAGE.CLEARABLE, label });
+        },
+        refreshable(state) {
+            /* Merged onto what was last said rather than replacing it, so a page can
+               call `refreshable({ busy: true })` on the way into a read without
+               restating a timestamp it has not changed. The whole state still goes on
+               the wire — the message is an offer, whole, every time — and this is
+               only about what a caller has to type.
+      
+               `busy` is the one field that does NOT carry forward, and the asymmetry
+               is the point: `can` and `at` are facts that stay true until something
+               changes them, and busy is true for the length of one read. Carried
+               forward, a page that forgot to say `busy: false` on the way out would
+               leave a spinner turning forever; defaulted off, a page that forgets is
+               a page that merely did not show one. */
+            refreshing = {
+                can: state.can ?? refreshing?.can ?? true,
+                at: state.at !== undefined ? state.at : (refreshing?.at ?? null),
+                busy: state.busy ?? false,
+            };
+            send({ type: MESSAGE.REFRESHABLE, ...refreshing });
         },
         greeted: () => host !== null,
         stop() {

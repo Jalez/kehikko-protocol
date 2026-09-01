@@ -139,7 +139,8 @@ export function useRoadmap(id, events = {}, options = {}) {
     const resize = useCallback((height) => held.current?.resize(height), []);
     const filters = useCallback((groups) => held.current?.filters(groups), []);
     const clearable = useCallback((label) => held.current?.clearable(label), []);
+    const refreshable = useCallback((state) => held.current?.refreshable(state), []);
     const connection = useCallback(() => held.current, []);
-    return useMemo(() => ({ where, context, state, request, resize, filters, clearable, connection }), [where, context, state, request, resize, filters, clearable, connection]);
+    return useMemo(() => ({ where, context, state, request, resize, filters, clearable, refreshable, connection }), [where, context, state, request, resize, filters, clearable, refreshable, connection]);
 }
 //# sourceMappingURL=react.js.map
