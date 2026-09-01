@@ -36,6 +36,7 @@ export {
   within,
   ignoresKehikot,
   withKehikotIgnored,
+  withoutKehikotIgnored,
 } from './project.js'
 
 export {

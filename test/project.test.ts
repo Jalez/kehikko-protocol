@@ -10,6 +10,7 @@ import {
   moduleFile,
   moduleFolder,
   withKehikotIgnored,
+  withoutKehikotIgnored,
   within,
 } from '../src/index.js'
 
@@ -173,5 +174,64 @@ describe('the line a project’s .gitignore gains', () => {
     expect(ignoresKehikot('kehikot/\n')).toBe(false)
     expect(ignoresKehikot('.kehikko/\n')).toBe(false)
     expect(ignoresKehikot('')).toBe(false)
+  })
+})
+
+describe('taking that line back out again', () => {
+  /* The round trip is the property worth defending: whether a project shares
+     its `.kehikot/` is a setting, and a setting that cannot be turned off is a
+     one-way door with a checkbox drawn on it. */
+  test('a file the block was added to comes back exactly as it was', () => {
+    for (const before of ['node_modules\ndist\n', 'dist', '', '\n\n', '  dist  \n\n\n#   node_modules\n\tbuild']) {
+      const added = withKehikotIgnored(before)
+      expect(ignoresKehikot(added)).toBe(true)
+      const back = withoutKehikotIgnored(added)
+      expect(ignoresKehikot(back)).toBe(false)
+      /* Not `toBe(before)`: an empty file gains a trailing newline on the way
+         through and the two blank lines collapse. What must survive is every
+         line that says something. */
+      expect(back.split('\n').filter((l) => l.trim())).toEqual(before.split('\n').filter((l) => l.trim()))
+    }
+  })
+
+  test('removes the rule however it was spelled, and the comment above it', () => {
+    for (const rule of ['.kehikot', '.kehikot/', '/.kehikot/', '**/.kehikot/', 'anything/.kehikot']) {
+      const out = withoutKehikotIgnored(`dist\n\n# what this is\n# and why\n${rule}\nbuild\n`)
+      expect(out).toBe('dist\nbuild\n')
+    }
+  })
+
+  /* Idempotent for the same reason its inverse is: it runs against a file in
+     somebody's repository, and a second call that took another line with it
+     would be a program editing their work while they were not looking. */
+  test('a file with no such rule comes back byte for byte', () => {
+    for (const untouched of ['node_modules\ndist\n', '', '# nothing to do with it\n', '.kehikot-notes/\n']) {
+      expect(withoutKehikotIgnored(untouched)).toBe(untouched)
+      expect(withoutKehikotIgnored(withoutKehikotIgnored(untouched))).toBe(untouched)
+    }
+  })
+
+  /* `.kehikot-notes/` above is the case a `startsWith` would have got wrong,
+     and it is there rather than in a comment because that one character is the
+     whole bug — the same one `within` is written to avoid. */
+
+  test('leaves a commented-out rule alone, where its inverse counts one as ignored', () => {
+    const decided = 'dist\n#.kehikot/\n'
+    /* The two disagree on purpose. `ignoresKehikot` says "ignored" so that
+       nothing is ever appended under somebody's deliberate `#`; there is
+       nothing here for this function to remove. */
+    expect(ignoresKehikot(decided)).toBe(true)
+    expect(withoutKehikotIgnored(decided)).toBe(decided)
+  })
+
+  test('leaves a negation alone: it rescues from the rule rather than being one', () => {
+    const rescued = `dist\n${KEHIKOT_DIR}/*\n!${KEHIKOT_DIR}/paper/\n`
+    const out = withoutKehikotIgnored(rescued)
+    expect(out).toContain(`!${KEHIKOT_DIR}/paper/`)
+    expect(out).not.toContain(`\n${KEHIKOT_DIR}/*`)
+  })
+
+  test('a .gitignore that held nothing else is emptied rather than left blank', () => {
+    expect(withoutKehikotIgnored(KEHIKOT_IGNORE)).toBe('')
   })
 })

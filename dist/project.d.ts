@@ -231,4 +231,46 @@ export declare function ignoresKehikot(gitignore: string): boolean;
  * overruling them every few seconds.
  */
 export declare function withKehikotIgnored(gitignore: string): string;
+/**
+ * The text a `.gitignore` should have after this convention is TAKEN OUT of it.
+ *
+ * The inverse of `withKehikotIgnored`, and the half that was missing. This
+ * package could put the rule in and had no way to take it back, so the only
+ * documented way to share a project's `.kehikot/` was the sentence in the
+ * comment telling a person to delete the lines by hand. That is a fine sentence
+ * and a bad interface: whether this folder is shared is a decision about ONE
+ * project, it changes when a project changes, and a decision a program can only
+ * make in one direction is not a setting.
+ *
+ * ## What it removes, and why the comment goes with the rule
+ *
+ * Every uncommented line that ignores this folder, and the run of comment lines
+ * directly above it. The comment is removed WITH the rule because it exists to
+ * explain that rule — this package wrote both together — and a `.gitignore` left
+ * holding five lines explaining an ignore that is no longer there is worse than
+ * one holding neither. A blank line left stranded by the removal goes too.
+ *
+ * The cost is stated rather than hidden: a comment somebody wrote themselves
+ * directly above their own `.kehikot/` line is removed as well. That is the
+ * right trade — it is a comment about the rule being removed — but it is a byte
+ * of theirs that this function touches, which is more than `withKehikotIgnored`
+ * has ever done, so it is said out loud here rather than discovered in a diff.
+ *
+ * ## What it leaves alone
+ *
+ * A commented-out `#.kehikot/` is already not ignoring anything, and is somebody
+ * who decided against it once. `ignoresKehikot` counts it as ignored — it errs
+ * that way on purpose, so that nothing is ever appended under somebody's
+ * deliberate `#` — and this function does not, because the two are asking
+ * different questions. Removing it would be tidying a file that is already
+ * saying what the caller wants it to say.
+ *
+ * A negation (`!.kehikot/…`) is left as well: it is not a rule that ignores this
+ * folder, it is a rule that rescues something from one, and a caller turning the
+ * ignore off has no quarrel with it.
+ *
+ * Idempotent: a `.gitignore` with no such rule comes back unchanged, byte for
+ * byte, so a caller may run it without first asking whether it will do anything.
+ */
+export declare function withoutKehikotIgnored(gitignore: string): string;
 //# sourceMappingURL=project.d.ts.map

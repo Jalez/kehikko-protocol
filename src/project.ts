@@ -309,3 +309,98 @@ export function withKehikotIgnored(gitignore: string): string {
   const ends = gitignore.endsWith('\n') ? gitignore : `${gitignore}\n`
   return `${ends}\n${KEHIKOT_IGNORE}`
 }
+
+/**
+ * The text a `.gitignore` should have after this convention is TAKEN OUT of it.
+ *
+ * The inverse of `withKehikotIgnored`, and the half that was missing. This
+ * package could put the rule in and had no way to take it back, so the only
+ * documented way to share a project's `.kehikot/` was the sentence in the
+ * comment telling a person to delete the lines by hand. That is a fine sentence
+ * and a bad interface: whether this folder is shared is a decision about ONE
+ * project, it changes when a project changes, and a decision a program can only
+ * make in one direction is not a setting.
+ *
+ * ## What it removes, and why the comment goes with the rule
+ *
+ * Every uncommented line that ignores this folder, and the run of comment lines
+ * directly above it. The comment is removed WITH the rule because it exists to
+ * explain that rule — this package wrote both together — and a `.gitignore` left
+ * holding five lines explaining an ignore that is no longer there is worse than
+ * one holding neither. A blank line left stranded by the removal goes too.
+ *
+ * The cost is stated rather than hidden: a comment somebody wrote themselves
+ * directly above their own `.kehikot/` line is removed as well. That is the
+ * right trade — it is a comment about the rule being removed — but it is a byte
+ * of theirs that this function touches, which is more than `withKehikotIgnored`
+ * has ever done, so it is said out loud here rather than discovered in a diff.
+ *
+ * ## What it leaves alone
+ *
+ * A commented-out `#.kehikot/` is already not ignoring anything, and is somebody
+ * who decided against it once. `ignoresKehikot` counts it as ignored — it errs
+ * that way on purpose, so that nothing is ever appended under somebody's
+ * deliberate `#` — and this function does not, because the two are asking
+ * different questions. Removing it would be tidying a file that is already
+ * saying what the caller wants it to say.
+ *
+ * A negation (`!.kehikot/…`) is left as well: it is not a rule that ignores this
+ * folder, it is a rule that rescues something from one, and a caller turning the
+ * ignore off has no quarrel with it.
+ *
+ * Idempotent: a `.gitignore` with no such rule comes back unchanged, byte for
+ * byte, so a caller may run it without first asking whether it will do anything.
+ */
+export function withoutKehikotIgnored(gitignore: string): string {
+  const lines = gitignore.split('\n')
+  const drop = new Set<number>()
+
+  for (let i = 0; i < lines.length; i += 1) {
+    const line = lines[i]!.trim()
+    /* The rule itself, uncommented and un-negated. `ignoresKehikot` is not
+       reused here for the reason above: it deliberately answers yes to a
+       commented-out rule, and this function must answer no to one. */
+    if (line.startsWith('#') || line.startsWith('!')) continue
+    /* `.kehikot/`, `.kehikot` and `.kehikot/*` are one rule spelled three ways.
+       The last is the form somebody reaches for when they want to rescue one
+       folder from inside — `.kehikot/*` with a `!.kehikot/paper/` under it — and
+       a function that removed the other two and left that one would turn the
+       setting off everywhere except the file the person cared most about. */
+    const rule = line.replace(/\/\*$/, '').replace(/\/+$/, '')
+    if (!rule || (rule !== KEHIKOT_DIR && !rule.endsWith(`/${KEHIKOT_DIR}`))) continue
+
+    drop.add(i)
+    /* The comment that introduces it, however many lines it runs to. */
+    let top = i
+    for (let above = i - 1; above >= 0 && lines[above]!.trim().startsWith('#'); above -= 1) {
+      drop.add(above)
+      top = above
+    }
+    /* And the blank line above THAT, but only one of them. It is the separator
+       `withKehikotIgnored` puts in front of the block, so leaving it behind
+       would mean adding the rule and removing it again left a file that was not
+       the file you started with — which is the one property a setting has to
+       have to be worth calling one. */
+    if (top > 0 && lines[top - 1]!.trim() === '') drop.add(top - 1)
+  }
+
+  if (drop.size === 0) return gitignore
+
+  /* The blank line that separated the block from what came before it. Removed
+     only when the removal has left two blanks against each other or a blank at
+     the very top, so a file that was already spaced the way somebody wanted it
+     keeps its spacing. */
+  const kept = lines.filter((_, i) => !drop.has(i))
+  const tidied: string[] = []
+  for (const line of kept) {
+    const blank = line.trim() === ''
+    const last = tidied[tidied.length - 1]
+    if (blank && (tidied.length === 0 || last?.trim() === '')) continue
+    tidied.push(line)
+  }
+  /* A file that is now nothing but whitespace is empty, not a stack of blank
+     lines: this function is the only thing that ever emptied it. */
+  if (tidied.every((line) => line.trim() === '')) return ''
+  const out = tidied.join('\n')
+  return out.endsWith('\n') ? out : `${out}\n`
+}
