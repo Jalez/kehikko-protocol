@@ -94,6 +94,27 @@ export declare class HostRefused extends Error {
  */
 export declare const ANSWER_WITHIN_MS = 12000;
 /**
+ * How long to wait for an answer that waits on a PERSON.
+ *
+ * `ANSWER_WITHIN_MS` is a number about a program: twelve seconds is a host
+ * reading a file off a cold disk, and anything past it is a host that has
+ * stopped answering. `projects.pick` is the first method whose answer waits on
+ * somebody reading a list and deciding, and twelve seconds is a person who has
+ * looked away for a moment.
+ *
+ * Five minutes, and it is still a number rather than forever, for the reason
+ * the essay above gives: a wait that cannot end is a claim that an answer is
+ * coming, and something has to be able to say that the dialog is gone and
+ * nobody is going to answer. It is long enough that timing out means the
+ * question was abandoned rather than that the person was slow.
+ *
+ * The deadline belongs to the QUESTION and not to the connection, which is why
+ * this is a value a caller passes rather than a second default. A module that
+ * raised its whole connection to five minutes would spend five minutes finding
+ * out that the host is not there, on every other question it asks.
+ */
+export declare const PERSON_ANSWERS_WITHIN_MS: number;
+/**
  * How long a `goto` listener has before the backstop answers for it.
  *
  * A timer rather than a line after the call, and the difference matters: a
@@ -206,6 +227,24 @@ export interface HostEvents {
      */
     onRefresh?: () => void;
 }
+/**
+ * What a single question may say about itself, beyond its params.
+ *
+ * One field today, and the reason it is here rather than on `ConnectOptions`
+ * is the whole of it: how long an answer takes is a property of the QUESTION,
+ * not of the wire. `epic.get` is slow when a disk is cold; `projects.pick` is
+ * slow because somebody is reading. A connection-wide number cannot be right
+ * for both — set for the reader it makes every unanswered call take five
+ * minutes to fail, and set for the disk it cuts the reader off mid-decision.
+ *
+ * It is a ceiling on waiting and never a promise about answering. Nothing here
+ * reaches the host, which has its own opinion about how long it will take and
+ * was never told this number.
+ */
+export interface AskOptions {
+    /** Milliseconds to wait for this one answer. Defaults to the connection's own. */
+    within?: number;
+}
 export interface ConnectOptions {
     /**
      * What to listen to. The `mailbox` by default, and it is the default for a
@@ -253,8 +292,13 @@ export interface Connection {
      * Idempotent, so a second call is nothing rather than a second subscription.
      */
     listen: () => Connection;
-    /** Ask one question. Rejects with `HostRefused` — never with a bare string. */
-    request: (method: string, params?: Record<string, unknown>) => Promise<unknown>;
+    /**
+     * Ask one question. Rejects with `HostRefused` — never with a bare string.
+     *
+     * `within` overrides `ANSWER_WITHIN_MS` for this call and no other. See
+     * `AskOptions`.
+     */
+    request: (method: string, params?: Record<string, unknown>, options?: AskOptions) => Promise<unknown>;
     /** Say how tall we would like to be. Fire and forget, by design. */
     resize: (height: number) => void;
     /**

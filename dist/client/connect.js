@@ -28,6 +28,27 @@ export class HostRefused extends Error {
  */
 export const ANSWER_WITHIN_MS = 12_000;
 /**
+ * How long to wait for an answer that waits on a PERSON.
+ *
+ * `ANSWER_WITHIN_MS` is a number about a program: twelve seconds is a host
+ * reading a file off a cold disk, and anything past it is a host that has
+ * stopped answering. `projects.pick` is the first method whose answer waits on
+ * somebody reading a list and deciding, and twelve seconds is a person who has
+ * looked away for a moment.
+ *
+ * Five minutes, and it is still a number rather than forever, for the reason
+ * the essay above gives: a wait that cannot end is a claim that an answer is
+ * coming, and something has to be able to say that the dialog is gone and
+ * nobody is going to answer. It is long enough that timing out means the
+ * question was abandoned rather than that the person was slow.
+ *
+ * The deadline belongs to the QUESTION and not to the connection, which is why
+ * this is a value a caller passes rather than a second default. A module that
+ * raised its whole connection to five minutes would spend five minutes finding
+ * out that the host is not there, on every other question it asks.
+ */
+export const PERSON_ANSWERS_WITHIN_MS = 5 * 60_000;
+/**
  * How long a `goto` listener has before the backstop answers for it.
  *
  * A timer rather than a line after the call, and the difference matters: a
@@ -246,21 +267,28 @@ export function connect(id, events = {}, options = {}) {
             source.addEventListener('message', onMessage);
             return this;
         },
-        request(method, params = {}) {
+        request(method, params = {}, options) {
             if (!host) {
                 return Promise.reject(new HostRefused({ reason: 'silent', error: NOBODY_TO_ASK }));
             }
             const correlation = nextId();
+            /* A number this caller asked for, or the connection's. Guarded rather
+               than trusted: `within: 0` and `within: NaN` would both mean "time out
+               before the message is posted", which is a caller's typo turned into a
+               refusal about the host. */
+            const deadline = typeof options?.within === 'number' && Number.isFinite(options.within) && options.within > 0
+                ? options.within
+                : answerWithin;
             return new Promise((resolve, reject) => {
                 const timer = setTimeout(() => {
                     settle(correlation, {
                         ok: false,
                         refusal: {
                             reason: 'silent',
-                            error: `The roadmap was asked ${method} and had not answered ${Math.round(answerWithin / 1000)} seconds later.`,
+                            error: `The roadmap was asked ${method} and had not answered ${Math.round(deadline / 1000)} seconds later.`,
                         },
                     });
-                }, answerWithin);
+                }, deadline);
                 waiting.set(correlation, { resolve, reject, timer });
                 send({ type: MESSAGE.REQUEST, id: correlation, method, params });
             });

@@ -127,10 +127,10 @@ export function useRoadmap(id, events = {}, options = {}) {
                 held.current = null;
         };
     }, [id]);
-    const request = useCallback((method, params = {}) => {
+    const request = useCallback((method, params = {}, options) => {
         const live = held.current;
         if (live)
-            return live.request(method, params);
+            return live.request(method, params, options);
         /* Refused in the connection's own words rather than a second spelling of
            them, so a caller sees one sentence for "nobody is there" whichever side
            of the mount it asked from. */

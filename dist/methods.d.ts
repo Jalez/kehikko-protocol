@@ -29,9 +29,9 @@ import { z } from 'zod';
  * method, field, capability and pattern that carried the conflation is renamed
  * rather than aliased, and `PROTOCOL` went to 2 for it. See the essay there.
  *
- * ## Two answers ARE described, and the line is not where you would guess
+ * ## Some answers ARE described, and the line is not where you would guess
  *
- * `methodResults` below gives a shape to exactly two of these answers, which
+ * `methodResults` below gives a shape to a few of these answers, which
  * looks at first like the rule above being broken. It is not, and the
  * distinction is worth stating because it decides what may be added later.
  *
@@ -48,8 +48,13 @@ import { z } from 'zod';
  * different places. An unspecified outcome is not modesty; it is a request
  * that cannot be acted on.
  *
- * `epics.list` is the third case, and the argument for it is different again —
- * see `epicsListResult`.
+ * `projects.pick` is an outcome by the same test and gets a shape for the same
+ * reason: `picked`, `cancelled` and `declined` send a module three different
+ * ways, and two of them must be indistinguishable in what they carry rather
+ * than in whether they parse. See `projectPickResult`.
+ *
+ * `epics.list` is the case the rule does not cover, and the argument for it is
+ * different again — see `epicsListResult`.
  */
 /**
  * The areas of a host's material these methods touch.
@@ -114,6 +119,33 @@ export declare const CAPABILITIES: {
      */
     readonly 'filters:set': "Move this container’s own filters, so it can show you something you asked to see.";
     /**
+     * Ask the person to choose one of their projects, and be told which.
+     *
+     * ## The sentence says "ask the person", and that is the whole of it
+     *
+     * A module is told one `projectPath` and may read what the host named. That
+     * rule is what makes framing a stranger's program survivable, and the obvious
+     * way to break it is a capability spelled "read the projects" — a module
+     * holding that has been handed a listing of somebody's disk, and everything
+     * after is a matter of how fast it can walk it.
+     *
+     * This is the other shape, and it is the browser's file picker's shape. The
+     * module cannot enumerate, cannot name a project it has not been given,
+     * cannot filter the menu, and cannot open the picker without the person
+     * seeing it: what it receives is ONE answer to ONE question a person just
+     * answered, in a dialog the host drew out of its own material. A refusal and
+     * a cancellation are indistinguishable from the module's side on purpose, so
+     * that "no projects" and "I would rather not" cannot be told apart by asking
+     * repeatedly.
+     *
+     * No new KIND of thing crosses the wire for it. `context.projectPath` already
+     * hands a module an absolute path to the open project; this hands it a second
+     * one, chosen, one at a time. That is why the sentence a person reads before
+     * running the program says "the roadmap asks you which" — the reader is the
+     * gate, and there is no version of this where they are not.
+     */
+    readonly 'projects:pick': "Ask you to choose one of your projects, and be told where it is. The roadmap draws the picker.";
+    /**
      * Keep a little state of its own, and get it back next time.
      *
      * Named for what the module gets rather than for what the host does, because
@@ -144,6 +176,7 @@ export declare const METHODS: {
     readonly 'selection.set': "selection:set";
     readonly 'passage.set': "passage:set";
     readonly 'filters.set': "filters:set";
+    readonly 'projects.pick': "projects:pick";
     readonly 'state.set': "state:keep";
 };
 export type Method = keyof typeof METHODS;
@@ -401,6 +434,37 @@ export declare const methodParams: {
     }, {
         filters: Record<string, string>;
     }>;
+    /**
+     * Ask the person to choose one of their projects.
+     *
+     * ## It takes nothing, and the emptiness is the design
+     *
+     * There is no name to suggest, no path to prefer, no filter to apply and no
+     * sentence to put in the dialog. Every one of those was considered and every
+     * one gives a module a way to speak in the host's own voice about the host's
+     * own material: a suggested path is a claim that a folder exists, a filter is
+     * a probe run against a listing the module may not have, and a sentence in
+     * the host's dialog is a sentence a person will read as the host's. What the
+     * host says is composed by the host, out of the registration this
+     * conversation was built on, which is the same rule that supplies `from` to
+     * `events.emit` and `filters.set`.
+     *
+     * So the call is `{}`, and it says one thing: this module would like the
+     * person to name a project. See `projectPickResult` for what may come back,
+     * and the `projects:pick` capability for why this is not an enumeration.
+     *
+     * ## The answer arrives when a person answers, which is late
+     *
+     * This is the first method whose answer waits on somebody. The
+     * request/response pair is still the right shape — it correlates, it carries
+     * a refusal envelope, and an outcome that is not a failure is exactly what
+     * `view.goto` already established — but the CLOCK is not: `ANSWER_WITHIN_MS`
+     * is twelve seconds, tuned for a host reading a file off a cold disk, and a
+     * person reading a list of thirty folders will beat it. A caller passes its
+     * own deadline for this one question; see `PERSON_ANSWERS_WITHIN_MS` and the
+     * `within` option on `request`.
+     */
+    readonly 'projects.pick': z.ZodObject<{}, "strip", z.ZodTypeAny, {}, {}>;
     /**
      * Keep a small amount of this module's own state.
      *
@@ -673,6 +737,99 @@ export declare const epicsListResult: z.ZodObject<{
     }, z.ZodTypeAny, "passthrough">>, "many">;
 }, z.ZodTypeAny, "passthrough">>;
 export type EpicsListResult = z.infer<typeof epicsListResult>;
+/**
+ * What became of a `projects.pick`.
+ *
+ * ## Three outcomes, and two of them are deliberately not distinguishable
+ *
+ * `picked` — a person chose a project, and `project` says which. The path is
+ * absolute and is what the host's own filesystem resolved it to, exactly like
+ * `context.projectPath`; the name is what the host calls it, for putting in a
+ * sentence and never for locating anything.
+ *
+ * `cancelled` — the picker was opened and the person closed it without
+ * choosing. Nothing is wrong. A module says so quietly and puts the reader back
+ * where they were.
+ *
+ * `declined` — the host would not ask. It holds no projects, another picker is
+ * already open, this module is not the surface with the person's attention, or
+ * the host simply does not let framed programs interrupt anybody. No reason is
+ * enumerated, for the reason `NAVIGATION_OUTCOMES` enumerates none.
+ *
+ * Now the part that is a decision rather than a description. `declined` is what
+ * a host answers when it has NO projects to offer, rather than a fourth outcome
+ * saying so — because a fourth outcome is an enumeration with a count of zero,
+ * and a module that could tell "you have no projects" from "I would rather not"
+ * could learn something about the disk by asking. One bit is one bit. The
+ * capability's whole argument is that a module learns what a person told it and
+ * nothing else, and a host reporting on the shape of its own holdings to a
+ * program that was refused is reporting anyway.
+ *
+ * A module must therefore treat `cancelled` and `declined` the same way: stop
+ * asking, say nothing alarming, leave the control where it was. `why` is for
+ * the author reading a console, and a host that puts its holdings in it has
+ * given away what the outcome was arranged not to say.
+ *
+ * All three are `ok: true`. The question succeeded; the picking did not — the
+ * same line `navigationResult` draws, and for the same reason: a caller has to
+ * be able to tell a host that said no from a host too old to have been asked.
+ */
+export declare const PICK_OUTCOMES: readonly ["picked", "cancelled", "declined"];
+export type PickOutcome = (typeof PICK_OUTCOMES)[number];
+/**
+ * One project, as a host hands it over.
+ *
+ * The same two fields `context` uses for the open project and named the same
+ * way, because they are the same two facts and a second spelling of them is a
+ * module that resolves a picked project differently from the open one. `path`
+ * is absolute and resolved; `name` is what the host calls it and is never a
+ * path.
+ */
+export declare const pickedProject: z.ZodObject<{
+    path: z.ZodString;
+    name: z.ZodDefault<z.ZodString>;
+}, "strip", z.ZodTypeAny, {
+    path: string;
+    name: string;
+}, {
+    path: string;
+    name?: string | undefined;
+}>;
+export type PickedProject = z.infer<typeof pickedProject>;
+export declare const projectPickResult: z.ZodObject<{
+    outcome: z.ZodEnum<["picked", "cancelled", "declined"]>;
+    /**
+     * Null unless `outcome` is `picked`, and a module should check the outcome
+     * rather than the field. A host that filled this in beside `cancelled` would
+     * be answering a question nobody was allowed to ask.
+     */
+    project: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+        path: z.ZodString;
+        name: z.ZodDefault<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        path: string;
+        name: string;
+    }, {
+        path: string;
+        name?: string | undefined;
+    }>>>;
+    why: z.ZodDefault<z.ZodString>;
+}, "strip", z.ZodTypeAny, {
+    why: string;
+    project: {
+        path: string;
+        name: string;
+    } | null;
+    outcome: "declined" | "picked" | "cancelled";
+}, {
+    outcome: "declined" | "picked" | "cancelled";
+    why?: string | undefined;
+    project?: {
+        path: string;
+        name?: string | undefined;
+    } | null | undefined;
+}>;
+export type ProjectPickResult = z.infer<typeof projectPickResult>;
 /**
  * The answers this package describes, by method.
  *

@@ -927,3 +927,61 @@ describe('the offer to read this page’s material again', () => {
     expect(asked).toBe(0)
   })
 })
+
+describe('a question that waits on a person', () => {
+  /*
+   * `projects.pick` is answered when somebody has read a list and decided, and
+   * twelve seconds is a person who looked away. What these pin down is that the
+   * deadline belongs to the QUESTION: a caller can lengthen one call without
+   * making every other call take that long to fail.
+   */
+
+  test('a per-call deadline outlives the connection own', async () => {
+    const { source, deliver } = fakeWindow()
+    const host = speaker()
+    const live = attach({}, { source, answerWithin: 5 })
+    deliver(hello(host))
+    const answer = live.request('projects.pick', {}, { within: 5_000 })
+    /* Well past the connection five milliseconds, and nothing has refused it. */
+    await new Promise((r) => setTimeout(r, 40))
+    const asked = host.said.find((m) => (m as { type: string }).type === MESSAGE.REQUEST) as { id: string }
+    deliver({
+      data: {
+        type: MESSAGE.RESPONSE,
+        protocol: PROTOCOL,
+        id: asked.id,
+        ok: true,
+        data: { outcome: 'picked', project: { path: '/p', name: 'p' }, why: '' },
+      },
+      origin: 'null',
+      source: host,
+    })
+    expect(await answer).toEqual({ outcome: 'picked', project: { path: '/p', name: 'p' }, why: '' })
+  })
+
+  test('and it does not lengthen the next question, which is the whole reason it is per call', async () => {
+    const { source, deliver } = fakeWindow()
+    const host = speaker()
+    const live = attach({}, { source, answerWithin: 5 })
+    deliver(hello(host))
+    void live.request('projects.pick', {}, { within: 5_000 })
+    await live.request('live.get', {}).then(
+      () => expect.unreachable(),
+      (error: HostRefused) => expect(error.refusal.reason).toBe('silent'),
+    )
+  })
+
+  test('a deadline that is not a number falls back rather than refusing before the message is posted', async () => {
+    const { source, deliver } = fakeWindow()
+    const host = speaker()
+    const live = attach({}, { source, answerWithin: 5 })
+    deliver(hello(host))
+    /* `within: 0` and `within: NaN` are a caller typo. Honouring them would
+       turn it into a refusal that reads as the host having gone quiet. */
+    await live.request('projects.pick', {}, { within: 0 }).then(
+      () => expect.unreachable(),
+      (error: HostRefused) => expect(error.refusal.reason).toBe('silent'),
+    )
+    expect(host.said.some((m) => (m as { type: string }).type === MESSAGE.REQUEST)).toBe(true)
+  })
+})

@@ -65,8 +65,8 @@ Concretely, the things this package deliberately does not do:
 | `notificationPayload`, `callPayload`, `EXTENSIONS` | The versioned formats modules send each other through a host. |
 | `PROTOCOL`, `WELL_KNOWN`, `MANIFEST_KIND`, `MESSAGE`, `LIMITS` | One spelling and one number each, so two packages cannot disagree. |
 | `METHODS`, `methodParams`, `CAPABILITIES` | The questions a module can ask, by name and by shape. |
-| `methodResults`, `resultSchemaFor` | The two answers that are outcomes rather than material, and so have a shape. |
-| `navigationResult`, `epicsListResult`, `epicSpine` | Those two answers. |
+| `methodResults`, `resultSchemaFor` | The answers that are outcomes rather than material, and so have a shape. |
+| `navigationResult`, `projectPickResult`, `epicsListResult`, `epicSpine` | Those answers. |
 | `MODULE_ID`, `MODE_ID`, `EPIC_SLUG`, `own` | The name patterns, and one lookup that does not fall through a prototype. |
 | `KEHIKOT_DIR`, `moduleFolder`, `moduleDir`, `moduleFile`, `within` | Where a module keeps this project's data, given `context.projectPath`. |
 | `KEHIKOT_IGNORE`, `ignoresKehikot`, `withKehikotIgnored` | The lines that project's `.gitignore` gains, added once. |
@@ -277,7 +277,55 @@ it was — the call did not happen — because collapsing "the answer is no" int
 host too old to have been asked, and those are the two futures the refusal
 design exists to keep apart.
 
-## Two answers have a shape, and the line is not where you would guess
+## Asking the person which project, without being told what projects there are
+
+A module is handed one `projectPath` and may read what the host named. That is
+the rule the whole arrangement rests on, and the obvious way to break it is a
+method called `projects.list` — a module holding that has been given a listing
+of somebody's disk, and everything after is a question of how fast it can walk
+it.
+
+`projects.pick` is the other shape, and it is the browser's file picker's shape:
+
+```ts
+const answer = await ask('projects.pick', {}, { within: PERSON_ANSWERS_WITHIN_MS })
+// { outcome: 'picked', project: { path: '/Users/…/thesis', name: 'thesis' }, why: '' }
+```
+
+The call takes **nothing**. No path to prefer, no filter, no sentence for the
+dialog: a suggested path is a claim that a folder exists, a filter is a probe
+run against a listing the module was not given, and a sentence in the host's
+dialog is a sentence a person reads as the host's. The host composes what it
+says out of the registration the conversation was built on, exactly as it
+supplies `from` to `events.emit` and `filters.set`.
+
+What comes back is one answer to one question a person just answered:
+
+| | |
+|---|---|
+| `picked` | Somebody chose one. `project.path` is absolute and resolved, like `context.projectPath`; `project.name` is for a sentence and never for locating anything. |
+| `cancelled` | The picker was opened and closed without a choice. Nothing is wrong. |
+| `declined` | The host would not ask — including because it holds no projects. |
+
+**`declined` covers "there are none", and that is deliberate.** A fourth outcome
+saying so is an enumeration with a count of zero, and a module that could tell
+"you have no projects" from "I would rather not" could learn about the disk by
+asking. A module treats the two the same way: stop asking, say nothing
+alarming, leave the control where it was.
+
+No new KIND of thing crosses the wire. `context.projectPath` already gives a
+module an absolute path; this gives it a second one, chosen, one at a time. The
+person is the gate, and there is no version of this where they are not.
+
+**Its answer arrives late, and that is a property of the question.** The
+client's `ANSWER_WITHIN_MS` is twelve seconds, tuned for a host reading a file
+off a cold disk; somebody reading a list of thirty folders beats it. So
+`request` takes a per-call `{ within }` — because how long an answer takes
+belongs to the question, not to the wire, and a connection raised to five
+minutes would take five minutes to discover the host is gone. See
+`PERSON_ANSWERS_WITHIN_MS`.
+
+## Some answers have a shape, and the line is not where you would guess
 
 `methodParams` says what a caller constructs; what comes back is `unknown`,
 because no host promised otherwise. That still holds for `epic.get`,
@@ -285,7 +333,7 @@ because no host promised otherwise. That still holds for `epic.get`,
 hosts hold different amounts of an epic, and a schema over that would be this
 package legislating what a host must keep.
 
-Two answers are not material, and `methodResults` gives those a shape.
+Some answers are not material, and `methodResults` gives those a shape.
 
 An **outcome** reports what happened to an act this protocol itself defines.
 Nothing about a host's holdings varies there. An unspecified `view.goto` answer
@@ -293,7 +341,11 @@ is not modesty — a caller that cannot tell "you are looking at it" from "I wou
 rather not" from "there is nothing by that name" without parsing English has a
 request it cannot act on.
 
-**`epics.list`** is the other, and its argument is different. Every other
+`projects.pick` is an outcome by the same test: `picked`, `cancelled` and
+`declined` send a module three different ways.
+
+**`epics.list`** is the case the rule does not cover, and its argument is
+different. Every other
 question takes an epic slug, and `epics.list` is the only way to get one. If its
 answer may be anything, a module cannot rely on an epic having a name, and a
 protocol whose entry point returns an unknown shape has one reachable method.

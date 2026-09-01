@@ -6,6 +6,7 @@ import {
   NOBODY_TO_ASK,
   connect,
   type Connection,
+  type AskOptions,
   type ConnectOptions,
   type HostEvents,
 } from './connect.js'
@@ -71,8 +72,16 @@ export interface Roadmap {
   context: ModuleContext | null
   /** Whatever the host is keeping for this module, from the greeting. `null` when it keeps nothing. */
   state: string | null
-  /** Ask the host something. Rejects with `HostRefused`, always. Safe before the greeting: it refuses. */
-  request: (method: string, params?: Record<string, unknown>) => Promise<unknown>
+  /**
+   * Ask the host something. Rejects with `HostRefused`, always. Safe before the
+   * greeting: it refuses.
+   *
+   * `options.within` is this one question's deadline — see `AskOptions`. It is
+   * threaded through rather than dropped because the hook is how most modules
+   * ask anything, and a question that waits on a person is unaskable through a
+   * wrapper that only knows the connection's clock.
+   */
+  request: (method: string, params?: Record<string, unknown>, options?: AskOptions) => Promise<unknown>
   /** Say how tall this page would like its frame to be. Silent when nothing is framing it. */
   resize: (height: number) => void
   /**
@@ -222,9 +231,9 @@ export function useRoadmap(id: string, events: HostEvents = {}, options: UseRoad
     }
   }, [id])
 
-  const request = useCallback((method: string, params: Record<string, unknown> = {}) => {
+  const request = useCallback((method: string, params: Record<string, unknown> = {}, options?: AskOptions) => {
     const live = held.current
-    if (live) return live.request(method, params)
+    if (live) return live.request(method, params, options)
     /* Refused in the connection's own words rather than a second spelling of
        them, so a caller sees one sentence for "nobody is there" whichever side
        of the mount it asked from. */
