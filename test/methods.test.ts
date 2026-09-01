@@ -263,3 +263,41 @@ describe('passage.set — a module saying where somebody is pointing', () => {
     expect(resultSchemaFor('passage.set')).toBeUndefined()
   })
 })
+
+describe('filters.set, the half the offer was missing', () => {
+  /*
+   * `roadmap.filters` went one way: a module said what it could be narrowed by,
+   * the host drew the control, and the choice came back in `context.filters`
+   * with no way for the module to ask for a different one.
+   *
+   * References declined the header control entirely because of it, and wrote
+   * down the two behaviours that would have broken: answering `view.goto` by
+   * clearing whatever hides the target row, and a Clear that clears everything.
+   * Both need a module to be able to ask.
+   */
+  test('takes a whole choice, in the shape the host sends back', () => {
+    const shape = methodParams['filters.set']
+    expect(shape.safeParse({ filters: { kind: 'issues', state: 'open' } }).success).toBe(true)
+    /* `{}` is the meaningful empty value — every group back to its fallback,
+       which is what clearing the narrowing IS. A per-group message would make a
+       three-group reset three contexts and three renders, and the page would be
+       seen part-way through its own reset. */
+    expect(shape.safeParse({ filters: {} }).success).toBe(true)
+    expect(shape.safeParse({}).success).toBe(false)
+  })
+
+  test('is a capability, and the sentence says how far it reaches', () => {
+    expect(METHODS['filters.set']).toBe('filters:set')
+    expect(CAPABILITIES['filters:set']).toContain('container')
+  })
+
+  /* The same shape as its neighbours on purpose: the module asks, the host
+     decides, and a refusal is survivable. Nothing here entitles a module to a
+     setting; it entitles it to ask. */
+  test('sits with the other requests a module makes of its host', () => {
+    for (const method of ['passage.set', 'selection.set', 'filters.set'] as const) {
+      expect(METHODS[method]).toBeTruthy()
+      expect(methodParams[method]).toBeTruthy()
+    }
+  })
+})

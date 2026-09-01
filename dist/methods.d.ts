@@ -104,6 +104,16 @@ export declare const CAPABILITIES: {
      */
     readonly 'passage:set': "Say where in a document the person is pointing, and quote it. Every module on the canvas is told.";
     /**
+     * Ask for its own container's filters to be moved.
+     *
+     * Narrow, and the sentence says how narrow: it reaches this container's own
+     * narrowing and nothing else — not another container's, not the canvas, not
+     * what anybody else is shown. A module wants it in order to answer "go to
+     * this row" by clearing whatever is hiding that row, which is a thing the
+     * person just asked for.
+     */
+    readonly 'filters:set': "Move this container’s own filters, so it can show you something you asked to see.";
+    /**
      * Keep a little state of its own, and get it back next time.
      *
      * Named for what the module gets rather than for what the host does, because
@@ -133,6 +143,7 @@ export declare const METHODS: {
     readonly 'view.goto': "view:navigate";
     readonly 'selection.set': "selection:set";
     readonly 'passage.set': "passage:set";
+    readonly 'filters.set': "filters:set";
     readonly 'state.set': "state:keep";
 };
 export type Method = keyof typeof METHODS;
@@ -337,6 +348,58 @@ export declare const methodParams: {
             to?: number | null | undefined;
             quoted?: string | undefined;
         } | null;
+    }>;
+    /**
+     * Ask the host to put this container's filters somewhere.
+     *
+     * ## The offer went one way, and that was the gap
+     *
+     * `roadmap.filters` lets a module say what it can be narrowed by; the host
+     * draws the control and the choice comes back in `context.filters`. There was
+     * no way back. The host owned the choice completely, which is right — it is
+     * per container, it outlives a reload, and a module that could silently move
+     * its own control would be a control that moves on its own.
+     *
+     * What that cost was discovered in References, which declined the header
+     * control altogether and wrote down why. Two behaviours depended on the
+     * module being able to clear its own narrowing:
+     *
+     *   - Answering `view.goto`. "Go to !1848" is answered by clearing whatever
+     *     is hiding that row and scrolling to it. A module that cannot clear a
+     *     host-held filter must either answer `found: true` about a row nobody
+     *     can see, or refuse a reference it is looking at.
+     *   - "One press puts everything back". A Clear that clears two thirds of the
+     *     narrowing is a button that does not do what it says.
+     *
+     * ## It is a REQUEST, which is the whole reason this is safe
+     *
+     * The same shape as `passage.set` and `selection.set`: the module asks, the
+     * host decides, and a refusal is survivable. The host may refuse for any
+     * reason it likes — the container is pinned, the module is asking for a group
+     * it never offered, the person is in the middle of choosing — and a module
+     * has to keep working when it does. Nothing here entitles a module to a
+     * setting; it entitles it to ask.
+     *
+     * ## What may be asked for
+     *
+     * A whole choice, replacing what is there, in the shape the host already
+     * sends back in `context.filters`. `{}` is the meaningful empty value — every
+     * group back to its fallback, which is what "clear the narrowing" is — and is
+     * why this is not a per-group message: a module clearing three groups one at
+     * a time would produce three contexts and three renders, and the page would
+     * be seen part-way through its own reset.
+     *
+     * A host must drop any group the module is not currently offering, exactly as
+     * it does when filling `context.filters` from its own store. The result is
+     * whatever the host settled on, so a module learns what actually happened
+     * rather than assuming it got what it asked for.
+     */
+    readonly 'filters.set': z.ZodObject<{
+        filters: z.ZodEffects<z.ZodRecord<z.ZodEffects<z.ZodString, string, string>, z.ZodEffects<z.ZodString, string, string>>, Record<string, string>, Record<string, string>>;
+    }, "strip", z.ZodTypeAny, {
+        filters: Record<string, string>;
+    }, {
+        filters: Record<string, string>;
     }>;
     /**
      * Keep a small amount of this module's own state.
