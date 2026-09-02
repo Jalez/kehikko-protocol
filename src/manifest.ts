@@ -115,12 +115,16 @@ const url = z.string().min(1).max(LIMITS.URL)
  * better to a person browsing; the word in the manifest is chosen for the
  * author writing it.
  *
- * ## Why these two and not more
+ * ## Why these three and not more
  *
- * `passage` and `selection` are the context fields a module can genuinely
- * choose to ignore, and each has a matching capability — `passage:set`,
- * `selection:set` — on the other side, which is what lets a registry name both
- * ends of one relationship instead of one and a half.
+ * `passage`, `selection` and `containers` are the context fields a module can
+ * genuinely choose to ignore, and each has a matching capability —
+ * `passage:set`, `selection:set`, `showing:set` — on the other side, which is
+ * what lets a registry name both ends of one relationship instead of one and a
+ * half. The third is the odd one: half of what it carries — which containers
+ * are picked out — is the host's own act with no module at the other end, and
+ * a registry that finds no setter for it is not finding an absence of the
+ * fact, only an absence of anybody describing what they show. See `REACTS_TO`.
  *
  * The obvious third, the open epic, is NOT here, and the reason is that it is
  * already declared: a mode with `scope: 'epic'` is a module saying it follows
@@ -138,6 +142,21 @@ export const REACTS_TO = {
   passage:
     'Does something when the reader points at a passage — a file, a place in it, and the words that were there.',
   selection: 'Does something when the references somebody picked out change.',
+  /**
+   * The third word, and the first whose other end is partly the host itself.
+   *
+   * `containers` is the list of what is arranged on the kehikko: which module
+   * each container holds, whether it is picked out, and what it says it is
+   * showing. Two things change it. A module calling `showing.set` — which is
+   * the capability a registry pairs this with, exactly as `passage:set` pairs
+   * with `passage` — and a person ticking a container's box, which is the
+   * host's own act and needs no module at the other end. A module ticking this
+   * word is saying it narrows to what is picked out; whether anything on the
+   * canvas can also say what it shows is a separate question the registry
+   * answers by looking for setters, as it does for the other two.
+   */
+  containers:
+    'Does something when which containers are picked out changes, or when what one of them is showing changes.',
 } as const
 
 export type Reaction = keyof typeof REACTS_TO

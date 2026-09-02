@@ -395,8 +395,19 @@ say who RECEIVES a context, because nothing in a manifest said so — every fram
 module is handed the whole context, so receiving one distinguished nobody.
 
 So `reacts` is a top-level array of context kinds, and `REACTS_TO` is the
-vocabulary this version knows: `passage` and `selection`. A registry can now put
-"Consumes: X, Y" beside "Provides to: Z, W" and mean something by both.
+vocabulary this version knows: `passage`, `selection` and `containers`. A
+registry can now put "Consumes: X, Y" beside "Provides to: Z, W" and mean
+something by both.
+
+`containers` is the newest of the three and the one whose other end is partly
+the host. `context.containers` lists every container on the kehikko: which
+module, whether a person has picked it out as a target, and what it says it is
+showing — references and places in documents, sent with `showing.set` under
+`showing:set`. A module that files things against references and documents
+reads it to show what belongs to everything on the canvas, and to narrow to the
+containers that are picked out. The essays on `showingSchema` and
+`containerSchema` in `src/wire.ts` are the argument, including why `passage` and
+`selection` could not already say it and what a host may fold into the list.
 
 Three things about it, and each is load-bearing:
 

@@ -137,6 +137,27 @@ export const CAPABILITIES = {
    */
   'filters:set': 'Move this container’s own filters, so it can show you something you asked to see.',
   /**
+   * Say what this container is showing.
+   *
+   * A write, and a SHARED one, in the family of `selection:set` and
+   * `passage:set`: what a module says here goes into the `containers` list in
+   * the context every framed module receives, attributed to this container. A
+   * module declaring it is asking to tell its neighbours what it has open, so
+   * that a neighbour holding checklists, notes, or anything else filed against
+   * references and places in documents can narrow to it — and the sentence a
+   * person reads before running the program should say that, rather than leave
+   * it to be inferred from a field name.
+   *
+   * Narrower than either sibling in one way worth naming: it moves nobody. A
+   * passage or a selection is the canvas being POINTED, and every consumer
+   * follows. This is a container DESCRIBING ITSELF, and a consumer that reads
+   * it decides for itself what to do — usually nothing, until a person picks
+   * that container out.
+   */
+  'showing:set':
+    'Say what this container is showing — which references, and which places in which documents — so a neighbour '
+    + 'can narrow to it. Every module on the canvas is told.',
+  /**
    * Ask the person to choose one of their projects, and be told which.
    *
    * ## The sentence says "ask the person", and that is the whole of it
@@ -196,6 +217,7 @@ export const METHODS = {
   'selection.set': 'selection:set',
   'passage.set': 'passage:set',
   'filters.set': 'filters:set',
+  'showing.set': 'showing:set',
   'projects.pick': 'projects:pick',
   'state.set': 'state:keep',
 } as const satisfies Record<string, Capability>
@@ -383,6 +405,45 @@ export const methodParams = {
    */
   'filters.set': z.object({
     filters: filterChoiceSchema,
+  }),
+
+  /**
+   * Say what this container is showing.
+   *
+   * ## The same act `passage.set` performs, one step further out
+   *
+   * A module asks; the host holds it against this module's container on the
+   * open kehikko and relays it in `context.containers` to every framed module;
+   * no module ever learns which of its neighbours was listening, or whether
+   * any was. The whole argument is on `showingSchema` and `containerSchema` in
+   * `wire.ts`, and it is not repeated here.
+   *
+   * ## Both lists are required, and neither has a default here
+   *
+   * `showingSchema` defaults both to empty, because on the way OUT — in a
+   * context — a missing list means nothing is shown and that is a true reading.
+   * On the way IN it is the wrong reading: a call of `{ refs: [...] }` that
+   * meant "and the documents are unchanged" and a call that meant "and there
+   * are no documents" would be indistinguishable, and one of them is a module
+   * quietly withdrawing half its claim. So a call spells out both, every time,
+   * and "showing nothing" is `{ refs: [], documents: [] }` — a real call and
+   * the way a module that closed its document says so, for the reason an empty
+   * `refs` clears a selection and a `null` passage clears the passage.
+   *
+   * Whole replacement, never a merge, for the reason `roadmap.filters` is: a
+   * merge could never take anything back, and a container that stopped showing
+   * a file would go on being described as showing it.
+   *
+   * ## The shape is imported rather than restated
+   *
+   * The bounds and the passage rules are `wire.ts`'s, read by both sides, so
+   * that a host cannot accept on the way in what the context schema will later
+   * drop on the way out — a document that validates when sent and vanishes
+   * when broadcast, with nothing anywhere saying so.
+   */
+  'showing.set': z.object({
+    refs: z.array(z.string().min(1).max(LIMITS.REF)).max(LIMITS.REFS),
+    documents: z.array(passageSchema).max(LIMITS.SHOWING_DOCUMENTS),
   }),
 
   /**
