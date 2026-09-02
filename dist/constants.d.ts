@@ -64,6 +64,21 @@
  *   draws one for a module that announced itself. There is no version of this
  *   where one side acts on a half-understanding of the other.
  *
+ * - `containers` is a new CONTEXT FIELD and `showing.set` a new method for
+ *   filling part of it, and they pass the test from both ends. The field
+ *   defaults to `[]`, which is what a module reading it against an older host
+ *   would have found: that host has told it nothing about which containers
+ *   are on the kehikko or what they show, and a consumer that narrows to what
+ *   is picked out has nothing to narrow to and shows everything — which is
+ *   what it showed yesterday. The method is answered `unknown-method` by an
+ *   older host, exactly as `passage.set` was, and a module that asked loses a
+ *   way to say what it shows and keeps its page. Going the other way, a module
+ *   built against an older copy of this package parses the context with a
+ *   schema that has no such field, and a `z.object` strips what it does not
+ *   name — so the field never reaches the module at all, and the module is
+ *   byte-for-byte the module it was. Nothing that already had a shape changed
+ *   shape.
+ *
  *   It is worth saying out loud that a DESTRUCTIVE addition does not earn a
  *   bump either, tempting as it is to raise the number to mark the occasion. A
  *   version is not a warning label. It says whether two programs can speak, and
@@ -481,8 +496,8 @@ export declare const LIMITS: {
      * rather than lazy: all three are short registry words a module copies out of
      * a document, and an author made to remember three different ceilings for
      * three lists of short words will get one of them wrong. The words this
-     * version knows are `passage` and `selection`; the room is for the ones a
-     * later host broadcasts.
+     * version knows are `passage`, `selection` and `containers`; the room is for
+     * the ones a later host broadcasts.
      */
     readonly REACTION: 64;
     /** An epic slug, everywhere one appears. */
@@ -591,9 +606,9 @@ export declare const LIMITS: {
      *
      * Eight, against `CAPABILITIES`' thirty-two, and the smaller number is an
      * argument rather than an economy. A context has a handful of fields and
-     * always will: this version broadcasts two things a module can meaningfully
+     * always will: this version broadcasts three things a module can meaningfully
      * choose to ignore, so a manifest listing eight is already claiming to react
-     * to six kinds that do not exist yet. The bound sits where an honest list
+     * to five kinds that do not exist yet. The bound sits where an honest list
      * stops, which means a manifest with thirty entries here is refused as the
      * nonsense it is rather than drawn as a module that reacts to everything.
      */
@@ -739,6 +754,36 @@ export declare const LIMITS: {
     readonly FILTER_TEXT: 200;
     /** How many refs one payload may carry, and how many may be selected at once. */
     readonly REFS: 32;
+    /**
+     * How many places in documents one container may say it is showing.
+     *
+     * Sixteen, and the number is about what the field is FOR rather than about
+     * any document. A container saying what it shows names the file a reader has
+     * open, or the file and the section they are in, or — for a program that
+     * lists things — a handful of places at once. That is one, two, or a few. A
+     * program with more than sixteen is enumerating its own material into every
+     * frame on the canvas on every change, and the essay on `QUOTE` already says
+     * why the context is not the place for a document: it is broadcast, to
+     * everybody, on every change of anything.
+     *
+     * Each entry is a whole `passage`, with `quoted` bounded at `QUOTE` — so
+     * the worst case is bounded too, and is far larger than any honest use. A
+     * module saying what it shows should leave `quoted` EMPTY, and the essay on
+     * `containerSchema` in `wire.ts` says why: a quote is a reader's evidence for
+     * a highlight, and a file being shown has no highlight to evidence.
+     */
+    readonly SHOWING_DOCUMENTS: 16;
+    /**
+     * How many containers one context may describe.
+     *
+     * Sixty-four, which is the most a host this was written against lets onto one
+     * kehikko, restated here so that a module reading `context.containers` knows
+     * the size of the list it is about to walk. It bounds an array a HOST built
+     * out of its own arrangement, so unlike almost every other number here it is
+     * not protecting a host from a stranger — it is protecting a module from a
+     * host, the same direction `TITLE` runs in.
+     */
+    readonly CONTAINERS: 64;
     /**
      * A module's own state, which the host keeps and never reads.
      *

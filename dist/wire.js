@@ -587,6 +587,138 @@ export const filterChoiceSchema = z
     .refine((chosen) => Object.keys(chosen).length <= LIMITS.FILTER_GROUPS, {
     message: `no more than ${LIMITS.FILTER_GROUPS} filter groups can be chosen at once`,
 });
+/* ------------------------------------------------------------------------ *
+ * Containers: what is arranged on the kehikko, what each shows, which are aimed at
+ * ------------------------------------------------------------------------ */
+/**
+ * What one container says it is showing.
+ *
+ * ## The ask this exists for, in the words it arrived in
+ *
+ * > "Lets say we have multiple things in kehikko that can have a checklist for
+ * > instance and they all have different checklists. Obviously we should be
+ * > able to show both items checklists. And if user selects x number of the
+ * > modules then we should only show those modules checklist no? Same with
+ * > notes, and references."
+ *
+ * Two facts are being asked for and neither was on the wire. The first is
+ * WHAT EACH CONTAINER IS ABOUT — a paper open at chapter three, a journey
+ * step, a reference somebody clicked — so that a module holding checklists, or
+ * notes, or anything else filed against such things can show what belongs to
+ * everything on the canvas at once. The second is WHICH CONTAINERS ARE PICKED
+ * OUT, so that the same module can narrow to the ones a person is aiming at.
+ * This schema is the first fact, `containerSchema` below carries both, and
+ * `contextSchema.containers` is where they travel.
+ *
+ * ## Why `passage` and `selection` did not already say it
+ *
+ * They nearly do, and the temptation to read them as this was real. A passage
+ * is where the reader is pointing, a selection is what they picked out, and a
+ * consumer intersecting its material with both already shows "what is in
+ * front of you". What neither can say is which CONTAINER is showing it, and
+ * both are single-valued per canvas: one passage, one list of refs, the last
+ * writer winning. Two containers each showing a document, or two each holding
+ * refs, cannot both be described — the second overwrites the first, correctly,
+ * because pointing is a canvas-wide act and only one thing is pointed at.
+ *
+ * So the two fields are kept exactly as they are and mean exactly what they
+ * meant: the reader's finger, and the person's pick. This is a third thing —
+ * what a container has open, said by the container, held per container, and
+ * changing when the container changes what it shows rather than on every drag
+ * across a paragraph. A module sends it with `showing.set` and re-sends it
+ * when the answer changes, including to nothing.
+ *
+ * ## Refs and places, because those are the two kinds of thing anybody files against
+ *
+ * `refs` is the vocabulary `selection` already uses — `gh#105`, `!44` —
+ * compared for equality and vouched for by nobody; see `selection.set` in
+ * `methods.ts` for why a kind does not ride along. `documents` reuses
+ * `passageSchema` whole, and reuse is the argument: a place in a document at
+ * whatever precision — a file, a page of it, a range in it — is a shape this
+ * package already argued for at length, and every consumer that follows a
+ * passage already has the code to read one. A third spelling of "this file,
+ * these bytes" would be a third thing to get wrong.
+ *
+ * A module saying what it shows should leave `quoted` empty. The quote exists
+ * so that a consumer can tell a rotten highlight from a live one by looking at
+ * the words; a file being shown is not a highlight and has no words to
+ * evidence, and a chapter's text through every frame on the canvas on every
+ * change is the thing `LIMITS.QUOTE` was written to prevent.
+ *
+ * ## The host cannot check any of it, and says so by relaying it unchanged
+ *
+ * A module saying "I am showing chapter three" is a claim about itself, and a
+ * host has no way to look inside a frame on another origin to see whether it
+ * is true. What the host CAN vouch for is that this frame — identified by its
+ * window, which nothing in the page can forge — said so, which is the same
+ * strength of claim `passage` has always had. So it is relayed per container,
+ * attributed to the container that made it, and a consumer treats it as that
+ * container's word. That is weaker than an event the host carried, and
+ * `relations.ts` in the host draws it as weaker; it is the honest amount.
+ */
+export const showingSchema = z.object({
+    /** The references this container is showing. The same strings `selection` carries. */
+    refs: z.array(z.string().min(1).max(LIMITS.REF)).max(LIMITS.REFS).default([]),
+    /** The places in documents it is showing, at whatever precision it has. `quoted` should be empty. */
+    documents: z.array(passageSchema).max(LIMITS.SHOWING_DOCUMENTS).default([]),
+});
+/**
+ * One container on the kehikko: which module, whether it is picked out, and
+ * what it is showing.
+ *
+ * ## `selected` is the second fact, and it is the host's own
+ *
+ * The host draws a box in every container's header and a ring around the
+ * container when it is ticked, holds the tick with the arrangement, and lets
+ * an agent set it over MCP. It is "which of the containers arranged here are
+ * the ones being aimed at" — a third axis beside the refs and the passage,
+ * said about the canvas rather than about the work. Until now it never crossed
+ * the wire, and the host's own code recorded the decision: a module could not
+ * act on being selected, because from inside there is no telling an agent
+ * about to work on it from a box somebody ticked last Tuesday.
+ *
+ * That argument was about a module reading ITS OWN flag, and it stands. This
+ * is a different reading. A consumer does not ask "am I selected"; it asks
+ * "which containers are, and what are they showing" — and narrows its own
+ * material to that, under a control in its own header that the person can turn
+ * off. The tick is visible on the canvas as a ring, so a container narrowed by
+ * last Tuesday's tick is narrowed by something the person can see and unpick.
+ * What was refused was a module changing its behaviour on a fact it could not
+ * see the end of; what is sent is a fact a person is looking at.
+ *
+ * ## Every container is listed, not only the ones that have spoken
+ *
+ * A container that has said nothing still appears, with `showing` empty, and
+ * the emptiness is load-bearing. "Journeys is picked out and has said nothing
+ * about what it shows" is a sentence a consumer has to be able to print,
+ * because it is the difference between a pane that is empty for a reason and a
+ * pane that is empty. A list holding only the containers that spoke could not
+ * say it.
+ *
+ * ## What the host may fold in, and why that is not a second source
+ *
+ * A host that knows which container set the current `passage` — it does; the
+ * call arrived from a window — may put that passage into that container's
+ * `documents`, and the current `selection` into its setter's `refs`. That is
+ * a projection of one fact into a second place, composed by one function from
+ * one source, and it is what lets a module that has only ever called
+ * `passage.set` be "showing" what it points at without learning a new word.
+ * It is not a claim the module made, and a host doing it should say so in its
+ * own code; a module that wants to be showing more than it points at says so
+ * with `showing.set`.
+ *
+ * `module` rather than a container id, because a module is on a kehikko once
+ * and its id is the one name for a container that means the same thing on
+ * every machine — see the host's `kehikot.ts`. A consumer finds its own row by
+ * its own id, and may, though nothing here needs it to.
+ */
+export const containerSchema = z.object({
+    module: z.string().regex(MODULE_ID),
+    /** Whether this container is picked out as a target on this kehikko. The host's own fact. */
+    selected: z.boolean().default(false),
+    /** What it says it is showing, or nothing. Never absent, for the reason `filters` is `{}` and not missing. */
+    showing: showingSchema.default({}),
+});
 export const contextSchema = z.object({
     epic: z.string().regex(EPIC_SLUG).nullable().default(null),
     /**
@@ -857,6 +989,48 @@ export const contextSchema = z.object({
      * `{}`, which is the true answer there.
      */
     filters: filterChoiceSchema.default({}),
+    /**
+     * Every container on this kehikko: which module, whether it is picked out,
+     * and what it says it is showing. See `containerSchema`.
+     *
+     * ## Context, for the reasons everything else here is context
+     *
+     * A module arrives late to it — a checklist pane placed after two containers
+     * were picked out has to open narrowed, not wait for the next tick. It has to
+     * be there before the first render, or the pane draws everything and then
+     * narrows in front of somebody. And it is the same KIND of fact as the
+     * selection and the passage: what this canvas is looking at, one step
+     * further out — not one place, but the set of places its containers hold
+     * open, and which of those the person means.
+     *
+     * ## It is per canvas and broadcast whole, deliberately
+     *
+     * Every frame on the kehikko is told the same list, including the rows about
+     * itself and about containers that never asked to be described. The
+     * alternative — composing a different list per frame, or sending it only to
+     * modules that declared `reacts: ['containers']` — would be the host deciding
+     * what each module may know about the canvas it is standing on, which the
+     * essay on `reacts` in `manifest.ts` refuses in so many words: a broadcast is
+     * not a permission, and a manifest word must not become one.
+     *
+     * ## What a consumer does with it, said once so three consumers do not say it three ways
+     *
+     * When no container is picked out, "what is in front of you" is everything:
+     * the passage, the selection, and the union of what every container shows.
+     * When some are, it is the union of what THOSE show, and nothing else. A
+     * consumer offers the person a way to turn that narrowing off, in its own
+     * container header, and when the narrowing leaves it empty it says which
+     * containers are picked out and that nothing it holds belongs to what they
+     * show — because a pane that is empty because another pane spoke is a pane
+     * whose emptiness has no visible cause otherwise.
+     *
+     * Empty rather than absent, for the reason every other field here is. A
+     * module reading this against a host that has never heard of it finds `[]`,
+     * which is the true answer there: that host has said nothing about its
+     * containers, nothing is picked out as far as this module can know, and
+     * everything is in front of it.
+     */
+    containers: z.array(containerSchema).max(LIMITS.CONTAINERS).default([]),
 });
 /** The id correlating a question with its answer, or a `goto` with its `went`. */
 const correlation = z.string().min(1).max(LIMITS.CORRELATION);

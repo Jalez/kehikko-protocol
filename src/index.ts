@@ -86,6 +86,8 @@ export {
 export {
   contextSchema,
   passageSchema,
+  showingSchema,
+  containerSchema,
   helloSchema,
   contextMessageSchema,
   responseSchema,
@@ -109,6 +111,8 @@ export {
   looksLikeWireMessage,
   type ModuleContext,
   type Passage,
+  type Showing,
+  type CanvasContainer,
   type ResponseFailureReason,
   type HostMessage,
   type ModuleMessage,
