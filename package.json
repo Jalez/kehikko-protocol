@@ -35,9 +35,14 @@
     },
     "./package.json": "./package.json"
   },
+  "bin": {
+    "kehikko-create": "./bin/create.ts"
+  },
   "files": [
     "dist",
     "src",
+    "template",
+    "bin",
     "README.md"
   ],
   "sideEffects": [
@@ -53,7 +58,8 @@
     "build": "tsc",
     "typecheck": "tsc --noEmit",
     "test": "tsc && bun test",
-    "prepublishOnly": "bun run build"
+    "prepublishOnly": "bun run build",
+    "create": "bun run bin/create.ts"
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0",
