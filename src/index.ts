@@ -86,6 +86,7 @@ export {
 export {
   contextSchema,
   passageSchema,
+  sectionSchema,
   showingSchema,
   containerSchema,
   helloSchema,
@@ -111,6 +112,7 @@ export {
   looksLikeWireMessage,
   type ModuleContext,
   type Passage,
+  type Section,
   type Showing,
   type CanvasContainer,
   type ResponseFailureReason,

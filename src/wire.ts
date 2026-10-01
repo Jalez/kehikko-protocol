@@ -68,6 +68,31 @@ import { EPIC_SLUG, MODULE_ID } from './ids.js'
  */
 
 /**
+ * A section of a document: its heading, and where it spans when known.
+ *
+ * The title is what identifies it across edits — byte offsets move when
+ * anything above them changes, and a link written down against a heading's
+ * words survives that. The span is a convenience for a consumer comparing
+ * against a selection, and null when the sender does not know it (a module
+ * that stored only the title, pointing back at the section).
+ */
+export const sectionSchema = z
+  .object({
+    title: z.string().min(1).max(LIMITS.QUOTE),
+    from: z.number().int().min(0).nullable().default(null),
+    to: z.number().int().min(0).nullable().default(null),
+  })
+  .refine((s) => (s.from === null) === (s.to === null), {
+    message: 'a section names both ends of its span or neither',
+  })
+  .refine((s) => s.from === null || s.to === null || s.to > s.from, {
+    message: 'a section ends after it starts',
+  })
+
+/** A heading of a document, and its span when the sender knows it. */
+export type Section = z.infer<typeof sectionSchema>
+
+/**
  * Where in a document the reader is pointing, at whatever precision they have
  * managed.
  *
@@ -172,6 +197,19 @@ export const passageSchema = z.object({
    * limit says why a clipped quote is worse than no quote at all.
    */
   quoted: z.string().max(LIMITS.QUOTE).default(''),
+  /**
+   * Which section of `path` the reader is in, or null.
+   *
+   * A different claim from `from`/`to`, and the reason it is a field of its
+   * own. `from`/`to` say "this exact text is pointed at" — a consumer marks it,
+   * a reader turns to it, a list narrows to what overlaps it. Reading a section
+   * is none of those: publishing it as a range would make every scroll look like
+   * a highlight and paint a whole section in colour. So a reader that knows its
+   * outline says where it is HERE, and the range stays for selections.
+   *
+   * See `sectionSchema` for what a section names.
+   */
+  section: sectionSchema.nullable().default(null),
 })
   .refine((p) => (p.from === null) === (p.to === null), {
     message: 'a passage names both ends of a selection or neither; a half-range is a malformed answer, not a coarser one',
