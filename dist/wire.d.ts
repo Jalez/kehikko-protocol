@@ -63,6 +63,46 @@ import { z } from 'zod';
  * had to ask would render once in the wrong colours first.
  */
 /**
+ * A section of a document: its heading, and where it spans when known.
+ *
+ * The title is what identifies it across edits — byte offsets move when
+ * anything above them changes, and a link written down against a heading's
+ * words survives that. The span is a convenience for a consumer comparing
+ * against a selection, and null when the sender does not know it (a module
+ * that stored only the title, pointing back at the section).
+ */
+export declare const sectionSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
+    title: z.ZodString;
+    from: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+    to: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+}, "strip", z.ZodTypeAny, {
+    title: string;
+    from: number | null;
+    to: number | null;
+}, {
+    title: string;
+    from?: number | null | undefined;
+    to?: number | null | undefined;
+}>, {
+    title: string;
+    from: number | null;
+    to: number | null;
+}, {
+    title: string;
+    from?: number | null | undefined;
+    to?: number | null | undefined;
+}>, {
+    title: string;
+    from: number | null;
+    to: number | null;
+}, {
+    title: string;
+    from?: number | null | undefined;
+    to?: number | null | undefined;
+}>;
+/** A heading of a document, and its span when the sender knows it. */
+export type Section = z.infer<typeof sectionSchema>;
+/**
  * Where in a document the reader is pointing, at whatever precision they have
  * managed.
  *
@@ -167,42 +207,113 @@ export declare const passageSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
      * limit says why a clipped quote is worse than no quote at all.
      */
     quoted: z.ZodDefault<z.ZodString>;
+    /**
+     * Which section of `path` the reader is in, or null.
+     *
+     * A different claim from `from`/`to`, and the reason it is a field of its
+     * own. `from`/`to` say "this exact text is pointed at" — a consumer marks it,
+     * a reader turns to it, a list narrows to what overlaps it. Reading a section
+     * is none of those: publishing it as a range would make every scroll look like
+     * a highlight and paint a whole section in colour. So a reader that knows its
+     * outline says where it is HERE, and the range stays for selections.
+     *
+     * See `sectionSchema` for what a section names.
+     */
+    section: z.ZodDefault<z.ZodNullable<z.ZodEffects<z.ZodEffects<z.ZodObject<{
+        title: z.ZodString;
+        from: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+        to: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+    }, "strip", z.ZodTypeAny, {
+        title: string;
+        from: number | null;
+        to: number | null;
+    }, {
+        title: string;
+        from?: number | null | undefined;
+        to?: number | null | undefined;
+    }>, {
+        title: string;
+        from: number | null;
+        to: number | null;
+    }, {
+        title: string;
+        from?: number | null | undefined;
+        to?: number | null | undefined;
+    }>, {
+        title: string;
+        from: number | null;
+        to: number | null;
+    }, {
+        title: string;
+        from?: number | null | undefined;
+        to?: number | null | undefined;
+    }>>>;
 }, "strip", z.ZodTypeAny, {
     path: string;
-    page: number | null;
     from: number | null;
     to: number | null;
+    page: number | null;
     quoted: string;
+    section: {
+        title: string;
+        from: number | null;
+        to: number | null;
+    } | null;
 }, {
     path: string;
-    page?: number | null | undefined;
     from?: number | null | undefined;
     to?: number | null | undefined;
+    page?: number | null | undefined;
     quoted?: string | undefined;
+    section?: {
+        title: string;
+        from?: number | null | undefined;
+        to?: number | null | undefined;
+    } | null | undefined;
 }>, {
     path: string;
-    page: number | null;
     from: number | null;
     to: number | null;
+    page: number | null;
     quoted: string;
+    section: {
+        title: string;
+        from: number | null;
+        to: number | null;
+    } | null;
 }, {
     path: string;
-    page?: number | null | undefined;
     from?: number | null | undefined;
     to?: number | null | undefined;
+    page?: number | null | undefined;
     quoted?: string | undefined;
+    section?: {
+        title: string;
+        from?: number | null | undefined;
+        to?: number | null | undefined;
+    } | null | undefined;
 }>, {
     path: string;
-    page: number | null;
     from: number | null;
     to: number | null;
+    page: number | null;
     quoted: string;
+    section: {
+        title: string;
+        from: number | null;
+        to: number | null;
+    } | null;
 }, {
     path: string;
-    page?: number | null | undefined;
     from?: number | null | undefined;
     to?: number | null | undefined;
+    page?: number | null | undefined;
     quoted?: string | undefined;
+    section?: {
+        title: string;
+        from?: number | null | undefined;
+        to?: number | null | undefined;
+    } | null | undefined;
 }>;
 /** Where the reader is pointing, at whatever precision they have. */
 export type Passage = z.infer<typeof passageSchema>;
@@ -911,60 +1022,141 @@ export declare const showingSchema: z.ZodObject<{
          * limit says why a clipped quote is worse than no quote at all.
          */
         quoted: z.ZodDefault<z.ZodString>;
+        /**
+         * Which section of `path` the reader is in, or null.
+         *
+         * A different claim from `from`/`to`, and the reason it is a field of its
+         * own. `from`/`to` say "this exact text is pointed at" — a consumer marks it,
+         * a reader turns to it, a list narrows to what overlaps it. Reading a section
+         * is none of those: publishing it as a range would make every scroll look like
+         * a highlight and paint a whole section in colour. So a reader that knows its
+         * outline says where it is HERE, and the range stays for selections.
+         *
+         * See `sectionSchema` for what a section names.
+         */
+        section: z.ZodDefault<z.ZodNullable<z.ZodEffects<z.ZodEffects<z.ZodObject<{
+            title: z.ZodString;
+            from: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+            to: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+        }, "strip", z.ZodTypeAny, {
+            title: string;
+            from: number | null;
+            to: number | null;
+        }, {
+            title: string;
+            from?: number | null | undefined;
+            to?: number | null | undefined;
+        }>, {
+            title: string;
+            from: number | null;
+            to: number | null;
+        }, {
+            title: string;
+            from?: number | null | undefined;
+            to?: number | null | undefined;
+        }>, {
+            title: string;
+            from: number | null;
+            to: number | null;
+        }, {
+            title: string;
+            from?: number | null | undefined;
+            to?: number | null | undefined;
+        }>>>;
     }, "strip", z.ZodTypeAny, {
         path: string;
-        page: number | null;
         from: number | null;
         to: number | null;
+        page: number | null;
         quoted: string;
+        section: {
+            title: string;
+            from: number | null;
+            to: number | null;
+        } | null;
     }, {
         path: string;
-        page?: number | null | undefined;
         from?: number | null | undefined;
         to?: number | null | undefined;
+        page?: number | null | undefined;
         quoted?: string | undefined;
+        section?: {
+            title: string;
+            from?: number | null | undefined;
+            to?: number | null | undefined;
+        } | null | undefined;
     }>, {
         path: string;
-        page: number | null;
         from: number | null;
         to: number | null;
+        page: number | null;
         quoted: string;
+        section: {
+            title: string;
+            from: number | null;
+            to: number | null;
+        } | null;
     }, {
         path: string;
-        page?: number | null | undefined;
         from?: number | null | undefined;
         to?: number | null | undefined;
+        page?: number | null | undefined;
         quoted?: string | undefined;
+        section?: {
+            title: string;
+            from?: number | null | undefined;
+            to?: number | null | undefined;
+        } | null | undefined;
     }>, {
         path: string;
-        page: number | null;
         from: number | null;
         to: number | null;
+        page: number | null;
         quoted: string;
+        section: {
+            title: string;
+            from: number | null;
+            to: number | null;
+        } | null;
     }, {
         path: string;
-        page?: number | null | undefined;
         from?: number | null | undefined;
         to?: number | null | undefined;
+        page?: number | null | undefined;
         quoted?: string | undefined;
+        section?: {
+            title: string;
+            from?: number | null | undefined;
+            to?: number | null | undefined;
+        } | null | undefined;
     }>, "many">>;
 }, "strip", z.ZodTypeAny, {
     refs: string[];
     documents: {
         path: string;
-        page: number | null;
         from: number | null;
         to: number | null;
+        page: number | null;
         quoted: string;
+        section: {
+            title: string;
+            from: number | null;
+            to: number | null;
+        } | null;
     }[];
 }, {
     refs?: string[] | undefined;
     documents?: {
         path: string;
-        page?: number | null | undefined;
         from?: number | null | undefined;
         to?: number | null | undefined;
+        page?: number | null | undefined;
         quoted?: string | undefined;
+        section?: {
+            title: string;
+            from?: number | null | undefined;
+            to?: number | null | undefined;
+        } | null | undefined;
     }[] | undefined;
 }>;
 export type Showing = z.infer<typeof showingSchema>;
@@ -1078,60 +1270,141 @@ export declare const containerSchema: z.ZodObject<{
              * limit says why a clipped quote is worse than no quote at all.
              */
             quoted: z.ZodDefault<z.ZodString>;
+            /**
+             * Which section of `path` the reader is in, or null.
+             *
+             * A different claim from `from`/`to`, and the reason it is a field of its
+             * own. `from`/`to` say "this exact text is pointed at" — a consumer marks it,
+             * a reader turns to it, a list narrows to what overlaps it. Reading a section
+             * is none of those: publishing it as a range would make every scroll look like
+             * a highlight and paint a whole section in colour. So a reader that knows its
+             * outline says where it is HERE, and the range stays for selections.
+             *
+             * See `sectionSchema` for what a section names.
+             */
+            section: z.ZodDefault<z.ZodNullable<z.ZodEffects<z.ZodEffects<z.ZodObject<{
+                title: z.ZodString;
+                from: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+                to: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+            }, "strip", z.ZodTypeAny, {
+                title: string;
+                from: number | null;
+                to: number | null;
+            }, {
+                title: string;
+                from?: number | null | undefined;
+                to?: number | null | undefined;
+            }>, {
+                title: string;
+                from: number | null;
+                to: number | null;
+            }, {
+                title: string;
+                from?: number | null | undefined;
+                to?: number | null | undefined;
+            }>, {
+                title: string;
+                from: number | null;
+                to: number | null;
+            }, {
+                title: string;
+                from?: number | null | undefined;
+                to?: number | null | undefined;
+            }>>>;
         }, "strip", z.ZodTypeAny, {
             path: string;
-            page: number | null;
             from: number | null;
             to: number | null;
+            page: number | null;
             quoted: string;
+            section: {
+                title: string;
+                from: number | null;
+                to: number | null;
+            } | null;
         }, {
             path: string;
-            page?: number | null | undefined;
             from?: number | null | undefined;
             to?: number | null | undefined;
+            page?: number | null | undefined;
             quoted?: string | undefined;
+            section?: {
+                title: string;
+                from?: number | null | undefined;
+                to?: number | null | undefined;
+            } | null | undefined;
         }>, {
             path: string;
-            page: number | null;
             from: number | null;
             to: number | null;
+            page: number | null;
             quoted: string;
+            section: {
+                title: string;
+                from: number | null;
+                to: number | null;
+            } | null;
         }, {
             path: string;
-            page?: number | null | undefined;
             from?: number | null | undefined;
             to?: number | null | undefined;
+            page?: number | null | undefined;
             quoted?: string | undefined;
+            section?: {
+                title: string;
+                from?: number | null | undefined;
+                to?: number | null | undefined;
+            } | null | undefined;
         }>, {
             path: string;
-            page: number | null;
             from: number | null;
             to: number | null;
+            page: number | null;
             quoted: string;
+            section: {
+                title: string;
+                from: number | null;
+                to: number | null;
+            } | null;
         }, {
             path: string;
-            page?: number | null | undefined;
             from?: number | null | undefined;
             to?: number | null | undefined;
+            page?: number | null | undefined;
             quoted?: string | undefined;
+            section?: {
+                title: string;
+                from?: number | null | undefined;
+                to?: number | null | undefined;
+            } | null | undefined;
         }>, "many">>;
     }, "strip", z.ZodTypeAny, {
         refs: string[];
         documents: {
             path: string;
-            page: number | null;
             from: number | null;
             to: number | null;
+            page: number | null;
             quoted: string;
+            section: {
+                title: string;
+                from: number | null;
+                to: number | null;
+            } | null;
         }[];
     }, {
         refs?: string[] | undefined;
         documents?: {
             path: string;
-            page?: number | null | undefined;
             from?: number | null | undefined;
             to?: number | null | undefined;
+            page?: number | null | undefined;
             quoted?: string | undefined;
+            section?: {
+                title: string;
+                from?: number | null | undefined;
+                to?: number | null | undefined;
+            } | null | undefined;
         }[] | undefined;
     }>>;
 }, "strip", z.ZodTypeAny, {
@@ -1141,10 +1414,15 @@ export declare const containerSchema: z.ZodObject<{
         refs: string[];
         documents: {
             path: string;
-            page: number | null;
             from: number | null;
             to: number | null;
+            page: number | null;
             quoted: string;
+            section: {
+                title: string;
+                from: number | null;
+                to: number | null;
+            } | null;
         }[];
     };
 }, {
@@ -1154,10 +1432,15 @@ export declare const containerSchema: z.ZodObject<{
         refs?: string[] | undefined;
         documents?: {
             path: string;
-            page?: number | null | undefined;
             from?: number | null | undefined;
             to?: number | null | undefined;
+            page?: number | null | undefined;
             quoted?: string | undefined;
+            section?: {
+                title: string;
+                from?: number | null | undefined;
+                to?: number | null | undefined;
+            } | null | undefined;
         }[] | undefined;
     } | undefined;
 }>;
@@ -1352,42 +1635,113 @@ export declare const contextSchema: z.ZodObject<{
          * limit says why a clipped quote is worse than no quote at all.
          */
         quoted: z.ZodDefault<z.ZodString>;
+        /**
+         * Which section of `path` the reader is in, or null.
+         *
+         * A different claim from `from`/`to`, and the reason it is a field of its
+         * own. `from`/`to` say "this exact text is pointed at" — a consumer marks it,
+         * a reader turns to it, a list narrows to what overlaps it. Reading a section
+         * is none of those: publishing it as a range would make every scroll look like
+         * a highlight and paint a whole section in colour. So a reader that knows its
+         * outline says where it is HERE, and the range stays for selections.
+         *
+         * See `sectionSchema` for what a section names.
+         */
+        section: z.ZodDefault<z.ZodNullable<z.ZodEffects<z.ZodEffects<z.ZodObject<{
+            title: z.ZodString;
+            from: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+            to: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+        }, "strip", z.ZodTypeAny, {
+            title: string;
+            from: number | null;
+            to: number | null;
+        }, {
+            title: string;
+            from?: number | null | undefined;
+            to?: number | null | undefined;
+        }>, {
+            title: string;
+            from: number | null;
+            to: number | null;
+        }, {
+            title: string;
+            from?: number | null | undefined;
+            to?: number | null | undefined;
+        }>, {
+            title: string;
+            from: number | null;
+            to: number | null;
+        }, {
+            title: string;
+            from?: number | null | undefined;
+            to?: number | null | undefined;
+        }>>>;
     }, "strip", z.ZodTypeAny, {
         path: string;
-        page: number | null;
         from: number | null;
         to: number | null;
+        page: number | null;
         quoted: string;
+        section: {
+            title: string;
+            from: number | null;
+            to: number | null;
+        } | null;
     }, {
         path: string;
-        page?: number | null | undefined;
         from?: number | null | undefined;
         to?: number | null | undefined;
+        page?: number | null | undefined;
         quoted?: string | undefined;
+        section?: {
+            title: string;
+            from?: number | null | undefined;
+            to?: number | null | undefined;
+        } | null | undefined;
     }>, {
         path: string;
-        page: number | null;
         from: number | null;
         to: number | null;
+        page: number | null;
         quoted: string;
+        section: {
+            title: string;
+            from: number | null;
+            to: number | null;
+        } | null;
     }, {
         path: string;
-        page?: number | null | undefined;
         from?: number | null | undefined;
         to?: number | null | undefined;
+        page?: number | null | undefined;
         quoted?: string | undefined;
+        section?: {
+            title: string;
+            from?: number | null | undefined;
+            to?: number | null | undefined;
+        } | null | undefined;
     }>, {
         path: string;
-        page: number | null;
         from: number | null;
         to: number | null;
+        page: number | null;
         quoted: string;
+        section: {
+            title: string;
+            from: number | null;
+            to: number | null;
+        } | null;
     }, {
         path: string;
-        page?: number | null | undefined;
         from?: number | null | undefined;
         to?: number | null | undefined;
+        page?: number | null | undefined;
         quoted?: string | undefined;
+        section?: {
+            title: string;
+            from?: number | null | undefined;
+            to?: number | null | undefined;
+        } | null | undefined;
     }>>>;
     /**
      * Whether this module has been pinned, and will stop being re-pointed.
@@ -1629,60 +1983,141 @@ export declare const contextSchema: z.ZodObject<{
                  * limit says why a clipped quote is worse than no quote at all.
                  */
                 quoted: z.ZodDefault<z.ZodString>;
+                /**
+                 * Which section of `path` the reader is in, or null.
+                 *
+                 * A different claim from `from`/`to`, and the reason it is a field of its
+                 * own. `from`/`to` say "this exact text is pointed at" — a consumer marks it,
+                 * a reader turns to it, a list narrows to what overlaps it. Reading a section
+                 * is none of those: publishing it as a range would make every scroll look like
+                 * a highlight and paint a whole section in colour. So a reader that knows its
+                 * outline says where it is HERE, and the range stays for selections.
+                 *
+                 * See `sectionSchema` for what a section names.
+                 */
+                section: z.ZodDefault<z.ZodNullable<z.ZodEffects<z.ZodEffects<z.ZodObject<{
+                    title: z.ZodString;
+                    from: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+                    to: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+                }, "strip", z.ZodTypeAny, {
+                    title: string;
+                    from: number | null;
+                    to: number | null;
+                }, {
+                    title: string;
+                    from?: number | null | undefined;
+                    to?: number | null | undefined;
+                }>, {
+                    title: string;
+                    from: number | null;
+                    to: number | null;
+                }, {
+                    title: string;
+                    from?: number | null | undefined;
+                    to?: number | null | undefined;
+                }>, {
+                    title: string;
+                    from: number | null;
+                    to: number | null;
+                }, {
+                    title: string;
+                    from?: number | null | undefined;
+                    to?: number | null | undefined;
+                }>>>;
             }, "strip", z.ZodTypeAny, {
                 path: string;
-                page: number | null;
                 from: number | null;
                 to: number | null;
+                page: number | null;
                 quoted: string;
+                section: {
+                    title: string;
+                    from: number | null;
+                    to: number | null;
+                } | null;
             }, {
                 path: string;
-                page?: number | null | undefined;
                 from?: number | null | undefined;
                 to?: number | null | undefined;
+                page?: number | null | undefined;
                 quoted?: string | undefined;
+                section?: {
+                    title: string;
+                    from?: number | null | undefined;
+                    to?: number | null | undefined;
+                } | null | undefined;
             }>, {
                 path: string;
-                page: number | null;
                 from: number | null;
                 to: number | null;
+                page: number | null;
                 quoted: string;
+                section: {
+                    title: string;
+                    from: number | null;
+                    to: number | null;
+                } | null;
             }, {
                 path: string;
-                page?: number | null | undefined;
                 from?: number | null | undefined;
                 to?: number | null | undefined;
+                page?: number | null | undefined;
                 quoted?: string | undefined;
+                section?: {
+                    title: string;
+                    from?: number | null | undefined;
+                    to?: number | null | undefined;
+                } | null | undefined;
             }>, {
                 path: string;
-                page: number | null;
                 from: number | null;
                 to: number | null;
+                page: number | null;
                 quoted: string;
+                section: {
+                    title: string;
+                    from: number | null;
+                    to: number | null;
+                } | null;
             }, {
                 path: string;
-                page?: number | null | undefined;
                 from?: number | null | undefined;
                 to?: number | null | undefined;
+                page?: number | null | undefined;
                 quoted?: string | undefined;
+                section?: {
+                    title: string;
+                    from?: number | null | undefined;
+                    to?: number | null | undefined;
+                } | null | undefined;
             }>, "many">>;
         }, "strip", z.ZodTypeAny, {
             refs: string[];
             documents: {
                 path: string;
-                page: number | null;
                 from: number | null;
                 to: number | null;
+                page: number | null;
                 quoted: string;
+                section: {
+                    title: string;
+                    from: number | null;
+                    to: number | null;
+                } | null;
             }[];
         }, {
             refs?: string[] | undefined;
             documents?: {
                 path: string;
-                page?: number | null | undefined;
                 from?: number | null | undefined;
                 to?: number | null | undefined;
+                page?: number | null | undefined;
                 quoted?: string | undefined;
+                section?: {
+                    title: string;
+                    from?: number | null | undefined;
+                    to?: number | null | undefined;
+                } | null | undefined;
             }[] | undefined;
         }>>;
     }, "strip", z.ZodTypeAny, {
@@ -1692,10 +2127,15 @@ export declare const contextSchema: z.ZodObject<{
             refs: string[];
             documents: {
                 path: string;
-                page: number | null;
                 from: number | null;
                 to: number | null;
+                page: number | null;
                 quoted: string;
+                section: {
+                    title: string;
+                    from: number | null;
+                    to: number | null;
+                } | null;
             }[];
         };
     }, {
@@ -1705,10 +2145,15 @@ export declare const contextSchema: z.ZodObject<{
             refs?: string[] | undefined;
             documents?: {
                 path: string;
-                page?: number | null | undefined;
                 from?: number | null | undefined;
                 to?: number | null | undefined;
+                page?: number | null | undefined;
                 quoted?: string | undefined;
+                section?: {
+                    title: string;
+                    from?: number | null | undefined;
+                    to?: number | null | undefined;
+                } | null | undefined;
             }[] | undefined;
         } | undefined;
     }>, "many">>;
@@ -1716,10 +2161,15 @@ export declare const contextSchema: z.ZodObject<{
     epic: string | null;
     passage: {
         path: string;
-        page: number | null;
         from: number | null;
         to: number | null;
+        page: number | null;
         quoted: string;
+        section: {
+            title: string;
+            from: number | null;
+            to: number | null;
+        } | null;
     } | null;
     selection: string[];
     containers: {
@@ -1729,10 +2179,15 @@ export declare const contextSchema: z.ZodObject<{
             refs: string[];
             documents: {
                 path: string;
-                page: number | null;
                 from: number | null;
                 to: number | null;
+                page: number | null;
                 quoted: string;
+                section: {
+                    title: string;
+                    from: number | null;
+                    to: number | null;
+                } | null;
             }[];
         };
     }[];
@@ -1750,10 +2205,15 @@ export declare const contextSchema: z.ZodObject<{
     epic?: string | null | undefined;
     passage?: {
         path: string;
-        page?: number | null | undefined;
         from?: number | null | undefined;
         to?: number | null | undefined;
+        page?: number | null | undefined;
         quoted?: string | undefined;
+        section?: {
+            title: string;
+            from?: number | null | undefined;
+            to?: number | null | undefined;
+        } | null | undefined;
     } | null | undefined;
     selection?: string[] | undefined;
     containers?: {
@@ -1763,10 +2223,15 @@ export declare const contextSchema: z.ZodObject<{
             refs?: string[] | undefined;
             documents?: {
                 path: string;
-                page?: number | null | undefined;
                 from?: number | null | undefined;
                 to?: number | null | undefined;
+                page?: number | null | undefined;
                 quoted?: string | undefined;
+                section?: {
+                    title: string;
+                    from?: number | null | undefined;
+                    to?: number | null | undefined;
+                } | null | undefined;
             }[] | undefined;
         } | undefined;
     }[] | undefined;
@@ -2005,42 +2470,113 @@ export declare const helloSchema: z.ZodObject<{
              * limit says why a clipped quote is worse than no quote at all.
              */
             quoted: z.ZodDefault<z.ZodString>;
+            /**
+             * Which section of `path` the reader is in, or null.
+             *
+             * A different claim from `from`/`to`, and the reason it is a field of its
+             * own. `from`/`to` say "this exact text is pointed at" — a consumer marks it,
+             * a reader turns to it, a list narrows to what overlaps it. Reading a section
+             * is none of those: publishing it as a range would make every scroll look like
+             * a highlight and paint a whole section in colour. So a reader that knows its
+             * outline says where it is HERE, and the range stays for selections.
+             *
+             * See `sectionSchema` for what a section names.
+             */
+            section: z.ZodDefault<z.ZodNullable<z.ZodEffects<z.ZodEffects<z.ZodObject<{
+                title: z.ZodString;
+                from: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+                to: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+            }, "strip", z.ZodTypeAny, {
+                title: string;
+                from: number | null;
+                to: number | null;
+            }, {
+                title: string;
+                from?: number | null | undefined;
+                to?: number | null | undefined;
+            }>, {
+                title: string;
+                from: number | null;
+                to: number | null;
+            }, {
+                title: string;
+                from?: number | null | undefined;
+                to?: number | null | undefined;
+            }>, {
+                title: string;
+                from: number | null;
+                to: number | null;
+            }, {
+                title: string;
+                from?: number | null | undefined;
+                to?: number | null | undefined;
+            }>>>;
         }, "strip", z.ZodTypeAny, {
             path: string;
-            page: number | null;
             from: number | null;
             to: number | null;
+            page: number | null;
             quoted: string;
+            section: {
+                title: string;
+                from: number | null;
+                to: number | null;
+            } | null;
         }, {
             path: string;
-            page?: number | null | undefined;
             from?: number | null | undefined;
             to?: number | null | undefined;
+            page?: number | null | undefined;
             quoted?: string | undefined;
+            section?: {
+                title: string;
+                from?: number | null | undefined;
+                to?: number | null | undefined;
+            } | null | undefined;
         }>, {
             path: string;
-            page: number | null;
             from: number | null;
             to: number | null;
+            page: number | null;
             quoted: string;
+            section: {
+                title: string;
+                from: number | null;
+                to: number | null;
+            } | null;
         }, {
             path: string;
-            page?: number | null | undefined;
             from?: number | null | undefined;
             to?: number | null | undefined;
+            page?: number | null | undefined;
             quoted?: string | undefined;
+            section?: {
+                title: string;
+                from?: number | null | undefined;
+                to?: number | null | undefined;
+            } | null | undefined;
         }>, {
             path: string;
-            page: number | null;
             from: number | null;
             to: number | null;
+            page: number | null;
             quoted: string;
+            section: {
+                title: string;
+                from: number | null;
+                to: number | null;
+            } | null;
         }, {
             path: string;
-            page?: number | null | undefined;
             from?: number | null | undefined;
             to?: number | null | undefined;
+            page?: number | null | undefined;
             quoted?: string | undefined;
+            section?: {
+                title: string;
+                from?: number | null | undefined;
+                to?: number | null | undefined;
+            } | null | undefined;
         }>>>;
         /**
          * Whether this module has been pinned, and will stop being re-pointed.
@@ -2282,60 +2818,141 @@ export declare const helloSchema: z.ZodObject<{
                      * limit says why a clipped quote is worse than no quote at all.
                      */
                     quoted: z.ZodDefault<z.ZodString>;
+                    /**
+                     * Which section of `path` the reader is in, or null.
+                     *
+                     * A different claim from `from`/`to`, and the reason it is a field of its
+                     * own. `from`/`to` say "this exact text is pointed at" — a consumer marks it,
+                     * a reader turns to it, a list narrows to what overlaps it. Reading a section
+                     * is none of those: publishing it as a range would make every scroll look like
+                     * a highlight and paint a whole section in colour. So a reader that knows its
+                     * outline says where it is HERE, and the range stays for selections.
+                     *
+                     * See `sectionSchema` for what a section names.
+                     */
+                    section: z.ZodDefault<z.ZodNullable<z.ZodEffects<z.ZodEffects<z.ZodObject<{
+                        title: z.ZodString;
+                        from: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+                        to: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+                    }, "strip", z.ZodTypeAny, {
+                        title: string;
+                        from: number | null;
+                        to: number | null;
+                    }, {
+                        title: string;
+                        from?: number | null | undefined;
+                        to?: number | null | undefined;
+                    }>, {
+                        title: string;
+                        from: number | null;
+                        to: number | null;
+                    }, {
+                        title: string;
+                        from?: number | null | undefined;
+                        to?: number | null | undefined;
+                    }>, {
+                        title: string;
+                        from: number | null;
+                        to: number | null;
+                    }, {
+                        title: string;
+                        from?: number | null | undefined;
+                        to?: number | null | undefined;
+                    }>>>;
                 }, "strip", z.ZodTypeAny, {
                     path: string;
-                    page: number | null;
                     from: number | null;
                     to: number | null;
+                    page: number | null;
                     quoted: string;
+                    section: {
+                        title: string;
+                        from: number | null;
+                        to: number | null;
+                    } | null;
                 }, {
                     path: string;
-                    page?: number | null | undefined;
                     from?: number | null | undefined;
                     to?: number | null | undefined;
+                    page?: number | null | undefined;
                     quoted?: string | undefined;
+                    section?: {
+                        title: string;
+                        from?: number | null | undefined;
+                        to?: number | null | undefined;
+                    } | null | undefined;
                 }>, {
                     path: string;
-                    page: number | null;
                     from: number | null;
                     to: number | null;
+                    page: number | null;
                     quoted: string;
+                    section: {
+                        title: string;
+                        from: number | null;
+                        to: number | null;
+                    } | null;
                 }, {
                     path: string;
-                    page?: number | null | undefined;
                     from?: number | null | undefined;
                     to?: number | null | undefined;
+                    page?: number | null | undefined;
                     quoted?: string | undefined;
+                    section?: {
+                        title: string;
+                        from?: number | null | undefined;
+                        to?: number | null | undefined;
+                    } | null | undefined;
                 }>, {
                     path: string;
-                    page: number | null;
                     from: number | null;
                     to: number | null;
+                    page: number | null;
                     quoted: string;
+                    section: {
+                        title: string;
+                        from: number | null;
+                        to: number | null;
+                    } | null;
                 }, {
                     path: string;
-                    page?: number | null | undefined;
                     from?: number | null | undefined;
                     to?: number | null | undefined;
+                    page?: number | null | undefined;
                     quoted?: string | undefined;
+                    section?: {
+                        title: string;
+                        from?: number | null | undefined;
+                        to?: number | null | undefined;
+                    } | null | undefined;
                 }>, "many">>;
             }, "strip", z.ZodTypeAny, {
                 refs: string[];
                 documents: {
                     path: string;
-                    page: number | null;
                     from: number | null;
                     to: number | null;
+                    page: number | null;
                     quoted: string;
+                    section: {
+                        title: string;
+                        from: number | null;
+                        to: number | null;
+                    } | null;
                 }[];
             }, {
                 refs?: string[] | undefined;
                 documents?: {
                     path: string;
-                    page?: number | null | undefined;
                     from?: number | null | undefined;
                     to?: number | null | undefined;
+                    page?: number | null | undefined;
                     quoted?: string | undefined;
+                    section?: {
+                        title: string;
+                        from?: number | null | undefined;
+                        to?: number | null | undefined;
+                    } | null | undefined;
                 }[] | undefined;
             }>>;
         }, "strip", z.ZodTypeAny, {
@@ -2345,10 +2962,15 @@ export declare const helloSchema: z.ZodObject<{
                 refs: string[];
                 documents: {
                     path: string;
-                    page: number | null;
                     from: number | null;
                     to: number | null;
+                    page: number | null;
                     quoted: string;
+                    section: {
+                        title: string;
+                        from: number | null;
+                        to: number | null;
+                    } | null;
                 }[];
             };
         }, {
@@ -2358,10 +2980,15 @@ export declare const helloSchema: z.ZodObject<{
                 refs?: string[] | undefined;
                 documents?: {
                     path: string;
-                    page?: number | null | undefined;
                     from?: number | null | undefined;
                     to?: number | null | undefined;
+                    page?: number | null | undefined;
                     quoted?: string | undefined;
+                    section?: {
+                        title: string;
+                        from?: number | null | undefined;
+                        to?: number | null | undefined;
+                    } | null | undefined;
                 }[] | undefined;
             } | undefined;
         }>, "many">>;
@@ -2369,10 +2996,15 @@ export declare const helloSchema: z.ZodObject<{
         epic: string | null;
         passage: {
             path: string;
-            page: number | null;
             from: number | null;
             to: number | null;
+            page: number | null;
             quoted: string;
+            section: {
+                title: string;
+                from: number | null;
+                to: number | null;
+            } | null;
         } | null;
         selection: string[];
         containers: {
@@ -2382,10 +3014,15 @@ export declare const helloSchema: z.ZodObject<{
                 refs: string[];
                 documents: {
                     path: string;
-                    page: number | null;
                     from: number | null;
                     to: number | null;
+                    page: number | null;
                     quoted: string;
+                    section: {
+                        title: string;
+                        from: number | null;
+                        to: number | null;
+                    } | null;
                 }[];
             };
         }[];
@@ -2403,10 +3040,15 @@ export declare const helloSchema: z.ZodObject<{
         epic?: string | null | undefined;
         passage?: {
             path: string;
-            page?: number | null | undefined;
             from?: number | null | undefined;
             to?: number | null | undefined;
+            page?: number | null | undefined;
             quoted?: string | undefined;
+            section?: {
+                title: string;
+                from?: number | null | undefined;
+                to?: number | null | undefined;
+            } | null | undefined;
         } | null | undefined;
         selection?: string[] | undefined;
         containers?: {
@@ -2416,10 +3058,15 @@ export declare const helloSchema: z.ZodObject<{
                 refs?: string[] | undefined;
                 documents?: {
                     path: string;
-                    page?: number | null | undefined;
                     from?: number | null | undefined;
                     to?: number | null | undefined;
+                    page?: number | null | undefined;
                     quoted?: string | undefined;
+                    section?: {
+                        title: string;
+                        from?: number | null | undefined;
+                        to?: number | null | undefined;
+                    } | null | undefined;
                 }[] | undefined;
             } | undefined;
         }[] | undefined;
@@ -2465,10 +3112,15 @@ export declare const helloSchema: z.ZodObject<{
         epic: string | null;
         passage: {
             path: string;
-            page: number | null;
             from: number | null;
             to: number | null;
+            page: number | null;
             quoted: string;
+            section: {
+                title: string;
+                from: number | null;
+                to: number | null;
+            } | null;
         } | null;
         selection: string[];
         containers: {
@@ -2478,10 +3130,15 @@ export declare const helloSchema: z.ZodObject<{
                 refs: string[];
                 documents: {
                     path: string;
-                    page: number | null;
                     from: number | null;
                     to: number | null;
+                    page: number | null;
                     quoted: string;
+                    section: {
+                        title: string;
+                        from: number | null;
+                        to: number | null;
+                    } | null;
                 }[];
             };
         }[];
@@ -2505,10 +3162,15 @@ export declare const helloSchema: z.ZodObject<{
         epic?: string | null | undefined;
         passage?: {
             path: string;
-            page?: number | null | undefined;
             from?: number | null | undefined;
             to?: number | null | undefined;
+            page?: number | null | undefined;
             quoted?: string | undefined;
+            section?: {
+                title: string;
+                from?: number | null | undefined;
+                to?: number | null | undefined;
+            } | null | undefined;
         } | null | undefined;
         selection?: string[] | undefined;
         containers?: {
@@ -2518,10 +3180,15 @@ export declare const helloSchema: z.ZodObject<{
                 refs?: string[] | undefined;
                 documents?: {
                     path: string;
-                    page?: number | null | undefined;
                     from?: number | null | undefined;
                     to?: number | null | undefined;
+                    page?: number | null | undefined;
                     quoted?: string | undefined;
+                    section?: {
+                        title: string;
+                        from?: number | null | undefined;
+                        to?: number | null | undefined;
+                    } | null | undefined;
                 }[] | undefined;
             } | undefined;
         }[] | undefined;
@@ -2740,42 +3407,113 @@ export declare const contextMessageSchema: z.ZodObject<{
          * limit says why a clipped quote is worse than no quote at all.
          */
         quoted: z.ZodDefault<z.ZodString>;
+        /**
+         * Which section of `path` the reader is in, or null.
+         *
+         * A different claim from `from`/`to`, and the reason it is a field of its
+         * own. `from`/`to` say "this exact text is pointed at" — a consumer marks it,
+         * a reader turns to it, a list narrows to what overlaps it. Reading a section
+         * is none of those: publishing it as a range would make every scroll look like
+         * a highlight and paint a whole section in colour. So a reader that knows its
+         * outline says where it is HERE, and the range stays for selections.
+         *
+         * See `sectionSchema` for what a section names.
+         */
+        section: z.ZodDefault<z.ZodNullable<z.ZodEffects<z.ZodEffects<z.ZodObject<{
+            title: z.ZodString;
+            from: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+            to: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+        }, "strip", z.ZodTypeAny, {
+            title: string;
+            from: number | null;
+            to: number | null;
+        }, {
+            title: string;
+            from?: number | null | undefined;
+            to?: number | null | undefined;
+        }>, {
+            title: string;
+            from: number | null;
+            to: number | null;
+        }, {
+            title: string;
+            from?: number | null | undefined;
+            to?: number | null | undefined;
+        }>, {
+            title: string;
+            from: number | null;
+            to: number | null;
+        }, {
+            title: string;
+            from?: number | null | undefined;
+            to?: number | null | undefined;
+        }>>>;
     }, "strip", z.ZodTypeAny, {
         path: string;
-        page: number | null;
         from: number | null;
         to: number | null;
+        page: number | null;
         quoted: string;
+        section: {
+            title: string;
+            from: number | null;
+            to: number | null;
+        } | null;
     }, {
         path: string;
-        page?: number | null | undefined;
         from?: number | null | undefined;
         to?: number | null | undefined;
+        page?: number | null | undefined;
         quoted?: string | undefined;
+        section?: {
+            title: string;
+            from?: number | null | undefined;
+            to?: number | null | undefined;
+        } | null | undefined;
     }>, {
         path: string;
-        page: number | null;
         from: number | null;
         to: number | null;
+        page: number | null;
         quoted: string;
+        section: {
+            title: string;
+            from: number | null;
+            to: number | null;
+        } | null;
     }, {
         path: string;
-        page?: number | null | undefined;
         from?: number | null | undefined;
         to?: number | null | undefined;
+        page?: number | null | undefined;
         quoted?: string | undefined;
+        section?: {
+            title: string;
+            from?: number | null | undefined;
+            to?: number | null | undefined;
+        } | null | undefined;
     }>, {
         path: string;
-        page: number | null;
         from: number | null;
         to: number | null;
+        page: number | null;
         quoted: string;
+        section: {
+            title: string;
+            from: number | null;
+            to: number | null;
+        } | null;
     }, {
         path: string;
-        page?: number | null | undefined;
         from?: number | null | undefined;
         to?: number | null | undefined;
+        page?: number | null | undefined;
         quoted?: string | undefined;
+        section?: {
+            title: string;
+            from?: number | null | undefined;
+            to?: number | null | undefined;
+        } | null | undefined;
     }>>>;
     /**
      * Whether this module has been pinned, and will stop being re-pointed.
@@ -3017,60 +3755,141 @@ export declare const contextMessageSchema: z.ZodObject<{
                  * limit says why a clipped quote is worse than no quote at all.
                  */
                 quoted: z.ZodDefault<z.ZodString>;
+                /**
+                 * Which section of `path` the reader is in, or null.
+                 *
+                 * A different claim from `from`/`to`, and the reason it is a field of its
+                 * own. `from`/`to` say "this exact text is pointed at" — a consumer marks it,
+                 * a reader turns to it, a list narrows to what overlaps it. Reading a section
+                 * is none of those: publishing it as a range would make every scroll look like
+                 * a highlight and paint a whole section in colour. So a reader that knows its
+                 * outline says where it is HERE, and the range stays for selections.
+                 *
+                 * See `sectionSchema` for what a section names.
+                 */
+                section: z.ZodDefault<z.ZodNullable<z.ZodEffects<z.ZodEffects<z.ZodObject<{
+                    title: z.ZodString;
+                    from: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+                    to: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+                }, "strip", z.ZodTypeAny, {
+                    title: string;
+                    from: number | null;
+                    to: number | null;
+                }, {
+                    title: string;
+                    from?: number | null | undefined;
+                    to?: number | null | undefined;
+                }>, {
+                    title: string;
+                    from: number | null;
+                    to: number | null;
+                }, {
+                    title: string;
+                    from?: number | null | undefined;
+                    to?: number | null | undefined;
+                }>, {
+                    title: string;
+                    from: number | null;
+                    to: number | null;
+                }, {
+                    title: string;
+                    from?: number | null | undefined;
+                    to?: number | null | undefined;
+                }>>>;
             }, "strip", z.ZodTypeAny, {
                 path: string;
-                page: number | null;
                 from: number | null;
                 to: number | null;
+                page: number | null;
                 quoted: string;
+                section: {
+                    title: string;
+                    from: number | null;
+                    to: number | null;
+                } | null;
             }, {
                 path: string;
-                page?: number | null | undefined;
                 from?: number | null | undefined;
                 to?: number | null | undefined;
+                page?: number | null | undefined;
                 quoted?: string | undefined;
+                section?: {
+                    title: string;
+                    from?: number | null | undefined;
+                    to?: number | null | undefined;
+                } | null | undefined;
             }>, {
                 path: string;
-                page: number | null;
                 from: number | null;
                 to: number | null;
+                page: number | null;
                 quoted: string;
+                section: {
+                    title: string;
+                    from: number | null;
+                    to: number | null;
+                } | null;
             }, {
                 path: string;
-                page?: number | null | undefined;
                 from?: number | null | undefined;
                 to?: number | null | undefined;
+                page?: number | null | undefined;
                 quoted?: string | undefined;
+                section?: {
+                    title: string;
+                    from?: number | null | undefined;
+                    to?: number | null | undefined;
+                } | null | undefined;
             }>, {
                 path: string;
-                page: number | null;
                 from: number | null;
                 to: number | null;
+                page: number | null;
                 quoted: string;
+                section: {
+                    title: string;
+                    from: number | null;
+                    to: number | null;
+                } | null;
             }, {
                 path: string;
-                page?: number | null | undefined;
                 from?: number | null | undefined;
                 to?: number | null | undefined;
+                page?: number | null | undefined;
                 quoted?: string | undefined;
+                section?: {
+                    title: string;
+                    from?: number | null | undefined;
+                    to?: number | null | undefined;
+                } | null | undefined;
             }>, "many">>;
         }, "strip", z.ZodTypeAny, {
             refs: string[];
             documents: {
                 path: string;
-                page: number | null;
                 from: number | null;
                 to: number | null;
+                page: number | null;
                 quoted: string;
+                section: {
+                    title: string;
+                    from: number | null;
+                    to: number | null;
+                } | null;
             }[];
         }, {
             refs?: string[] | undefined;
             documents?: {
                 path: string;
-                page?: number | null | undefined;
                 from?: number | null | undefined;
                 to?: number | null | undefined;
+                page?: number | null | undefined;
                 quoted?: string | undefined;
+                section?: {
+                    title: string;
+                    from?: number | null | undefined;
+                    to?: number | null | undefined;
+                } | null | undefined;
             }[] | undefined;
         }>>;
     }, "strip", z.ZodTypeAny, {
@@ -3080,10 +3899,15 @@ export declare const contextMessageSchema: z.ZodObject<{
             refs: string[];
             documents: {
                 path: string;
-                page: number | null;
                 from: number | null;
                 to: number | null;
+                page: number | null;
                 quoted: string;
+                section: {
+                    title: string;
+                    from: number | null;
+                    to: number | null;
+                } | null;
             }[];
         };
     }, {
@@ -3093,10 +3917,15 @@ export declare const contextMessageSchema: z.ZodObject<{
             refs?: string[] | undefined;
             documents?: {
                 path: string;
-                page?: number | null | undefined;
                 from?: number | null | undefined;
                 to?: number | null | undefined;
+                page?: number | null | undefined;
                 quoted?: string | undefined;
+                section?: {
+                    title: string;
+                    from?: number | null | undefined;
+                    to?: number | null | undefined;
+                } | null | undefined;
             }[] | undefined;
         } | undefined;
     }>, "many">>;
@@ -3108,10 +3937,15 @@ export declare const contextMessageSchema: z.ZodObject<{
     epic: string | null;
     passage: {
         path: string;
-        page: number | null;
         from: number | null;
         to: number | null;
+        page: number | null;
         quoted: string;
+        section: {
+            title: string;
+            from: number | null;
+            to: number | null;
+        } | null;
     } | null;
     selection: string[];
     containers: {
@@ -3121,10 +3955,15 @@ export declare const contextMessageSchema: z.ZodObject<{
             refs: string[];
             documents: {
                 path: string;
-                page: number | null;
                 from: number | null;
                 to: number | null;
+                page: number | null;
                 quoted: string;
+                section: {
+                    title: string;
+                    from: number | null;
+                    to: number | null;
+                } | null;
             }[];
         };
     }[];
@@ -3145,10 +3984,15 @@ export declare const contextMessageSchema: z.ZodObject<{
     epic?: string | null | undefined;
     passage?: {
         path: string;
-        page?: number | null | undefined;
         from?: number | null | undefined;
         to?: number | null | undefined;
+        page?: number | null | undefined;
         quoted?: string | undefined;
+        section?: {
+            title: string;
+            from?: number | null | undefined;
+            to?: number | null | undefined;
+        } | null | undefined;
     } | null | undefined;
     selection?: string[] | undefined;
     containers?: {
@@ -3158,10 +4002,15 @@ export declare const contextMessageSchema: z.ZodObject<{
             refs?: string[] | undefined;
             documents?: {
                 path: string;
-                page?: number | null | undefined;
                 from?: number | null | undefined;
                 to?: number | null | undefined;
+                page?: number | null | undefined;
                 quoted?: string | undefined;
+                section?: {
+                    title: string;
+                    from?: number | null | undefined;
+                    to?: number | null | undefined;
+                } | null | undefined;
             }[] | undefined;
         } | undefined;
     }[] | undefined;
@@ -3741,42 +4590,113 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
              * limit says why a clipped quote is worse than no quote at all.
              */
             quoted: z.ZodDefault<z.ZodString>;
+            /**
+             * Which section of `path` the reader is in, or null.
+             *
+             * A different claim from `from`/`to`, and the reason it is a field of its
+             * own. `from`/`to` say "this exact text is pointed at" — a consumer marks it,
+             * a reader turns to it, a list narrows to what overlaps it. Reading a section
+             * is none of those: publishing it as a range would make every scroll look like
+             * a highlight and paint a whole section in colour. So a reader that knows its
+             * outline says where it is HERE, and the range stays for selections.
+             *
+             * See `sectionSchema` for what a section names.
+             */
+            section: z.ZodDefault<z.ZodNullable<z.ZodEffects<z.ZodEffects<z.ZodObject<{
+                title: z.ZodString;
+                from: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+                to: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+            }, "strip", z.ZodTypeAny, {
+                title: string;
+                from: number | null;
+                to: number | null;
+            }, {
+                title: string;
+                from?: number | null | undefined;
+                to?: number | null | undefined;
+            }>, {
+                title: string;
+                from: number | null;
+                to: number | null;
+            }, {
+                title: string;
+                from?: number | null | undefined;
+                to?: number | null | undefined;
+            }>, {
+                title: string;
+                from: number | null;
+                to: number | null;
+            }, {
+                title: string;
+                from?: number | null | undefined;
+                to?: number | null | undefined;
+            }>>>;
         }, "strip", z.ZodTypeAny, {
             path: string;
-            page: number | null;
             from: number | null;
             to: number | null;
+            page: number | null;
             quoted: string;
+            section: {
+                title: string;
+                from: number | null;
+                to: number | null;
+            } | null;
         }, {
             path: string;
-            page?: number | null | undefined;
             from?: number | null | undefined;
             to?: number | null | undefined;
+            page?: number | null | undefined;
             quoted?: string | undefined;
+            section?: {
+                title: string;
+                from?: number | null | undefined;
+                to?: number | null | undefined;
+            } | null | undefined;
         }>, {
             path: string;
-            page: number | null;
             from: number | null;
             to: number | null;
+            page: number | null;
             quoted: string;
+            section: {
+                title: string;
+                from: number | null;
+                to: number | null;
+            } | null;
         }, {
             path: string;
-            page?: number | null | undefined;
             from?: number | null | undefined;
             to?: number | null | undefined;
+            page?: number | null | undefined;
             quoted?: string | undefined;
+            section?: {
+                title: string;
+                from?: number | null | undefined;
+                to?: number | null | undefined;
+            } | null | undefined;
         }>, {
             path: string;
-            page: number | null;
             from: number | null;
             to: number | null;
+            page: number | null;
             quoted: string;
+            section: {
+                title: string;
+                from: number | null;
+                to: number | null;
+            } | null;
         }, {
             path: string;
-            page?: number | null | undefined;
             from?: number | null | undefined;
             to?: number | null | undefined;
+            page?: number | null | undefined;
             quoted?: string | undefined;
+            section?: {
+                title: string;
+                from?: number | null | undefined;
+                to?: number | null | undefined;
+            } | null | undefined;
         }>>>;
         /**
          * Whether this module has been pinned, and will stop being re-pointed.
@@ -4018,60 +4938,141 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
                      * limit says why a clipped quote is worse than no quote at all.
                      */
                     quoted: z.ZodDefault<z.ZodString>;
+                    /**
+                     * Which section of `path` the reader is in, or null.
+                     *
+                     * A different claim from `from`/`to`, and the reason it is a field of its
+                     * own. `from`/`to` say "this exact text is pointed at" — a consumer marks it,
+                     * a reader turns to it, a list narrows to what overlaps it. Reading a section
+                     * is none of those: publishing it as a range would make every scroll look like
+                     * a highlight and paint a whole section in colour. So a reader that knows its
+                     * outline says where it is HERE, and the range stays for selections.
+                     *
+                     * See `sectionSchema` for what a section names.
+                     */
+                    section: z.ZodDefault<z.ZodNullable<z.ZodEffects<z.ZodEffects<z.ZodObject<{
+                        title: z.ZodString;
+                        from: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+                        to: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+                    }, "strip", z.ZodTypeAny, {
+                        title: string;
+                        from: number | null;
+                        to: number | null;
+                    }, {
+                        title: string;
+                        from?: number | null | undefined;
+                        to?: number | null | undefined;
+                    }>, {
+                        title: string;
+                        from: number | null;
+                        to: number | null;
+                    }, {
+                        title: string;
+                        from?: number | null | undefined;
+                        to?: number | null | undefined;
+                    }>, {
+                        title: string;
+                        from: number | null;
+                        to: number | null;
+                    }, {
+                        title: string;
+                        from?: number | null | undefined;
+                        to?: number | null | undefined;
+                    }>>>;
                 }, "strip", z.ZodTypeAny, {
                     path: string;
-                    page: number | null;
                     from: number | null;
                     to: number | null;
+                    page: number | null;
                     quoted: string;
+                    section: {
+                        title: string;
+                        from: number | null;
+                        to: number | null;
+                    } | null;
                 }, {
                     path: string;
-                    page?: number | null | undefined;
                     from?: number | null | undefined;
                     to?: number | null | undefined;
+                    page?: number | null | undefined;
                     quoted?: string | undefined;
+                    section?: {
+                        title: string;
+                        from?: number | null | undefined;
+                        to?: number | null | undefined;
+                    } | null | undefined;
                 }>, {
                     path: string;
-                    page: number | null;
                     from: number | null;
                     to: number | null;
+                    page: number | null;
                     quoted: string;
+                    section: {
+                        title: string;
+                        from: number | null;
+                        to: number | null;
+                    } | null;
                 }, {
                     path: string;
-                    page?: number | null | undefined;
                     from?: number | null | undefined;
                     to?: number | null | undefined;
+                    page?: number | null | undefined;
                     quoted?: string | undefined;
+                    section?: {
+                        title: string;
+                        from?: number | null | undefined;
+                        to?: number | null | undefined;
+                    } | null | undefined;
                 }>, {
                     path: string;
-                    page: number | null;
                     from: number | null;
                     to: number | null;
+                    page: number | null;
                     quoted: string;
+                    section: {
+                        title: string;
+                        from: number | null;
+                        to: number | null;
+                    } | null;
                 }, {
                     path: string;
-                    page?: number | null | undefined;
                     from?: number | null | undefined;
                     to?: number | null | undefined;
+                    page?: number | null | undefined;
                     quoted?: string | undefined;
+                    section?: {
+                        title: string;
+                        from?: number | null | undefined;
+                        to?: number | null | undefined;
+                    } | null | undefined;
                 }>, "many">>;
             }, "strip", z.ZodTypeAny, {
                 refs: string[];
                 documents: {
                     path: string;
-                    page: number | null;
                     from: number | null;
                     to: number | null;
+                    page: number | null;
                     quoted: string;
+                    section: {
+                        title: string;
+                        from: number | null;
+                        to: number | null;
+                    } | null;
                 }[];
             }, {
                 refs?: string[] | undefined;
                 documents?: {
                     path: string;
-                    page?: number | null | undefined;
                     from?: number | null | undefined;
                     to?: number | null | undefined;
+                    page?: number | null | undefined;
                     quoted?: string | undefined;
+                    section?: {
+                        title: string;
+                        from?: number | null | undefined;
+                        to?: number | null | undefined;
+                    } | null | undefined;
                 }[] | undefined;
             }>>;
         }, "strip", z.ZodTypeAny, {
@@ -4081,10 +5082,15 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
                 refs: string[];
                 documents: {
                     path: string;
-                    page: number | null;
                     from: number | null;
                     to: number | null;
+                    page: number | null;
                     quoted: string;
+                    section: {
+                        title: string;
+                        from: number | null;
+                        to: number | null;
+                    } | null;
                 }[];
             };
         }, {
@@ -4094,10 +5100,15 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
                 refs?: string[] | undefined;
                 documents?: {
                     path: string;
-                    page?: number | null | undefined;
                     from?: number | null | undefined;
                     to?: number | null | undefined;
+                    page?: number | null | undefined;
                     quoted?: string | undefined;
+                    section?: {
+                        title: string;
+                        from?: number | null | undefined;
+                        to?: number | null | undefined;
+                    } | null | undefined;
                 }[] | undefined;
             } | undefined;
         }>, "many">>;
@@ -4105,10 +5116,15 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         epic: string | null;
         passage: {
             path: string;
-            page: number | null;
             from: number | null;
             to: number | null;
+            page: number | null;
             quoted: string;
+            section: {
+                title: string;
+                from: number | null;
+                to: number | null;
+            } | null;
         } | null;
         selection: string[];
         containers: {
@@ -4118,10 +5134,15 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
                 refs: string[];
                 documents: {
                     path: string;
-                    page: number | null;
                     from: number | null;
                     to: number | null;
+                    page: number | null;
                     quoted: string;
+                    section: {
+                        title: string;
+                        from: number | null;
+                        to: number | null;
+                    } | null;
                 }[];
             };
         }[];
@@ -4139,10 +5160,15 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         epic?: string | null | undefined;
         passage?: {
             path: string;
-            page?: number | null | undefined;
             from?: number | null | undefined;
             to?: number | null | undefined;
+            page?: number | null | undefined;
             quoted?: string | undefined;
+            section?: {
+                title: string;
+                from?: number | null | undefined;
+                to?: number | null | undefined;
+            } | null | undefined;
         } | null | undefined;
         selection?: string[] | undefined;
         containers?: {
@@ -4152,10 +5178,15 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
                 refs?: string[] | undefined;
                 documents?: {
                     path: string;
-                    page?: number | null | undefined;
                     from?: number | null | undefined;
                     to?: number | null | undefined;
+                    page?: number | null | undefined;
                     quoted?: string | undefined;
+                    section?: {
+                        title: string;
+                        from?: number | null | undefined;
+                        to?: number | null | undefined;
+                    } | null | undefined;
                 }[] | undefined;
             } | undefined;
         }[] | undefined;
@@ -4201,10 +5232,15 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         epic: string | null;
         passage: {
             path: string;
-            page: number | null;
             from: number | null;
             to: number | null;
+            page: number | null;
             quoted: string;
+            section: {
+                title: string;
+                from: number | null;
+                to: number | null;
+            } | null;
         } | null;
         selection: string[];
         containers: {
@@ -4214,10 +5250,15 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
                 refs: string[];
                 documents: {
                     path: string;
-                    page: number | null;
                     from: number | null;
                     to: number | null;
+                    page: number | null;
                     quoted: string;
+                    section: {
+                        title: string;
+                        from: number | null;
+                        to: number | null;
+                    } | null;
                 }[];
             };
         }[];
@@ -4241,10 +5282,15 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         epic?: string | null | undefined;
         passage?: {
             path: string;
-            page?: number | null | undefined;
             from?: number | null | undefined;
             to?: number | null | undefined;
+            page?: number | null | undefined;
             quoted?: string | undefined;
+            section?: {
+                title: string;
+                from?: number | null | undefined;
+                to?: number | null | undefined;
+            } | null | undefined;
         } | null | undefined;
         selection?: string[] | undefined;
         containers?: {
@@ -4254,10 +5300,15 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
                 refs?: string[] | undefined;
                 documents?: {
                     path: string;
-                    page?: number | null | undefined;
                     from?: number | null | undefined;
                     to?: number | null | undefined;
+                    page?: number | null | undefined;
                     quoted?: string | undefined;
+                    section?: {
+                        title: string;
+                        from?: number | null | undefined;
+                        to?: number | null | undefined;
+                    } | null | undefined;
                 }[] | undefined;
             } | undefined;
         }[] | undefined;
@@ -4463,42 +5514,113 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
          * limit says why a clipped quote is worse than no quote at all.
          */
         quoted: z.ZodDefault<z.ZodString>;
+        /**
+         * Which section of `path` the reader is in, or null.
+         *
+         * A different claim from `from`/`to`, and the reason it is a field of its
+         * own. `from`/`to` say "this exact text is pointed at" — a consumer marks it,
+         * a reader turns to it, a list narrows to what overlaps it. Reading a section
+         * is none of those: publishing it as a range would make every scroll look like
+         * a highlight and paint a whole section in colour. So a reader that knows its
+         * outline says where it is HERE, and the range stays for selections.
+         *
+         * See `sectionSchema` for what a section names.
+         */
+        section: z.ZodDefault<z.ZodNullable<z.ZodEffects<z.ZodEffects<z.ZodObject<{
+            title: z.ZodString;
+            from: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+            to: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+        }, "strip", z.ZodTypeAny, {
+            title: string;
+            from: number | null;
+            to: number | null;
+        }, {
+            title: string;
+            from?: number | null | undefined;
+            to?: number | null | undefined;
+        }>, {
+            title: string;
+            from: number | null;
+            to: number | null;
+        }, {
+            title: string;
+            from?: number | null | undefined;
+            to?: number | null | undefined;
+        }>, {
+            title: string;
+            from: number | null;
+            to: number | null;
+        }, {
+            title: string;
+            from?: number | null | undefined;
+            to?: number | null | undefined;
+        }>>>;
     }, "strip", z.ZodTypeAny, {
         path: string;
-        page: number | null;
         from: number | null;
         to: number | null;
+        page: number | null;
         quoted: string;
+        section: {
+            title: string;
+            from: number | null;
+            to: number | null;
+        } | null;
     }, {
         path: string;
-        page?: number | null | undefined;
         from?: number | null | undefined;
         to?: number | null | undefined;
+        page?: number | null | undefined;
         quoted?: string | undefined;
+        section?: {
+            title: string;
+            from?: number | null | undefined;
+            to?: number | null | undefined;
+        } | null | undefined;
     }>, {
         path: string;
-        page: number | null;
         from: number | null;
         to: number | null;
+        page: number | null;
         quoted: string;
+        section: {
+            title: string;
+            from: number | null;
+            to: number | null;
+        } | null;
     }, {
         path: string;
-        page?: number | null | undefined;
         from?: number | null | undefined;
         to?: number | null | undefined;
+        page?: number | null | undefined;
         quoted?: string | undefined;
+        section?: {
+            title: string;
+            from?: number | null | undefined;
+            to?: number | null | undefined;
+        } | null | undefined;
     }>, {
         path: string;
-        page: number | null;
         from: number | null;
         to: number | null;
+        page: number | null;
         quoted: string;
+        section: {
+            title: string;
+            from: number | null;
+            to: number | null;
+        } | null;
     }, {
         path: string;
-        page?: number | null | undefined;
         from?: number | null | undefined;
         to?: number | null | undefined;
+        page?: number | null | undefined;
         quoted?: string | undefined;
+        section?: {
+            title: string;
+            from?: number | null | undefined;
+            to?: number | null | undefined;
+        } | null | undefined;
     }>>>;
     /**
      * Whether this module has been pinned, and will stop being re-pointed.
@@ -4740,60 +5862,141 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
                  * limit says why a clipped quote is worse than no quote at all.
                  */
                 quoted: z.ZodDefault<z.ZodString>;
+                /**
+                 * Which section of `path` the reader is in, or null.
+                 *
+                 * A different claim from `from`/`to`, and the reason it is a field of its
+                 * own. `from`/`to` say "this exact text is pointed at" — a consumer marks it,
+                 * a reader turns to it, a list narrows to what overlaps it. Reading a section
+                 * is none of those: publishing it as a range would make every scroll look like
+                 * a highlight and paint a whole section in colour. So a reader that knows its
+                 * outline says where it is HERE, and the range stays for selections.
+                 *
+                 * See `sectionSchema` for what a section names.
+                 */
+                section: z.ZodDefault<z.ZodNullable<z.ZodEffects<z.ZodEffects<z.ZodObject<{
+                    title: z.ZodString;
+                    from: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+                    to: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+                }, "strip", z.ZodTypeAny, {
+                    title: string;
+                    from: number | null;
+                    to: number | null;
+                }, {
+                    title: string;
+                    from?: number | null | undefined;
+                    to?: number | null | undefined;
+                }>, {
+                    title: string;
+                    from: number | null;
+                    to: number | null;
+                }, {
+                    title: string;
+                    from?: number | null | undefined;
+                    to?: number | null | undefined;
+                }>, {
+                    title: string;
+                    from: number | null;
+                    to: number | null;
+                }, {
+                    title: string;
+                    from?: number | null | undefined;
+                    to?: number | null | undefined;
+                }>>>;
             }, "strip", z.ZodTypeAny, {
                 path: string;
-                page: number | null;
                 from: number | null;
                 to: number | null;
+                page: number | null;
                 quoted: string;
+                section: {
+                    title: string;
+                    from: number | null;
+                    to: number | null;
+                } | null;
             }, {
                 path: string;
-                page?: number | null | undefined;
                 from?: number | null | undefined;
                 to?: number | null | undefined;
+                page?: number | null | undefined;
                 quoted?: string | undefined;
+                section?: {
+                    title: string;
+                    from?: number | null | undefined;
+                    to?: number | null | undefined;
+                } | null | undefined;
             }>, {
                 path: string;
-                page: number | null;
                 from: number | null;
                 to: number | null;
+                page: number | null;
                 quoted: string;
+                section: {
+                    title: string;
+                    from: number | null;
+                    to: number | null;
+                } | null;
             }, {
                 path: string;
-                page?: number | null | undefined;
                 from?: number | null | undefined;
                 to?: number | null | undefined;
+                page?: number | null | undefined;
                 quoted?: string | undefined;
+                section?: {
+                    title: string;
+                    from?: number | null | undefined;
+                    to?: number | null | undefined;
+                } | null | undefined;
             }>, {
                 path: string;
-                page: number | null;
                 from: number | null;
                 to: number | null;
+                page: number | null;
                 quoted: string;
+                section: {
+                    title: string;
+                    from: number | null;
+                    to: number | null;
+                } | null;
             }, {
                 path: string;
-                page?: number | null | undefined;
                 from?: number | null | undefined;
                 to?: number | null | undefined;
+                page?: number | null | undefined;
                 quoted?: string | undefined;
+                section?: {
+                    title: string;
+                    from?: number | null | undefined;
+                    to?: number | null | undefined;
+                } | null | undefined;
             }>, "many">>;
         }, "strip", z.ZodTypeAny, {
             refs: string[];
             documents: {
                 path: string;
-                page: number | null;
                 from: number | null;
                 to: number | null;
+                page: number | null;
                 quoted: string;
+                section: {
+                    title: string;
+                    from: number | null;
+                    to: number | null;
+                } | null;
             }[];
         }, {
             refs?: string[] | undefined;
             documents?: {
                 path: string;
-                page?: number | null | undefined;
                 from?: number | null | undefined;
                 to?: number | null | undefined;
+                page?: number | null | undefined;
                 quoted?: string | undefined;
+                section?: {
+                    title: string;
+                    from?: number | null | undefined;
+                    to?: number | null | undefined;
+                } | null | undefined;
             }[] | undefined;
         }>>;
     }, "strip", z.ZodTypeAny, {
@@ -4803,10 +6006,15 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             refs: string[];
             documents: {
                 path: string;
-                page: number | null;
                 from: number | null;
                 to: number | null;
+                page: number | null;
                 quoted: string;
+                section: {
+                    title: string;
+                    from: number | null;
+                    to: number | null;
+                } | null;
             }[];
         };
     }, {
@@ -4816,10 +6024,15 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             refs?: string[] | undefined;
             documents?: {
                 path: string;
-                page?: number | null | undefined;
                 from?: number | null | undefined;
                 to?: number | null | undefined;
+                page?: number | null | undefined;
                 quoted?: string | undefined;
+                section?: {
+                    title: string;
+                    from?: number | null | undefined;
+                    to?: number | null | undefined;
+                } | null | undefined;
             }[] | undefined;
         } | undefined;
     }>, "many">>;
@@ -4831,10 +6044,15 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     epic: string | null;
     passage: {
         path: string;
-        page: number | null;
         from: number | null;
         to: number | null;
+        page: number | null;
         quoted: string;
+        section: {
+            title: string;
+            from: number | null;
+            to: number | null;
+        } | null;
     } | null;
     selection: string[];
     containers: {
@@ -4844,10 +6062,15 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             refs: string[];
             documents: {
                 path: string;
-                page: number | null;
                 from: number | null;
                 to: number | null;
+                page: number | null;
                 quoted: string;
+                section: {
+                    title: string;
+                    from: number | null;
+                    to: number | null;
+                } | null;
             }[];
         };
     }[];
@@ -4868,10 +6091,15 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     epic?: string | null | undefined;
     passage?: {
         path: string;
-        page?: number | null | undefined;
         from?: number | null | undefined;
         to?: number | null | undefined;
+        page?: number | null | undefined;
         quoted?: string | undefined;
+        section?: {
+            title: string;
+            from?: number | null | undefined;
+            to?: number | null | undefined;
+        } | null | undefined;
     } | null | undefined;
     selection?: string[] | undefined;
     containers?: {
@@ -4881,10 +6109,15 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             refs?: string[] | undefined;
             documents?: {
                 path: string;
-                page?: number | null | undefined;
                 from?: number | null | undefined;
                 to?: number | null | undefined;
+                page?: number | null | undefined;
                 quoted?: string | undefined;
+                section?: {
+                    title: string;
+                    from?: number | null | undefined;
+                    to?: number | null | undefined;
+                } | null | undefined;
             }[] | undefined;
         } | undefined;
     }[] | undefined;
