@@ -5,3 +5,8 @@
 # test runs without a document is a stack trace nobody reads as "wrong config".
 [test]
 preload = ["./test/setup.ts"]
+
+# Only this package's own tests. `template/test/` holds a generated module's
+# tests, which import the module's files and are run by the generated-module
+# test in `test/create.test.ts`, inside the module, where they belong.
+root = "./test"

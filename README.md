@@ -871,6 +871,30 @@ write down about itself — and both of those were already the module's to decid
 Fourteen modules were deciding them fourteen times, in two files each, with the
 port literal duplicated between them.
 
+## Making a new module
+
+```
+bun run create <name> [--dir <path>] [--register]
+```
+
+From a checkout of this repository. `bun run create slides` makes
+`~/Projects/kehikko-slides` from `template/`: id `roadmap.slides`, data under
+`<project>/.kehikot/slides/`, and a preferred port on the ten-apart grid above
+every module registered on this machine (the highest registered port, or the
+preferred port in that checkout's `manifest.ts`, rounded up to the next free
+multiple of ten, never below 7960). It then runs `git init`, `bun install` and
+the new module's own `bun test`. `--register` also writes its registration;
+otherwise `bun run register` in the new module does that. No GitHub repository
+is created.
+
+What you get is a working module with nothing in it: the manifest, the doors
+(`/app`, the manifest route, `/healthz`, `/mcp` with one example tool, `/api`
+with a write ticket), a JSON store inside the project, the host connection, a
+placeholder screen with a header switcher in the host's menu grammar
+(`src/components/menu.tsx`), shadcn components, and tests. `test/create.test.ts`
+here generates one against this checkout and runs its tests and typecheck, so
+the template cannot drift from the protocol silently.
+
 ## Development
 
 ```
