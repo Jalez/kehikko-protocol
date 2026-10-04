@@ -448,8 +448,20 @@ export declare const filterGroupSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
      * which is the correct degradation: a group with no options renders as an
      * empty section rather than as a broken one, and the module goes on
      * receiving `{}` for it — which is what "nothing typed" means anyway.
+     *
+     * `toggles` is a SET of independently hideable options. What comes back
+     * under its id is a list of the option ids that are switched on — for a
+     * group called "hide", the things hidden. It exists because one choice per
+     * axis cannot say "hide closed changes, keep closed issues": kind and state
+     * were two groups, each holding one value, and the combination people want
+     * is a cell of their product. A toggles group says it in one group, which
+     * also gives back the groups the product used to cost.
+     *
+     * Its resting state is the empty set, so it has no fallback, for the reason
+     * a text group has none. A host that has never heard of `toggles` draws
+     * nothing and sends `{}` — every option off, which is the unnarrowed list.
      */
-    kind: z.ZodOptional<z.ZodEnum<["choice", "text"]>>;
+    kind: z.ZodOptional<z.ZodEnum<["choice", "text", "toggles"]>>;
     /**
      * What can be chosen. Empty for a `text` group, at least one for a choice.
      *
@@ -483,7 +495,7 @@ export declare const filterGroupSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
     }[];
     id: string;
     label: string;
-    kind?: "choice" | "text" | undefined;
+    kind?: "choice" | "text" | "toggles" | undefined;
     fallback?: string | undefined;
 }, {
     id: string;
@@ -492,7 +504,7 @@ export declare const filterGroupSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
         id: string;
         label: string;
     }[] | undefined;
-    kind?: "choice" | "text" | undefined;
+    kind?: "choice" | "text" | "toggles" | undefined;
     fallback?: string | undefined;
 }>, {
     options: {
@@ -501,7 +513,7 @@ export declare const filterGroupSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
     }[];
     id: string;
     label: string;
-    kind?: "choice" | "text" | undefined;
+    kind?: "choice" | "text" | "toggles" | undefined;
     fallback?: string | undefined;
 }, {
     id: string;
@@ -510,7 +522,7 @@ export declare const filterGroupSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
         id: string;
         label: string;
     }[] | undefined;
-    kind?: "choice" | "text" | undefined;
+    kind?: "choice" | "text" | "toggles" | undefined;
     fallback?: string | undefined;
 }>, {
     options: {
@@ -519,7 +531,7 @@ export declare const filterGroupSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
     }[];
     id: string;
     label: string;
-    kind?: "choice" | "text" | undefined;
+    kind?: "choice" | "text" | "toggles" | undefined;
     fallback?: string | undefined;
 }, {
     id: string;
@@ -528,7 +540,7 @@ export declare const filterGroupSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
         id: string;
         label: string;
     }[] | undefined;
-    kind?: "choice" | "text" | undefined;
+    kind?: "choice" | "text" | "toggles" | undefined;
     fallback?: string | undefined;
 }>;
 export type FilterGroup = z.infer<typeof filterGroupSchema>;
@@ -570,8 +582,20 @@ export declare const filtersSchema: z.ZodObject<{
          * which is the correct degradation: a group with no options renders as an
          * empty section rather than as a broken one, and the module goes on
          * receiving `{}` for it — which is what "nothing typed" means anyway.
+         *
+         * `toggles` is a SET of independently hideable options. What comes back
+         * under its id is a list of the option ids that are switched on — for a
+         * group called "hide", the things hidden. It exists because one choice per
+         * axis cannot say "hide closed changes, keep closed issues": kind and state
+         * were two groups, each holding one value, and the combination people want
+         * is a cell of their product. A toggles group says it in one group, which
+         * also gives back the groups the product used to cost.
+         *
+         * Its resting state is the empty set, so it has no fallback, for the reason
+         * a text group has none. A host that has never heard of `toggles` draws
+         * nothing and sends `{}` — every option off, which is the unnarrowed list.
          */
-        kind: z.ZodOptional<z.ZodEnum<["choice", "text"]>>;
+        kind: z.ZodOptional<z.ZodEnum<["choice", "text", "toggles"]>>;
         /**
          * What can be chosen. Empty for a `text` group, at least one for a choice.
          *
@@ -605,7 +629,7 @@ export declare const filtersSchema: z.ZodObject<{
         }[];
         id: string;
         label: string;
-        kind?: "choice" | "text" | undefined;
+        kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
     }, {
         id: string;
@@ -614,7 +638,7 @@ export declare const filtersSchema: z.ZodObject<{
             id: string;
             label: string;
         }[] | undefined;
-        kind?: "choice" | "text" | undefined;
+        kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
     }>, {
         options: {
@@ -623,7 +647,7 @@ export declare const filtersSchema: z.ZodObject<{
         }[];
         id: string;
         label: string;
-        kind?: "choice" | "text" | undefined;
+        kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
     }, {
         id: string;
@@ -632,7 +656,7 @@ export declare const filtersSchema: z.ZodObject<{
             id: string;
             label: string;
         }[] | undefined;
-        kind?: "choice" | "text" | undefined;
+        kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
     }>, {
         options: {
@@ -641,7 +665,7 @@ export declare const filtersSchema: z.ZodObject<{
         }[];
         id: string;
         label: string;
-        kind?: "choice" | "text" | undefined;
+        kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
     }, {
         id: string;
@@ -650,7 +674,7 @@ export declare const filtersSchema: z.ZodObject<{
             id: string;
             label: string;
         }[] | undefined;
-        kind?: "choice" | "text" | undefined;
+        kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
     }>, "many">, {
         options: {
@@ -659,7 +683,7 @@ export declare const filtersSchema: z.ZodObject<{
         }[];
         id: string;
         label: string;
-        kind?: "choice" | "text" | undefined;
+        kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
     }[], {
         id: string;
@@ -668,7 +692,7 @@ export declare const filtersSchema: z.ZodObject<{
             id: string;
             label: string;
         }[] | undefined;
-        kind?: "choice" | "text" | undefined;
+        kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
     }[]>;
 }, "strip", z.ZodTypeAny, {
@@ -680,7 +704,7 @@ export declare const filtersSchema: z.ZodObject<{
         }[];
         id: string;
         label: string;
-        kind?: "choice" | "text" | undefined;
+        kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
     }[];
 }, {
@@ -692,7 +716,7 @@ export declare const filtersSchema: z.ZodObject<{
             id: string;
             label: string;
         }[] | undefined;
-        kind?: "choice" | "text" | undefined;
+        kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
     }[];
 }>;
@@ -898,9 +922,75 @@ export type Refresh = z.infer<typeof refreshSchema>;
  * side. Two programs already had to survive a value neither of them recognises,
  * because that is what a module shipping new options means; this makes the set
  * of such values slightly larger and changes nothing about what happens to one.
+ *
+ * ## A list, for a toggles group and for nothing else
+ *
+ * A `toggles` group's value is the list of its option ids that are on. The
+ * value was a string for every group until then, so this is a widening, and it
+ * is safe for the reason `kind` was: a module receives a list only under a
+ * group it offered as `toggles`, which no module written before the kind
+ * existed can have done. A host reconciles a list the way it reconciles a
+ * string — drop every id the group does not offer now — and an empty list is
+ * stored as nothing, since it means the resting state.
  */
-export declare const filterChoiceSchema: z.ZodEffects<z.ZodRecord<z.ZodEffects<z.ZodString, string, string>, z.ZodString>, Record<string, string>, Record<string, string>>;
+export declare const filterChoiceSchema: z.ZodEffects<z.ZodRecord<z.ZodEffects<z.ZodString, string, string>, z.ZodUnion<[z.ZodString, z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">, string[], string[]>]>>, Record<string, string | string[]>, Record<string, string | string[]>>;
 export type FilterChoice = z.infer<typeof filterChoiceSchema>;
+/**
+ * What a closed reference came to.
+ *
+ * A tracker's `closed` covers finished work, work nobody will do, a duplicate
+ * and something replaced by something else, and a module that reads `closed`
+ * as `done` counts the second, third and fourth as delivered. These four are
+ * the answers people actually give. Open to extension the way every list here
+ * is: a module meeting a value it does not know treats the ref as closed for a
+ * reason it cannot name, which is what it did before this list existed.
+ */
+export declare const DISPOSITIONS: readonly ["done", "wont-do", "duplicate", "superseded"];
+export type DispositionValue = (typeof DISPOSITIONS)[number];
+/**
+ * One person's verdict on one reference, as the host holds it.
+ *
+ * ## Only the marks, never the derivation
+ *
+ * A tracker sometimes says why it closed something — GitHub's `stateReason`, a
+ * GitLab issue closed by a merged change — and that is a DEFAULT, not a mark.
+ * It stays out of this list on purpose: every module holding a tracker reading
+ * derives it with `deriveDisposition` in `facets.ts`, and a person's mark wins
+ * over it there. Kept apart, a module can always say which one it is showing,
+ * which is the whole difference between "you said won't do" and "GitHub says
+ * not planned".
+ *
+ * `target` is the other ref for `duplicate` (duplicate OF it) and `superseded`
+ * (superseded BY it), and null for the other two. One field rather than two,
+ * because a ref is never both and two nullable fields can disagree.
+ *
+ * `by` is who said so, in words the host chose — a person, or an agent through
+ * the MCP door — and `at` is when, as an ISO timestamp. Both are the host's
+ * own knowledge: the method that sets a disposition does not carry either.
+ */
+export declare const dispositionSchema: z.ZodObject<{
+    ref: z.ZodString;
+    value: z.ZodEnum<["done", "wont-do", "duplicate", "superseded"]>;
+    target: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+    note: z.ZodDefault<z.ZodString>;
+    by: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+    at: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+}, "strip", z.ZodTypeAny, {
+    value: "done" | "wont-do" | "duplicate" | "superseded";
+    at: string | null;
+    target: string | null;
+    ref: string;
+    note: string;
+    by: string | null;
+}, {
+    value: "done" | "wont-do" | "duplicate" | "superseded";
+    ref: string;
+    at?: string | null | undefined;
+    target?: string | null | undefined;
+    note?: string | undefined;
+    by?: string | null | undefined;
+}>;
+export type Disposition = z.infer<typeof dispositionSchema>;
 /**
  * What one container says it is showing.
  *
@@ -1881,7 +1971,7 @@ export declare const contextSchema: z.ZodObject<{
      * module reading this against a host that has never heard of filters finds
      * `{}`, which is the true answer there.
      */
-    filters: z.ZodDefault<z.ZodEffects<z.ZodRecord<z.ZodEffects<z.ZodString, string, string>, z.ZodString>, Record<string, string>, Record<string, string>>>;
+    filters: z.ZodDefault<z.ZodEffects<z.ZodRecord<z.ZodEffects<z.ZodString, string, string>, z.ZodUnion<[z.ZodString, z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">, string[], string[]>]>>, Record<string, string | string[]>, Record<string, string | string[]>>>;
     /**
      * Every container on this kehikko: which module, whether it is picked out,
      * and what it says it is showing. See `containerSchema`.
@@ -2157,8 +2247,50 @@ export declare const contextSchema: z.ZodObject<{
             }[] | undefined;
         } | undefined;
     }>, "many">>;
+    /**
+     * Why the open project's closed references closed, where a person has said.
+     *
+     * Context rather than an answer to a question, for the reasons the selection
+     * is: a module has to have it before it draws a step as settled, it is true
+     * for as long as nobody changes it, and when somebody does every module
+     * showing that ref has to move — Journeys counting a step as done, References
+     * hiding what is won't-do. A module saying `reacts: ['dispositions']` is
+     * telling the registry it is one of those.
+     *
+     * Per project, not per canvas: a verdict on `#2274` is about the work, and
+     * holds on every kehikko that shows it. Only people's marks travel; see
+     * `dispositionSchema` on why what a tracker says is derived on each side.
+     * Empty rather than absent: nobody has said anything, which is the true
+     * answer from a host that has never heard of dispositions.
+     */
+    dispositions: z.ZodDefault<z.ZodArray<z.ZodObject<{
+        ref: z.ZodString;
+        value: z.ZodEnum<["done", "wont-do", "duplicate", "superseded"]>;
+        target: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+        note: z.ZodDefault<z.ZodString>;
+        by: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+        at: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+    }, "strip", z.ZodTypeAny, {
+        value: "done" | "wont-do" | "duplicate" | "superseded";
+        at: string | null;
+        target: string | null;
+        ref: string;
+        note: string;
+        by: string | null;
+    }, {
+        value: "done" | "wont-do" | "duplicate" | "superseded";
+        ref: string;
+        at?: string | null | undefined;
+        target?: string | null | undefined;
+        note?: string | undefined;
+        by?: string | null | undefined;
+    }>, "many">>;
 }, "strip", z.ZodTypeAny, {
     epic: string | null;
+    project: string | null;
+    projectPath: string | null;
+    theme: "light" | "dark";
+    selection: string[];
     passage: {
         path: string;
         from: number | null;
@@ -2171,7 +2303,13 @@ export declare const contextSchema: z.ZodObject<{
             to: number | null;
         } | null;
     } | null;
-    selection: string[];
+    pinned: boolean;
+    prompt: string | null;
+    kehikko: {
+        id: number;
+        name: string;
+    } | null;
+    filters: Record<string, string | string[]>;
     containers: {
         module: string;
         selected: boolean;
@@ -2191,18 +2329,20 @@ export declare const contextSchema: z.ZodObject<{
             }[];
         };
     }[];
-    prompt: string | null;
-    project: string | null;
-    projectPath: string | null;
-    theme: "light" | "dark";
-    pinned: boolean;
-    kehikko: {
-        id: number;
-        name: string;
-    } | null;
-    filters: Record<string, string>;
+    dispositions: {
+        value: "done" | "wont-do" | "duplicate" | "superseded";
+        at: string | null;
+        target: string | null;
+        ref: string;
+        note: string;
+        by: string | null;
+    }[];
 }, {
     epic?: string | null | undefined;
+    project?: string | null | undefined;
+    projectPath?: string | null | undefined;
+    theme?: "light" | "dark" | undefined;
+    selection?: string[] | undefined;
     passage?: {
         path: string;
         from?: number | null | undefined;
@@ -2215,7 +2355,13 @@ export declare const contextSchema: z.ZodObject<{
             to?: number | null | undefined;
         } | null | undefined;
     } | null | undefined;
-    selection?: string[] | undefined;
+    pinned?: boolean | undefined;
+    prompt?: string | null | undefined;
+    kehikko?: {
+        id: number;
+        name: string;
+    } | null | undefined;
+    filters?: Record<string, string | string[]> | undefined;
     containers?: {
         module: string;
         selected?: boolean | undefined;
@@ -2235,16 +2381,14 @@ export declare const contextSchema: z.ZodObject<{
             }[] | undefined;
         } | undefined;
     }[] | undefined;
-    prompt?: string | null | undefined;
-    project?: string | null | undefined;
-    projectPath?: string | null | undefined;
-    theme?: "light" | "dark" | undefined;
-    pinned?: boolean | undefined;
-    kehikko?: {
-        id: number;
-        name: string;
-    } | null | undefined;
-    filters?: Record<string, string> | undefined;
+    dispositions?: {
+        value: "done" | "wont-do" | "duplicate" | "superseded";
+        ref: string;
+        at?: string | null | undefined;
+        target?: string | null | undefined;
+        note?: string | undefined;
+        by?: string | null | undefined;
+    }[] | undefined;
 }>;
 export type ModuleContext = z.infer<typeof contextSchema>;
 /**
@@ -2716,7 +2860,7 @@ export declare const helloSchema: z.ZodObject<{
          * module reading this against a host that has never heard of filters finds
          * `{}`, which is the true answer there.
          */
-        filters: z.ZodDefault<z.ZodEffects<z.ZodRecord<z.ZodEffects<z.ZodString, string, string>, z.ZodString>, Record<string, string>, Record<string, string>>>;
+        filters: z.ZodDefault<z.ZodEffects<z.ZodRecord<z.ZodEffects<z.ZodString, string, string>, z.ZodUnion<[z.ZodString, z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">, string[], string[]>]>>, Record<string, string | string[]>, Record<string, string | string[]>>>;
         /**
          * Every container on this kehikko: which module, whether it is picked out,
          * and what it says it is showing. See `containerSchema`.
@@ -2992,8 +3136,50 @@ export declare const helloSchema: z.ZodObject<{
                 }[] | undefined;
             } | undefined;
         }>, "many">>;
+        /**
+         * Why the open project's closed references closed, where a person has said.
+         *
+         * Context rather than an answer to a question, for the reasons the selection
+         * is: a module has to have it before it draws a step as settled, it is true
+         * for as long as nobody changes it, and when somebody does every module
+         * showing that ref has to move — Journeys counting a step as done, References
+         * hiding what is won't-do. A module saying `reacts: ['dispositions']` is
+         * telling the registry it is one of those.
+         *
+         * Per project, not per canvas: a verdict on `#2274` is about the work, and
+         * holds on every kehikko that shows it. Only people's marks travel; see
+         * `dispositionSchema` on why what a tracker says is derived on each side.
+         * Empty rather than absent: nobody has said anything, which is the true
+         * answer from a host that has never heard of dispositions.
+         */
+        dispositions: z.ZodDefault<z.ZodArray<z.ZodObject<{
+            ref: z.ZodString;
+            value: z.ZodEnum<["done", "wont-do", "duplicate", "superseded"]>;
+            target: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+            note: z.ZodDefault<z.ZodString>;
+            by: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+            at: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+        }, "strip", z.ZodTypeAny, {
+            value: "done" | "wont-do" | "duplicate" | "superseded";
+            at: string | null;
+            target: string | null;
+            ref: string;
+            note: string;
+            by: string | null;
+        }, {
+            value: "done" | "wont-do" | "duplicate" | "superseded";
+            ref: string;
+            at?: string | null | undefined;
+            target?: string | null | undefined;
+            note?: string | undefined;
+            by?: string | null | undefined;
+        }>, "many">>;
     }, "strip", z.ZodTypeAny, {
         epic: string | null;
+        project: string | null;
+        projectPath: string | null;
+        theme: "light" | "dark";
+        selection: string[];
         passage: {
             path: string;
             from: number | null;
@@ -3006,7 +3192,13 @@ export declare const helloSchema: z.ZodObject<{
                 to: number | null;
             } | null;
         } | null;
-        selection: string[];
+        pinned: boolean;
+        prompt: string | null;
+        kehikko: {
+            id: number;
+            name: string;
+        } | null;
+        filters: Record<string, string | string[]>;
         containers: {
             module: string;
             selected: boolean;
@@ -3026,18 +3218,20 @@ export declare const helloSchema: z.ZodObject<{
                 }[];
             };
         }[];
-        prompt: string | null;
-        project: string | null;
-        projectPath: string | null;
-        theme: "light" | "dark";
-        pinned: boolean;
-        kehikko: {
-            id: number;
-            name: string;
-        } | null;
-        filters: Record<string, string>;
+        dispositions: {
+            value: "done" | "wont-do" | "duplicate" | "superseded";
+            at: string | null;
+            target: string | null;
+            ref: string;
+            note: string;
+            by: string | null;
+        }[];
     }, {
         epic?: string | null | undefined;
+        project?: string | null | undefined;
+        projectPath?: string | null | undefined;
+        theme?: "light" | "dark" | undefined;
+        selection?: string[] | undefined;
         passage?: {
             path: string;
             from?: number | null | undefined;
@@ -3050,7 +3244,13 @@ export declare const helloSchema: z.ZodObject<{
                 to?: number | null | undefined;
             } | null | undefined;
         } | null | undefined;
-        selection?: string[] | undefined;
+        pinned?: boolean | undefined;
+        prompt?: string | null | undefined;
+        kehikko?: {
+            id: number;
+            name: string;
+        } | null | undefined;
+        filters?: Record<string, string | string[]> | undefined;
         containers?: {
             module: string;
             selected?: boolean | undefined;
@@ -3070,16 +3270,14 @@ export declare const helloSchema: z.ZodObject<{
                 }[] | undefined;
             } | undefined;
         }[] | undefined;
-        prompt?: string | null | undefined;
-        project?: string | null | undefined;
-        projectPath?: string | null | undefined;
-        theme?: "light" | "dark" | undefined;
-        pinned?: boolean | undefined;
-        kehikko?: {
-            id: number;
-            name: string;
-        } | null | undefined;
-        filters?: Record<string, string> | undefined;
+        dispositions?: {
+            value: "done" | "wont-do" | "duplicate" | "superseded";
+            ref: string;
+            at?: string | null | undefined;
+            target?: string | null | undefined;
+            note?: string | undefined;
+            by?: string | null | undefined;
+        }[] | undefined;
     }>;
     /**
      * Whatever this module last asked the host to keep for it, verbatim.
@@ -3110,6 +3308,10 @@ export declare const helloSchema: z.ZodObject<{
     session: string;
     context: {
         epic: string | null;
+        project: string | null;
+        projectPath: string | null;
+        theme: "light" | "dark";
+        selection: string[];
         passage: {
             path: string;
             from: number | null;
@@ -3122,7 +3324,13 @@ export declare const helloSchema: z.ZodObject<{
                 to: number | null;
             } | null;
         } | null;
-        selection: string[];
+        pinned: boolean;
+        prompt: string | null;
+        kehikko: {
+            id: number;
+            name: string;
+        } | null;
+        filters: Record<string, string | string[]>;
         containers: {
             module: string;
             selected: boolean;
@@ -3142,16 +3350,14 @@ export declare const helloSchema: z.ZodObject<{
                 }[];
             };
         }[];
-        prompt: string | null;
-        project: string | null;
-        projectPath: string | null;
-        theme: "light" | "dark";
-        pinned: boolean;
-        kehikko: {
-            id: number;
-            name: string;
-        } | null;
-        filters: Record<string, string>;
+        dispositions: {
+            value: "done" | "wont-do" | "duplicate" | "superseded";
+            at: string | null;
+            target: string | null;
+            ref: string;
+            note: string;
+            by: string | null;
+        }[];
     };
     state: string | null;
 }, {
@@ -3160,6 +3366,10 @@ export declare const helloSchema: z.ZodObject<{
     session: string;
     context: {
         epic?: string | null | undefined;
+        project?: string | null | undefined;
+        projectPath?: string | null | undefined;
+        theme?: "light" | "dark" | undefined;
+        selection?: string[] | undefined;
         passage?: {
             path: string;
             from?: number | null | undefined;
@@ -3172,7 +3382,13 @@ export declare const helloSchema: z.ZodObject<{
                 to?: number | null | undefined;
             } | null | undefined;
         } | null | undefined;
-        selection?: string[] | undefined;
+        pinned?: boolean | undefined;
+        prompt?: string | null | undefined;
+        kehikko?: {
+            id: number;
+            name: string;
+        } | null | undefined;
+        filters?: Record<string, string | string[]> | undefined;
         containers?: {
             module: string;
             selected?: boolean | undefined;
@@ -3192,16 +3408,14 @@ export declare const helloSchema: z.ZodObject<{
                 }[] | undefined;
             } | undefined;
         }[] | undefined;
-        prompt?: string | null | undefined;
-        project?: string | null | undefined;
-        projectPath?: string | null | undefined;
-        theme?: "light" | "dark" | undefined;
-        pinned?: boolean | undefined;
-        kehikko?: {
-            id: number;
-            name: string;
-        } | null | undefined;
-        filters?: Record<string, string> | undefined;
+        dispositions?: {
+            value: "done" | "wont-do" | "duplicate" | "superseded";
+            ref: string;
+            at?: string | null | undefined;
+            target?: string | null | undefined;
+            note?: string | undefined;
+            by?: string | null | undefined;
+        }[] | undefined;
     };
     state?: string | null | undefined;
 }>;
@@ -3653,7 +3867,7 @@ export declare const contextMessageSchema: z.ZodObject<{
      * module reading this against a host that has never heard of filters finds
      * `{}`, which is the true answer there.
      */
-    filters: z.ZodDefault<z.ZodEffects<z.ZodRecord<z.ZodEffects<z.ZodString, string, string>, z.ZodString>, Record<string, string>, Record<string, string>>>;
+    filters: z.ZodDefault<z.ZodEffects<z.ZodRecord<z.ZodEffects<z.ZodString, string, string>, z.ZodUnion<[z.ZodString, z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">, string[], string[]>]>>, Record<string, string | string[]>, Record<string, string | string[]>>>;
     /**
      * Every container on this kehikko: which module, whether it is picked out,
      * and what it says it is showing. See `containerSchema`.
@@ -3929,12 +4143,55 @@ export declare const contextMessageSchema: z.ZodObject<{
             }[] | undefined;
         } | undefined;
     }>, "many">>;
+    /**
+     * Why the open project's closed references closed, where a person has said.
+     *
+     * Context rather than an answer to a question, for the reasons the selection
+     * is: a module has to have it before it draws a step as settled, it is true
+     * for as long as nobody changes it, and when somebody does every module
+     * showing that ref has to move — Journeys counting a step as done, References
+     * hiding what is won't-do. A module saying `reacts: ['dispositions']` is
+     * telling the registry it is one of those.
+     *
+     * Per project, not per canvas: a verdict on `#2274` is about the work, and
+     * holds on every kehikko that shows it. Only people's marks travel; see
+     * `dispositionSchema` on why what a tracker says is derived on each side.
+     * Empty rather than absent: nobody has said anything, which is the true
+     * answer from a host that has never heard of dispositions.
+     */
+    dispositions: z.ZodDefault<z.ZodArray<z.ZodObject<{
+        ref: z.ZodString;
+        value: z.ZodEnum<["done", "wont-do", "duplicate", "superseded"]>;
+        target: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+        note: z.ZodDefault<z.ZodString>;
+        by: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+        at: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+    }, "strip", z.ZodTypeAny, {
+        value: "done" | "wont-do" | "duplicate" | "superseded";
+        at: string | null;
+        target: string | null;
+        ref: string;
+        note: string;
+        by: string | null;
+    }, {
+        value: "done" | "wont-do" | "duplicate" | "superseded";
+        ref: string;
+        at?: string | null | undefined;
+        target?: string | null | undefined;
+        note?: string | undefined;
+        by?: string | null | undefined;
+    }>, "many">>;
 } & {
     type: z.ZodLiteral<"roadmap.context">;
     protocol: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
     type: "roadmap.context";
     epic: string | null;
+    protocol: number;
+    project: string | null;
+    projectPath: string | null;
+    theme: "light" | "dark";
+    selection: string[];
     passage: {
         path: string;
         from: number | null;
@@ -3947,7 +4204,13 @@ export declare const contextMessageSchema: z.ZodObject<{
             to: number | null;
         } | null;
     } | null;
-    selection: string[];
+    pinned: boolean;
+    prompt: string | null;
+    kehikko: {
+        id: number;
+        name: string;
+    } | null;
+    filters: Record<string, string | string[]>;
     containers: {
         module: string;
         selected: boolean;
@@ -3967,21 +4230,22 @@ export declare const contextMessageSchema: z.ZodObject<{
             }[];
         };
     }[];
-    protocol: number;
-    prompt: string | null;
-    project: string | null;
-    projectPath: string | null;
-    theme: "light" | "dark";
-    pinned: boolean;
-    kehikko: {
-        id: number;
-        name: string;
-    } | null;
-    filters: Record<string, string>;
+    dispositions: {
+        value: "done" | "wont-do" | "duplicate" | "superseded";
+        at: string | null;
+        target: string | null;
+        ref: string;
+        note: string;
+        by: string | null;
+    }[];
 }, {
     type: "roadmap.context";
     protocol: number;
     epic?: string | null | undefined;
+    project?: string | null | undefined;
+    projectPath?: string | null | undefined;
+    theme?: "light" | "dark" | undefined;
+    selection?: string[] | undefined;
     passage?: {
         path: string;
         from?: number | null | undefined;
@@ -3994,7 +4258,13 @@ export declare const contextMessageSchema: z.ZodObject<{
             to?: number | null | undefined;
         } | null | undefined;
     } | null | undefined;
-    selection?: string[] | undefined;
+    pinned?: boolean | undefined;
+    prompt?: string | null | undefined;
+    kehikko?: {
+        id: number;
+        name: string;
+    } | null | undefined;
+    filters?: Record<string, string | string[]> | undefined;
     containers?: {
         module: string;
         selected?: boolean | undefined;
@@ -4014,16 +4284,14 @@ export declare const contextMessageSchema: z.ZodObject<{
             }[] | undefined;
         } | undefined;
     }[] | undefined;
-    prompt?: string | null | undefined;
-    project?: string | null | undefined;
-    projectPath?: string | null | undefined;
-    theme?: "light" | "dark" | undefined;
-    pinned?: boolean | undefined;
-    kehikko?: {
-        id: number;
-        name: string;
-    } | null | undefined;
-    filters?: Record<string, string> | undefined;
+    dispositions?: {
+        value: "done" | "wont-do" | "duplicate" | "superseded";
+        ref: string;
+        at?: string | null | undefined;
+        target?: string | null | undefined;
+        note?: string | undefined;
+        by?: string | null | undefined;
+    }[] | undefined;
 }>;
 /**
  * The answer to exactly one request.
@@ -4376,8 +4644,8 @@ export declare const eventSchema: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     at: string;
     type: "roadmap.event";
-    protocol: number;
     from: string;
+    protocol: number;
     kehikko: {
         id: number;
         name: string;
@@ -4387,8 +4655,8 @@ export declare const eventSchema: z.ZodObject<{
 }, {
     at: string;
     type: "roadmap.event";
-    protocol: number;
     from: string;
+    protocol: number;
     extension: string;
     kehikko?: {
         id: number;
@@ -4836,7 +5104,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
          * module reading this against a host that has never heard of filters finds
          * `{}`, which is the true answer there.
          */
-        filters: z.ZodDefault<z.ZodEffects<z.ZodRecord<z.ZodEffects<z.ZodString, string, string>, z.ZodString>, Record<string, string>, Record<string, string>>>;
+        filters: z.ZodDefault<z.ZodEffects<z.ZodRecord<z.ZodEffects<z.ZodString, string, string>, z.ZodUnion<[z.ZodString, z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">, string[], string[]>]>>, Record<string, string | string[]>, Record<string, string | string[]>>>;
         /**
          * Every container on this kehikko: which module, whether it is picked out,
          * and what it says it is showing. See `containerSchema`.
@@ -5112,8 +5380,50 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
                 }[] | undefined;
             } | undefined;
         }>, "many">>;
+        /**
+         * Why the open project's closed references closed, where a person has said.
+         *
+         * Context rather than an answer to a question, for the reasons the selection
+         * is: a module has to have it before it draws a step as settled, it is true
+         * for as long as nobody changes it, and when somebody does every module
+         * showing that ref has to move — Journeys counting a step as done, References
+         * hiding what is won't-do. A module saying `reacts: ['dispositions']` is
+         * telling the registry it is one of those.
+         *
+         * Per project, not per canvas: a verdict on `#2274` is about the work, and
+         * holds on every kehikko that shows it. Only people's marks travel; see
+         * `dispositionSchema` on why what a tracker says is derived on each side.
+         * Empty rather than absent: nobody has said anything, which is the true
+         * answer from a host that has never heard of dispositions.
+         */
+        dispositions: z.ZodDefault<z.ZodArray<z.ZodObject<{
+            ref: z.ZodString;
+            value: z.ZodEnum<["done", "wont-do", "duplicate", "superseded"]>;
+            target: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+            note: z.ZodDefault<z.ZodString>;
+            by: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+            at: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+        }, "strip", z.ZodTypeAny, {
+            value: "done" | "wont-do" | "duplicate" | "superseded";
+            at: string | null;
+            target: string | null;
+            ref: string;
+            note: string;
+            by: string | null;
+        }, {
+            value: "done" | "wont-do" | "duplicate" | "superseded";
+            ref: string;
+            at?: string | null | undefined;
+            target?: string | null | undefined;
+            note?: string | undefined;
+            by?: string | null | undefined;
+        }>, "many">>;
     }, "strip", z.ZodTypeAny, {
         epic: string | null;
+        project: string | null;
+        projectPath: string | null;
+        theme: "light" | "dark";
+        selection: string[];
         passage: {
             path: string;
             from: number | null;
@@ -5126,7 +5436,13 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
                 to: number | null;
             } | null;
         } | null;
-        selection: string[];
+        pinned: boolean;
+        prompt: string | null;
+        kehikko: {
+            id: number;
+            name: string;
+        } | null;
+        filters: Record<string, string | string[]>;
         containers: {
             module: string;
             selected: boolean;
@@ -5146,18 +5462,20 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
                 }[];
             };
         }[];
-        prompt: string | null;
-        project: string | null;
-        projectPath: string | null;
-        theme: "light" | "dark";
-        pinned: boolean;
-        kehikko: {
-            id: number;
-            name: string;
-        } | null;
-        filters: Record<string, string>;
+        dispositions: {
+            value: "done" | "wont-do" | "duplicate" | "superseded";
+            at: string | null;
+            target: string | null;
+            ref: string;
+            note: string;
+            by: string | null;
+        }[];
     }, {
         epic?: string | null | undefined;
+        project?: string | null | undefined;
+        projectPath?: string | null | undefined;
+        theme?: "light" | "dark" | undefined;
+        selection?: string[] | undefined;
         passage?: {
             path: string;
             from?: number | null | undefined;
@@ -5170,7 +5488,13 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
                 to?: number | null | undefined;
             } | null | undefined;
         } | null | undefined;
-        selection?: string[] | undefined;
+        pinned?: boolean | undefined;
+        prompt?: string | null | undefined;
+        kehikko?: {
+            id: number;
+            name: string;
+        } | null | undefined;
+        filters?: Record<string, string | string[]> | undefined;
         containers?: {
             module: string;
             selected?: boolean | undefined;
@@ -5190,16 +5514,14 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
                 }[] | undefined;
             } | undefined;
         }[] | undefined;
-        prompt?: string | null | undefined;
-        project?: string | null | undefined;
-        projectPath?: string | null | undefined;
-        theme?: "light" | "dark" | undefined;
-        pinned?: boolean | undefined;
-        kehikko?: {
-            id: number;
-            name: string;
-        } | null | undefined;
-        filters?: Record<string, string> | undefined;
+        dispositions?: {
+            value: "done" | "wont-do" | "duplicate" | "superseded";
+            ref: string;
+            at?: string | null | undefined;
+            target?: string | null | undefined;
+            note?: string | undefined;
+            by?: string | null | undefined;
+        }[] | undefined;
     }>;
     /**
      * Whatever this module last asked the host to keep for it, verbatim.
@@ -5230,6 +5552,10 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     session: string;
     context: {
         epic: string | null;
+        project: string | null;
+        projectPath: string | null;
+        theme: "light" | "dark";
+        selection: string[];
         passage: {
             path: string;
             from: number | null;
@@ -5242,7 +5568,13 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
                 to: number | null;
             } | null;
         } | null;
-        selection: string[];
+        pinned: boolean;
+        prompt: string | null;
+        kehikko: {
+            id: number;
+            name: string;
+        } | null;
+        filters: Record<string, string | string[]>;
         containers: {
             module: string;
             selected: boolean;
@@ -5262,16 +5594,14 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
                 }[];
             };
         }[];
-        prompt: string | null;
-        project: string | null;
-        projectPath: string | null;
-        theme: "light" | "dark";
-        pinned: boolean;
-        kehikko: {
-            id: number;
-            name: string;
-        } | null;
-        filters: Record<string, string>;
+        dispositions: {
+            value: "done" | "wont-do" | "duplicate" | "superseded";
+            at: string | null;
+            target: string | null;
+            ref: string;
+            note: string;
+            by: string | null;
+        }[];
     };
     state: string | null;
 }, {
@@ -5280,6 +5610,10 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     session: string;
     context: {
         epic?: string | null | undefined;
+        project?: string | null | undefined;
+        projectPath?: string | null | undefined;
+        theme?: "light" | "dark" | undefined;
+        selection?: string[] | undefined;
         passage?: {
             path: string;
             from?: number | null | undefined;
@@ -5292,7 +5626,13 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
                 to?: number | null | undefined;
             } | null | undefined;
         } | null | undefined;
-        selection?: string[] | undefined;
+        pinned?: boolean | undefined;
+        prompt?: string | null | undefined;
+        kehikko?: {
+            id: number;
+            name: string;
+        } | null | undefined;
+        filters?: Record<string, string | string[]> | undefined;
         containers?: {
             module: string;
             selected?: boolean | undefined;
@@ -5312,16 +5652,14 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
                 }[] | undefined;
             } | undefined;
         }[] | undefined;
-        prompt?: string | null | undefined;
-        project?: string | null | undefined;
-        projectPath?: string | null | undefined;
-        theme?: "light" | "dark" | undefined;
-        pinned?: boolean | undefined;
-        kehikko?: {
-            id: number;
-            name: string;
-        } | null | undefined;
-        filters?: Record<string, string> | undefined;
+        dispositions?: {
+            value: "done" | "wont-do" | "duplicate" | "superseded";
+            ref: string;
+            at?: string | null | undefined;
+            target?: string | null | undefined;
+            note?: string | undefined;
+            by?: string | null | undefined;
+        }[] | undefined;
     };
     state?: string | null | undefined;
 }>, z.ZodObject<{
@@ -5760,7 +6098,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
      * module reading this against a host that has never heard of filters finds
      * `{}`, which is the true answer there.
      */
-    filters: z.ZodDefault<z.ZodEffects<z.ZodRecord<z.ZodEffects<z.ZodString, string, string>, z.ZodString>, Record<string, string>, Record<string, string>>>;
+    filters: z.ZodDefault<z.ZodEffects<z.ZodRecord<z.ZodEffects<z.ZodString, string, string>, z.ZodUnion<[z.ZodString, z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">, string[], string[]>]>>, Record<string, string | string[]>, Record<string, string | string[]>>>;
     /**
      * Every container on this kehikko: which module, whether it is picked out,
      * and what it says it is showing. See `containerSchema`.
@@ -6036,12 +6374,55 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             }[] | undefined;
         } | undefined;
     }>, "many">>;
+    /**
+     * Why the open project's closed references closed, where a person has said.
+     *
+     * Context rather than an answer to a question, for the reasons the selection
+     * is: a module has to have it before it draws a step as settled, it is true
+     * for as long as nobody changes it, and when somebody does every module
+     * showing that ref has to move — Journeys counting a step as done, References
+     * hiding what is won't-do. A module saying `reacts: ['dispositions']` is
+     * telling the registry it is one of those.
+     *
+     * Per project, not per canvas: a verdict on `#2274` is about the work, and
+     * holds on every kehikko that shows it. Only people's marks travel; see
+     * `dispositionSchema` on why what a tracker says is derived on each side.
+     * Empty rather than absent: nobody has said anything, which is the true
+     * answer from a host that has never heard of dispositions.
+     */
+    dispositions: z.ZodDefault<z.ZodArray<z.ZodObject<{
+        ref: z.ZodString;
+        value: z.ZodEnum<["done", "wont-do", "duplicate", "superseded"]>;
+        target: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+        note: z.ZodDefault<z.ZodString>;
+        by: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+        at: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+    }, "strip", z.ZodTypeAny, {
+        value: "done" | "wont-do" | "duplicate" | "superseded";
+        at: string | null;
+        target: string | null;
+        ref: string;
+        note: string;
+        by: string | null;
+    }, {
+        value: "done" | "wont-do" | "duplicate" | "superseded";
+        ref: string;
+        at?: string | null | undefined;
+        target?: string | null | undefined;
+        note?: string | undefined;
+        by?: string | null | undefined;
+    }>, "many">>;
 } & {
     type: z.ZodLiteral<"roadmap.context">;
     protocol: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
     type: "roadmap.context";
     epic: string | null;
+    protocol: number;
+    project: string | null;
+    projectPath: string | null;
+    theme: "light" | "dark";
+    selection: string[];
     passage: {
         path: string;
         from: number | null;
@@ -6054,7 +6435,13 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             to: number | null;
         } | null;
     } | null;
-    selection: string[];
+    pinned: boolean;
+    prompt: string | null;
+    kehikko: {
+        id: number;
+        name: string;
+    } | null;
+    filters: Record<string, string | string[]>;
     containers: {
         module: string;
         selected: boolean;
@@ -6074,21 +6461,22 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             }[];
         };
     }[];
-    protocol: number;
-    prompt: string | null;
-    project: string | null;
-    projectPath: string | null;
-    theme: "light" | "dark";
-    pinned: boolean;
-    kehikko: {
-        id: number;
-        name: string;
-    } | null;
-    filters: Record<string, string>;
+    dispositions: {
+        value: "done" | "wont-do" | "duplicate" | "superseded";
+        at: string | null;
+        target: string | null;
+        ref: string;
+        note: string;
+        by: string | null;
+    }[];
 }, {
     type: "roadmap.context";
     protocol: number;
     epic?: string | null | undefined;
+    project?: string | null | undefined;
+    projectPath?: string | null | undefined;
+    theme?: "light" | "dark" | undefined;
+    selection?: string[] | undefined;
     passage?: {
         path: string;
         from?: number | null | undefined;
@@ -6101,7 +6489,13 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             to?: number | null | undefined;
         } | null | undefined;
     } | null | undefined;
-    selection?: string[] | undefined;
+    pinned?: boolean | undefined;
+    prompt?: string | null | undefined;
+    kehikko?: {
+        id: number;
+        name: string;
+    } | null | undefined;
+    filters?: Record<string, string | string[]> | undefined;
     containers?: {
         module: string;
         selected?: boolean | undefined;
@@ -6121,16 +6515,14 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             }[] | undefined;
         } | undefined;
     }[] | undefined;
-    prompt?: string | null | undefined;
-    project?: string | null | undefined;
-    projectPath?: string | null | undefined;
-    theme?: "light" | "dark" | undefined;
-    pinned?: boolean | undefined;
-    kehikko?: {
-        id: number;
-        name: string;
-    } | null | undefined;
-    filters?: Record<string, string> | undefined;
+    dispositions?: {
+        value: "done" | "wont-do" | "duplicate" | "superseded";
+        ref: string;
+        at?: string | null | undefined;
+        target?: string | null | undefined;
+        note?: string | undefined;
+        by?: string | null | undefined;
+    }[] | undefined;
 }>, z.ZodDiscriminatedUnion<"ok", [z.ZodObject<{
     type: z.ZodLiteral<"roadmap.response">;
     id: z.ZodString;
@@ -6243,8 +6635,8 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     at: string;
     type: "roadmap.event";
-    protocol: number;
     from: string;
+    protocol: number;
     kehikko: {
         id: number;
         name: string;
@@ -6254,8 +6646,8 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
 }, {
     at: string;
     type: "roadmap.event";
-    protocol: number;
     from: string;
+    protocol: number;
     extension: string;
     kehikko?: {
         id: number;
@@ -6364,8 +6756,20 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
          * which is the correct degradation: a group with no options renders as an
          * empty section rather than as a broken one, and the module goes on
          * receiving `{}` for it — which is what "nothing typed" means anyway.
+         *
+         * `toggles` is a SET of independently hideable options. What comes back
+         * under its id is a list of the option ids that are switched on — for a
+         * group called "hide", the things hidden. It exists because one choice per
+         * axis cannot say "hide closed changes, keep closed issues": kind and state
+         * were two groups, each holding one value, and the combination people want
+         * is a cell of their product. A toggles group says it in one group, which
+         * also gives back the groups the product used to cost.
+         *
+         * Its resting state is the empty set, so it has no fallback, for the reason
+         * a text group has none. A host that has never heard of `toggles` draws
+         * nothing and sends `{}` — every option off, which is the unnarrowed list.
          */
-        kind: z.ZodOptional<z.ZodEnum<["choice", "text"]>>;
+        kind: z.ZodOptional<z.ZodEnum<["choice", "text", "toggles"]>>;
         /**
          * What can be chosen. Empty for a `text` group, at least one for a choice.
          *
@@ -6399,7 +6803,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         }[];
         id: string;
         label: string;
-        kind?: "choice" | "text" | undefined;
+        kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
     }, {
         id: string;
@@ -6408,7 +6812,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
             id: string;
             label: string;
         }[] | undefined;
-        kind?: "choice" | "text" | undefined;
+        kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
     }>, {
         options: {
@@ -6417,7 +6821,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         }[];
         id: string;
         label: string;
-        kind?: "choice" | "text" | undefined;
+        kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
     }, {
         id: string;
@@ -6426,7 +6830,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
             id: string;
             label: string;
         }[] | undefined;
-        kind?: "choice" | "text" | undefined;
+        kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
     }>, {
         options: {
@@ -6435,7 +6839,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         }[];
         id: string;
         label: string;
-        kind?: "choice" | "text" | undefined;
+        kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
     }, {
         id: string;
@@ -6444,7 +6848,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
             id: string;
             label: string;
         }[] | undefined;
-        kind?: "choice" | "text" | undefined;
+        kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
     }>, "many">, {
         options: {
@@ -6453,7 +6857,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         }[];
         id: string;
         label: string;
-        kind?: "choice" | "text" | undefined;
+        kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
     }[], {
         id: string;
@@ -6462,7 +6866,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
             id: string;
             label: string;
         }[] | undefined;
-        kind?: "choice" | "text" | undefined;
+        kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
     }[]>;
 }, "strip", z.ZodTypeAny, {
@@ -6474,7 +6878,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         }[];
         id: string;
         label: string;
-        kind?: "choice" | "text" | undefined;
+        kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
     }[];
 }, {
@@ -6486,7 +6890,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
             id: string;
             label: string;
         }[] | undefined;
-        kind?: "choice" | "text" | undefined;
+        kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
     }[];
 }>, z.ZodObject<{

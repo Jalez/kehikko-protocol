@@ -14,7 +14,7 @@ import { EPIC_SLUG } from './ids.js';
  * `context.filters` are the same shape, and two copies of it is a wire where a
  * choice validates on the way in and is dropped on the way out.
  */
-import { filterChoiceSchema, passageSchema } from './wire.js';
+import { DISPOSITIONS, filterChoiceSchema, passageSchema } from './wire.js';
 /**
  * The questions a module can ask, by name and by shape.
  *
@@ -189,6 +189,15 @@ export const CAPABILITIES = {
      * a string it never reads.
      */
     'state:keep': 'Keep a small amount of its own state between sessions. The roadmap does not read it.',
+    /**
+     * Say why a reference closed: done, won't do, a duplicate, superseded.
+     *
+     * A write into the project, beside the stages `stage:report` files, and read
+     * back by every module in `context.dispositions`. It is a verdict a person
+     * reaches, so a module should set it on a press and not on its own judgment;
+     * an agent reaches the same store through the host's MCP door.
+     */
+    'disposition:set': "Mark why a closed reference closed — done, won't do, duplicate or superseded — for every module to read.",
 };
 export const CAPABILITY_NAMES = Object.keys(CAPABILITIES);
 /**
@@ -214,6 +223,7 @@ export const METHODS = {
     'showing.set': 'showing:set',
     'projects.pick': 'projects:pick',
     'state.set': 'state:keep',
+    'disposition.set': 'disposition:set',
 };
 export const METHOD_NAMES = Object.keys(METHODS);
 /**
@@ -506,6 +516,24 @@ export const methodParams = {
          * stored has to be what was sent, or refused outright.
          */
         note: z.string().max(LIMITS.MESSAGE).default(''),
+    }),
+    /**
+     * Mark one reference, or take a mark back with `value: null`.
+     *
+     * `target` is the other ref for `duplicate` and `superseded`, and refused for
+     * `done` and `wont-do`, where it would name a relation nobody claimed. `by`
+     * and `at` are not here: who pressed and when are the host's own facts, and
+     * a module that could write them could write somebody else's name.
+     */
+    'disposition.set': z
+        .object({
+        ref,
+        value: z.enum(DISPOSITIONS).nullable(),
+        target: ref.optional(),
+        note: z.string().max(LIMITS.SUMMARY).default(''),
+    })
+        .refine((p) => p.target === undefined || p.value === 'duplicate' || p.value === 'superseded', {
+        message: 'only a duplicate or a superseded mark names another ref',
     }),
     'events.emit': z.object({
         extension: z.string().min(1).max(LIMITS.EXTENSION),

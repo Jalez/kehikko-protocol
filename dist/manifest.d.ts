@@ -145,6 +145,12 @@ export declare const REACTS_TO: {
      * answers by looking for setters, as it does for the other two.
      */
     readonly containers: "Does something when which containers are picked out changes, or when what one of them is showing changes.";
+    /**
+     * The fourth word: somebody marked why a reference closed. Paired with
+     * `disposition:set` the way `selection` is with `selection:set`, and changed
+     * by an agent through the host's MCP door as often as by a module.
+     */
+    readonly dispositions: "Does something when somebody marks why a reference closed — done, won't do, duplicate, superseded.";
 };
 export type Reaction = keyof typeof REACTS_TO;
 export declare const REACTION_NAMES: Reaction[];
@@ -408,14 +414,14 @@ export declare const manifestSchema: z.ZodObject<{
         prompt: z.ZodDefault<z.ZodBoolean>;
     }, "strip", z.ZodTypeAny, {
         protocol: string;
+        prompt: boolean;
         uses: string[];
         storage: boolean;
-        prompt: boolean;
     }, {
         protocol?: string | undefined;
+        prompt?: boolean | undefined;
         uses?: string[] | undefined;
         storage?: boolean | undefined;
-        prompt?: boolean | undefined;
     }>>;
 }, "strip", z.ZodTypeAny, {
     id: string;
@@ -438,9 +444,9 @@ export declare const manifestSchema: z.ZodObject<{
     }[];
     declares: {
         protocol: string;
+        prompt: boolean;
         uses: string[];
         storage: boolean;
-        prompt: boolean;
     };
     icon?: string | undefined;
     health?: string | undefined;
@@ -477,9 +483,9 @@ export declare const manifestSchema: z.ZodObject<{
     reacts?: string[] | undefined;
     declares?: {
         protocol?: string | undefined;
+        prompt?: boolean | undefined;
         uses?: string[] | undefined;
         storage?: boolean | undefined;
-        prompt?: boolean | undefined;
     } | undefined;
 }>;
 export type Manifest = z.infer<typeof manifestSchema>;

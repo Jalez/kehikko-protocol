@@ -157,6 +157,12 @@ export const REACTS_TO = {
    */
   containers:
     'Does something when which containers are picked out changes, or when what one of them is showing changes.',
+  /**
+   * The fourth word: somebody marked why a reference closed. Paired with
+   * `disposition:set` the way `selection` is with `selection:set`, and changed
+   * by an agent through the host's MCP door as often as by a module.
+   */
+  dispositions: "Does something when somebody marks why a reference closed — done, won't do, duplicate, superseded.",
 } as const
 
 export type Reaction = keyof typeof REACTS_TO

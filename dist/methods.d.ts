@@ -172,6 +172,15 @@ export declare const CAPABILITIES: {
      * a string it never reads.
      */
     readonly 'state:keep': "Keep a small amount of its own state between sessions. The roadmap does not read it.";
+    /**
+     * Say why a reference closed: done, won't do, a duplicate, superseded.
+     *
+     * A write into the project, beside the stages `stage:report` files, and read
+     * back by every module in `context.dispositions`. It is a verdict a person
+     * reaches, so a module should set it on a press and not on its own judgment;
+     * an agent reaches the same store through the host's MCP door.
+     */
+    readonly 'disposition:set': "Mark why a closed reference closed — done, won't do, duplicate or superseded — for every module to read.";
 };
 export type Capability = keyof typeof CAPABILITIES;
 export declare const CAPABILITY_NAMES: Capability[];
@@ -198,6 +207,7 @@ export declare const METHODS: {
     readonly 'showing.set': "showing:set";
     readonly 'projects.pick': "projects:pick";
     readonly 'state.set': "state:keep";
+    readonly 'disposition.set': "disposition:set";
 };
 export type Method = keyof typeof METHODS;
 export declare const METHOD_NAMES: Method[];
@@ -517,11 +527,11 @@ export declare const methodParams: {
      * rather than assuming it got what it asked for.
      */
     readonly 'filters.set': z.ZodObject<{
-        filters: z.ZodEffects<z.ZodRecord<z.ZodEffects<z.ZodString, string, string>, z.ZodString>, Record<string, string>, Record<string, string>>;
+        filters: z.ZodEffects<z.ZodRecord<z.ZodEffects<z.ZodString, string, string>, z.ZodUnion<[z.ZodString, z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">, string[], string[]>]>>, Record<string, string | string[]>, Record<string, string | string[]>>;
     }, "strip", z.ZodTypeAny, {
-        filters: Record<string, string>;
+        filters: Record<string, string | string[]>;
     }, {
-        filters: Record<string, string>;
+        filters: Record<string, string | string[]>;
     }>;
     /**
      * Say what this container is showing.
@@ -773,11 +783,45 @@ export declare const methodParams: {
         note: z.ZodDefault<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
         ref: string;
-        stage: "blocked" | "working" | "in-review";
         note: string;
+        stage: "blocked" | "working" | "in-review";
     }, {
         ref: string;
         stage: "blocked" | "working" | "in-review";
+        note?: string | undefined;
+    }>;
+    /**
+     * Mark one reference, or take a mark back with `value: null`.
+     *
+     * `target` is the other ref for `duplicate` and `superseded`, and refused for
+     * `done` and `wont-do`, where it would name a relation nobody claimed. `by`
+     * and `at` are not here: who pressed and when are the host's own facts, and
+     * a module that could write them could write somebody else's name.
+     */
+    readonly 'disposition.set': z.ZodEffects<z.ZodObject<{
+        ref: z.ZodString;
+        value: z.ZodNullable<z.ZodEnum<["done", "wont-do", "duplicate", "superseded"]>>;
+        target: z.ZodOptional<z.ZodString>;
+        note: z.ZodDefault<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        value: "done" | "wont-do" | "duplicate" | "superseded" | null;
+        ref: string;
+        note: string;
+        target?: string | undefined;
+    }, {
+        value: "done" | "wont-do" | "duplicate" | "superseded" | null;
+        ref: string;
+        target?: string | undefined;
+        note?: string | undefined;
+    }>, {
+        value: "done" | "wont-do" | "duplicate" | "superseded" | null;
+        ref: string;
+        note: string;
+        target?: string | undefined;
+    }, {
+        value: "done" | "wont-do" | "duplicate" | "superseded" | null;
+        ref: string;
+        target?: string | undefined;
         note?: string | undefined;
     }>;
     readonly 'events.emit': z.ZodObject<{

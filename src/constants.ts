@@ -786,6 +786,17 @@ export const LIMITS = {
   /** How many refs one payload may carry, and how many may be selected at once. */
   REFS: 32,
   /**
+   * How many dispositions a context may carry: the marks people put on refs to
+   * say why each one closed. See `dispositionSchema` in `wire.ts`.
+   *
+   * Two hundred and fifty-six, because these are a person's own verdicts, made
+   * one press at a time, and a project's worth of them is the tens. What a
+   * tracker already says about a close is NOT in this list — every module
+   * derives that from its own reading with `deriveDisposition` in `facets.ts` —
+   * so the bound is on what people wrote, which is the small number.
+   */
+  DISPOSITIONS: 256,
+  /**
    * How many places in documents one container may say it is showing.
    *
    * Sixteen, and the number is about what the field is FOR rather than about
