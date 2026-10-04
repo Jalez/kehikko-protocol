@@ -515,6 +515,32 @@ The one thing the shapes insist on is that it arrives in the greeting, so a
 module never draws its defaults and corrects them a moment later — the same
 argument `state` makes, and the same flicker.
 
+### Toggles, and the shared ref facets at `/facets`
+
+A third group kind, `toggles`, is a set of options each switched on or off on
+its own; its value in `context.filters` is the list of ids that are on. It is
+what lets one "hide" group say *hide closed MRs/PRs, keep closed issues* —
+a cell of kind × state that two single-choice groups could not reach.
+
+The modules that list references agree on what those ids mean through
+`roadmap-module-protocol/facets`: `issue:closed`, `change:closed`,
+`change:merged`, `closed:wont-do`, … with `facetsOf`, `offer`, `hiddenIn`,
+`sift` and `countFacets` to build the group and apply a choice. It is pure,
+off the main entry because it is vocabulary rather than shape, and a host never
+imports it — the host still draws options it does not understand.
+
+## Why a reference closed
+
+A tracker's `closed` is done, won't do, duplicate and superseded at once.
+`disposition.set` (capability `disposition:set`) lets a person — or an agent
+through the host's MCP door — say which; the host keeps the marks per project
+and sends them to every module as `context.dispositions`, and a module that
+moves when one changes says `reacts: ['dispositions']`. Only people's marks
+travel. What the tracker says (GitHub `stateReason`, a GitLab issue closed by a
+merged change) is derived on each side with `deriveDisposition`, and
+`dispositionOf` puts the two together with the mark winning and the source
+named, so a module can always say whose verdict it is showing.
+
 ## And a control that clears what a module is showing
 
 The same shape a second time, for the other control a module cannot draw in a

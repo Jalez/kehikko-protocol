@@ -371,8 +371,20 @@ export const filterGroupSchema = z
      * which is the correct degradation: a group with no options renders as an
      * empty section rather than as a broken one, and the module goes on
      * receiving `{}` for it — which is what "nothing typed" means anyway.
+     *
+     * `toggles` is a SET of independently hideable options. What comes back
+     * under its id is a list of the option ids that are switched on — for a
+     * group called "hide", the things hidden. It exists because one choice per
+     * axis cannot say "hide closed changes, keep closed issues": kind and state
+     * were two groups, each holding one value, and the combination people want
+     * is a cell of their product. A toggles group says it in one group, which
+     * also gives back the groups the product used to cost.
+     *
+     * Its resting state is the empty set, so it has no fallback, for the reason
+     * a text group has none. A host that has never heard of `toggles` draws
+     * nothing and sends `{}` — every option off, which is the unnarrowed list.
      */
-    kind: z.enum(['choice', 'text']).optional(),
+    kind: z.enum(['choice', 'text', 'toggles']).optional(),
     /**
      * What can be chosen. Empty for a `text` group, at least one for a choice.
      *
@@ -403,6 +415,18 @@ export const filterGroupSchema = z
             ctx.addIssue({
                 code: z.ZodIssueCode.custom,
                 message: 'a text group cannot have a fallback: its resting state is empty',
+            });
+        }
+        return;
+    }
+    if (group.kind === 'toggles') {
+        if (!group.options.length) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'a toggles group needs at least one option' });
+        }
+        if (group.fallback !== undefined) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'a toggles group cannot have a fallback: its resting state is nothing switched on',
             });
         }
         return;
@@ -615,11 +639,70 @@ export const refreshSchema = z.object({
  * side. Two programs already had to survive a value neither of them recognises,
  * because that is what a module shipping new options means; this makes the set
  * of such values slightly larger and changes nothing about what happens to one.
+ *
+ * ## A list, for a toggles group and for nothing else
+ *
+ * A `toggles` group's value is the list of its option ids that are on. The
+ * value was a string for every group until then, so this is a widening, and it
+ * is safe for the reason `kind` was: a module receives a list only under a
+ * group it offered as `toggles`, which no module written before the kind
+ * existed can have done. A host reconciles a list the way it reconciles a
+ * string — drop every id the group does not offer now — and an empty list is
+ * stored as nothing, since it means the resting state.
  */
 export const filterChoiceSchema = z
-    .record(filterId, z.string().min(1).max(LIMITS.FILTER_TEXT))
+    .record(filterId, z.union([
+    z.string().min(1).max(LIMITS.FILTER_TEXT),
+    z
+        .array(filterId)
+        .max(LIMITS.FILTER_OPTIONS)
+        .refine((ids) => new Set(ids).size === ids.length, { message: 'a toggles choice cannot name an option twice' }),
+]))
     .refine((chosen) => Object.keys(chosen).length <= LIMITS.FILTER_GROUPS, {
     message: `no more than ${LIMITS.FILTER_GROUPS} filter groups can be chosen at once`,
+});
+/* ------------------------------------------------------------------------ *
+ * Dispositions: why a reference closed, in a person's words
+ * ------------------------------------------------------------------------ */
+/**
+ * What a closed reference came to.
+ *
+ * A tracker's `closed` covers finished work, work nobody will do, a duplicate
+ * and something replaced by something else, and a module that reads `closed`
+ * as `done` counts the second, third and fourth as delivered. These four are
+ * the answers people actually give. Open to extension the way every list here
+ * is: a module meeting a value it does not know treats the ref as closed for a
+ * reason it cannot name, which is what it did before this list existed.
+ */
+export const DISPOSITIONS = ['done', 'wont-do', 'duplicate', 'superseded'];
+/**
+ * One person's verdict on one reference, as the host holds it.
+ *
+ * ## Only the marks, never the derivation
+ *
+ * A tracker sometimes says why it closed something — GitHub's `stateReason`, a
+ * GitLab issue closed by a merged change — and that is a DEFAULT, not a mark.
+ * It stays out of this list on purpose: every module holding a tracker reading
+ * derives it with `deriveDisposition` in `facets.ts`, and a person's mark wins
+ * over it there. Kept apart, a module can always say which one it is showing,
+ * which is the whole difference between "you said won't do" and "GitHub says
+ * not planned".
+ *
+ * `target` is the other ref for `duplicate` (duplicate OF it) and `superseded`
+ * (superseded BY it), and null for the other two. One field rather than two,
+ * because a ref is never both and two nullable fields can disagree.
+ *
+ * `by` is who said so, in words the host chose — a person, or an agent through
+ * the MCP door — and `at` is when, as an ISO timestamp. Both are the host's
+ * own knowledge: the method that sets a disposition does not carry either.
+ */
+export const dispositionSchema = z.object({
+    ref: z.string().min(1).max(LIMITS.REF),
+    value: z.enum(DISPOSITIONS),
+    target: z.string().min(1).max(LIMITS.REF).nullable().default(null),
+    note: z.string().max(LIMITS.SUMMARY).default(''),
+    by: z.string().max(LIMITS.NAME).nullable().default(null),
+    at: z.string().max(LIMITS.NAME).nullable().default(null),
 });
 /* ------------------------------------------------------------------------ *
  * Containers: what is arranged on the kehikko, what each shows, which are aimed at
@@ -1065,6 +1148,23 @@ export const contextSchema = z.object({
      * everything is in front of it.
      */
     containers: z.array(containerSchema).max(LIMITS.CONTAINERS).default([]),
+    /**
+     * Why the open project's closed references closed, where a person has said.
+     *
+     * Context rather than an answer to a question, for the reasons the selection
+     * is: a module has to have it before it draws a step as settled, it is true
+     * for as long as nobody changes it, and when somebody does every module
+     * showing that ref has to move — Journeys counting a step as done, References
+     * hiding what is won't-do. A module saying `reacts: ['dispositions']` is
+     * telling the registry it is one of those.
+     *
+     * Per project, not per canvas: a verdict on `#2274` is about the work, and
+     * holds on every kehikko that shows it. Only people's marks travel; see
+     * `dispositionSchema` on why what a tracker says is derived on each side.
+     * Empty rather than absent: nobody has said anything, which is the true
+     * answer from a host that has never heard of dispositions.
+     */
+    dispositions: z.array(dispositionSchema).max(LIMITS.DISPOSITIONS).default([]),
 });
 /** The id correlating a question with its answer, or a `goto` with its `went`. */
 const correlation = z.string().min(1).max(LIMITS.CORRELATION);

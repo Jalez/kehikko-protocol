@@ -143,7 +143,7 @@ export function copyTemplate(from, to, values) {
     return written;
 }
 export function defaultDir(names) {
-    return join(homedir(), 'Projects', names.pkg);
+    return join(homedir(), 'Projects', names.pkg); // kehikot-storage: allow where a new module's repository is created, not where any data is kept
 }
 /** The whole command. Throws a sentence when it refuses or a step fails. */
 export function create(options) {
