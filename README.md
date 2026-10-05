@@ -486,6 +486,25 @@ says whether a module follows the reader, and `declares.prompt` already says
 whether it wants a prompt. The rule for adding a word is that no other field in
 the manifest already says it.
 
+## A module's data has a version of its own
+
+`dataVersion` is a positive integer naming the format a module writes under
+`<project>/.kehikot/<module>/`. Absent means 1, so every manifest written before
+it parses unchanged.
+
+It exists because a host may run more than one release of a module against one
+project — a container pinned to `v1.2.0` beside one on the latest. Data stays
+shared between them, so a newer release that migrated the files could leave an
+older one reading something it does not understand. A host records, per project
+and module, the highest `dataVersion` that has run there, and refuses — with a
+sentence saying why — to run a release that declares a lower one.
+
+It is not `version`. `version` is the program's own string, which this protocol
+never parses; most releases change it and leave the data format alone, and a
+host that compared `version` would refuse every harmless downgrade. Raise
+`dataVersion` in the one release that first writes data an earlier release
+cannot read, and at no other time.
+
 ## A filter the host draws and the module means
 
 Five modules in the workspace this was distilled from had each built the same

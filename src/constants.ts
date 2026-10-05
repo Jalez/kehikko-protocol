@@ -558,6 +558,13 @@ export const LIMITS = {
   NAME: 40,
   /** Its version string, which this protocol never parses. */
   VERSION: 32,
+  /**
+   * The highest data-format number a manifest may declare in `dataVersion`.
+   * Not a string, but a number a host records per project, and a host should
+   * not have to store whatever a stranger typed. A million formats is more
+   * than any module will ever ship.
+   */
+  DATA_VERSION: 1_000_000,
   /** One line about what it is. */
   SUMMARY: 200,
   /** The word on a tab. */

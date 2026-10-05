@@ -198,6 +198,42 @@ export const manifestSchema = z.object({
      * string with no agreed grammar.
      */
     version: z.string().min(1).max(LIMITS.VERSION).default('0'),
+    /**
+     * Which FORMAT this module writes its project data in, as one positive
+     * integer. Absent means 1.
+     *
+     * ## Why this is not `version`
+     *
+     * `version` is a string this protocol never parses, and it says what the
+     * PROGRAM is. This says what the program's DATA is — the files under
+     * `<project>/.kehikot/<module>/` — and it is the one number a host compares.
+     * A module ships many versions in one data format: a release that fixes a
+     * button does not change what an older release can read. So the two move at
+     * different speeds and must not be the same field; a host that made a
+     * decision out of `version` would be refusing every downgrade, including the
+     * thousand harmless ones.
+     *
+     * ## What a host does with it
+     *
+     * A host that can run more than one version of a module against the same
+     * project — a container pinned to an older release beside one on the latest
+     * — records, per project and module, the highest number any version has run
+     * with. It refuses to run a version whose number is LOWER, because that
+     * version may not be able to read what a newer one already migrated, and the
+     * failure would be a module quietly overwriting data it misunderstood. The
+     * refusal is the host's, and it must say why; nothing here decides it.
+     *
+     * ## What a module author should do
+     *
+     * Raise it in the same release that first writes data an earlier release
+     * cannot read, and at no other time. Leaving it alone is the right answer for
+     * almost every release. A module that never writes project data never needs
+     * to raise it.
+     *
+     * Bounded like everything else: it is an integer a stranger wrote, and a
+     * host records it.
+     */
+    dataVersion: z.number().int().min(1).max(LIMITS.DATA_VERSION).default(1),
     summary: z.string().max(LIMITS.SUMMARY).default(''),
     /**
      * What an agent should do about this module, given that it is here.

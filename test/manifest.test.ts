@@ -84,6 +84,35 @@ describe('the bounds refuse what they were put there for', () => {
   })
 })
 
+describe('the data version', () => {
+  test('is 1 when a manifest says nothing, so every manifest written before it still parses', () => {
+    expect(manifestSchema.parse(minimal).dataVersion).toBe(1)
+  })
+
+  test('is carried through when a module says it', () => {
+    expect(manifestSchema.parse({ ...minimal, dataVersion: 3 }).dataVersion).toBe(3)
+  })
+
+  test.each([
+    ['zero', 0],
+    ['negative', -1],
+    ['a fraction', 1.5],
+    ['a string', '2'],
+    ['past the bound', LIMITS.DATA_VERSION + 1],
+    ['not a number', Number.NaN],
+  ])('%s is refused', (_what, value) => {
+    /* A host compares this number against what it recorded for a project. A
+       value it cannot compare — or one it would have to store as a stranger's
+       arbitrary blob — must not reach it as a valid manifest. */
+    expect(manifestSchema.safeParse({ ...minimal, dataVersion: value }).success).toBe(false)
+  })
+
+  test('is not `version`: the program can move without the data moving', () => {
+    const m = manifestSchema.parse({ ...minimal, version: '9.9.9' })
+    expect(m.dataVersion).toBe(1)
+  })
+})
+
 describe('ids', () => {
   test.each([
     'Roadmap.Checklist',
