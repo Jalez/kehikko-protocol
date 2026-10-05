@@ -156,6 +156,14 @@ export const REACTS_TO = {
      * by an agent through the host's MCP door as often as by a module.
      */
     dispositions: "Does something when somebody marks why a reference closed — done, won't do, duplicate, superseded.",
+    /**
+     * The fifth: the shared tracker reading changed. Paired with
+     * `trackers:refresh` the way `selection` is with `selection:set` — and, like
+     * `containers`, also moved by the host's own act: a person pressing "Refresh
+     * all", or the project's schedule. A module ticking this re-asks
+     * `tracker.get` when `context.tracker.at` moves.
+     */
+    tracker: 'Does something when the trackers have been read again — re-reads the issues, merge requests and pull requests it shows.',
 };
 export const REACTION_NAMES = Object.keys(REACTS_TO);
 export const manifestSchema = z.object({

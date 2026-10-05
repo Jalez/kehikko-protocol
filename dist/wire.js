@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { LIMITS, MESSAGE, PROTOCOL } from './constants.js';
+import { trackerSignalSchema } from './tracker.js';
 import { EPIC_SLUG, MODULE_ID } from './ids.js';
 /**
  * Everything the two sides say to each other.
@@ -1165,6 +1166,17 @@ export const contextSchema = z.object({
      * answer from a host that has never heard of dispositions.
      */
     dispositions: z.array(dispositionSchema).max(LIMITS.DISPOSITIONS).default([]),
+    /**
+     * When the open project's shared tracker reading last changed, and whether a
+     * read is in flight. The signal, not the reading — see `trackerSignalSchema`
+     * in `tracker.ts` for why the rows stay behind `tracker.get`.
+     *
+     * Per project, like `dispositions`: a refresh pressed in one container moves
+     * this for every container standing in that project, and a module saying
+     * `reacts: ['tracker']` re-asks `tracker.get` when `at` changes and draws
+     * itself busy while `refreshing` is true.
+     */
+    tracker: trackerSignalSchema.default({}),
 });
 /** The id correlating a question with its answer, or a `goto` with its `went`. */
 const correlation = z.string().min(1).max(LIMITS.CORRELATION);

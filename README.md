@@ -541,6 +541,52 @@ merged change) is derived on each side with `deriveDisposition`, and
 `dispositionOf` puts the two together with the mark winning and the source
 named, so a module can always say whose verdict it is showing.
 
+## One tracker reading, shared
+
+Every module that showed a ref used to read its state its own way, so two
+containers could disagree about whether `#2274` was open. The host now reads
+GitHub and GitLab once per project, with the person's own logged-in CLIs, and
+every module reads that one reading. The shapes are in `src/tracker.ts`.
+
+```ts
+// what the trackers last said — answered at once from the host's reading
+const reading = await request('tracker.get', { refs: ['gh#41', '!1848'] })   // or { epic } or { project: true }
+// reading: { at, refreshing, sources: [{ tracker, host, repo, default, listed, at, error, refreshing }],
+//            rows: TrackerRow[], missing: [{ ref, reason: 'pending' | 'not-found' | 'no-tracker' | 'failed' }] }
+
+// ask for a new read; answered when it lands
+await request('tracker.refresh', { epic: 'modes-are-modules' }, { within: TRACKER_REFRESH_WITHIN_MS })
+// → { outcome: 'read' | 'failed' | 'declined', at, why }
+```
+
+- **Capabilities** `trackers:read` (`tracker.get`) and `trackers:refresh`
+  (`tracker.refresh`). Refreshing is apart because it spends the person's rate
+  limit for everybody on the canvas.
+- **Scope**: exactly one of `refs` (up to `TRACKER_ASK`), `epic`, or
+  `project: true` — the refs every epic names, the refs modules asked about,
+  and the recent issues and changes of each listed source. Asking for a ref the
+  host has not read is how it gets read: it comes back in `missing` as
+  `pending`, and a read starts.
+- **Detail**: `detail: 'detail'` (only with `refs`) adds `row.detail` —
+  description, changed files, head sha, approvers — for modules that check
+  content.
+- **A row is a `Sighting`.** `kind`, `state`, `stateReason` (GitHub's, as
+  GitHub spells it) and `closedByMerge` sit on the row under the names
+  `/facets` reads, so `facetsOf(row)` and `dispositionOf(row.ref, row,
+  context.dispositions)` take a row as it is. Fields a tracker does not record
+  are absent, never guessed.
+- **The signal**: `context.tracker` is `{ at, refreshing }` for the open
+  project — the reading's last change and whether a read is in flight. Not the
+  rows: context is broadcast and bounded. A module that re-asks `tracker.get`
+  when `at` moves says `reacts: ['tracker']`.
+- **Ref spellings**: `readTrackerRef` reads `gh#41`, `gh:owner/repo#41`,
+  `#12`/`gl#12` (GitLab issue), `!7`/`gl!7` (merge request),
+  `gl:group/project#12`; `spellTrackerRef` spells a ref the host found.
+  A row's `ref` is the spelling it was asked for or named by.
+
+`live.get` stays, answered by a host as a view over the same reading, until
+the modules that ask it have moved.
+
 ## And a control that clears what a module is showing
 
 The same shape a second time, for the other control a module cannot draw in a

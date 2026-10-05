@@ -151,6 +151,14 @@ export declare const REACTS_TO: {
      * by an agent through the host's MCP door as often as by a module.
      */
     readonly dispositions: "Does something when somebody marks why a reference closed — done, won't do, duplicate, superseded.";
+    /**
+     * The fifth: the shared tracker reading changed. Paired with
+     * `trackers:refresh` the way `selection` is with `selection:set` — and, like
+     * `containers`, also moved by the host's own act: a person pressing "Refresh
+     * all", or the project's schedule. A module ticking this re-asks
+     * `tracker.get` when `context.tracker.at` moves.
+     */
+    readonly tracker: "Does something when the trackers have been read again — re-reads the issues, merge requests and pull requests it shows.";
 };
 export type Reaction = keyof typeof REACTS_TO;
 export declare const REACTION_NAMES: Reaction[];
@@ -424,12 +432,12 @@ export declare const manifestSchema: z.ZodObject<{
         storage?: boolean | undefined;
     }>>;
 }, "strip", z.ZodTypeAny, {
-    id: string;
+    summary: string;
     kind: "roadmap.module";
+    id: string;
     protocol: number;
     name: string;
     version: string;
-    summary: string;
     guidance: string;
     entry: string;
     extensions: {
@@ -456,8 +464,8 @@ export declare const manifestSchema: z.ZodObject<{
         about: string;
     } | undefined;
 }, {
-    id: string;
     kind: "roadmap.module";
+    id: string;
     protocol: number;
     name: string;
     entry: string;
@@ -466,8 +474,8 @@ export declare const manifestSchema: z.ZodObject<{
         label: string;
         scope?: "epic" | "global" | undefined;
     }[];
-    version?: string | undefined;
     summary?: string | undefined;
+    version?: string | undefined;
     guidance?: string | undefined;
     icon?: string | undefined;
     health?: string | undefined;

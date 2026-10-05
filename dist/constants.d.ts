@@ -831,5 +831,31 @@ export declare const LIMITS: {
     readonly GUIDANCE: 1024;
     /** As much of a manifest as anyone should read from a stranger on a port. */
     readonly MANIFEST_BYTES: number;
+    /** How many refs one `tracker.get` or `tracker.refresh` may name. A journey's worth, not a repository's. */
+    readonly TRACKER_ASK: 200;
+    /** How many rows one reading may answer with: a project's recent issues and changes, and every ref its epics name. */
+    readonly TRACKER_ROWS: 2000;
+    /** How many places one project reads. */
+    readonly TRACKER_SOURCES: 16;
+    /** A tracker's hostname. */
+    readonly TRACKER_HOST: 255;
+    /** `owner/repo`, or a GitLab project path with its groups. */
+    readonly TRACKER_REPO: 200;
+    /** One label. */
+    readonly TRACKER_LABEL: 100;
+    /** How many labels one row carries. */
+    readonly TRACKER_LABELS: 32;
+    /** A person's name or handle as a tracker gives it. */
+    readonly TRACKER_PERSON: 100;
+    /** How many assignees or approvers one row lists. */
+    readonly TRACKER_PEOPLE: 16;
+    /** How many links one row carries. */
+    readonly TRACKER_LINKS: 32;
+    /** A short tracker word: a close reason, a commit sha. */
+    readonly TRACKER_WORD: 64;
+    /** A description, read for `detail`. Long enough for a real one, short enough to send. */
+    readonly TRACKER_BODY: 20000;
+    /** How many files of a change `detail` lists. */
+    readonly TRACKER_FILES: 300;
 };
 //# sourceMappingURL=constants.d.ts.map
