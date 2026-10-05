@@ -20,6 +20,10 @@ export const MANIFEST: Manifest = manifestSchema.parse({
   id: ID,
   name: '__MODULE_NAME__',
   version: VERSION,
+  /* The format of what this module keeps under `.kehikot/`. Raise it only in
+     the release that first writes data an older release cannot read; a host
+     then refuses to run an older release against that project. */
+  dataVersion: 1,
   summary: 'What __MODULE_NAME__ is, in a sentence, for a person deciding whether to place it.',
   /* What this module's PRESENCE obliges an agent to do. Composed into every
      agent's prompt on the canvas, so write it to somebody who just arrived. */
