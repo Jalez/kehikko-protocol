@@ -39,7 +39,7 @@ function registerFake(id: string, port: number, dir = ''): void {
 
 describe('a module name', () => {
   test('gives every name the module is known by', () => {
-    expect(namesFor('slides')).toEqual({ id: 'roadmap.slides', name: 'Slides', folder: 'slides', pkg: 'kehikko-slides' })
+    expect(namesFor('slides')).toEqual({ id: 'kehikot.slides', name: 'Slides', folder: 'slides', pkg: 'kehikko-slides' })
     expect(namesFor('reading-list').name).toBe('Reading list')
   })
 
@@ -55,7 +55,7 @@ describe('placeholders', () => {
 
   test('every one is replaced, everywhere, and nothing else is touched', () => {
     const text = 'id __MODULE_ID__ / __MODULE_ID__, __MODULE_NAME__ in __MODULE_FOLDER__ (__MODULE_PACKAGE__:__MODULE_PORT__) __TICKET__'
-    expect(fill(text, values)).toBe('id roadmap.slides / roadmap.slides, Slides in slides (kehikko-slides:7990) __TICKET__')
+    expect(fill(text, values)).toBe('id kehikot.slides / kehikot.slides, Slides in slides (kehikko-slides:7990) __TICKET__')
   })
 
   test('the template uses no placeholder the command does not know', () => {
@@ -102,10 +102,10 @@ describe('the port', () => {
     const checkout = join(scratch, 'checkout')
     mkdirSync(checkout, { recursive: true })
     writeFileSync(join(checkout, 'manifest.ts'), 'export const PREFERRED_PORT = 8040\n')
-    registerFake('roadmap.notes', 7940)
-    registerFake('roadmap.paper', 7981, checkout)
+    registerFake('kehikot.notes', 7940)
+    registerFake('kehikot.paper', 7981, checkout)
     writeFileSync(join(registry, 'not-json.txt'), 'x')
-    writeFileSync(join(registry, 'roadmap.broken.json'), '{')
+    writeFileSync(join(registry, 'kehikot.broken.json'), '{')
     expect([...takenPorts()].sort()).toEqual([7940, 7981, 8040])
     expect(choosePort(takenPorts())).toBe(8050)
   })
@@ -136,7 +136,7 @@ describe('create refuses', () => {
   })
 
   test('a name already registered', () => {
-    registerFake('roadmap.taken', 7990, '/somewhere')
+    registerFake('kehikot.taken', 7990, '/somewhere')
     expect(() => create({ name: 'taken', dir: join(scratch, 'taken'), git: false, install: false, test: false })).toThrow(
       /already registered/,
     )
@@ -144,7 +144,7 @@ describe('create refuses', () => {
 
   test('and with --register writes only into the registry it was given', () => {
     const made = create({ name: 'quiet', dir: join(scratch, 'quiet'), register: true, git: false, install: false, test: false })
-    expect(made.registered).toBe(join(registry, 'roadmap.quiet.json'))
+    expect(made.registered).toBe(join(registry, 'kehikot.quiet.json'))
     expect(JSON.parse(readFileSync(made.registered!, 'utf8'))).toEqual({ url: `http://127.0.0.1:${made.port}`, dir: made.dir })
     expect(statSync(join(made.dir, 'run.sh')).mode & 0o111).toBeTruthy()
   })
@@ -162,7 +162,7 @@ describe('a generated module', () => {
       const here = resolve(dirname(fileURLToPath(import.meta.url)), '..')
       const made = create({ name: 'generated', dir: join(scratch, 'kehikko-generated'), protocolSource: `file:${here}` })
       expect(existsSync(join(made.dir, '.git'))).toBe(true)
-      expect(existsSync(join(made.dir, 'node_modules', 'roadmap-module-protocol', 'dist', 'index.js'))).toBe(true)
+      expect(existsSync(join(made.dir, 'node_modules', 'kehikot-module-protocol', 'dist', 'index.js'))).toBe(true)
       run('bunx', ['tsc', '--noEmit'], made.dir)
     },
     { timeout: 300_000 },

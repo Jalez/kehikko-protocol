@@ -3,8 +3,8 @@ import { resolve } from 'node:path'
 
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
-import { WELL_KNOWN } from 'roadmap-module-protocol'
-import { serves } from 'roadmap-module-protocol/serve'
+import { LEGACY_WELL_KNOWN, WELL_KNOWN, legacyManifest } from 'kehikot-module-protocol'
+import { frameAncestors, serves } from 'kehikot-module-protocol/serve'
 import { defineConfig, type Plugin } from 'vite'
 
 import { MANIFEST, TICKET, TICKET_HEADER, answer } from './doors.ts'
@@ -37,6 +37,10 @@ function doors(): Plugin {
         }
 
         if (path === WELL_KNOWN) return send(200, MANIFEST)
+        /* The same manifest in the spelling a host from before the rename asks
+           for, so that host still finds this module. It greets in that
+           dialect and the protocol's client answers in it. */
+        if (path === LEGACY_WELL_KNOWN) return send(200, legacyManifest(MANIFEST))
 
         if (path === '/app' || path === '/app/' || path === '/') {
           void server
@@ -46,11 +50,10 @@ function doors(): Plugin {
               response.setHeader('content-type', 'text/html; charset=utf-8')
               /* The ticket is per process; a cached page would have every write refused. */
               response.setHeader('cache-control', 'no-store')
-              /* Framed by a host (ROADMAP_ORIGIN, default the workspace host) or by nothing. */
-              response.setHeader(
-                'content-security-policy',
-                `frame-ancestors 'self' ${process.env.ROADMAP_ORIGIN ?? 'http://127.0.0.1:4181 http://localhost:4181'}`,
-              )
+              /* Framed by a host or by nothing. Which hosts: `KEHIKOT_ORIGINS`, the
+                 list a host passes to what it starts (then `KEHIKOT_ORIGIN`, then
+                 `ROADMAP_ORIGIN`, then every origin a host here serves from). */
+              response.setHeader('content-security-policy', frameAncestors())
               response.end(html)
             })
             .catch(next)
@@ -103,7 +106,7 @@ async function body(request: IncomingMessage): Promise<Record<string, unknown> |
 /**
  * - No `server.cors`: the manifest declares storage, so the page is same-origin
  *   and a permissive CORS header would only let strangers read the ticket.
- * - No alias for `roadmap-module-protocol`: resolve it through its exports, as
+ * - No alias for `kehikot-module-protocol`: resolve it through its exports, as
  *   the host does. The `@` alias points inside this repo, for shadcn.
  * - No `server.port`: `serves()` (first, so it claims before anything else)
  *   decides it from PREFERRED_PORT and keeps the registration true.

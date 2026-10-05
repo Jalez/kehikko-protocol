@@ -17,7 +17,7 @@ export function preferred(prefer, env = process.env) {
 export function serves({ id, prefer, dir, span, timeoutMs }) {
     let claimed = null;
     return {
-        name: 'roadmap-module-serves',
+        name: 'kehikot-module-serves',
         apply: 'serve',
         async config() {
             claimed = await claim({ id, prefer: preferred(prefer), span, timeoutMs });

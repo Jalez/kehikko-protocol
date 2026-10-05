@@ -1,4 +1,4 @@
-import { MANIFEST_KIND, PROTOCOL, manifestSchema, type Manifest } from 'roadmap-module-protocol'
+import { MANIFEST_KIND, PROTOCOL, manifestSchema, type Manifest } from 'kehikot-module-protocol'
 
 export const ID = '__MODULE_ID__'
 export const VERSION = '0.1.0'

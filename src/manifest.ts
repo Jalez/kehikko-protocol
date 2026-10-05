@@ -1,5 +1,6 @@
 import { z } from 'zod'
-import { LIMITS, MANIFEST_KIND, PROTOCOL } from './constants.js'
+import { LEGACY_MANIFEST_KIND, LIMITS, MANIFEST_KIND, PROTOCOL } from './constants.js'
+import { canonicalName, legacyName } from './dialect.js'
 import { MODE_ID, MODULE_ID } from './ids.js'
 
 /**
@@ -42,7 +43,7 @@ const modeSchema = z.object({
   /**
    * `epic` gives the mode a tab that FOLLOWS THE READER: it is told which epic
    * is open and told again on every switch. `global` gives it one page for the
-   * whole roadmap, told nothing and never re-pointed.
+   * whole canvas, told nothing and never re-pointed.
    *
    * Defaulted rather than required, because following the reader is what nearly
    * every module wants and a module that says nothing has not made a choice
@@ -176,16 +177,30 @@ export const REACTS_TO = {
 export type Reaction = keyof typeof REACTS_TO
 export const REACTION_NAMES = Object.keys(REACTS_TO) as Reaction[]
 
+/* An extension name, canonical once parsed: `roadmap.notifications@1` is
+   read as `kehikot.notifications@1`. See `dialect.ts`. */
+const extensionName = z.string().min(1).max(LIMITS.EXTENSION).transform(canonicalName)
+
 export const manifestSchema = z.object({
   /**
    * The word that makes this a claim rather than a hopeful GET. Something else
    * entirely may be listening on the port a host asked, and it must not be
    * possible for that something to become a tab by accident.
+   *
+   * Either spelling is accepted, and it is handed back AS IT WAS SAID rather
+   * than respelled, because it is the one place a host learns which dialect
+   * the module speaks before it greets it: `roadmap.module` is a module built
+   * against this package from before the rename. See `dialectOfKind`.
    */
-  kind: z.literal(MANIFEST_KIND),
+  kind: z.enum([MANIFEST_KIND, LEGACY_MANIFEST_KIND]),
   /** Which protocol this module was built against, as a single integer. */
   protocol: z.number().int().min(1),
-  id: z.string().regex(MODULE_ID, 'lowercase reverse-DNS: letters, digits, dots and dashes'),
+  /**
+   * Canonical once parsed: `roadmap.journeys` is read as `kehikot.journeys`,
+   * the same module under the name it has had since the rename. See
+   * `canonicalModuleId`.
+   */
+  id: z.string().regex(MODULE_ID, 'lowercase reverse-DNS: letters, digits, dots and dashes').transform(canonicalName),
   name: z.string().min(1).max(LIMITS.NAME),
   /**
    * The module's own version, which this protocol never parses and never
@@ -301,8 +316,8 @@ export const manifestSchema = z.object({
    */
   extensions: z
     .object({
-      emits: z.array(z.string().min(1).max(LIMITS.EXTENSION)).max(LIMITS.EXTENSIONS).default([]),
-      consumes: z.array(z.string().min(1).max(LIMITS.EXTENSION)).max(LIMITS.EXTENSIONS).default([]),
+      emits: z.array(extensionName).max(LIMITS.EXTENSIONS).default([]),
+      consumes: z.array(extensionName).max(LIMITS.EXTENSIONS).default([]),
     })
     .default({ emits: [], consumes: [] }),
   /**
@@ -311,7 +326,7 @@ export const manifestSchema = z.object({
    * ## Why this is not a third entry in `extensions`
    *
    * `extensions.consumes` already names things a module receives, so folding
-   * `passage` in beside `roadmap.notifications@1` would have cost one field and
+   * `passage` in beside `kehikot.notifications@1` would have cost one field and
    * looked tidier. It would also have destroyed the only distinction a registry
    * has worth drawing. An extension is CARRIED: a host reads `emits` on one
    * manifest and `consumes` on another and posts the payload into the second
@@ -407,6 +422,30 @@ export const manifestSchema = z.object({
 export type Manifest = z.infer<typeof manifestSchema>
 /** What a module author writes, before defaults are filled in. */
 export type ManifestInput = z.input<typeof manifestSchema>
+
+/**
+ * A parsed manifest, spelled for a host from before the rename.
+ *
+ * What a module built against this package serves at `LEGACY_WELL_KNOWN`, so
+ * a host that has not been updated still finds it: the old `kind`, the old
+ * module id, the old extension names. Everything else is the same document.
+ * That host then greets the module with `roadmap.hello`, and `connect()`
+ * answers in the dialect it was greeted in, so the module is the same module
+ * to both hosts.
+ *
+ * Pure. The manifest passed in is not changed.
+ */
+export function legacyManifest(manifest: Manifest): Omit<Manifest, 'kind'> & { kind: typeof LEGACY_MANIFEST_KIND } {
+  return {
+    ...manifest,
+    kind: LEGACY_MANIFEST_KIND,
+    id: legacyName(manifest.id),
+    extensions: {
+      emits: manifest.extensions.emits.map(legacyName),
+      consumes: manifest.extensions.consumes.map(legacyName),
+    },
+  }
+}
 
 /**
  * Does a range include a protocol number?

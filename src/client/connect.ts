@@ -4,6 +4,7 @@ import {
   PROTOCOL,
   clampHeight,
 } from '../constants.js'
+import { dialectOfType, toDialect, type Dialect } from '../dialect.js'
 import {
   hostMessageSchema,
   looksLikeWireMessage,
@@ -78,8 +79,8 @@ import { mailbox, type MessageSource } from './mailbox.js'
  *
  * The protocol's three, plus one more. `silent` is the timeout, and it is a
  * separate word rather than folded into `failed` because the two send a person
- * to different places: `failed` is the roadmap telling us it went wrong, and
- * `silent` is the roadmap not being there — which, from inside a frame, is
+ * to different places: `failed` is the host telling us it went wrong, and
+ * `silent` is the host not being there — which, from inside a frame, is
  * indistinguishable from a host that is still starting up. The protocol names
  * the same condition `silent` on the other side of the wire, for a module that
  * was greeted and never answered; the symmetry is intentional.
@@ -107,7 +108,7 @@ export class HostRefused extends Error {
  * A number rather than forever, because forever is a page that shows "asking…"
  * until somebody reloads it, which is the exact shape of dishonesty a spinner
  * has — it is a claim that an answer is coming. Twelve seconds is long enough
- * for a roadmap reading a file off a cold disk and short enough that nobody sits
+ * for a host reading a file off a cold disk and short enough that nobody sits
  * through it twice.
  */
 export const ANSWER_WITHIN_MS = 12_000
@@ -331,7 +332,7 @@ export interface Connection {
    *
    * Fire and forget, like `resize`, and for the same reason: the host may draw
    * it, may draw part of it, or may not have heard of the idea. What comes back
-   * is not an answer but a `roadmap.context` with `filters` in it, which is
+   * is not an answer but a `kehikot.context` with `filters` in it, which is
    * where a page reads the choice — including the first time, out of the
    * greeting, before it has drawn anything.
    *
@@ -456,9 +457,15 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
   let counter = 0
   const nextId = () => `${Date.now().toString(36)}-${(counter += 1).toString(36)}`
 
+  /* Which spelling the host greeted us in, and so the one we answer in. A host
+     from before the rename greets with `roadmap.hello` and hears nothing else;
+     a current one greets with `kehikot.hello`. Everything this file builds is
+     canonical, and is respelled only here, on the way out. See `dialect.ts`. */
+  let dialect: Dialect = 'kehikot'
+
   const send = (message: unknown) => {
     if (!host) return
-    host.postMessage(message, origin)
+    host.postMessage(toDialect(message, dialect), origin)
   }
 
   const settle = (correlation: string, outcome: { ok: true; data: unknown } | { ok: false; refusal: Refusal }) => {
@@ -500,6 +507,7 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
        */
       host = (ev.source as Window | null) ?? source.parent ?? null
       origin = ev.origin && ev.origin !== 'null' ? ev.origin : '*'
+      dialect = dialectOfType((ev.data as { type: string }).type) ?? 'kehikot'
       send({ type: MESSAGE.READY, id, protocol: message.protocol ?? PROTOCOL })
       /* After `ready` and before the page is told, so that a host which reads
          the offer while composing what to draw has it, and so that a handler
@@ -635,7 +643,7 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
             ok: false,
             refusal: {
               reason: 'silent',
-              error: `The roadmap was asked ${method} and had not answered ${Math.round(deadline / 1000)} seconds later.`,
+              error: `The host was asked ${method} and had not answered ${Math.round(deadline / 1000)} seconds later.`,
             },
           })
         }, deadline)

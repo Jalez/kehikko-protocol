@@ -35,7 +35,7 @@ export function namesFor(raw) {
         throw new Error(`"${raw}" is not a module name. Use lowercase letters and digits, with dashes between words — `
             + '"slides", "reading-list" — starting with a letter.');
     }
-    const id = `roadmap.${short}`;
+    const id = `kehikot.${short}`;
     if (!MODULE_ID.test(id))
         throw new Error(`"${id}" is not a module id the protocol accepts (too long?).`);
     const words = short.split('-').join(' ');
@@ -180,7 +180,7 @@ export function create(options) {
 function pointProtocolAt(dir, source) {
     const file = join(dir, 'package.json');
     const pkg = JSON.parse(readFileSync(file, 'utf8'));
-    pkg.dependencies['roadmap-module-protocol'] = source;
+    pkg.dependencies['kehikot-module-protocol'] = source;
     writeFileSync(file, `${JSON.stringify(pkg, null, 2)}\n`);
 }
 /** One step, its output kept and shown only when it fails. */

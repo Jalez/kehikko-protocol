@@ -4,21 +4,21 @@
  *
  * ## Why this is in the protocol package
  *
- * `roadmap.context` carries `projectPath`, and the moment it did, every module
+ * `kehikot.context` carries `projectPath`, and the moment it did, every module
  * that keeps anything had the same question: *given that path, where do I put
  * my file?* Four modules answering it separately is four answers, and the
  * failure is not a crash. A module that spells the folder `.kehikot` and one
  * that spells it `kehikot` both work, both look right, and the person who opens
  * their project finds their notes in one place and their checklists in another,
  * with nothing on any screen to say why. It is exactly the class of
- * disagreement this package exists for — the same class as `roadmap.hello` and
- * `roadmap.Hello` — so the spelling is written down once and both sides import
+ * disagreement this package exists for — the same class as `kehikot.hello` and
+ * `kehikot.Hello` — so the spelling is written down once and both sides import
  * it.
  *
  * ## What the convention is
  *
  * `<projectPath>/.kehikot/<module>/<file>.json`, where `<module>` is the
- * module's own id with the `roadmap.` prefix taken off.
+ * module's own id with the `kehikot.` prefix (or the old `roadmap.` one) taken off.
  *
  *     <projectPath>/.kehikot/
  *         checklist/checklists.json
@@ -105,13 +105,20 @@ export declare const MODULE_FOLDER: RegExp;
 /**
  * A module's folder name, from its id.
  *
- * `roadmap.checklist` becomes `checklist`. The prefix is stripped because the
+ * `kehikot.checklist` becomes `checklist`. The prefix is stripped because the
  * whole point of putting this in somebody's project is that they can read it,
- * and `roadmap.` in front of every directory is four modules restating which
+ * and `kehikot.` in front of every directory is four modules restating which
  * program they belong to inside a folder already named after that program. An id
  * with no such prefix is used whole — `something.else` stays `something.else` —
  * because this package does not get to decide that somebody else's namespace is
  * noise.
+ *
+ * ## Both spellings give the same folder, and that is the migration
+ *
+ * `roadmap.checklist` — the id from before the app was renamed — ALSO becomes
+ * `checklist`. The folder is named after the bare name, never after the
+ * prefix, so a module renamed from `roadmap.x` to `kehikot.x` reads the very
+ * folder it wrote yesterday. No data moves and none is orphaned.
  *
  * ## Why it throws rather than falling back
  *

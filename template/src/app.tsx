@@ -5,10 +5,10 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Switcher, type Item } from '@/switcher'
 import { api as realApi, type Api } from '@/wire/api'
-import { useRoadmap, type Host } from '@/wire/use-roadmap'
+import { useKehikot, type Host } from '@/wire/use-kehikot'
 
 export function App() {
-  return <Screen host={useRoadmap()} />
+  return <Screen host={useKehikot()} />
 }
 
 /**

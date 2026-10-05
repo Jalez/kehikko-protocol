@@ -10,9 +10,13 @@
 export {
   PROTOCOL,
   WELL_KNOWN,
+  LEGACY_WELL_KNOWN,
   MANIFEST_KIND,
+  LEGACY_MANIFEST_KIND,
   MESSAGE,
   MESSAGE_PREFIX,
+  LEGACY_MESSAGE_PREFIX,
+  MESSAGE_PREFIXES,
   HOST_MESSAGES,
   MODULE_MESSAGES,
   MIN_HEIGHT,
@@ -25,6 +29,21 @@ export {
 } from './constants.js'
 
 export { MODULE_ID, MODE_ID, EPIC_SLUG, own } from './ids.js'
+
+export {
+  DIALECTS,
+  canonicalName,
+  legacyName,
+  nameIn,
+  canonicalModuleId,
+  legacyModuleId,
+  canonicalExtension,
+  dialectOfType,
+  dialectOfKind,
+  toDialect,
+  canonicalMessage,
+  type Dialect,
+} from './dialect.js'
 
 export {
   KEHIKOT_DIR,
@@ -43,6 +62,7 @@ export {
 
 export {
   manifestSchema,
+  legacyManifest,
   speaks,
   MODULE_CONDITIONS,
   REACTS_TO,

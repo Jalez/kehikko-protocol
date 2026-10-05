@@ -20,7 +20,7 @@ import { HostRefused, connect, makeMailbox, type Connection, type MessageSource 
  * not know what it was for.
  */
 
-const ID = 'roadmap.example'
+const ID = 'kehikot.example'
 
 /** A window we can post at, standing in for the frame a module runs in. */
 function fakeWindow() {
@@ -267,7 +267,7 @@ describe('binding to the window, not the origin', () => {
     const { source, deliver } = fakeWindow()
     const host = speaker()
     attach({}, { source })
-    for (const data of [null, 'hello', { type: 'webpack/hot' }, { type: 'roadmap.hello' }, 7]) {
+    for (const data of [null, 'hello', { type: 'webpack/hot' }, { type: 'kehikot.hello' }, 7]) {
       deliver({ data, source: host })
     }
     /* The fourth one starts `roadmap.` and is still not a greeting: no protocol,
@@ -569,16 +569,16 @@ describe('an event from another module', () => {
       data: {
         type: MESSAGE.EVENT,
         protocol: PROTOCOL,
-        extension: 'roadmap.notifications@1',
+        extension: 'kehikot.notifications@1',
         payload: { epic: 'a-epic', message: 'a tool ran' },
-        from: 'roadmap.checklist',
+        from: 'kehikot.checklist',
         at: '2026-08-31T00:00:00.000Z',
       },
       source: host,
     })
     expect(got).not.toBeNull()
-    expect((got as unknown as { extension: string }).extension).toBe('roadmap.notifications@1')
-    expect((got as unknown as { from: string }).from).toBe('roadmap.checklist')
+    expect((got as unknown as { extension: string }).extension).toBe('kehikot.notifications@1')
+    expect((got as unknown as { from: string }).from).toBe('kehikot.checklist')
   })
 
   test('a module that never registered for one is unchanged by it arriving', () => {
@@ -590,9 +590,9 @@ describe('an event from another module', () => {
       data: {
         type: MESSAGE.EVENT,
         protocol: PROTOCOL,
-        extension: 'roadmap.notifications@1',
+        extension: 'kehikot.notifications@1',
         payload: {},
-        from: 'roadmap.checklist',
+        from: 'kehikot.checklist',
         at: '2026-08-31T00:00:00.000Z',
       },
       source: host,

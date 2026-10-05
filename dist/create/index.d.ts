@@ -12,7 +12,7 @@ export declare const PORT_STEP = 10;
 export declare const PLACEHOLDERS: readonly ["__MODULE_ID__", "__MODULE_NAME__", "__MODULE_FOLDER__", "__MODULE_PACKAGE__", "__MODULE_PORT__"];
 export type Placeholder = (typeof PLACEHOLDERS)[number];
 export interface Names {
-    /** `roadmap.slides` */
+    /** `kehikot.slides` */
     id: string;
     /** `Slides`, for people. */
     name: string;
@@ -60,7 +60,7 @@ export interface CreateOptions {
     /** Write the registration, putting the module on this machine's host. */
     register?: boolean;
     /**
-     * What the new module's `roadmap-module-protocol` dependency says, instead of
+     * What the new module's `kehikot-module-protocol` dependency says, instead of
      * the GitHub source — e.g. `file:/path/to/this/checkout`. The protocol's own
      * test uses it so a generated module is tested against the protocol as it is
      * now, offline.

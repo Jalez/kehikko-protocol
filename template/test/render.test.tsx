@@ -3,7 +3,7 @@ import { cleanup, render, screen, waitFor } from '@testing-library/react'
 
 import { Screen } from '../src/app.tsx'
 import type { Api } from '../src/wire/api.ts'
-import type { Host } from '../src/wire/use-roadmap.ts'
+import type { Host } from '../src/wire/use-kehikot.ts'
 
 afterEach(cleanup)
 

@@ -1,6 +1,7 @@
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
+import { canonicalName, legacyName } from '../dialect.js';
 import { MODULE_ID } from '../ids.js';
 /**
  * The one directory a host sweeps, and the one shape it finds there.
@@ -18,21 +19,52 @@ import { MODULE_ID } from '../ids.js';
  *
  * So the path is spelled once, in the package both halves already import.
  *
- * ## `ROADMAP_MODULES_DIR` is honoured, and that is not a convenience
+ * ## Where it is now, and where it was
+ *
+ * `~/Library/Application Support/Kehikot/modules` on macOS — the place the
+ * platform keeps an app's own data — and `$XDG_DATA_HOME/kehikot/modules`
+ * (default `~/.local/share/kehikot/modules`) elsewhere. The same directory the
+ * host reads first; see `machineDirs.ts` in the host.
+ *
+ * It used to be `~/.roadmap/modules`, named after the app before it was called
+ * Kehikot. Modules built against an older copy of this package still write
+ * there, and the host still reads it as a fallback, so nothing is lost by a
+ * module moving: it writes the new place, and where an id is in both, the
+ * newer file wins in the host.
+ *
+ * ## `KEHIKOT_MODULES_DIR` is honoured, and that is not a convenience
  *
  * It is how any of this can be tested. A test that wrote into a person's real
- * `~/.roadmap/modules` would be a test that ADOPTS a module onto their canvas,
- * and the only way to notice is a container appearing in an app the test never
+ * registry would be a test that ADOPTS a module onto their canvas, and the
+ * only way to notice is a container appearing in an app the test never
  * opened. The host reads the same variable, so a whole second registry is a
- * directory and an environment variable away.
+ * directory and an environment variable away. `ROADMAP_MODULES_DIR`, its name
+ * before the rename, is read when it is not set.
  */
-export function registryDir() {
-    return process.env.ROADMAP_MODULES_DIR ?? join(homedir(), '.roadmap', 'modules');
+export function registryDir(env = process.env) {
+    const said = env.KEHIKOT_MODULES_DIR || env.ROADMAP_MODULES_DIR;
+    if (said)
+        return said;
+    const home = env.HOME || homedir();
+    if (process.platform === 'darwin')
+        return join(home, 'Library', 'Application Support', 'Kehikot', 'modules');
+    return join(env.XDG_DATA_HOME || join(home, '.local', 'share'), 'kehikot', 'modules');
+}
+/**
+ * The registry before the rename, `~/.roadmap/modules` — READ, never written,
+ * so that what a module wrote there (`keep`, above all) is carried over the
+ * first time it registers in the new place. `null` when the registry was
+ * pointed somewhere on purpose, so a test never reads a person's real one.
+ */
+export function legacyRegistryDir(env = process.env) {
+    if (env.KEHIKOT_MODULES_DIR || env.ROADMAP_MODULES_DIR)
+        return null;
+    return join(env.HOME || homedir(), '.roadmap', 'modules');
 }
 /**
  * Say where this module answers.
  *
- * The filename carries the id — `roadmap.history.json`, not a field inside the
+ * The filename carries the id — `kehikot.history.json`, not a field inside the
  * document — because that is what makes the id unforgeable. A host takes the id
  * from the NAME, so two files claiming one module cannot both exist: the
  * filesystem already refuses that, and a uniqueness rule enforced by the
@@ -89,7 +121,12 @@ export function registerAt({ id, origin, dir }) {
         throw new Error(`"${id}" is not a module id, so there is no registration file to write`);
     const where = registryDir();
     const file = join(where, `${id}.json`);
-    const before = readRegistration(file);
+    /* What this module said last time, wherever it said it: under this id; under
+       the same id spelled as before the rename (`roadmap.x`), beside it or in
+       the old `~/.roadmap/modules`. Only read — the older files are left exactly
+       as they are, for a host that has not been updated. */
+    const earlier = earlierFiles(id, where, file);
+    const before = earlier.map(readRegistration).find((r) => r !== null) ?? null;
     /*
      * Everything already in the file that this function does not manage.
      *
@@ -110,11 +147,26 @@ export function registerAt({ id, origin, dir }) {
      * is also what makes a field added to this format later safe from every
      * module still running the version before it.
      */
-    const kept = readAll(file);
+    const kept = earlier.map(readAll).find((all) => Object.keys(all).length > 0) ?? {};
     mkdirSync(where, { recursive: true });
     writeFileSync(file, `${JSON.stringify({ ...kept, url: origin, dir }, null, 2)}\n`);
     const was = before && (before.url !== origin || before.dir !== dir) ? before : null;
     return { id, url: origin, dir, file, was };
+}
+/* This module's file, then the files that are the same module under its
+   pre-rename id, nearest first. See `registerAt`. */
+function earlierFiles(id, where, file) {
+    const files = [file];
+    const old = legacyName(id);
+    if (old !== id)
+        files.push(join(where, `${old}.json`));
+    const legacy = legacyRegistryDir();
+    if (legacy && legacy !== where) {
+        files.push(join(legacy, `${id}.json`));
+        if (old !== id)
+            files.push(join(legacy, `${old}.json`));
+    }
+    return files;
 }
 /**
  * The whole registration object as it stands on disk, unnarrowed.
@@ -173,29 +225,37 @@ export function readRegistration(file) {
  * system where reading somebody's claim is cheaper than discovering it.
  */
 export function neighbourPorts(selfId, where = registryDir()) {
-    let names;
-    try {
-        names = readdirSync(where);
-    }
-    catch {
-        /* No registry directory yet. The first module on a clean machine is not an
-           error, and a drift that refused to happen because nobody had registered
-           anything would be a strange first experience. */
-        return new Set();
-    }
+    /* And the pre-rename registry too, when this is the real one: a module that
+       has not been updated still states its port there, and that claim is just
+       as much a claim. */
+    const legacy = where === registryDir() ? legacyRegistryDir() : null;
     const ports = new Set();
-    for (const name of names) {
-        if (!name.endsWith('.json'))
+    for (const dir of legacy && legacy !== where ? [where, legacy] : [where]) {
+        let names;
+        try {
+            names = readdirSync(dir);
+        }
+        catch {
+            /* No registry directory yet. The first module on a clean machine is not an
+               error, and a drift that refused to happen because nobody had registered
+               anything would be a strange first experience. */
             continue;
-        const id = name.slice(0, -'.json'.length);
-        if (id === selfId || !MODULE_ID.test(id))
-            continue;
-        const registration = readRegistration(join(where, name));
-        if (!registration)
-            continue;
-        const port = portOf(registration.url);
-        if (port !== null)
-            ports.add(port);
+        }
+        for (const name of names) {
+            if (!name.endsWith('.json'))
+                continue;
+            const id = name.slice(0, -'.json'.length);
+            /* Compared canonically: `roadmap.x.json` is this same module under its
+               pre-rename id, and its port is our own, not a neighbour's. */
+            if (canonicalName(id) === canonicalName(selfId) || !MODULE_ID.test(id))
+                continue;
+            const registration = readRegistration(join(dir, name));
+            if (!registration)
+                continue;
+            const port = portOf(registration.url);
+            if (port !== null)
+                ports.add(port);
+        }
     }
     return ports;
 }

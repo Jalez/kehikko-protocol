@@ -86,7 +86,7 @@ export declare const CAPABILITIES: {
      * installing a program is "reads the epics and asks to navigate" rather than
      * a list of method names.
      */
-    readonly 'view:navigate': "Ask the roadmap to show a particular epic, step or reference. The roadmap decides.";
+    readonly 'view:navigate': "Ask the host to show a particular epic, step or reference. The host decides.";
     /**
      * Say which references the person has picked out.
      *
@@ -160,10 +160,10 @@ export declare const CAPABILITIES: {
      * No new KIND of thing crosses the wire for it. `context.projectPath` already
      * hands a module an absolute path to the open project; this hands it a second
      * one, chosen, one at a time. That is why the sentence a person reads before
-     * running the program says "the roadmap asks you which" — the reader is the
+     * running the program says "the host asks you which" — the reader is the
      * gate, and there is no version of this where they are not.
      */
-    readonly 'projects:pick': "Ask you to choose one of your projects, and be told where it is. The roadmap draws the picker.";
+    readonly 'projects:pick': "Ask you to choose one of your projects, and be told where it is. The host draws the picker.";
     /**
      * Keep a little state of its own, and get it back next time.
      *
@@ -171,7 +171,7 @@ export declare const CAPABILITIES: {
      * from the host's side this is not storage of anything in particular — it is
      * a string it never reads.
      */
-    readonly 'state:keep': "Keep a small amount of its own state between sessions. The roadmap does not read it.";
+    readonly 'state:keep': "Keep a small amount of its own state between sessions. The host does not read it.";
     /**
      * Say why a reference closed: done, won't do, a duplicate, superseded.
      *
@@ -198,7 +198,7 @@ export declare const CAPABILITIES: {
      * canvas. A person deciding whether to run a program should be able to see
      * that it asks for reads, not only that it looks at them.
      */
-    readonly 'trackers:refresh': "Ask the roadmap to read GitHub and GitLab again, for every module on the canvas.";
+    readonly 'trackers:refresh': "Ask the host to read GitHub and GitLab again, for every module on the canvas.";
 };
 export type Capability = keyof typeof CAPABILITIES;
 export declare const CAPABILITY_NAMES: Capability[];
@@ -273,9 +273,9 @@ export declare const methodParams: {
         epic: string;
     }>;
     /**
-     * Ask the roadmap to show something. See the essay on `navigationResult`.
+     * Ask the host to show something. See the essay on `navigationResult`.
      *
-     * The same triple `roadmap.goto` carries, and named the same way on purpose:
+     * The same triple `kehikot.goto` carries, and named the same way on purpose:
      * a module that can receive a walk and a module that can ask for one are
      * describing the same act from two ends, and two spellings of it would be two
      * things to get wrong.
@@ -389,24 +389,24 @@ export declare const methodParams: {
                 from: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
                 to: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
             }, "strip", z.ZodTypeAny, {
-                title: string;
                 from: number | null;
+                title: string;
                 to: number | null;
             }, {
                 title: string;
                 from?: number | null | undefined;
                 to?: number | null | undefined;
             }>, {
-                title: string;
                 from: number | null;
+                title: string;
                 to: number | null;
             }, {
                 title: string;
                 from?: number | null | undefined;
                 to?: number | null | undefined;
             }>, {
-                title: string;
                 from: number | null;
+                title: string;
                 to: number | null;
             }, {
                 title: string;
@@ -414,14 +414,14 @@ export declare const methodParams: {
                 to?: number | null | undefined;
             }>>>;
         }, "strip", z.ZodTypeAny, {
-            path: string;
             from: number | null;
+            path: string;
             to: number | null;
             page: number | null;
             quoted: string;
             section: {
-                title: string;
                 from: number | null;
+                title: string;
                 to: number | null;
             } | null;
         }, {
@@ -436,14 +436,14 @@ export declare const methodParams: {
                 to?: number | null | undefined;
             } | null | undefined;
         }>, {
-            path: string;
             from: number | null;
+            path: string;
             to: number | null;
             page: number | null;
             quoted: string;
             section: {
-                title: string;
                 from: number | null;
+                title: string;
                 to: number | null;
             } | null;
         }, {
@@ -458,14 +458,14 @@ export declare const methodParams: {
                 to?: number | null | undefined;
             } | null | undefined;
         }>, {
-            path: string;
             from: number | null;
+            path: string;
             to: number | null;
             page: number | null;
             quoted: string;
             section: {
-                title: string;
                 from: number | null;
+                title: string;
                 to: number | null;
             } | null;
         }, {
@@ -482,14 +482,14 @@ export declare const methodParams: {
         }>>;
     }, "strip", z.ZodTypeAny, {
         passage: {
-            path: string;
             from: number | null;
+            path: string;
             to: number | null;
             page: number | null;
             quoted: string;
             section: {
-                title: string;
                 from: number | null;
+                title: string;
                 to: number | null;
             } | null;
         } | null;
@@ -512,7 +512,7 @@ export declare const methodParams: {
      *
      * ## The offer went one way, and that was the gap
      *
-     * `roadmap.filters` lets a module say what it can be narrowed by; the host
+     * `kehikot.filters` lets a module say what it can be narrowed by; the host
      * draws the control and the choice comes back in `context.filters`. There was
      * no way back. The host owned the choice completely, which is right — it is
      * per container, it outlives a reload, and a module that could silently move
@@ -582,7 +582,7 @@ export declare const methodParams: {
      * the way a module that closed its document says so, for the reason an empty
      * `refs` clears a selection and a `null` passage clears the passage.
      *
-     * Whole replacement, never a merge, for the reason `roadmap.filters` is: a
+     * Whole replacement, never a merge, for the reason `kehikot.filters` is: a
      * merge could never take anything back, and a container that stopped showing
      * a file would go on being described as showing it.
      *
@@ -606,24 +606,24 @@ export declare const methodParams: {
                 from: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
                 to: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
             }, "strip", z.ZodTypeAny, {
-                title: string;
                 from: number | null;
+                title: string;
                 to: number | null;
             }, {
                 title: string;
                 from?: number | null | undefined;
                 to?: number | null | undefined;
             }>, {
-                title: string;
                 from: number | null;
+                title: string;
                 to: number | null;
             }, {
                 title: string;
                 from?: number | null | undefined;
                 to?: number | null | undefined;
             }>, {
-                title: string;
                 from: number | null;
+                title: string;
                 to: number | null;
             }, {
                 title: string;
@@ -631,14 +631,14 @@ export declare const methodParams: {
                 to?: number | null | undefined;
             }>>>;
         }, "strip", z.ZodTypeAny, {
-            path: string;
             from: number | null;
+            path: string;
             to: number | null;
             page: number | null;
             quoted: string;
             section: {
-                title: string;
                 from: number | null;
+                title: string;
                 to: number | null;
             } | null;
         }, {
@@ -653,14 +653,14 @@ export declare const methodParams: {
                 to?: number | null | undefined;
             } | null | undefined;
         }>, {
-            path: string;
             from: number | null;
+            path: string;
             to: number | null;
             page: number | null;
             quoted: string;
             section: {
-                title: string;
                 from: number | null;
+                title: string;
                 to: number | null;
             } | null;
         }, {
@@ -675,14 +675,14 @@ export declare const methodParams: {
                 to?: number | null | undefined;
             } | null | undefined;
         }>, {
-            path: string;
             from: number | null;
+            path: string;
             to: number | null;
             page: number | null;
             quoted: string;
             section: {
-                title: string;
                 from: number | null;
+                title: string;
                 to: number | null;
             } | null;
         }, {
@@ -700,14 +700,14 @@ export declare const methodParams: {
     }, "strip", z.ZodTypeAny, {
         refs: string[];
         documents: {
-            path: string;
             from: number | null;
+            path: string;
             to: number | null;
             page: number | null;
             quoted: string;
             section: {
-                title: string;
                 from: number | null;
+                title: string;
                 to: number | null;
             } | null;
         }[];
@@ -924,7 +924,7 @@ export declare const methodParams: {
         project?: true | undefined;
     }>;
     readonly 'events.emit': z.ZodObject<{
-        extension: z.ZodString;
+        extension: z.ZodEffects<z.ZodString, string, string>;
         /**
          * Unknown here, and checked against the named extension's own schema by
          * whoever routes it — see `./extensions.js`. Typing it as a union of every
@@ -948,7 +948,7 @@ export type MethodParams<M extends Method> = z.input<(typeof methodParams)[M]>;
  *
  * ## The wall this removes
  *
- * Until now a module could be walked and could not walk. `roadmap.goto` goes
+ * Until now a module could be walked and could not walk. `kehikot.goto` goes
  * one way, and the module → host words were `ready`, `request`, `resize`,
  * `went` — none of which moves anybody. So a program that shows a person every
  * project and epic on the machine could draw the whole map and never travel on
@@ -957,7 +957,7 @@ export type MethodParams<M extends Method> = z.input<(typeof methodParams)[M]>;
  *
  * ## Why a method and not a ninth message
  *
- * A new top-level `roadmap.navigate` was the other candidate, and it loses on
+ * A new top-level `kehikot.navigate` was the other candidate, and it loses on
  * three counts.
  *
  * The first is that it would need an answer, and an answer needs correlation,
@@ -976,7 +976,7 @@ export type MethodParams<M extends Method> = z.input<(typeof methodParams)[M]>;
  * module's messages are: three statements and one unanswerable ask. `resize` is
  * the closest to a demand and it is deliberately fire-and-forget — the host
  * clamps it, may ignore it, and never replies. A module posting
- * `roadmap.navigate` at a host would read like `resize`: a thing done rather
+ * `kehikot.navigate` at a host would read like `resize`: a thing done rather
  * than a thing asked, with no place for a no. Two programs both believing they
  * decide what is on screen is the defect this whole arrangement exists to
  * prevent. A REQUEST is a question with an answer, and the answer may be no.
@@ -1014,7 +1014,7 @@ export type MethodParams<M extends Method> = z.input<(typeof methodParams)[M]>;
  * otherwise have no way to know. A `global` mode is never sent context — that
  * is what `global` means — so after moving somebody it would be drawing a map
  * with no marker on it until the next thing happened to tell it. A
- * epic-scoped mode gets a `roadmap.context` too and can ignore this. Null
+ * epic-scoped mode gets a `kehikot.context` too and can ignore this. Null
  * when the host did not move, and null is also honest for a move within the
  * epic already open.
  *

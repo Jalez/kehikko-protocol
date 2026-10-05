@@ -18,11 +18,11 @@ describe('a format is named with its version, and that is the whole mechanism', 
   })
 
   test('the version is not optional: the unversioned name is a different name, and unknown', () => {
-    expect(known('roadmap.notifications@1')).toBe(true)
-    expect(known('roadmap.notifications')).toBe(false)
-    expect(known('roadmap.notifications@2')).toBe(false)
-    expect(schemaFor('roadmap.notifications')).toBeUndefined()
-    expect(schemaFor('roadmap.notifications@1')).toBeDefined()
+    expect(known('kehikot.notifications@1')).toBe(true)
+    expect(known('kehikot.notifications')).toBe(false)
+    expect(known('kehikot.notifications@2')).toBe(false)
+    expect(schemaFor('kehikot.notifications')).toBeUndefined()
+    expect(schemaFor('kehikot.notifications@1')).toBeDefined()
   })
 
   test('a name off the prototype is not a known extension', () => {
@@ -32,7 +32,7 @@ describe('a format is named with its version, and that is the whole mechanism', 
   })
 })
 
-describe('roadmap.notifications@1', () => {
+describe('kehikot.notifications@1', () => {
   test('the minimum is an epic and a message, and the level defaults', () => {
     const p = notificationPayload.parse({ epic: 'modes-are-modules', message: 'Built the paper.' })
     expect(p.level).toBe('info')
@@ -67,7 +67,7 @@ describe('roadmap.notifications@1', () => {
   })
 })
 
-describe('roadmap.calls@1', () => {
+describe('kehikot.calls@1', () => {
   test('what was called, whether it worked, and how long it took', () => {
     const p = callPayload.parse({ target: 'api.github.com', ok: false, ms: 12 })
     expect(p.why).toBe('')

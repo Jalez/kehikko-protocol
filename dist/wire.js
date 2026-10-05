@@ -1,7 +1,21 @@
 import { z } from 'zod';
-import { LIMITS, MESSAGE, PROTOCOL } from './constants.js';
+import { LIMITS, MESSAGE, MESSAGE_PREFIXES, PROTOCOL } from './constants.js';
+import { canonicalName, legacyName } from './dialect.js';
 import { trackerSignalSchema } from './tracker.js';
 import { EPIC_SLUG, MODULE_ID } from './ids.js';
+/**
+ * A message type, read in either spelling and handed back in the current one.
+ *
+ * Every message schema below uses this for its `type`, so a host built
+ * against this package reads `roadmap.ready` from a module that has not been
+ * updated, and a module built against it reads `roadmap.hello` from a host
+ * that has not been. Downstream of a parse there is only the `kehikot.`
+ * spelling, and code comparing `message.type === MESSAGE.READY` is right for
+ * both. Sending in the old spelling is `toDialect`'s job; see `dialect.ts`.
+ */
+function messageType(type) {
+    return z.union([z.literal(type), z.literal(legacyName(type))]).transform(() => type);
+}
 /**
  * Everything the two sides say to each other.
  *
@@ -32,7 +46,7 @@ import { EPIC_SLUG, MODULE_ID } from './ids.js';
  * the host sends is not, and is the same rule: a framed page receives every
  * message posted at its window, from the host, from a bundler's dev socket,
  * from anything else that has a handle on it. The type check is what tells a
- * `roadmap.context` from a coincidence.
+ * `kehikot.context` from a coincidence.
  */
 /**
  * What a module is told about where the reader is standing.
@@ -457,7 +471,7 @@ export const filterGroupSchema = z
  * words change. See `filterOptionSchema` on why the count lives in the label.
  */
 export const filtersSchema = z.object({
-    type: z.literal(MESSAGE.FILTERS),
+    type: messageType(MESSAGE.FILTERS),
     groups: z
         .array(filterGroupSchema)
         .max(LIMITS.FILTER_GROUPS)
@@ -503,7 +517,7 @@ export const filtersSchema = z.object({
  * feature has and the only one it needs.
  */
 export const clearableSchema = z.object({
-    type: z.literal(MESSAGE.CLEARABLE),
+    type: messageType(MESSAGE.CLEARABLE),
     /** The words on the control, or `null` to take the control away. */
     label: z.string().min(1).max(LIMITS.CLEAR_LABEL).nullable().default(null),
 });
@@ -515,7 +529,7 @@ export const clearableSchema = z.object({
  *
  * **Not a list of what to delete**, because the host does not know and must not
  * find out. **Not the filter choice**, because the module already has that from
- * `roadmap.context` and a second copy would be a second answer to one question,
+ * `kehikot.context` and a second copy would be a second answer to one question,
  * arriving on its own schedule and disagreeing after any race. **Not a
  * correlation id**, because there is no answer: see `MESSAGE.CLEAR` for why an
  * acknowledgement would only tempt a host into reporting a number it did not
@@ -525,7 +539,7 @@ export const clearableSchema = z.object({
  * can tell which host it is talking to without keeping the greeting.
  */
 export const clearSchema = z.object({
-    type: z.literal(MESSAGE.CLEAR),
+    type: messageType(MESSAGE.CLEAR),
     protocol: z.number().int().min(1),
 });
 /* ------------------------------------------------------------------------ *
@@ -571,7 +585,7 @@ export const clearSchema = z.object({
  * and that is the whole of the feedback this feature has.
  */
 export const refreshableSchema = z.object({
-    type: z.literal(MESSAGE.REFRESHABLE),
+    type: messageType(MESSAGE.REFRESHABLE),
     /** Whether there is anything to read again right now. `false` withdraws the control. */
     can: z.boolean().default(true),
     /** When this module's material was last read, as the MODULE knows it. */
@@ -595,18 +609,18 @@ export const refreshableSchema = z.object({
  * timer beside it.
  *
  * **Not a correlation id**, because there is no answer. What comes back is a
- * new `roadmap.refreshable`: `busy` while it runs, then a new `at`. An
+ * new `kehikot.refreshable`: `busy` while it runs, then a new `at`. An
  * acknowledgement would only tempt a host into reporting on work it cannot see.
  */
 export const refreshSchema = z.object({
-    type: z.literal(MESSAGE.REFRESH),
+    type: messageType(MESSAGE.REFRESH),
     protocol: z.number().int().min(1),
 });
 /**
  * What each group is currently set to: group id → an option id, or what
  * somebody typed.
  *
- * This is the half that travels back, and it travels in `roadmap.context` — see
+ * This is the half that travels back, and it travels in `kehikot.context` — see
  * the field there for why it is context rather than a message of its own.
  *
  * Bounded to `FILTER_GROUPS` entries, so the record cannot be larger than the
@@ -831,7 +845,7 @@ export const showingSchema = z.object({
  * its own id, and may, though nothing here needs it to.
  */
 export const containerSchema = z.object({
-    module: z.string().regex(MODULE_ID),
+    module: z.string().regex(MODULE_ID).transform(canonicalName),
     /** Whether this container is picked out as a target on this kehikko. The host's own fact. */
     selected: z.boolean().default(false),
     /** What it says it is showing, or nothing. Never absent, for the reason `filters` is `{}` and not missing. */
@@ -1063,8 +1077,8 @@ export const contextSchema = z.object({
      *
      * ## Why the choice is context and not a message of its own
      *
-     * The offer goes one way as `roadmap.filters`, so the obvious symmetry is a
-     * `roadmap.chose` coming back. It is the wrong shape, for three reasons that
+     * The offer goes one way as `kehikot.filters`, so the obvious symmetry is a
+     * `kehikot.chose` coming back. It is the wrong shape, for three reasons that
      * all point the same way.
      *
      * The first is that a module has to have this BEFORE it draws. A page told
@@ -1213,7 +1227,7 @@ const correlation = z.string().min(1).max(LIMITS.CORRELATION);
  * approval it has no business modelling.
  */
 export const helloSchema = z.object({
-    type: z.literal(MESSAGE.HELLO),
+    type: messageType(MESSAGE.HELLO),
     protocol: z.number().int().min(1),
     session: z.string().min(1).max(LIMITS.SESSION),
     context: contextSchema,
@@ -1251,10 +1265,10 @@ export const helloSchema = z.object({
  * definition either way, so the two cannot drift apart in what they carry.
  *
  * Only epic-scoped modes are told. A `global` mode asked for one page over the
- * whole roadmap and gets one.
+ * whole canvas and gets one.
  */
 export const contextMessageSchema = contextSchema.extend({
-    type: z.literal(MESSAGE.CONTEXT),
+    type: messageType(MESSAGE.CONTEXT),
     protocol: z.number().int().min(1),
 });
 /**
@@ -1292,7 +1306,7 @@ export const responseFailureReasons = ['unknown-module', 'unknown-method', 'fail
  */
 export const responseSchema = z.discriminatedUnion('ok', [
     z.object({
-        type: z.literal(MESSAGE.RESPONSE),
+        type: messageType(MESSAGE.RESPONSE),
         id: correlation,
         ok: z.literal(true),
         /**
@@ -1303,7 +1317,7 @@ export const responseSchema = z.discriminatedUnion('ok', [
         data: z.unknown(),
     }),
     z.object({
-        type: z.literal(MESSAGE.RESPONSE),
+        type: messageType(MESSAGE.RESPONSE),
         id: correlation,
         ok: z.literal(false),
         reason: z.enum(responseFailureReasons),
@@ -1352,7 +1366,7 @@ export const responseSchema = z.discriminatedUnion('ok', [
  */
 export const gotoSchema = z
     .object({
-    type: z.literal(MESSAGE.GOTO),
+    type: messageType(MESSAGE.GOTO),
     id: correlation,
     ref: z.string().min(1).max(LIMITS.GOTO_REF).optional(),
     step: z.number().int().min(1).max(999).optional(),
@@ -1381,13 +1395,14 @@ export const gotoSchema = z
  * a word nobody has said yet.
  */
 export const readySchema = z.object({
-    type: z.literal(MESSAGE.READY),
-    id: z.string().regex(MODULE_ID),
+    type: messageType(MESSAGE.READY),
+    /* Canonical once parsed: an unchanged module still answers as `roadmap.x`. */
+    id: z.string().regex(MODULE_ID).transform(canonicalName),
     protocol: z.number().int().min(1).default(PROTOCOL),
 });
 /** One question, with an id the answer will carry back. */
 export const requestSchema = z.object({
-    type: z.literal(MESSAGE.REQUEST),
+    type: messageType(MESSAGE.REQUEST),
     id: correlation,
     /**
      * Bounded but not held to the list of known methods, which would be this
@@ -1407,7 +1422,7 @@ export const requestSchema = z.object({
  * itself.
  */
 export const resizeSchema = z.object({
-    type: z.literal(MESSAGE.RESIZE),
+    type: messageType(MESSAGE.RESIZE),
     height: z.number().finite(),
 });
 /**
@@ -1453,7 +1468,7 @@ export const resizeSchema = z.object({
  * degrades to silence.
  */
 export const wentSchema = z.object({
-    type: z.literal(MESSAGE.WENT),
+    type: messageType(MESSAGE.WENT),
     id: correlation,
     found: z.boolean(),
     why: z.string().max(LIMITS.REASON).default(''),
@@ -1475,7 +1490,7 @@ export const wentSchema = z.object({
  *
  * The sender does not name a recipient and cannot: a module has no way to know
  * what else is on the canvas, and giving it one would end modularity. It names
- * a FORMAT — `roadmap.notifications@1` — and the host works out who has said,
+ * a FORMAT — `kehikot.notifications@1` — and the host works out who has said,
  * in their manifest, that they consume it. So a module emits into the room and
  * the room decides who hears, which is why either can be removed without the
  * other noticing.
@@ -1505,14 +1520,14 @@ export const wentSchema = z.object({
  * needs history should keep its own rather than expect the wire to hold it.
  */
 export const eventSchema = z.object({
-    type: z.literal(MESSAGE.EVENT),
+    type: messageType(MESSAGE.EVENT),
     protocol: z.number().int().min(1),
-    /** The format, e.g. `roadmap.notifications@1`. Known to the host, or unsent. */
-    extension: z.string().min(1).max(LIMITS.EXTENSION),
+    /** The format, e.g. `kehikot.notifications@1`. Known to the host, or unsent. */
+    extension: z.string().min(1).max(LIMITS.EXTENSION).transform(canonicalName),
     /** Whatever that format says. Validated by the host before it left. */
     payload: z.unknown(),
     /** The module that emitted it, named by the host from its own registry. */
-    from: z.string().regex(MODULE_ID),
+    from: z.string().regex(MODULE_ID).transform(canonicalName),
     /**
      * When the host accepted it, ISO 8601. A receiver ordering by arrival would
      * be ordering by its own scheduler instead.
@@ -1553,14 +1568,16 @@ export const moduleMessageSchema = z.union([
  * The cheap first filter, before a schema is run over a `MessageEvent` from a
  * window that receives messages from everything. It says nothing about whether
  * the message is valid or whether the sender is anybody — it says the value is
- * an object with a `type` that starts `roadmap.`, which is what separates a
- * message meant for this protocol from the several that are not.
+ * an object with a `type` that starts `kehikot.` — or `roadmap.`, the same
+ * protocol before the rename, which is still read (see `dialect.ts`) — and that
+ * is what separates a message meant for this protocol from the several that
+ * are not.
  */
 export function looksLikeWireMessage(value) {
     return (typeof value === 'object' &&
         value !== null &&
         'type' in value &&
         typeof value.type === 'string' &&
-        value.type.startsWith('roadmap.'));
+        MESSAGE_PREFIXES.some((prefix) => value.type.startsWith(prefix)));
 }
 //# sourceMappingURL=wire.js.map

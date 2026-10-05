@@ -14,15 +14,36 @@
  *
  * So the path is spelled once, in the package both halves already import.
  *
- * ## `ROADMAP_MODULES_DIR` is honoured, and that is not a convenience
+ * ## Where it is now, and where it was
+ *
+ * `~/Library/Application Support/Kehikot/modules` on macOS — the place the
+ * platform keeps an app's own data — and `$XDG_DATA_HOME/kehikot/modules`
+ * (default `~/.local/share/kehikot/modules`) elsewhere. The same directory the
+ * host reads first; see `machineDirs.ts` in the host.
+ *
+ * It used to be `~/.roadmap/modules`, named after the app before it was called
+ * Kehikot. Modules built against an older copy of this package still write
+ * there, and the host still reads it as a fallback, so nothing is lost by a
+ * module moving: it writes the new place, and where an id is in both, the
+ * newer file wins in the host.
+ *
+ * ## `KEHIKOT_MODULES_DIR` is honoured, and that is not a convenience
  *
  * It is how any of this can be tested. A test that wrote into a person's real
- * `~/.roadmap/modules` would be a test that ADOPTS a module onto their canvas,
- * and the only way to notice is a container appearing in an app the test never
+ * registry would be a test that ADOPTS a module onto their canvas, and the
+ * only way to notice is a container appearing in an app the test never
  * opened. The host reads the same variable, so a whole second registry is a
- * directory and an environment variable away.
+ * directory and an environment variable away. `ROADMAP_MODULES_DIR`, its name
+ * before the rename, is read when it is not set.
  */
-export declare function registryDir(): string;
+export declare function registryDir(env?: Record<string, string | undefined>): string;
+/**
+ * The registry before the rename, `~/.roadmap/modules` — READ, never written,
+ * so that what a module wrote there (`keep`, above all) is carried over the
+ * first time it registers in the new place. `null` when the registry was
+ * pointed somewhere on purpose, so a test never reads a person's real one.
+ */
+export declare function legacyRegistryDir(env?: Record<string, string | undefined>): string | null;
 /** What one registration says. The host reads `url`, `dir`, and a `keep` this never writes. */
 export interface Registration {
     url: string;
@@ -38,7 +59,7 @@ export interface Registered extends Registration {
 /**
  * Say where this module answers.
  *
- * The filename carries the id — `roadmap.history.json`, not a field inside the
+ * The filename carries the id — `kehikot.history.json`, not a field inside the
  * document — because that is what makes the id unforgeable. A host takes the id
  * from the NAME, so two files claiming one module cannot both exist: the
  * filesystem already refuses that, and a uniqueness rule enforced by the

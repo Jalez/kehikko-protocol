@@ -1,6 +1,6 @@
-# roadmap-module-protocol
+# kehikot-module-protocol
 
-The contract between a roadmap host and a module it frames.
+The contract between a Kehikot host and a module it frames.
 
 A host application frames small programs somebody runs on their own machine.
 Each program serves a manifest describing itself, a page the host embeds in a
@@ -9,7 +9,7 @@ agree on — the manifest, the eight messages that cross the frame, the extensio
 payloads — and nothing else.
 
 ```
-npm install roadmap-module-protocol zod
+npm install kehikot-module-protocol zod
 ```
 
 `zod` is a peer dependency on purpose. Schemas from two copies of zod do not
@@ -75,8 +75,58 @@ And behind two subpaths, which are not shapes and say so:
 
 | | |
 |---|---|
-| `roadmap-module-protocol/client` | `connect`, `mailbox`, `HostRefused` — the module half of the wire, for a page that would rather not write it again. Browser code, kept out of the front door so a Bun process can import shapes without it. **A convenience: a module may hand-roll its wire and be perfectly conforming.** |
-| `roadmap-module-protocol/client/react` | `useRoadmap`. Optional; `react` is an optional peer dependency and `client` does not import it. |
+| `kehikot-module-protocol/client` | `connect`, `mailbox`, `HostRefused` — the module half of the wire, for a page that would rather not write it again. Browser code, kept out of the front door so a Bun process can import shapes without it. **A convenience: a module may hand-roll its wire and be perfectly conforming.** |
+| `kehikot-module-protocol/client/react` | `useKehikot` (once `useRoadmap`, still exported as an alias). Optional; `react` is an optional peer dependency and `client` does not import it. |
+
+## Renamed from "roadmap", and what a module has to change
+
+This package was `roadmap-module-protocol`, and every name it put on the wire
+said `roadmap.`. The app is Kehikot now, and since 0.25.0 the names say
+`kehikot.`. Nothing about the protocol changed meaning, so `PROTOCOL` is still
+2 — see the note on it in `constants.ts`, and `src/dialect.ts` for the design.
+
+**Both spellings work, in both directions, for at least one version:**
+
+- A host reads either spelling of everything: `roadmap.*` and `kehikot.*`
+  messages, both manifest kinds, both well-known paths (new first), both
+  spellings of an extension name, and `roadmap.x` as the same module as
+  `kehikot.x`. Every schema here hands back the `kehikot.` spelling.
+- A host greets a module in the dialect its manifest's `kind` says it speaks,
+  so an unchanged module is greeted with `roadmap.hello` and hears everything
+  after it in `roadmap.` too (`toDialect`).
+- `connect()` answers in whatever dialect it was greeted in, so a module built
+  against this version works under a host from before the rename as well.
+- `moduleFolder('roadmap.x')` and `moduleFolder('kehikot.x')` are both `x`:
+  no module's data moves.
+
+**What a module changes, when it moves to this version:**
+
+1. `package.json`: the dependency key becomes `kehikot-module-protocol`, same
+   git URL (`git+ssh://git@github.com/Jalez/kehikko-protocol.git#main`). Then
+   `bun install` and commit `bun.lock`.
+2. Imports: `roadmap-module-protocol…` becomes `kehikot-module-protocol…`
+   (`/client`, `/client/react`, `/serve`, `/facets`). `useRoadmap` is
+   `useKehikot` (the old names are deprecated aliases).
+3. The manifest: `kind: MANIFEST_KIND` (now `kehikot.module`) and the id
+   `kehikot.<name>` instead of `roadmap.<name>`. The host treats both ids as
+   one module, so its placements, state and registration carry over.
+4. Serve the manifest at `WELL_KNOWN` (`/.well-known/kehikot-module.json`) —
+   and, to stay visible to a host from before the rename, also at
+   `LEGACY_WELL_KNOWN` with `legacyManifest(MANIFEST)`.
+5. Message types: only a module that spells them by hand (rather than through
+   `MESSAGE` and `connect()`) has anything to change — use `MESSAGE.*`, or
+   `toDialect` if it posts its own.
+6. Extension names: `kehikot.notifications@1`, `kehikot.calls@1` in
+   `extensions.emits`/`consumes` and in `events.emit`.
+7. `vite.config.ts`: `frame-ancestors` from `frameAncestors()` in `/serve`,
+   which reads `KEHIKOT_ORIGINS` (the space-separated list a host passes:
+   development page, desktop app page, Tauri window), then `KEHIKOT_ORIGIN`,
+   then `ROADMAP_ORIGIN`, then every origin a host here serves from.
+8. `run.sh`: `bun install --frozen-lockfile` whenever `bun.lock` or
+   `package.json` is newer than the last install — see `template/run.sh`.
+9. `register.ts` needs nothing: `registerAt` now writes the Kehikot machine
+   directory (`~/Library/Application Support/Kehikot/modules`), reading what the
+   old `roadmap.x.json` said (`keep` above all) and leaving that file alone.
 
 ## The wire
 
@@ -84,21 +134,21 @@ Ten messages, across a frame, by `postMessage`.
 
 | Host → module | |
 |---|---|
-| `roadmap.hello` | The greeting, on every frame load. Carries the protocol both sides settled on, a session name, and the current context. |
-| `roadmap.context` | Which epic is open, which project it belongs to and where that project is on disk, which theme. Sent on every switch. |
-| `roadmap.response` | The answer to exactly one request. |
-| `roadmap.goto` | Go to this reference. |
-| `roadmap.event` | An extension payload another module emitted. |
-| `roadmap.clear` | "Clear what you are showing." The press, relayed — no ids, no answer. |
+| `kehikot.hello` | The greeting, on every frame load. Carries the protocol both sides settled on, a session name, and the current context. |
+| `kehikot.context` | Which epic is open, which project it belongs to and where that project is on disk, which theme. Sent on every switch. |
+| `kehikot.response` | The answer to exactly one request. |
+| `kehikot.goto` | Go to this reference. |
+| `kehikot.event` | An extension payload another module emitted. |
+| `kehikot.clear` | "Clear what you are showing." The press, relayed — no ids, no answer. |
 
 | Module → host | |
 |---|---|
-| `roadmap.ready` | "I heard you." |
-| `roadmap.request` | One question, with an id the answer carries back. |
-| `roadmap.resize` | How tall it would like to be. |
-| `roadmap.went` | Whether the `goto` found anything. |
-| `roadmap.filters` | What this module can be narrowed by, so the host can draw the control. |
-| `roadmap.clearable` | That what it shows can be cleared, and what to call the control. `null` withdraws it. |
+| `kehikot.ready` | "I heard you." |
+| `kehikot.request` | One question, with an id the answer carries back. |
+| `kehikot.resize` | How tall it would like to be. |
+| `kehikot.went` | Whether the `goto` found anything. |
+| `kehikot.filters` | What this module can be narrowed by, so the host can draw the control. |
+| `kehikot.clearable` | That what it shows can be cleared, and what to call the control. `null` withdraws it. |
 
 `goto` and `went` are the new pair, and `went` is the piece the protocol has
 always lacked. Everything else the host says is fire-and-forget. `goto` cannot
@@ -132,7 +182,7 @@ capability names and the slug pattern. All of it now says `epic`, with **no
 aliases** — a shim would keep the confusion working, which is the whole of what
 was wrong with it.
 
-The consequence worth naming is `roadmap.context`. It used to say which journey
+The consequence worth naming is `kehikot.context`. It used to say which journey
 was open, and a host saying that is repeating something it was told: the module
 that owns journeys could be showing a different one, or none, or have been
 closed. Context has to be the host's own knowledge or it is a rumour with a
@@ -166,7 +216,7 @@ describing a different project from the one the host had named.
 
 ## And a module's data lives in the project, at `.kehikot/`
 
-`moduleFile(context.projectPath, 'roadmap.notes', 'notes')` is
+`moduleFile(context.projectPath, 'kehikot.notes', 'notes')` is
 `<projectPath>/.kehikot/notes/notes.json`, and that is the whole convention:
 one folder for the app, one folder per module inside it, and the module's own
 files in there.
@@ -179,7 +229,7 @@ files in there.
         journeys/journeys.json
 
 It is here rather than in each module because it is the same class of thing as
-`roadmap.hello`: a spelling two programs have to share, whose disagreement has
+`kehikot.hello`: a spelling two programs have to share, whose disagreement has
 no symptom. A module writing `.kehikot/` and one writing `kehikot/` both work,
 both look right, and the person who opens their project finds half their work
 in one folder and half in another with nothing on any screen to say why.
@@ -199,12 +249,13 @@ that are the whole of what the extra level buys:
   of what "transparent, and usable by others in the project" actually buys
   somebody. `rm -r .kehikot/notes` is a sentence.
 
-The folder's name is `moduleFolder(id)`: the module's id with `roadmap.` taken
-off, because a directory called `roadmap.checklist` in somebody's own
+The folder's name is `moduleFolder(id)`: the module's id with `kehikot.` (or
+the pre-rename `roadmap.`) taken off — so `roadmap.notes` and `kehikot.notes`
+both keep their data in `.kehikot/notes` and the rename moves nothing — because a directory called `kehikot.checklist` in somebody's own
 repository carries a prefix that means nothing to the person reading it. That
 derivation is a PATH BUILT FROM DATA — the id came off a manifest on a port —
 so it is checked against a rule of its own and throws rather than falling back.
-An id with no `roadmap.` prefix is used whole; this package does not get to
+An id with neither prefix is used whole; this package does not get to
 decide somebody else's namespace is noise.
 
 Three more things follow, and they are why this is worth a section:
@@ -234,7 +285,7 @@ never means editing somebody's ignore file again.
 
 ## Asking the host to move
 
-A module could be walked and could not walk. `roadmap.goto` goes one way, and
+A module could be walked and could not walk. `kehikot.goto` goes one way, and
 the module's four words are `ready`, `request`, `resize`, `went` — none of which
 moves anybody. So a program showing a person every project and epic on the
 machine could draw the whole map and never travel on it.
@@ -253,7 +304,7 @@ and a refusal envelope — a second answered pair would be that machinery again,
 differently, for one act. It belongs to a capability, so `declares.uses` still
 reads as a sentence. And the tone is right: the module's messages are three
 statements and one unanswerable ask (`resize`, which the host clamps and may
-ignore), so a `roadmap.navigate` posted at a host would read like a thing done
+ignore), so a `kehikot.navigate` posted at a host would read like a thing done
 rather than a thing asked. Two programs both believing they decide what is on
 screen is the defect this arrangement exists to prevent.
 
@@ -461,7 +512,7 @@ live.filters([
 ])
 ```
 
-`roadmap.filters` goes module → host and replaces the whole offer every time; an
+`kehikot.filters` goes module → host and replaces the whole offer every time; an
 empty `groups` withdraws it. The choice comes back the other way in
 `context.filters`, a record of group id → option id.
 
@@ -523,7 +574,7 @@ what lets one "hide" group say *hide closed MRs/PRs, keep closed issues* —
 a cell of kind × state that two single-choice groups could not reach.
 
 The modules that list references agree on what those ids mean through
-`roadmap-module-protocol/facets`: `issue:closed`, `change:closed`,
+`kehikot-module-protocol/facets`: `issue:closed`, `change:closed`,
 `change:merged`, `closed:wont-do`, … with `facetsOf`, `offer`, `hiddenIn`,
 `sift` and `countFacets` to build the group and apply a choice. It is pure,
 off the main entry because it is vocabulary rather than shape, and a host never
@@ -591,7 +642,7 @@ the modules that ask it have moved.
 
 The same shape a second time, for the other control a module cannot draw in a
 strip it does not own. A module says that what it shows can be cleared and what
-to call it; the host draws one button; a press comes back as `roadmap.clear`;
+to call it; the host draws one button; a press comes back as `kehikot.clear`;
 **the module does the deleting**.
 
 ```ts
@@ -599,12 +650,12 @@ live.clearable(`clear ${shown.length} shown`)   // and `null` to withdraw it
 ```
 
 ```ts
-useRoadmap(id, {
+useKehikot(id, {
   onClear: () => forget(shown.map((one) => one.id)),   // exactly what is on screen
 })
 ```
 
-**The host never touches the data and never learns what went.** `roadmap.clear`
+**The host never touches the data and never learns what went.** `kehikot.clear`
 carries no ids, no filter, no count, and gets no answer. It is a press, relayed.
 What a module says afterwards is a new `clearable` — with a smaller count, or
 `null` because there is nothing left — which is feedback the module wrote and
@@ -745,12 +796,12 @@ already has consumers, that is a bump of its own.
 ## The client, which is a second entry point and an optional one
 
 ```
-import { connect } from 'roadmap-module-protocol/client'
-import { useRoadmap } from 'roadmap-module-protocol/client/react'   // optional again
+import { connect } from 'kehikot-module-protocol/client'
+import { useKehikot } from 'kehikot-module-protocol/client/react'   // optional again
 ```
 
 Twelve modules wrote the same `postMessage` handshake by hand — 7,519 lines of
-`mailbox.ts`, `host.ts` and `use-roadmap.ts` between them — and two bugs turned
+`mailbox.ts`, `host.ts` and `use-roadmap.ts` (now `use-kehikot.ts`) between them — and two bugs turned
 up in several of those copies INDEPENDENTLY, months apart:
 
 - **The replayed greeting nobody was there for.** The host greets on the frame's
@@ -763,7 +814,7 @@ up in several of those copies INDEPENDENTLY, months apart:
   reads "the module will not speak" while the host sees a module that answered
   `ready`.
 - **The context rebuilt field by field.** A module that lists the fields it
-  copies out of `roadmap.context` silently drops every field the protocol later
+  copies out of `kehikot.context` silently drops every field the protocol later
   adds. No error; just that module's settled belief that the host said nothing
   about it. Five modules had it, and it was fixed five times with the same
   one-liner: `const { type, protocol, ...context } = message`.
@@ -779,8 +830,8 @@ module sit out the host's whole timeout.
 **It is a separate entry point, and that is not packaging trivia.** The front
 door of this package is shapes and nothing else, and a host's server or a
 module's server imports it from a Bun process where `window` does not exist.
-`roadmap-module-protocol/client` is where the browser code lives, so that rule
-stays true of `roadmap-module-protocol`.
+`kehikot-module-protocol/client` is where the browser code lives, so that rule
+stays true of `kehikot-module-protocol`.
 
 **The React hook is a third entry point, and optional twice over.** Not every
 module is a React app and none is obliged to be, so `client` imports no React;
@@ -808,9 +859,9 @@ package is the first one.
 
 ```ts
 // main.tsx — for its side effect, from the ENTRY, before React renders anything.
-import 'roadmap-module-protocol/client'
+import 'kehikot-module-protocol/client'
 
-const live = connect('roadmap.example', {
+const live = connect('kehikot.example', {
   onHello: (context, state) => { … },
   onContext: (context) => { … },
   onGoto: (message, answer) => answer(false, 'nothing here to walk to'),
@@ -832,7 +883,7 @@ entire point of the file — importing it installs a `message` listener at modul
 scope, which is what catches a greeting posted before React has rendered.
 
 A bundler told `"sideEffects": false` is entitled to delete a bare
-`import 'roadmap-module-protocol/client'` that binds no names, and it would be
+`import 'kehikot-module-protocol/client'` that binds no names, and it would be
 right to. That deletion produces precisely the bug this client exists to prevent,
 in production only, silently. So `sideEffects` now names the two client files
 rather than saying `false`, and everything else in the package stays as
@@ -847,7 +898,7 @@ does on the wire.
 
 ```ts
 // vite.config.ts
-import { serves } from 'roadmap-module-protocol/serve'
+import { serves } from 'kehikot-module-protocol/serve'
 import { ID } from './manifest.ts'
 
 export default defineConfig({
@@ -868,7 +919,7 @@ module, and a system that sometimes moved for reasons of its own would have
 thrown that away to solve a collision that had not happened.
 
 If something is listening there, it is asked
-`GET /.well-known/roadmap-module.json` with a short deadline, and what happens
+`GET /.well-known/kehikot-module.json` with a short deadline, and what happens
 next depends on **who** answered.
 
 - **The same module id.** This module is already running. It exits 0 with a
@@ -921,7 +972,7 @@ rather than a test.
 
 Everything here binds sockets, reads a port, and writes into somebody's home
 directory. One line of it behind the front door would make
-`import { WELL_KNOWN } from 'roadmap-module-protocol'` an import of `node:fs`, in
+`import { WELL_KNOWN } from 'kehikot-module-protocol'` an import of `node:fs`, in
 a browser bundle, in every module that renders a page. So it stands beside the
 front door the way `/client` does and for the mirror reason: `/client` exists so
 a server with no `window` can import this package, `/serve` exists so a page with
@@ -950,7 +1001,7 @@ bun run create <name> [--dir <path>] [--register]
 ```
 
 From a checkout of this repository. `bun run create slides` makes
-`~/Projects/kehikko-slides` from `template/`: id `roadmap.slides`, data under
+`~/Projects/kehikko-slides` from `template/`: id `kehikot.slides`, data under
 `<project>/.kehikot/slides/`, and a preferred port on the ten-apart grid above
 every module registered on this machine (the highest registered port, or the
 preferred port in that checkout's `manifest.ts`, rounded up to the next free

@@ -12,7 +12,7 @@
  *
  * It is not a shape, though. It is a handful of pure functions, and the main
  * entry is "shapes only — no I/O, no state, no decisions". So it lives at
- * `roadmap-module-protocol/facets`, apart from the wire, and a host never
+ * `kehikot-module-protocol/facets`, apart from the wire, and a host never
  * imports it: the host still draws options it does not understand. Only the
  * modules that build the offer and apply the choice need to agree on what the
  * ids mean, and this is where they agree.
@@ -151,7 +151,7 @@ export interface OfferOptions {
 /** The group id this vocabulary is offered under unless a module says otherwise. */
 export const HIDE_GROUP = 'hide'
 
-/** A `toggles` group offering the facets, ready to go into `roadmap.filters`. */
+/** A `toggles` group offering the facets, ready to go into `kehikot.filters`. */
 export function offer(options: OfferOptions = {}): FilterGroup {
   const { id = HIDE_GROUP, label = 'hide', facets = FACET_IDS, counts, hidden = [] } = options
   const chosen = facets

@@ -2,8 +2,8 @@
  * The spellings, the numbers, and the one place each of them is written down.
  *
  * Everything in this file exists because two programs have to agree about it
- * and neither of them owns it. A host that spells the greeting `roadmap.hello`
- * and a module that listens for `roadmap.Hello` are not slightly wrong; they
+ * and neither of them owns it. A host that spells the greeting `kehikot.hello`
+ * and a module that listens for `kehikot.Hello` are not slightly wrong; they
  * are two programs that will never speak, and the failure has no symptom other
  * than silence. So there is one definition of each spelling and both sides
  * import it.
@@ -31,7 +31,7 @@
  * - The greeting no longer carries a list of permissions, because there are no
  *   permissions. A module that reads that field finds nothing there and greys
  *   out nothing, which is a module showing MORE of itself than before.
- * - `roadmap.goto` and `roadmap.went` are message types both halves already
+ * - `kehikot.goto` and `kehikot.went` are message types both halves already
  *   ignore when unrecognised — they have to, since a window receives every
  *   `postMessage` sent to it — so sending one to a module that never heard of
  *   it produces silence, which is what it produced yesterday.
@@ -45,7 +45,7 @@
  *   at anything". A module that never reads it is untouched, and a module that
  *   does reads a real state rather than an absence. Nothing that already had a
  *   shape changed shape.
- * - `roadmap.filters` is a new MESSAGE and `context.filters` a new context
+ * - `kehikot.filters` is a new MESSAGE and `context.filters` a new context
  *   field, and both pass the same test. A module message a host has never heard
  *   of is dropped, which is what any unrecognised message has always produced,
  *   and the module is left drawing its own control exactly as it did — it loses
@@ -53,7 +53,7 @@
  *   `{}`, which is precisely what a module reading it against an older host
  *   would have found: nothing has been chosen for it, because nothing there can
  *   choose. Nothing gets a second meaning and nothing changes shape.
- * - `roadmap.clearable` and `roadmap.clear` are two new MESSAGES, one in each
+ * - `kehikot.clearable` and `kehikot.clear` are two new MESSAGES, one in each
  *   direction, and they pass the same test from both ends. A host that has
  *   never heard of `clearable` drops it and draws no control, which is what
  *   every module's header looked like the day before — the module loses a place
@@ -100,6 +100,26 @@
  * removed.
  */
 export const PROTOCOL = 2;
+/*
+ * ## And why the rename did not raise it either
+ *
+ * Every name on the wire changed spelling — `roadmap.hello` became
+ * `kehikot.hello`, `roadmap.module` became `kehikot.module`, the well-known
+ * path, the extension names and the module ids with them — when the app that
+ * was once called "roadmap" became Kehikot. That LOOKS like the condition above:
+ * existing messages changing name. It is not, because nothing changed meaning
+ * and nothing was taken away. Both spellings are read everywhere, and the old
+ * one is still written to anybody known to speak only it — see `dialect.ts`.
+ * A module built against the old names keeps working against a new host, and a
+ * module built against the new ones keeps working against an old host. Two
+ * programs that could speak yesterday can speak today, which is the only thing
+ * this number is for, so it stays where it is.
+ *
+ * The essay above says there are no aliases for the epic/journey rename, and
+ * that is not contradicted here. That rename removed a confusion and an alias
+ * would have kept it alive. This one removes a NAME, and the alias keeps
+ * nothing alive but the modules that have not been updated yet.
+ */
 /**
  * The one path a module has to answer on. Nothing else is ever asked for.
  *
@@ -107,7 +127,16 @@ export const PROTOCOL = 2;
  * itself that some other program came looking for, and because it cannot
  * collide with whatever the module's own pages are called.
  */
-export const WELL_KNOWN = '/.well-known/roadmap-module.json';
+export const WELL_KNOWN = '/.well-known/kehikot-module.json';
+/**
+ * Where a module built before the rename serves its manifest.
+ *
+ * A host asks `WELL_KNOWN` first and this second, so an unchanged module is
+ * still found. A module built against this package may serve its manifest here
+ * too, in the old dialect (`legacyManifest`), so an unchanged host still finds
+ * it. See `dialect.ts`.
+ */
+export const LEGACY_WELL_KNOWN = '/.well-known/roadmap-module.json';
 /**
  * The word that makes a manifest a claim rather than a hopeful GET.
  *
@@ -116,32 +145,37 @@ export const WELL_KNOWN = '/.well-known/roadmap-module.json';
  * document that does not say this word is not a manifest, however many of the
  * other fields it happens to have.
  */
-export const MANIFEST_KIND = 'roadmap.module';
+export const MANIFEST_KIND = 'kehikot.module';
+/**
+ * The same word before the rename. Accepted by `manifestSchema`, and the way a
+ * host knows to greet a module in its old dialect — see `dialectOfKind`.
+ */
+export const LEGACY_MANIFEST_KIND = 'roadmap.module';
 /**
  * Every message type, spelled once.
  *
- * Prefixed `roadmap.` so that a page framed inside a host can tell a message
+ * Prefixed `kehikot.` so that a page framed inside a host can tell a message
  * meant for it from the analytics beacon, the framework hot-reload socket, and
  * whatever else in a browser posts messages at windows all day. Both ends
  * filter on the prefix before they look at anything else.
  */
 export const MESSAGE = {
     /** Host → module. The greeting, and the whole of what a module is given without asking. */
-    HELLO: 'roadmap.hello',
+    HELLO: 'kehikot.hello',
     /** Module → host. "I heard you, and here is the protocol I answered in." */
-    READY: 'roadmap.ready',
+    READY: 'kehikot.ready',
     /** Host → module. Which epic is open, which project it belongs to and where that project is, and which theme. */
-    CONTEXT: 'roadmap.context',
+    CONTEXT: 'kehikot.context',
     /** Module → host. One question, with an id the answer will carry back. */
-    REQUEST: 'roadmap.request',
+    REQUEST: 'kehikot.request',
     /** Host → module. The answer to exactly one request. */
-    RESPONSE: 'roadmap.response',
+    RESPONSE: 'kehikot.response',
     /** Module → host. How tall the module would like its frame to be. */
-    RESIZE: 'roadmap.resize',
+    RESIZE: 'kehikot.resize',
     /** Host → module. "Go to this reference." */
-    GOTO: 'roadmap.goto',
+    GOTO: 'kehikot.goto',
     /** Module → host. "I went" — or "there is nothing here by that name." */
-    WENT: 'roadmap.went',
+    WENT: 'kehikot.went',
     /**
      * Host → module. An extension payload another module emitted.
      *
@@ -158,7 +192,7 @@ export const MESSAGE = {
      * host that waited for acknowledgement would be a host that can be hung by a
      * pane nobody is looking at.
      */
-    EVENT: 'roadmap.event',
+    EVENT: 'kehikot.event',
     /**
      * Module → host. "Here is what I can be narrowed by."
      *
@@ -199,7 +233,7 @@ export const MESSAGE = {
      * host takes the control away rather than leaving a menu of options that no
      * longer mean anything.
      */
-    FILTERS: 'roadmap.filters',
+    FILTERS: 'kehikot.filters',
     /**
      * Module → host. "What I am showing can be cleared, and here is what to call it."
      *
@@ -243,7 +277,7 @@ export const MESSAGE = {
      * the control away rather than leaving a button that deletes nothing. It is
      * the exact counterpart of an empty `groups`.
      */
-    CLEARABLE: 'roadmap.clearable',
+    CLEARABLE: 'kehikot.clearable',
     /**
      * Host → module. "Clear what you are showing."
      *
@@ -276,11 +310,11 @@ export const MESSAGE = {
      *
      * ## Not answered, and not correlated
      *
-     * Like `roadmap.event` and for a sharpened version of the same reason. There
+     * Like `kehikot.event` and for a sharpened version of the same reason. There
      * is nothing for the host to do with an acknowledgement except display it,
      * and displaying it would mean the host reporting a number it did not count
      * about data it cannot see. What a module says afterwards is a new
-     * `roadmap.clearable` — with a smaller count in the label, or `null` because
+     * `kehikot.clearable` — with a smaller count in the label, or `null` because
      * there is nothing left — which is feedback the module wrote and the host
      * merely draws.
      *
@@ -294,7 +328,7 @@ export const MESSAGE = {
      * second press. Nothing here can enforce that, which is why it is written
      * down.
      */
-    CLEAR: 'roadmap.clear',
+    CLEAR: 'kehikot.clear',
     /**
      * Module → host. "I can be refreshed, and this is when I last was."
      *
@@ -306,7 +340,7 @@ export const MESSAGE = {
      * ## `at` is the MODULE's fact, and a host must never infer it
      *
      * "Last refreshed" looks like something a host could work out for itself: it
-     * sent `roadmap.refresh` at 10:04, so the data is from 10:04. That is wrong
+     * sent `kehikot.refresh` at 10:04, so the data is from 10:04. That is wrong
      * in every case anybody cares about, and wrong silently:
      *
      *  - the module answered out of its own cache and the reading is an hour old;
@@ -345,13 +379,13 @@ export const MESSAGE = {
      * its own page, in its own words, with whatever remedy it can offer. The most
      * a host can honestly say is when the data is from, which is `at`.
      */
-    REFRESHABLE: 'roadmap.refreshable',
+    REFRESHABLE: 'kehikot.refreshable',
     /**
      * Host → module. "Read your material again."
      *
      * The fourteenth, and `MESSAGE.CLEAR`'s twin in shape: a press, relayed,
      * carrying nothing and answered by nothing. What comes back is not a reply
-     * but a new `roadmap.refreshable` — `busy: true` while it runs, then a new
+     * but a new `kehikot.refreshable` — `busy: true` while it runs, then a new
      * `at` — which is the module reporting on its own work in its own words, the
      * only reporting anybody here is entitled to.
      *
@@ -381,15 +415,22 @@ export const MESSAGE = {
      * ## Not sent to a module that has not offered
      *
      * A host draws this control only for a module that announced
-     * `roadmap.refreshable`, so a press or a tick for a module that never did is
+     * `kehikot.refreshable`, so a press or a tick for a module that never did is
      * a press on a button that should not exist. The bound on how often it may be
      * sent is `REFRESH_EVERY_MIN`: a host must not run this faster than the
      * person asked for, and must not run it at all when nobody asked.
      */
-    REFRESH: 'roadmap.refresh',
+    REFRESH: 'kehikot.refresh',
 };
 /** The prefix every message type carries, so a listener can drop the rest cheaply. */
-export const MESSAGE_PREFIX = 'roadmap.';
+export const MESSAGE_PREFIX = 'kehikot.';
+/**
+ * The prefix message types carried before the rename. Still accepted on
+ * receive, and still sent to a party that speaks only it. See `dialect.ts`.
+ */
+export const LEGACY_MESSAGE_PREFIX = 'roadmap.';
+/** Both prefixes a listener lets through, the current one first. */
+export const MESSAGE_PREFIXES = [MESSAGE_PREFIX, LEGACY_MESSAGE_PREFIX];
 /** What the host says, and only the host. A module sending one of these is confused. */
 export const HOST_MESSAGES = [
     MESSAGE.HELLO,
@@ -504,7 +545,7 @@ export const LIMITS = {
     SUMMARY: 200,
     /** The word on a tab. */
     LABEL: 24,
-    /** An extension name, e.g. `roadmap.notifications@1`. */
+    /** An extension name, e.g. `kehikot.notifications@1`. */
     EXTENSION: 64,
     /** A capability a module declares it will use. */
     CAPABILITY: 64,
@@ -598,7 +639,7 @@ export const LIMITS = {
      *
      * ## Why it is bounded far below a document
      *
-     * This rides in `roadmap.context`, which is broadcast to every framed module
+     * This rides in `kehikot.context`, which is broadcast to every framed module
      * on the canvas every time the reader moves. Unbounded, a reader who selected
      * a chapter would push a chapter through every frame on every change of
      * selection. Two kilobytes is several paragraphs — more than anybody
@@ -752,7 +793,7 @@ export const LIMITS = {
      * ## Two hundred, and what the number is protecting
      *
      * This is stored per container in a host's database, echoed back in every
-     * `roadmap.context`, and rendered inside somebody else's chrome — the same
+     * `kehikot.context`, and rendered inside somebody else's chrome — the same
      * three exposures `FILTER_LABEL` has, and one more: a module can WRITE it
      * with `filters.set`, so it is the one value here that a program rather than
      * a person can produce at speed.

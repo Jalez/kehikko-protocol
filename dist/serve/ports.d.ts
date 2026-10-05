@@ -125,12 +125,13 @@ export declare function identify(port: number, timeoutMs?: number): Promise<Occu
  * What a document on that port makes the program serving it. Pure.
  *
  * The `kind` word is checked before the id, which is the whole reason that word
- * exists: a JSON document that does not say `roadmap.module` is not a manifest
+ * exists: a JSON document that does not say `kehikot.module` (or `roadmap.module`,
+ * its spelling before the rename) is not a manifest
  * however many of the other fields it happens to have, and a program with an
  * `id` field is not thereby a module. Without that check a module could be
  * talked out of starting by any JSON server that happened to have an `id`.
  */
-export declare function readManifest(text: string): Occupant;
+export declare function readManifest(text: string, path?: string): Occupant;
 export interface ClaimOptions {
     id: string;
     prefer: number;

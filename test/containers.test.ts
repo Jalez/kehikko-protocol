@@ -51,7 +51,7 @@ describe('what a container says it is showing', () => {
 
 describe('one container on the kehikko', () => {
   test('names a module, says whether it is picked out, and says what it shows', () => {
-    const row = containerSchema.parse({ module: 'roadmap.paper', selected: true, showing: { documents: [file] } })
+    const row = containerSchema.parse({ module: 'kehikot.paper', selected: true, showing: { documents: [file] } })
     expect(row.selected).toBe(true)
     expect(row.showing.documents).toHaveLength(1)
     expect(row.showing.refs).toEqual([])
@@ -61,7 +61,7 @@ describe('one container on the kehikko', () => {
     /* "Journeys is picked out and has said nothing about what it shows" is a
        sentence a consumer has to be able to print, and it cannot print it about
        a row that is not there. */
-    const quiet = containerSchema.parse({ module: 'roadmap.journeys' })
+    const quiet = containerSchema.parse({ module: 'kehikot.journeys' })
     expect(quiet.selected).toBe(false)
     expect(quiet.showing).toEqual({ refs: [], documents: [] })
   })
@@ -80,12 +80,12 @@ describe('the context carries every container, and defaults to none', () => {
   test('the list is the host\'s, in the host\'s order, and bounded', () => {
     const told = contextSchema.parse({
       containers: [
-        { module: 'roadmap.paper', selected: true, showing: { documents: [file] } },
-        { module: 'roadmap.checklist' },
+        { module: 'kehikot.paper', selected: true, showing: { documents: [file] } },
+        { module: 'kehikot.checklist' },
       ],
     })
-    expect(told.containers.map((c) => c.module)).toEqual(['roadmap.paper', 'roadmap.checklist'])
-    const many = Array.from({ length: LIMITS.CONTAINERS + 1 }, (_, i) => ({ module: `roadmap.m${i}` }))
+    expect(told.containers.map((c) => c.module)).toEqual(['kehikot.paper', 'kehikot.checklist'])
+    const many = Array.from({ length: LIMITS.CONTAINERS + 1 }, (_, i) => ({ module: `kehikot.m${i}` }))
     expect(contextSchema.safeParse({ containers: many }).success).toBe(false)
   })
 
@@ -94,7 +94,7 @@ describe('the context carries every container, and defaults to none', () => {
        does not name, so a module holding the previous copy of this package
        never sees the field. Modelled with the schema minus the field. */
     const older = contextSchema.omit({ containers: true })
-    const parsed = older.parse({ containers: [{ module: 'roadmap.paper' }] }) as Record<string, unknown>
+    const parsed = older.parse({ containers: [{ module: 'kehikot.paper' }] }) as Record<string, unknown>
     expect(parsed).not.toHaveProperty('containers')
   })
 })

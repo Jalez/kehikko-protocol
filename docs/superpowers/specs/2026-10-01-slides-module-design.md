@@ -6,7 +6,7 @@ Status: parts 1–2 approved in conversation; parts 3–6 written from the decis
 ## Intent (agreed)
 
 - **What:** a Slides module (think PowerPoint) for **presenting a paper** — a thesis defence, a conference talk. A deck follows the paper's structure; an agent can draft it from the paper; the person edits it.
-- **Same frame:** it is an ordinary kehikko module — registered, framed by the host, themed by `roadmap.context`, data under `<project>/.kehikot/slides/`.
+- **Same frame:** it is an ordinary kehikko module — registered, framed by the host, themed by `kehikot.context`, data under `<project>/.kehikot/slides/`.
 - **Follows the paper:** scrolling the paper moves the slides to the slides linked to the section being read; stepping through slides turns the paper to that section. Same mechanism as learning: the protocol's `passage`.
 - **Feels the same:** shadcn + Tailwind v4, the same header menu grammar as the host (switcher, pencil/F2 rename, two-press remove, "new …" last).
 - **Faster next time:** a module template and a `create` command, built first; Slides is the first module made with it.
@@ -45,7 +45,7 @@ Learning is not changed in this round (it can adopt `section` later in a few lin
 
 - `kehikko-protocol/template/`, shipped in the package (`files` includes it). Generalised from notes/learning:
   `run.sh`, `register.ts`, `bunfig.toml`, `tsconfig.json`, `components.json`, `vite.config.ts` (with `serves()`), `manifest.ts` (placeholders, `storage: true`), `doors.ts` (manifest route, `/app`, `/healthz`, `/api`, `/mcp` with one example tool), `store.ts` (JSON store under `.kehikot/<folder>/`, write ticket, realpath containment), `page/document.ts`, `src/` (lean host-connection hook, placeholder screen with a header, shadcn button/badge/input/dropdown-menu/tooltip/dialog, the shared menu pieces), `test/` (setup + manifest/doors/store/render tests that pass as generated).
-- Placeholders: `__MODULE_ID__` (`roadmap.<name>`), `__MODULE_NAME__`, `__MODULE_FOLDER__` (`<name>`), `__MODULE_PACKAGE__` (`kehikko-<name>`), `__MODULE_PORT__`.
+- Placeholders: `__MODULE_ID__` (`kehikot.<name>`), `__MODULE_NAME__`, `__MODULE_FOLDER__` (`<name>`), `__MODULE_PACKAGE__` (`kehikko-<name>`), `__MODULE_PORT__`.
 - Command: `bun run create <name> [--dir <path>] [--register]` from a protocol checkout (`bin/create.ts`, also exposed as a package `bin`). It validates the id against `MODULE_ID`, picks the next free port in the 10-apart scheme above every registered module's port, copies and fills the template, `git init`, `bun install`, runs the new module's `bun test`, and with `--register` writes the registration. No GitHub repo is created.
 - The protocol's own test suite generates a module into a temp dir and runs its tests and typecheck, so the template cannot drift from the protocol silently.
 

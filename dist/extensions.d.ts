@@ -1,6 +1,6 @@
 import { z } from 'zod';
 /**
- * `roadmap.notifications@1` — a line on a notification panel: what happened,
+ * `kehikot.notifications@1` — a line on a notification panel: what happened,
  * and on which work.
  *
  * `refs` is the field that earns the whole extension. A line saying a module
@@ -35,7 +35,7 @@ export declare const notificationPayload: z.ZodObject<{
 }>;
 export type NotificationPayload = z.infer<typeof notificationPayload>;
 /**
- * `roadmap.calls@1` — one call somebody made, whether or not the host made it.
+ * `kehikot.calls@1` — one call somebody made, whether or not the host made it.
  *
  * A host records its own outbound calls already, and counts every question a
  * module asks it. What it cannot see is a module's own traffic — a module
@@ -97,7 +97,12 @@ export interface ExtensionFormat {
  */
 export declare const EXTENSIONS: Record<string, ExtensionFormat>;
 export declare const EXTENSION_NAMES: string[];
-/** A name this version of the protocol can check, which is the only kind worth accepting. */
+/**
+ * A name this version of the protocol can check, which is the only kind worth accepting.
+ *
+ * Either spelling: `roadmap.notifications@1` is `kehikot.notifications@1` as an
+ * unchanged module still names it. See `dialect.ts`.
+ */
 export declare function known(extension: string): boolean;
 /**
  * The schema for one extension, or nothing.

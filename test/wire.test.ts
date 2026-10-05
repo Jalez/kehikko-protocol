@@ -174,7 +174,7 @@ describe('who may say what', () => {
   })
 
   test('the module says ready, request, resize and went', () => {
-    expect(moduleMessageSchema.safeParse({ type: MESSAGE.READY, id: 'roadmap.checklist' }).success).toBe(true)
+    expect(moduleMessageSchema.safeParse({ type: MESSAGE.READY, id: 'kehikot.checklist' }).success).toBe(true)
     expect(
       moduleMessageSchema.safeParse({ type: MESSAGE.REQUEST, id: 'q1', method: 'live.get', params: { epic: 'x' } })
         .success,
@@ -186,7 +186,7 @@ describe('who may say what', () => {
     expect(moduleMessageSchema.safeParse({ type: MESSAGE.HELLO, protocol: 1, session: 'a', context: {} }).success).toBe(
       false,
     )
-    expect(hostMessageSchema.safeParse({ type: MESSAGE.READY, id: 'roadmap.checklist' }).success).toBe(false)
+    expect(hostMessageSchema.safeParse({ type: MESSAGE.READY, id: 'kehikot.checklist' }).success).toBe(false)
   })
 
   test('the greeting carries no permissions, because there are none to carry', () => {
@@ -209,7 +209,7 @@ describe('the cheap first filter', () => {
   test('separates this protocol from everything else posted at a window', () => {
     expect(looksLikeWireMessage({ type: MESSAGE.READY })).toBe(true)
     expect(looksLikeWireMessage({ type: 'webpackHotUpdate' })).toBe(false)
-    expect(looksLikeWireMessage('roadmap.hello')).toBe(false)
+    expect(looksLikeWireMessage('kehikot.hello')).toBe(false)
     expect(looksLikeWireMessage(null)).toBe(false)
     expect(looksLikeWireMessage(undefined)).toBe(false)
     expect(looksLikeWireMessage({ type: 42 })).toBe(false)

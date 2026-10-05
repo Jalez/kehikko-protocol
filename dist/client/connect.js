@@ -1,4 +1,5 @@
 import { LIMITS, MESSAGE, PROTOCOL, clampHeight, } from '../constants.js';
+import { dialectOfType, toDialect } from '../dialect.js';
 import { hostMessageSchema, looksLikeWireMessage, } from '../wire.js';
 import { mailbox } from './mailbox.js';
 /**
@@ -23,7 +24,7 @@ export class HostRefused extends Error {
  * A number rather than forever, because forever is a page that shows "asking…"
  * until somebody reloads it, which is the exact shape of dishonesty a spinner
  * has — it is a claim that an answer is coming. Twelve seconds is long enough
- * for a roadmap reading a file off a cold disk and short enough that nobody sits
+ * for a host reading a file off a cold disk and short enough that nobody sits
  * through it twice.
  */
 export const ANSWER_WITHIN_MS = 12_000;
@@ -106,10 +107,15 @@ export function connect(id, events = {}, options = {}) {
     const waiting = new Map();
     let counter = 0;
     const nextId = () => `${Date.now().toString(36)}-${(counter += 1).toString(36)}`;
+    /* Which spelling the host greeted us in, and so the one we answer in. A host
+       from before the rename greets with `roadmap.hello` and hears nothing else;
+       a current one greets with `kehikot.hello`. Everything this file builds is
+       canonical, and is respelled only here, on the way out. See `dialect.ts`. */
+    let dialect = 'kehikot';
     const send = (message) => {
         if (!host)
             return;
-        host.postMessage(message, origin);
+        host.postMessage(toDialect(message, dialect), origin);
     };
     const settle = (correlation, outcome) => {
         /*
@@ -154,6 +160,7 @@ export function connect(id, events = {}, options = {}) {
              */
             host = ev.source ?? source.parent ?? null;
             origin = ev.origin && ev.origin !== 'null' ? ev.origin : '*';
+            dialect = dialectOfType(ev.data.type) ?? 'kehikot';
             send({ type: MESSAGE.READY, id, protocol: message.protocol ?? PROTOCOL });
             /* After `ready` and before the page is told, so that a host which reads
                the offer while composing what to draw has it, and so that a handler
@@ -285,7 +292,7 @@ export function connect(id, events = {}, options = {}) {
                         ok: false,
                         refusal: {
                             reason: 'silent',
-                            error: `The roadmap was asked ${method} and had not answered ${Math.round(deadline / 1000)} seconds later.`,
+                            error: `The host was asked ${method} and had not answered ${Math.round(deadline / 1000)} seconds later.`,
                         },
                     });
                 }, deadline);

@@ -4,7 +4,7 @@ import { registerAt } from './registry.js'
 /**
  * A module's whole port story, as one line in its `vite.config.ts`.
  *
- *     import { serves } from 'roadmap-module-protocol/serve'
+ *     import { serves } from 'kehikot-module-protocol/serve'
  *     import { ID } from './manifest.ts'
  *
  *     plugins: [serves({ id: ID, prefer: 7960 }), doors(), react()]
@@ -109,7 +109,7 @@ export function serves({ id, prefer, dir, span, timeoutMs }: ServesOptions): Ser
   let claimed: Claimed | null = null
 
   return {
-    name: 'roadmap-module-serves',
+    name: 'kehikot-module-serves',
     apply: 'serve',
 
     async config() {
