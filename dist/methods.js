@@ -15,6 +15,7 @@ import { EPIC_SLUG } from './ids.js';
  * choice validates on the way in and is dropped on the way out.
  */
 import { DISPOSITIONS, filterChoiceSchema, passageSchema } from './wire.js';
+import { TRACKER_DETAILS, trackerReadingResult, trackerRefreshResult } from './tracker.js';
 /**
  * The questions a module can ask, by name and by shape.
  *
@@ -198,6 +199,24 @@ export const CAPABILITIES = {
      * an agent reaches the same store through the host's MCP door.
      */
     'disposition:set': "Mark why a closed reference closed — done, won't do, duplicate or superseded — for every module to read.",
+    /**
+     * Read what the trackers last said about the project's refs, from the
+     * reading the host keeps for everybody. See `tracker.get` and `tracker.ts`.
+     *
+     * A read of the host's material, like `live:read` — which it replaces — and
+     * nothing more: the module gets rows and never a credential, and the host
+     * reads with the person's own logged-in CLIs.
+     */
+    'trackers:read': 'Read what GitHub and GitLab last said about the project’s issues, merge requests and pull requests.',
+    /**
+     * Ask the host to read the trackers again.
+     *
+     * Apart from `trackers:read` because it SPENDS something: the person's rate
+     * limit, on a tracker that may be slow, on behalf of every module on the
+     * canvas. A person deciding whether to run a program should be able to see
+     * that it asks for reads, not only that it looks at them.
+     */
+    'trackers:refresh': 'Ask the roadmap to read GitHub and GitLab again, for every module on the canvas.',
 };
 export const CAPABILITY_NAMES = Object.keys(CAPABILITIES);
 /**
@@ -224,6 +243,8 @@ export const METHODS = {
     'projects.pick': 'projects:pick',
     'state.set': 'state:keep',
     'disposition.set': 'disposition:set',
+    'tracker.get': 'trackers:read',
+    'tracker.refresh': 'trackers:refresh',
 };
 export const METHOD_NAMES = Object.keys(METHODS);
 /**
@@ -256,10 +277,38 @@ const ref = z.string().min(1).max(LIMITS.REF);
  * one.
  */
 export const REPORTED_STAGES = ['working', 'in-review', 'blocked'];
+/**
+ * Which refs a tracker call is about: exactly one of three.
+ *
+ * `refs` — these, by spelling, up to `TRACKER_ASK`. A host reads a ref it has
+ * not seen before on the strength of this call: asking is how a module whose
+ * refs live in its own store (a journey, a checklist target) gets them read.
+ * `epic` — every ref the epic names, in its steps and around them.
+ * `project: true` — everything the host reads for the open project: the refs
+ * every epic names, the refs modules have asked about, and the recent issues
+ * and changes of each listed source. The list References shows.
+ *
+ * One and only one, because a call naming two is a call whose author meant
+ * something this protocol would have to guess — the union, the intersection,
+ * or the first — and the three are different answers.
+ */
+const trackerScope = {
+    refs: z.array(ref).min(1).max(LIMITS.TRACKER_ASK).optional(),
+    epic: epic.optional(),
+    project: z.literal(true).optional(),
+};
+const oneScope = (scope) => [scope.refs, scope.epic, scope.project].filter((one) => one !== undefined).length === 1;
+const ONE_SCOPE = 'name exactly one of refs, epic or project';
 export const methodParams = {
     'epics.list': z.object({}),
     'epic.get': z.object({ epic }),
     'steps.list': z.object({ epic }),
+    /**
+     * The old door to tracker state: the epic's refs in four bags. Kept, and
+     * answered by a host as a view over the same shared reading `tracker.get`
+     * serves, so a module that has not moved yet sees the same states as one that
+     * has. New code asks `tracker.get`.
+     */
     'live.get': z.object({ epic }),
     /**
      * Ask the roadmap to show something. See the essay on `navigationResult`.
@@ -535,6 +584,29 @@ export const methodParams = {
         .refine((p) => p.target === undefined || p.value === 'duplicate' || p.value === 'superseded', {
         message: 'only a duplicate or a superseded mark names another ref',
     }),
+    /**
+     * What the trackers last said, from the host's shared reading.
+     *
+     * Answered at once from what the host holds; see `trackerReadingResult` in
+     * `tracker.ts` for the answer, and for `missing`, which is how a ref the
+     * host has not read yet comes back. `detail: 'detail'` costs a call per ref
+     * at the tracker, so it is only accepted with `refs`.
+     */
+    'tracker.get': z
+        .object({ ...trackerScope, detail: z.enum(TRACKER_DETAILS).default('summary') })
+        .refine(oneScope, { message: ONE_SCOPE })
+        .refine((p) => p.detail === 'summary' || p.refs !== undefined, {
+        message: 'detail is read a ref at a time, so ask for it by refs',
+    }),
+    /**
+     * Read the trackers again, for these refs or this epic or the whole project,
+     * and answer when the read lands. Every module on the canvas is told through
+     * `context.tracker`. See `trackerRefreshResult`.
+     *
+     * A host joins a refresh to one already running rather than starting a
+     * second; two presses are one read.
+     */
+    'tracker.refresh': z.object(trackerScope).refine(oneScope, { message: ONE_SCOPE }),
     'events.emit': z.object({
         extension: z.string().min(1).max(LIMITS.EXTENSION),
         /**
@@ -765,6 +837,13 @@ export const methodResults = {
     'epics.list': epicsListResult,
     'view.goto': navigationResult,
     'projects.pick': projectPickResult,
+    /**
+     * The tracker reading is specified though it is a host's material, and the
+     * exception is the reason it exists: two modules showing one ref have to read
+     * the same fields to agree about it. See `tracker.ts`.
+     */
+    'tracker.get': trackerReadingResult,
+    'tracker.refresh': trackerRefreshResult,
 };
 /** The schema for one method's answer, or nothing — which means unspecified. */
 export function resultSchemaFor(method) {

@@ -850,5 +850,40 @@ export const LIMITS = {
     GUIDANCE: 1024,
     /** As much of a manifest as anyone should read from a stranger on a port. */
     MANIFEST_BYTES: 64 * 1024,
+    /*
+     * The shared tracker reading. See `tracker.ts`.
+     *
+     * These bound an answer a HOST built from what a tracker said, so like
+     * `CONTAINERS` they protect a module from a host — and a host from a tracker
+     * that hands back a ten-megabyte description. Text is clipped to them when
+     * the host reads it, with a flag where clipping loses something a reader
+     * would want to know about (`bodyClipped`, `filesClipped`); refs never are.
+     */
+    /** How many refs one `tracker.get` or `tracker.refresh` may name. A journey's worth, not a repository's. */
+    TRACKER_ASK: 200,
+    /** How many rows one reading may answer with: a project's recent issues and changes, and every ref its epics name. */
+    TRACKER_ROWS: 2000,
+    /** How many places one project reads. */
+    TRACKER_SOURCES: 16,
+    /** A tracker's hostname. */
+    TRACKER_HOST: 255,
+    /** `owner/repo`, or a GitLab project path with its groups. */
+    TRACKER_REPO: 200,
+    /** One label. */
+    TRACKER_LABEL: 100,
+    /** How many labels one row carries. */
+    TRACKER_LABELS: 32,
+    /** A person's name or handle as a tracker gives it. */
+    TRACKER_PERSON: 100,
+    /** How many assignees or approvers one row lists. */
+    TRACKER_PEOPLE: 16,
+    /** How many links one row carries. */
+    TRACKER_LINKS: 32,
+    /** A short tracker word: a close reason, a commit sha. */
+    TRACKER_WORD: 64,
+    /** A description, read for `detail`. Long enough for a real one, short enough to send. */
+    TRACKER_BODY: 20_000,
+    /** How many files of a change `detail` lists. */
+    TRACKER_FILES: 300,
 };
 //# sourceMappingURL=constants.js.map

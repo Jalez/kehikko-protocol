@@ -181,6 +181,24 @@ export declare const CAPABILITIES: {
      * an agent reaches the same store through the host's MCP door.
      */
     readonly 'disposition:set': "Mark why a closed reference closed — done, won't do, duplicate or superseded — for every module to read.";
+    /**
+     * Read what the trackers last said about the project's refs, from the
+     * reading the host keeps for everybody. See `tracker.get` and `tracker.ts`.
+     *
+     * A read of the host's material, like `live:read` — which it replaces — and
+     * nothing more: the module gets rows and never a credential, and the host
+     * reads with the person's own logged-in CLIs.
+     */
+    readonly 'trackers:read': "Read what GitHub and GitLab last said about the project’s issues, merge requests and pull requests.";
+    /**
+     * Ask the host to read the trackers again.
+     *
+     * Apart from `trackers:read` because it SPENDS something: the person's rate
+     * limit, on a tracker that may be slow, on behalf of every module on the
+     * canvas. A person deciding whether to run a program should be able to see
+     * that it asks for reads, not only that it looks at them.
+     */
+    readonly 'trackers:refresh': "Ask the roadmap to read GitHub and GitLab again, for every module on the canvas.";
 };
 export type Capability = keyof typeof CAPABILITIES;
 export declare const CAPABILITY_NAMES: Capability[];
@@ -208,6 +226,8 @@ export declare const METHODS: {
     readonly 'projects.pick': "projects:pick";
     readonly 'state.set': "state:keep";
     readonly 'disposition.set': "disposition:set";
+    readonly 'tracker.get': "trackers:read";
+    readonly 'tracker.refresh': "trackers:refresh";
 };
 export type Method = keyof typeof METHODS;
 export declare const METHOD_NAMES: Method[];
@@ -239,6 +259,12 @@ export declare const methodParams: {
     }, {
         epic: string;
     }>;
+    /**
+     * The old door to tracker state: the epic's refs in four bags. Kept, and
+     * answered by a host as a view over the same shared reading `tracker.get`
+     * serves, so a module that has not moved yet sees the same states as one that
+     * has. New code asks `tracker.get`.
+     */
     readonly 'live.get': z.ZodObject<{
         epic: z.ZodString;
     }, "strip", z.ZodTypeAny, {
@@ -824,6 +850,79 @@ export declare const methodParams: {
         target?: string | undefined;
         note?: string | undefined;
     }>;
+    /**
+     * What the trackers last said, from the host's shared reading.
+     *
+     * Answered at once from what the host holds; see `trackerReadingResult` in
+     * `tracker.ts` for the answer, and for `missing`, which is how a ref the
+     * host has not read yet comes back. `detail: 'detail'` costs a call per ref
+     * at the tracker, so it is only accepted with `refs`.
+     */
+    readonly 'tracker.get': z.ZodEffects<z.ZodEffects<z.ZodObject<{
+        detail: z.ZodDefault<z.ZodEnum<["summary", "detail"]>>;
+        refs: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        epic: z.ZodOptional<z.ZodString>;
+        project: z.ZodOptional<z.ZodLiteral<true>>;
+    }, "strip", z.ZodTypeAny, {
+        detail: "summary" | "detail";
+        epic?: string | undefined;
+        refs?: string[] | undefined;
+        project?: true | undefined;
+    }, {
+        epic?: string | undefined;
+        refs?: string[] | undefined;
+        detail?: "summary" | "detail" | undefined;
+        project?: true | undefined;
+    }>, {
+        detail: "summary" | "detail";
+        epic?: string | undefined;
+        refs?: string[] | undefined;
+        project?: true | undefined;
+    }, {
+        epic?: string | undefined;
+        refs?: string[] | undefined;
+        detail?: "summary" | "detail" | undefined;
+        project?: true | undefined;
+    }>, {
+        detail: "summary" | "detail";
+        epic?: string | undefined;
+        refs?: string[] | undefined;
+        project?: true | undefined;
+    }, {
+        epic?: string | undefined;
+        refs?: string[] | undefined;
+        detail?: "summary" | "detail" | undefined;
+        project?: true | undefined;
+    }>;
+    /**
+     * Read the trackers again, for these refs or this epic or the whole project,
+     * and answer when the read lands. Every module on the canvas is told through
+     * `context.tracker`. See `trackerRefreshResult`.
+     *
+     * A host joins a refresh to one already running rather than starting a
+     * second; two presses are one read.
+     */
+    readonly 'tracker.refresh': z.ZodEffects<z.ZodObject<{
+        refs: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        epic: z.ZodOptional<z.ZodString>;
+        project: z.ZodOptional<z.ZodLiteral<true>>;
+    }, "strip", z.ZodTypeAny, {
+        epic?: string | undefined;
+        refs?: string[] | undefined;
+        project?: true | undefined;
+    }, {
+        epic?: string | undefined;
+        refs?: string[] | undefined;
+        project?: true | undefined;
+    }>, {
+        epic?: string | undefined;
+        refs?: string[] | undefined;
+        project?: true | undefined;
+    }, {
+        epic?: string | undefined;
+        refs?: string[] | undefined;
+        project?: true | undefined;
+    }>;
     readonly 'events.emit': z.ZodObject<{
         extension: z.ZodString;
         /**
@@ -933,9 +1032,9 @@ export declare const navigationResult: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     epic: string | null;
     why: string;
-    outcome: "moved" | "declined" | "no-such-target";
+    outcome: "declined" | "moved" | "no-such-target";
 }, {
-    outcome: "moved" | "declined" | "no-such-target";
+    outcome: "declined" | "moved" | "no-such-target";
     epic?: string | null | undefined;
     why?: string | undefined;
 }>;
@@ -1116,11 +1215,11 @@ export declare const projectPickResult: z.ZodObject<{
     why: z.ZodDefault<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     why: string;
+    outcome: "declined" | "picked" | "cancelled";
     project: {
         path: string;
         name: string;
     } | null;
-    outcome: "declined" | "picked" | "cancelled";
 }, {
     outcome: "declined" | "picked" | "cancelled";
     why?: string | undefined;

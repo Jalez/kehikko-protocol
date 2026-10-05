@@ -2285,8 +2285,32 @@ export declare const contextSchema: z.ZodObject<{
         note?: string | undefined;
         by?: string | null | undefined;
     }>, "many">>;
+    /**
+     * When the open project's shared tracker reading last changed, and whether a
+     * read is in flight. The signal, not the reading — see `trackerSignalSchema`
+     * in `tracker.ts` for why the rows stay behind `tracker.get`.
+     *
+     * Per project, like `dispositions`: a refresh pressed in one container moves
+     * this for every container standing in that project, and a module saying
+     * `reacts: ['tracker']` re-asks `tracker.get` when `at` changes and draws
+     * itself busy while `refreshing` is true.
+     */
+    tracker: z.ZodDefault<z.ZodObject<{
+        at: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+        refreshing: z.ZodDefault<z.ZodBoolean>;
+    }, "strip", z.ZodTypeAny, {
+        at: string | null;
+        refreshing: boolean;
+    }, {
+        at?: string | null | undefined;
+        refreshing?: boolean | undefined;
+    }>>;
 }, "strip", z.ZodTypeAny, {
     epic: string | null;
+    tracker: {
+        at: string | null;
+        refreshing: boolean;
+    };
     project: string | null;
     projectPath: string | null;
     theme: "light" | "dark";
@@ -2339,6 +2363,10 @@ export declare const contextSchema: z.ZodObject<{
     }[];
 }, {
     epic?: string | null | undefined;
+    tracker?: {
+        at?: string | null | undefined;
+        refreshing?: boolean | undefined;
+    } | undefined;
     project?: string | null | undefined;
     projectPath?: string | null | undefined;
     theme?: "light" | "dark" | undefined;
@@ -3174,8 +3202,32 @@ export declare const helloSchema: z.ZodObject<{
             note?: string | undefined;
             by?: string | null | undefined;
         }>, "many">>;
+        /**
+         * When the open project's shared tracker reading last changed, and whether a
+         * read is in flight. The signal, not the reading — see `trackerSignalSchema`
+         * in `tracker.ts` for why the rows stay behind `tracker.get`.
+         *
+         * Per project, like `dispositions`: a refresh pressed in one container moves
+         * this for every container standing in that project, and a module saying
+         * `reacts: ['tracker']` re-asks `tracker.get` when `at` changes and draws
+         * itself busy while `refreshing` is true.
+         */
+        tracker: z.ZodDefault<z.ZodObject<{
+            at: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+            refreshing: z.ZodDefault<z.ZodBoolean>;
+        }, "strip", z.ZodTypeAny, {
+            at: string | null;
+            refreshing: boolean;
+        }, {
+            at?: string | null | undefined;
+            refreshing?: boolean | undefined;
+        }>>;
     }, "strip", z.ZodTypeAny, {
         epic: string | null;
+        tracker: {
+            at: string | null;
+            refreshing: boolean;
+        };
         project: string | null;
         projectPath: string | null;
         theme: "light" | "dark";
@@ -3228,6 +3280,10 @@ export declare const helloSchema: z.ZodObject<{
         }[];
     }, {
         epic?: string | null | undefined;
+        tracker?: {
+            at?: string | null | undefined;
+            refreshing?: boolean | undefined;
+        } | undefined;
         project?: string | null | undefined;
         projectPath?: string | null | undefined;
         theme?: "light" | "dark" | undefined;
@@ -3304,10 +3360,15 @@ export declare const helloSchema: z.ZodObject<{
     state: z.ZodDefault<z.ZodNullable<z.ZodString>>;
 }, "strip", z.ZodTypeAny, {
     type: "roadmap.hello";
+    state: string | null;
     protocol: number;
     session: string;
     context: {
         epic: string | null;
+        tracker: {
+            at: string | null;
+            refreshing: boolean;
+        };
         project: string | null;
         projectPath: string | null;
         theme: "light" | "dark";
@@ -3359,13 +3420,16 @@ export declare const helloSchema: z.ZodObject<{
             by: string | null;
         }[];
     };
-    state: string | null;
 }, {
     type: "roadmap.hello";
     protocol: number;
     session: string;
     context: {
         epic?: string | null | undefined;
+        tracker?: {
+            at?: string | null | undefined;
+            refreshing?: boolean | undefined;
+        } | undefined;
         project?: string | null | undefined;
         projectPath?: string | null | undefined;
         theme?: "light" | "dark" | undefined;
@@ -4181,12 +4245,36 @@ export declare const contextMessageSchema: z.ZodObject<{
         note?: string | undefined;
         by?: string | null | undefined;
     }>, "many">>;
+    /**
+     * When the open project's shared tracker reading last changed, and whether a
+     * read is in flight. The signal, not the reading — see `trackerSignalSchema`
+     * in `tracker.ts` for why the rows stay behind `tracker.get`.
+     *
+     * Per project, like `dispositions`: a refresh pressed in one container moves
+     * this for every container standing in that project, and a module saying
+     * `reacts: ['tracker']` re-asks `tracker.get` when `at` changes and draws
+     * itself busy while `refreshing` is true.
+     */
+    tracker: z.ZodDefault<z.ZodObject<{
+        at: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+        refreshing: z.ZodDefault<z.ZodBoolean>;
+    }, "strip", z.ZodTypeAny, {
+        at: string | null;
+        refreshing: boolean;
+    }, {
+        at?: string | null | undefined;
+        refreshing?: boolean | undefined;
+    }>>;
 } & {
     type: z.ZodLiteral<"roadmap.context">;
     protocol: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
     type: "roadmap.context";
     epic: string | null;
+    tracker: {
+        at: string | null;
+        refreshing: boolean;
+    };
     protocol: number;
     project: string | null;
     projectPath: string | null;
@@ -4242,6 +4330,10 @@ export declare const contextMessageSchema: z.ZodObject<{
     type: "roadmap.context";
     protocol: number;
     epic?: string | null | undefined;
+    tracker?: {
+        at?: string | null | undefined;
+        refreshing?: boolean | undefined;
+    } | undefined;
     project?: string | null | undefined;
     projectPath?: string | null | undefined;
     theme?: "light" | "dark" | undefined;
@@ -4364,14 +4456,14 @@ export declare const responseSchema: z.ZodDiscriminatedUnion<"ok", [z.ZodObject<
 }, "strip", z.ZodTypeAny, {
     type: "roadmap.response";
     ok: false;
-    id: string;
-    reason: "unknown-module" | "unknown-method" | "failed";
     error: string;
+    reason: "failed" | "unknown-module" | "unknown-method";
+    id: string;
 }, {
     type: "roadmap.response";
     ok: false;
+    reason: "failed" | "unknown-module" | "unknown-method";
     id: string;
-    reason: "unknown-module" | "unknown-method" | "failed";
     error?: string | undefined;
 }>]>;
 /**
@@ -5418,8 +5510,32 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             note?: string | undefined;
             by?: string | null | undefined;
         }>, "many">>;
+        /**
+         * When the open project's shared tracker reading last changed, and whether a
+         * read is in flight. The signal, not the reading — see `trackerSignalSchema`
+         * in `tracker.ts` for why the rows stay behind `tracker.get`.
+         *
+         * Per project, like `dispositions`: a refresh pressed in one container moves
+         * this for every container standing in that project, and a module saying
+         * `reacts: ['tracker']` re-asks `tracker.get` when `at` changes and draws
+         * itself busy while `refreshing` is true.
+         */
+        tracker: z.ZodDefault<z.ZodObject<{
+            at: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+            refreshing: z.ZodDefault<z.ZodBoolean>;
+        }, "strip", z.ZodTypeAny, {
+            at: string | null;
+            refreshing: boolean;
+        }, {
+            at?: string | null | undefined;
+            refreshing?: boolean | undefined;
+        }>>;
     }, "strip", z.ZodTypeAny, {
         epic: string | null;
+        tracker: {
+            at: string | null;
+            refreshing: boolean;
+        };
         project: string | null;
         projectPath: string | null;
         theme: "light" | "dark";
@@ -5472,6 +5588,10 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         }[];
     }, {
         epic?: string | null | undefined;
+        tracker?: {
+            at?: string | null | undefined;
+            refreshing?: boolean | undefined;
+        } | undefined;
         project?: string | null | undefined;
         projectPath?: string | null | undefined;
         theme?: "light" | "dark" | undefined;
@@ -5548,10 +5668,15 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     state: z.ZodDefault<z.ZodNullable<z.ZodString>>;
 }, "strip", z.ZodTypeAny, {
     type: "roadmap.hello";
+    state: string | null;
     protocol: number;
     session: string;
     context: {
         epic: string | null;
+        tracker: {
+            at: string | null;
+            refreshing: boolean;
+        };
         project: string | null;
         projectPath: string | null;
         theme: "light" | "dark";
@@ -5603,13 +5728,16 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             by: string | null;
         }[];
     };
-    state: string | null;
 }, {
     type: "roadmap.hello";
     protocol: number;
     session: string;
     context: {
         epic?: string | null | undefined;
+        tracker?: {
+            at?: string | null | undefined;
+            refreshing?: boolean | undefined;
+        } | undefined;
         project?: string | null | undefined;
         projectPath?: string | null | undefined;
         theme?: "light" | "dark" | undefined;
@@ -6412,12 +6540,36 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         note?: string | undefined;
         by?: string | null | undefined;
     }>, "many">>;
+    /**
+     * When the open project's shared tracker reading last changed, and whether a
+     * read is in flight. The signal, not the reading — see `trackerSignalSchema`
+     * in `tracker.ts` for why the rows stay behind `tracker.get`.
+     *
+     * Per project, like `dispositions`: a refresh pressed in one container moves
+     * this for every container standing in that project, and a module saying
+     * `reacts: ['tracker']` re-asks `tracker.get` when `at` changes and draws
+     * itself busy while `refreshing` is true.
+     */
+    tracker: z.ZodDefault<z.ZodObject<{
+        at: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+        refreshing: z.ZodDefault<z.ZodBoolean>;
+    }, "strip", z.ZodTypeAny, {
+        at: string | null;
+        refreshing: boolean;
+    }, {
+        at?: string | null | undefined;
+        refreshing?: boolean | undefined;
+    }>>;
 } & {
     type: z.ZodLiteral<"roadmap.context">;
     protocol: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
     type: "roadmap.context";
     epic: string | null;
+    tracker: {
+        at: string | null;
+        refreshing: boolean;
+    };
     protocol: number;
     project: string | null;
     projectPath: string | null;
@@ -6473,6 +6625,10 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     type: "roadmap.context";
     protocol: number;
     epic?: string | null | undefined;
+    tracker?: {
+        at?: string | null | undefined;
+        refreshing?: boolean | undefined;
+    } | undefined;
     project?: string | null | undefined;
     projectPath?: string | null | undefined;
     theme?: "light" | "dark" | undefined;
@@ -6560,14 +6716,14 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     type: "roadmap.response";
     ok: false;
-    id: string;
-    reason: "unknown-module" | "unknown-method" | "failed";
     error: string;
+    reason: "failed" | "unknown-module" | "unknown-method";
+    id: string;
 }, {
     type: "roadmap.response";
     ok: false;
+    reason: "failed" | "unknown-module" | "unknown-method";
     id: string;
-    reason: "unknown-module" | "unknown-method" | "failed";
     error?: string | undefined;
 }>]>, z.ZodEffects<z.ZodObject<{
     type: z.ZodLiteral<"roadmap.goto">;
