@@ -266,7 +266,7 @@ describe('passage.set — a module saying where somebody is pointing', () => {
 
 describe('filters.set, the half the offer was missing', () => {
   /*
-   * `roadmap.filters` went one way: a module said what it could be narrowed by,
+   * `kehikot.filters` went one way: a module said what it could be narrowed by,
    * the host drew the control, and the choice came back in `context.filters`
    * with no way for the module to ask for a different one.
    *

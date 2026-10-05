@@ -29,7 +29,7 @@ import { z } from 'zod';
  * the host sends is not, and is the same rule: a framed page receives every
  * message posted at its window, from the host, from a bundler's dev socket,
  * from anything else that has a handle on it. The type check is what tells a
- * `roadmap.context` from a coincidence.
+ * `kehikot.context` from a coincidence.
  */
 /**
  * What a module is told about where the reader is standing.
@@ -76,24 +76,24 @@ export declare const sectionSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
     from: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
     to: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
 }, "strip", z.ZodTypeAny, {
-    title: string;
     from: number | null;
+    title: string;
     to: number | null;
 }, {
     title: string;
     from?: number | null | undefined;
     to?: number | null | undefined;
 }>, {
-    title: string;
     from: number | null;
+    title: string;
     to: number | null;
 }, {
     title: string;
     from?: number | null | undefined;
     to?: number | null | undefined;
 }>, {
-    title: string;
     from: number | null;
+    title: string;
     to: number | null;
 }, {
     title: string;
@@ -224,24 +224,24 @@ export declare const passageSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
         from: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
         to: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
     }, "strip", z.ZodTypeAny, {
-        title: string;
         from: number | null;
+        title: string;
         to: number | null;
     }, {
         title: string;
         from?: number | null | undefined;
         to?: number | null | undefined;
     }>, {
-        title: string;
         from: number | null;
+        title: string;
         to: number | null;
     }, {
         title: string;
         from?: number | null | undefined;
         to?: number | null | undefined;
     }>, {
-        title: string;
         from: number | null;
+        title: string;
         to: number | null;
     }, {
         title: string;
@@ -249,14 +249,14 @@ export declare const passageSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
         to?: number | null | undefined;
     }>>>;
 }, "strip", z.ZodTypeAny, {
-    path: string;
     from: number | null;
+    path: string;
     to: number | null;
     page: number | null;
     quoted: string;
     section: {
-        title: string;
         from: number | null;
+        title: string;
         to: number | null;
     } | null;
 }, {
@@ -271,14 +271,14 @@ export declare const passageSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
         to?: number | null | undefined;
     } | null | undefined;
 }>, {
-    path: string;
     from: number | null;
+    path: string;
     to: number | null;
     page: number | null;
     quoted: string;
     section: {
-        title: string;
         from: number | null;
+        title: string;
         to: number | null;
     } | null;
 }, {
@@ -293,14 +293,14 @@ export declare const passageSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
         to?: number | null | undefined;
     } | null | undefined;
 }>, {
-    path: string;
     from: number | null;
+    path: string;
     to: number | null;
     page: number | null;
     quoted: string;
     section: {
-        title: string;
         from: number | null;
+        title: string;
         to: number | null;
     } | null;
 }, {
@@ -489,11 +489,11 @@ export declare const filterGroupSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
      */
     fallback: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
 }, "strip", z.ZodTypeAny, {
+    id: string;
     options: {
         id: string;
         label: string;
     }[];
-    id: string;
     label: string;
     kind?: "choice" | "text" | "toggles" | undefined;
     fallback?: string | undefined;
@@ -507,11 +507,11 @@ export declare const filterGroupSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
     kind?: "choice" | "text" | "toggles" | undefined;
     fallback?: string | undefined;
 }>, {
+    id: string;
     options: {
         id: string;
         label: string;
     }[];
-    id: string;
     label: string;
     kind?: "choice" | "text" | "toggles" | undefined;
     fallback?: string | undefined;
@@ -525,11 +525,11 @@ export declare const filterGroupSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
     kind?: "choice" | "text" | "toggles" | undefined;
     fallback?: string | undefined;
 }>, {
+    id: string;
     options: {
         id: string;
         label: string;
     }[];
-    id: string;
     label: string;
     kind?: "choice" | "text" | "toggles" | undefined;
     fallback?: string | undefined;
@@ -558,7 +558,7 @@ export type FilterGroup = z.infer<typeof filterGroupSchema>;
  * words change. See `filterOptionSchema` on why the count lives in the label.
  */
 export declare const filtersSchema: z.ZodObject<{
-    type: z.ZodLiteral<"roadmap.filters">;
+    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.filters">, z.ZodLiteral<string>]>, "kehikot.filters", string>;
     groups: z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodEffects<z.ZodObject<{
         id: z.ZodEffects<z.ZodString, string, string>;
         /** What this axis is called: `ignored`, `kind`, `scope`, `search`. A person reads it. */
@@ -623,11 +623,11 @@ export declare const filtersSchema: z.ZodObject<{
          */
         fallback: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
     }, "strip", z.ZodTypeAny, {
+        id: string;
         options: {
             id: string;
             label: string;
         }[];
-        id: string;
         label: string;
         kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
@@ -641,11 +641,11 @@ export declare const filtersSchema: z.ZodObject<{
         kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
     }>, {
+        id: string;
         options: {
             id: string;
             label: string;
         }[];
-        id: string;
         label: string;
         kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
@@ -659,11 +659,11 @@ export declare const filtersSchema: z.ZodObject<{
         kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
     }>, {
+        id: string;
         options: {
             id: string;
             label: string;
         }[];
-        id: string;
         label: string;
         kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
@@ -677,11 +677,11 @@ export declare const filtersSchema: z.ZodObject<{
         kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
     }>, "many">, {
+        id: string;
         options: {
             id: string;
             label: string;
         }[];
-        id: string;
         label: string;
         kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
@@ -696,19 +696,19 @@ export declare const filtersSchema: z.ZodObject<{
         fallback?: string | undefined;
     }[]>;
 }, "strip", z.ZodTypeAny, {
-    type: "roadmap.filters";
+    type: "kehikot.filters";
     groups: {
+        id: string;
         options: {
             id: string;
             label: string;
         }[];
-        id: string;
         label: string;
         kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
     }[];
 }, {
-    type: "roadmap.filters";
+    type: string;
     groups: {
         id: string;
         label: string;
@@ -756,14 +756,14 @@ export type Filters = z.infer<typeof filtersSchema>;
  * feature has and the only one it needs.
  */
 export declare const clearableSchema: z.ZodObject<{
-    type: z.ZodLiteral<"roadmap.clearable">;
+    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.clearable">, z.ZodLiteral<string>]>, "kehikot.clearable", string>;
     /** The words on the control, or `null` to take the control away. */
     label: z.ZodDefault<z.ZodNullable<z.ZodString>>;
 }, "strip", z.ZodTypeAny, {
-    type: "roadmap.clearable";
+    type: "kehikot.clearable";
     label: string | null;
 }, {
-    type: "roadmap.clearable";
+    type: string;
     label?: string | null | undefined;
 }>;
 export type Clearable = z.infer<typeof clearableSchema>;
@@ -775,7 +775,7 @@ export type Clearable = z.infer<typeof clearableSchema>;
  *
  * **Not a list of what to delete**, because the host does not know and must not
  * find out. **Not the filter choice**, because the module already has that from
- * `roadmap.context` and a second copy would be a second answer to one question,
+ * `kehikot.context` and a second copy would be a second answer to one question,
  * arriving on its own schedule and disagreeing after any race. **Not a
  * correlation id**, because there is no answer: see `MESSAGE.CLEAR` for why an
  * acknowledgement would only tempt a host into reporting a number it did not
@@ -785,13 +785,13 @@ export type Clearable = z.infer<typeof clearableSchema>;
  * can tell which host it is talking to without keeping the greeting.
  */
 export declare const clearSchema: z.ZodObject<{
-    type: z.ZodLiteral<"roadmap.clear">;
+    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.clear">, z.ZodLiteral<string>]>, "kehikot.clear", string>;
     protocol: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
-    type: "roadmap.clear";
+    type: "kehikot.clear";
     protocol: number;
 }, {
-    type: "roadmap.clear";
+    type: string;
     protocol: number;
 }>;
 export type Clear = z.infer<typeof clearSchema>;
@@ -835,7 +835,7 @@ export type Clear = z.infer<typeof clearSchema>;
  * and that is the whole of the feedback this feature has.
  */
 export declare const refreshableSchema: z.ZodObject<{
-    type: z.ZodLiteral<"roadmap.refreshable">;
+    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.refreshable">, z.ZodLiteral<string>]>, "kehikot.refreshable", string>;
     /** Whether there is anything to read again right now. `false` withdraws the control. */
     can: z.ZodDefault<z.ZodBoolean>;
     /** When this module's material was last read, as the MODULE knows it. */
@@ -843,12 +843,12 @@ export declare const refreshableSchema: z.ZodObject<{
     /** Whether a read is in flight this second. */
     busy: z.ZodDefault<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
+    type: "kehikot.refreshable";
     at: string | null;
-    type: "roadmap.refreshable";
     can: boolean;
     busy: boolean;
 }, {
-    type: "roadmap.refreshable";
+    type: string;
     at?: string | null | undefined;
     can?: boolean | undefined;
     busy?: boolean | undefined;
@@ -870,17 +870,17 @@ export type Refreshable = z.infer<typeof refreshableSchema>;
  * timer beside it.
  *
  * **Not a correlation id**, because there is no answer. What comes back is a
- * new `roadmap.refreshable`: `busy` while it runs, then a new `at`. An
+ * new `kehikot.refreshable`: `busy` while it runs, then a new `at`. An
  * acknowledgement would only tempt a host into reporting on work it cannot see.
  */
 export declare const refreshSchema: z.ZodObject<{
-    type: z.ZodLiteral<"roadmap.refresh">;
+    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.refresh">, z.ZodLiteral<string>]>, "kehikot.refresh", string>;
     protocol: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
-    type: "roadmap.refresh";
+    type: "kehikot.refresh";
     protocol: number;
 }, {
-    type: "roadmap.refresh";
+    type: string;
     protocol: number;
 }>;
 export type Refresh = z.infer<typeof refreshSchema>;
@@ -888,7 +888,7 @@ export type Refresh = z.infer<typeof refreshSchema>;
  * What each group is currently set to: group id → an option id, or what
  * somebody typed.
  *
- * This is the half that travels back, and it travels in `roadmap.context` — see
+ * This is the half that travels back, and it travels in `kehikot.context` — see
  * the field there for why it is context rather than a message of its own.
  *
  * Bounded to `FILTER_GROUPS` entries, so the record cannot be larger than the
@@ -1129,24 +1129,24 @@ export declare const showingSchema: z.ZodObject<{
             from: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
             to: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
         }, "strip", z.ZodTypeAny, {
-            title: string;
             from: number | null;
+            title: string;
             to: number | null;
         }, {
             title: string;
             from?: number | null | undefined;
             to?: number | null | undefined;
         }>, {
-            title: string;
             from: number | null;
+            title: string;
             to: number | null;
         }, {
             title: string;
             from?: number | null | undefined;
             to?: number | null | undefined;
         }>, {
-            title: string;
             from: number | null;
+            title: string;
             to: number | null;
         }, {
             title: string;
@@ -1154,14 +1154,14 @@ export declare const showingSchema: z.ZodObject<{
             to?: number | null | undefined;
         }>>>;
     }, "strip", z.ZodTypeAny, {
-        path: string;
         from: number | null;
+        path: string;
         to: number | null;
         page: number | null;
         quoted: string;
         section: {
-            title: string;
             from: number | null;
+            title: string;
             to: number | null;
         } | null;
     }, {
@@ -1176,14 +1176,14 @@ export declare const showingSchema: z.ZodObject<{
             to?: number | null | undefined;
         } | null | undefined;
     }>, {
-        path: string;
         from: number | null;
+        path: string;
         to: number | null;
         page: number | null;
         quoted: string;
         section: {
-            title: string;
             from: number | null;
+            title: string;
             to: number | null;
         } | null;
     }, {
@@ -1198,14 +1198,14 @@ export declare const showingSchema: z.ZodObject<{
             to?: number | null | undefined;
         } | null | undefined;
     }>, {
-        path: string;
         from: number | null;
+        path: string;
         to: number | null;
         page: number | null;
         quoted: string;
         section: {
-            title: string;
             from: number | null;
+            title: string;
             to: number | null;
         } | null;
     }, {
@@ -1223,14 +1223,14 @@ export declare const showingSchema: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     refs: string[];
     documents: {
-        path: string;
         from: number | null;
+        path: string;
         to: number | null;
         page: number | null;
         quoted: string;
         section: {
-            title: string;
             from: number | null;
+            title: string;
             to: number | null;
         } | null;
     }[];
@@ -1301,7 +1301,7 @@ export type Showing = z.infer<typeof showingSchema>;
  * its own id, and may, though nothing here needs it to.
  */
 export declare const containerSchema: z.ZodObject<{
-    module: z.ZodString;
+    module: z.ZodEffects<z.ZodString, string, string>;
     /** Whether this container is picked out as a target on this kehikko. The host's own fact. */
     selected: z.ZodDefault<z.ZodBoolean>;
     /** What it says it is showing, or nothing. Never absent, for the reason `filters` is `{}` and not missing. */
@@ -1377,24 +1377,24 @@ export declare const containerSchema: z.ZodObject<{
                 from: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
                 to: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
             }, "strip", z.ZodTypeAny, {
-                title: string;
                 from: number | null;
+                title: string;
                 to: number | null;
             }, {
                 title: string;
                 from?: number | null | undefined;
                 to?: number | null | undefined;
             }>, {
-                title: string;
                 from: number | null;
+                title: string;
                 to: number | null;
             }, {
                 title: string;
                 from?: number | null | undefined;
                 to?: number | null | undefined;
             }>, {
-                title: string;
                 from: number | null;
+                title: string;
                 to: number | null;
             }, {
                 title: string;
@@ -1402,14 +1402,14 @@ export declare const containerSchema: z.ZodObject<{
                 to?: number | null | undefined;
             }>>>;
         }, "strip", z.ZodTypeAny, {
-            path: string;
             from: number | null;
+            path: string;
             to: number | null;
             page: number | null;
             quoted: string;
             section: {
-                title: string;
                 from: number | null;
+                title: string;
                 to: number | null;
             } | null;
         }, {
@@ -1424,14 +1424,14 @@ export declare const containerSchema: z.ZodObject<{
                 to?: number | null | undefined;
             } | null | undefined;
         }>, {
-            path: string;
             from: number | null;
+            path: string;
             to: number | null;
             page: number | null;
             quoted: string;
             section: {
-                title: string;
                 from: number | null;
+                title: string;
                 to: number | null;
             } | null;
         }, {
@@ -1446,14 +1446,14 @@ export declare const containerSchema: z.ZodObject<{
                 to?: number | null | undefined;
             } | null | undefined;
         }>, {
-            path: string;
             from: number | null;
+            path: string;
             to: number | null;
             page: number | null;
             quoted: string;
             section: {
-                title: string;
                 from: number | null;
+                title: string;
                 to: number | null;
             } | null;
         }, {
@@ -1471,14 +1471,14 @@ export declare const containerSchema: z.ZodObject<{
     }, "strip", z.ZodTypeAny, {
         refs: string[];
         documents: {
-            path: string;
             from: number | null;
+            path: string;
             to: number | null;
             page: number | null;
             quoted: string;
             section: {
-                title: string;
                 from: number | null;
+                title: string;
                 to: number | null;
             } | null;
         }[];
@@ -1503,14 +1503,14 @@ export declare const containerSchema: z.ZodObject<{
     showing: {
         refs: string[];
         documents: {
-            path: string;
             from: number | null;
+            path: string;
             to: number | null;
             page: number | null;
             quoted: string;
             section: {
-                title: string;
                 from: number | null;
+                title: string;
                 to: number | null;
             } | null;
         }[];
@@ -1742,24 +1742,24 @@ export declare const contextSchema: z.ZodObject<{
             from: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
             to: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
         }, "strip", z.ZodTypeAny, {
-            title: string;
             from: number | null;
+            title: string;
             to: number | null;
         }, {
             title: string;
             from?: number | null | undefined;
             to?: number | null | undefined;
         }>, {
-            title: string;
             from: number | null;
+            title: string;
             to: number | null;
         }, {
             title: string;
             from?: number | null | undefined;
             to?: number | null | undefined;
         }>, {
-            title: string;
             from: number | null;
+            title: string;
             to: number | null;
         }, {
             title: string;
@@ -1767,14 +1767,14 @@ export declare const contextSchema: z.ZodObject<{
             to?: number | null | undefined;
         }>>>;
     }, "strip", z.ZodTypeAny, {
-        path: string;
         from: number | null;
+        path: string;
         to: number | null;
         page: number | null;
         quoted: string;
         section: {
-            title: string;
             from: number | null;
+            title: string;
             to: number | null;
         } | null;
     }, {
@@ -1789,14 +1789,14 @@ export declare const contextSchema: z.ZodObject<{
             to?: number | null | undefined;
         } | null | undefined;
     }>, {
-        path: string;
         from: number | null;
+        path: string;
         to: number | null;
         page: number | null;
         quoted: string;
         section: {
-            title: string;
             from: number | null;
+            title: string;
             to: number | null;
         } | null;
     }, {
@@ -1811,14 +1811,14 @@ export declare const contextSchema: z.ZodObject<{
             to?: number | null | undefined;
         } | null | undefined;
     }>, {
-        path: string;
         from: number | null;
+        path: string;
         to: number | null;
         page: number | null;
         quoted: string;
         section: {
-            title: string;
             from: number | null;
+            title: string;
             to: number | null;
         } | null;
     }, {
@@ -1928,8 +1928,8 @@ export declare const contextSchema: z.ZodObject<{
      *
      * ## Why the choice is context and not a message of its own
      *
-     * The offer goes one way as `roadmap.filters`, so the obvious symmetry is a
-     * `roadmap.chose` coming back. It is the wrong shape, for three reasons that
+     * The offer goes one way as `kehikot.filters`, so the obvious symmetry is a
+     * `kehikot.chose` coming back. It is the wrong shape, for three reasons that
      * all point the same way.
      *
      * The first is that a module has to have this BEFORE it draws. A page told
@@ -2014,7 +2014,7 @@ export declare const contextSchema: z.ZodObject<{
      * everything is in front of it.
      */
     containers: z.ZodDefault<z.ZodArray<z.ZodObject<{
-        module: z.ZodString;
+        module: z.ZodEffects<z.ZodString, string, string>;
         /** Whether this container is picked out as a target on this kehikko. The host's own fact. */
         selected: z.ZodDefault<z.ZodBoolean>;
         /** What it says it is showing, or nothing. Never absent, for the reason `filters` is `{}` and not missing. */
@@ -2090,24 +2090,24 @@ export declare const contextSchema: z.ZodObject<{
                     from: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
                     to: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
                 }, "strip", z.ZodTypeAny, {
-                    title: string;
                     from: number | null;
+                    title: string;
                     to: number | null;
                 }, {
                     title: string;
                     from?: number | null | undefined;
                     to?: number | null | undefined;
                 }>, {
-                    title: string;
                     from: number | null;
+                    title: string;
                     to: number | null;
                 }, {
                     title: string;
                     from?: number | null | undefined;
                     to?: number | null | undefined;
                 }>, {
-                    title: string;
                     from: number | null;
+                    title: string;
                     to: number | null;
                 }, {
                     title: string;
@@ -2115,14 +2115,14 @@ export declare const contextSchema: z.ZodObject<{
                     to?: number | null | undefined;
                 }>>>;
             }, "strip", z.ZodTypeAny, {
-                path: string;
                 from: number | null;
+                path: string;
                 to: number | null;
                 page: number | null;
                 quoted: string;
                 section: {
-                    title: string;
                     from: number | null;
+                    title: string;
                     to: number | null;
                 } | null;
             }, {
@@ -2137,14 +2137,14 @@ export declare const contextSchema: z.ZodObject<{
                     to?: number | null | undefined;
                 } | null | undefined;
             }>, {
-                path: string;
                 from: number | null;
+                path: string;
                 to: number | null;
                 page: number | null;
                 quoted: string;
                 section: {
-                    title: string;
                     from: number | null;
+                    title: string;
                     to: number | null;
                 } | null;
             }, {
@@ -2159,14 +2159,14 @@ export declare const contextSchema: z.ZodObject<{
                     to?: number | null | undefined;
                 } | null | undefined;
             }>, {
-                path: string;
                 from: number | null;
+                path: string;
                 to: number | null;
                 page: number | null;
                 quoted: string;
                 section: {
-                    title: string;
                     from: number | null;
+                    title: string;
                     to: number | null;
                 } | null;
             }, {
@@ -2184,14 +2184,14 @@ export declare const contextSchema: z.ZodObject<{
         }, "strip", z.ZodTypeAny, {
             refs: string[];
             documents: {
-                path: string;
                 from: number | null;
+                path: string;
                 to: number | null;
                 page: number | null;
                 quoted: string;
                 section: {
-                    title: string;
                     from: number | null;
+                    title: string;
                     to: number | null;
                 } | null;
             }[];
@@ -2216,14 +2216,14 @@ export declare const contextSchema: z.ZodObject<{
         showing: {
             refs: string[];
             documents: {
-                path: string;
                 from: number | null;
+                path: string;
                 to: number | null;
                 page: number | null;
                 quoted: string;
                 section: {
-                    title: string;
                     from: number | null;
+                    title: string;
                     to: number | null;
                 } | null;
             }[];
@@ -2306,6 +2306,25 @@ export declare const contextSchema: z.ZodObject<{
         refreshing?: boolean | undefined;
     }>>;
 }, "strip", z.ZodTypeAny, {
+    containers: {
+        module: string;
+        selected: boolean;
+        showing: {
+            refs: string[];
+            documents: {
+                from: number | null;
+                path: string;
+                to: number | null;
+                page: number | null;
+                quoted: string;
+                section: {
+                    from: number | null;
+                    title: string;
+                    to: number | null;
+                } | null;
+            }[];
+        };
+    }[];
     epic: string | null;
     tracker: {
         at: string | null;
@@ -2316,14 +2335,14 @@ export declare const contextSchema: z.ZodObject<{
     theme: "light" | "dark";
     selection: string[];
     passage: {
-        path: string;
         from: number | null;
+        path: string;
         to: number | null;
         page: number | null;
         quoted: string;
         section: {
-            title: string;
             from: number | null;
+            title: string;
             to: number | null;
         } | null;
     } | null;
@@ -2334,25 +2353,6 @@ export declare const contextSchema: z.ZodObject<{
         name: string;
     } | null;
     filters: Record<string, string | string[]>;
-    containers: {
-        module: string;
-        selected: boolean;
-        showing: {
-            refs: string[];
-            documents: {
-                path: string;
-                from: number | null;
-                to: number | null;
-                page: number | null;
-                quoted: string;
-                section: {
-                    title: string;
-                    from: number | null;
-                    to: number | null;
-                } | null;
-            }[];
-        };
-    }[];
     dispositions: {
         value: "done" | "wont-do" | "duplicate" | "superseded";
         at: string | null;
@@ -2362,6 +2362,25 @@ export declare const contextSchema: z.ZodObject<{
         by: string | null;
     }[];
 }, {
+    containers?: {
+        module: string;
+        selected?: boolean | undefined;
+        showing?: {
+            refs?: string[] | undefined;
+            documents?: {
+                path: string;
+                from?: number | null | undefined;
+                to?: number | null | undefined;
+                page?: number | null | undefined;
+                quoted?: string | undefined;
+                section?: {
+                    title: string;
+                    from?: number | null | undefined;
+                    to?: number | null | undefined;
+                } | null | undefined;
+            }[] | undefined;
+        } | undefined;
+    }[] | undefined;
     epic?: string | null | undefined;
     tracker?: {
         at?: string | null | undefined;
@@ -2390,25 +2409,6 @@ export declare const contextSchema: z.ZodObject<{
         name: string;
     } | null | undefined;
     filters?: Record<string, string | string[]> | undefined;
-    containers?: {
-        module: string;
-        selected?: boolean | undefined;
-        showing?: {
-            refs?: string[] | undefined;
-            documents?: {
-                path: string;
-                from?: number | null | undefined;
-                to?: number | null | undefined;
-                page?: number | null | undefined;
-                quoted?: string | undefined;
-                section?: {
-                    title: string;
-                    from?: number | null | undefined;
-                    to?: number | null | undefined;
-                } | null | undefined;
-            }[] | undefined;
-        } | undefined;
-    }[] | undefined;
     dispositions?: {
         value: "done" | "wont-do" | "duplicate" | "superseded";
         ref: string;
@@ -2449,7 +2449,7 @@ export type ModuleContext = z.infer<typeof contextSchema>;
  * approval it has no business modelling.
  */
 export declare const helloSchema: z.ZodObject<{
-    type: z.ZodLiteral<"roadmap.hello">;
+    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.hello">, z.ZodLiteral<string>]>, "kehikot.hello", string>;
     protocol: z.ZodNumber;
     session: z.ZodString;
     context: z.ZodObject<{
@@ -2659,24 +2659,24 @@ export declare const helloSchema: z.ZodObject<{
                 from: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
                 to: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
             }, "strip", z.ZodTypeAny, {
-                title: string;
                 from: number | null;
+                title: string;
                 to: number | null;
             }, {
                 title: string;
                 from?: number | null | undefined;
                 to?: number | null | undefined;
             }>, {
-                title: string;
                 from: number | null;
+                title: string;
                 to: number | null;
             }, {
                 title: string;
                 from?: number | null | undefined;
                 to?: number | null | undefined;
             }>, {
-                title: string;
                 from: number | null;
+                title: string;
                 to: number | null;
             }, {
                 title: string;
@@ -2684,14 +2684,14 @@ export declare const helloSchema: z.ZodObject<{
                 to?: number | null | undefined;
             }>>>;
         }, "strip", z.ZodTypeAny, {
-            path: string;
             from: number | null;
+            path: string;
             to: number | null;
             page: number | null;
             quoted: string;
             section: {
-                title: string;
                 from: number | null;
+                title: string;
                 to: number | null;
             } | null;
         }, {
@@ -2706,14 +2706,14 @@ export declare const helloSchema: z.ZodObject<{
                 to?: number | null | undefined;
             } | null | undefined;
         }>, {
-            path: string;
             from: number | null;
+            path: string;
             to: number | null;
             page: number | null;
             quoted: string;
             section: {
-                title: string;
                 from: number | null;
+                title: string;
                 to: number | null;
             } | null;
         }, {
@@ -2728,14 +2728,14 @@ export declare const helloSchema: z.ZodObject<{
                 to?: number | null | undefined;
             } | null | undefined;
         }>, {
-            path: string;
             from: number | null;
+            path: string;
             to: number | null;
             page: number | null;
             quoted: string;
             section: {
-                title: string;
                 from: number | null;
+                title: string;
                 to: number | null;
             } | null;
         }, {
@@ -2845,8 +2845,8 @@ export declare const helloSchema: z.ZodObject<{
          *
          * ## Why the choice is context and not a message of its own
          *
-         * The offer goes one way as `roadmap.filters`, so the obvious symmetry is a
-         * `roadmap.chose` coming back. It is the wrong shape, for three reasons that
+         * The offer goes one way as `kehikot.filters`, so the obvious symmetry is a
+         * `kehikot.chose` coming back. It is the wrong shape, for three reasons that
          * all point the same way.
          *
          * The first is that a module has to have this BEFORE it draws. A page told
@@ -2931,7 +2931,7 @@ export declare const helloSchema: z.ZodObject<{
          * everything is in front of it.
          */
         containers: z.ZodDefault<z.ZodArray<z.ZodObject<{
-            module: z.ZodString;
+            module: z.ZodEffects<z.ZodString, string, string>;
             /** Whether this container is picked out as a target on this kehikko. The host's own fact. */
             selected: z.ZodDefault<z.ZodBoolean>;
             /** What it says it is showing, or nothing. Never absent, for the reason `filters` is `{}` and not missing. */
@@ -3007,24 +3007,24 @@ export declare const helloSchema: z.ZodObject<{
                         from: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
                         to: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
                     }, "strip", z.ZodTypeAny, {
-                        title: string;
                         from: number | null;
+                        title: string;
                         to: number | null;
                     }, {
                         title: string;
                         from?: number | null | undefined;
                         to?: number | null | undefined;
                     }>, {
-                        title: string;
                         from: number | null;
+                        title: string;
                         to: number | null;
                     }, {
                         title: string;
                         from?: number | null | undefined;
                         to?: number | null | undefined;
                     }>, {
-                        title: string;
                         from: number | null;
+                        title: string;
                         to: number | null;
                     }, {
                         title: string;
@@ -3032,14 +3032,14 @@ export declare const helloSchema: z.ZodObject<{
                         to?: number | null | undefined;
                     }>>>;
                 }, "strip", z.ZodTypeAny, {
-                    path: string;
                     from: number | null;
+                    path: string;
                     to: number | null;
                     page: number | null;
                     quoted: string;
                     section: {
-                        title: string;
                         from: number | null;
+                        title: string;
                         to: number | null;
                     } | null;
                 }, {
@@ -3054,14 +3054,14 @@ export declare const helloSchema: z.ZodObject<{
                         to?: number | null | undefined;
                     } | null | undefined;
                 }>, {
-                    path: string;
                     from: number | null;
+                    path: string;
                     to: number | null;
                     page: number | null;
                     quoted: string;
                     section: {
-                        title: string;
                         from: number | null;
+                        title: string;
                         to: number | null;
                     } | null;
                 }, {
@@ -3076,14 +3076,14 @@ export declare const helloSchema: z.ZodObject<{
                         to?: number | null | undefined;
                     } | null | undefined;
                 }>, {
-                    path: string;
                     from: number | null;
+                    path: string;
                     to: number | null;
                     page: number | null;
                     quoted: string;
                     section: {
-                        title: string;
                         from: number | null;
+                        title: string;
                         to: number | null;
                     } | null;
                 }, {
@@ -3101,14 +3101,14 @@ export declare const helloSchema: z.ZodObject<{
             }, "strip", z.ZodTypeAny, {
                 refs: string[];
                 documents: {
-                    path: string;
                     from: number | null;
+                    path: string;
                     to: number | null;
                     page: number | null;
                     quoted: string;
                     section: {
-                        title: string;
                         from: number | null;
+                        title: string;
                         to: number | null;
                     } | null;
                 }[];
@@ -3133,14 +3133,14 @@ export declare const helloSchema: z.ZodObject<{
             showing: {
                 refs: string[];
                 documents: {
-                    path: string;
                     from: number | null;
+                    path: string;
                     to: number | null;
                     page: number | null;
                     quoted: string;
                     section: {
-                        title: string;
                         from: number | null;
+                        title: string;
                         to: number | null;
                     } | null;
                 }[];
@@ -3223,6 +3223,25 @@ export declare const helloSchema: z.ZodObject<{
             refreshing?: boolean | undefined;
         }>>;
     }, "strip", z.ZodTypeAny, {
+        containers: {
+            module: string;
+            selected: boolean;
+            showing: {
+                refs: string[];
+                documents: {
+                    from: number | null;
+                    path: string;
+                    to: number | null;
+                    page: number | null;
+                    quoted: string;
+                    section: {
+                        from: number | null;
+                        title: string;
+                        to: number | null;
+                    } | null;
+                }[];
+            };
+        }[];
         epic: string | null;
         tracker: {
             at: string | null;
@@ -3233,14 +3252,14 @@ export declare const helloSchema: z.ZodObject<{
         theme: "light" | "dark";
         selection: string[];
         passage: {
-            path: string;
             from: number | null;
+            path: string;
             to: number | null;
             page: number | null;
             quoted: string;
             section: {
-                title: string;
                 from: number | null;
+                title: string;
                 to: number | null;
             } | null;
         } | null;
@@ -3251,25 +3270,6 @@ export declare const helloSchema: z.ZodObject<{
             name: string;
         } | null;
         filters: Record<string, string | string[]>;
-        containers: {
-            module: string;
-            selected: boolean;
-            showing: {
-                refs: string[];
-                documents: {
-                    path: string;
-                    from: number | null;
-                    to: number | null;
-                    page: number | null;
-                    quoted: string;
-                    section: {
-                        title: string;
-                        from: number | null;
-                        to: number | null;
-                    } | null;
-                }[];
-            };
-        }[];
         dispositions: {
             value: "done" | "wont-do" | "duplicate" | "superseded";
             at: string | null;
@@ -3279,6 +3279,25 @@ export declare const helloSchema: z.ZodObject<{
             by: string | null;
         }[];
     }, {
+        containers?: {
+            module: string;
+            selected?: boolean | undefined;
+            showing?: {
+                refs?: string[] | undefined;
+                documents?: {
+                    path: string;
+                    from?: number | null | undefined;
+                    to?: number | null | undefined;
+                    page?: number | null | undefined;
+                    quoted?: string | undefined;
+                    section?: {
+                        title: string;
+                        from?: number | null | undefined;
+                        to?: number | null | undefined;
+                    } | null | undefined;
+                }[] | undefined;
+            } | undefined;
+        }[] | undefined;
         epic?: string | null | undefined;
         tracker?: {
             at?: string | null | undefined;
@@ -3307,25 +3326,6 @@ export declare const helloSchema: z.ZodObject<{
             name: string;
         } | null | undefined;
         filters?: Record<string, string | string[]> | undefined;
-        containers?: {
-            module: string;
-            selected?: boolean | undefined;
-            showing?: {
-                refs?: string[] | undefined;
-                documents?: {
-                    path: string;
-                    from?: number | null | undefined;
-                    to?: number | null | undefined;
-                    page?: number | null | undefined;
-                    quoted?: string | undefined;
-                    section?: {
-                        title: string;
-                        from?: number | null | undefined;
-                        to?: number | null | undefined;
-                    } | null | undefined;
-                }[] | undefined;
-            } | undefined;
-        }[] | undefined;
         dispositions?: {
             value: "done" | "wont-do" | "duplicate" | "superseded";
             ref: string;
@@ -3359,11 +3359,27 @@ export declare const helloSchema: z.ZodObject<{
      */
     state: z.ZodDefault<z.ZodNullable<z.ZodString>>;
 }, "strip", z.ZodTypeAny, {
-    type: "roadmap.hello";
-    state: string | null;
-    protocol: number;
-    session: string;
+    type: "kehikot.hello";
     context: {
+        containers: {
+            module: string;
+            selected: boolean;
+            showing: {
+                refs: string[];
+                documents: {
+                    from: number | null;
+                    path: string;
+                    to: number | null;
+                    page: number | null;
+                    quoted: string;
+                    section: {
+                        from: number | null;
+                        title: string;
+                        to: number | null;
+                    } | null;
+                }[];
+            };
+        }[];
         epic: string | null;
         tracker: {
             at: string | null;
@@ -3374,14 +3390,14 @@ export declare const helloSchema: z.ZodObject<{
         theme: "light" | "dark";
         selection: string[];
         passage: {
-            path: string;
             from: number | null;
+            path: string;
             to: number | null;
             page: number | null;
             quoted: string;
             section: {
-                title: string;
                 from: number | null;
+                title: string;
                 to: number | null;
             } | null;
         } | null;
@@ -3392,25 +3408,6 @@ export declare const helloSchema: z.ZodObject<{
             name: string;
         } | null;
         filters: Record<string, string | string[]>;
-        containers: {
-            module: string;
-            selected: boolean;
-            showing: {
-                refs: string[];
-                documents: {
-                    path: string;
-                    from: number | null;
-                    to: number | null;
-                    page: number | null;
-                    quoted: string;
-                    section: {
-                        title: string;
-                        from: number | null;
-                        to: number | null;
-                    } | null;
-                }[];
-            };
-        }[];
         dispositions: {
             value: "done" | "wont-do" | "duplicate" | "superseded";
             at: string | null;
@@ -3420,11 +3417,31 @@ export declare const helloSchema: z.ZodObject<{
             by: string | null;
         }[];
     };
-}, {
-    type: "roadmap.hello";
+    state: string | null;
     protocol: number;
     session: string;
+}, {
+    type: string;
     context: {
+        containers?: {
+            module: string;
+            selected?: boolean | undefined;
+            showing?: {
+                refs?: string[] | undefined;
+                documents?: {
+                    path: string;
+                    from?: number | null | undefined;
+                    to?: number | null | undefined;
+                    page?: number | null | undefined;
+                    quoted?: string | undefined;
+                    section?: {
+                        title: string;
+                        from?: number | null | undefined;
+                        to?: number | null | undefined;
+                    } | null | undefined;
+                }[] | undefined;
+            } | undefined;
+        }[] | undefined;
         epic?: string | null | undefined;
         tracker?: {
             at?: string | null | undefined;
@@ -3453,25 +3470,6 @@ export declare const helloSchema: z.ZodObject<{
             name: string;
         } | null | undefined;
         filters?: Record<string, string | string[]> | undefined;
-        containers?: {
-            module: string;
-            selected?: boolean | undefined;
-            showing?: {
-                refs?: string[] | undefined;
-                documents?: {
-                    path: string;
-                    from?: number | null | undefined;
-                    to?: number | null | undefined;
-                    page?: number | null | undefined;
-                    quoted?: string | undefined;
-                    section?: {
-                        title: string;
-                        from?: number | null | undefined;
-                        to?: number | null | undefined;
-                    } | null | undefined;
-                }[] | undefined;
-            } | undefined;
-        }[] | undefined;
         dispositions?: {
             value: "done" | "wont-do" | "duplicate" | "superseded";
             ref: string;
@@ -3481,6 +3479,8 @@ export declare const helloSchema: z.ZodObject<{
             by?: string | null | undefined;
         }[] | undefined;
     };
+    protocol: number;
+    session: string;
     state?: string | null | undefined;
 }>;
 /**
@@ -3493,7 +3493,7 @@ export declare const helloSchema: z.ZodObject<{
  * definition either way, so the two cannot drift apart in what they carry.
  *
  * Only epic-scoped modes are told. A `global` mode asked for one page over the
- * whole roadmap and gets one.
+ * whole canvas and gets one.
  */
 export declare const contextMessageSchema: z.ZodObject<{
     epic: z.ZodDefault<z.ZodNullable<z.ZodString>>;
@@ -3702,24 +3702,24 @@ export declare const contextMessageSchema: z.ZodObject<{
             from: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
             to: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
         }, "strip", z.ZodTypeAny, {
-            title: string;
             from: number | null;
+            title: string;
             to: number | null;
         }, {
             title: string;
             from?: number | null | undefined;
             to?: number | null | undefined;
         }>, {
-            title: string;
             from: number | null;
+            title: string;
             to: number | null;
         }, {
             title: string;
             from?: number | null | undefined;
             to?: number | null | undefined;
         }>, {
-            title: string;
             from: number | null;
+            title: string;
             to: number | null;
         }, {
             title: string;
@@ -3727,14 +3727,14 @@ export declare const contextMessageSchema: z.ZodObject<{
             to?: number | null | undefined;
         }>>>;
     }, "strip", z.ZodTypeAny, {
-        path: string;
         from: number | null;
+        path: string;
         to: number | null;
         page: number | null;
         quoted: string;
         section: {
-            title: string;
             from: number | null;
+            title: string;
             to: number | null;
         } | null;
     }, {
@@ -3749,14 +3749,14 @@ export declare const contextMessageSchema: z.ZodObject<{
             to?: number | null | undefined;
         } | null | undefined;
     }>, {
-        path: string;
         from: number | null;
+        path: string;
         to: number | null;
         page: number | null;
         quoted: string;
         section: {
-            title: string;
             from: number | null;
+            title: string;
             to: number | null;
         } | null;
     }, {
@@ -3771,14 +3771,14 @@ export declare const contextMessageSchema: z.ZodObject<{
             to?: number | null | undefined;
         } | null | undefined;
     }>, {
-        path: string;
         from: number | null;
+        path: string;
         to: number | null;
         page: number | null;
         quoted: string;
         section: {
-            title: string;
             from: number | null;
+            title: string;
             to: number | null;
         } | null;
     }, {
@@ -3888,8 +3888,8 @@ export declare const contextMessageSchema: z.ZodObject<{
      *
      * ## Why the choice is context and not a message of its own
      *
-     * The offer goes one way as `roadmap.filters`, so the obvious symmetry is a
-     * `roadmap.chose` coming back. It is the wrong shape, for three reasons that
+     * The offer goes one way as `kehikot.filters`, so the obvious symmetry is a
+     * `kehikot.chose` coming back. It is the wrong shape, for three reasons that
      * all point the same way.
      *
      * The first is that a module has to have this BEFORE it draws. A page told
@@ -3974,7 +3974,7 @@ export declare const contextMessageSchema: z.ZodObject<{
      * everything is in front of it.
      */
     containers: z.ZodDefault<z.ZodArray<z.ZodObject<{
-        module: z.ZodString;
+        module: z.ZodEffects<z.ZodString, string, string>;
         /** Whether this container is picked out as a target on this kehikko. The host's own fact. */
         selected: z.ZodDefault<z.ZodBoolean>;
         /** What it says it is showing, or nothing. Never absent, for the reason `filters` is `{}` and not missing. */
@@ -4050,24 +4050,24 @@ export declare const contextMessageSchema: z.ZodObject<{
                     from: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
                     to: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
                 }, "strip", z.ZodTypeAny, {
-                    title: string;
                     from: number | null;
+                    title: string;
                     to: number | null;
                 }, {
                     title: string;
                     from?: number | null | undefined;
                     to?: number | null | undefined;
                 }>, {
-                    title: string;
                     from: number | null;
+                    title: string;
                     to: number | null;
                 }, {
                     title: string;
                     from?: number | null | undefined;
                     to?: number | null | undefined;
                 }>, {
-                    title: string;
                     from: number | null;
+                    title: string;
                     to: number | null;
                 }, {
                     title: string;
@@ -4075,14 +4075,14 @@ export declare const contextMessageSchema: z.ZodObject<{
                     to?: number | null | undefined;
                 }>>>;
             }, "strip", z.ZodTypeAny, {
-                path: string;
                 from: number | null;
+                path: string;
                 to: number | null;
                 page: number | null;
                 quoted: string;
                 section: {
-                    title: string;
                     from: number | null;
+                    title: string;
                     to: number | null;
                 } | null;
             }, {
@@ -4097,14 +4097,14 @@ export declare const contextMessageSchema: z.ZodObject<{
                     to?: number | null | undefined;
                 } | null | undefined;
             }>, {
-                path: string;
                 from: number | null;
+                path: string;
                 to: number | null;
                 page: number | null;
                 quoted: string;
                 section: {
-                    title: string;
                     from: number | null;
+                    title: string;
                     to: number | null;
                 } | null;
             }, {
@@ -4119,14 +4119,14 @@ export declare const contextMessageSchema: z.ZodObject<{
                     to?: number | null | undefined;
                 } | null | undefined;
             }>, {
-                path: string;
                 from: number | null;
+                path: string;
                 to: number | null;
                 page: number | null;
                 quoted: string;
                 section: {
-                    title: string;
                     from: number | null;
+                    title: string;
                     to: number | null;
                 } | null;
             }, {
@@ -4144,14 +4144,14 @@ export declare const contextMessageSchema: z.ZodObject<{
         }, "strip", z.ZodTypeAny, {
             refs: string[];
             documents: {
-                path: string;
                 from: number | null;
+                path: string;
                 to: number | null;
                 page: number | null;
                 quoted: string;
                 section: {
-                    title: string;
                     from: number | null;
+                    title: string;
                     to: number | null;
                 } | null;
             }[];
@@ -4176,14 +4176,14 @@ export declare const contextMessageSchema: z.ZodObject<{
         showing: {
             refs: string[];
             documents: {
-                path: string;
                 from: number | null;
+                path: string;
                 to: number | null;
                 page: number | null;
                 quoted: string;
                 section: {
-                    title: string;
                     from: number | null;
+                    title: string;
                     to: number | null;
                 } | null;
             }[];
@@ -4266,10 +4266,29 @@ export declare const contextMessageSchema: z.ZodObject<{
         refreshing?: boolean | undefined;
     }>>;
 } & {
-    type: z.ZodLiteral<"roadmap.context">;
+    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.context">, z.ZodLiteral<string>]>, "kehikot.context", string>;
     protocol: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
-    type: "roadmap.context";
+    containers: {
+        module: string;
+        selected: boolean;
+        showing: {
+            refs: string[];
+            documents: {
+                from: number | null;
+                path: string;
+                to: number | null;
+                page: number | null;
+                quoted: string;
+                section: {
+                    from: number | null;
+                    title: string;
+                    to: number | null;
+                } | null;
+            }[];
+        };
+    }[];
+    type: "kehikot.context";
     epic: string | null;
     tracker: {
         at: string | null;
@@ -4281,14 +4300,14 @@ export declare const contextMessageSchema: z.ZodObject<{
     theme: "light" | "dark";
     selection: string[];
     passage: {
-        path: string;
         from: number | null;
+        path: string;
         to: number | null;
         page: number | null;
         quoted: string;
         section: {
-            title: string;
             from: number | null;
+            title: string;
             to: number | null;
         } | null;
     } | null;
@@ -4299,25 +4318,6 @@ export declare const contextMessageSchema: z.ZodObject<{
         name: string;
     } | null;
     filters: Record<string, string | string[]>;
-    containers: {
-        module: string;
-        selected: boolean;
-        showing: {
-            refs: string[];
-            documents: {
-                path: string;
-                from: number | null;
-                to: number | null;
-                page: number | null;
-                quoted: string;
-                section: {
-                    title: string;
-                    from: number | null;
-                    to: number | null;
-                } | null;
-            }[];
-        };
-    }[];
     dispositions: {
         value: "done" | "wont-do" | "duplicate" | "superseded";
         at: string | null;
@@ -4327,8 +4327,27 @@ export declare const contextMessageSchema: z.ZodObject<{
         by: string | null;
     }[];
 }, {
-    type: "roadmap.context";
+    type: string;
     protocol: number;
+    containers?: {
+        module: string;
+        selected?: boolean | undefined;
+        showing?: {
+            refs?: string[] | undefined;
+            documents?: {
+                path: string;
+                from?: number | null | undefined;
+                to?: number | null | undefined;
+                page?: number | null | undefined;
+                quoted?: string | undefined;
+                section?: {
+                    title: string;
+                    from?: number | null | undefined;
+                    to?: number | null | undefined;
+                } | null | undefined;
+            }[] | undefined;
+        } | undefined;
+    }[] | undefined;
     epic?: string | null | undefined;
     tracker?: {
         at?: string | null | undefined;
@@ -4357,25 +4376,6 @@ export declare const contextMessageSchema: z.ZodObject<{
         name: string;
     } | null | undefined;
     filters?: Record<string, string | string[]> | undefined;
-    containers?: {
-        module: string;
-        selected?: boolean | undefined;
-        showing?: {
-            refs?: string[] | undefined;
-            documents?: {
-                path: string;
-                from?: number | null | undefined;
-                to?: number | null | undefined;
-                page?: number | null | undefined;
-                quoted?: string | undefined;
-                section?: {
-                    title: string;
-                    from?: number | null | undefined;
-                    to?: number | null | undefined;
-                } | null | undefined;
-            }[] | undefined;
-        } | undefined;
-    }[] | undefined;
     dispositions?: {
         value: "done" | "wont-do" | "duplicate" | "superseded";
         ref: string;
@@ -4420,7 +4420,7 @@ export type ResponseFailureReason = (typeof responseFailureReasons)[number];
  * a list that cannot be kept and would read as the set of policies allowed.
  */
 export declare const responseSchema: z.ZodDiscriminatedUnion<"ok", [z.ZodObject<{
-    type: z.ZodLiteral<"roadmap.response">;
+    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.response">, z.ZodLiteral<string>]>, "kehikot.response", string>;
     id: z.ZodString;
     ok: z.ZodLiteral<true>;
     /**
@@ -4430,17 +4430,17 @@ export declare const responseSchema: z.ZodDiscriminatedUnion<"ok", [z.ZodObject<
      */
     data: z.ZodUnknown;
 }, "strip", z.ZodTypeAny, {
-    type: "roadmap.response";
-    ok: true;
+    type: "kehikot.response";
     id: string;
+    ok: true;
     data?: unknown;
 }, {
-    type: "roadmap.response";
-    ok: true;
+    type: string;
     id: string;
+    ok: true;
     data?: unknown;
 }>, z.ZodObject<{
-    type: z.ZodLiteral<"roadmap.response">;
+    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.response">, z.ZodLiteral<string>]>, "kehikot.response", string>;
     id: z.ZodString;
     ok: z.ZodLiteral<false>;
     reason: z.ZodEnum<["unknown-module", "unknown-method", "failed"]>;
@@ -4454,16 +4454,16 @@ export declare const responseSchema: z.ZodDiscriminatedUnion<"ok", [z.ZodObject<
      */
     error: z.ZodDefault<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    type: "roadmap.response";
+    type: "kehikot.response";
+    id: string;
     ok: false;
     error: string;
     reason: "failed" | "unknown-module" | "unknown-method";
-    id: string;
 }, {
-    type: "roadmap.response";
+    type: string;
+    id: string;
     ok: false;
     reason: "failed" | "unknown-module" | "unknown-method";
-    id: string;
     error?: string | undefined;
 }>]>;
 /**
@@ -4499,31 +4499,31 @@ export declare const responseSchema: z.ZodDiscriminatedUnion<"ok", [z.ZodObject<
  * an epic is the commonest ask a module has.
  */
 export declare const gotoSchema: z.ZodEffects<z.ZodObject<{
-    type: z.ZodLiteral<"roadmap.goto">;
+    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.goto">, z.ZodLiteral<string>]>, "kehikot.goto", string>;
     id: z.ZodString;
     ref: z.ZodOptional<z.ZodString>;
     step: z.ZodOptional<z.ZodNumber>;
     epic: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    type: "roadmap.goto";
+    type: "kehikot.goto";
     id: string;
     epic?: string | undefined;
     step?: number | undefined;
     ref?: string | undefined;
 }, {
-    type: "roadmap.goto";
+    type: string;
     id: string;
     epic?: string | undefined;
     step?: number | undefined;
     ref?: string | undefined;
 }>, {
-    type: "roadmap.goto";
+    type: "kehikot.goto";
     id: string;
     epic?: string | undefined;
     step?: number | undefined;
     ref?: string | undefined;
 }, {
-    type: "roadmap.goto";
+    type: string;
     id: string;
     epic?: string | undefined;
     step?: number | undefined;
@@ -4546,21 +4546,21 @@ export declare const gotoSchema: z.ZodEffects<z.ZodObject<{
  * a word nobody has said yet.
  */
 export declare const readySchema: z.ZodObject<{
-    type: z.ZodLiteral<"roadmap.ready">;
-    id: z.ZodString;
+    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.ready">, z.ZodLiteral<string>]>, "kehikot.ready", string>;
+    id: z.ZodEffects<z.ZodString, string, string>;
     protocol: z.ZodDefault<z.ZodNumber>;
 }, "strip", z.ZodTypeAny, {
-    type: "roadmap.ready";
+    type: "kehikot.ready";
     id: string;
     protocol: number;
 }, {
-    type: "roadmap.ready";
+    type: string;
     id: string;
     protocol?: number | undefined;
 }>;
 /** One question, with an id the answer will carry back. */
 export declare const requestSchema: z.ZodObject<{
-    type: z.ZodLiteral<"roadmap.request">;
+    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.request">, z.ZodLiteral<string>]>, "kehikot.request", string>;
     id: z.ZodString;
     /**
      * Bounded but not held to the list of known methods, which would be this
@@ -4571,12 +4571,12 @@ export declare const requestSchema: z.ZodObject<{
     method: z.ZodString;
     params: z.ZodDefault<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
 }, "strip", z.ZodTypeAny, {
-    params: Record<string, unknown>;
-    type: "roadmap.request";
+    type: "kehikot.request";
     id: string;
     method: string;
+    params: Record<string, unknown>;
 }, {
-    type: "roadmap.request";
+    type: string;
     id: string;
     method: string;
     params?: Record<string, unknown> | undefined;
@@ -4590,13 +4590,13 @@ export declare const requestSchema: z.ZodObject<{
  * itself.
  */
 export declare const resizeSchema: z.ZodObject<{
-    type: z.ZodLiteral<"roadmap.resize">;
+    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.resize">, z.ZodLiteral<string>]>, "kehikot.resize", string>;
     height: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
-    type: "roadmap.resize";
+    type: "kehikot.resize";
     height: number;
 }, {
-    type: "roadmap.resize";
+    type: string;
     height: number;
 }>;
 /**
@@ -4642,17 +4642,17 @@ export declare const resizeSchema: z.ZodObject<{
  * degrades to silence.
  */
 export declare const wentSchema: z.ZodObject<{
-    type: z.ZodLiteral<"roadmap.went">;
+    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.went">, z.ZodLiteral<string>]>, "kehikot.went", string>;
     id: z.ZodString;
     found: z.ZodBoolean;
     why: z.ZodDefault<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    type: "roadmap.went";
-    why: string;
+    type: "kehikot.went";
     id: string;
+    why: string;
     found: boolean;
 }, {
-    type: "roadmap.went";
+    type: string;
     id: string;
     found: boolean;
     why?: string | undefined;
@@ -4671,7 +4671,7 @@ export declare const wentSchema: z.ZodObject<{
  *
  * The sender does not name a recipient and cannot: a module has no way to know
  * what else is on the canvas, and giving it one would end modularity. It names
- * a FORMAT — `roadmap.notifications@1` — and the host works out who has said,
+ * a FORMAT — `kehikot.notifications@1` — and the host works out who has said,
  * in their manifest, that they consume it. So a module emits into the room and
  * the room decides who hears, which is why either can be removed without the
  * other noticing.
@@ -4701,14 +4701,14 @@ export declare const wentSchema: z.ZodObject<{
  * needs history should keep its own rather than expect the wire to hold it.
  */
 export declare const eventSchema: z.ZodObject<{
-    type: z.ZodLiteral<"roadmap.event">;
+    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.event">, z.ZodLiteral<string>]>, "kehikot.event", string>;
     protocol: z.ZodNumber;
-    /** The format, e.g. `roadmap.notifications@1`. Known to the host, or unsent. */
-    extension: z.ZodString;
+    /** The format, e.g. `kehikot.notifications@1`. Known to the host, or unsent. */
+    extension: z.ZodEffects<z.ZodString, string, string>;
     /** Whatever that format says. Validated by the host before it left. */
     payload: z.ZodUnknown;
     /** The module that emitted it, named by the host from its own registry. */
-    from: z.ZodString;
+    from: z.ZodEffects<z.ZodString, string, string>;
     /**
      * When the host accepted it, ISO 8601. A receiver ordering by arrival would
      * be ordering by its own scheduler instead.
@@ -4734,22 +4734,22 @@ export declare const eventSchema: z.ZodObject<{
         name: string;
     }>>>;
 }, "strip", z.ZodTypeAny, {
-    at: string;
-    type: "roadmap.event";
+    type: "kehikot.event";
     from: string;
+    extension: string;
+    at: string;
     protocol: number;
     kehikko: {
         id: number;
         name: string;
     } | null;
-    extension: string;
     payload?: unknown;
 }, {
-    at: string;
-    type: "roadmap.event";
+    type: string;
     from: string;
-    protocol: number;
     extension: string;
+    at: string;
+    protocol: number;
     kehikko?: {
         id: number;
         name: string;
@@ -4757,7 +4757,7 @@ export declare const eventSchema: z.ZodObject<{
     payload?: unknown;
 }>;
 export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
-    type: z.ZodLiteral<"roadmap.hello">;
+    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.hello">, z.ZodLiteral<string>]>, "kehikot.hello", string>;
     protocol: z.ZodNumber;
     session: z.ZodString;
     context: z.ZodObject<{
@@ -4967,24 +4967,24 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
                 from: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
                 to: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
             }, "strip", z.ZodTypeAny, {
-                title: string;
                 from: number | null;
+                title: string;
                 to: number | null;
             }, {
                 title: string;
                 from?: number | null | undefined;
                 to?: number | null | undefined;
             }>, {
-                title: string;
                 from: number | null;
+                title: string;
                 to: number | null;
             }, {
                 title: string;
                 from?: number | null | undefined;
                 to?: number | null | undefined;
             }>, {
-                title: string;
                 from: number | null;
+                title: string;
                 to: number | null;
             }, {
                 title: string;
@@ -4992,14 +4992,14 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
                 to?: number | null | undefined;
             }>>>;
         }, "strip", z.ZodTypeAny, {
-            path: string;
             from: number | null;
+            path: string;
             to: number | null;
             page: number | null;
             quoted: string;
             section: {
-                title: string;
                 from: number | null;
+                title: string;
                 to: number | null;
             } | null;
         }, {
@@ -5014,14 +5014,14 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
                 to?: number | null | undefined;
             } | null | undefined;
         }>, {
-            path: string;
             from: number | null;
+            path: string;
             to: number | null;
             page: number | null;
             quoted: string;
             section: {
-                title: string;
                 from: number | null;
+                title: string;
                 to: number | null;
             } | null;
         }, {
@@ -5036,14 +5036,14 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
                 to?: number | null | undefined;
             } | null | undefined;
         }>, {
-            path: string;
             from: number | null;
+            path: string;
             to: number | null;
             page: number | null;
             quoted: string;
             section: {
-                title: string;
                 from: number | null;
+                title: string;
                 to: number | null;
             } | null;
         }, {
@@ -5153,8 +5153,8 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
          *
          * ## Why the choice is context and not a message of its own
          *
-         * The offer goes one way as `roadmap.filters`, so the obvious symmetry is a
-         * `roadmap.chose` coming back. It is the wrong shape, for three reasons that
+         * The offer goes one way as `kehikot.filters`, so the obvious symmetry is a
+         * `kehikot.chose` coming back. It is the wrong shape, for three reasons that
          * all point the same way.
          *
          * The first is that a module has to have this BEFORE it draws. A page told
@@ -5239,7 +5239,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
          * everything is in front of it.
          */
         containers: z.ZodDefault<z.ZodArray<z.ZodObject<{
-            module: z.ZodString;
+            module: z.ZodEffects<z.ZodString, string, string>;
             /** Whether this container is picked out as a target on this kehikko. The host's own fact. */
             selected: z.ZodDefault<z.ZodBoolean>;
             /** What it says it is showing, or nothing. Never absent, for the reason `filters` is `{}` and not missing. */
@@ -5315,24 +5315,24 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
                         from: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
                         to: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
                     }, "strip", z.ZodTypeAny, {
-                        title: string;
                         from: number | null;
+                        title: string;
                         to: number | null;
                     }, {
                         title: string;
                         from?: number | null | undefined;
                         to?: number | null | undefined;
                     }>, {
-                        title: string;
                         from: number | null;
+                        title: string;
                         to: number | null;
                     }, {
                         title: string;
                         from?: number | null | undefined;
                         to?: number | null | undefined;
                     }>, {
-                        title: string;
                         from: number | null;
+                        title: string;
                         to: number | null;
                     }, {
                         title: string;
@@ -5340,14 +5340,14 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
                         to?: number | null | undefined;
                     }>>>;
                 }, "strip", z.ZodTypeAny, {
-                    path: string;
                     from: number | null;
+                    path: string;
                     to: number | null;
                     page: number | null;
                     quoted: string;
                     section: {
-                        title: string;
                         from: number | null;
+                        title: string;
                         to: number | null;
                     } | null;
                 }, {
@@ -5362,14 +5362,14 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
                         to?: number | null | undefined;
                     } | null | undefined;
                 }>, {
-                    path: string;
                     from: number | null;
+                    path: string;
                     to: number | null;
                     page: number | null;
                     quoted: string;
                     section: {
-                        title: string;
                         from: number | null;
+                        title: string;
                         to: number | null;
                     } | null;
                 }, {
@@ -5384,14 +5384,14 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
                         to?: number | null | undefined;
                     } | null | undefined;
                 }>, {
-                    path: string;
                     from: number | null;
+                    path: string;
                     to: number | null;
                     page: number | null;
                     quoted: string;
                     section: {
-                        title: string;
                         from: number | null;
+                        title: string;
                         to: number | null;
                     } | null;
                 }, {
@@ -5409,14 +5409,14 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             }, "strip", z.ZodTypeAny, {
                 refs: string[];
                 documents: {
-                    path: string;
                     from: number | null;
+                    path: string;
                     to: number | null;
                     page: number | null;
                     quoted: string;
                     section: {
-                        title: string;
                         from: number | null;
+                        title: string;
                         to: number | null;
                     } | null;
                 }[];
@@ -5441,14 +5441,14 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             showing: {
                 refs: string[];
                 documents: {
-                    path: string;
                     from: number | null;
+                    path: string;
                     to: number | null;
                     page: number | null;
                     quoted: string;
                     section: {
-                        title: string;
                         from: number | null;
+                        title: string;
                         to: number | null;
                     } | null;
                 }[];
@@ -5531,6 +5531,25 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             refreshing?: boolean | undefined;
         }>>;
     }, "strip", z.ZodTypeAny, {
+        containers: {
+            module: string;
+            selected: boolean;
+            showing: {
+                refs: string[];
+                documents: {
+                    from: number | null;
+                    path: string;
+                    to: number | null;
+                    page: number | null;
+                    quoted: string;
+                    section: {
+                        from: number | null;
+                        title: string;
+                        to: number | null;
+                    } | null;
+                }[];
+            };
+        }[];
         epic: string | null;
         tracker: {
             at: string | null;
@@ -5541,14 +5560,14 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         theme: "light" | "dark";
         selection: string[];
         passage: {
-            path: string;
             from: number | null;
+            path: string;
             to: number | null;
             page: number | null;
             quoted: string;
             section: {
-                title: string;
                 from: number | null;
+                title: string;
                 to: number | null;
             } | null;
         } | null;
@@ -5559,25 +5578,6 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             name: string;
         } | null;
         filters: Record<string, string | string[]>;
-        containers: {
-            module: string;
-            selected: boolean;
-            showing: {
-                refs: string[];
-                documents: {
-                    path: string;
-                    from: number | null;
-                    to: number | null;
-                    page: number | null;
-                    quoted: string;
-                    section: {
-                        title: string;
-                        from: number | null;
-                        to: number | null;
-                    } | null;
-                }[];
-            };
-        }[];
         dispositions: {
             value: "done" | "wont-do" | "duplicate" | "superseded";
             at: string | null;
@@ -5587,6 +5587,25 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             by: string | null;
         }[];
     }, {
+        containers?: {
+            module: string;
+            selected?: boolean | undefined;
+            showing?: {
+                refs?: string[] | undefined;
+                documents?: {
+                    path: string;
+                    from?: number | null | undefined;
+                    to?: number | null | undefined;
+                    page?: number | null | undefined;
+                    quoted?: string | undefined;
+                    section?: {
+                        title: string;
+                        from?: number | null | undefined;
+                        to?: number | null | undefined;
+                    } | null | undefined;
+                }[] | undefined;
+            } | undefined;
+        }[] | undefined;
         epic?: string | null | undefined;
         tracker?: {
             at?: string | null | undefined;
@@ -5615,25 +5634,6 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             name: string;
         } | null | undefined;
         filters?: Record<string, string | string[]> | undefined;
-        containers?: {
-            module: string;
-            selected?: boolean | undefined;
-            showing?: {
-                refs?: string[] | undefined;
-                documents?: {
-                    path: string;
-                    from?: number | null | undefined;
-                    to?: number | null | undefined;
-                    page?: number | null | undefined;
-                    quoted?: string | undefined;
-                    section?: {
-                        title: string;
-                        from?: number | null | undefined;
-                        to?: number | null | undefined;
-                    } | null | undefined;
-                }[] | undefined;
-            } | undefined;
-        }[] | undefined;
         dispositions?: {
             value: "done" | "wont-do" | "duplicate" | "superseded";
             ref: string;
@@ -5667,11 +5667,27 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
      */
     state: z.ZodDefault<z.ZodNullable<z.ZodString>>;
 }, "strip", z.ZodTypeAny, {
-    type: "roadmap.hello";
-    state: string | null;
-    protocol: number;
-    session: string;
+    type: "kehikot.hello";
     context: {
+        containers: {
+            module: string;
+            selected: boolean;
+            showing: {
+                refs: string[];
+                documents: {
+                    from: number | null;
+                    path: string;
+                    to: number | null;
+                    page: number | null;
+                    quoted: string;
+                    section: {
+                        from: number | null;
+                        title: string;
+                        to: number | null;
+                    } | null;
+                }[];
+            };
+        }[];
         epic: string | null;
         tracker: {
             at: string | null;
@@ -5682,14 +5698,14 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         theme: "light" | "dark";
         selection: string[];
         passage: {
-            path: string;
             from: number | null;
+            path: string;
             to: number | null;
             page: number | null;
             quoted: string;
             section: {
-                title: string;
                 from: number | null;
+                title: string;
                 to: number | null;
             } | null;
         } | null;
@@ -5700,25 +5716,6 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             name: string;
         } | null;
         filters: Record<string, string | string[]>;
-        containers: {
-            module: string;
-            selected: boolean;
-            showing: {
-                refs: string[];
-                documents: {
-                    path: string;
-                    from: number | null;
-                    to: number | null;
-                    page: number | null;
-                    quoted: string;
-                    section: {
-                        title: string;
-                        from: number | null;
-                        to: number | null;
-                    } | null;
-                }[];
-            };
-        }[];
         dispositions: {
             value: "done" | "wont-do" | "duplicate" | "superseded";
             at: string | null;
@@ -5728,11 +5725,31 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             by: string | null;
         }[];
     };
-}, {
-    type: "roadmap.hello";
+    state: string | null;
     protocol: number;
     session: string;
+}, {
+    type: string;
     context: {
+        containers?: {
+            module: string;
+            selected?: boolean | undefined;
+            showing?: {
+                refs?: string[] | undefined;
+                documents?: {
+                    path: string;
+                    from?: number | null | undefined;
+                    to?: number | null | undefined;
+                    page?: number | null | undefined;
+                    quoted?: string | undefined;
+                    section?: {
+                        title: string;
+                        from?: number | null | undefined;
+                        to?: number | null | undefined;
+                    } | null | undefined;
+                }[] | undefined;
+            } | undefined;
+        }[] | undefined;
         epic?: string | null | undefined;
         tracker?: {
             at?: string | null | undefined;
@@ -5761,25 +5778,6 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             name: string;
         } | null | undefined;
         filters?: Record<string, string | string[]> | undefined;
-        containers?: {
-            module: string;
-            selected?: boolean | undefined;
-            showing?: {
-                refs?: string[] | undefined;
-                documents?: {
-                    path: string;
-                    from?: number | null | undefined;
-                    to?: number | null | undefined;
-                    page?: number | null | undefined;
-                    quoted?: string | undefined;
-                    section?: {
-                        title: string;
-                        from?: number | null | undefined;
-                        to?: number | null | undefined;
-                    } | null | undefined;
-                }[] | undefined;
-            } | undefined;
-        }[] | undefined;
         dispositions?: {
             value: "done" | "wont-do" | "duplicate" | "superseded";
             ref: string;
@@ -5789,6 +5787,8 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             by?: string | null | undefined;
         }[] | undefined;
     };
+    protocol: number;
+    session: string;
     state?: string | null | undefined;
 }>, z.ZodObject<{
     epic: z.ZodDefault<z.ZodNullable<z.ZodString>>;
@@ -5997,24 +5997,24 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             from: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
             to: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
         }, "strip", z.ZodTypeAny, {
-            title: string;
             from: number | null;
+            title: string;
             to: number | null;
         }, {
             title: string;
             from?: number | null | undefined;
             to?: number | null | undefined;
         }>, {
-            title: string;
             from: number | null;
+            title: string;
             to: number | null;
         }, {
             title: string;
             from?: number | null | undefined;
             to?: number | null | undefined;
         }>, {
-            title: string;
             from: number | null;
+            title: string;
             to: number | null;
         }, {
             title: string;
@@ -6022,14 +6022,14 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             to?: number | null | undefined;
         }>>>;
     }, "strip", z.ZodTypeAny, {
-        path: string;
         from: number | null;
+        path: string;
         to: number | null;
         page: number | null;
         quoted: string;
         section: {
-            title: string;
             from: number | null;
+            title: string;
             to: number | null;
         } | null;
     }, {
@@ -6044,14 +6044,14 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             to?: number | null | undefined;
         } | null | undefined;
     }>, {
-        path: string;
         from: number | null;
+        path: string;
         to: number | null;
         page: number | null;
         quoted: string;
         section: {
-            title: string;
             from: number | null;
+            title: string;
             to: number | null;
         } | null;
     }, {
@@ -6066,14 +6066,14 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             to?: number | null | undefined;
         } | null | undefined;
     }>, {
-        path: string;
         from: number | null;
+        path: string;
         to: number | null;
         page: number | null;
         quoted: string;
         section: {
-            title: string;
             from: number | null;
+            title: string;
             to: number | null;
         } | null;
     }, {
@@ -6183,8 +6183,8 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
      *
      * ## Why the choice is context and not a message of its own
      *
-     * The offer goes one way as `roadmap.filters`, so the obvious symmetry is a
-     * `roadmap.chose` coming back. It is the wrong shape, for three reasons that
+     * The offer goes one way as `kehikot.filters`, so the obvious symmetry is a
+     * `kehikot.chose` coming back. It is the wrong shape, for three reasons that
      * all point the same way.
      *
      * The first is that a module has to have this BEFORE it draws. A page told
@@ -6269,7 +6269,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
      * everything is in front of it.
      */
     containers: z.ZodDefault<z.ZodArray<z.ZodObject<{
-        module: z.ZodString;
+        module: z.ZodEffects<z.ZodString, string, string>;
         /** Whether this container is picked out as a target on this kehikko. The host's own fact. */
         selected: z.ZodDefault<z.ZodBoolean>;
         /** What it says it is showing, or nothing. Never absent, for the reason `filters` is `{}` and not missing. */
@@ -6345,24 +6345,24 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
                     from: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
                     to: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
                 }, "strip", z.ZodTypeAny, {
-                    title: string;
                     from: number | null;
+                    title: string;
                     to: number | null;
                 }, {
                     title: string;
                     from?: number | null | undefined;
                     to?: number | null | undefined;
                 }>, {
-                    title: string;
                     from: number | null;
+                    title: string;
                     to: number | null;
                 }, {
                     title: string;
                     from?: number | null | undefined;
                     to?: number | null | undefined;
                 }>, {
-                    title: string;
                     from: number | null;
+                    title: string;
                     to: number | null;
                 }, {
                     title: string;
@@ -6370,14 +6370,14 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
                     to?: number | null | undefined;
                 }>>>;
             }, "strip", z.ZodTypeAny, {
-                path: string;
                 from: number | null;
+                path: string;
                 to: number | null;
                 page: number | null;
                 quoted: string;
                 section: {
-                    title: string;
                     from: number | null;
+                    title: string;
                     to: number | null;
                 } | null;
             }, {
@@ -6392,14 +6392,14 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
                     to?: number | null | undefined;
                 } | null | undefined;
             }>, {
-                path: string;
                 from: number | null;
+                path: string;
                 to: number | null;
                 page: number | null;
                 quoted: string;
                 section: {
-                    title: string;
                     from: number | null;
+                    title: string;
                     to: number | null;
                 } | null;
             }, {
@@ -6414,14 +6414,14 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
                     to?: number | null | undefined;
                 } | null | undefined;
             }>, {
-                path: string;
                 from: number | null;
+                path: string;
                 to: number | null;
                 page: number | null;
                 quoted: string;
                 section: {
-                    title: string;
                     from: number | null;
+                    title: string;
                     to: number | null;
                 } | null;
             }, {
@@ -6439,14 +6439,14 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         }, "strip", z.ZodTypeAny, {
             refs: string[];
             documents: {
-                path: string;
                 from: number | null;
+                path: string;
                 to: number | null;
                 page: number | null;
                 quoted: string;
                 section: {
-                    title: string;
                     from: number | null;
+                    title: string;
                     to: number | null;
                 } | null;
             }[];
@@ -6471,14 +6471,14 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         showing: {
             refs: string[];
             documents: {
-                path: string;
                 from: number | null;
+                path: string;
                 to: number | null;
                 page: number | null;
                 quoted: string;
                 section: {
-                    title: string;
                     from: number | null;
+                    title: string;
                     to: number | null;
                 } | null;
             }[];
@@ -6561,10 +6561,29 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         refreshing?: boolean | undefined;
     }>>;
 } & {
-    type: z.ZodLiteral<"roadmap.context">;
+    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.context">, z.ZodLiteral<string>]>, "kehikot.context", string>;
     protocol: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
-    type: "roadmap.context";
+    containers: {
+        module: string;
+        selected: boolean;
+        showing: {
+            refs: string[];
+            documents: {
+                from: number | null;
+                path: string;
+                to: number | null;
+                page: number | null;
+                quoted: string;
+                section: {
+                    from: number | null;
+                    title: string;
+                    to: number | null;
+                } | null;
+            }[];
+        };
+    }[];
+    type: "kehikot.context";
     epic: string | null;
     tracker: {
         at: string | null;
@@ -6576,14 +6595,14 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     theme: "light" | "dark";
     selection: string[];
     passage: {
-        path: string;
         from: number | null;
+        path: string;
         to: number | null;
         page: number | null;
         quoted: string;
         section: {
-            title: string;
             from: number | null;
+            title: string;
             to: number | null;
         } | null;
     } | null;
@@ -6594,25 +6613,6 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         name: string;
     } | null;
     filters: Record<string, string | string[]>;
-    containers: {
-        module: string;
-        selected: boolean;
-        showing: {
-            refs: string[];
-            documents: {
-                path: string;
-                from: number | null;
-                to: number | null;
-                page: number | null;
-                quoted: string;
-                section: {
-                    title: string;
-                    from: number | null;
-                    to: number | null;
-                } | null;
-            }[];
-        };
-    }[];
     dispositions: {
         value: "done" | "wont-do" | "duplicate" | "superseded";
         at: string | null;
@@ -6622,8 +6622,27 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         by: string | null;
     }[];
 }, {
-    type: "roadmap.context";
+    type: string;
     protocol: number;
+    containers?: {
+        module: string;
+        selected?: boolean | undefined;
+        showing?: {
+            refs?: string[] | undefined;
+            documents?: {
+                path: string;
+                from?: number | null | undefined;
+                to?: number | null | undefined;
+                page?: number | null | undefined;
+                quoted?: string | undefined;
+                section?: {
+                    title: string;
+                    from?: number | null | undefined;
+                    to?: number | null | undefined;
+                } | null | undefined;
+            }[] | undefined;
+        } | undefined;
+    }[] | undefined;
     epic?: string | null | undefined;
     tracker?: {
         at?: string | null | undefined;
@@ -6652,25 +6671,6 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         name: string;
     } | null | undefined;
     filters?: Record<string, string | string[]> | undefined;
-    containers?: {
-        module: string;
-        selected?: boolean | undefined;
-        showing?: {
-            refs?: string[] | undefined;
-            documents?: {
-                path: string;
-                from?: number | null | undefined;
-                to?: number | null | undefined;
-                page?: number | null | undefined;
-                quoted?: string | undefined;
-                section?: {
-                    title: string;
-                    from?: number | null | undefined;
-                    to?: number | null | undefined;
-                } | null | undefined;
-            }[] | undefined;
-        } | undefined;
-    }[] | undefined;
     dispositions?: {
         value: "done" | "wont-do" | "duplicate" | "superseded";
         ref: string;
@@ -6680,7 +6680,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         by?: string | null | undefined;
     }[] | undefined;
 }>, z.ZodDiscriminatedUnion<"ok", [z.ZodObject<{
-    type: z.ZodLiteral<"roadmap.response">;
+    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.response">, z.ZodLiteral<string>]>, "kehikot.response", string>;
     id: z.ZodString;
     ok: z.ZodLiteral<true>;
     /**
@@ -6690,17 +6690,17 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
      */
     data: z.ZodUnknown;
 }, "strip", z.ZodTypeAny, {
-    type: "roadmap.response";
-    ok: true;
+    type: "kehikot.response";
     id: string;
+    ok: true;
     data?: unknown;
 }, {
-    type: "roadmap.response";
-    ok: true;
+    type: string;
     id: string;
+    ok: true;
     data?: unknown;
 }>, z.ZodObject<{
-    type: z.ZodLiteral<"roadmap.response">;
+    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.response">, z.ZodLiteral<string>]>, "kehikot.response", string>;
     id: z.ZodString;
     ok: z.ZodLiteral<false>;
     reason: z.ZodEnum<["unknown-module", "unknown-method", "failed"]>;
@@ -6714,56 +6714,56 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
      */
     error: z.ZodDefault<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    type: "roadmap.response";
+    type: "kehikot.response";
+    id: string;
     ok: false;
     error: string;
     reason: "failed" | "unknown-module" | "unknown-method";
-    id: string;
 }, {
-    type: "roadmap.response";
+    type: string;
+    id: string;
     ok: false;
     reason: "failed" | "unknown-module" | "unknown-method";
-    id: string;
     error?: string | undefined;
 }>]>, z.ZodEffects<z.ZodObject<{
-    type: z.ZodLiteral<"roadmap.goto">;
+    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.goto">, z.ZodLiteral<string>]>, "kehikot.goto", string>;
     id: z.ZodString;
     ref: z.ZodOptional<z.ZodString>;
     step: z.ZodOptional<z.ZodNumber>;
     epic: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    type: "roadmap.goto";
+    type: "kehikot.goto";
     id: string;
     epic?: string | undefined;
     step?: number | undefined;
     ref?: string | undefined;
 }, {
-    type: "roadmap.goto";
+    type: string;
     id: string;
     epic?: string | undefined;
     step?: number | undefined;
     ref?: string | undefined;
 }>, {
-    type: "roadmap.goto";
+    type: "kehikot.goto";
     id: string;
     epic?: string | undefined;
     step?: number | undefined;
     ref?: string | undefined;
 }, {
-    type: "roadmap.goto";
+    type: string;
     id: string;
     epic?: string | undefined;
     step?: number | undefined;
     ref?: string | undefined;
 }>, z.ZodObject<{
-    type: z.ZodLiteral<"roadmap.event">;
+    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.event">, z.ZodLiteral<string>]>, "kehikot.event", string>;
     protocol: z.ZodNumber;
-    /** The format, e.g. `roadmap.notifications@1`. Known to the host, or unsent. */
-    extension: z.ZodString;
+    /** The format, e.g. `kehikot.notifications@1`. Known to the host, or unsent. */
+    extension: z.ZodEffects<z.ZodString, string, string>;
     /** Whatever that format says. Validated by the host before it left. */
     payload: z.ZodUnknown;
     /** The module that emitted it, named by the host from its own registry. */
-    from: z.ZodString;
+    from: z.ZodEffects<z.ZodString, string, string>;
     /**
      * When the host accepted it, ISO 8601. A receiver ordering by arrival would
      * be ordering by its own scheduler instead.
@@ -6789,61 +6789,61 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         name: string;
     }>>>;
 }, "strip", z.ZodTypeAny, {
-    at: string;
-    type: "roadmap.event";
+    type: "kehikot.event";
     from: string;
+    extension: string;
+    at: string;
     protocol: number;
     kehikko: {
         id: number;
         name: string;
     } | null;
-    extension: string;
     payload?: unknown;
 }, {
-    at: string;
-    type: "roadmap.event";
+    type: string;
     from: string;
-    protocol: number;
     extension: string;
+    at: string;
+    protocol: number;
     kehikko?: {
         id: number;
         name: string;
     } | null | undefined;
     payload?: unknown;
 }>, z.ZodObject<{
-    type: z.ZodLiteral<"roadmap.clear">;
+    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.clear">, z.ZodLiteral<string>]>, "kehikot.clear", string>;
     protocol: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
-    type: "roadmap.clear";
+    type: "kehikot.clear";
     protocol: number;
 }, {
-    type: "roadmap.clear";
+    type: string;
     protocol: number;
 }>, z.ZodObject<{
-    type: z.ZodLiteral<"roadmap.refresh">;
+    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.refresh">, z.ZodLiteral<string>]>, "kehikot.refresh", string>;
     protocol: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
-    type: "roadmap.refresh";
+    type: "kehikot.refresh";
     protocol: number;
 }, {
-    type: "roadmap.refresh";
+    type: string;
     protocol: number;
 }>]>;
 export type HostMessage = z.infer<typeof hostMessageSchema>;
 export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
-    type: z.ZodLiteral<"roadmap.ready">;
-    id: z.ZodString;
+    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.ready">, z.ZodLiteral<string>]>, "kehikot.ready", string>;
+    id: z.ZodEffects<z.ZodString, string, string>;
     protocol: z.ZodDefault<z.ZodNumber>;
 }, "strip", z.ZodTypeAny, {
-    type: "roadmap.ready";
+    type: "kehikot.ready";
     id: string;
     protocol: number;
 }, {
-    type: "roadmap.ready";
+    type: string;
     id: string;
     protocol?: number | undefined;
 }>, z.ZodObject<{
-    type: z.ZodLiteral<"roadmap.request">;
+    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.request">, z.ZodLiteral<string>]>, "kehikot.request", string>;
     id: z.ZodString;
     /**
      * Bounded but not held to the list of known methods, which would be this
@@ -6854,41 +6854,41 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
     method: z.ZodString;
     params: z.ZodDefault<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
 }, "strip", z.ZodTypeAny, {
-    params: Record<string, unknown>;
-    type: "roadmap.request";
+    type: "kehikot.request";
     id: string;
     method: string;
+    params: Record<string, unknown>;
 }, {
-    type: "roadmap.request";
+    type: string;
     id: string;
     method: string;
     params?: Record<string, unknown> | undefined;
 }>, z.ZodObject<{
-    type: z.ZodLiteral<"roadmap.resize">;
+    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.resize">, z.ZodLiteral<string>]>, "kehikot.resize", string>;
     height: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
-    type: "roadmap.resize";
+    type: "kehikot.resize";
     height: number;
 }, {
-    type: "roadmap.resize";
+    type: string;
     height: number;
 }>, z.ZodObject<{
-    type: z.ZodLiteral<"roadmap.went">;
+    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.went">, z.ZodLiteral<string>]>, "kehikot.went", string>;
     id: z.ZodString;
     found: z.ZodBoolean;
     why: z.ZodDefault<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    type: "roadmap.went";
-    why: string;
+    type: "kehikot.went";
     id: string;
+    why: string;
     found: boolean;
 }, {
-    type: "roadmap.went";
+    type: string;
     id: string;
     found: boolean;
     why?: string | undefined;
 }>, z.ZodObject<{
-    type: z.ZodLiteral<"roadmap.filters">;
+    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.filters">, z.ZodLiteral<string>]>, "kehikot.filters", string>;
     groups: z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodEffects<z.ZodObject<{
         id: z.ZodEffects<z.ZodString, string, string>;
         /** What this axis is called: `ignored`, `kind`, `scope`, `search`. A person reads it. */
@@ -6953,11 +6953,11 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
          */
         fallback: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
     }, "strip", z.ZodTypeAny, {
+        id: string;
         options: {
             id: string;
             label: string;
         }[];
-        id: string;
         label: string;
         kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
@@ -6971,11 +6971,11 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
     }>, {
+        id: string;
         options: {
             id: string;
             label: string;
         }[];
-        id: string;
         label: string;
         kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
@@ -6989,11 +6989,11 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
     }>, {
+        id: string;
         options: {
             id: string;
             label: string;
         }[];
-        id: string;
         label: string;
         kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
@@ -7007,11 +7007,11 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
     }>, "many">, {
+        id: string;
         options: {
             id: string;
             label: string;
         }[];
-        id: string;
         label: string;
         kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
@@ -7026,19 +7026,19 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         fallback?: string | undefined;
     }[]>;
 }, "strip", z.ZodTypeAny, {
-    type: "roadmap.filters";
+    type: "kehikot.filters";
     groups: {
+        id: string;
         options: {
             id: string;
             label: string;
         }[];
-        id: string;
         label: string;
         kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
     }[];
 }, {
-    type: "roadmap.filters";
+    type: string;
     groups: {
         id: string;
         label: string;
@@ -7050,17 +7050,17 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         fallback?: string | undefined;
     }[];
 }>, z.ZodObject<{
-    type: z.ZodLiteral<"roadmap.clearable">;
+    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.clearable">, z.ZodLiteral<string>]>, "kehikot.clearable", string>;
     /** The words on the control, or `null` to take the control away. */
     label: z.ZodDefault<z.ZodNullable<z.ZodString>>;
 }, "strip", z.ZodTypeAny, {
-    type: "roadmap.clearable";
+    type: "kehikot.clearable";
     label: string | null;
 }, {
-    type: "roadmap.clearable";
+    type: string;
     label?: string | null | undefined;
 }>, z.ZodObject<{
-    type: z.ZodLiteral<"roadmap.refreshable">;
+    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.refreshable">, z.ZodLiteral<string>]>, "kehikot.refreshable", string>;
     /** Whether there is anything to read again right now. `false` withdraws the control. */
     can: z.ZodDefault<z.ZodBoolean>;
     /** When this module's material was last read, as the MODULE knows it. */
@@ -7068,12 +7068,12 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
     /** Whether a read is in flight this second. */
     busy: z.ZodDefault<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
+    type: "kehikot.refreshable";
     at: string | null;
-    type: "roadmap.refreshable";
     can: boolean;
     busy: boolean;
 }, {
-    type: "roadmap.refreshable";
+    type: string;
     at?: string | null | undefined;
     can?: boolean | undefined;
     busy?: boolean | undefined;
@@ -7095,8 +7095,10 @@ export type Went = z.infer<typeof wentSchema>;
  * The cheap first filter, before a schema is run over a `MessageEvent` from a
  * window that receives messages from everything. It says nothing about whether
  * the message is valid or whether the sender is anybody — it says the value is
- * an object with a `type` that starts `roadmap.`, which is what separates a
- * message meant for this protocol from the several that are not.
+ * an object with a `type` that starts `kehikot.` — or `roadmap.`, the same
+ * protocol before the rename, which is still read (see `dialect.ts`) — and that
+ * is what separates a message meant for this protocol from the several that
+ * are not.
  */
 export declare function looksLikeWireMessage(value: unknown): value is {
     type: string;

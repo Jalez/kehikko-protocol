@@ -37,7 +37,7 @@ export type Placeholder = (typeof PLACEHOLDERS)[number]
 const NAME = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/
 
 export interface Names {
-  /** `roadmap.slides` */
+  /** `kehikot.slides` */
   id: string
   /** `Slides`, for people. */
   name: string
@@ -63,7 +63,7 @@ export function namesFor(raw: string): Names {
         + '"slides", "reading-list" — starting with a letter.',
     )
   }
-  const id = `roadmap.${short}`
+  const id = `kehikot.${short}`
   if (!MODULE_ID.test(id)) throw new Error(`"${id}" is not a module id the protocol accepts (too long?).`)
   const words = short.split('-').join(' ')
   return { id, name: words.charAt(0).toUpperCase() + words.slice(1), folder: moduleFolder(id), pkg: `kehikko-${short}` }
@@ -173,7 +173,7 @@ export interface CreateOptions {
   /** Write the registration, putting the module on this machine's host. */
   register?: boolean
   /**
-   * What the new module's `roadmap-module-protocol` dependency says, instead of
+   * What the new module's `kehikot-module-protocol` dependency says, instead of
    * the GitHub source — e.g. `file:/path/to/this/checkout`. The protocol's own
    * test uses it so a generated module is tested against the protocol as it is
    * now, offline.
@@ -237,7 +237,7 @@ export function create(options: CreateOptions): Created {
 function pointProtocolAt(dir: string, source: string): void {
   const file = join(dir, 'package.json')
   const pkg = JSON.parse(readFileSync(file, 'utf8')) as { dependencies: Record<string, string> }
-  pkg.dependencies['roadmap-module-protocol'] = source
+  pkg.dependencies['kehikot-module-protocol'] = source
   writeFileSync(file, `${JSON.stringify(pkg, null, 2)}\n`)
 }
 

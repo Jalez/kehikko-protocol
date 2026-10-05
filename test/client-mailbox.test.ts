@@ -42,12 +42,12 @@ describe('listening starts on construction, not on subscription', () => {
   test('what arrived before anybody listened is handed over on subscribe', () => {
     const { target, post } = fakeWindow()
     const inbox = makeMailbox(target)
-    post({ type: 'roadmap.hello' })
-    post({ type: 'roadmap.context' })
+    post({ type: 'kehikot.hello' })
+    post({ type: 'kehikot.context' })
 
     const heard: unknown[] = []
     inbox.addEventListener('message', (ev) => heard.push(ev.data))
-    expect(heard).toEqual([{ type: 'roadmap.hello' }, { type: 'roadmap.context' }])
+    expect(heard).toEqual([{ type: 'kehikot.hello' }, { type: 'kehikot.context' }])
   })
 
   test('the replay happens inside addEventListener, not after it', () => {
@@ -57,7 +57,7 @@ describe('listening starts on construction, not on subscription', () => {
        a `useEffect` has already crossed. */
     const { target, post } = fakeWindow()
     const inbox = makeMailbox(target)
-    post({ type: 'roadmap.hello' })
+    post({ type: 'kehikot.hello' })
 
     let duringTheCall = false
     let returned = false
@@ -81,14 +81,14 @@ describe('recorded always, not only while unheard', () => {
     const first: unknown[] = []
     const one = (ev: MessageEvent) => first.push(ev.data)
     inbox.addEventListener('message', one)
-    post({ type: 'roadmap.hello' })
+    post({ type: 'kehikot.hello' })
     inbox.removeEventListener('message', one)
 
     const second: unknown[] = []
     inbox.addEventListener('message', (ev) => second.push(ev.data))
 
-    expect(first).toEqual([{ type: 'roadmap.hello' }])
-    expect(second).toEqual([{ type: 'roadmap.hello' }])
+    expect(first).toEqual([{ type: 'kehikot.hello' }])
+    expect(second).toEqual([{ type: 'kehikot.hello' }])
   })
 
   test('every live subscriber hears every message, including a doomed one', () => {
@@ -98,7 +98,7 @@ describe('recorded always, not only while unheard', () => {
     const b: unknown[] = []
     inbox.addEventListener('message', (ev) => a.push(ev.data))
     inbox.addEventListener('message', (ev) => b.push(ev.data))
-    post({ type: 'roadmap.context' })
+    post({ type: 'kehikot.context' })
     expect(a).toHaveLength(1)
     expect(b).toHaveLength(1)
   })
@@ -110,7 +110,7 @@ describe('recorded always, not only while unheard', () => {
     const fn = (ev: MessageEvent) => heard.push(ev.data)
     inbox.addEventListener('message', fn)
     inbox.removeEventListener('message', fn)
-    post({ type: 'roadmap.context' })
+    post({ type: 'kehikot.context' })
     expect(heard).toEqual([])
   })
 })
@@ -119,7 +119,7 @@ describe('the backlog is bounded', () => {
   test('a host talking at a page that never mounts cannot grow it without limit', () => {
     const { target, post } = fakeWindow()
     const inbox = makeMailbox(target)
-    for (let n = 0; n < KEEP * 3; n += 1) post({ type: 'roadmap.context', n })
+    for (let n = 0; n < KEEP * 3; n += 1) post({ type: 'kehikot.context', n })
 
     const heard: { n: number }[] = []
     inbox.addEventListener('message', (ev) => heard.push(ev.data as { n: number }))
@@ -134,7 +134,7 @@ describe('forgetting, which is for a test suite and nothing else', () => {
   test('clears what would otherwise leak from one case into the next', () => {
     const { target, post } = fakeWindow()
     const inbox = makeMailbox(target)
-    post({ type: 'roadmap.hello' })
+    post({ type: 'kehikot.hello' })
     inbox.forget?.()
 
     const heard: unknown[] = []

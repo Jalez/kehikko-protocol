@@ -1,4 +1,4 @@
-import { KEHIKOT_DIR } from 'roadmap-module-protocol'
+import { KEHIKOT_DIR } from 'kehikot-module-protocol'
 
 import { ID, MANIFEST, VERSION } from './manifest.ts'
 import { FILE, readValue, writeValue } from './store.ts'

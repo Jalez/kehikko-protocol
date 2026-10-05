@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, realpathSync, renameSync, statSync, writeFileSync } from 'node:fs'
 import { isAbsolute } from 'node:path'
 
-import { kehikotDir, moduleDir, moduleFile, within } from 'roadmap-module-protocol'
+import { kehikotDir, moduleDir, moduleFile, within } from 'kehikot-module-protocol'
 
 import { ID } from './manifest.ts'
 

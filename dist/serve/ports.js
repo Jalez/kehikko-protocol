@@ -1,7 +1,8 @@
 import { get as httpGet } from 'node:http';
 import { createServer } from 'node:net';
 import { join } from 'node:path';
-import { MANIFEST_KIND, WELL_KNOWN } from '../constants.js';
+import { LEGACY_MANIFEST_KIND, LEGACY_WELL_KNOWN, MANIFEST_KIND, WELL_KNOWN } from '../constants.js';
+import { canonicalName, legacyName } from '../dialect.js';
 import { neighbourPorts, portOf, readRegistration, registryDir } from './registry.js';
 /**
  * Which port this module binds, decided rather than assumed.
@@ -67,7 +68,7 @@ export function originFor(port) {
 export function verdict(id, occupant) {
     if (occupant.at === 'free')
         return { take: 'preferred' };
-    if (occupant.at === 'module' && occupant.id === id)
+    if (occupant.at === 'module' && occupant.id === canonicalName(id))
         return { take: 'nothing', because: 'already-running' };
     if (occupant.at === 'module')
         return { take: 'another', because: `${occupant.id} is answering there` };
@@ -124,7 +125,22 @@ export function free(port, host = LOOPBACK) {
  * whoever is on that port is a stranger, and a reader with no deadline hangs on
  * a program that accepts a connection and then says nothing.
  */
-export function identify(port, timeoutMs = IDENTIFY_TIMEOUT_MS) {
+export async function identify(port, timeoutMs = IDENTIFY_TIMEOUT_MS) {
+    /* The current path first, then the one a module from before the rename
+       serves — but only after a plain "not here", so a module answering the
+       first path is asked once, and a program that answered anything but 404
+       there is judged on what it said. */
+    const first = await peek(port, WELL_KNOWN, timeoutMs);
+    if (first.at !== 'stranger' || !first.notHere)
+        return strip(first);
+    return strip(await peek(port, LEGACY_WELL_KNOWN, timeoutMs));
+}
+function strip(occupant) {
+    if (occupant.at !== 'stranger')
+        return occupant;
+    return { at: 'stranger', why: occupant.why };
+}
+function peek(port, path, timeoutMs) {
     return new Promise((resolve) => {
         let settled = false;
         const done = (occupant) => {
@@ -133,10 +149,10 @@ export function identify(port, timeoutMs = IDENTIFY_TIMEOUT_MS) {
             settled = true;
             resolve(occupant);
         };
-        const request = httpGet({ host: LOOPBACK, port, path: WELL_KNOWN, headers: { accept: 'application/json' }, timeout: timeoutMs }, (response) => {
+        const request = httpGet({ host: LOOPBACK, port, path, headers: { accept: 'application/json' }, timeout: timeoutMs }, (response) => {
             if (response.statusCode !== 200) {
                 response.resume();
-                return done({ at: 'stranger', why: `something answered ${response.statusCode} at ${WELL_KNOWN}` });
+                return done({ at: 'stranger', why: `something answered ${response.statusCode} at ${path}`, notHere: response.statusCode === 404 });
             }
             let text = '';
             response.setEncoding('utf8');
@@ -144,10 +160,10 @@ export function identify(port, timeoutMs = IDENTIFY_TIMEOUT_MS) {
                 text += chunk;
                 if (text.length > MANIFEST_PEEK_BYTES) {
                     request.destroy();
-                    done({ at: 'stranger', why: `something is serving more than ${MANIFEST_PEEK_BYTES} bytes at ${WELL_KNOWN}` });
+                    done({ at: 'stranger', why: `something is serving more than ${MANIFEST_PEEK_BYTES} bytes at ${path}` });
                 }
             });
-            response.on('end', () => done(readManifest(text)));
+            response.on('end', () => done(readManifest(text, path)));
             response.on('error', () => done({ at: 'stranger', why: 'something took the port and then dropped the connection' }));
         });
         request.on('timeout', () => {
@@ -165,27 +181,30 @@ export function identify(port, timeoutMs = IDENTIFY_TIMEOUT_MS) {
  * What a document on that port makes the program serving it. Pure.
  *
  * The `kind` word is checked before the id, which is the whole reason that word
- * exists: a JSON document that does not say `roadmap.module` is not a manifest
+ * exists: a JSON document that does not say `kehikot.module` (or `roadmap.module`,
+ * its spelling before the rename) is not a manifest
  * however many of the other fields it happens to have, and a program with an
  * `id` field is not thereby a module. Without that check a module could be
  * talked out of starting by any JSON server that happened to have an `id`.
  */
-export function readManifest(text) {
+export function readManifest(text, path = WELL_KNOWN) {
     let parsed;
     try {
         parsed = JSON.parse(text);
     }
     catch {
-        return { at: 'stranger', why: `something is serving a non-JSON document at ${WELL_KNOWN}` };
+        return { at: 'stranger', why: `something is serving a non-JSON document at ${path}` };
     }
     if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
-        return { at: 'stranger', why: `something is serving JSON that is not a manifest at ${WELL_KNOWN}` };
+        return { at: 'stranger', why: `something is serving JSON that is not a manifest at ${path}` };
     }
     const { kind, id } = parsed;
-    if (kind !== MANIFEST_KIND || typeof id !== 'string') {
+    if ((kind !== MANIFEST_KIND && kind !== LEGACY_MANIFEST_KIND) || typeof id !== 'string') {
         return { at: 'stranger', why: `something is serving a document that does not call itself ${MANIFEST_KIND}` };
     }
-    return { at: 'module', id };
+    /* Canonical, so a module from before the rename (`roadmap.x`) is recognised
+       as the same module as `kehikot.x`. See `dialect.ts`. */
+    return { at: 'module', id: canonicalName(id) };
 }
 /**
  * Decide which port this module should bind.
@@ -245,10 +264,10 @@ export async function claim({ id, prefer, span = DRIFT_SPAN, timeoutMs = IDENTIF
      * nothing about whether this module is running, and treating it as if it did
      * would be a module refusing to start because of a line in a file.
      */
-    const mine = portOf(readRegistration(join(registry, `${id}.json`))?.url ?? '');
+    const mine = portOf((readRegistration(join(registry, `${id}.json`)) ?? readRegistration(join(registry, `${legacyName(id)}.json`)))?.url ?? '');
     if (mine !== null && mine !== prefer && !(await isFree(mine))) {
         const there = await ask(mine, timeoutMs);
-        if (there.at === 'module' && there.id === id) {
+        if (there.at === 'module' && there.id === canonicalName(id)) {
             return {
                 status: 'already-running',
                 id,

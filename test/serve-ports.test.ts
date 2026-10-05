@@ -37,7 +37,7 @@ import {
  * agree with them.
  */
 
-const ID = 'roadmap.example'
+const ID = 'kehikot.example'
 
 describe('who is on the port, and what follows', () => {
   test('a free port is simply taken', () => {
@@ -52,9 +52,9 @@ describe('who is on the port, and what follows', () => {
   })
 
   test('a different module answering there is a collision, and it is named', () => {
-    const said = verdict(ID, { at: 'module', id: 'roadmap.notes' })
+    const said = verdict(ID, { at: 'module', id: 'kehikot.notes' })
     expect(said.take).toBe('another')
-    expect(said).toHaveProperty('because', 'roadmap.notes is answering there')
+    expect(said).toHaveProperty('because', 'kehikot.notes is answering there')
   })
 
   test('a stranger is a collision too, and keeps its own sentence', () => {
@@ -83,8 +83,8 @@ describe('reading a document off a stranger’s port', () => {
 
   test('html, an array, and a truncated body are all strangers rather than throws', () => {
     expect(readManifest('<!doctype html>').at).toBe('stranger')
-    expect(readManifest('[{"kind":"roadmap.module","id":"roadmap.x"}]').at).toBe('stranger')
-    expect(readManifest('{"kind":"roadmap.mod').at).toBe('stranger')
+    expect(readManifest('[{"kind":"kehikot.module","id":"kehikot.x"}]').at).toBe('stranger')
+    expect(readManifest('{"kind":"kehikot.mod').at).toBe('stranger')
   })
 })
 
@@ -131,7 +131,7 @@ describe('claiming, against probes that answer on demand', () => {
       moved: false,
       why: null,
     })
-    expect(sayClaim(got)).toBe('roadmap.example at http://127.0.0.1:7960')
+    expect(sayClaim(got)).toBe('kehikot.example at http://127.0.0.1:7960')
   })
 
   test('its own id on the port is already-running, and the sentence names the address', async () => {
@@ -165,9 +165,9 @@ describe('claiming, against probes that answer on demand', () => {
       id: ID,
       prefer: 7960,
       registry: join(tmpdir(), 'roadmap-registry-that-is-not-there'),
-      probes: probes(new Set([7960]), { at: 'module', id: 'roadmap.notes' }),
+      probes: probes(new Set([7960]), { at: 'module', id: 'kehikot.notes' }),
     })
-    expect(got.status === 'claimed' && got.why).toBe('roadmap.notes is answering there')
+    expect(got.status === 'claimed' && got.why).toBe('kehikot.notes is answering there')
   })
 
   test('nowhere to go is a state with a sentence, not an exception', async () => {
@@ -234,7 +234,7 @@ describe('claiming, against probes that answer on demand', () => {
         free: (port) => Promise.resolve(port !== 7960 && port !== 7961),
         identify: (port) =>
           Promise.resolve(
-            port === 7961 ? { at: 'module', id: 'roadmap.notes' } : { at: 'stranger', why: 'a squatter' },
+            port === 7961 ? { at: 'module', id: 'kehikot.notes' } : { at: 'stranger', why: 'a squatter' },
           ),
       },
     })
@@ -245,7 +245,7 @@ describe('claiming, against probes that answer on demand', () => {
 
   test('a neighbour’s registered port is stepped over while drifting', async () => {
     const where = mkdtempSync(join(tmpdir(), 'roadmap-modules-'))
-    writeFileSync(join(where, 'roadmap.notes.json'), JSON.stringify({ url: 'http://127.0.0.1:7961', dir: '/x' }))
+    writeFileSync(join(where, 'kehikot.notes.json'), JSON.stringify({ url: 'http://127.0.0.1:7961', dir: '/x' }))
     writeFileSync(join(where, `${ID}.json`), JSON.stringify({ url: 'http://127.0.0.1:7960', dir: '/x' }))
 
     const got = await claim({
@@ -369,7 +369,7 @@ describe('writing down where it answers', () => {
   test('the file is named for the module', () => {
     withRegistry((where) => {
       const written = registerAt({ id: ID, origin: 'http://127.0.0.1:7961', dir: '/Users/x/Projects/example' })
-      expect(written.file).toBe(join(where, 'roadmap.example.json'))
+      expect(written.file).toBe(join(where, 'kehikot.example.json'))
     })
   })
 
@@ -404,7 +404,7 @@ describe('writing down where it answers', () => {
    */
   test('a keep flag somebody wrote is not deleted by a restart', () => {
     withRegistry((where) => {
-      const file = join(where, 'roadmap.example.json')
+      const file = join(where, 'kehikot.example.json')
       writeFileSync(file, JSON.stringify({ url: 'http://127.0.0.1:7960', dir: '/Users/x/old', keep: true }, null, 2))
 
       const written = registerAt({ id: ID, origin: 'http://127.0.0.1:7961', dir: '/Users/x/new' })
@@ -420,7 +420,7 @@ describe('writing down where it answers', () => {
      of — which is what makes adding one safe while older modules are running. */
   test('an unknown field survives too', () => {
     withRegistry((where) => {
-      const file = join(where, 'roadmap.example.json')
+      const file = join(where, 'kehikot.example.json')
       writeFileSync(file, JSON.stringify({ url: 'http://127.0.0.1:7960', somethingLater: ['a'] }))
 
       const written = registerAt({ id: ID, origin: 'http://127.0.0.1:7961', dir: '/Users/x/new' })
@@ -479,8 +479,8 @@ describe('writing down where it answers', () => {
 describe('reading the neighbours', () => {
   test('collects every other module’s port and never this module’s own', () => {
     const where = mkdtempSync(join(tmpdir(), 'roadmap-modules-'))
-    writeFileSync(join(where, 'roadmap.notes.json'), JSON.stringify({ url: 'http://127.0.0.1:7940', dir: '/a' }))
-    writeFileSync(join(where, 'roadmap.paper.json'), JSON.stringify({ url: 'http://127.0.0.1:7950', dir: '/b' }))
+    writeFileSync(join(where, 'kehikot.notes.json'), JSON.stringify({ url: 'http://127.0.0.1:7940', dir: '/a' }))
+    writeFileSync(join(where, 'kehikot.paper.json'), JSON.stringify({ url: 'http://127.0.0.1:7950', dir: '/b' }))
     writeFileSync(join(where, `${ID}.json`), JSON.stringify({ url: 'http://127.0.0.1:7960', dir: '/c' }))
 
     expect(neighbourPorts(ID, where)).toEqual(new Set([7940, 7950]))
@@ -493,8 +493,8 @@ describe('reading the neighbours', () => {
     const where = mkdtempSync(join(tmpdir(), 'roadmap-modules-'))
     mkdirSync(join(where, 'a-folder'), { recursive: true })
     writeFileSync(join(where, 'README.txt'), 'not a registration')
-    writeFileSync(join(where, 'roadmap.broken.json'), 'this is not json')
-    writeFileSync(join(where, 'roadmap.urlless.json'), '{"dir":"/a"}')
+    writeFileSync(join(where, 'kehikot.broken.json'), 'this is not json')
+    writeFileSync(join(where, 'kehikot.urlless.json'), '{"dir":"/a"}')
 
     expect(neighbourPorts(ID, where)).toEqual(new Set())
     expect(neighbourPorts(ID, join(where, 'nowhere-at-all'))).toEqual(new Set())
@@ -502,7 +502,7 @@ describe('reading the neighbours', () => {
 
   test('reads a registration that names no directory rather than discarding it', () => {
     const where = mkdtempSync(join(tmpdir(), 'roadmap-modules-'))
-    const file = join(where, 'roadmap.terminal.json')
+    const file = join(where, 'kehikot.terminal.json')
     writeFileSync(file, JSON.stringify({ url: 'http://127.0.0.1:7930' }))
     expect(readRegistration(file)).toEqual({ url: 'http://127.0.0.1:7930', dir: '' })
     expect(neighbourPorts(ID, where)).toEqual(new Set([7930]))

@@ -5,7 +5,7 @@ import './index.css'
 
 /* For its side effect: installs the mailbox before React mounts, so a host's
    greeting that arrives early is held rather than lost. */
-import 'roadmap-module-protocol/client'
+import 'kehikot-module-protocol/client'
 import { App } from './app.tsx'
 
 const root = document.getElementById('root')

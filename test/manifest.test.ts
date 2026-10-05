@@ -11,9 +11,9 @@ import { LIMITS, MODULE_ID, REACTION_NAMES, REACTS_TO, manifestSchema, own, spea
  */
 
 const minimal = {
-  kind: 'roadmap.module',
+  kind: 'kehikot.module',
   protocol: 1,
-  id: 'roadmap.checklist',
+  id: 'kehikot.checklist',
   name: 'Checklist',
   entry: '/app',
   modes: [{ id: 'checklist', label: 'Checklist' }],
@@ -77,7 +77,7 @@ describe('the bounds refuse what they were put there for', () => {
   })
 
   test('the lists are bounded too, not just the strings in them', () => {
-    const many = Array.from({ length: 17 }, (_, i) => `roadmap.thing@${i}`)
+    const many = Array.from({ length: 17 }, (_, i) => `kehikot.thing@${i}`)
     expect(manifestSchema.safeParse({ ...minimal, extensions: { emits: many } }).success).toBe(false)
     const uses = Array.from({ length: 33 }, (_, i) => `thing${i}:read`)
     expect(manifestSchema.safeParse({ ...minimal, declares: { uses } }).success).toBe(false)
@@ -97,12 +97,12 @@ describe('ids', () => {
        comment, because "a short id" is the kind of thing somebody loosens. */
     'ab',
     `${'a'.repeat(65)}`,
-    'roadmap.checklist!',
+    'kehikot.checklist!',
   ])('%p is not an id', (bad) => {
     expect(manifestSchema.safeParse({ ...minimal, id: bad }).success).toBe(false)
   })
 
-  test.each(['roadmap.checklist', 'abc', 'a.b-c.d', 'org.example.thing'])('%p is an id', (good) => {
+  test.each(['kehikot.checklist', 'abc', 'a.b-c.d', 'org.example.thing'])('%p is an id', (good) => {
     expect(MODULE_ID.test(good)).toBe(true)
   })
 
@@ -120,13 +120,13 @@ describe('ids', () => {
     expect(MODULE_ID.test('prototype')).toBe(true)
     expect(manifestSchema.safeParse({ ...minimal, id: 'constructor' }).success).toBe(true)
 
-    const table: Record<string, string> = { 'roadmap.checklist': 'here' }
+    const table: Record<string, string> = { 'kehikot.checklist': 'here' }
     /* The bug, reproduced: truthy, and not a string. */
     expect(table['constructor']).toBeTruthy()
     expect(typeof table['constructor']).not.toBe('string')
     /* And the lookup that does not have it. */
     expect(own(table, 'constructor')).toBeUndefined()
-    expect(own(table, 'roadmap.checklist')).toBe('here')
+    expect(own(table, 'kehikot.checklist')).toBe('here')
   })
 })
 

@@ -28,8 +28,8 @@ import {
 describe('where a module keeps this project’s data', () => {
   test('is its own folder under .kehikot, beside the project', () => {
     expect(kehikotDir('/Users/x/Projects/roadmap')).toBe('/Users/x/Projects/roadmap/.kehikot')
-    expect(moduleDir('/Users/x/Projects/roadmap', 'roadmap.notes')).toBe('/Users/x/Projects/roadmap/.kehikot/notes')
-    expect(moduleFile('/Users/x/Projects/roadmap', 'roadmap.notes', 'notes')).toBe(
+    expect(moduleDir('/Users/x/Projects/roadmap', 'kehikot.notes')).toBe('/Users/x/Projects/roadmap/.kehikot/notes')
+    expect(moduleFile('/Users/x/Projects/roadmap', 'kehikot.notes', 'notes')).toBe(
       '/Users/x/Projects/roadmap/.kehikot/notes/notes.json',
     )
   })
@@ -37,13 +37,13 @@ describe('where a module keeps this project’s data', () => {
   /* The reason a folder per module was asked for: a second file needs no prefix
      to say whose it is, because the directory already said. */
   test('lets one module keep two files without either name having to disambiguate', () => {
-    expect(moduleFile('/p', 'roadmap.checklist', 'checklists')).toBe('/p/.kehikot/checklist/checklists.json')
-    expect(moduleFile('/p', 'roadmap.checklist', 'papers')).toBe('/p/.kehikot/checklist/papers.json')
+    expect(moduleFile('/p', 'kehikot.checklist', 'checklists')).toBe('/p/.kehikot/checklist/checklists.json')
+    expect(moduleFile('/p', 'kehikot.checklist', 'papers')).toBe('/p/.kehikot/checklist/papers.json')
   })
 
   test('tolerates a trailing slash rather than producing a doubled one', () => {
     expect(kehikotDir('/Users/x/roadmap/')).toBe('/Users/x/roadmap/.kehikot')
-    expect(moduleFile('/Users/x/roadmap//', 'roadmap.notes', 'notes')).toBe('/Users/x/roadmap/.kehikot/notes/notes.json')
+    expect(moduleFile('/Users/x/roadmap//', 'kehikot.notes', 'notes')).toBe('/Users/x/roadmap/.kehikot/notes/notes.json')
   })
 
   /* The important one. A module handed no project must be handed no path — not
@@ -55,9 +55,9 @@ describe('where a module keeps this project’s data', () => {
     expect(kehikotDir(undefined)).toBeNull()
     expect(kehikotDir('')).toBeNull()
     expect(kehikotDir('   ')).toBeNull()
-    expect(moduleDir(null, 'roadmap.notes')).toBeNull()
-    expect(moduleFile(null, 'roadmap.notes', 'notes')).toBeNull()
-    expect(moduleFile('', 'roadmap.notes', 'notes')).toBeNull()
+    expect(moduleDir(null, 'kehikot.notes')).toBeNull()
+    expect(moduleFile(null, 'kehikot.notes', 'notes')).toBeNull()
+    expect(moduleFile('', 'kehikot.notes', 'notes')).toBeNull()
   })
 
   /* A file name is a constant in the module that owns it. Anything else is a
@@ -65,7 +65,7 @@ describe('where a module keeps this project’s data', () => {
      quietly. */
   test('throws on a file name a module may not give one of its files', () => {
     for (const bad of ['../escape', 'notes.json', 'Notes', 'notes/deep', '', '-notes', 'notes-', 'a']) {
-      expect(() => moduleFile('/p', 'roadmap.notes', bad)).toThrow()
+      expect(() => moduleFile('/p', 'kehikot.notes', bad)).toThrow()
     }
     expect(DATA_FILE.test('checklists')).toBe(true)
     expect(DATA_FILE.test('a-b-2')).toBe(true)
@@ -73,11 +73,20 @@ describe('where a module keeps this project’s data', () => {
 })
 
 describe('a module’s folder name, which is a path built from data', () => {
-  test('is the id with the roadmap. prefix taken off', () => {
-    expect(moduleFolder('roadmap.checklist')).toBe('checklist')
-    expect(moduleFolder('roadmap.notes')).toBe('notes')
-    expect(moduleFolder('roadmap.learning')).toBe('learning')
-    expect(moduleFolder('roadmap.journeys')).toBe('journeys')
+  test('is the id with the kehikot. prefix taken off', () => {
+    expect(moduleFolder('kehikot.checklist')).toBe('checklist')
+    expect(moduleFolder('kehikot.notes')).toBe('notes')
+    expect(moduleFolder('kehikot.learning')).toBe('learning')
+    expect(moduleFolder('kehikot.journeys')).toBe('journeys')
+  })
+
+  /* The rename moves no data: a module that was `roadmap.journeys` yesterday and
+     is `kehikot.journeys` today reads the folder it wrote. */
+  test('gives the pre-rename roadmap. id the very same folder', () => {
+    for (const bare of ['checklist', 'notes', 'learning', 'journeys', 'paper', 'references']) {
+      expect(moduleFolder(`roadmap.${bare}`)).toBe(bare)
+      expect(moduleFolder(`roadmap.${bare}`)).toBe(moduleFolder(`kehikot.${bare}`))
+    }
   })
 
   /* This package does not get to decide that somebody else's namespace is
@@ -89,10 +98,10 @@ describe('a module’s folder name, which is a path built from data', () => {
 
   /* The whole reason this is a function with a rule of its own rather than a
      `slice`. The name is about to be joined onto somebody's project root, and
-     `roadmap.` alone would slice to the empty string — which joined onto a root
+     `kehikot.` alone would slice to the empty string — which joined onto a root
      IS the root, every module writing into the project itself. */
   test('cannot produce a name that would escape the folder, or an empty one', () => {
-    for (const bad of ['', '.', '..', 'roadmap.', '/etc/passwd', 'roadmap./..', 'a/b', 'roadmap.a/b', 'ROADMAP.x']) {
+    for (const bad of ['', '.', '..', 'kehikot.', 'roadmap.', '/etc/passwd', 'kehikot./..', 'roadmap./..', 'a/b', 'kehikot.a/b', 'KEHIKOT.x', 'ROADMAP.x']) {
       expect(() => moduleFolder(bad)).toThrow()
     }
     for (const name of ['.', '..', '', 'a/b', '.hidden']) {

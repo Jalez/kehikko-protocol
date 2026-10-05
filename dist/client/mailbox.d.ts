@@ -26,7 +26,7 @@
  * So the listener is installed here, at module scope, synchronously, as part of
  * importing the client at all. Anything that arrives before the application is
  * ready is kept and handed over when it asks. A page adopting this client must
- * therefore import it from its ENTRY — `import 'roadmap-module-protocol/client'`
+ * therefore import it from its ENTRY — `import 'kehikot-module-protocol/client'`
  * beside the first React import, not from inside a component — because a module
  * that is only imported by a lazily-loaded chunk is a module scope that has not
  * run yet, which is the same bug wearing a bundler's clothes.
@@ -44,7 +44,7 @@
  *
  * The cost is a duplicate: a subscriber that comes and goes and comes back
  * answers the same greeting twice. That is the right trade. A second
- * `roadmap.ready` is the same sentence as the first and a host takes a module at
+ * `kehikot.ready` is the same sentence as the first and a host takes a module at
  * its word either way. Losing it is silence; repeating it is noise.
  */
 /** Just enough of a window to listen to. `connect` takes one of these. */

@@ -21,7 +21,7 @@
  * This pattern accepts `constructor`. It accepts `prototype`, `toString`,
  * `valueOf` and every other name that lives on `Object.prototype`. They are
  * ordinary lowercase letters, and no rule about the SHAPE of a name can tell
- * them from `roadmap.checklist` without becoming a list of forbidden spellings
+ * them from `kehikot.checklist` without becoming a list of forbidden spellings
  * — which is a list of the ways somebody has already thought of, and is exactly
  * the kind of rule this protocol argues against everywhere else. So the pattern
  * is not going to be narrowed to close this, and the hazard is permanent and by

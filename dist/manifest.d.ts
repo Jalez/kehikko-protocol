@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { LEGACY_MANIFEST_KIND } from './constants.js';
 /**
  * What a module says about itself when a host asks.
  *
@@ -38,7 +39,7 @@ declare const modeSchema: z.ZodObject<{
     /**
      * `epic` gives the mode a tab that FOLLOWS THE READER: it is told which epic
      * is open and told again on every switch. `global` gives it one page for the
-     * whole roadmap, told nothing and never re-pointed.
+     * whole canvas, told nothing and never re-pointed.
      *
      * Defaulted rather than required, because following the reader is what nearly
      * every module wants and a module that says nothing has not made a choice
@@ -167,11 +168,21 @@ export declare const manifestSchema: z.ZodObject<{
      * The word that makes this a claim rather than a hopeful GET. Something else
      * entirely may be listening on the port a host asked, and it must not be
      * possible for that something to become a tab by accident.
+     *
+     * Either spelling is accepted, and it is handed back AS IT WAS SAID rather
+     * than respelled, because it is the one place a host learns which dialect
+     * the module speaks before it greets it: `roadmap.module` is a module built
+     * against this package from before the rename. See `dialectOfKind`.
      */
-    kind: z.ZodLiteral<"roadmap.module">;
+    kind: z.ZodEnum<["kehikot.module", "roadmap.module"]>;
     /** Which protocol this module was built against, as a single integer. */
     protocol: z.ZodNumber;
-    id: z.ZodString;
+    /**
+     * Canonical once parsed: `roadmap.journeys` is read as `kehikot.journeys`,
+     * the same module under the name it has had since the rename. See
+     * `canonicalModuleId`.
+     */
+    id: z.ZodEffects<z.ZodString, string, string>;
     name: z.ZodString;
     /**
      * The module's own version, which this protocol never parses and never
@@ -292,8 +303,8 @@ export declare const manifestSchema: z.ZodObject<{
      * that does not know a name simply does not route it, and can say so.
      */
     extensions: z.ZodDefault<z.ZodObject<{
-        emits: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
-        consumes: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
+        emits: z.ZodDefault<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">>;
+        consumes: z.ZodDefault<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">>;
     }, "strip", z.ZodTypeAny, {
         emits: string[];
         consumes: string[];
@@ -307,7 +318,7 @@ export declare const manifestSchema: z.ZodObject<{
      * ## Why this is not a third entry in `extensions`
      *
      * `extensions.consumes` already names things a module receives, so folding
-     * `passage` in beside `roadmap.notifications@1` would have cost one field and
+     * `passage` in beside `kehikot.notifications@1` would have cost one field and
      * looked tidier. It would also have destroyed the only distinction a registry
      * has worth drawing. An extension is CARRIED: a host reads `emits` on one
      * manifest and `consumes` on another and posts the payload into the second
@@ -335,7 +346,7 @@ export declare const manifestSchema: z.ZodObject<{
         /**
          * `epic` gives the mode a tab that FOLLOWS THE READER: it is told which epic
          * is open and told again on every switch. `global` gives it one page for the
-         * whole roadmap, told nothing and never re-pointed.
+         * whole canvas, told nothing and never re-pointed.
          *
          * Defaulted rather than required, because following the reader is what nearly
          * every module wants and a module that says nothing has not made a choice
@@ -432,9 +443,9 @@ export declare const manifestSchema: z.ZodObject<{
         storage?: boolean | undefined;
     }>>;
 }, "strip", z.ZodTypeAny, {
-    summary: string;
-    kind: "roadmap.module";
     id: string;
+    summary: string;
+    kind: "kehikot.module" | "roadmap.module";
     protocol: number;
     name: string;
     version: string;
@@ -464,8 +475,8 @@ export declare const manifestSchema: z.ZodObject<{
         about: string;
     } | undefined;
 }, {
-    kind: "roadmap.module";
     id: string;
+    kind: "kehikot.module" | "roadmap.module";
     protocol: number;
     name: string;
     entry: string;
@@ -499,6 +510,21 @@ export declare const manifestSchema: z.ZodObject<{
 export type Manifest = z.infer<typeof manifestSchema>;
 /** What a module author writes, before defaults are filled in. */
 export type ManifestInput = z.input<typeof manifestSchema>;
+/**
+ * A parsed manifest, spelled for a host from before the rename.
+ *
+ * What a module built against this package serves at `LEGACY_WELL_KNOWN`, so
+ * a host that has not been updated still finds it: the old `kind`, the old
+ * module id, the old extension names. Everything else is the same document.
+ * That host then greets the module with `roadmap.hello`, and `connect()`
+ * answers in the dialect it was greeted in, so the module is the same module
+ * to both hosts.
+ *
+ * Pure. The manifest passed in is not changed.
+ */
+export declare function legacyManifest(manifest: Manifest): Omit<Manifest, 'kind'> & {
+    kind: typeof LEGACY_MANIFEST_KIND;
+};
 /**
  * Does a range include a protocol number?
  *

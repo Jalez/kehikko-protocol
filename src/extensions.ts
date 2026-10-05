@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { LIMITS } from './constants.js'
+import { canonicalName } from './dialect.js'
 import { EPIC_SLUG } from './ids.js'
 
 /**
@@ -10,7 +11,7 @@ import { EPIC_SLUG } from './ids.js'
  * one thing neither a sender nor a shower can own alone: the SHAPE of the
  * message between them.
  *
- * An extension is one such shape, named and versioned — `roadmap.notifications@1`.
+ * An extension is one such shape, named and versioned — `kehikot.notifications@1`.
  * A module that emits one is saying "here is a notification, in the form
  * everything agrees a notification takes"; a module that consumes one is saying
  * "I will show them". Neither has to know the other exists, which is the whole
@@ -19,7 +20,7 @@ import { EPIC_SLUG } from './ids.js'
  *
  * ## The version is in the NAME
  *
- * `roadmap.notifications@1` and not `{ name, version }`, and this is the field
+ * `kehikot.notifications@1` and not `{ name, version }`, and this is the field
  * every consumer binds to, so it is worth saying why the version is welded into
  * the string.
  *
@@ -32,7 +33,7 @@ import { EPIC_SLUG } from './ids.js'
  * name is routed nowhere and can be said out loud.
  *
  * So a shape that quietly changed is worse than one that was replaced.
- * `roadmap.notifications@2` is a different extension, a consumer says which of
+ * `kehikot.notifications@2` is a different extension, a consumer says which of
  * the two it speaks, and a module may speak both. Nothing in this package will
  * ever mutate the fields of an `@1` payload; that is the promise the number in
  * the name makes.
@@ -60,7 +61,7 @@ const epic = z.string().regex(EPIC_SLUG, 'an epic slug is lowercase letters, dig
 const refs = z.array(z.string().min(1).max(LIMITS.REF)).max(LIMITS.REFS).default([])
 
 /**
- * `roadmap.notifications@1` — a line on a notification panel: what happened,
+ * `kehikot.notifications@1` — a line on a notification panel: what happened,
  * and on which work.
  *
  * `refs` is the field that earns the whole extension. A line saying a module
@@ -84,7 +85,7 @@ export const notificationPayload = z.object({
 export type NotificationPayload = z.infer<typeof notificationPayload>
 
 /**
- * `roadmap.calls@1` — one call somebody made, whether or not the host made it.
+ * `kehikot.calls@1` — one call somebody made, whether or not the host made it.
  *
  * A host records its own outbound calls already, and counts every question a
  * module asks it. What it cannot see is a module's own traffic — a module
@@ -135,11 +136,11 @@ export interface ExtensionFormat {
  * unvalidated is one a future consumer has to distrust.
  */
 export const EXTENSIONS: Record<string, ExtensionFormat> = {
-  'roadmap.notifications@1': {
+  'kehikot.notifications@1': {
     about: 'Say what it did, and on which issues or changes — a line on a notification panel.',
     payload: notificationPayload,
   },
-  'roadmap.calls@1': {
+  'kehikot.calls@1': {
     about: 'Report the calls it makes to the outside, so an activity chart covers more than the host.',
     payload: callPayload,
   },
@@ -147,9 +148,14 @@ export const EXTENSIONS: Record<string, ExtensionFormat> = {
 
 export const EXTENSION_NAMES = Object.keys(EXTENSIONS)
 
-/** A name this version of the protocol can check, which is the only kind worth accepting. */
+/**
+ * A name this version of the protocol can check, which is the only kind worth accepting.
+ *
+ * Either spelling: `roadmap.notifications@1` is `kehikot.notifications@1` as an
+ * unchanged module still names it. See `dialect.ts`.
+ */
 export function known(extension: string): boolean {
-  return Object.hasOwn(EXTENSIONS, extension)
+  return Object.hasOwn(EXTENSIONS, canonicalName(extension))
 }
 
 /**
@@ -160,5 +166,6 @@ export function known(extension: string): boolean {
  * belong to whoever is doing the delivering.
  */
 export function schemaFor(extension: string): z.ZodTypeAny | undefined {
-  return Object.hasOwn(EXTENSIONS, extension) ? EXTENSIONS[extension]?.payload : undefined
+  const name = canonicalName(extension)
+  return Object.hasOwn(EXTENSIONS, name) ? EXTENSIONS[name]?.payload : undefined
 }

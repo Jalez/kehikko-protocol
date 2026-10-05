@@ -30,7 +30,7 @@ Node**, and Node refuses to strip types from anything under `node_modules`.
 ```
 ERR_UNSUPPORTED_NODE_MODULES_TYPE_STRIPPING: Stripping types is currently
 unsupported for files under node_modules, for
-".../node_modules/roadmap-module-protocol/src/index.ts"
+".../node_modules/kehikot-module-protocol/src/index.ts"
 ```
 
 That is not an edge case for this package. A module's Vite config is exactly

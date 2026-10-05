@@ -9,7 +9,7 @@
  * than tidy. Everything here breaks it: it binds sockets, it fetches a document
  * off a port, it writes into somebody's home directory. Putting one line of it
  * behind the front door would make `import { WELL_KNOWN } from
- * 'roadmap-module-protocol'` an import of `node:fs`, in a browser bundle, in
+ * 'kehikot-module-protocol'` an import of `node:fs`, in a browser bundle, in
  * every module that renders a page.
  *
  * So it stands beside the front door the way `/client` does, and for the mirror
@@ -61,7 +61,10 @@ export {
   type Verdict,
 } from './ports.js'
 
+export { DEFAULT_FRAME_ORIGINS, frameAncestors, frameOrigins } from './origins.js'
+
 export {
+  legacyRegistryDir,
   neighbourPorts,
   portOf,
   readRegistration,

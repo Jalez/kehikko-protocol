@@ -3,7 +3,7 @@ import { mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-import { WELL_KNOWN } from 'roadmap-module-protocol'
+import { WELL_KNOWN } from 'kehikot-module-protocol'
 
 import { MANIFEST, TICKET, answer } from '../doors.ts'
 import { ID } from '../manifest.ts'

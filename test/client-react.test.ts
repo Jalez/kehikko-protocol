@@ -20,7 +20,7 @@ import { useRoadmap, type Roadmap } from '../src/client/react.js'
  * be the tail wagging the dog.
  */
 
-const ID = 'roadmap.example'
+const ID = 'kehikot.example'
 
 /** Something with a `postMessage`, which is all a host is from in here. */
 function speaker() {
@@ -137,7 +137,7 @@ describe('a greeting that arrived before React did', () => {
     /*
      * Noise rather than silence, and it is the deliberate trade. The mailbox
      * replays to every subscriber including the doomed first mount, so a
-     * double-mounted page says `ready` twice. A second `roadmap.ready` is the
+     * double-mounted page says `ready` twice. A second `kehikot.ready` is the
      * same sentence as the first and a host takes a module at its word either
      * way; losing it is a module that never speaks.
      */

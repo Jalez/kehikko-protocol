@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { LIMITS } from './constants.js';
+import { canonicalName } from './dialect.js';
 import { EPIC_SLUG } from './ids.js';
 /**
  * The one import this file makes from the other half of the wire.
@@ -103,7 +104,7 @@ export const CAPABILITIES = {
      * installing a program is "reads the epics and asks to navigate" rather than
      * a list of method names.
      */
-    'view:navigate': 'Ask the roadmap to show a particular epic, step or reference. The roadmap decides.',
+    'view:navigate': 'Ask the host to show a particular epic, step or reference. The host decides.',
     /**
      * Say which references the person has picked out.
      *
@@ -178,10 +179,10 @@ export const CAPABILITIES = {
      * No new KIND of thing crosses the wire for it. `context.projectPath` already
      * hands a module an absolute path to the open project; this hands it a second
      * one, chosen, one at a time. That is why the sentence a person reads before
-     * running the program says "the roadmap asks you which" — the reader is the
+     * running the program says "the host asks you which" — the reader is the
      * gate, and there is no version of this where they are not.
      */
-    'projects:pick': 'Ask you to choose one of your projects, and be told where it is. The roadmap draws the picker.',
+    'projects:pick': 'Ask you to choose one of your projects, and be told where it is. The host draws the picker.',
     /**
      * Keep a little state of its own, and get it back next time.
      *
@@ -189,7 +190,7 @@ export const CAPABILITIES = {
      * from the host's side this is not storage of anything in particular — it is
      * a string it never reads.
      */
-    'state:keep': 'Keep a small amount of its own state between sessions. The roadmap does not read it.',
+    'state:keep': 'Keep a small amount of its own state between sessions. The host does not read it.',
     /**
      * Say why a reference closed: done, won't do, a duplicate, superseded.
      *
@@ -216,7 +217,7 @@ export const CAPABILITIES = {
      * canvas. A person deciding whether to run a program should be able to see
      * that it asks for reads, not only that it looks at them.
      */
-    'trackers:refresh': 'Ask the roadmap to read GitHub and GitLab again, for every module on the canvas.',
+    'trackers:refresh': 'Ask the host to read GitHub and GitLab again, for every module on the canvas.',
 };
 export const CAPABILITY_NAMES = Object.keys(CAPABILITIES);
 /**
@@ -311,9 +312,9 @@ export const methodParams = {
      */
     'live.get': z.object({ epic }),
     /**
-     * Ask the roadmap to show something. See the essay on `navigationResult`.
+     * Ask the host to show something. See the essay on `navigationResult`.
      *
-     * The same triple `roadmap.goto` carries, and named the same way on purpose:
+     * The same triple `kehikot.goto` carries, and named the same way on purpose:
      * a module that can receive a walk and a module that can ask for one are
      * describing the same act from two ends, and two spellings of it would be two
      * things to get wrong.
@@ -407,7 +408,7 @@ export const methodParams = {
      *
      * ## The offer went one way, and that was the gap
      *
-     * `roadmap.filters` lets a module say what it can be narrowed by; the host
+     * `kehikot.filters` lets a module say what it can be narrowed by; the host
      * draws the control and the choice comes back in `context.filters`. There was
      * no way back. The host owned the choice completely, which is right — it is
      * per container, it outlives a reload, and a module that could silently move
@@ -473,7 +474,7 @@ export const methodParams = {
      * the way a module that closed its document says so, for the reason an empty
      * `refs` clears a selection and a `null` passage clears the passage.
      *
-     * Whole replacement, never a merge, for the reason `roadmap.filters` is: a
+     * Whole replacement, never a merge, for the reason `kehikot.filters` is: a
      * merge could never take anything back, and a container that stopped showing
      * a file would go on being described as showing it.
      *
@@ -608,7 +609,8 @@ export const methodParams = {
      */
     'tracker.refresh': z.object(trackerScope).refine(oneScope, { message: ONE_SCOPE }),
     'events.emit': z.object({
-        extension: z.string().min(1).max(LIMITS.EXTENSION),
+        /* Canonical once parsed, whichever spelling the module used. See `dialect.ts`. */
+        extension: z.string().min(1).max(LIMITS.EXTENSION).transform(canonicalName),
         /**
          * Unknown here, and checked against the named extension's own schema by
          * whoever routes it — see `./extensions.js`. Typing it as a union of every
@@ -627,7 +629,7 @@ export const methodParams = {
  *
  * ## The wall this removes
  *
- * Until now a module could be walked and could not walk. `roadmap.goto` goes
+ * Until now a module could be walked and could not walk. `kehikot.goto` goes
  * one way, and the module → host words were `ready`, `request`, `resize`,
  * `went` — none of which moves anybody. So a program that shows a person every
  * project and epic on the machine could draw the whole map and never travel on
@@ -636,7 +638,7 @@ export const methodParams = {
  *
  * ## Why a method and not a ninth message
  *
- * A new top-level `roadmap.navigate` was the other candidate, and it loses on
+ * A new top-level `kehikot.navigate` was the other candidate, and it loses on
  * three counts.
  *
  * The first is that it would need an answer, and an answer needs correlation,
@@ -655,7 +657,7 @@ export const methodParams = {
  * module's messages are: three statements and one unanswerable ask. `resize` is
  * the closest to a demand and it is deliberately fire-and-forget — the host
  * clamps it, may ignore it, and never replies. A module posting
- * `roadmap.navigate` at a host would read like `resize`: a thing done rather
+ * `kehikot.navigate` at a host would read like `resize`: a thing done rather
  * than a thing asked, with no place for a no. Two programs both believing they
  * decide what is on screen is the defect this whole arrangement exists to
  * prevent. A REQUEST is a question with an answer, and the answer may be no.
@@ -693,7 +695,7 @@ export const methodParams = {
  * otherwise have no way to know. A `global` mode is never sent context — that
  * is what `global` means — so after moving somebody it would be drawing a map
  * with no marker on it until the next thing happened to tell it. A
- * epic-scoped mode gets a `roadmap.context` too and can ignore this. Null
+ * epic-scoped mode gets a `kehikot.context` too and can ignore this. Null
  * when the host did not move, and null is also honest for a move within the
  * epic already open.
  *

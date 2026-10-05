@@ -61,8 +61,8 @@ import { type MessageSource } from './mailbox.js';
  *
  * The protocol's three, plus one more. `silent` is the timeout, and it is a
  * separate word rather than folded into `failed` because the two send a person
- * to different places: `failed` is the roadmap telling us it went wrong, and
- * `silent` is the roadmap not being there — which, from inside a frame, is
+ * to different places: `failed` is the host telling us it went wrong, and
+ * `silent` is the host not being there — which, from inside a frame, is
  * indistinguishable from a host that is still starting up. The protocol names
  * the same condition `silent` on the other side of the wire, for a module that
  * was greeted and never answered; the symmetry is intentional.
@@ -89,7 +89,7 @@ export declare class HostRefused extends Error {
  * A number rather than forever, because forever is a page that shows "asking…"
  * until somebody reloads it, which is the exact shape of dishonesty a spinner
  * has — it is a claim that an answer is coming. Twelve seconds is long enough
- * for a roadmap reading a file off a cold disk and short enough that nobody sits
+ * for a host reading a file off a cold disk and short enough that nobody sits
  * through it twice.
  */
 export declare const ANSWER_WITHIN_MS = 12000;
@@ -306,7 +306,7 @@ export interface Connection {
      *
      * Fire and forget, like `resize`, and for the same reason: the host may draw
      * it, may draw part of it, or may not have heard of the idea. What comes back
-     * is not an answer but a `roadmap.context` with `filters` in it, which is
+     * is not an answer but a `kehikot.context` with `filters` in it, which is
      * where a page reads the choice — including the first time, out of the
      * greeting, before it has drawn anything.
      *

@@ -3,7 +3,7 @@ import { HostRefused, NOBODY_TO_ASK, connect, } from './connect.js';
 /**
  * The bridge as one React value — and it is OPTIONAL, twice over.
  *
- * Optional because it is a second subpath: `roadmap-module-protocol/client` has
+ * Optional because it is a second subpath: `kehikot-module-protocol/client` has
  * no idea this file exists, imports no React, and works in a page built with
  * anything or nothing. A client that imported React would make this package
  * opinionated about a thing it has no business having an opinion on. Not every
@@ -39,7 +39,7 @@ export const GREETING_GRACE_MS = 700;
  * only dependency, because reconnecting is a second `ready` and a torn-down
  * listener during whatever millisecond the host chose to greet in.
  */
-export function useRoadmap(id, events = {}, options = {}) {
+export function useKehikot(id, events = {}, options = {}) {
     const [where, setWhere] = useState('listening');
     const [context, setContext] = useState(null);
     const [state, setState] = useState(null);
@@ -143,4 +143,12 @@ export function useRoadmap(id, events = {}, options = {}) {
     const connection = useCallback(() => held.current, []);
     return useMemo(() => ({ where, context, state, request, resize, filters, clearable, refreshable, connection }), [where, context, state, request, resize, filters, clearable, refreshable, connection]);
 }
+/**
+ * The names this hook and its types had before the app was renamed, kept so a
+ * module that has not been updated still builds against this copy. Same
+ * function, same types. Use `useKehikot`.
+ *
+ * @deprecated Renamed to `useKehikot`.
+ */
+export const useRoadmap = useKehikot;
 //# sourceMappingURL=react.js.map

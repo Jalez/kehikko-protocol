@@ -26,7 +26,7 @@ import { LIMITS } from './constants.js'
  *
  * ## A row is a `Sighting`
  *
- * `roadmap-module-protocol/facets` reads a `Sighting` — `kind`, `state`,
+ * `kehikot-module-protocol/facets` reads a `Sighting` — `kind`, `state`,
  * `stateReason`, `closedByMerge` — and a row here carries exactly those fields
  * under exactly those names. A module hands a row straight to `facetsOf(row)`
  * and `dispositionOf(row.ref, row, context.dispositions)`; there is no mapping

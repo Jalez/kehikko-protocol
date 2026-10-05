@@ -89,7 +89,7 @@ export interface OfferOptions {
 }
 /** The group id this vocabulary is offered under unless a module says otherwise. */
 export declare const HIDE_GROUP = "hide";
-/** A `toggles` group offering the facets, ready to go into `roadmap.filters`. */
+/** A `toggles` group offering the facets, ready to go into `kehikot.filters`. */
 export declare function offer(options?: OfferOptions): FilterGroup;
 /**
  * The facets switched on under one toggles group, from `context.filters`.

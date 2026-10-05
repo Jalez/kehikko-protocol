@@ -1,7 +1,7 @@
 /**
  * A module's whole port story, as one line in its `vite.config.ts`.
  *
- *     import { serves } from 'roadmap-module-protocol/serve'
+ *     import { serves } from 'kehikot-module-protocol/serve'
  *     import { ID } from './manifest.ts'
  *
  *     plugins: [serves({ id: ID, prefer: 7960 }), doors(), react()]

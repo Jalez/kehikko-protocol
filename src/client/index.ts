@@ -5,9 +5,9 @@
  *
  * The package's front door says, at the top of `src/index.ts`: shapes, and
  * nothing else. That rule is load-bearing rather than tidy, and this file does
- * not break it — it stands beside it. `roadmap-module-protocol` stays a set of
+ * not break it — it stands beside it. `kehikot-module-protocol` stays a set of
  * types, schemas and constants that a Bun process can import without a browser
- * anywhere in sight; `roadmap-module-protocol/client` is where the browser code
+ * anywhere in sight; `kehikot-module-protocol/client` is where the browser code
  * lives, and a host's server or a module's server can go on importing the front
  * door without dragging a `window` reference into a process that has none.
  *
@@ -26,10 +26,10 @@
  *
  * ```ts
  * // main.tsx — imported for its side effect, from the ENTRY, before React runs.
- * import 'roadmap-module-protocol/client'
+ * import 'kehikot-module-protocol/client'
  *
  * // wherever the connection is made:
- * const live = connect('roadmap.example', {
+ * const live = connect('kehikot.example', {
  *   onHello: (context, state) => …,
  *   onContext: (context) => …,
  *   onGoto: (message, answer) => answer(false, 'nothing here to walk to'),

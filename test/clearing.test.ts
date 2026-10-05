@@ -89,7 +89,7 @@ describe('the press, relayed', () => {
    *
    * A list of ids would mean the host knows what is on the page — it does not,
    * cannot, and must not. A copy of the filter choice would be a second answer
-   * to a question `roadmap.context` already answers, disagreeing after any
+   * to a question `kehikot.context` already answers, disagreeing after any
    * race. A correlation id would imply an answer, and the only thing a host
    * could do with an answer is report a number it did not count about data it
    * cannot see.
