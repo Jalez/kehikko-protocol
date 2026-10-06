@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { LIMITS, MESSAGE, MESSAGE_PREFIXES, PROTOCOL } from './constants.js';
 import { canonicalName, legacyName } from './dialect.js';
 import { trackerSignalSchema } from './tracker.js';
+import { contentSignalSchema } from './content.js';
 import { EPIC_SLUG, MODULE_ID } from './ids.js';
 /**
  * A message type, read in either spelling and handed back in the current one.
@@ -1191,6 +1192,16 @@ export const contextSchema = z.object({
      * itself busy while `refreshing` is true.
      */
     tracker: trackerSignalSchema.default({}),
+    /**
+     * What has changed in the material kept for the open project's epics: the
+     * last change per source and epic. The signal, not the material — see
+     * `content.ts`.
+     *
+     * Per project, like `tracker`: a write reported from one container moves
+     * this for every container standing in that project, and a module saying
+     * `reacts: ['content']` re-reads what it shows when the entries for it move.
+     */
+    content: contentSignalSchema.default([]),
 });
 /** The id correlating a question with its answer, or a `goto` with its `went`. */
 const correlation = z.string().min(1).max(LIMITS.CORRELATION);

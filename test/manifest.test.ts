@@ -201,14 +201,14 @@ describe('what a module says it reacts to', () => {
     expect(LIMITS.REACTIONS).toBe(8)
   })
 
-  test('the vocabulary names the five context fields a module can ignore', () => {
+  test('the vocabulary names the six context fields a module can ignore', () => {
     /* Deliberately NOT the open epic, and deliberately not the prompt: both are
        already declared elsewhere in this same document — `modes[].scope` and
        `declares.prompt` — and a second field meaning the same thing is a second
        field that will eventually disagree with the first. If this list grows,
        the test that should fail first is this one. It grew once, by
-       `containers`, again by `dispositions`, and by `tracker`; the arguments are on `REACTS_TO`. */
-    expect(REACTION_NAMES).toEqual(['passage', 'selection', 'containers', 'dispositions', 'tracker'])
+       `containers`, again by `dispositions`, by `tracker`, and by `content`; the arguments are on `REACTS_TO`. */
+    expect(REACTION_NAMES).toEqual(['passage', 'selection', 'containers', 'dispositions', 'tracker', 'content'])
     expect(REACTS_TO).not.toHaveProperty('epic')
     expect(REACTS_TO).not.toHaveProperty('prompt')
   })

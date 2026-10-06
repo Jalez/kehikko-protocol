@@ -199,6 +199,15 @@ export declare const CAPABILITIES: {
      * that it asks for reads, not only that it looks at them.
      */
     readonly 'trackers:refresh': "Ask the host to read GitHub and GitLab again, for every module on the canvas.";
+    /**
+     * Say that the material this module keeps changed. See `content.changed` and
+     * `content.ts`.
+     *
+     * A permission although it writes nothing, for the reason `passage:set` is
+     * one: it moves every other container on the canvas. A module that reported
+     * without cause would have each of them re-reading on its say-so.
+     */
+    readonly 'content:report': "Tell every module on the canvas that the material this one keeps has changed, so they read it again.";
 };
 export type Capability = keyof typeof CAPABILITIES;
 export declare const CAPABILITY_NAMES: Capability[];
@@ -228,6 +237,7 @@ export declare const METHODS: {
     readonly 'disposition.set': "disposition:set";
     readonly 'tracker.get': "trackers:read";
     readonly 'tracker.refresh': "trackers:refresh";
+    readonly 'content.changed': "content:report";
 };
 export type Method = keyof typeof METHODS;
 export declare const METHOD_NAMES: Method[];
@@ -922,6 +932,26 @@ export declare const methodParams: {
         epic?: string | undefined;
         refs?: string[] | undefined;
         project?: true | undefined;
+    }>;
+    /**
+     * This module's own material changed, for this epic — or, with no epic, for
+     * no one epic in particular. The host tells every container standing in the
+     * project through `context.content`, the caller's own included.
+     *
+     * WHOSE material is not here: it is the caller's, and the host knows who is
+     * asking. A module that could name a source could announce a change to
+     * somebody else's, and to the host's epics. `at` is the host's fact for the
+     * same reason `disposition.set` carries none.
+     *
+     * Reported AFTER the write has landed, so a container that re-reads at once
+     * reads the new material.
+     */
+    readonly 'content.changed': z.ZodObject<{
+        epic: z.ZodOptional<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        epic?: string | undefined;
+    }, {
+        epic?: string | undefined;
     }>;
     readonly 'events.emit': z.ZodObject<{
         extension: z.ZodEffects<z.ZodString, string, string>;

@@ -286,10 +286,10 @@ export declare const trackerRowSchema: z.ZodObject<{
     }>>;
 }, "strip", z.ZodTypeAny, {
     number: number;
+    host: string;
     ref: string;
     readAt: string;
     tracker: "github" | "gitlab";
-    host: string;
     repo: string;
     kind: "issue" | "change";
     state: "open" | "closed" | "merged";
@@ -326,10 +326,10 @@ export declare const trackerRowSchema: z.ZodObject<{
     review?: "approved" | "changes-requested" | "required" | undefined;
 }, {
     number: number;
+    host: string;
     ref: string;
     readAt: string;
     tracker: "github" | "gitlab";
-    host: string;
     repo: string;
     kind: "issue" | "change";
     state: "open" | "closed" | "merged";
@@ -394,17 +394,17 @@ export declare const trackerSourceSchema: z.ZodObject<{
     error: z.ZodDefault<z.ZodNullable<z.ZodString>>;
     refreshing: z.ZodDefault<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
+    host: string;
     at: string | null;
     tracker: "github" | "gitlab";
-    host: string;
     repo: string;
     default: boolean;
     listed: boolean;
     error: string | null;
     refreshing: boolean;
 }, {
-    tracker: "github" | "gitlab";
     host: string;
+    tracker: "github" | "gitlab";
     repo: string;
     at?: string | null | undefined;
     default?: boolean | undefined;
@@ -471,17 +471,17 @@ export declare const trackerReadingResult: z.ZodObject<{
         error: z.ZodDefault<z.ZodNullable<z.ZodString>>;
         refreshing: z.ZodDefault<z.ZodBoolean>;
     }, "strip", z.ZodTypeAny, {
+        host: string;
         at: string | null;
         tracker: "github" | "gitlab";
-        host: string;
         repo: string;
         default: boolean;
         listed: boolean;
         error: string | null;
         refreshing: boolean;
     }, {
-        tracker: "github" | "gitlab";
         host: string;
+        tracker: "github" | "gitlab";
         repo: string;
         at?: string | null | undefined;
         default?: boolean | undefined;
@@ -599,10 +599,10 @@ export declare const trackerReadingResult: z.ZodObject<{
         }>>;
     }, "strip", z.ZodTypeAny, {
         number: number;
+        host: string;
         ref: string;
         readAt: string;
         tracker: "github" | "gitlab";
-        host: string;
         repo: string;
         kind: "issue" | "change";
         state: "open" | "closed" | "merged";
@@ -639,10 +639,10 @@ export declare const trackerReadingResult: z.ZodObject<{
         review?: "approved" | "changes-requested" | "required" | undefined;
     }, {
         number: number;
+        host: string;
         ref: string;
         readAt: string;
         tracker: "github" | "gitlab";
-        host: string;
         repo: string;
         kind: "issue" | "change";
         state: "open" | "closed" | "merged";
@@ -692,9 +692,9 @@ export declare const trackerReadingResult: z.ZodObject<{
     at: string | null;
     refreshing: boolean;
     sources: {
+        host: string;
         at: string | null;
         tracker: "github" | "gitlab";
-        host: string;
         repo: string;
         default: boolean;
         listed: boolean;
@@ -703,10 +703,10 @@ export declare const trackerReadingResult: z.ZodObject<{
     }[];
     rows: {
         number: number;
+        host: string;
         ref: string;
         readAt: string;
         tracker: "github" | "gitlab";
-        host: string;
         repo: string;
         kind: "issue" | "change";
         state: "open" | "closed" | "merged";
@@ -750,8 +750,8 @@ export declare const trackerReadingResult: z.ZodObject<{
     at?: string | null | undefined;
     refreshing?: boolean | undefined;
     sources?: {
-        tracker: "github" | "gitlab";
         host: string;
+        tracker: "github" | "gitlab";
         repo: string;
         at?: string | null | undefined;
         default?: boolean | undefined;
@@ -761,10 +761,10 @@ export declare const trackerReadingResult: z.ZodObject<{
     }[] | undefined;
     rows?: {
         number: number;
+        host: string;
         ref: string;
         readAt: string;
         tracker: "github" | "gitlab";
-        host: string;
         repo: string;
         kind: "issue" | "change";
         state: "open" | "closed" | "merged";

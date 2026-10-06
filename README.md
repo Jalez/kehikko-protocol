@@ -657,6 +657,53 @@ await request('tracker.refresh', { epic: 'modes-are-modules' }, { within: TRACKE
 `live.get` stays, answered by a host as a view over the same reading, until
 the modules that ask it have moved.
 
+## When what a container shows has changed
+
+A step gains a ref, a journey is edited, an epic's text is rewritten — by a
+person, by an agent through a module's MCP door, or by an edit to the project's
+files. A container that loaded the epic when it opened would go on showing the
+old material until the window was reloaded. `context.content` says what
+changed, and a module that re-reads on it says `reacts: ['content']`. The shapes
+are in `src/content.ts`.
+
+```ts
+// context.content: [{ source: 'host' | '<module id>', epic: '<slug>' | null, at }]
+// the last change per source and epic, for the open project
+
+// a string that moves only when material this container shows changed
+const stamp = contentStamp(context.content, {
+  sources: [CONTENT_HOST, 'kehikot.journeys'],
+  epic: context.epic,
+})
+useEffect(() => { reread() }, [stamp])
+
+// after this module's own write has landed
+await request('content.changed', { epic: 'modes-are-modules' })
+```
+
+- **The signal, not the material.** The context says whose material changed
+  and for which epic; the module re-reads it through the door it already reads
+  by — `steps.list`, `epic.get`, its own server.
+- **Sources**: `CONTENT_HOST` (`'host'`) is the epics the host keeps, which is
+  what `epics.list`, `epic.get` and `steps.list` answer from. Anything else is
+  the id of the module that keeps the material. `epic: null` means the host
+  could not tell which epic — an edited file holding several — and counts for
+  any.
+- **A list, not the latest**: a host may fold two changes into one broadcast,
+  and "the latest change" would lose the first. `contentStamp` compares only
+  the entries for what a container shows.
+- **Reporting**: `content.changed` (capability `content:report`) is a module
+  saying its own material changed. The host names the source — it knows who is
+  asking — and tells every container in the project, the caller's included. A
+  host also announces its own epic writes, and edits it sees made to the
+  project's files, so a write from a module's server process is heard without
+  the page reporting it.
+- **Re-reading well**: re-read the one epic, not everything. Keep the reader's
+  scroll position, their selection and whatever they had folded open — the
+  material moved, the reader did not. Let a burst land as one read: the stamp
+  is one string however many broadcasts carried it, and a read still in flight
+  when it moves again needs one more read after it, not one per change.
+
 ## And a control that clears what a module is showing
 
 The same shape a second time, for the other control a module cannot draw in a

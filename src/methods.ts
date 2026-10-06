@@ -221,6 +221,15 @@ export const CAPABILITIES = {
    * that it asks for reads, not only that it looks at them.
    */
   'trackers:refresh': 'Ask the host to read GitHub and GitLab again, for every module on the canvas.',
+  /**
+   * Say that the material this module keeps changed. See `content.changed` and
+   * `content.ts`.
+   *
+   * A permission although it writes nothing, for the reason `passage:set` is
+   * one: it moves every other container on the canvas. A module that reported
+   * without cause would have each of them re-reading on its say-so.
+   */
+  'content:report': 'Tell every module on the canvas that the material this one keeps has changed, so they read it again.',
 } as const
 
 export type Capability = keyof typeof CAPABILITIES
@@ -252,6 +261,7 @@ export const METHODS = {
   'disposition.set': 'disposition:set',
   'tracker.get': 'trackers:read',
   'tracker.refresh': 'trackers:refresh',
+  'content.changed': 'content:report',
 } as const satisfies Record<string, Capability>
 
 export type Method = keyof typeof METHODS
@@ -630,6 +640,20 @@ export const methodParams = {
    * second; two presses are one read.
    */
   'tracker.refresh': z.object(trackerScope).refine(oneScope, { message: ONE_SCOPE }),
+  /**
+   * This module's own material changed, for this epic — or, with no epic, for
+   * no one epic in particular. The host tells every container standing in the
+   * project through `context.content`, the caller's own included.
+   *
+   * WHOSE material is not here: it is the caller's, and the host knows who is
+   * asking. A module that could name a source could announce a change to
+   * somebody else's, and to the host's epics. `at` is the host's fact for the
+   * same reason `disposition.set` carries none.
+   *
+   * Reported AFTER the write has landed, so a container that re-reads at once
+   * reads the new material.
+   */
+  'content.changed': z.object({ epic: epic.optional() }),
   'events.emit': z.object({
     /* Canonical once parsed, whichever spelling the module used. See `dialect.ts`. */
     extension: z.string().min(1).max(LIMITS.EXTENSION).transform(canonicalName),

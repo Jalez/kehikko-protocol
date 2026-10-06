@@ -1,6 +1,6 @@
 {
   "name": "kehikot-module-protocol",
-  "version": "0.26.0",
+  "version": "0.27.0",
   "description": "The shapes a Kehikot host and a module it frames agree on: the manifest, the wire, and the extension payloads. Shapes only — no I/O, no state, no decisions.",
   "keywords": [
     "kehikot",

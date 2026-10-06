@@ -885,5 +885,11 @@ export declare const LIMITS: {
     readonly TRACKER_BODY: 20000;
     /** How many files of a change `detail` lists. */
     readonly TRACKER_FILES: 300;
+    /**
+     * How many `(source, epic)` changes a context's `content` carries. See
+     * `content.ts`. A host keeps the newest; one dropped costs a module a re-read
+     * it did not need, never a change it did.
+     */
+    readonly CONTENT: 64;
 };
 //# sourceMappingURL=constants.d.ts.map
