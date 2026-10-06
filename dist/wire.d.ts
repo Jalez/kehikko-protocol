@@ -2305,6 +2305,28 @@ export declare const contextSchema: z.ZodObject<{
         at?: string | null | undefined;
         refreshing?: boolean | undefined;
     }>>;
+    /**
+     * What has changed in the material kept for the open project's epics: the
+     * last change per source and epic. The signal, not the material — see
+     * `content.ts`.
+     *
+     * Per project, like `tracker`: a write reported from one container moves
+     * this for every container standing in that project, and a module saying
+     * `reacts: ['content']` re-reads what it shows when the entries for it move.
+     */
+    content: z.ZodDefault<z.ZodArray<z.ZodObject<{
+        source: z.ZodEffects<z.ZodString, string, string>;
+        epic: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+        at: z.ZodString;
+    }, "strip", z.ZodTypeAny, {
+        source: string;
+        at: string;
+        epic: string | null;
+    }, {
+        source: string;
+        at: string;
+        epic?: string | null | undefined;
+    }>, "many">>;
 }, "strip", z.ZodTypeAny, {
     containers: {
         module: string;
@@ -2361,6 +2383,11 @@ export declare const contextSchema: z.ZodObject<{
         note: string;
         by: string | null;
     }[];
+    content: {
+        source: string;
+        at: string;
+        epic: string | null;
+    }[];
 }, {
     containers?: {
         module: string;
@@ -2416,6 +2443,11 @@ export declare const contextSchema: z.ZodObject<{
         target?: string | null | undefined;
         note?: string | undefined;
         by?: string | null | undefined;
+    }[] | undefined;
+    content?: {
+        source: string;
+        at: string;
+        epic?: string | null | undefined;
     }[] | undefined;
 }>;
 export type ModuleContext = z.infer<typeof contextSchema>;
@@ -3222,6 +3254,28 @@ export declare const helloSchema: z.ZodObject<{
             at?: string | null | undefined;
             refreshing?: boolean | undefined;
         }>>;
+        /**
+         * What has changed in the material kept for the open project's epics: the
+         * last change per source and epic. The signal, not the material — see
+         * `content.ts`.
+         *
+         * Per project, like `tracker`: a write reported from one container moves
+         * this for every container standing in that project, and a module saying
+         * `reacts: ['content']` re-reads what it shows when the entries for it move.
+         */
+        content: z.ZodDefault<z.ZodArray<z.ZodObject<{
+            source: z.ZodEffects<z.ZodString, string, string>;
+            epic: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+            at: z.ZodString;
+        }, "strip", z.ZodTypeAny, {
+            source: string;
+            at: string;
+            epic: string | null;
+        }, {
+            source: string;
+            at: string;
+            epic?: string | null | undefined;
+        }>, "many">>;
     }, "strip", z.ZodTypeAny, {
         containers: {
             module: string;
@@ -3278,6 +3332,11 @@ export declare const helloSchema: z.ZodObject<{
             note: string;
             by: string | null;
         }[];
+        content: {
+            source: string;
+            at: string;
+            epic: string | null;
+        }[];
     }, {
         containers?: {
             module: string;
@@ -3333,6 +3392,11 @@ export declare const helloSchema: z.ZodObject<{
             target?: string | null | undefined;
             note?: string | undefined;
             by?: string | null | undefined;
+        }[] | undefined;
+        content?: {
+            source: string;
+            at: string;
+            epic?: string | null | undefined;
         }[] | undefined;
     }>;
     /**
@@ -3416,6 +3480,11 @@ export declare const helloSchema: z.ZodObject<{
             note: string;
             by: string | null;
         }[];
+        content: {
+            source: string;
+            at: string;
+            epic: string | null;
+        }[];
     };
     state: string | null;
     protocol: number;
@@ -3477,6 +3546,11 @@ export declare const helloSchema: z.ZodObject<{
             target?: string | null | undefined;
             note?: string | undefined;
             by?: string | null | undefined;
+        }[] | undefined;
+        content?: {
+            source: string;
+            at: string;
+            epic?: string | null | undefined;
         }[] | undefined;
     };
     protocol: number;
@@ -4265,6 +4339,28 @@ export declare const contextMessageSchema: z.ZodObject<{
         at?: string | null | undefined;
         refreshing?: boolean | undefined;
     }>>;
+    /**
+     * What has changed in the material kept for the open project's epics: the
+     * last change per source and epic. The signal, not the material — see
+     * `content.ts`.
+     *
+     * Per project, like `tracker`: a write reported from one container moves
+     * this for every container standing in that project, and a module saying
+     * `reacts: ['content']` re-reads what it shows when the entries for it move.
+     */
+    content: z.ZodDefault<z.ZodArray<z.ZodObject<{
+        source: z.ZodEffects<z.ZodString, string, string>;
+        epic: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+        at: z.ZodString;
+    }, "strip", z.ZodTypeAny, {
+        source: string;
+        at: string;
+        epic: string | null;
+    }, {
+        source: string;
+        at: string;
+        epic?: string | null | undefined;
+    }>, "many">>;
 } & {
     type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.context">, z.ZodLiteral<string>]>, "kehikot.context", string>;
     protocol: z.ZodNumber;
@@ -4326,6 +4422,11 @@ export declare const contextMessageSchema: z.ZodObject<{
         note: string;
         by: string | null;
     }[];
+    content: {
+        source: string;
+        at: string;
+        epic: string | null;
+    }[];
 }, {
     type: string;
     protocol: number;
@@ -4383,6 +4484,11 @@ export declare const contextMessageSchema: z.ZodObject<{
         target?: string | null | undefined;
         note?: string | undefined;
         by?: string | null | undefined;
+    }[] | undefined;
+    content?: {
+        source: string;
+        at: string;
+        epic?: string | null | undefined;
     }[] | undefined;
 }>;
 /**
@@ -5530,6 +5636,28 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             at?: string | null | undefined;
             refreshing?: boolean | undefined;
         }>>;
+        /**
+         * What has changed in the material kept for the open project's epics: the
+         * last change per source and epic. The signal, not the material — see
+         * `content.ts`.
+         *
+         * Per project, like `tracker`: a write reported from one container moves
+         * this for every container standing in that project, and a module saying
+         * `reacts: ['content']` re-reads what it shows when the entries for it move.
+         */
+        content: z.ZodDefault<z.ZodArray<z.ZodObject<{
+            source: z.ZodEffects<z.ZodString, string, string>;
+            epic: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+            at: z.ZodString;
+        }, "strip", z.ZodTypeAny, {
+            source: string;
+            at: string;
+            epic: string | null;
+        }, {
+            source: string;
+            at: string;
+            epic?: string | null | undefined;
+        }>, "many">>;
     }, "strip", z.ZodTypeAny, {
         containers: {
             module: string;
@@ -5586,6 +5714,11 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             note: string;
             by: string | null;
         }[];
+        content: {
+            source: string;
+            at: string;
+            epic: string | null;
+        }[];
     }, {
         containers?: {
             module: string;
@@ -5641,6 +5774,11 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             target?: string | null | undefined;
             note?: string | undefined;
             by?: string | null | undefined;
+        }[] | undefined;
+        content?: {
+            source: string;
+            at: string;
+            epic?: string | null | undefined;
         }[] | undefined;
     }>;
     /**
@@ -5724,6 +5862,11 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             note: string;
             by: string | null;
         }[];
+        content: {
+            source: string;
+            at: string;
+            epic: string | null;
+        }[];
     };
     state: string | null;
     protocol: number;
@@ -5785,6 +5928,11 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             target?: string | null | undefined;
             note?: string | undefined;
             by?: string | null | undefined;
+        }[] | undefined;
+        content?: {
+            source: string;
+            at: string;
+            epic?: string | null | undefined;
         }[] | undefined;
     };
     protocol: number;
@@ -6560,6 +6708,28 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         at?: string | null | undefined;
         refreshing?: boolean | undefined;
     }>>;
+    /**
+     * What has changed in the material kept for the open project's epics: the
+     * last change per source and epic. The signal, not the material — see
+     * `content.ts`.
+     *
+     * Per project, like `tracker`: a write reported from one container moves
+     * this for every container standing in that project, and a module saying
+     * `reacts: ['content']` re-reads what it shows when the entries for it move.
+     */
+    content: z.ZodDefault<z.ZodArray<z.ZodObject<{
+        source: z.ZodEffects<z.ZodString, string, string>;
+        epic: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+        at: z.ZodString;
+    }, "strip", z.ZodTypeAny, {
+        source: string;
+        at: string;
+        epic: string | null;
+    }, {
+        source: string;
+        at: string;
+        epic?: string | null | undefined;
+    }>, "many">>;
 } & {
     type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.context">, z.ZodLiteral<string>]>, "kehikot.context", string>;
     protocol: z.ZodNumber;
@@ -6621,6 +6791,11 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         note: string;
         by: string | null;
     }[];
+    content: {
+        source: string;
+        at: string;
+        epic: string | null;
+    }[];
 }, {
     type: string;
     protocol: number;
@@ -6678,6 +6853,11 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         target?: string | null | undefined;
         note?: string | undefined;
         by?: string | null | undefined;
+    }[] | undefined;
+    content?: {
+        source: string;
+        at: string;
+        epic?: string | null | undefined;
     }[] | undefined;
 }>, z.ZodDiscriminatedUnion<"ok", [z.ZodObject<{
     type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.response">, z.ZodLiteral<string>]>, "kehikot.response", string>;

@@ -204,6 +204,15 @@ export {
 } from './tracker.js'
 
 export {
+  CONTENT_HOST,
+  contentChangeSchema,
+  contentSignalSchema,
+  contentStamp,
+  type ContentChange,
+  type ContentSignal,
+} from './content.js'
+
+export {
   notificationPayload,
   callPayload,
   EXTENSIONS,

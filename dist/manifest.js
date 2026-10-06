@@ -165,6 +165,15 @@ export const REACTS_TO = {
      * `tracker.get` when `context.tracker.at` moves.
      */
     tracker: 'Does something when the trackers have been read again — re-reads the issues, merge requests and pull requests it shows.',
+    /**
+     * The sixth: the material a container shows for an epic changed — a step, a
+     * journey, an epic's own text. Paired with `content:report`, and, like
+     * `tracker`, moved by the host's own acts as well: its own writes to an
+     * epic, and an edit to the project's files by anybody. A module ticking this
+     * re-reads what it shows when `contentStamp(context.content, …)` moves. See
+     * `content.ts`.
+     */
+    content: 'Does something when the material it shows for an epic has been changed — re-reads the epic, its steps or its own data.',
 };
 export const REACTION_NAMES = Object.keys(REACTS_TO);
 /* An extension name, canonical once parsed: `roadmap.notifications@1` is
