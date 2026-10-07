@@ -71,10 +71,15 @@ import { LIMITS } from './constants.js'
  * characters as an epic's slug, which is what a step's `part` holds and what a
  * host stores for the focus, and the heading is free to change.
  *
- * Where the id comes from is the host's business, as an epic's slug is: a host
- * that finds one written beside the heading uses it, and one that does not
- * derives one from the heading. This package says only what the id looks like
- * once it is on the wire.
+ * Where the id comes from used to be called the host's business, and this
+ * package said only what an id looks like once it is on the wire. That stopped
+ * being enough the day a second program had to name a part: the module that
+ * edits steps writes a part's id into a step, the host compares it, and two
+ * derivations of an id from a heading are a step that is in a part on one
+ * screen and in none on the other. So the derivation is in this package too —
+ * `partIdsOf` and `partsOf` in `journey.ts`, over the record the parts are
+ * read from: an id written beside the heading is used, and one that is not is
+ * derived from the heading.
  */
 export const PART_ID = /^[a-z0-9-]{1,80}$/
 
