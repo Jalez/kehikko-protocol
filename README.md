@@ -486,6 +486,39 @@ says whether a module follows the reader, and `declares.prompt` already says
 whether it wants a prompt. The rule for adding a word is that no other field in
 the manifest already says it.
 
+## Where a module files itself
+
+`tags` is a short list of category words a module gives about itself, most
+fitting first: `tags: ['code', 'review']`. A host that lists modules can then
+group and search them without a table of which module is which, and somebody's
+own module is shelved by the same rule as a first-party one.
+
+The words this version suggests are in `TAGS`:
+
+| tag | for |
+| --- | --- |
+| `planning` | deciding what the work is: journeys, references, checklists |
+| `reading` | reading a document somebody else wrote |
+| `writing` | writing one: a paper, a deck, notes |
+| `code` | looking at and working in source |
+| `review` | judging a change before it lands |
+| `agents` | running agents and hearing back from them |
+| `tests` | running checks and reading what they said |
+
+**It is a suggestion, and nothing is checked against it.** The same rule as
+`reacts`: a word no host has heard of is carried as written and drawn as it is.
+What is checked is the shape — lowercase, starting with a letter, letters,
+digits and hyphens, at most `LIMITS.TAG` long, at most `LIMITS.TAGS` of them —
+because a tag ends up in a heading and a search box.
+
+**The order is the meaning.** The first tag is the module's primary category,
+which is where a host that shows each module once puts it. The rest only widen
+what a search finds.
+
+Empty by default, so the field is additive: a manifest that says nothing parses
+to a module with no category, and a host files it under whatever it calls
+"other".
+
 ## A module's data has a version of its own
 
 `dataVersion` is a positive integer naming the format a module writes under

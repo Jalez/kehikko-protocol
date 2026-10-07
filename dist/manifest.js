@@ -176,6 +176,31 @@ export const REACTS_TO = {
     content: 'Does something when the material it shows for an epic has been changed — re-reads the epic, its steps or its own data.',
 };
 export const REACTION_NAMES = Object.keys(REACTS_TO);
+/**
+ * The category words this version suggests for `tags`, each with what it is
+ * for.
+ *
+ * A suggestion and not a registry. `tags` is not checked against it, for the
+ * reason `reacts` is not checked against `REACTS_TO`: a module that files
+ * itself under a word nobody has heard of yet is not a malformed module, and a
+ * host shows the word as it is. What the list buys is that two authors who
+ * mean the same shelf write the same word, and that a host has an order to put
+ * the shelves in without keeping a table of its own.
+ */
+export const TAGS = {
+    planning: 'Deciding what the work is: journeys, references, checklists.',
+    reading: 'Reading a document somebody else wrote.',
+    writing: 'Writing one: a paper, a deck, notes.',
+    code: 'Looking at and working in source.',
+    review: 'Judging a change before it lands.',
+    agents: 'Running agents and hearing back from them.',
+    tests: 'Running checks and reading what they said.',
+};
+export const TAG_NAMES = Object.keys(TAGS);
+/* Lowercase and hyphenated, starting with a letter, so a tag is a word a host
+   can put in a heading or a search box and never a sentence or a path. The
+   length is `LIMITS.TAG`, said here because a regex cannot read a constant. */
+const tag = z.string().regex(new RegExp(`^[a-z][a-z0-9-]{0,${LIMITS.TAG - 1}}$`));
 /* An extension name, canonical once parsed: `roadmap.notifications@1` is
    read as `kehikot.notifications@1`. See `dialect.ts`. */
 const extensionName = z.string().min(1).max(LIMITS.EXTENSION).transform(canonicalName);
@@ -244,6 +269,21 @@ export const manifestSchema = z.object({
      */
     dataVersion: z.number().int().min(1).max(LIMITS.DATA_VERSION).default(1),
     summary: z.string().max(LIMITS.SUMMARY).default(''),
+    /**
+     * The categories this module files itself under, most fitting first.
+     *
+     * Said by the module so that a host can group and search what it lists
+     * without a table of which module is which, and so that somebody's own
+     * module is shelved by the same rule as a first-party one. See `TAGS` for
+     * the words this version suggests; a word outside it is carried as written.
+     *
+     * The ORDER is the meaning: the first tag is where a host puts a module it
+     * shows once, and the rest only widen what a search finds. Empty by default,
+     * so a manifest written before this field existed is a module with no
+     * category — which a host draws under whatever it calls "other" — and the
+     * field could be added without moving `PROTOCOL`.
+     */
+    tags: z.array(tag).max(LIMITS.TAGS).default([]),
     /**
      * What an agent should do about this module, given that it is here.
      *

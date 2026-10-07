@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { LIMITS, MODULE_ID, REACTION_NAMES, REACTS_TO, manifestSchema, own, speaks } from '../src/index.js'
+import { LIMITS, MODULE_ID, REACTION_NAMES, REACTS_TO, TAG_NAMES, manifestSchema, own, speaks } from '../src/index.js'
 
 /**
  * What is tested here is what would actually break somebody.
@@ -34,6 +34,7 @@ describe('a manifest at its smallest', () => {
        nothing, which is a true reading of a document that says nothing — and
        it is why the field could be added without moving `PROTOCOL`. */
     expect(m.reacts).toEqual([])
+    expect(m.tags).toEqual([])
   })
 
   test('a manifest without the word is not a manifest', () => {
@@ -176,6 +177,32 @@ describe('speaks', () => {
     expect(speaks('~1', 1)).toBe(false)
     expect(speaks('>=1 || <3', 1)).toBe(false)
     expect(speaks('latest', 1)).toBe(false)
+  })
+})
+
+describe('the categories a module files itself under', () => {
+  test('are carried through in the order written, because the first is the primary one', () => {
+    const m = manifestSchema.parse({ ...minimal, tags: ['review', 'code'] })
+    expect(m.tags).toEqual(['review', 'code'])
+  })
+
+  test('are not checked against the suggested words', () => {
+    expect(TAG_NAMES).toEqual(['planning', 'reading', 'writing', 'code', 'review', 'agents', 'tests'])
+    expect(manifestSchema.safeParse({ ...minimal, tags: ['music-theory'] }).success).toBe(true)
+  })
+
+  test.each([['Planning'], ['two words'], ['9lives'], ['-code'], [''], ['a/b'], ['x'.repeat(LIMITS.TAG + 1)]])(
+    'refuse %p, which is not a word a host could put in a heading',
+    (bad) => {
+      expect(manifestSchema.safeParse({ ...minimal, tags: [bad] }).success).toBe(false)
+    },
+  )
+
+  test('are bounded in both directions, like every other list here', () => {
+    expect(manifestSchema.safeParse({ ...minimal, tags: ['x'.repeat(LIMITS.TAG)] }).success).toBe(true)
+    const six = Array.from({ length: LIMITS.TAGS + 1 }, (_, i) => `tag-${i}`)
+    expect(manifestSchema.safeParse({ ...minimal, tags: six }).success).toBe(false)
+    expect(LIMITS.TAGS).toBe(5)
   })
 })
 
