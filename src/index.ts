@@ -207,6 +207,18 @@ export {
 } from './tracker.js'
 
 export {
+  PART_ID,
+  partSchema,
+  partsSchema,
+  pickedParts,
+  isFocused,
+  refInFocus,
+  partInFocus,
+  focusCount,
+  type EpicPart,
+} from './parts.js'
+
+export {
   CONTENT_HOST,
   contentChangeSchema,
   contentSignalSchema,

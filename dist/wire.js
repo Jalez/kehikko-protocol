@@ -4,6 +4,7 @@ import { canonicalName, legacyName } from './dialect.js';
 import { trackerSignalSchema } from './tracker.js';
 import { contentSignalSchema } from './content.js';
 import { EPIC_SLUG, MODULE_ID } from './ids.js';
+import { partsSchema } from './parts.js';
 /**
  * A message type, read in either spelling and handed back in the current one.
  *
@@ -1202,6 +1203,44 @@ export const contextSchema = z.object({
      * `reacts: ['content']` re-reads what it shows when the entries for it move.
      */
     content: contentSignalSchema.default([]),
+    /**
+     * The parts of the open epic, and which of them the person has picked out.
+     * See `parts.ts`, which is the whole argument.
+     *
+     * ## Context, beside the epic and the selection, because it is the same fact
+     *
+     * What a canvas is about used to be two things: the epic, and the refs
+     * picked out of it. This is the third, standing between them — narrower than
+     * the epic, wider than a selection — and it travels the way they do for the
+     * reasons they do. A module has to have it before it draws, or it draws the
+     * whole epic and then narrows in front of somebody. It is true for as long
+     * as nobody changes it, so a module can arrive late to it. And no module
+     * sets it: the picking is done in the host's own bar, beside the epic, so
+     * there is no capability here and no setter to pair it with.
+     *
+     * It belongs to the PROJECT's subject and not to a kehikko. A kehikko is a
+     * layout; switching it changes neither the epic nor what is picked out of
+     * it. And it belongs to the EPIC: a host that moves to another epic sends
+     * that epic's parts with nothing picked, for the reason it clears the
+     * selection.
+     *
+     * ## What a consumer does with it, said once
+     *
+     * When no part is picked, the whole epic is in front of the person and a
+     * module shows what it always showed. When some are, it shows what belongs
+     * to THOSE — `refInFocus` for a reference, `partInFocus` for a step that was
+     * assigned to a part — and it SAYS that it has narrowed and by how much:
+     * "showing 6 · 14 outside the picked parts", in its own header, with a way
+     * to see them. A focus that hides things and says nothing is the failure
+     * this field was designed against, and the reason every part is listed with
+     * its refs rather than only the picked ones.
+     *
+     * Empty rather than absent, for the reason every other field here is. An
+     * epic with no parts, no epic at all, and a host that has never heard of
+     * parts all send `[]`, and all three mean the same true thing to a module:
+     * nothing is narrowed.
+     */
+    parts: partsSchema.default([]),
 });
 /** The id correlating a question with its answer, or a `goto` with its `went`. */
 const correlation = z.string().min(1).max(LIMITS.CORRELATION);

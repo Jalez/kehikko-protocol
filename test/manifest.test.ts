@@ -234,8 +234,8 @@ describe('what a module says it reacts to', () => {
        `declares.prompt` — and a second field meaning the same thing is a second
        field that will eventually disagree with the first. If this list grows,
        the test that should fail first is this one. It grew once, by
-       `containers`, again by `dispositions`, by `tracker`, and by `content`; the arguments are on `REACTS_TO`. */
-    expect(REACTION_NAMES).toEqual(['passage', 'selection', 'containers', 'dispositions', 'tracker', 'content'])
+       `containers`, again by `dispositions`, by `tracker`, by `content`, and by `parts`; the arguments are on `REACTS_TO`. */
+    expect(REACTION_NAMES).toEqual(['passage', 'selection', 'containers', 'dispositions', 'tracker', 'content', 'parts'])
     expect(REACTS_TO).not.toHaveProperty('epic')
     expect(REACTS_TO).not.toHaveProperty('prompt')
   })

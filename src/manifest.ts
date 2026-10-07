@@ -181,6 +181,14 @@ export const REACTS_TO = {
    * `content.ts`.
    */
   content: 'Does something when the material it shows for an epic has been changed — re-reads the epic, its steps or its own data.',
+  /**
+   * The seventh: which parts of the open epic a person picked out. Like half
+   * of `containers`, its other end is the host itself — the picking is done in
+   * the host's bar and no module sets it, so a registry finds no setter and is
+   * not finding an absence. A module ticking this narrows to the picked parts
+   * and says how much it left out. See `parts.ts`.
+   */
+  parts: 'Does something when the parts of the epic somebody picked out change — narrows to them, and says what it left out.',
 } as const
 
 export type Reaction = keyof typeof REACTS_TO

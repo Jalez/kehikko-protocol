@@ -13,6 +13,7 @@ function host(over: Partial<Host> = {}): Host {
     project: 'Thesis',
     projectPath: '/work/thesis',
     epic: 'write-chapter-two',
+    focus: [],
     theme: 'dark',
     request: () => Promise.resolve(null),
     ...over,
@@ -28,6 +29,14 @@ describe('the screen', () => {
     expect(screen.getByTestId('epic').textContent).toBe('write-chapter-two')
     expect(screen.getByTestId('theme').textContent).toBe('dark')
     expect(screen.getByTestId('where').textContent).toBe('hosted')
+  })
+
+  test('says which parts of the epic are picked out, and says so when none are', () => {
+    render(<Screen host={host()} api={fakeApi(null)} />)
+    expect(screen.getByTestId('parts').textContent).toBe('the whole epic')
+    cleanup()
+    render(<Screen host={host({ focus: ['The method', 'The results'] })} api={fakeApi(null)} />)
+    expect(screen.getByTestId('parts').textContent).toBe('The method, The results')
   })
 
   test('shows the value stored in the project', async () => {
