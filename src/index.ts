@@ -28,7 +28,7 @@ export {
   type MessageType,
 } from './constants.js'
 
-export { MODULE_ID, MODE_ID, EPIC_SLUG, own } from './ids.js'
+export { MODULE_ID, MODE_ID, EPIC_SLUG, own, slugFrom } from './ids.js'
 
 export {
   DIALECTS,
@@ -230,6 +230,9 @@ export {
   journeySlugs,
   stepsOf,
   stepPart,
+  partIdsOf,
+  partsOf,
+  type JourneyPart,
   type JourneyStep,
   type JourneyGroup,
   type StepsFrom,

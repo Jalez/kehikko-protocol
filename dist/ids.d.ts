@@ -77,6 +77,36 @@ export declare const MODE_ID: RegExp;
  */
 export declare const EPIC_SLUG: RegExp;
 /**
+ * A slug out of a line of prose, the way a person would write one by hand.
+ *
+ * Lowercased, accents folded to their base letters, every run of anything that
+ * is not a letter or a digit becomes one dash, and the dashes at the ends go.
+ * Cut at eighty characters — the bound `EPIC_SLUG` and `PART_ID` share — and
+ * then trimmed of a trailing dash again, because a cut can land on one.
+ *
+ * The empty string for a line with nothing usable in it. Not a fallback, not
+ * `untitled`: "!!!" has no slug, and the caller is the one who knows what to
+ * do about that — a host making an epic refuses with a sentence, and `partsOf`
+ * calls the part `part-<n>`.
+ *
+ * ## Why a derivation is in a package of shapes
+ *
+ * It came from a host, where it made an epic's slug out of its title and then,
+ * when parts arrived, a part's id out of its heading. The second use is what
+ * moved it. A part's id is written into a step (`part`) by the program that
+ * edits steps and compared by the program that composes `context.parts`, and
+ * those are two programs: one deriving `what-the-page-shows` and the other
+ * `what-the-page-shows-` for the same heading is a step that is in a part on
+ * one screen and in none on the next. One spelling of the derivation, here,
+ * is the same argument as one spelling of a method name.
+ *
+ * **The output is a contract.** Ids made by this function are already written
+ * in people's files. A change to what it returns for any input is a change to
+ * which part every such step is in, and is made — if it ever is — as a
+ * migration and not as a tidy-up.
+ */
+export declare function slugFrom(text: string): string;
+/**
  * One lookup that does not fall through to a prototype.
  *
  * A convenience, offered because the hazard above is easy to write around and

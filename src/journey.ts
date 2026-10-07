@@ -1,5 +1,6 @@
 import { z } from 'zod'
-import { EPIC_SLUG } from './ids.js'
+import { LIMITS } from './constants.js'
+import { EPIC_SLUG, slugFrom } from './ids.js'
 import { PART_ID } from './parts.js'
 
 /**
@@ -299,4 +300,161 @@ export function stepPart(step: unknown): string | null {
   if (!step || typeof step !== 'object') return null
   const part = (step as { part?: unknown }).part
   return typeof part === 'string' && PART_ID.test(part) ? part : null
+}
+
+/**
+ * One part of an epic, as it is read off the epic's record.
+ *
+ * `EpicPart` in `parts.ts` is what goes on the wire, and carries `picked`,
+ * which is a fact about a person and not about a record. This is the reading
+ * underneath it: the same `id`, `heading` and `refs`, and a count of the steps
+ * that say they are in the part, which a picker draws and the wire has no use
+ * for.
+ */
+export interface JourneyPart {
+  id: string
+  heading: string
+  /** The refs listed under the heading, and the refs of the steps assigned here. */
+  refs: string[]
+  /** How many steps say they are in this part. */
+  steps: number
+}
+
+/** Refs out of whatever a file holds under `refs`: short non-empty strings, once each. */
+function refsIn(raw: unknown): string[] {
+  if (!Array.isArray(raw)) return []
+  const out: string[] = []
+  for (const one of raw) {
+    if (typeof one !== 'string') continue
+    const ref = one.trim()
+    if (!ref || ref.length > LIMITS.REF || out.includes(ref)) continue
+    out.push(ref)
+  }
+  return out
+}
+
+/**
+ * The id of the part each group is, in the groups' own positions.
+ *
+ * One entry per entry of `groups`, so `ids[i]` is the id of `groups[i]` —
+ * and `null` where that entry is not a part at all: something that is not an
+ * object, or a group past `LIMITS.PARTS`. `[]` for anything that is not an
+ * array.
+ *
+ * ## Where an id comes from
+ *
+ * A group that carries an `id` in `PART_ID`'s class is called that. One that
+ * does not — every group written before parts existed — is called
+ * `slugFrom(heading)`, so every record already on disk has ids without
+ * anybody editing it, stable for as long as the heading is.
+ *
+ * Two groups that come out with one id are told apart by a suffix — `-2`,
+ * `-3` — in the record's order, and a heading with nothing usable in it
+ * becomes `part-<n>`, where `n` is the group's position counted from one.
+ * Both are better than dropping a group: a part that vanished from a picker
+ * is exactly the silent hiding parts exist to avoid.
+ *
+ * ## Why the positions are kept
+ *
+ * `partsOf` wants the parts and has no use for the gaps. The program that
+ * edits the record does: the day it assigns a step to a part whose group has
+ * no `id` written, it writes the derived id onto THAT group, so the heading
+ * is free to be reworded from then on — and it has to know which group that
+ * is. An id written that way is the one this function would have derived, so
+ * writing it changes nothing any reader sees.
+ *
+ * ## One derivation, and it does not move
+ *
+ * A host derives these to compose `context.parts`; the Journeys module derives
+ * them to check a step's `part` and to draw which part a step is in. Those
+ * must be one function or they will one day be two answers, and the ids it has
+ * produced are already in files and in stored focuses. See `slugFrom`.
+ */
+export function partIdsOf(groups: unknown): (string | null)[] {
+  if (!Array.isArray(groups)) return []
+  const ids: (string | null)[] = []
+  const taken = new Set<string>()
+  groups.forEach((group, index) => {
+    if (taken.size >= LIMITS.PARTS || !group || typeof group !== 'object') {
+      ids.push(null)
+      return
+    }
+    const { id: written, heading: said } = group as { id?: unknown; heading?: unknown }
+    const heading = typeof said === 'string' ? said.trim().slice(0, LIMITS.TITLE) : ''
+    const wanted =
+      typeof written === 'string' && PART_ID.test(written) ? written : slugFrom(heading) || `part-${index + 1}`
+    let id = wanted
+    for (let n = 2; taken.has(id); n += 1) id = `${wanted.slice(0, 76)}-${n}`
+    taken.add(id)
+    ids.push(id)
+  })
+  return ids
+}
+
+/**
+ * Every part an epic has, in the record's order.
+ *
+ * ## A part is a group, read
+ *
+ * A record has always had `groups: [{ heading, refs }]`. A part is not a new
+ * idea beside that — it IS a group, with an id (`partIdsOf`), one level deep.
+ *
+ * ## A step says which part it is in
+ *
+ * `steps[].part` is the id of a part. A step is in a part because it says so
+ * and for no other reason — not because it names a ref the part lists. A step
+ * with no `part`, or one naming a part the record does not have, belongs to
+ * the epic as a whole and is counted nowhere here.
+ *
+ * What an assignment does is fold the step's refs into its part's `refs`, once
+ * each, after the ones listed under the heading. That is one fact projected
+ * into a second place by one function, and it is what lets a module that knows
+ * only references narrow correctly without learning what a step is.
+ *
+ * ## It takes anything, and nothing here throws
+ *
+ * `unknown`, and not `JourneyRecord`, although a parsed record is what it is
+ * for. A host falls back to a file of its own when a project has no record,
+ * and that file is whatever somebody left in it: the same derivation has to
+ * read both, or the fallback would be a second derivation. So junk costs the
+ * entry it is in and nothing else — a group that is not an object is skipped,
+ * a ref that is not a short string is dropped — and `[]` is the answer for a
+ * record with no `groups` and for anything that is not a record at all.
+ *
+ * ## Bounded, because this is what goes on the wire
+ *
+ * At `LIMITS.PARTS` parts and `LIMITS.PART_REFS` refs each, a heading at
+ * `LIMITS.TITLE` and a ref at `LIMITS.REF`: the list goes out in a context
+ * broadcast to every frame. What is past a bound is not in the answer; the
+ * record is where the whole of it is. A part with no heading is called by its
+ * id, so that there is always something to draw.
+ */
+export function partsOf(record: unknown): JourneyPart[] {
+  if (!record || typeof record !== 'object') return []
+  const { groups, steps } = record as { groups?: unknown; steps?: unknown }
+  if (!Array.isArray(groups)) return []
+
+  const parts: JourneyPart[] = []
+  partIdsOf(groups).forEach((id, index) => {
+    if (id === null) return
+    const { heading: said, refs } = groups[index] as { heading?: unknown; refs?: unknown }
+    const heading = typeof said === 'string' ? said.trim().slice(0, LIMITS.TITLE) : ''
+    parts.push({ id, heading: heading || id, refs: refsIn(refs), steps: 0 })
+  })
+
+  /* The steps that say which part they are in bring their refs with them. */
+  if (Array.isArray(steps)) {
+    const byId = new Map(parts.map((part) => [part.id, part]))
+    for (const step of steps) {
+      const assigned = stepPart(step)
+      const part = assigned === null ? undefined : byId.get(assigned)
+      if (!part) continue
+      part.steps += 1
+      for (const ref of refsIn((step as { refs?: unknown }).refs)) {
+        if (!part.refs.includes(ref)) part.refs.push(ref)
+      }
+    }
+  }
+  for (const part of parts) part.refs = part.refs.slice(0, LIMITS.PART_REFS)
+  return parts
 }

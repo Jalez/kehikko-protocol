@@ -73,6 +73,7 @@ Concretely, the things this package deliberately does not do:
 | `partSchema`, `EpicPart`, `PART_ID`, `pickedParts`, `isFocused`, `refInFocus`, `partInFocus`, `focusCount` | The parts of the open epic in `context.parts`, and whether a thing is in the ones a person picked out. |
 
 | `journeyRecordSchema`, `journeyStepSchema`, `journeyGroupSchema`, `stepsFromSchema`, `journeysDocumentSchema`, `journeyIn`, `journeySlugs`, `stepsOf`, `stepPart`, `JOURNEYS_MODULE`, `JOURNEYS_FILE` | An epic's steps and groups as a project keeps them on disk: the one shape the module that writes them and a host that reads them both import. |
+| `partsOf`, `partIdsOf`, `JourneyPart`, `slugFrom` | The parts of an epic read off its record, and the one derivation of a part's id from its heading: what a host composes `context.parts` from and what the module that edits steps checks a step's `part` against. |
 
 And behind two subpaths, which are not shapes and say so:
 
@@ -691,9 +692,9 @@ so a module that only knows references narrows correctly without learning what
 a step is.
 
 **The id is not the heading.** A heading is prose somebody will reword; the id
-is what a step and a stored focus hold on to. Where a host gets it is the
-host's business — one written beside the heading, or one derived from it — and
-this package says only what it looks like on the wire.
+is what a step and a stored focus hold on to. It is one written beside the
+heading, or one derived from it — and since 0.31.0 the derivation is this
+package's and not a host's own; see `partsOf` below.
 
 No module sets this. The picking is the host's own control, so there is no
 capability and no method; a module that moves when it changes says
@@ -779,6 +780,39 @@ paper sits beside them), `elsewhere` (there are steps, not here — **never
 answer is shown or counted: a host that answered `steps.list` with `[]` for an
 `elsewhere` record would be reporting an epic with twenty sections as having
 no steps.
+
+**The parts are derived here, once (0.31.0).** A host composes `context.parts`
+out of a record's groups, and the module that edits steps has to name the same
+parts — to check a step's `part`, and to draw which part a step is in. Two
+derivations of an id from a heading would be a step that is in a part on one
+screen and in none on the next, so there is one:
+
+```ts
+import { partsOf, partIdsOf, slugFrom } from 'kehikot-module-protocol'
+
+partsOf(record)            // [{ id, heading, refs, steps }], in the record's order
+partIdsOf(record.groups)   // ['the-posting-seam', null, 'tests-2']: ids[i] is groups[i]'s
+slugFrom('What the page shows')   // 'what-the-page-shows'
+```
+
+- A group's `id`, when it is a `PART_ID`, is the part's id. Otherwise it is
+  `slugFrom(heading)`: lowercased, accents folded, every run of anything else
+  one dash, cut at eighty.
+- Two groups that come out alike are told apart by `-2`, `-3` in the record's
+  order; a heading with nothing usable in it is `part-<n>`, by position. A
+  group is never dropped for its name.
+- A step carrying `part: <id>` is counted in that part and its refs are folded
+  into the part's, once each. A step is never filed by the refs it names, and
+  a `part` naming nothing the record has is no assignment.
+- It takes `unknown` and never throws: a host falls back to a file of its own
+  when a project has no record, and the same function has to read both.
+- Bounded at `LIMITS.PARTS` and `LIMITS.PART_REFS`, because this is what goes
+  into a context.
+
+`partIdsOf` keeps the groups' positions — `null` where an entry is not a part —
+so the writer can put a derived id onto the group it belongs to the first time
+a step is assigned there, and the heading is free from then on. **The ids these
+produce are already in people's files and stored focuses. They do not change.**
 
 **The file is read behind `/serve`**, with the rest of what touches the
 machine. `readJourneys` answers the parsed document or null — no project, a

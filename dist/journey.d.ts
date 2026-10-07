@@ -1209,4 +1209,98 @@ export declare function stepsOf(record: Pick<JourneyRecord, 'steps' | 'stepsFrom
  * question, and `partInFocus` answers it.
  */
 export declare function stepPart(step: unknown): string | null;
+/**
+ * One part of an epic, as it is read off the epic's record.
+ *
+ * `EpicPart` in `parts.ts` is what goes on the wire, and carries `picked`,
+ * which is a fact about a person and not about a record. This is the reading
+ * underneath it: the same `id`, `heading` and `refs`, and a count of the steps
+ * that say they are in the part, which a picker draws and the wire has no use
+ * for.
+ */
+export interface JourneyPart {
+    id: string;
+    heading: string;
+    /** The refs listed under the heading, and the refs of the steps assigned here. */
+    refs: string[];
+    /** How many steps say they are in this part. */
+    steps: number;
+}
+/**
+ * The id of the part each group is, in the groups' own positions.
+ *
+ * One entry per entry of `groups`, so `ids[i]` is the id of `groups[i]` —
+ * and `null` where that entry is not a part at all: something that is not an
+ * object, or a group past `LIMITS.PARTS`. `[]` for anything that is not an
+ * array.
+ *
+ * ## Where an id comes from
+ *
+ * A group that carries an `id` in `PART_ID`'s class is called that. One that
+ * does not — every group written before parts existed — is called
+ * `slugFrom(heading)`, so every record already on disk has ids without
+ * anybody editing it, stable for as long as the heading is.
+ *
+ * Two groups that come out with one id are told apart by a suffix — `-2`,
+ * `-3` — in the record's order, and a heading with nothing usable in it
+ * becomes `part-<n>`, where `n` is the group's position counted from one.
+ * Both are better than dropping a group: a part that vanished from a picker
+ * is exactly the silent hiding parts exist to avoid.
+ *
+ * ## Why the positions are kept
+ *
+ * `partsOf` wants the parts and has no use for the gaps. The program that
+ * edits the record does: the day it assigns a step to a part whose group has
+ * no `id` written, it writes the derived id onto THAT group, so the heading
+ * is free to be reworded from then on — and it has to know which group that
+ * is. An id written that way is the one this function would have derived, so
+ * writing it changes nothing any reader sees.
+ *
+ * ## One derivation, and it does not move
+ *
+ * A host derives these to compose `context.parts`; the Journeys module derives
+ * them to check a step's `part` and to draw which part a step is in. Those
+ * must be one function or they will one day be two answers, and the ids it has
+ * produced are already in files and in stored focuses. See `slugFrom`.
+ */
+export declare function partIdsOf(groups: unknown): (string | null)[];
+/**
+ * Every part an epic has, in the record's order.
+ *
+ * ## A part is a group, read
+ *
+ * A record has always had `groups: [{ heading, refs }]`. A part is not a new
+ * idea beside that — it IS a group, with an id (`partIdsOf`), one level deep.
+ *
+ * ## A step says which part it is in
+ *
+ * `steps[].part` is the id of a part. A step is in a part because it says so
+ * and for no other reason — not because it names a ref the part lists. A step
+ * with no `part`, or one naming a part the record does not have, belongs to
+ * the epic as a whole and is counted nowhere here.
+ *
+ * What an assignment does is fold the step's refs into its part's `refs`, once
+ * each, after the ones listed under the heading. That is one fact projected
+ * into a second place by one function, and it is what lets a module that knows
+ * only references narrow correctly without learning what a step is.
+ *
+ * ## It takes anything, and nothing here throws
+ *
+ * `unknown`, and not `JourneyRecord`, although a parsed record is what it is
+ * for. A host falls back to a file of its own when a project has no record,
+ * and that file is whatever somebody left in it: the same derivation has to
+ * read both, or the fallback would be a second derivation. So junk costs the
+ * entry it is in and nothing else — a group that is not an object is skipped,
+ * a ref that is not a short string is dropped — and `[]` is the answer for a
+ * record with no `groups` and for anything that is not a record at all.
+ *
+ * ## Bounded, because this is what goes on the wire
+ *
+ * At `LIMITS.PARTS` parts and `LIMITS.PART_REFS` refs each, a heading at
+ * `LIMITS.TITLE` and a ref at `LIMITS.REF`: the list goes out in a context
+ * broadcast to every frame. What is past a bound is not in the answer; the
+ * record is where the whole of it is. A part with no heading is called by its
+ * id, so that there is always something to draw.
+ */
+export declare function partsOf(record: unknown): JourneyPart[];
 //# sourceMappingURL=journey.d.ts.map
