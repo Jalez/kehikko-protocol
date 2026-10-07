@@ -61,7 +61,10 @@ export declare const MODE_ID: RegExp;
  * An epic belongs to a project, and it is the thing a host holds and can
  * therefore tell a module about. A JOURNEY is a different idea living in a
  * different program — a module app of its own — and this package deliberately
- * says nothing about one: not its name, not its shape, not its bounds. An
+ * says nothing about one ON THE WIRE: not its name, not its shape, not its
+ * bounds. (The one thing it does describe is the record that module keeps on
+ * disk for an epic's steps, because a host reads it; see `journey.ts`, which
+ * says what was decided and why that is narrower than it sounds.) An
  * earlier draft of these files inherited a codebase where the two words meant
  * one thing, and every place that conflation reached is renamed rather than
  * aliased, because an alias would preserve exactly the confusion being removed.

@@ -72,6 +72,8 @@ Concretely, the things this package deliberately does not do:
 | `KEHIKOT_IGNORE`, `ignoresKehikot`, `withKehikotIgnored` | The lines that project's `.gitignore` gains, added once. |
 | `partSchema`, `EpicPart`, `PART_ID`, `pickedParts`, `isFocused`, `refInFocus`, `partInFocus`, `focusCount` | The parts of the open epic in `context.parts`, and whether a thing is in the ones a person picked out. |
 
+| `journeyRecordSchema`, `journeyStepSchema`, `journeyGroupSchema`, `stepsFromSchema`, `journeysDocumentSchema`, `journeyIn`, `journeySlugs`, `stepsOf`, `stepPart`, `JOURNEYS_MODULE`, `JOURNEYS_FILE` | An epic's steps and groups as a project keeps them on disk: the one shape the module that writes them and a host that reads them both import. |
+
 And behind two subpaths, which are not shapes and say so:
 
 | | |
@@ -195,6 +197,12 @@ It is just a program.
 `EPIC_SLUG` describes an epic slug and only that. If a journey slug turns out to
 be spelled differently, nothing here changes, because a host is not the
 authority on that name.
+
+All of that is about the **wire**, and all of it still holds. What 0.30.0 adds
+is about the **disk**, and it is narrower than it sounds: the record the
+Journeys module keeps for an epic is now something a host reads, so its shape
+is written here. See "An epic's steps are kept once", below, for what was
+decided.
 
 ## A project is named and a project is somewhere
 
@@ -693,6 +701,91 @@ capability and no method; a module that moves when it changes says
 the reason it keeps its epic. Moving to another epic sends that epic's parts
 with nothing picked, for the reason it clears the selection.
 
+## An epic's steps are kept once, and this is the shape they are kept in
+
+Every epic used to exist twice in a project. A host kept
+`.kehikot/kehikko/epics/<slug>.json` and answered `epics.list`, `epic.get`,
+`steps.list`, `context.parts` and the tracker scope out of it; the Journeys
+module kept `.kehikot/journeys/journeys.json`, which is where a step was
+actually edited. Nothing kept them in step, and in one real project they had
+come apart — nine steps in one, twelve in the other — with nothing on screen to
+say so.
+
+The owner decided: **Journeys owns the steps, the groups (an epic's parts) and
+the prose; a host owns the epic's slug, its title and whether it exists.** A
+host reads steps and groups out of Journeys' file, and falls back to what it
+holds itself when the project has no record under that slug — including when
+Journeys was never installed.
+
+A host reading another program's file is a host parsing a private format. So
+the format is not private: it is `journey.ts`, here, and both the writer and
+the reader import it.
+
+```ts
+import { journeyIn, stepsOf, stepPart } from 'kehikot-module-protocol'
+import { readJourneys, readJourney } from 'kehikot-module-protocol/serve'
+
+const record = readJourney(projectPath, 'the-posting-seam')   // JourneyRecord | null
+if (record) {
+  const said = stepsOf(record)        // 'stored' | 'elsewhere' | 'none'
+  if (said.kind === 'stored') for (const step of said.steps) stepPart(step)
+}
+
+// Every epic in a project: read the file once, ask per slug.
+const document = readJourneys(projectPath)
+const one = journeyIn(document, slug)
+```
+
+**The shape.** The file is `{ version, journeys: { <slug>: record } }`. A
+record models only what a host has to read to answer what it already answers:
+
+| | |
+|---|---|
+| `slug`, `title`, `lede`, `project?`, `umbrella?` | What a list of epics is drawn from. `slug` is `EPIC_SLUG`: the host's `epic` and this are one name. |
+| `steps: [{ title, body, refs, notes, part? }]` | `part` is the id of the part a step was assigned to. |
+| `groups: [{ heading, refs, id? }]` | What a host reads as the epic's parts. `id` is what `part` and a stored focus name. |
+| `stepsFrom?: { projector, where, why }` | The steps are kept somewhere else. See below. |
+| `exists`, `open` | Counted, with `steps`, for an epic's size. |
+
+Everything else Journeys keeps in a record is its own, and **every object is
+`.passthrough()`**: a field this version has never heard of comes out of a
+parse exactly as it went in, at every level. A reader that stripped would hand
+over part of somebody's document; a *writer* that parsed with a stripping
+schema before saving would delete it from the file. Parse with these schemas,
+or extend them — do not restate them with `z.object` and write the result back.
+
+**Nothing in it is bounded**, unlike everything else here. This is a document a
+person wrote in their own repository, not a message from a stranger, and a
+reader that refused a record over a long title would be a host declining to
+show somebody their own work. The bounds bite where something is put on the
+wire (`partsSchema`) and at the writer's own door. For the same reason `part`
+and `id` are plain strings in the schema, and `stepPart` is how a `part` is
+read: anything that is not a `PART_ID` is no assignment.
+
+**`journeyIn` never throws and reads one record at a time.** Null for a
+document that is not one, a slug that is not one, an unknown slug, a record
+that will not parse, and a record filed under one slug that calls itself
+another. One epic with a step nobody titled costs that epic its record and no
+other. The lookup is `Object.hasOwn` — `constructor` matches `EPIC_SLUG`.
+`journeysDocumentSchema` is the strict whole-file check, and it is for the
+writer, which must not write over a file it could not read.
+
+**An empty `steps` is two different things, and `stepsOf` is how to tell.**
+Some epics are written as a paper and their steps are its sections, projected
+by something that can read LaTeX. Their record carries `"steps": []` and a
+`stepsFrom`. `stepsOf` answers `stored` (the steps, and `alsoProjected` when a
+paper sits beside them), `elsewhere` (there are steps, not here — **never
+"none"**) or `none`. Read `stepsOf(record)`, never `record.steps`, wherever the
+answer is shown or counted: a host that answered `steps.list` with `[]` for an
+`elsewhere` record would be reporting an epic with twenty sections as having
+no steps.
+
+**The file is read behind `/serve`**, with the rest of what touches the
+machine. `readJourneys` answers the parsed document or null — no project, a
+relative path, no folder, no file, not JSON, not an object — and does not
+follow a `.kehikot` or a `.kehikot/journeys` that resolves outside the project
+it was asked about.
+
 ## Why a reference closed
 
 A tracker's `closed` is done, won't do, duplicate and superseded at once.
@@ -1146,8 +1239,11 @@ exact thing the two client files are listed for.
 ### And it is still not a decision the host imports
 
 The rule at the top of this README is unbroken, which is worth saying because a
-file that decides a port looks like a counterexample. Nothing in `/serve` is ever
-run by the host. The host reads the registry and asks each address what it is,
+file that decides a port looks like a counterexample. Nothing in `/serve` that decides
+anything is ever run by the host. (One thing in it IS run by a host and decides
+nothing: `readJourneys`, which opens the file an epic's steps are kept in — it
+is here because it reads a disk, and its judgement is `journeyIn` behind the
+front door.) The host reads the registry and asks each address what it is,
 and would reach identical conclusions about a module that had never heard of this
 file. What is here is a *module's* own housekeeping — where to bind, what to
 write down about itself — and both of those were already the module's to decide.

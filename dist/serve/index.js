@@ -22,8 +22,9 @@
  *
  * The rule about decisions is unbroken here, which is worth being explicit
  * about, because a file that decides a port looks like a counterexample. Nothing
- * in this directory is ever run by the host. The host reads the registry and
- * asks each address what it is, and it would reach exactly the same conclusions
+ * in this directory that DECIDES anything is ever run by the host. (One thing
+ * here is run by a host, and it decides nothing: `readJourneys`, below.) The
+ * host reads the registry and asks each address what it is, and it would reach exactly the same conclusions
  * about a module that had never heard of this file. What is written here is a
  * MODULE's own housekeeping — where to bind, what to write down about itself —
  * and every one of those is a decision that was already the module's to make.
@@ -37,6 +38,10 @@
  * - `serves` is the Vite plugin that does both at the right moments, and is the
  *   only one of the three most modules will name.
  *
+ * - `readJourneys` and `readJourney` open the file an epic's steps are kept
+ *   in. Here because they read a disk, and for no other reason: the shape and
+ *   the judgement are `journey.ts` behind the front door. See `journeys.ts`.
+ *
  * The first two are exported on their own because a module that does not use
  * Vite is an ordinary module, and because the plugin's timing — claim before the
  * server starts, register after it is listening — is the interesting part rather
@@ -46,4 +51,5 @@ export { claim, free, identify, originFor, readManifest, sayClaim, search, verdi
 export { DEFAULT_FRAME_ORIGINS, frameAncestors, frameOrigins } from './origins.js';
 export { legacyRegistryDir, neighbourPorts, portOf, readRegistration, registerAt, registryDir, } from './registry.js';
 export { preferred, serves, } from './plugin.js';
+export { readJourney, readJourneys } from './journeys.js';
 //# sourceMappingURL=index.js.map
