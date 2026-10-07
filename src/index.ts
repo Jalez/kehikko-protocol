@@ -219,6 +219,26 @@ export {
 } from './parts.js'
 
 export {
+  JOURNEYS_MODULE,
+  JOURNEYS_FILE,
+  journeyStepSchema,
+  journeyGroupSchema,
+  stepsFromSchema,
+  journeyRecordSchema,
+  journeysDocumentSchema,
+  journeyIn,
+  journeySlugs,
+  stepsOf,
+  stepPart,
+  type JourneyStep,
+  type JourneyGroup,
+  type StepsFrom,
+  type JourneyRecord,
+  type JourneysDocument,
+  type JourneySteps,
+} from './journey.js'
+
+export {
   CONTENT_HOST,
   contentChangeSchema,
   contentSignalSchema,
