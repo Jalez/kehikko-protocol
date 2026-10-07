@@ -71,6 +71,7 @@ Concretely, the things this package deliberately does not do:
 | `KEHIKOT_DIR`, `moduleFolder`, `moduleDir`, `moduleFile`, `within` | Where a module keeps this project's data, given `context.projectPath`. |
 | `KEHIKOT_IGNORE`, `ignoresKehikot`, `withKehikotIgnored` | The lines that project's `.gitignore` gains, added once. |
 | `partSchema`, `EpicPart`, `PART_ID`, `pickedParts`, `isFocused`, `refInFocus`, `partInFocus`, `focusCount` | The parts of the open epic in `context.parts`, and whether a thing is in the ones a person picked out. |
+| `fileInFocus`, `pickedFiles`, `partsOfFile`, `paperFileOf`, `partFile`, `isPartFile`, `PAPER_MODULE` | The files of the epic's paper a part owns (0.32.0): whether a file is in the picked parts, and the one comparison between the path a module holds and the name a part stores. |
 
 | `journeyRecordSchema`, `journeyStepSchema`, `journeyGroupSchema`, `stepsFromSchema`, `journeysDocumentSchema`, `journeyIn`, `journeySlugs`, `stepsOf`, `stepPart`, `JOURNEYS_MODULE`, `JOURNEYS_FILE` | An epic's steps and groups as a project keeps them on disk: the one shape the module that writes them and a host that reads them both import. |
 | `partsOf`, `partIdsOf`, `JourneyPart`, `slugFrom` | The parts of an epic read off its record, and the one derivation of a part's id from its heading: what a host composes `context.parts` from and what the module that edits steps checks a step's `part` against. |
@@ -661,6 +662,7 @@ parts: Array<{
   heading: string   // what a person calls it; drawn, never compared
   refs: string[]    // the references the host says belong to it
   picked: boolean   // whether the person picked it out
+  files?: string[]  // the paper's files it owns, relative to the paper's folder (0.32.0); absent means none
 }>
 ```
 
@@ -695,6 +697,80 @@ a step is.
 is what a step and a stored focus hold on to. It is one written beside the
 heading, or one derived from it — and since 0.31.0 the derivation is this
 package's and not a host's own; see `partsOf` below.
+
+### The files a part owns (0.32.0)
+
+A part knew only references, so a module that shows a document — the paper,
+the notes on it, the questions about it — could not narrow to one. A part may
+now name the files of the epic's paper that are its own. A paper is a folder
+with a `main.tex` that pulls other files in; a part's file is one of those.
+
+**What the strings are.** Each is a path **relative to the paper's folder**,
+`<project>/.kehikot/paper/<epic>/` — the folder `main.tex` is in — with forward
+slashes and the file's extension: `parts/posting-seam.tex`. Not absolute,
+because the string is written into a record that is committed and cloned. Not
+relative to the project, because that repeats `.kehikot/paper/<epic>/` — a fact
+the record already holds as its slug — in every entry, free to disagree with it.
+Relative to the paper's folder is the name the Paper module already keys its
+file list, its hashes and its page map by, and the one a person reads in
+`\input{parts/posting-seam}`, plus `.tex`: the extension is written, never
+guessed.
+
+**The form, and what is refused.** `partFile(raw)` answers the stored form or
+`null`: no leading `/` or drive letter, no `\`, no empty, `.` or `..` segment
+(`a/../b` is refused, not resolved — nothing here opens anything), no control
+character, at most `LIMITS.PART_FILE` (256) characters, Unicode in NFC. Only
+space around the name and a leading `./` are tidied. A module will join this
+string onto a folder; it keeps its own fence, and this is the second. On the
+wire every entry must already be in the form (`isPartFile`) or the part is
+refused, and a part lists at most `LIMITS.PART_FILES` (32).
+
+**One function compares: `paperFileOf(path, epic)`.** A module does not hold
+the relative name; it holds the absolute `passage.path` the Paper module
+publishes. `paperFileOf` turns one into the other, or answers `null`:
+
+```ts
+import { fileInFocus, focusCount, paperFileOf, pickedFiles } from 'kehikot-module-protocol'
+
+paperFileOf('/p/.kehikot/paper/my-epic/parts/a.tex', 'my-epic')   // 'parts/a.tex'
+paperFileOf('/p/.kehikot/paper/other/parts/a.tex', 'my-epic')     // null: another epic's paper
+paperFileOf('/p/README.md', 'my-epic')                            // null: not a file of the paper
+paperFileOf('parts/a.tex', 'my-epic')                             // 'parts/a.tex': already the paper's name
+
+fileInFocus(context.parts, passage.path, context.epic)
+focusCount(context.parts, files, (file) => fileInFocus(context.parts, file, context.epic))   // { shown, outside }
+pickedFiles(context.parts)   // the picked parts' files, once each; ask isFocused first
+```
+
+- An **absolute** path is a file of the paper when it has
+  `/.kehikot/paper/<epic>/` in it, and its name is what follows. The path is
+  not measured against `context.projectPath`: Paper publishes a resolved path
+  and a host sends the project as it was typed, and under a symlink those do
+  not share a prefix. Backslashes are read as slashes.
+- A **relative** path is taken to be the paper's own name already — what the
+  Paper module holds for its files.
+- Pass `context.epic`. Without it any epic's paper folder is read, and another
+  epic's `parts/intro.tex` is indistinguishable from this one's.
+- Names are compared as written, case included.
+- Not seen: a paper folder that is itself a symlink elsewhere. Paper publishes
+  the far path, which names no paper folder, so it is counted outside a focus
+  rather than guessed into one.
+
+Do not strip a prefix or match a suffix yourself; that is the second derivation
+this function exists to prevent.
+
+**The rule is the one already decided.** Nothing picked: every file is in
+focus. Otherwise a file is in focus exactly when a picked part owns it. Text
+written directly in `main.tex`, and any file no part names, belongs to the epic
+as a whole and is therefore in no *picked* part — outside the focus, and
+counted. `partsOfFile(parts, file, epic)` says which parts own a file.
+
+**`files` is optional, and absent means none.** It is the one field of a part
+that is not defaulted to empty: a part from a host older than 0.32.0, and a
+part that owns no file, parse to `{ id, heading, refs, picked }` exactly as
+before, so nothing that compares that shape changes. The helpers read absent
+as none; read it yourself as `part.files ?? []`. A module on an older version
+never sees the field — its schema strips it.
 
 No module sets this. The picking is the host's own control, so there is no
 capability and no method; a module that moves when it changes says
@@ -744,7 +820,7 @@ record models only what a host has to read to answer what it already answers:
 |---|---|
 | `slug`, `title`, `lede`, `project?`, `umbrella?` | What a list of epics is drawn from. `slug` is `EPIC_SLUG`: the host's `epic` and this are one name. |
 | `steps: [{ title, body, refs, notes, part? }]` | `part` is the id of the part a step was assigned to. |
-| `groups: [{ heading, refs, id? }]` | What a host reads as the epic's parts. `id` is what `part` and a stored focus name. |
+| `groups: [{ heading, refs, id?, files? }]` | What a host reads as the epic's parts. `id` is what `part` and a stored focus name. `files` (0.32.0) is the files of the epic's paper the part owns, each relative to `<project>/.kehikot/paper/<slug>/`: `parts/posting-seam.tex`. |
 | `stepsFrom?: { projector, where, why }` | The steps are kept somewhere else. See below. |
 | `exists`, `open` | Counted, with `steps`, for an epic's size. |
 
@@ -790,7 +866,7 @@ screen and in none on the next, so there is one:
 ```ts
 import { partsOf, partIdsOf, slugFrom } from 'kehikot-module-protocol'
 
-partsOf(record)            // [{ id, heading, refs, steps }], in the record's order
+partsOf(record)            // [{ id, heading, refs, steps, files? }], in the record's order
 partIdsOf(record.groups)   // ['the-posting-seam', null, 'tests-2']: ids[i] is groups[i]'s
 slugFrom('What the page shows')   // 'what-the-page-shows'
 ```
@@ -804,9 +880,15 @@ slugFrom('What the page shows')   // 'what-the-page-shows'
 - A step carrying `part: <id>` is counted in that part and its refs are folded
   into the part's, once each. A step is never filed by the refs it names, and
   a `part` naming nothing the record has is no assignment.
+- A group's `files` come out in `partFile`'s form, once each, at most
+  `LIMITS.PART_FILES`; a name not in the form is dropped like any other junk.
+  Nothing is folded in from steps — a step names no file. The key is absent
+  when a group names none, so a record that says nothing about files reads
+  exactly as it did. A host puts it on the wire as it is:
+  `partsOf(record).map(({ steps, ...part }) => ({ ...part, picked }))`.
 - It takes `unknown` and never throws: a host falls back to a file of its own
   when a project has no record, and the same function has to read both.
-- Bounded at `LIMITS.PARTS` and `LIMITS.PART_REFS`, because this is what goes
+- Bounded at `LIMITS.PARTS`, `LIMITS.PART_REFS` and `LIMITS.PART_FILES`, because this is what goes
   into a context.
 
 `partIdsOf` keeps the groups' positions — `null` where an entry is not a part —

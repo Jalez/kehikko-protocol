@@ -215,6 +215,13 @@ export {
   refInFocus,
   partInFocus,
   focusCount,
+  PAPER_MODULE,
+  partFile,
+  isPartFile,
+  paperFileOf,
+  partsOfFile,
+  pickedFiles,
+  fileInFocus,
   type EpicPart,
 } from './parts.js'
 

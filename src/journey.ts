@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { LIMITS } from './constants.js'
 import { EPIC_SLUG, slugFrom } from './ids.js'
-import { PART_ID } from './parts.js'
+import { PART_ID, partFile } from './parts.js'
 
 /**
  * An epic's steps and groups, as a project keeps them — and whose they are.
@@ -125,12 +125,23 @@ export type JourneyStep = z.infer<typeof journeyStepSchema>
  * free to be reworded. Optional, because every group written before parts has
  * none and a host derives one from the heading; see `parts.ts`. A plain string
  * for the reason `part` is one.
+ *
+ * `files` is the files of the epic's paper this part owns, each named RELATIVE
+ * TO THE PAPER'S FOLDER, `<project>/.kehikot/paper/<slug>/`, with forward
+ * slashes and its extension: `parts/posting-seam.tex`. See `partFile` in
+ * `parts.ts` for the form and for why it is that one. Optional and not
+ * defaulted, so a writer that parses a record and saves it does not write an
+ * empty list onto every group that never had one. Plain strings here, for the
+ * reason `id` is one: a name somebody mistyped costs that name, in `partsOf`,
+ * and not the record.
  */
 export const journeyGroupSchema = z
   .object({
     heading: z.string().default(''),
     refs: z.array(ref).default([]),
     id: z.string().optional(),
+    /** The paper's files this part owns, relative to the paper's folder. Absent means none. */
+    files: z.array(z.string()).optional(),
   })
   .passthrough()
 export type JourneyGroup = z.infer<typeof journeyGroupSchema>
@@ -318,6 +329,28 @@ export interface JourneyPart {
   refs: string[]
   /** How many steps say they are in this part. */
   steps: number
+  /**
+   * The files of the epic's paper this part owns, in `partFile`'s form.
+   *
+   * ABSENT when the group names none — not `[]`. Every reading made before a
+   * part could own a file is `{ id, heading, refs, steps }` exactly, and it
+   * stays exactly that for a record that says nothing about files. Read it as
+   * `part.files ?? []`; that is what goes on the wire.
+   */
+  files?: string[]
+}
+
+/** Files out of whatever a group holds under `files`: each in `partFile`'s form, once each, bounded. */
+function filesIn(raw: unknown): string[] {
+  if (!Array.isArray(raw)) return []
+  const out: string[] = []
+  for (const one of raw) {
+    const file = partFile(one)
+    if (file === null || out.includes(file)) continue
+    out.push(file)
+    if (out.length >= LIMITS.PART_FILES) break
+  }
+  return out
 }
 
 /** Refs out of whatever a file holds under `refs`: short non-empty strings, once each. */
@@ -428,6 +461,16 @@ export function partIdsOf(groups: unknown): (string | null)[] {
  * broadcast to every frame. What is past a bound is not in the answer; the
  * record is where the whole of it is. A part with no heading is called by its
  * id, so that there is always something to draw.
+ *
+ * ## The files a part owns
+ *
+ * A group may carry `files`, the files of the epic's paper that are this
+ * part's. They come out under `files` in `partFile`'s form — relative to the
+ * paper's folder, forward slashes, once each, at most `LIMITS.PART_FILES` —
+ * and a name that is not in that form (an absolute path, a `..`, a backslash)
+ * is dropped like any other junk. Unlike refs, NOTHING is folded in from the
+ * steps: a step names no file. The key is absent when a group names none; see
+ * `JourneyPart`.
  */
 export function partsOf(record: unknown): JourneyPart[] {
   if (!record || typeof record !== 'object') return []
@@ -437,9 +480,12 @@ export function partsOf(record: unknown): JourneyPart[] {
   const parts: JourneyPart[] = []
   partIdsOf(groups).forEach((id, index) => {
     if (id === null) return
-    const { heading: said, refs } = groups[index] as { heading?: unknown; refs?: unknown }
+    const { heading: said, refs, files } = groups[index] as { heading?: unknown; refs?: unknown; files?: unknown }
     const heading = typeof said === 'string' ? said.trim().slice(0, LIMITS.TITLE) : ''
-    parts.push({ id, heading: heading || id, refs: refsIn(refs), steps: 0 })
+    const part: JourneyPart = { id, heading: heading || id, refs: refsIn(refs), steps: 0 }
+    const owned = filesIn(files)
+    if (owned.length) part.files = owned
+    parts.push(part)
   })
 
   /* The steps that say which part they are in bring their refs with them. */

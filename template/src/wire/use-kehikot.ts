@@ -23,7 +23,8 @@ export interface Host {
    * The headings of the parts of the epic the person picked out in the host's
    * bar. Empty means the whole epic, which is also what a host that has never
    * heard of parts says. A module that narrows to these has to SAY it narrowed
-   * — see `context.parts`, `refInFocus` and `partInFocus` in the protocol.
+   * — see `context.parts`, `refInFocus`, `partInFocus` and, for a file of the
+   * epic's paper, `fileInFocus` in the protocol.
    */
   focus: string[]
   theme: 'light' | 'dark'
