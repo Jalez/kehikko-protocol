@@ -1276,7 +1276,9 @@ export const contextSchema = z.object({
    * When no part is picked, the whole epic is in front of the person and a
    * module shows what it always showed. When some are, it shows what belongs
    * to THOSE — `refInFocus` for a reference, `partInFocus` for a step that was
-   * assigned to a part — and it SAYS that it has narrowed and by how much:
+   * assigned to a part, `fileInFocus` for a file of the epic's paper, which a
+   * part may own (`files`, each relative to the paper's folder; absent from a
+   * host older than 0.32.0, and read as none) — and it SAYS that it has narrowed and by how much:
    * "showing 6 · 14 outside the picked parts", in its own header, with a way
    * to see them. A focus that hides things and says nothing is the failure
    * this field was designed against, and the reason every part is listed with

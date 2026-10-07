@@ -132,19 +132,34 @@ export type JourneyStep = z.infer<typeof journeyStepSchema>;
  * free to be reworded. Optional, because every group written before parts has
  * none and a host derives one from the heading; see `parts.ts`. A plain string
  * for the reason `part` is one.
+ *
+ * `files` is the files of the epic's paper this part owns, each named RELATIVE
+ * TO THE PAPER'S FOLDER, `<project>/.kehikot/paper/<slug>/`, with forward
+ * slashes and its extension: `parts/posting-seam.tex`. See `partFile` in
+ * `parts.ts` for the form and for why it is that one. Optional and not
+ * defaulted, so a writer that parses a record and saves it does not write an
+ * empty list onto every group that never had one. Plain strings here, for the
+ * reason `id` is one: a name somebody mistyped costs that name, in `partsOf`,
+ * and not the record.
  */
 export declare const journeyGroupSchema: z.ZodObject<{
     heading: z.ZodDefault<z.ZodString>;
     refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
     id: z.ZodOptional<z.ZodString>;
+    /** The paper's files this part owns, relative to the paper's folder. Absent means none. */
+    files: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
 }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
     heading: z.ZodDefault<z.ZodString>;
     refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
     id: z.ZodOptional<z.ZodString>;
+    /** The paper's files this part owns, relative to the paper's folder. Absent means none. */
+    files: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
 }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
     heading: z.ZodDefault<z.ZodString>;
     refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
     id: z.ZodOptional<z.ZodString>;
+    /** The paper's files this part owns, relative to the paper's folder. Absent means none. */
+    files: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
 }, z.ZodTypeAny, "passthrough">>;
 export type JourneyGroup = z.infer<typeof journeyGroupSchema>;
 /**
@@ -249,14 +264,20 @@ export declare const journeyRecordSchema: z.ZodObject<{
         heading: z.ZodDefault<z.ZodString>;
         refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
         id: z.ZodOptional<z.ZodString>;
+        /** The paper's files this part owns, relative to the paper's folder. Absent means none. */
+        files: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
     }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
         heading: z.ZodDefault<z.ZodString>;
         refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
         id: z.ZodOptional<z.ZodString>;
+        /** The paper's files this part owns, relative to the paper's folder. Absent means none. */
+        files: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
     }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
         heading: z.ZodDefault<z.ZodString>;
         refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
         id: z.ZodOptional<z.ZodString>;
+        /** The paper's files this part owns, relative to the paper's folder. Absent means none. */
+        files: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
     }, z.ZodTypeAny, "passthrough">>, "many">>;
     /** "What already exists". Counted, with `steps` and `open`, for an epic's size. */
     exists: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
@@ -326,14 +347,20 @@ export declare const journeyRecordSchema: z.ZodObject<{
         heading: z.ZodDefault<z.ZodString>;
         refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
         id: z.ZodOptional<z.ZodString>;
+        /** The paper's files this part owns, relative to the paper's folder. Absent means none. */
+        files: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
     }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
         heading: z.ZodDefault<z.ZodString>;
         refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
         id: z.ZodOptional<z.ZodString>;
+        /** The paper's files this part owns, relative to the paper's folder. Absent means none. */
+        files: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
     }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
         heading: z.ZodDefault<z.ZodString>;
         refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
         id: z.ZodOptional<z.ZodString>;
+        /** The paper's files this part owns, relative to the paper's folder. Absent means none. */
+        files: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
     }, z.ZodTypeAny, "passthrough">>, "many">>;
     /** "What already exists". Counted, with `steps` and `open`, for an epic's size. */
     exists: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
@@ -403,14 +430,20 @@ export declare const journeyRecordSchema: z.ZodObject<{
         heading: z.ZodDefault<z.ZodString>;
         refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
         id: z.ZodOptional<z.ZodString>;
+        /** The paper's files this part owns, relative to the paper's folder. Absent means none. */
+        files: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
     }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
         heading: z.ZodDefault<z.ZodString>;
         refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
         id: z.ZodOptional<z.ZodString>;
+        /** The paper's files this part owns, relative to the paper's folder. Absent means none. */
+        files: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
     }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
         heading: z.ZodDefault<z.ZodString>;
         refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
         id: z.ZodOptional<z.ZodString>;
+        /** The paper's files this part owns, relative to the paper's folder. Absent means none. */
+        files: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
     }, z.ZodTypeAny, "passthrough">>, "many">>;
     /** "What already exists". Counted, with `steps` and `open`, for an epic's size. */
     exists: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
@@ -496,14 +529,20 @@ export declare const journeysDocumentSchema: z.ZodObject<{
             heading: z.ZodDefault<z.ZodString>;
             refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
             id: z.ZodOptional<z.ZodString>;
+            /** The paper's files this part owns, relative to the paper's folder. Absent means none. */
+            files: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
             heading: z.ZodDefault<z.ZodString>;
             refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
             id: z.ZodOptional<z.ZodString>;
+            /** The paper's files this part owns, relative to the paper's folder. Absent means none. */
+            files: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
             heading: z.ZodDefault<z.ZodString>;
             refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
             id: z.ZodOptional<z.ZodString>;
+            /** The paper's files this part owns, relative to the paper's folder. Absent means none. */
+            files: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, z.ZodTypeAny, "passthrough">>, "many">>;
         /** "What already exists". Counted, with `steps` and `open`, for an epic's size. */
         exists: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
@@ -573,14 +612,20 @@ export declare const journeysDocumentSchema: z.ZodObject<{
             heading: z.ZodDefault<z.ZodString>;
             refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
             id: z.ZodOptional<z.ZodString>;
+            /** The paper's files this part owns, relative to the paper's folder. Absent means none. */
+            files: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
             heading: z.ZodDefault<z.ZodString>;
             refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
             id: z.ZodOptional<z.ZodString>;
+            /** The paper's files this part owns, relative to the paper's folder. Absent means none. */
+            files: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
             heading: z.ZodDefault<z.ZodString>;
             refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
             id: z.ZodOptional<z.ZodString>;
+            /** The paper's files this part owns, relative to the paper's folder. Absent means none. */
+            files: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, z.ZodTypeAny, "passthrough">>, "many">>;
         /** "What already exists". Counted, with `steps` and `open`, for an epic's size. */
         exists: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
@@ -650,14 +695,20 @@ export declare const journeysDocumentSchema: z.ZodObject<{
             heading: z.ZodDefault<z.ZodString>;
             refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
             id: z.ZodOptional<z.ZodString>;
+            /** The paper's files this part owns, relative to the paper's folder. Absent means none. */
+            files: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
             heading: z.ZodDefault<z.ZodString>;
             refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
             id: z.ZodOptional<z.ZodString>;
+            /** The paper's files this part owns, relative to the paper's folder. Absent means none. */
+            files: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
             heading: z.ZodDefault<z.ZodString>;
             refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
             id: z.ZodOptional<z.ZodString>;
+            /** The paper's files this part owns, relative to the paper's folder. Absent means none. */
+            files: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, z.ZodTypeAny, "passthrough">>, "many">>;
         /** "What already exists". Counted, with `steps` and `open`, for an epic's size. */
         exists: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
@@ -730,14 +781,20 @@ export declare const journeysDocumentSchema: z.ZodObject<{
             heading: z.ZodDefault<z.ZodString>;
             refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
             id: z.ZodOptional<z.ZodString>;
+            /** The paper's files this part owns, relative to the paper's folder. Absent means none. */
+            files: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
             heading: z.ZodDefault<z.ZodString>;
             refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
             id: z.ZodOptional<z.ZodString>;
+            /** The paper's files this part owns, relative to the paper's folder. Absent means none. */
+            files: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
             heading: z.ZodDefault<z.ZodString>;
             refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
             id: z.ZodOptional<z.ZodString>;
+            /** The paper's files this part owns, relative to the paper's folder. Absent means none. */
+            files: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, z.ZodTypeAny, "passthrough">>, "many">>;
         /** "What already exists". Counted, with `steps` and `open`, for an epic's size. */
         exists: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
@@ -807,14 +864,20 @@ export declare const journeysDocumentSchema: z.ZodObject<{
             heading: z.ZodDefault<z.ZodString>;
             refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
             id: z.ZodOptional<z.ZodString>;
+            /** The paper's files this part owns, relative to the paper's folder. Absent means none. */
+            files: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
             heading: z.ZodDefault<z.ZodString>;
             refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
             id: z.ZodOptional<z.ZodString>;
+            /** The paper's files this part owns, relative to the paper's folder. Absent means none. */
+            files: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
             heading: z.ZodDefault<z.ZodString>;
             refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
             id: z.ZodOptional<z.ZodString>;
+            /** The paper's files this part owns, relative to the paper's folder. Absent means none. */
+            files: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, z.ZodTypeAny, "passthrough">>, "many">>;
         /** "What already exists". Counted, with `steps` and `open`, for an epic's size. */
         exists: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
@@ -884,14 +947,20 @@ export declare const journeysDocumentSchema: z.ZodObject<{
             heading: z.ZodDefault<z.ZodString>;
             refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
             id: z.ZodOptional<z.ZodString>;
+            /** The paper's files this part owns, relative to the paper's folder. Absent means none. */
+            files: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
             heading: z.ZodDefault<z.ZodString>;
             refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
             id: z.ZodOptional<z.ZodString>;
+            /** The paper's files this part owns, relative to the paper's folder. Absent means none. */
+            files: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
             heading: z.ZodDefault<z.ZodString>;
             refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
             id: z.ZodOptional<z.ZodString>;
+            /** The paper's files this part owns, relative to the paper's folder. Absent means none. */
+            files: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, z.ZodTypeAny, "passthrough">>, "many">>;
         /** "What already exists". Counted, with `steps` and `open`, for an epic's size. */
         exists: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
@@ -964,14 +1033,20 @@ export declare const journeysDocumentSchema: z.ZodObject<{
             heading: z.ZodDefault<z.ZodString>;
             refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
             id: z.ZodOptional<z.ZodString>;
+            /** The paper's files this part owns, relative to the paper's folder. Absent means none. */
+            files: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
             heading: z.ZodDefault<z.ZodString>;
             refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
             id: z.ZodOptional<z.ZodString>;
+            /** The paper's files this part owns, relative to the paper's folder. Absent means none. */
+            files: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
             heading: z.ZodDefault<z.ZodString>;
             refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
             id: z.ZodOptional<z.ZodString>;
+            /** The paper's files this part owns, relative to the paper's folder. Absent means none. */
+            files: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, z.ZodTypeAny, "passthrough">>, "many">>;
         /** "What already exists". Counted, with `steps` and `open`, for an epic's size. */
         exists: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
@@ -1041,14 +1116,20 @@ export declare const journeysDocumentSchema: z.ZodObject<{
             heading: z.ZodDefault<z.ZodString>;
             refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
             id: z.ZodOptional<z.ZodString>;
+            /** The paper's files this part owns, relative to the paper's folder. Absent means none. */
+            files: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
             heading: z.ZodDefault<z.ZodString>;
             refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
             id: z.ZodOptional<z.ZodString>;
+            /** The paper's files this part owns, relative to the paper's folder. Absent means none. */
+            files: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
             heading: z.ZodDefault<z.ZodString>;
             refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
             id: z.ZodOptional<z.ZodString>;
+            /** The paper's files this part owns, relative to the paper's folder. Absent means none. */
+            files: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, z.ZodTypeAny, "passthrough">>, "many">>;
         /** "What already exists". Counted, with `steps` and `open`, for an epic's size. */
         exists: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
@@ -1118,14 +1199,20 @@ export declare const journeysDocumentSchema: z.ZodObject<{
             heading: z.ZodDefault<z.ZodString>;
             refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
             id: z.ZodOptional<z.ZodString>;
+            /** The paper's files this part owns, relative to the paper's folder. Absent means none. */
+            files: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
             heading: z.ZodDefault<z.ZodString>;
             refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
             id: z.ZodOptional<z.ZodString>;
+            /** The paper's files this part owns, relative to the paper's folder. Absent means none. */
+            files: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
             heading: z.ZodDefault<z.ZodString>;
             refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
             id: z.ZodOptional<z.ZodString>;
+            /** The paper's files this part owns, relative to the paper's folder. Absent means none. */
+            files: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, z.ZodTypeAny, "passthrough">>, "many">>;
         /** "What already exists". Counted, with `steps` and `open`, for an epic's size. */
         exists: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
@@ -1225,6 +1312,15 @@ export interface JourneyPart {
     refs: string[];
     /** How many steps say they are in this part. */
     steps: number;
+    /**
+     * The files of the epic's paper this part owns, in `partFile`'s form.
+     *
+     * ABSENT when the group names none — not `[]`. Every reading made before a
+     * part could own a file is `{ id, heading, refs, steps }` exactly, and it
+     * stays exactly that for a record that says nothing about files. Read it as
+     * `part.files ?? []`; that is what goes on the wire.
+     */
+    files?: string[];
 }
 /**
  * The id of the part each group is, in the groups' own positions.
@@ -1301,6 +1397,16 @@ export declare function partIdsOf(groups: unknown): (string | null)[];
  * broadcast to every frame. What is past a bound is not in the answer; the
  * record is where the whole of it is. A part with no heading is called by its
  * id, so that there is always something to draw.
+ *
+ * ## The files a part owns
+ *
+ * A group may carry `files`, the files of the epic's paper that are this
+ * part's. They come out under `files` in `partFile`'s form — relative to the
+ * paper's folder, forward slashes, once each, at most `LIMITS.PART_FILES` —
+ * and a name that is not in that form (an absolute path, a `..`, a backslash)
+ * is dropped like any other junk. Unlike refs, NOTHING is folded in from the
+ * steps: a step names no file. The key is absent when a group names none; see
+ * `JourneyPart`.
  */
 export declare function partsOf(record: unknown): JourneyPart[];
 //# sourceMappingURL=journey.d.ts.map

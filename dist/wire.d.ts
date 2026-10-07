@@ -2353,7 +2353,9 @@ export declare const contextSchema: z.ZodObject<{
      * When no part is picked, the whole epic is in front of the person and a
      * module shows what it always showed. When some are, it shows what belongs
      * to THOSE — `refInFocus` for a reference, `partInFocus` for a step that was
-     * assigned to a part — and it SAYS that it has narrowed and by how much:
+     * assigned to a part, `fileInFocus` for a file of the epic's paper, which a
+     * part may own (`files`, each relative to the paper's folder; absent from a
+     * host older than 0.32.0, and read as none) — and it SAYS that it has narrowed and by how much:
      * "showing 6 · 14 outside the picked parts", in its own header, with a way
      * to see them. A focus that hides things and says nothing is the failure
      * this field was designed against, and the reason every part is listed with
@@ -2369,14 +2371,17 @@ export declare const contextSchema: z.ZodObject<{
         heading: z.ZodDefault<z.ZodString>;
         refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
         picked: z.ZodDefault<z.ZodBoolean>;
+        files: z.ZodOptional<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">>;
     }, "strip", z.ZodTypeAny, {
         id: string;
         refs: string[];
         heading: string;
         picked: boolean;
+        files?: string[] | undefined;
     }, {
         id: string;
         refs?: string[] | undefined;
+        files?: string[] | undefined;
         heading?: string | undefined;
         picked?: boolean | undefined;
     }>, "many">>;
@@ -2446,6 +2451,7 @@ export declare const contextSchema: z.ZodObject<{
         refs: string[];
         heading: string;
         picked: boolean;
+        files?: string[] | undefined;
     }[];
 }, {
     containers?: {
@@ -2511,6 +2517,7 @@ export declare const contextSchema: z.ZodObject<{
     parts?: {
         id: string;
         refs?: string[] | undefined;
+        files?: string[] | undefined;
         heading?: string | undefined;
         picked?: boolean | undefined;
     }[] | undefined;
@@ -3367,7 +3374,9 @@ export declare const helloSchema: z.ZodObject<{
          * When no part is picked, the whole epic is in front of the person and a
          * module shows what it always showed. When some are, it shows what belongs
          * to THOSE — `refInFocus` for a reference, `partInFocus` for a step that was
-         * assigned to a part — and it SAYS that it has narrowed and by how much:
+         * assigned to a part, `fileInFocus` for a file of the epic's paper, which a
+         * part may own (`files`, each relative to the paper's folder; absent from a
+         * host older than 0.32.0, and read as none) — and it SAYS that it has narrowed and by how much:
          * "showing 6 · 14 outside the picked parts", in its own header, with a way
          * to see them. A focus that hides things and says nothing is the failure
          * this field was designed against, and the reason every part is listed with
@@ -3383,14 +3392,17 @@ export declare const helloSchema: z.ZodObject<{
             heading: z.ZodDefault<z.ZodString>;
             refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
             picked: z.ZodDefault<z.ZodBoolean>;
+            files: z.ZodOptional<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">>;
         }, "strip", z.ZodTypeAny, {
             id: string;
             refs: string[];
             heading: string;
             picked: boolean;
+            files?: string[] | undefined;
         }, {
             id: string;
             refs?: string[] | undefined;
+            files?: string[] | undefined;
             heading?: string | undefined;
             picked?: boolean | undefined;
         }>, "many">>;
@@ -3460,6 +3472,7 @@ export declare const helloSchema: z.ZodObject<{
             refs: string[];
             heading: string;
             picked: boolean;
+            files?: string[] | undefined;
         }[];
     }, {
         containers?: {
@@ -3525,6 +3538,7 @@ export declare const helloSchema: z.ZodObject<{
         parts?: {
             id: string;
             refs?: string[] | undefined;
+            files?: string[] | undefined;
             heading?: string | undefined;
             picked?: boolean | undefined;
         }[] | undefined;
@@ -3620,6 +3634,7 @@ export declare const helloSchema: z.ZodObject<{
             refs: string[];
             heading: string;
             picked: boolean;
+            files?: string[] | undefined;
         }[];
     };
     state: string | null;
@@ -3691,6 +3706,7 @@ export declare const helloSchema: z.ZodObject<{
         parts?: {
             id: string;
             refs?: string[] | undefined;
+            files?: string[] | undefined;
             heading?: string | undefined;
             picked?: boolean | undefined;
         }[] | undefined;
@@ -4529,7 +4545,9 @@ export declare const contextMessageSchema: z.ZodObject<{
      * When no part is picked, the whole epic is in front of the person and a
      * module shows what it always showed. When some are, it shows what belongs
      * to THOSE — `refInFocus` for a reference, `partInFocus` for a step that was
-     * assigned to a part — and it SAYS that it has narrowed and by how much:
+     * assigned to a part, `fileInFocus` for a file of the epic's paper, which a
+     * part may own (`files`, each relative to the paper's folder; absent from a
+     * host older than 0.32.0, and read as none) — and it SAYS that it has narrowed and by how much:
      * "showing 6 · 14 outside the picked parts", in its own header, with a way
      * to see them. A focus that hides things and says nothing is the failure
      * this field was designed against, and the reason every part is listed with
@@ -4545,14 +4563,17 @@ export declare const contextMessageSchema: z.ZodObject<{
         heading: z.ZodDefault<z.ZodString>;
         refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
         picked: z.ZodDefault<z.ZodBoolean>;
+        files: z.ZodOptional<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">>;
     }, "strip", z.ZodTypeAny, {
         id: string;
         refs: string[];
         heading: string;
         picked: boolean;
+        files?: string[] | undefined;
     }, {
         id: string;
         refs?: string[] | undefined;
+        files?: string[] | undefined;
         heading?: string | undefined;
         picked?: boolean | undefined;
     }>, "many">>;
@@ -4627,6 +4648,7 @@ export declare const contextMessageSchema: z.ZodObject<{
         refs: string[];
         heading: string;
         picked: boolean;
+        files?: string[] | undefined;
     }[];
 }, {
     type: string;
@@ -4694,6 +4716,7 @@ export declare const contextMessageSchema: z.ZodObject<{
     parts?: {
         id: string;
         refs?: string[] | undefined;
+        files?: string[] | undefined;
         heading?: string | undefined;
         picked?: boolean | undefined;
     }[] | undefined;
@@ -5891,7 +5914,9 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
          * When no part is picked, the whole epic is in front of the person and a
          * module shows what it always showed. When some are, it shows what belongs
          * to THOSE — `refInFocus` for a reference, `partInFocus` for a step that was
-         * assigned to a part — and it SAYS that it has narrowed and by how much:
+         * assigned to a part, `fileInFocus` for a file of the epic's paper, which a
+         * part may own (`files`, each relative to the paper's folder; absent from a
+         * host older than 0.32.0, and read as none) — and it SAYS that it has narrowed and by how much:
          * "showing 6 · 14 outside the picked parts", in its own header, with a way
          * to see them. A focus that hides things and says nothing is the failure
          * this field was designed against, and the reason every part is listed with
@@ -5907,14 +5932,17 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             heading: z.ZodDefault<z.ZodString>;
             refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
             picked: z.ZodDefault<z.ZodBoolean>;
+            files: z.ZodOptional<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">>;
         }, "strip", z.ZodTypeAny, {
             id: string;
             refs: string[];
             heading: string;
             picked: boolean;
+            files?: string[] | undefined;
         }, {
             id: string;
             refs?: string[] | undefined;
+            files?: string[] | undefined;
             heading?: string | undefined;
             picked?: boolean | undefined;
         }>, "many">>;
@@ -5984,6 +6012,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             refs: string[];
             heading: string;
             picked: boolean;
+            files?: string[] | undefined;
         }[];
     }, {
         containers?: {
@@ -6049,6 +6078,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         parts?: {
             id: string;
             refs?: string[] | undefined;
+            files?: string[] | undefined;
             heading?: string | undefined;
             picked?: boolean | undefined;
         }[] | undefined;
@@ -6144,6 +6174,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             refs: string[];
             heading: string;
             picked: boolean;
+            files?: string[] | undefined;
         }[];
     };
     state: string | null;
@@ -6215,6 +6246,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         parts?: {
             id: string;
             refs?: string[] | undefined;
+            files?: string[] | undefined;
             heading?: string | undefined;
             picked?: boolean | undefined;
         }[] | undefined;
@@ -7040,7 +7072,9 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
      * When no part is picked, the whole epic is in front of the person and a
      * module shows what it always showed. When some are, it shows what belongs
      * to THOSE — `refInFocus` for a reference, `partInFocus` for a step that was
-     * assigned to a part — and it SAYS that it has narrowed and by how much:
+     * assigned to a part, `fileInFocus` for a file of the epic's paper, which a
+     * part may own (`files`, each relative to the paper's folder; absent from a
+     * host older than 0.32.0, and read as none) — and it SAYS that it has narrowed and by how much:
      * "showing 6 · 14 outside the picked parts", in its own header, with a way
      * to see them. A focus that hides things and says nothing is the failure
      * this field was designed against, and the reason every part is listed with
@@ -7056,14 +7090,17 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         heading: z.ZodDefault<z.ZodString>;
         refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
         picked: z.ZodDefault<z.ZodBoolean>;
+        files: z.ZodOptional<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">>;
     }, "strip", z.ZodTypeAny, {
         id: string;
         refs: string[];
         heading: string;
         picked: boolean;
+        files?: string[] | undefined;
     }, {
         id: string;
         refs?: string[] | undefined;
+        files?: string[] | undefined;
         heading?: string | undefined;
         picked?: boolean | undefined;
     }>, "many">>;
@@ -7138,6 +7175,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         refs: string[];
         heading: string;
         picked: boolean;
+        files?: string[] | undefined;
     }[];
 }, {
     type: string;
@@ -7205,6 +7243,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     parts?: {
         id: string;
         refs?: string[] | undefined;
+        files?: string[] | undefined;
         heading?: string | undefined;
         picked?: boolean | undefined;
     }[] | undefined;

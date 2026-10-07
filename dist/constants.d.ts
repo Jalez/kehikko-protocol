@@ -828,6 +828,31 @@ export declare const LIMITS: {
      */
     readonly PART_REFS: 256;
     /**
+     * How many of the paper's files one part may name. See `partFile` in
+     * `parts.ts`.
+     *
+     * Thirty-two. A part of a paper is a chapter or a section kept in a file of
+     * its own, and sometimes that file pulls in a few more — a table, a figure's
+     * source, a subsection. It is a list a person wrote by hand, one name at a
+     * time, so it is the small number: `PARTS`' number and not `PART_REFS`',
+     * which bounds what a tracker can pile under a heading. Like `PART_REFS`
+     * this rides in a context that is broadcast to every frame, and a part with
+     * more files than this sends the first of them.
+     */
+    readonly PART_FILES: 32;
+    /**
+     * How long one of those file names may be.
+     *
+     * Two hundred and fifty-six, and deliberately not `PATH`. `PATH` bounds an
+     * ABSOLUTE path, where the operating system is the authority and four
+     * thousand characters is its number. This is a name RELATIVE to one paper's
+     * folder — `parts/posting-seam.tex`, `chapters/3_method/tables/results.tex`
+     * — and 255 is the longest a single component may be on every filesystem a
+     * host is likely to stand on. A paper whose files sit deeper than that is
+     * not refused anything by its engine; it is a file a part cannot name.
+     */
+    readonly PART_FILE: 256;
+    /**
      * How many places in documents one container may say it is showing.
      *
      * Sixteen, and the number is about what the field is FOR rather than about
