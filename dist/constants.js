@@ -843,6 +843,30 @@ export const LIMITS = {
      */
     DISPOSITIONS: 256,
     /**
+     * How many parts of the open epic one context may list. See `parts.ts`.
+     *
+     * Thirty-two. A part is a heading a person wrote to divide one epic, and an
+     * epic with more than a handful has stopped being divided and started being
+     * indexed. Like `CONTAINERS`, this bounds a list a HOST built out of its own
+     * material, so it protects a module from a host: a module reading
+     * `context.parts` knows the size of the list it is about to draw a checkbox
+     * for.
+     */
+    PARTS: 32,
+    /**
+     * How many references one part may list.
+     *
+     * Two hundred and fifty-six, and deliberately not `REFS`. `REFS` bounds what
+     * somebody PICKED — a gesture, made by hand — and a part is not a gesture,
+     * it is a chapter of the work: everything the epic files under one heading.
+     * The number is the one `DISPOSITIONS` uses for the same reason, a project's
+     * worth of something. It is still a bound, because this list is broadcast to
+     * every frame on every change of anything, and a host that has more than
+     * this under one heading sends the first of them and is expected to say so
+     * on its own screen.
+     */
+    PART_REFS: 256,
+    /**
      * How many places in documents one container may say it is showing.
      *
      * Sixteen, and the number is about what the field is FOR rather than about

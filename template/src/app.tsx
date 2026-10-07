@@ -70,6 +70,9 @@ function Context({ host }: { host: Host }) {
   const rows: [string, string | null][] = [
     ['project', host.project],
     ['epic', host.epic],
+    /* Said even when nothing is picked: "the whole epic" is an answer, and a
+       blank here would read as a host that did not say. */
+    ['parts', host.epic ? (host.focus.length ? host.focus.join(', ') : 'the whole epic') : null],
     ['theme', host.theme],
   ]
   return (

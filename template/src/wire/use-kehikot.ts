@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from 'react'
 
+import { pickedParts } from 'kehikot-module-protocol'
 import { useKehikot as useProtocolKehikot, type Kehikot, type Where } from 'kehikot-module-protocol/client/react'
 
 import { ID } from '../../manifest.ts'
@@ -18,6 +19,13 @@ export interface Host {
   /** The absolute directory of the open project. Where this module keeps its data. */
   projectPath: string | null
   epic: string | null
+  /**
+   * The headings of the parts of the epic the person picked out in the host's
+   * bar. Empty means the whole epic, which is also what a host that has never
+   * heard of parts says. A module that narrows to these has to SAY it narrowed
+   * — see `context.parts`, `refInFocus` and `partInFocus` in the protocol.
+   */
+  focus: string[]
   theme: 'light' | 'dark'
   /** Ask the host for something (a method from the protocol). Rejects when unhosted. */
   request: Kehikot['request']
@@ -41,6 +49,7 @@ export function useKehikot(): Host {
       project: context?.project ?? null,
       projectPath: context?.projectPath ?? null,
       epic: context?.epic ?? null,
+      focus: pickedParts(context?.parts ?? []).map((part) => part.heading || part.id),
       theme,
       request: kehikot.request,
     }),

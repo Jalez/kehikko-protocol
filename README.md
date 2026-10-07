@@ -70,6 +70,7 @@ Concretely, the things this package deliberately does not do:
 | `MODULE_ID`, `MODE_ID`, `EPIC_SLUG`, `own` | The name patterns, and one lookup that does not fall through a prototype. |
 | `KEHIKOT_DIR`, `moduleFolder`, `moduleDir`, `moduleFile`, `within` | Where a module keeps this project's data, given `context.projectPath`. |
 | `KEHIKOT_IGNORE`, `ignoresKehikot`, `withKehikotIgnored` | The lines that project's `.gitignore` gains, added once. |
+| `partSchema`, `EpicPart`, `PART_ID`, `pickedParts`, `isFocused`, `refInFocus`, `partInFocus`, `focusCount` | The parts of the open epic in `context.parts`, and whether a thing is in the ones a person picked out. |
 
 And behind two subpaths, which are not shapes and say so:
 
@@ -446,11 +447,12 @@ say who RECEIVES a context, because nothing in a manifest said so — every fram
 module is handed the whole context, so receiving one distinguished nobody.
 
 So `reacts` is a top-level array of context kinds, and `REACTS_TO` is the
-vocabulary this version knows: `passage`, `selection` and `containers`. A
+vocabulary this version knows: `passage`, `selection`, `containers`,
+`dispositions`, `tracker`, `content` and `parts`. A
 registry can now put "Consumes: X, Y" beside "Provides to: Z, W" and mean
 something by both.
 
-`containers` is the newest of the three and the one whose other end is partly
+`containers` is the third and the first whose other end is partly
 the host. `context.containers` lists every container on the kehikko: which
 module, whether a person has picked it out as a target, and what it says it is
 showing — references and places in documents, sent with `showing.set` under
@@ -631,6 +633,65 @@ The modules that list references agree on what those ids mean through
 `sift` and `countFacets` to build the group and apply a choice. It is pure,
 off the main entry because it is vocabulary rather than shape, and a host never
 imports it — the host still draws options it does not understand.
+
+## The parts of an epic, and focusing on some of them
+
+An epic that has grown to forty steps is still one piece of work, and nobody
+can look at all of it at once. So an epic may be divided into **parts** — one
+level deep, a heading and what is under it; not an epic inside an epic — and a
+person may pick out one or several in the host's bar, beside the epic. The
+subject of a canvas is then the epic, the parts picked out of it, and the refs
+selected: three widths of the same fact, all held per project and none of them
+by a kehikko.
+
+`context.parts` is every part of the open epic, in the epic's order:
+
+```ts
+parts: Array<{
+  id: string        // PART_ID: lowercase, digits, dashes. What a step's `part` names.
+  heading: string   // what a person calls it; drawn, never compared
+  refs: string[]    // the references the host says belong to it
+  picked: boolean   // whether the person picked it out
+}>
+```
+
+Four things about it, and each is load-bearing:
+
+**None picked means the whole epic.** That is the resting state, it is what an
+epic with no parts sends, and it is what a host that has never heard of parts
+sends — `[]`. A module that never reads this field shows the whole epic, which
+is exactly what it did before and exactly what it should do.
+
+**Every part is listed, not only the picked ones.** The shape is `containers`'
+shape for `containers`' reason. A module handed only the picked parts could
+narrow and could never say what it had hidden, and a pane that is shorter than
+it was for a reason nobody can see is the failure this field is arranged
+against. A module that narrows says so, in its own header — "6 shown · 14
+outside the picked parts" — and offers a way to see them. `focusCount` gives the
+two numbers so that three modules do not count three ways.
+
+**A reference is in a part because the part lists it; a step is in a part
+because it says so.** A step may carry `part: <id>`, and that is the whole of
+how a step comes to be in one — it is not worked out from the refs the step
+names, because a step often names a reference it merely depends on. A step with
+no `part` belongs to the epic as a whole, which means it is in no *picked* part:
+under a focus it is one of the things counted as outside. So there are two
+questions: `refInFocus(parts, ref)` for a thing that is a reference, and
+`partInFocus(parts, step.part)` for a thing that was assigned. The host folds
+the refs of the steps it holds into the `refs` of the part each was assigned to,
+so a module that only knows references narrows correctly without learning what
+a step is.
+
+**The id is not the heading.** A heading is prose somebody will reword; the id
+is what a step and a stored focus hold on to. Where a host gets it is the
+host's business — one written beside the heading, or one derived from it — and
+this package says only what it looks like on the wire.
+
+No module sets this. The picking is the host's own control, so there is no
+capability and no method; a module that moves when it changes says
+`reacts: ['parts']`. A pinned container keeps the parts it was pinned with, for
+the reason it keeps its epic. Moving to another epic sends that epic's parts
+with nothing picked, for the reason it clears the selection.
 
 ## Why a reference closed
 
