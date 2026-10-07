@@ -25,6 +25,10 @@ export const MANIFEST: Manifest = manifestSchema.parse({
      then refuses to run an older release against that project. */
   dataVersion: 1,
   summary: 'What __MODULE_NAME__ is, in a sentence, for a person deciding whether to place it.',
+  /* Where a host files this module in its list, most fitting first: e.g.
+     `['code', 'review']`. The suggested words are `TAGS` in the protocol;
+     empty is filed under "other". */
+  tags: [],
   /* What this module's PRESENCE obliges an agent to do. Composed into every
      agent's prompt on the canvas, so write it to somebody who just arrived. */
   guidance:

@@ -664,6 +664,16 @@ export const LIMITS = {
     REASON: 400,
     /** How many modes one module may offer. */
     MODES: 8,
+    /** One category word a module files itself under, e.g. `planning`. */
+    TAG: 24,
+    /**
+     * How many of those it may give.
+     *
+     * Five, because a tag is where a module goes in a list, and a module filed
+     * under everything is filed nowhere. The first is the one a host uses when
+     * it shows each module once; the rest are only there to be searched.
+     */
+    TAGS: 5,
     /** How many extensions it may name in each direction. */
     EXTENSIONS: 16,
     /** How many capabilities it may declare. */
