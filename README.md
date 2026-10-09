@@ -106,6 +106,7 @@ The source says what each field is and what it is bounded by, in a line or three
 | [Extension payloads](docs/extensions.md) | The versioned formats modules send each other through a host: notifications and calls. |
 | [The client library](docs/client.md) | The module half of the wire behind `/client` and `/client/react`: `connect`, the mailbox, and the hooks. A convenience, never a requirement. |
 | [Serving a module: ports, the registry, frame origins, and the template](docs/serving.md) | The node-only half behind `/serve` — which port a module binds, where it writes down that it exists, which origins may frame it — and the generator that makes a new module from `template/`. |
+| [The shared plumbing of a module](docs/module-plumbing.md) | What every module used to type out for itself, behind `/serve`, `/client` and `/client/react`: the page document and its first paint, the write ticket, the JSON body reader, the `doors()` plugin, `ask()`, `useHost`, the one not-ready screen `Cover`, and the build identity. |
 | [Packaging](PACKAGING.md) | How this package is consumed straight from git, and why `dist/` is committed. |
 
 ## Renamed from "roadmap", and what a module has to change
@@ -190,6 +191,7 @@ The same list with what each version exported is in [CHANGELOG.md](CHANGELOG.md)
 
 | version | date | what it added |
 |---|---|---|
+| 0.35.0 | 2026-10-09 | The shared plumbing of a module: `pageDocument`, `mintTicket`/`refuseTicket`, `readJsonBody`, the `doors()` plugin, `ask`/`follow`, `useHost`, `Cover`/`coverFor`, and a build identity (`establishBuild`, `compareBuilds`, the manifest's and `ready`'s optional `build`, `PACKAGE_VERSION`). See [module plumbing](docs/module-plumbing.md). |
 | 0.34.1 | 2026-10-09 | `focusSentence(…, { total })` and `useFocus().narrow(…, { total: true })`: the sentence may say how many of how many. |
 | 0.34.0 | 2026-10-09 | Every module's data is part-specific by one rule: `Anchor`, `anchorInFocus`, `narrowToFocus`, `focusSentence`, `FOCUS_WHERE`, `sameParts`, `partsDeclaration`, `useFocus`, and the manifest's `partless`. See [parts](docs/parts.md). |
 | 0.33.0 | 2026-10-09 | Citations: the `[^n]: <path> \| "<quote>"` line and the rule for finding its words again (`parseSource`, `findQuote`, `resolveSource`, `CITE_STATUSES`). See [citations](docs/citations.md). |

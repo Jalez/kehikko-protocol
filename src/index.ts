@@ -297,3 +297,32 @@ export {
   type CitationView,
   type MarkerScan,
 } from './citations.js'
+
+/* The names a module's server and its own page agree on. See `page.ts`. */
+export {
+  PAGE_BACKGROUND,
+  ROOT_ELEMENT,
+  THEME_KEY,
+  THEME_PARAM,
+  TICKET_ELEMENT,
+  TICKET_HEADER,
+  TICKET_REFUSED,
+  type PageTheme,
+} from './page.js'
+
+/* What a module's server is built from, and how two builds compare. See `build.ts`. */
+export {
+  BUILD_ELEMENT,
+  BUILD_HEADER,
+  PACKAGE_VERSION,
+  buildIsStale,
+  buildSchema,
+  buildStamp,
+  compareBuilds,
+  describeBuild,
+  readBuild,
+  sameCode,
+  sameProcess,
+  type Build,
+  type BuildComparison,
+} from './build.js'

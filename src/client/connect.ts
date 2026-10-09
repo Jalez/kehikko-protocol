@@ -1,3 +1,4 @@
+import { pageBuild } from './build.js'
 import {
   MESSAGE,
   PROTOCOL,
@@ -208,7 +209,9 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
       host = (ev.source as Window | null) ?? source.parent ?? null
       origin = ev.origin && ev.origin !== 'null' ? ev.origin : '*'
       dialect = dialectOfType((ev.data as { type: string }).type) ?? 'kehikot'
-      send({ type: MESSAGE.READY, id, protocol: message.protocol ?? PROTOCOL })
+      /* With the build that served this page, when it printed one: a host compares it with the server's now. */
+      const build = pageBuild()
+      send({ type: MESSAGE.READY, id, protocol: message.protocol ?? PROTOCOL, ...(build ? { build } : {}) })
       /* After `ready` and before the page is told, so a handler that announces a NEW offer from
          `onHello` overwrites the replay rather than being overwritten by it. */
       if (offered !== null) send({ type: MESSAGE.FILTERS, groups: offered })

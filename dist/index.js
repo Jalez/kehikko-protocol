@@ -20,3 +20,7 @@ export { JOURNEYS_MODULE, JOURNEYS_FILE, journeyStepSchema, journeyGroupSchema, 
 export { CONTENT_HOST, contentChangeSchema, contentSignalSchema, contentStamp, } from './content.js';
 export { notificationPayload, callPayload, EXTENSIONS, EXTENSION_NAMES, known, schemaFor, } from './extensions.js';
 export { CITE_STATUSES, CITE_MARKER, parseSource, serialiseSource, uncitable, markersIn, replaceMarkers, normaliseQuote, findQuote, resolveSource, linesOf, } from './citations.js';
+/* The names a module's server and its own page agree on. See `page.ts`. */
+export { PAGE_BACKGROUND, ROOT_ELEMENT, THEME_KEY, THEME_PARAM, TICKET_ELEMENT, TICKET_HEADER, TICKET_REFUSED, } from './page.js';
+/* What a module's server is built from, and how two builds compare. See `build.ts`. */
+export { BUILD_ELEMENT, BUILD_HEADER, PACKAGE_VERSION, buildIsStale, buildSchema, buildStamp, compareBuilds, describeBuild, readBuild, sameCode, sameProcess, } from './build.js';

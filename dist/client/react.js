@@ -98,3 +98,6 @@ export { useFocus } from './focus.js';
  * @deprecated Renamed to `useKehikot`.
  */
 export const useRoadmap = useKehikot;
+/* The fuller listener and the shared not-ready screen. See `host.ts` and `cover.ts`. */
+export { useHost, hostFields, JSON_KEPT } from './host.js';
+export { Cover, coverFor, useServerStanding, COVER_CSS, COVER_STYLE_ID, COVER_WORDS, TRY_AGAIN, } from './cover.js';

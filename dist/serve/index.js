@@ -9,3 +9,10 @@ export { DEFAULT_FRAME_ORIGINS, frameAncestors, frameOrigins } from './origins.j
 export { legacyRegistryDir, neighbourPorts, portOf, readRegistration, registerAt, registryDir, } from './registry.js';
 export { preferred, serves, } from './plugin.js';
 export { readJourney, readJourneys } from './journeys.js';
+/* The shared plumbing of a module's server: its page, its ticket, its doors. */
+export { pageDocument, themeScript, FRAMED_DEFAULT_THEME } from './page.js';
+export { mintTicket, refuseTicket, sameTicket, ticketOf, TICKET_REFUSAL } from './ticket.js';
+export { readJsonBody, BODY_METHODS, BODY_TOO_LARGE, MAX_BODY_BYTES } from './body.js';
+export { doors, doorsHandler, PAGE_PATHS, } from './doors.js';
+export { TICKET_HEADER } from '../page.js';
+export { commitOf, establishBuild } from './build.js';

@@ -20,3 +20,5 @@ export { JOURNEYS_MODULE, JOURNEYS_FILE, journeyStepSchema, journeyGroupSchema, 
 export { CONTENT_HOST, contentChangeSchema, contentSignalSchema, contentStamp, type ContentChange, type ContentSignal, } from './content.js';
 export { notificationPayload, callPayload, EXTENSIONS, EXTENSION_NAMES, known, schemaFor, type NotificationPayload, type CallPayload, type ExtensionFormat, } from './extensions.js';
 export { CITE_STATUSES, CITE_MARKER, parseSource, serialiseSource, uncitable, markersIn, replaceMarkers, normaliseQuote, findQuote, resolveSource, linesOf, type CitedSource, type CiteStatus, type CitedRange, type CitationView, type MarkerScan, } from './citations.js';
+export { PAGE_BACKGROUND, ROOT_ELEMENT, THEME_KEY, THEME_PARAM, TICKET_ELEMENT, TICKET_HEADER, TICKET_REFUSED, type PageTheme, } from './page.js';
+export { BUILD_ELEMENT, BUILD_HEADER, PACKAGE_VERSION, buildIsStale, buildSchema, buildStamp, compareBuilds, describeBuild, readBuild, sameCode, sameProcess, type Build, type BuildComparison, } from './build.js';

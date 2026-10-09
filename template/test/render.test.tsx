@@ -44,10 +44,14 @@ describe('the screen', () => {
     await waitFor(() => expect((screen.getByLabelText(/a value kept/) as HTMLInputElement).value).toBe('kept'))
   })
 
-  test('with no project it says so rather than offering to save nowhere', () => {
-    render(<Screen host={host({ projectPath: null, project: null, epic: null, where: 'unhosted' })} api={fakeApi(null)} />)
-    expect(screen.getByText(/Open a project/)).toBeDefined()
-    expect(screen.queryByRole('button', { name: 'Save' })).toBeNull()
+  test('each not-ready state is the shared cover, and none offers to save nowhere', () => {
+    const none = { projectPath: null, project: null, epic: null }
+    for (const [where, state] of [['listening', 'waiting'], ['unhosted', 'unhosted'], ['hosted', 'no-project']] as const) {
+      const { container } = render(<Screen host={host({ ...none, where })} api={fakeApi(null)} />)
+      expect(container.querySelector('[data-cover]')?.getAttribute('data-cover')).toBe(state)
+      expect(screen.queryByRole('button', { name: 'Save' })).toBeNull()
+      cleanup()
+    }
   })
 
   test('the header switcher shows the open item', () => {

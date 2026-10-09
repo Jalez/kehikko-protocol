@@ -18,8 +18,8 @@ export declare const dispositionSchema: z.ZodObject<{
     by: z.ZodDefault<z.ZodNullable<z.ZodString>>;
     at: z.ZodDefault<z.ZodNullable<z.ZodString>>;
 }, "strip", z.ZodTypeAny, {
-    at: string | null;
     value: "done" | "wont-do" | "duplicate" | "superseded";
+    at: string | null;
     ref: string;
     target: string | null;
     note: string;
@@ -710,8 +710,8 @@ export declare const contextSchema: z.ZodObject<{
         by: z.ZodDefault<z.ZodNullable<z.ZodString>>;
         at: z.ZodDefault<z.ZodNullable<z.ZodString>>;
     }, "strip", z.ZodTypeAny, {
-        at: string | null;
         value: "done" | "wont-do" | "duplicate" | "superseded";
+        at: string | null;
         ref: string;
         target: string | null;
         note: string;
@@ -830,8 +830,8 @@ export declare const contextSchema: z.ZodObject<{
     } | null;
     filters: Record<string, string | string[]>;
     dispositions: {
-        at: string | null;
         value: "done" | "wont-do" | "duplicate" | "superseded";
+        at: string | null;
         ref: string;
         target: string | null;
         note: string;

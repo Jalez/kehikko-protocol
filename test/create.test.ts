@@ -1,5 +1,6 @@
 import { afterAll, afterEach, beforeEach, describe, expect, test } from 'bun:test'
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { spawnSync } from 'node:child_process'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -160,7 +161,17 @@ describe('a generated module', () => {
     'installs, passes its own tests, and typechecks',
     () => {
       const here = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-      const made = create({ name: 'generated', dir: join(scratch, 'kehikko-generated'), protocolSource: `file:${here}` })
+      /* Packed, not linked: a link would resolve `react` from THIS checkout's node_modules, and the
+         module's screen — which now draws the protocol's `Cover` — would run on two copies of React.
+         A packed copy is what a consumer installing from git has: the package and no dependencies. */
+      const packed = spawnSync('bun', ['pm', 'pack', '--destination', scratch, '--quiet'], { cwd: here, encoding: 'utf8' })
+      const tarball = packed.stdout.trim().split('\n').pop() ?? ''
+      expect(tarball.endsWith('.tgz')).toBe(true)
+      const made = create({
+        name: 'generated',
+        dir: join(scratch, 'kehikko-generated'),
+        protocolSource: `file:${tarball.startsWith('/') ? tarball : join(scratch, tarball)}`,
+      })
       expect(existsSync(join(made.dir, '.git'))).toBe(true)
       expect(existsSync(join(made.dir, 'node_modules', 'kehikot-module-protocol', 'dist', 'index.js'))).toBe(true)
       run('bunx', ['tsc', '--noEmit'], made.dir)

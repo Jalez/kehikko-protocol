@@ -19,6 +19,32 @@ Internal only; nothing a consumer can observe. No version change.
 - `dist/` no longer carries `.map` files. CI builds, checks that the committed `dist/` matches the
   source, typechecks and runs the tests.
 
+## 0.35.0 — 2026-10-09
+
+The plumbing every module typed out for itself, once. All additive; `PROTOCOL` is still 2 and
+`useKehikot` is untouched. See [docs/module-plumbing.md](docs/module-plumbing.md).
+
+- `/serve`: `pageDocument` (the page, with a themed background painted before any script runs),
+  `mintTicket`, `sameTicket` (constant-time), `ticketOf`, `refuseTicket`, `readJsonBody` (bounded;
+  too large is a 413), and the `doors()` Vite plugin / `doorsHandler` — both well-known manifest
+  paths, the page with `no-store` and `frame-ancestors`, `answer` for `/healthz`, `/mcp` and
+  `/api/*`, and server-sent-event doors through `stream`.
+- `/client`: `ticket`, `ask` (every failure one typed result: `down`, `stale`, `refused`),
+  `answered`/`AskFailed`, `serverStanding`, `follow` (SSE with reconnect and `detached`),
+  `reloadWhenStale`, `pageBuild`, `applyTheme`.
+- `/client/react`: `useHost` (the fuller listener: `where`, the flattened context, the theme on
+  `<html>`, typed kept state with `remember`, `point`, a stable `request`, and `onClear` /
+  `onRefresh` that actually arrive), `Cover` with `coverFor` and `COVER_WORDS` (one screen for
+  waiting, unhosted, no project, no epic, loading, own server down, stale), `useServerStanding`.
+- Build identity: `buildSchema`, `establishBuild`, `compareBuilds`, `buildIsStale`, `buildStamp`,
+  `PACKAGE_VERSION`; an optional `build` on the manifest and on `kehikot.ready`; `x-module-build`
+  on every answer from `doors()`. A page that finds its server is another process reloads itself,
+  once.
+- The front door gains the names both halves share: `TICKET_HEADER`, `TICKET_ELEMENT`,
+  `ROOT_ELEMENT`, `THEME_KEY`, `THEME_PARAM`, `PAGE_BACKGROUND`, `BUILD_HEADER`, `BUILD_ELEMENT`.
+- `template/` is built on all of it: its `vite.config.ts` went from 120 lines to 34,
+  and `page/document.ts` is gone.
+
 ## 0.34.1 — 2026-10-09
 
 `focusSentence` takes an optional fourth argument, `{ total }`: with it the sentence says how many

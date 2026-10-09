@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 
+import { Cover, coverFor, useServerStanding } from 'kehikot-module-protocol/client/react'
+
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -17,18 +19,25 @@ export function App() {
  * `Host`, so a test can draw it with a fake context (see test/render.test.tsx).
  */
 export function Screen({ host, api = realApi }: { host: Host; api?: Api }) {
+  /* What this page's own server last did, learned by every `ask()`: it stopped, or it restarted under this page. */
+  const server = useServerStanding()
+  const [again, setAgain] = useState(0)
+  /* The one screen for every not-ready moment, in the order that is true: waiting before anything else. */
+  const cover = server === 'stale' ? 'stale' : (coverFor(host, { project: true }) ?? (server === 'down' ? 'down' : null))
+
   return (
     <div className="flex h-screen flex-col text-sm">
       <Header host={host} />
-      <main className="min-h-0 flex-1 space-y-4 overflow-auto p-3">
-        <Context host={host} />
-        <Stored projectPath={host.projectPath} api={api} />
+      <main className="flex min-h-0 flex-1 flex-col gap-4 overflow-auto p-3">
+        {cover ? <Cover state={cover} name="__MODULE_NAME__" onRetry={() => setAgain((n) => n + 1)} /> : <Context host={host} />}
+        {host.projectPath && server !== 'stale' ? (
+          <Stored key={again} hidden={cover !== null} projectPath={host.projectPath} api={api} />
+        ) : null}
       </main>
     </div>
   )
 }
 
-/** The strip: the module's own controls, small, in one row that wraps rather than scrolls. */
 function Header({ host }: { host: Host }) {
   const [items, setItems] = useState<Item[]>([
     { id: 'first', name: 'First' },
@@ -88,12 +97,11 @@ function Context({ host }: { host: Host }) {
 }
 
 /** One JSON value, kept at <project>/.kehikot/__MODULE_FOLDER__/value.json through /api. */
-function Stored({ projectPath, api }: { projectPath: string | null; api: Api }) {
+function Stored({ projectPath, api, hidden }: { projectPath: string; api: Api; hidden: boolean }) {
   const [draft, setDraft] = useState('')
   const [said, setSaid] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!projectPath) return
     let live = true
     api
       .read(projectPath)
@@ -106,9 +114,8 @@ function Stored({ projectPath, api }: { projectPath: string | null; api: Api }) 
     }
   }, [projectPath, api])
 
-  if (!projectPath) {
-    return <p className="text-muted-foreground">Open a project in the host to keep anything here.</p>
-  }
+  /* Still mounted under a cover, so "Try again" is this component reading again. */
+  if (hidden) return null
 
   return (
     <form
