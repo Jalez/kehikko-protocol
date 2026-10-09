@@ -72,6 +72,7 @@ Concretely, the things this package deliberately does not do:
 | `KEHIKOT_IGNORE`, `ignoresKehikot`, `withKehikotIgnored` | The lines that project's `.gitignore` gains, added once. |
 | `partSchema`, `EpicPart`, `PART_ID`, `pickedParts`, `isFocused`, `refInFocus`, `partInFocus`, `focusCount` | The parts of the open epic in `context.parts`, and whether a thing is in the ones a person picked out. |
 | `fileInFocus`, `pickedFiles`, `partsOfFile`, `paperFileOf`, `partFile`, `isPartFile`, `PAPER_MODULE` | The files of the epic's paper a part owns (0.32.0): whether a file is in the picked parts, and the one comparison between the path a module holds and the name a part stores. |
+| `Anchor`, `anchorInFocus`, `narrowToFocus`, `focusSentence`, `FOCUS_WHERE`, `sameParts`, `partsDeclaration` | One anchor, one rule (0.34.0): what ties an item of a module's data to a part — a file, a ref or a part id — the one answer to "is it in front of the person", the list narrowed with its count, the sentence every module says about what it left out, and what a manifest says about all of it. |
 
 | `journeyRecordSchema`, `journeyStepSchema`, `journeyGroupSchema`, `stepsFromSchema`, `journeysDocumentSchema`, `journeyIn`, `journeySlugs`, `stepsOf`, `stepPart`, `JOURNEYS_MODULE`, `JOURNEYS_FILE` | An epic's steps and groups as a project keeps them on disk: the one shape the module that writes them and a host that reads them both import. |
 | `partsOf`, `partIdsOf`, `JourneyPart`, `slugFrom` | The parts of an epic read off its record, and the one derivation of a part's id from its heading: what a host composes `context.parts` from and what the module that edits steps checks a step's `part` against. |
@@ -82,7 +83,7 @@ And behind two subpaths, which are not shapes and say so:
 | | |
 |---|---|
 | `kehikot-module-protocol/client` | `connect`, `mailbox`, `HostRefused` — the module half of the wire, for a page that would rather not write it again. Browser code, kept out of the front door so a Bun process can import shapes without it. **A convenience: a module may hand-roll its wire and be perfectly conforming.** |
-| `kehikot-module-protocol/client/react` | `useKehikot` (once `useRoadmap`, still exported as an alias). Optional; `react` is an optional peer dependency and `client` does not import it. |
+| `kehikot-module-protocol/client/react` | `useKehikot` (once `useRoadmap`, still exported as an alias), and `useFocus` (0.34.0), the parts focus as one value. Optional; `react` is an optional peer dependency and `client` does not import it. |
 
 ## Renamed from "roadmap", and what a module has to change
 
@@ -778,6 +779,115 @@ capability and no method; a module that moves when it changes says
 `reacts: ['parts']`. A pinned container keeps the parts it was pinned with, for
 the reason it keeps its epic. Moving to another epic sends that epic's parts
 with nothing picked, for the reason it clears the selection.
+
+### Every module's data is part-specific, or the module says why not (0.34.0)
+
+Until here a module could read `context.parts` or not, and most did not: a
+person ticked a part, the paper narrowed, and the questions about the paper
+went on showing all thirty-seven. Correct by the letter — a module that
+ignores the field shows the whole epic — and not what a tick means. Four
+modules had narrowed, each with its own filter, count, sentence and
+comparison. So the requirement is stated once, and it is about data:
+
+> **Every item of a module's data is anchored to a part by a file, a ref or a
+> part id, or the module says why it has none.**
+
+**The anchor.** One item answers with an `Anchor`, told apart by its key:
+
+```ts
+type Anchor = { file: string } | { ref: string } | { part: string | null }
+```
+
+`file` is a file of the epic's paper, absolute or relative to the paper's
+folder (a note, a question, a citation); `ref` is a reference; `part` is a
+part's id, for a thing assigned to one. An item may answer with several — it is
+in front when any one is — or with none.
+
+**The rule.** `anchorInFocus(parts, anchor, epic)` is the one answer, and it
+decides nothing itself: it asks `fileInFocus`, `refInFocus` or `partInFocus`.
+True for everything when nothing is picked. With something picked, an item
+with no anchor is outside, like a step with no part — counted, never dropped.
+
+**What a module writes.** `anchorOf(item)`, and where the sentence is drawn:
+
+```tsx
+import { FOCUS_WHERE } from 'kehikot-module-protocol'
+import { useFocus } from 'kehikot-module-protocol/client/react'
+
+const focus = useFocus(context)                    // or useFocus({ parts, epic })
+const { shown, sentence } = focus.narrow(notes, (note) => ({ file: note.path }), {
+  noun: 'note',
+  keep: (note) => note.id === open,                // what the person is in the middle of
+})
+// draw `shown`; and when `sentence` is not '':
+<p title={FOCUS_WHERE}>{sentence}</p>
+```
+
+`useFocus` compares the parts by value, so a context re-sent because something
+else on the canvas moved hands back the same value and redraws nothing. A page
+that is not React calls `narrowToFocus(parts, items, anchorOf, { epic, keep })`
+and `focusSentence(parts, outside, noun)`, which are all the hook is. A module that sets an item back instead of removing it — a deck is an
+ordered thing — asks `focus.inFocus(anchor)` per item and still says the
+sentence.
+
+**The sentence** is one sentence, in every module:
+
+```
+3 questions outside the picked part (The posting seam).
+1 note outside the 2 picked parts (The posting seam, What the tests check).
+```
+
+Nothing when nothing is picked. `0 … outside` is said: it is how a person sees
+that the pane is following their ticks. `FOCUS_WHERE` says where the control
+is, for the tooltip, since it is never on the module's page.
+
+**Nothing in somebody's hands is taken away by a tick.** `keep` answers true
+for the note being written, the question on screen. It is drawn in its place,
+it is still counted outside because it is, and `kept` says how many so the
+page can say why it is there.
+
+**The declaration.** A module that follows the parts says `reacts: ['parts']`.
+One with nothing to narrow says so in one sentence, in the manifest's new
+optional `partless`:
+
+```ts
+partless: 'A terminal: nothing in it belongs to an epic.',
+```
+
+What such a sentence looks like, for the modules that have nothing a part
+could own: a file browser ("Lists the repository's files; a part owns files of
+the paper, not of the repository."), a source view ("One passage, and no list
+to narrow."), a diff or a review ("The pull request the person selected."), a
+history ("Commits carry no part."), an atlas ("Above epics."), a terminal ("A
+shell."), notifications ("Events carry no ref, epic or part."). A module whose
+items are each tied to SEVERAL things — a bibliography entry cited from three
+files, a slide with a linked section and four citations — is not one of these:
+it answers with all its anchors, and is in front when any one is.
+
+`partsDeclaration(manifest)` returns what is wrong — saying neither, or both —
+as sentences. **In this version that is a warning:** `manifestSchema` does not
+call it, every existing manifest parses to exactly what it did, and a host may
+show the list. **In the next minor version a manifest that says neither will
+not parse.**
+
+**The check.** `bun run check:parts <module dir>…` (the bin
+`kehikko-check-parts`, from a module: `bun node_modules/kehikot-module-protocol/bin/check-parts.ts .`)
+reads a module's `manifest.ts` and exits 1 on exactly what the manifest says:
+the module declares neither `parts` nor `partless`, declares both, or has no
+manifest that loads. It also scans the module's sources for a named import of
+a focus helper from this package (`useFocus`, `narrowToFocus`, `anchorInFocus`,
+`fileInFocus`, `refInFocus`, `partInFocus`) and prints where it found one;
+a module that declares `parts` and shows none gets a **note, not a failure**.
+The scan is a hint: it reads import text, so `import * as` or a wrapper's
+re-export gets past it and any import satisfies it. Whether the narrowing is
+right is a review's question.
+
+**Which build of this package a module has.** Every module depends on this
+package at git `#main`, which floats: each install holds whichever commit its
+lockfile pinned, so two modules on one canvas can hold two builds. A module
+that says `reacts: ['parts']` through these helpers needs 0.34.0 or later in
+its lockfile. Bringing every module under the requirement should pin each to a
+protocol version rather than to `#main`.
 
 ## An epic's steps are kept once, and this is the shape they are kept in
 

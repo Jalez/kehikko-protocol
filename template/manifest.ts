@@ -42,6 +42,11 @@ export const MANIFEST: Manifest = manifestSchema.parse({
   },
   extensions: { emits: [], consumes: [] },
   reacts: [],
+  /* Every module either follows the parts of the epic a person picked out —
+     `reacts: ['parts']`, narrowing with `useFocus` from the protocol's
+     `/client/react` — or says here, in one sentence, why it has nothing to
+     narrow. Replace this the day the module holds items of its own. */
+  partless: 'A new module: it keeps one value for the project and nothing that belongs to a part of an epic.',
   declares: {
     protocol: `>=${PROTOCOL} <${PROTOCOL + 1}`,
     uses: [],

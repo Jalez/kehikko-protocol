@@ -351,4 +351,116 @@ export declare function focusCount<T>(parts: readonly EpicPart[], items: readonl
     shown: number;
     outside: number;
 };
+/**
+ * ## One anchor, one rule (0.34.0)
+ *
+ * The three functions above are the three questions there are, and for a
+ * while each module picked one and wrote the rest itself: the filter, the
+ * count, the sentence, the comparison that keeps a re-sent context from
+ * redrawing. Four modules did, four ways, and the others showed the whole
+ * epic whatever was ticked — which is correct by the letter of this file and
+ * not what a person ticking a part meant.
+ *
+ * So the requirement is said once, here, and it is about DATA: **every item a
+ * module holds is anchored to a part by a file, a ref or a part id — or the
+ * module says why it has none.** An `Anchor` is that statement for one item,
+ * `anchorInFocus` is the one rule over it, and a module contributes only
+ * `anchorOf(item)`. The declaration is in the manifest: `reacts: ['parts']`,
+ * or `partless` with the reason. See `partsDeclaration` in `manifest.ts`.
+ */
+/**
+ * What ties one item of a module's data to a part of the epic.
+ *
+ * Told apart by its one key, which is also the name of the function that
+ * answers for it:
+ *
+ * - `{ file }` — a file of the epic's paper, absolute or relative to the
+ *   paper's folder: a note, a question, a slide's citation. `fileInFocus`.
+ * - `{ ref }` — a reference: a row in a list of issues, a checklist held
+ *   against a pull request. `refInFocus`.
+ * - `{ part }` — a part's id, for a thing that was ASSIGNED to one: a step.
+ *   `partInFocus`. Null is "assigned to none".
+ */
+export type Anchor = {
+    file: string;
+} | {
+    ref: string;
+} | {
+    part: string | null;
+};
+/**
+ * What an item may answer: one anchor, several (a slide that cites three
+ * files is in front when ANY of them is), or none. None — null, undefined or
+ * an empty list — belongs to the epic as a whole.
+ */
+export type Anchors = Anchor | readonly Anchor[] | null | undefined;
+/**
+ * Whether an anchored thing is in front of the person. THE rule.
+ *
+ * True when nothing is picked out. Otherwise true exactly when one of its
+ * anchors is in a picked part, each asked of the function above that owns the
+ * question. Something with no anchor is in no PICKED part: outside the focus,
+ * and counted — the same answer as a step with no `part`, a ref no part lists
+ * and a file no part names.
+ *
+ * `epic` is `context.epic`, for `fileInFocus`. Pass it.
+ */
+export declare function anchorInFocus(parts: readonly EpicPart[], anchor: Anchors, epic?: string | null): boolean;
+/** What a focus leaves of a list. */
+export interface Narrowed<T> {
+    /**
+     * The items to draw, in the order they came. Every item when nothing is
+     * picked — the same array's contents, untouched.
+     */
+    shown: T[];
+    /** How many items are outside the picked parts. Zero when nothing is picked. `focusCount`'s number. */
+    outside: number;
+    /** How many of `shown` are outside and drawn anyway, because `keep` said the person is in the middle of them. */
+    kept: number;
+}
+/**
+ * A list, narrowed to the picked parts: the items in front, and how many are
+ * not.
+ *
+ * `anchorOf` is the whole of what a module writes. Everything optional is in
+ * `options`, under the names `useFocus().narrow` uses: `epic` is
+ * `context.epic`, for a `{ file }` anchor — pass it. `keep` is for the one thing
+ * a tick in another control must never do, which is take away what somebody's
+ * hands are in — the note being written, the question on screen. An item it
+ * answers true for is drawn though it is outside, and is still COUNTED
+ * outside, because it is; `kept` says how many, so the page can say why they
+ * are there.
+ */
+export declare function narrowToFocus<T>(parts: readonly EpicPart[], items: readonly T[], anchorOf: (item: T) => Anchors, options?: {
+    epic?: string | null;
+    keep?: (item: T) => boolean;
+}): Narrowed<T>;
+/**
+ * The sentence every module says while parts are picked: how many of its
+ * items are outside them, and which parts.
+ *
+ *     3 questions outside the picked part (The posting seam).
+ *     1 note outside the 2 picked parts (The posting seam, What the tests check).
+ *
+ * `''` when nothing is picked, which is the cue to draw nothing. `0 … outside`
+ * IS said: a focus that hides nothing today is still a focus, and it is how a
+ * person sees that this pane is following their ticks.
+ *
+ * The wording is the Checklist module's, which is the References module's
+ * (`14 outside the picked part · The posting seam`) with the noun in it and a
+ * full stop — a sentence that can stand alone in a pane. `noun` is what the
+ * module calls one item; give `[one, many]` where adding an `s` is wrong.
+ */
+export declare function focusSentence(parts: readonly EpicPart[], outside: number, noun?: string | readonly [one: string, many: string]): string;
+/**
+ * Where the control is, for the sentence's tooltip or the line under an empty
+ * pane: it is never on the module's own page.
+ */
+export declare const FOCUS_WHERE = "Parts are picked in the host\u2019s bar, beside the epic. Unpick them there to see the rest.";
+/**
+ * Two lists of parts, by value: what `context.parts` is compared with before
+ * a page is redrawn for it. A host re-sends the context after every change
+ * anywhere on the canvas, and the list is the same list on nearly all of them.
+ */
+export declare function sameParts(a: readonly EpicPart[], b: readonly EpicPart[]): boolean;
 //# sourceMappingURL=parts.d.ts.map

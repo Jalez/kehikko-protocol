@@ -255,6 +255,10 @@ export function useKehikot(id: string, events: HostEvents = {}, options: UseKehi
   )
 }
 
+/* The parts focus, beside the bridge: the same entry, a hook that needs no
+   connection. See `focus.ts`. */
+export { useFocus, type Focus } from './focus.js'
+
 /**
  * The names this hook and its types had before the app was renamed, kept so a
  * module that has not been updated still builds against this copy. Same

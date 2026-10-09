@@ -64,6 +64,7 @@ export {
   manifestSchema,
   legacyManifest,
   speaks,
+  partsDeclaration,
   MODULE_CONDITIONS,
   REACTS_TO,
   REACTION_NAMES,
@@ -222,7 +223,15 @@ export {
   partsOfFile,
   pickedFiles,
   fileInFocus,
+  anchorInFocus,
+  narrowToFocus,
+  focusSentence,
+  FOCUS_WHERE,
+  sameParts,
   type EpicPart,
+  type Anchor,
+  type Anchors,
+  type Narrowed,
 } from './parts.js'
 
 export {
