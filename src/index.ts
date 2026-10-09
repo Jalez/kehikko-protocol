@@ -268,3 +268,22 @@ export {
   type CallPayload,
   type ExtensionFormat,
 } from './extensions.js'
+
+export {
+  CITE_STATUSES,
+  CITE_MARKER,
+  parseSource,
+  serialiseSource,
+  uncitable,
+  markersIn,
+  replaceMarkers,
+  normaliseQuote,
+  findQuote,
+  resolveSource,
+  linesOf,
+  type CitedSource,
+  type CiteStatus,
+  type CitedRange,
+  type CitationView,
+  type MarkerScan,
+} from './citations.js'

@@ -400,39 +400,39 @@ export declare const methodParams: {
                 to: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
             }, "strip", z.ZodTypeAny, {
                 from: number | null;
-                title: string;
                 to: number | null;
+                title: string;
             }, {
                 title: string;
                 from?: number | null | undefined;
                 to?: number | null | undefined;
             }>, {
                 from: number | null;
-                title: string;
                 to: number | null;
+                title: string;
             }, {
                 title: string;
                 from?: number | null | undefined;
                 to?: number | null | undefined;
             }>, {
                 from: number | null;
-                title: string;
                 to: number | null;
+                title: string;
             }, {
                 title: string;
                 from?: number | null | undefined;
                 to?: number | null | undefined;
             }>>>;
         }, "strip", z.ZodTypeAny, {
-            from: number | null;
             path: string;
+            from: number | null;
             to: number | null;
             page: number | null;
             quoted: string;
             section: {
                 from: number | null;
-                title: string;
                 to: number | null;
+                title: string;
             } | null;
         }, {
             path: string;
@@ -446,15 +446,15 @@ export declare const methodParams: {
                 to?: number | null | undefined;
             } | null | undefined;
         }>, {
-            from: number | null;
             path: string;
+            from: number | null;
             to: number | null;
             page: number | null;
             quoted: string;
             section: {
                 from: number | null;
-                title: string;
                 to: number | null;
+                title: string;
             } | null;
         }, {
             path: string;
@@ -468,15 +468,15 @@ export declare const methodParams: {
                 to?: number | null | undefined;
             } | null | undefined;
         }>, {
-            from: number | null;
             path: string;
+            from: number | null;
             to: number | null;
             page: number | null;
             quoted: string;
             section: {
                 from: number | null;
-                title: string;
                 to: number | null;
+                title: string;
             } | null;
         }, {
             path: string;
@@ -492,15 +492,15 @@ export declare const methodParams: {
         }>>;
     }, "strip", z.ZodTypeAny, {
         passage: {
-            from: number | null;
             path: string;
+            from: number | null;
             to: number | null;
             page: number | null;
             quoted: string;
             section: {
                 from: number | null;
-                title: string;
                 to: number | null;
+                title: string;
             } | null;
         } | null;
     }, {
@@ -617,39 +617,39 @@ export declare const methodParams: {
                 to: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
             }, "strip", z.ZodTypeAny, {
                 from: number | null;
-                title: string;
                 to: number | null;
+                title: string;
             }, {
                 title: string;
                 from?: number | null | undefined;
                 to?: number | null | undefined;
             }>, {
                 from: number | null;
-                title: string;
                 to: number | null;
+                title: string;
             }, {
                 title: string;
                 from?: number | null | undefined;
                 to?: number | null | undefined;
             }>, {
                 from: number | null;
-                title: string;
                 to: number | null;
+                title: string;
             }, {
                 title: string;
                 from?: number | null | undefined;
                 to?: number | null | undefined;
             }>>>;
         }, "strip", z.ZodTypeAny, {
-            from: number | null;
             path: string;
+            from: number | null;
             to: number | null;
             page: number | null;
             quoted: string;
             section: {
                 from: number | null;
-                title: string;
                 to: number | null;
+                title: string;
             } | null;
         }, {
             path: string;
@@ -663,15 +663,15 @@ export declare const methodParams: {
                 to?: number | null | undefined;
             } | null | undefined;
         }>, {
-            from: number | null;
             path: string;
+            from: number | null;
             to: number | null;
             page: number | null;
             quoted: string;
             section: {
                 from: number | null;
-                title: string;
                 to: number | null;
+                title: string;
             } | null;
         }, {
             path: string;
@@ -685,15 +685,15 @@ export declare const methodParams: {
                 to?: number | null | undefined;
             } | null | undefined;
         }>, {
-            from: number | null;
             path: string;
+            from: number | null;
             to: number | null;
             page: number | null;
             quoted: string;
             section: {
                 from: number | null;
-                title: string;
                 to: number | null;
+                title: string;
             } | null;
         }, {
             path: string;
@@ -710,15 +710,15 @@ export declare const methodParams: {
     }, "strip", z.ZodTypeAny, {
         refs: string[];
         documents: {
-            from: number | null;
             path: string;
+            from: number | null;
             to: number | null;
             page: number | null;
             quoted: string;
             section: {
                 from: number | null;
-                title: string;
                 to: number | null;
+                title: string;
             } | null;
         }[];
     }, {
