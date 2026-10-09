@@ -415,14 +415,17 @@ export function anchorInFocus(parts, anchor, epic) {
  * A list, narrowed to the picked parts: the items in front, and how many are
  * not.
  *
- * `anchorOf` is the whole of what a module writes. `keep` is for the one thing
+ * `anchorOf` is the whole of what a module writes. Everything optional is in
+ * `options`, under the names `useFocus().narrow` uses: `epic` is
+ * `context.epic`, for a `{ file }` anchor — pass it. `keep` is for the one thing
  * a tick in another control must never do, which is take away what somebody's
  * hands are in — the note being written, the question on screen. An item it
  * answers true for is drawn though it is outside, and is still COUNTED
  * outside, because it is; `kept` says how many, so the page can say why they
  * are there.
  */
-export function narrowToFocus(parts, items, anchorOf, epic, keep) {
+export function narrowToFocus(parts, items, anchorOf, options = {}) {
+    const { epic, keep } = options;
     if (!isFocused(parts))
         return { shown: [...items], outside: 0, kept: 0 };
     const inFocus = (item) => anchorInFocus(parts, anchorOf(item), epic);

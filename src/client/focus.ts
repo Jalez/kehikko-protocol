@@ -70,7 +70,7 @@ export function useFocus(context: { parts?: readonly EpicPart[]; epic?: string |
       focused: isFocused(parts),
       inFocus: (anchor) => anchorInFocus(parts, anchor, epic),
       narrow: (items, anchorOf, options = {}) => {
-        const narrowed = narrowToFocus(parts, items, anchorOf, epic, options.keep)
+        const narrowed = narrowToFocus(parts, items, anchorOf, { epic, keep: options.keep })
         return { ...narrowed, sentence: focusSentence(parts, narrowed.outside, options.noun) }
       },
     }),

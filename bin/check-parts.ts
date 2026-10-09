@@ -5,8 +5,10 @@
  *   bun run check:parts [<module dir> …]
  *
  * With no directory, the one it is run in. Exits 1 when any module declares
- * neither `reacts: ['parts']` nor `partless`, or declares `parts` and imports
- * no focus helper. The work is in `src/check/parts.ts`, where it is tested.
+ * neither `reacts: ['parts']` nor `partless`, declares both, or has no
+ * manifest that loads. A module that declares `parts` and shows no import of
+ * a focus helper gets a note, which is a hint and not a failure. The work is
+ * in `src/check/parts.ts`, where it is tested.
  */
 import { checkModule, said } from '../src/check/parts.ts'
 

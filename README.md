@@ -825,8 +825,8 @@ const { shown, sentence } = focus.narrow(notes, (note) => ({ file: note.path }),
 
 `useFocus` compares the parts by value, so a context re-sent because something
 else on the canvas moved hands back the same value and redraws nothing. A page
-that is not React calls `narrowToFocus` and `focusSentence`, which are all the
-hook is. A module that sets an item back instead of removing it — a deck is an
+that is not React calls `narrowToFocus(parts, items, anchorOf, { epic, keep })`
+and `focusSentence(parts, outside, noun)`, which are all the hook is. A module that sets an item back instead of removing it — a deck is an
 ordered thing — asks `focus.inFocus(anchor)` per item and still says the
 sentence.
 
@@ -872,11 +872,15 @@ not parse.**
 
 **The check.** `bun run check:parts <module dir>…` (the bin
 `kehikko-check-parts`, from a module: `bun node_modules/kehikot-module-protocol/bin/check-parts.ts .`)
-reads a module's `manifest.ts` and its sources, and exits 1 when the module
-declares neither, or declares `parts` and no source file imports a focus
-helper from this package (`useFocus`, `narrowToFocus`, `anchorInFocus`,
-`fileInFocus`, `refInFocus`, `partInFocus`). It cannot see whether the
-narrowing is right; it sees that the rule in use is this one.
+reads a module's `manifest.ts` and exits 1 on exactly what the manifest says:
+the module declares neither `parts` nor `partless`, declares both, or has no
+manifest that loads. It also scans the module's sources for a named import of
+a focus helper from this package (`useFocus`, `narrowToFocus`, `anchorInFocus`,
+`fileInFocus`, `refInFocus`, `partInFocus`) and prints where it found one;
+a module that declares `parts` and shows none gets a **note, not a failure**.
+The scan is a hint: it reads import text, so `import * as` or a wrapper's
+re-export gets past it and any import satisfies it. Whether the narrowing is
+right is a review's question.
 
 **Which build of this package a module has.** Every module depends on this
 package at git `#main`, which floats: each install holds whichever commit its

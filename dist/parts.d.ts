@@ -422,14 +422,19 @@ export interface Narrowed<T> {
  * A list, narrowed to the picked parts: the items in front, and how many are
  * not.
  *
- * `anchorOf` is the whole of what a module writes. `keep` is for the one thing
+ * `anchorOf` is the whole of what a module writes. Everything optional is in
+ * `options`, under the names `useFocus().narrow` uses: `epic` is
+ * `context.epic`, for a `{ file }` anchor — pass it. `keep` is for the one thing
  * a tick in another control must never do, which is take away what somebody's
  * hands are in — the note being written, the question on screen. An item it
  * answers true for is drawn though it is outside, and is still COUNTED
  * outside, because it is; `kept` says how many, so the page can say why they
  * are there.
  */
-export declare function narrowToFocus<T>(parts: readonly EpicPart[], items: readonly T[], anchorOf: (item: T) => Anchors, epic?: string | null, keep?: (item: T) => boolean): Narrowed<T>;
+export declare function narrowToFocus<T>(parts: readonly EpicPart[], items: readonly T[], anchorOf: (item: T) => Anchors, options?: {
+    epic?: string | null;
+    keep?: (item: T) => boolean;
+}): Narrowed<T>;
 /**
  * The sentence every module says while parts are picked: how many of its
  * items are outside them, and which parts.

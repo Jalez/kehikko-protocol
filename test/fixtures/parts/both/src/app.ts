@@ -1,2 +1,2 @@
-import { anchorInFocus } from "roadmap-module-protocol"
+import { anchorInFocus } from "kehikot-module-protocol"
 export { anchorInFocus }

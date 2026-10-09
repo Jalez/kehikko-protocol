@@ -95,33 +95,39 @@ describe('anchorInFocus', () => {
 
 describe('narrowToFocus', () => {
   test('nothing picked: every item, in order, nothing outside', () => {
-    const out = narrowToFocus(PARTS(false, false), ITEMS, anchorOf, EPIC)
+    const out = narrowToFocus(PARTS(false, false), ITEMS, anchorOf, { epic: EPIC })
     expect(out.shown).toEqual(ITEMS)
     expect(out).toMatchObject({ outside: 0, kept: 0 })
   })
 
   test('the items in a picked part, and the count of the rest — focusCount’s numbers', () => {
     const parts = PARTS(true, false)
-    const out = narrowToFocus(parts, ITEMS, anchorOf, EPIC)
+    const out = narrowToFocus(parts, ITEMS, anchorOf, { epic: EPIC })
     expect(ids(out.shown)).toEqual(['abs-file', 'ref'])
     expect(out.outside).toBe(7)
     expect(focusCount(parts, ITEMS, (item) => anchorInFocus(parts, item.anchor, EPIC))).toEqual({ shown: 2, outside: 7 })
   })
 
   test('two parts picked', () => {
-    const out = narrowToFocus(PARTS(true, true), ITEMS, anchorOf, EPIC)
+    const out = narrowToFocus(PARTS(true, true), ITEMS, anchorOf, { epic: EPIC })
     expect(ids(out.shown)).toEqual(['abs-file', 'rel-file', 'ref', 'step', 'several'])
     expect(out.outside).toBe(4)
   })
 
   test('what the person is in the middle of is drawn, in its place, and still counted outside', () => {
-    const out = narrowToFocus(PARTS(true, false), ITEMS, anchorOf, EPIC, (item) => item.id === 'main')
+    const out = narrowToFocus(PARTS(true, false), ITEMS, anchorOf, { epic: EPIC, keep: (item) => item.id === 'main' })
     expect(ids(out.shown)).toEqual(['abs-file', 'main', 'ref'])
     expect(out).toMatchObject({ outside: 7, kept: 1 })
   })
 
+  test('the options are optional: with no epic a paper-relative file still compares', () => {
+    const out = narrowToFocus(PARTS(false, true), ITEMS, anchorOf)
+    expect(ids(out.shown)).toContain('rel-file')
+    expect(out.kept).toBe(0)
+  })
+
   test('keeping something that is in the focus anyway keeps nothing', () => {
-    expect(narrowToFocus(PARTS(true, false), ITEMS, anchorOf, EPIC, (item) => item.id === 'ref').kept).toBe(0)
+    expect(narrowToFocus(PARTS(true, false), ITEMS, anchorOf, { epic: EPIC, keep: (item) => item.id === 'ref' }).kept).toBe(0)
   })
 })
 
