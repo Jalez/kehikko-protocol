@@ -41,4 +41,3 @@ export declare function readRegistration(file: string): Registration | null;
 export declare function neighbourPorts(selfId: string, where?: string): Set<number>;
 /** The port in an origin, or `null` for anything this cannot read. Pure. */
 export declare function portOf(origin: string): number | null;
-//# sourceMappingURL=registry.d.ts.map

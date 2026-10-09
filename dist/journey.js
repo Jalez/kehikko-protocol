@@ -236,4 +236,3 @@ export function partsOf(record) {
         part.refs = part.refs.slice(0, LIMITS.PART_REFS);
     return parts;
 }
-//# sourceMappingURL=journey.js.map

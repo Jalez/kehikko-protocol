@@ -1168,4 +1168,3 @@ export declare function partIdsOf(groups: unknown): (string | null)[];
  * Bounded by `LIMITS.PARTS`, `PART_REFS`, `PART_FILES`, `TITLE`, `REF`; an empty heading becomes the id.
  */
 export declare function partsOf(record: unknown): JourneyPart[];
-//# sourceMappingURL=journey.d.ts.map

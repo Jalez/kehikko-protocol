@@ -73,4 +73,3 @@ export declare function withKehikotIgnored(gitignore: string): string;
  * line; leaves a commented-out `#.kehikot/` and a negation (`!.kehikot/…`) alone. Idempotent.
  */
 export declare function withoutKehikotIgnored(gitignore: string): string;
-//# sourceMappingURL=project.d.ts.map

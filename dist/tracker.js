@@ -224,4 +224,3 @@ export function spellTrackerRef(name) {
     const mark = name.kind === 'change' ? '!' : '#';
     return name.isDefault ? `${mark}${name.number}` : `gl:${name.repo}${mark}${name.number}`;
 }
-//# sourceMappingURL=tracker.js.map

@@ -3081,4 +3081,3 @@ export type Went = z.infer<typeof wentSchema>;
 export declare function looksLikeWireMessage(value: unknown): value is {
     type: string;
 };
-//# sourceMappingURL=messages.d.ts.map

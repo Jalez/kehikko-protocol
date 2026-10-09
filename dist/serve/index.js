@@ -9,4 +9,3 @@ export { DEFAULT_FRAME_ORIGINS, frameAncestors, frameOrigins } from './origins.j
 export { legacyRegistryDir, neighbourPorts, portOf, readRegistration, registerAt, registryDir, } from './registry.js';
 export { preferred, serves, } from './plugin.js';
 export { readJourney, readJourneys } from './journeys.js';
-//# sourceMappingURL=index.js.map

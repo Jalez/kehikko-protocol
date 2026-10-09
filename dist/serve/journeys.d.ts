@@ -10,4 +10,3 @@ export declare function readJourneys(projectPath: string | null | undefined): Re
  * every epic reads the document once and asks `journeyIn` per slug.
  */
 export declare function readJourney(projectPath: string | null | undefined, slug: string): JourneyRecord | null;
-//# sourceMappingURL=journeys.d.ts.map

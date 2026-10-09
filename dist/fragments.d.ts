@@ -34,4 +34,3 @@ export declare const bothEndsOrNeither: (span: Span) => boolean;
 /** A span that names its ends ends after it starts. */
 export declare const endsAfterStart: (span: Span) => boolean;
 export {};
-//# sourceMappingURL=fragments.d.ts.map

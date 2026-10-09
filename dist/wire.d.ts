@@ -7,4 +7,3 @@ export * from './passage.js';
 export * from './filters.js';
 export * from './context.js';
 export * from './messages.js';
-//# sourceMappingURL=wire.d.ts.map

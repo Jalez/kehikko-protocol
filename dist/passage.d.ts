@@ -158,4 +158,3 @@ export declare const passageSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
 }>;
 /** Where the reader is pointing, at whatever precision they have. */
 export type Passage = z.infer<typeof passageSchema>;
-//# sourceMappingURL=passage.d.ts.map

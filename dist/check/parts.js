@@ -118,4 +118,3 @@ export function said(check) {
         ...check.notes.map((note) => `      note: ${note}`),
     ].join('\n');
 }
-//# sourceMappingURL=parts.js.map

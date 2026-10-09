@@ -236,4 +236,3 @@ export const FOCUS_WHERE = 'Parts are picked in the host’s bar, beside the epi
 export function sameParts(a, b) {
     return a === b || JSON.stringify(a) === JSON.stringify(b);
 }
-//# sourceMappingURL=parts.js.map

@@ -20,5 +20,6 @@ Why the protocol is the way it is. The source keeps one to three lines beside ea
 | [The client library](client.md) | The module half of the wire behind `/client` and `/client/react`: `connect`, the mailbox, and the hooks. A convenience, never a requirement. |
 | [Serving a module: ports, the registry, frame origins, and the template](serving.md) | The node-only half behind `/serve` — which port a module binds, where it writes down that it exists, which origins may frame it — and the generator that makes a new module from `template/`. |
 | [Packaging](../PACKAGING.md) | How this package is consumed straight from git, and why `dist/` is committed. |
+| [`kehikko` and `kehikot`](naming.md) | Which spelling goes where, as the code uses the two today. Inferred; to be confirmed. |
 
 Each file has an overview where the README used to carry one, then the notes by symbol, grouped by the source file the symbol is declared in and in the order it is declared.

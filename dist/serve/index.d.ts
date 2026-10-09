@@ -9,4 +9,3 @@ export { DEFAULT_FRAME_ORIGINS, frameAncestors, frameOrigins } from './origins.j
 export { legacyRegistryDir, neighbourPorts, portOf, readRegistration, registerAt, registryDir, type Registered, type Registration, } from './registry.js';
 export { preferred, serves, type DevServerLike, type HttpServerLike, type ServesOptions, type ServesPlugin, } from './plugin.js';
 export { readJourney, readJourneys } from './journeys.js';
-//# sourceMappingURL=index.d.ts.map

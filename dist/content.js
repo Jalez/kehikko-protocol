@@ -43,4 +43,3 @@ export function contentStamp(content, about) {
         .sort()
         .join('\n');
 }
-//# sourceMappingURL=content.js.map

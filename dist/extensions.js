@@ -74,4 +74,3 @@ export function schemaFor(extension) {
     const name = canonicalName(extension);
     return Object.hasOwn(EXTENSIONS, name) ? EXTENSIONS[name]?.payload : undefined;
 }
-//# sourceMappingURL=extensions.js.map

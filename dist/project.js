@@ -184,4 +184,3 @@ export function withoutKehikotIgnored(gitignore) {
     const out = tidied.join('\n');
     return out.endsWith('\n') ? out : `${out}\n`;
 }
-//# sourceMappingURL=project.js.map

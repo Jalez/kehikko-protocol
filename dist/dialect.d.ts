@@ -41,4 +41,3 @@ export declare function dialectOfKind(kind: unknown): Dialect;
 export declare function toDialect<T>(message: T, dialect: Dialect): T;
 /** One message as received, respelled into the canonical dialect. The schemas do this too; see rule 1. */
 export declare function canonicalMessage<T>(message: T): T;
-//# sourceMappingURL=dialect.d.ts.map

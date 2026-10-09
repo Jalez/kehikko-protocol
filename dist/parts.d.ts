@@ -184,4 +184,3 @@ export declare const FOCUS_WHERE = "Parts are picked in the host\u2019s bar, bes
  * anywhere on the canvas, and the list is the same list on nearly all of them.
  */
 export declare function sameParts(a: readonly EpicPart[], b: readonly EpicPart[]): boolean;
-//# sourceMappingURL=parts.d.ts.map

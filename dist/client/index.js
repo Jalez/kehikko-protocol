@@ -6,4 +6,3 @@
  */
 export { mailbox, makeMailbox, KEEP } from './mailbox.js';
 export { connect, HostRefused, ANSWER_WITHIN_MS, PERSON_ANSWERS_WITHIN_MS, GOTO_BACKSTOP_MS, NOBODY_TO_ASK, } from './connect.js';
-//# sourceMappingURL=index.js.map

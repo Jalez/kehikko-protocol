@@ -58,4 +58,3 @@ export function serves({ id, prefer, dir, span, timeoutMs }) {
         },
     };
 }
-//# sourceMappingURL=plugin.js.map

@@ -335,4 +335,3 @@ export const methodResults = {
 export function resultSchemaFor(method) {
     return Object.hasOwn(methodResults, method) ? methodResults[method] : undefined;
 }
-//# sourceMappingURL=methods.js.map

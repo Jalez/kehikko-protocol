@@ -39,4 +39,3 @@ export function slugFrom(text) {
 export function own(record, key) {
     return Object.hasOwn(record, key) ? record[key] : undefined;
 }
-//# sourceMappingURL=ids.js.map

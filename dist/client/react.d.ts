@@ -73,4 +73,3 @@ export declare const useRoadmap: typeof useKehikot;
 export type Roadmap = Kehikot;
 /** @deprecated Renamed to `UseKehikotOptions`. */
 export type UseRoadmapOptions = UseKehikotOptions;
-//# sourceMappingURL=react.d.ts.map

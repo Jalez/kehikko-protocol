@@ -127,4 +127,3 @@ export interface Connection {
  * before a greeting arrives either.
  */
 export declare function connect(id: string, events?: HostEvents, options?: ConnectOptions): Connection;
-//# sourceMappingURL=connect.d.ts.map
