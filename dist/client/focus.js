@@ -2,12 +2,9 @@ import { useMemo, useRef } from 'react';
 import { anchorInFocus, focusSentence, isFocused, narrowToFocus, sameParts, } from '../parts.js';
 const NONE = [];
 /**
- * `context` may be null (before the greeting) and may lack `parts` (a host
- * older than 0.29.0): both are no parts, nothing picked, the whole epic.
- *
- * The value it returns changes identity only when the parts change by value or
- * the epic changes, so it is safe in a dependency list: a context re-sent
- * because something else on the canvas moved redraws nothing here.
+ * `context` may be null (before the greeting) or lack `parts` (a host older than 0.29.0): both mean no
+ * parts, nothing picked. The returned value changes identity only when the parts change by value or
+ * the epic changes, so it is safe in a dependency list.
  */
 export function useFocus(context) {
     const next = context?.parts ?? NONE;

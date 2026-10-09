@@ -18,83 +18,19 @@ import {
 import { mailbox, type MessageSource } from './mailbox.js'
 
 /**
- * The bridge, and nothing about any one module.
- *
- * One conversation with one window, in the shape this package's schemas define.
- * It knows how to be greeted, how to ask a question and match the answer to it,
- * how to answer a `goto`, and how to say how tall it would like to be. It knows
- * nothing about what a module draws, and the code that draws knows nothing about
- * `postMessage`.
- *
- * This file was twelve files. Each of them was written by hand, and two of the
- * bugs below were found INDEPENDENTLY in several of them, months apart, because
- * a handshake copied by eye is a handshake whose reasoning did not travel with
- * it. The comments here are the record of what went wrong; a refactor that
- * shortens them will reintroduce what they prevent.
- *
- * ## Binding to the window, not to the origin
- *
- * A host may frame a module on an opaque origin — anything the module sends then
- * arrives at the host with an origin of `"null"`, and `"null"` is a string every
- * sandboxed frame in every tab shares, so it can never be an identity. A module
- * that declares storage does have a real origin of its own, and that changes
- * nothing here, because what it gained is an origin of OURS and not any
- * knowledge of the HOST's. The host's origin still arrives only in `ev.origin`,
- * it is still `"null"` exactly when the host is itself sandboxed, and a guess
- * that fails silently drops every message.
- *
- * So the identity is the window handle: the greeting arrives from exactly one
- * `MessageEvent.source`, nothing in this page or any other can forge that
- * handle, and after the greeting anything from another window is ignored. Not
- * because a stray message would be dangerous by itself, but because a second
- * sender answering our correlation ids is a page that quietly shows another
- * host's work under this one's name.
- *
- * We reply with `targetOrigin: '*'` where `ev.origin` gave us nothing to aim at.
- * There is nothing secret in what crosses this bridge — the name of an epic
- * somebody is already reading — and a module's own secrets never cross it at
- * all: they go to that module's own `/api` over an ordinary same-origin fetch.
- * Where `ev.origin` is a real origin we use it, because then it is a fact rather
- * than a guess.
- *
- * ## Parse what the host sends, too
- *
- * A framed page receives every message posted at its window: the host's, a dev
- * server's hot-reload socket, an extension's. `looksLikeWireMessage` is the
- * cheap filter and `hostMessageSchema` is the real one. A module that trusted
- * `data.type` alone would be one that a bundler's socket can put into an
- * unexplained state on a Tuesday.
- *
- * ## And it is still only a convenience
- *
- * Nothing here is the host's check, and nothing here is required of a module. A
- * module that hand-rolls all of this is exactly as conforming as one that
- * imports it — see the README. The moment this reads as mandatory, "a module is
- * a program somebody else could have written" has quietly become "a module is a
- * program that imports our client".
+ * The bridge: one conversation with one window, in the shape this package's schemas define.
+ * Identity is the greeting's window handle (`MessageEvent.source`), never the origin; everything
+ * the host sends is parsed with `hostMessageSchema`. A convenience — a module may hand-roll it all.
+ * Design notes: docs/client.md.
  */
 
 /**
- * Why a question came back without an answer.
- *
- * The protocol's three, plus one more. `silent` is the timeout, and it is a
- * separate word rather than folded into `failed` because the two send a person
- * to different places: `failed` is the host telling us it went wrong, and
- * `silent` is the host not being there — which, from inside a frame, is
- * indistinguishable from a host that is still starting up. The protocol names
- * the same condition `silent` on the other side of the wire, for a module that
- * was greeted and never answered; the symmetry is intentional.
+ * Why a question came back without an answer: the protocol's three reasons, plus `silent` for a
+ * timeout or a host that is not there.
  */
 export type Refusal = { reason: ResponseFailureReason | 'silent'; error: string }
 
-/**
- * A refusal, as a thrown thing.
- *
- * A class rather than a rejected string, so that `catch` can tell a refusal from
- * a `TypeError` in the caller's own handler without reading English. Every
- * rejection from `request` is one of these, always — a caller that writes
- * `catch (e) { e.refusal.reason }` is not making an assumption.
- */
+/** A refusal, as a thrown thing. Every rejection from `request` is one of these, always. */
 export class HostRefused extends Error {
   constructor(readonly refusal: Refusal) {
     super(refusal.error)
@@ -102,168 +38,61 @@ export class HostRefused extends Error {
   }
 }
 
-/**
- * How long to wait for one answer.
- *
- * A number rather than forever, because forever is a page that shows "asking…"
- * until somebody reloads it, which is the exact shape of dishonesty a spinner
- * has — it is a claim that an answer is coming. Twelve seconds is long enough
- * for a host reading a file off a cold disk and short enough that nobody sits
- * through it twice.
- */
+/** How long to wait for one answer, in ms, before the question is refused as `silent`. */
 export const ANSWER_WITHIN_MS = 12_000
 
 /**
- * How long to wait for an answer that waits on a PERSON.
- *
- * `ANSWER_WITHIN_MS` is a number about a program: twelve seconds is a host
- * reading a file off a cold disk, and anything past it is a host that has
- * stopped answering. `projects.pick` is the first method whose answer waits on
- * somebody reading a list and deciding, and twelve seconds is a person who has
- * looked away for a moment.
- *
- * Five minutes, and it is still a number rather than forever, for the reason
- * the essay above gives: a wait that cannot end is a claim that an answer is
- * coming, and something has to be able to say that the dialog is gone and
- * nobody is going to answer. It is long enough that timing out means the
- * question was abandoned rather than that the person was slow.
- *
- * The deadline belongs to the QUESTION and not to the connection, which is why
- * this is a value a caller passes rather than a second default. A module that
- * raised its whole connection to five minutes would spend five minutes finding
- * out that the host is not there, on every other question it asks.
+ * How long to wait, in ms, for an answer that waits on a PERSON (`projects.pick`): five minutes.
+ * Passed per question as `within`; never the connection's default.
  */
 export const PERSON_ANSWERS_WITHIN_MS = 5 * 60_000
 
 /**
- * How long a `goto` listener has before the backstop answers for it.
- *
- * A timer rather than a line after the call, and the difference matters: a
- * listener may quite reasonably want to answer after a scroll settles, so
- * answering `false` the moment it returns would pre-empt the honest answer. Half
- * a second is longer than any of that and far shorter than the host's own
- * timeout, which means the reader gets the fallback link instead of a wait.
+ * How long, in ms, a `goto` listener has before the backstop answers `false` for it. Far shorter
+ * than the host's own timeout.
  */
 export const GOTO_BACKSTOP_MS = 500
 
-/**
- * What a question asked before any greeting is refused with.
- *
- * One sentence in one place, because the React hook can be asked the same thing
- * between mounts and a caller should not have to tell two spellings of "nobody
- * is there" apart.
- */
+/** What a question asked before any greeting is refused with. The React hook says the same between mounts. */
 export const NOBODY_TO_ASK = 'Nothing has greeted this page, so there is nobody to ask.'
 
 export interface HostEvents {
   /**
-   * The greeting arrived, carrying the context that came with it and whatever
-   * this module last asked the host to keep for it.
-   *
-   * The kept string rides beside the context rather than inside it because it
-   * belongs to one module and the context is broadcast to all of them — the
-   * protocol's own note on `state` in `helloSchema` makes that argument. It is
-   * `null` when the host keeps nothing, which is a first run, a host that does
-   * not answer `state.set`, or a module that has never written any; a module has
-   * to be able to tell that from a field that is missing because the host is
-   * older than the idea, and only one of those means it should draw its defaults
-   * with confidence.
-   *
-   * And it arrives HERE, in the greeting, rather than being fetched — so a page
-   * has it before its first render instead of drawing the wrong filter and
-   * correcting it a moment later.
+   * The greeting arrived, with its context and whatever this module last asked the host to keep.
+   * `state` is `null` when the host keeps nothing: a first run, a host that does not answer
+   * `state.set`, or a module that has never written any.
    */
   onHello?: (context: ModuleContext, state: string | null) => void
   /** The reader switched epics, or this tab was shown again. */
   onContext?: (context: ModuleContext) => void
   /**
-   * "Go to this reference." The answer is not optional and not deferrable: the
-   * host is waiting on it, and the protocol is explicit that a module which
-   * never answers must not be able to hang a reference. So `answer` is handed
-   * in rather than returned, and `connect` guarantees it is called — see below.
+   * "Go to this reference." The host is waiting on `answer`, which may be called later than the
+   * listener returns. `connect` guarantees exactly one answer: it says `false` itself after
+   * `GOTO_BACKSTOP_MS`, when the listener throws, or when there is no listener.
    */
   onGoto?: (goto: Goto, answer: (found: boolean, why?: string) => void) => void
   /**
-   * Something another module emitted, carried here by the host.
-   *
-   * Handed over whole rather than unwrapped, because unlike a context this
-   * envelope is the message: `extension` says which format `payload` is in, and
-   * `from`, `at` and `kehikko` are what a receiver filters on. A module that
-   * declares no interest in any extension never registers this and never hears
-   * one, which is the same as before it existed.
+   * Something another module emitted, carried here by the host. Handed over whole: `extension`
+   * says which format `payload` is in; `from`, `at` and `kehikko` are what a receiver filters on.
    */
   onEvent?: (event: ModuleEvent) => void
   /**
-   * The host's clear control was pressed, twice, and this page should delete
-   * what it is showing.
-   *
-   * Only ever reaches a module that announced `clearable`, because that is what
-   * makes the host draw a control at all — so a page that never calls
-   * `clearable` never registers this and never hears one.
-   *
-   * ## What "showing" means is yours to decide, and nobody else can decide it
-   *
-   * There are no parameters and there will not be. The host does not know what
-   * is on this page, what its filter narrowed it to, what a search box in the
-   * corner is doing, or what any of the rows are. It knows a button was pressed
-   * twice. Everything about WHICH records go is decided here, by the code that
-   * drew them.
-   *
-   * That is also what makes the control compose with the filter beside it. A
-   * person who narrowed to one file and pressed clear means that file, and the
-   * only reason that works is that this handler applies the same narrowing the
-   * render did. A page that cleared its whole store here would delete a hundred
-   * records while somebody could see three, which is the worst thing this
-   * feature could do and the one it is easiest to do by accident.
-   *
-   * ## Say what happened by re-announcing
-   *
-   * There is no reply. The host learns nothing and reports nothing of its own.
-   * Call `clearable` again when the work is done — with a smaller count in the
-   * label, or `null` because there is nothing left — and the control updates or
-   * disappears. That is the whole of the feedback, and it is in the module's
-   * own words.
+   * The host's clear control was pressed, twice: delete what this page is showing, applying the
+   * same narrowing the render did. Only reaches a module that announced `clearable`. No parameters
+   * and no reply — call `clearable` again when done, with the new label or `null`.
    */
   onClear?: () => void
   /**
-   * The host's refresh control was pressed, or the interval somebody set for
-   * this container has elapsed. Read your material again.
-   *
-   * Only ever reaches a module that announced `refreshable`, on the same
-   * arrangement `onClear` has: the offer is what makes the host draw a control
-   * at all, so a page that never calls `refreshable` never hears one.
-   *
-   * ## You are not told which of the two it was, and that is deliberate
-   *
-   * There are no parameters and there will not be. A flag saying "this one was
-   * automatic" would be used to behave differently — to take a cache on one and
-   * not on the other — which is a module deciding policy from a fact about
-   * somebody else's timer. Whatever a deliberate press should do here is what a
-   * tick should do.
-   *
-   * ## Say what happened by re-announcing
-   *
-   * There is no reply. Call `refreshable` on the way in with `busy: true`, and
-   * again on the way out with a new `at` — or with the SAME `at`, if the read
-   * failed and what is on screen is still the old one, which is the case a host
-   * dating the data from its own message would have got wrong.
+   * The host's refresh control was pressed, or this container's interval elapsed: read your
+   * material again. Only reaches a module that announced `refreshable`; it is not told which of the
+   * two it was. No reply — call `refreshable` with `busy: true` going in and with `at` coming out.
    */
   onRefresh?: () => void
 }
 
 /**
- * What a single question may say about itself, beyond its params.
- *
- * One field today, and the reason it is here rather than on `ConnectOptions`
- * is the whole of it: how long an answer takes is a property of the QUESTION,
- * not of the wire. `epic.get` is slow when a disk is cold; `projects.pick` is
- * slow because somebody is reading. A connection-wide number cannot be right
- * for both — set for the reader it makes every unanswered call take five
- * minutes to fail, and set for the disk it cuts the reader off mid-decision.
- *
- * It is a ceiling on waiting and never a promise about answering. Nothing here
- * reaches the host, which has its own opinion about how long it will take and
- * was never told this number.
+ * What a single question may say about itself, beyond its params. A ceiling on waiting, never a
+ * promise about answering; nothing here reaches the host.
  */
 export interface AskOptions {
   /** Milliseconds to wait for this one answer. Defaults to the connection's own. */
@@ -271,13 +100,7 @@ export interface AskOptions {
 }
 
 export interface ConnectOptions {
-  /**
-   * What to listen to. The `mailbox` by default, and it is the default for a
-   * reason — see the essay in `mailbox.ts`.
-   *
-   * Injectable because everything this function decides is tested without a
-   * browser, and that has to keep being true.
-   */
+  /** What to listen to. The `mailbox` by default; injectable so tests need no browser. */
   source?: MessageSource
   /** Override `ANSWER_WITHIN_MS`, for a module whose one question is genuinely slower. */
   answerWithin?: number
@@ -287,121 +110,33 @@ export interface ConnectOptions {
 
 export interface Connection {
   /**
-   * Start hearing messages. Call it AFTER the connection has been stored.
-   *
-   * ## Why this is not part of `connect`, which is a bug in five modules
-   *
-   * The mailbox replays what arrived before anybody listened, and it replays
-   * SYNCHRONOUSLY inside `addEventListener`. The greeting almost always arrived
-   * before the page mounted — that is the entire reason the mailbox exists — so
-   * with a one-step `connect`, `onHello` fires DURING the call, before the
-   * caller's `host.current = connect(...)` has run. Anything the handler does
-   * that reads the connection finds `null` and quietly does nothing.
-   *
-   * Worse, it works often enough to look fine. When the host happens to greet
-   * after the effect returns — a slow module, a reload, a busy machine — the
-   * assignment has already happened and everything behaves. A race whose good
-   * outcome is the common one is the kind that ships, and it did: two modules
-   * hit it independently, and each spent an afternoon on a symptom that reads
-   * "the module will not speak" while the host's own log shows a module that
-   * answered `ready`.
-   *
-   * Deferring the replay to a microtask would hide it rather than fix it. So the
-   * two steps are in the caller's hands and in the caller's order:
-   *
-   * ```ts
-   * const live = connect(id, events)
-   * host.current = live
-   * live.listen()
-   * ```
-   *
-   * Idempotent, so a second call is nothing rather than a second subscription.
+   * Start hearing messages. Call it AFTER the connection has been stored: the mailbox replays
+   * synchronously inside this call, so `onHello` can fire before it returns. Idempotent.
    */
   listen: () => Connection
   /**
-   * Ask one question. Rejects with `HostRefused` — never with a bare string.
-   *
-   * `within` overrides `ANSWER_WITHIN_MS` for this call and no other. See
-   * `AskOptions`.
+   * Ask one question. Rejects with `HostRefused` — never with a bare string. `options.within`
+   * overrides `ANSWER_WITHIN_MS` for this call and no other.
    */
   request: (method: string, params?: Record<string, unknown>, options?: AskOptions) => Promise<unknown>
   /** Say how tall we would like to be. Fire and forget, by design. */
   resize: (height: number) => void
   /**
-   * Say what this page can be narrowed by, so the host can draw the control.
-   *
-   * Fire and forget, like `resize`, and for the same reason: the host may draw
-   * it, may draw part of it, or may not have heard of the idea. What comes back
-   * is not an answer but a `kehikot.context` with `filters` in it, which is
-   * where a page reads the choice — including the first time, out of the
-   * greeting, before it has drawn anything.
-   *
-   * ## Remembered, and re-sent on every greeting
-   *
-   * The offer is held here and posted again whenever the host greets. That is
-   * not a convenience; without it the feature has a silent failure with the
-   * shape this package keeps finding.
-   *
-   * A page normally announces its offer from an effect after its first render,
-   * and the greeting normally arrived before that — that is the entire reason
-   * `mailbox` exists — so the ordinary case is fine. The case that is not is a
-   * frame that RELOADS: the host greets again, and a page whose offer had not
-   * changed since would have no reason to send anything, so the host would
-   * carry an offer from a conversation that no longer exists, or none at all.
-   * Neither errors. The control simply goes missing, or stops matching what is
-   * on screen, on a page that looks entirely normal.
-   *
-   * So the last offer is replayed after `ready`, every time. A page that calls
-   * this once at mount and never again is correct across every reload.
+   * Say what this page can be narrowed by, so the host can draw the control. Fire and forget; the
+   * choice comes back in a `kehikot.context` with `filters` in it. The last offer is remembered and
+   * re-sent after `ready` on every greeting, so one call at mount is correct across reloads.
    */
   filters: (groups: FilterGroup[]) => void
   /**
-   * Say that what this page is showing can be cleared, and what to call it.
-   *
-   * Fire and forget like `filters`, remembered like `filters`, and replayed on
-   * every greeting for exactly the reason given above — a frame that reloads is
-   * greeted again, and a page whose offer had not changed since would have no
-   * reason to send anything, leaving the host with a control from a
-   * conversation that no longer exists.
-   *
-   * `null` withdraws it: there is nothing on screen to clear, so the host takes
-   * the button away rather than leaving one that deletes nothing. Send it
-   * whenever the words change — which, because the words carry a count, is
-   * whenever what is shown changes, including right after `onClear` has run.
-   *
-   * ## A page still has to guard nothing
-   *
-   * The two-press arm is the host's, and it is on the host's side of the frame
-   * where it can be drawn. A page does not need its own confirmation before
-   * `onClear` and should not add one: `confirm()` in a framed page is silently
-   * `false` under any sandbox without `allow-modals`, so the guard would not
-   * merely be redundant — it would be a guard that always says no, on a control
-   * that then appears to do nothing.
+   * Say that what this page is showing can be cleared, and what to call it; `null` withdraws the
+   * control. Fire and forget, remembered and replayed on every greeting. Send it whenever the words
+   * change, including after `onClear`. Add no confirmation of your own: the two-press arm is the host's.
    */
   clearable: (label: string | null) => void
   /**
-   * Say that this page can read its material again, and when it last did.
-   *
-   * Fire and forget like `filters` and `clearable`, remembered like both, and
-   * replayed on every greeting for the reason given two entries up: a frame
-   * that reloads is greeted again, and a page whose state had not changed since
-   * would have no reason to send anything, leaving the host with a control from
-   * a conversation that no longer exists — or with a "last read" time from
-   * before the reload, which is worse, because it is wrong rather than missing.
-   *
-   * Send it whenever any of the three fields changes, which is at least twice
-   * per refresh: `busy: true` on the way in, and a new `at` on the way out.
-   *
-   * ## `at` is yours, and nobody else can supply it
-   *
-   * The host knows when it asked. It does not know whether you answered out of
-   * a cache, whether the read failed over a reading you are still showing, or
-   * whether you refreshed yourself for a reason it has no view of. So it prints
-   * what you say here and nothing else, and `null` — "I cannot say" — makes it
-   * print no time at all rather than invent one. See `refreshableSchema`.
-   *
-   * `can: false` withdraws the control, the way `clearable(null)` does: there is
-   * nothing this page could read again right now.
+   * Say that this page can read its material again, and when it last did. Fire and forget,
+   * remembered and replayed on every greeting. Send it whenever a field changes. `at` is the
+   * module's own fact, `null` for "I cannot say"; `can: false` withdraws the control.
    */
   refreshable: (state: { can?: boolean; at?: string | null; busy?: boolean }) => void
   /** Whether anything has greeted us yet. */
@@ -411,11 +146,8 @@ export interface Connection {
 }
 
 /**
- * Build one conversation. Nothing is sent, and nothing is heard, until `listen`.
- *
- * Nothing is sent from here until a greeting arrives either, and nothing needs
- * to be: the host greets on every frame load, and a module that announced itself
- * first would be shouting at a window that may not be a host at all.
+ * Build one conversation. Nothing is sent, and nothing is heard, until `listen`; nothing is sent
+ * before a greeting arrives either.
  */
 export function connect(id: string, events: HostEvents = {}, options: ConnectOptions = {}): Connection {
   const source = options.source ?? mailbox
@@ -426,26 +158,13 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
   let origin = '*'
   let live = true
   let listening = false
-  /* The last offer, replayed on every greeting. See `filters` above for the
-     reload this exists to survive. `null` means nothing has been offered, which
-     is not the same as an empty offer: an empty one is a module saying it has
-     nothing to be narrowed by now, and has to be sent. */
+  /* The last offer, replayed on every greeting. `null` means nothing has been offered; an empty
+     offer is a real one and has to be sent. */
   let offered: FilterGroup[] | null = null
-  /* And the last clear offer, replayed for the same reason.
-
-     Wrapped in an object rather than held as a bare `string | null`, because
-     for this offer `null` is a REAL value — it is how a module says there is
-     nothing to clear — so it cannot also be the sentinel for "never said
-     anything". A bare null would make a module that withdrew its offer before
-     the greeting indistinguishable from one that never had a clear control, and
-     the two produce the same drawing today but would diverge the moment the
-     replay meant anything more than "post this again". */
+  /* The last clear offer, replayed likewise. Wrapped in an object because a `null` label is a REAL
+     value — nothing to clear — and cannot also mean "never said anything". */
   let clearing: { label: string | null } | null = null
-  /* And the last refresh state, replayed for the same reason and with one of
-     its own: what is replayed carries `at`, so a frame that reloads without
-     this would leave the host drawing a "last read" time from a conversation
-     that no longer exists. A missing control is a thing somebody notices; a
-     stale timestamp is a thing they believe. */
+  /* The last refresh state, replayed likewise; what is replayed carries `at`. */
   let refreshing: { can: boolean; at: string | null; busy: boolean } | null = null
 
   /** Correlation id -> the promise waiting on it. A `Map`, per the protocol's note on lookups. */
@@ -457,10 +176,8 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
   let counter = 0
   const nextId = () => `${Date.now().toString(36)}-${(counter += 1).toString(36)}`
 
-  /* Which spelling the host greeted us in, and so the one we answer in. A host
-     from before the rename greets with `roadmap.hello` and hears nothing else;
-     a current one greets with `kehikot.hello`. Everything this file builds is
-     canonical, and is respelled only here, on the way out. See `dialect.ts`. */
+  /* Which spelling the host greeted us in, and so the one we answer in. Everything this file
+     builds is canonical, and is respelled only in `send`. See `dialect.ts`. */
   let dialect: Dialect = 'kehikot'
 
   const send = (message: unknown) => {
@@ -469,14 +186,7 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
   }
 
   const settle = (correlation: string, outcome: { ok: true; data: unknown } | { ok: false; refusal: Refusal }) => {
-    /*
-     * A late answer to a question nobody is waiting for is dropped, quietly.
-     *
-     * It is the ordinary case rather than an anomaly: a question that timed out
-     * and was answered a second later, a question the caller abandoned, a
-     * duplicate. There is nothing to report and nobody to report it to, and a
-     * module that threw here would be a module a slow host can crash.
-     */
+    /* A late answer to a question nobody is waiting for is dropped, quietly. */
     const pending = waiting.get(correlation)
     if (!pending) return
     waiting.delete(correlation)
@@ -493,26 +203,14 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
     const message = parsed.data
 
     if (message.type === MESSAGE.HELLO) {
-      /*
-       * Answered on EVERY greeting, not only the first.
-       *
-       * Re-greeting is normal rather than an error: the host greets on every
-       * frame load, and a frame that reloaded itself has forgotten the whole
-       * conversation — it cannot tell a reload from a host that greeted twice,
-       * and it must not have to. So the newest greeting wins, the window it came
-       * from becomes the one we answer, and `ready` goes back every time. A
-       * module that replied only once is a module that goes silent after any
-       * reload of its own frame, which the host reports as a module that did not
-       * answer its greeting.
-       */
+      /* Answered on EVERY greeting, not only the first: the newest greeting wins, its window
+         becomes the one we answer, and `ready` goes back every time. */
       host = (ev.source as Window | null) ?? source.parent ?? null
       origin = ev.origin && ev.origin !== 'null' ? ev.origin : '*'
       dialect = dialectOfType((ev.data as { type: string }).type) ?? 'kehikot'
       send({ type: MESSAGE.READY, id, protocol: message.protocol ?? PROTOCOL })
-      /* After `ready` and before the page is told, so that a host which reads
-         the offer while composing what to draw has it, and so that a handler
-         which announces a NEW offer from `onHello` overwrites the replay rather
-         than being overwritten by it. */
+      /* After `ready` and before the page is told, so a handler that announces a NEW offer from
+         `onHello` overwrites the replay rather than being overwritten by it. */
       if (offered !== null) send({ type: MESSAGE.FILTERS, groups: offered })
       if (clearing !== null) send({ type: MESSAGE.CLEARABLE, label: clearing.label })
       if (refreshing !== null) send({ type: MESSAGE.REFRESHABLE, ...refreshing })
@@ -521,37 +219,12 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
     }
 
     /* Everything after the greeting has to come from the window that gave it.
-       See the essay at the top: the origin cannot do this job and this can. */
+       The origin cannot do this job and this can (docs/client.md). */
     if (ev.source !== host) return
 
     if (message.type === MESSAGE.CONTEXT) {
-      /*
-       * Handed on whole, with only the envelope removed.
-       *
-       * The version of this comment that stood in the modules argued carefully
-       * for the wrong thing. It said the context was "rebuilt field by field"
-       * because a context message carries a `type` a `ModuleContext` does not,
-       * and then listed the fields — with a paragraph on `selection` explaining
-       * that dropping it is the difference between a page that shows what
-       * somebody picked and one that ignores every click on the canvas. That
-       * diagnosis was right and the remedy was not.
-       *
-       * A list that has to be kept complete is a list that will be incomplete
-       * again at the next protocol release, and it was, in FIVE modules: `prompt`
-       * and `pinned` were both missing within a day of being added, and `kehikko`
-       * — which says which canvas a pane is standing on — was missing the moment
-       * the protocol grew it. The failure has no symptom. A field left out does
-       * not error; it quietly becomes that page's belief that the host said
-       * nothing about it.
-       *
-       * So the listing is gone, and it is gone from ONE place now rather than
-       * from twelve. `type` and `protocol` are the only two things a
-       * `ModuleContext` does not have, and removing exactly those means every
-       * field the protocol grows arrives at every module whether or not anybody
-       * has heard of it. What a module then chooses to READ is its own business;
-       * the difference is that the rest now arrives rather than being discarded
-       * on the way in.
-       */
+      /* Handed on whole, with only the envelope (`type`, `protocol`) removed, so every field the
+         protocol grows arrives without being listed here. */
       const { type: _envelope, protocol: _spoken, ...context } = message
       events.onContext?.(context)
       return
@@ -569,30 +242,18 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
     }
 
     if (message.type === MESSAGE.CLEAR) {
-      /* Nothing is unwrapped and nothing is passed on, because there is nothing
-         in it — see `clearSchema`. A page that never registered `onClear` does
-         nothing, which is correct rather than a dropped message: the host only
-         draws the control for a page that announced `clearable`, so a module
-         with a handler and no offer and one with an offer and no handler are
-         both modules that asked for this to do nothing. */
       events.onClear?.()
       return
     }
 
     if (message.type === MESSAGE.REFRESH) {
-      /* Nothing to unwrap, for the same reason and with the same consequence
-         as `MESSAGE.CLEAR` above: a page with no handler does nothing, which is
-         what a page that never announced `refreshable` asked for. */
       events.onRefresh?.()
       return
     }
 
     if (message.type === MESSAGE.GOTO) {
-      /* Answered exactly once, whatever the listener does — including nothing,
-         including throwing, including answering twice. The host is waiting on
-         this and will time out into "not found"; a module that leaves it to the
-         timeout has turned a hundred milliseconds into twelve seconds of a
-         reader waiting, for every reference that points at it. */
+      /* Answered exactly once, whatever the listener does — including nothing, including
+         throwing, including answering twice. */
       let answered = false
       const answer = (found: boolean, why = '') => {
         if (answered) return
@@ -629,10 +290,8 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
         )
       }
       const correlation = nextId()
-      /* A number this caller asked for, or the connection's. Guarded rather
-         than trusted: `within: 0` and `within: NaN` would both mean "time out
-         before the message is posted", which is a caller's typo turned into a
-         refusal about the host. */
+      /* This caller's `within`, or the connection's. Guarded: `within: 0` and `within: NaN` would
+         both mean "time out before the message is posted". */
       const deadline =
         typeof options?.within === 'number' && Number.isFinite(options.within) && options.within > 0
           ? options.within
@@ -653,42 +312,27 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
     },
 
     resize(height) {
-      /* Clamped on our own side with the host's own arithmetic, so that what we
-         ask for is what we will get. The host runs its own copy over the raw
-         number regardless — this is prediction, not enforcement. */
+      /* Clamped on our own side with the host's own arithmetic. The host runs its own copy
+         regardless — this is prediction, not enforcement. */
       send({ type: MESSAGE.RESIZE, height: clampHeight(height) })
     },
 
     filters(groups) {
-      /* Kept before it is sent, so that an offer made before the greeting is
-         not lost — it goes out with the replay instead. `send` is a no-op
-         without a host, and a page that announced early and never again would
-         otherwise have a control that never appears. */
+      /* Kept before it is sent, so an offer made before the greeting goes out with the replay:
+         `send` is a no-op without a host. */
       offered = groups
       send({ type: MESSAGE.FILTERS, groups })
     },
 
     clearable(label) {
-      /* Kept before it is sent, for the same reason as the filter offer: an
-         offer made before the greeting goes out with the replay rather than
-         being lost. */
+      /* Kept before it is sent, for the same reason as the filter offer. */
       clearing = { label }
       send({ type: MESSAGE.CLEARABLE, label })
     },
 
     refreshable(state) {
-      /* Merged onto what was last said rather than replacing it, so a page can
-         call `refreshable({ busy: true })` on the way into a read without
-         restating a timestamp it has not changed. The whole state still goes on
-         the wire — the message is an offer, whole, every time — and this is
-         only about what a caller has to type.
-
-         `busy` is the one field that does NOT carry forward, and the asymmetry
-         is the point: `can` and `at` are facts that stay true until something
-         changes them, and busy is true for the length of one read. Carried
-         forward, a page that forgot to say `busy: false` on the way out would
-         leave a spinner turning forever; defaulted off, a page that forgets is
-         a page that merely did not show one. */
+      /* Merged onto what was last said; the whole state still goes on the wire. `busy` alone does
+         NOT carry forward — it defaults to false, so a forgotten `busy: false` leaves no spinner. */
       refreshing = {
         can: state.can ?? refreshing?.can ?? true,
         at: state.at !== undefined ? state.at : (refreshing?.at ?? null),
