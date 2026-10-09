@@ -56,6 +56,13 @@ never when `NODE_ENV` is `production` or `test`, so no suite reads differently:
 - The bins under the package's own spelling, `kehikot-create` and `kehikot-check-parts`, beside the
   old names.
 
+### Tests
+
+- No test can reach the real module registry. The preload (`test/setup.ts`) points the registry at
+  a scratch directory for the whole suite, under every variable the code reads, and fails any test
+  that leaves it resolving anywhere else. Before this, each test set the variable itself — the
+  deprecated `ROADMAP_MODULES_DIR`, as it happens — which holds only while the code reads that name.
+
 ### Internal (carried from Unreleased; nothing a consumer can observe)
 
 - `wire.ts` split into `passage.ts`, `filters.ts`, `context.ts` and `messages.ts` (and still
