@@ -5,12 +5,17 @@ import { GREETING_GRACE_MS, type Where } from './host-store.js';
  * The bridge as one React value: `useKehikot`. Optional — a second subpath the plain client never
  * imports, and a module may hand-roll all of it.
  * Design notes: docs/client.md.
+ *
+ * `useKehikot` is deprecated in 0.37 and removed in the next breaking release: `useHost` (below,
+ * from `host.ts`) is the hook, and `hostStore` in `/client` is the same thing outside React.
  */
 export { GREETING_GRACE_MS, type Where };
+/** @deprecated Removed in the next breaking release. Use `UseHostOptions`. */
 export interface UseKehikotOptions extends ConnectOptions {
     /** Override `GREETING_GRACE_MS`, or pass `0` to say "unhosted" the moment the first paint lands. */
     grace?: number;
 }
+/** @deprecated Removed in the next breaking release. Use `Host`, what `useHost` returns. */
 export interface Kehikot {
     /** `listening` for under a second, then `unhosted`, or `hosted` from the greeting on. */
     where: Where;
@@ -53,6 +58,9 @@ export interface Kehikot {
 /**
  * Connect once, for the life of this component, and re-render when the host speaks. `events` is
  * read through a ref, so it need not be memoised; `id` is the only dependency that reconnects.
+ *
+ * @deprecated Removed in the next breaking release. Use `useHost`: the same connection, with the
+ * context flattened, the theme applied, the kept state typed, and `onClear` / `onRefresh` delivered.
  */
 export declare function useKehikot(id: string, events?: HostEvents, options?: UseKehikotOptions): Kehikot;
 export { useFocus, type Focus } from './focus.js';
@@ -61,12 +69,12 @@ export { useFocus, type Focus } from './focus.js';
  * module that has not been updated still builds against this copy. Same
  * function, same types. Use `useKehikot`.
  *
- * @deprecated Renamed to `useKehikot`.
+ * @deprecated Removed in the next breaking release, with `useKehikot`. Use `useHost`.
  */
 export declare const useRoadmap: typeof useKehikot;
-/** @deprecated Renamed to `Kehikot`. */
+/** @deprecated Removed in the next breaking release. Use `Host`. */
 export type Roadmap = Kehikot;
-/** @deprecated Renamed to `UseKehikotOptions`. */
+/** @deprecated Removed in the next breaking release. Use `UseHostOptions`. */
 export type UseRoadmapOptions = UseKehikotOptions;
 export { useHost, hostFields, JSON_KEPT, type Host, type KeptCodec, type UseHostOptions } from './host.js';
 export { type HostActions, type HostFields, type HostStanding } from './host-store.js';

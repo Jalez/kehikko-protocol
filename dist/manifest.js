@@ -169,7 +169,7 @@ export const manifestSchema = z.object({
     /**
      * Why this module has nothing to narrow to the picked parts, in one sentence, for a module that
      * does not say `reacts: ['parts']` (0.34.0). Optional and never defaulted. A module that says
-     * neither is reported by `partsDeclaration`, not refused; the next version refuses it.
+     * neither is reported by `partsDeclaration`, not refused; the next breaking release refuses it.
      */
     partless: z.string().trim().min(1).max(LIMITS.SUMMARY).optional(),
     modes: z.array(modeSchema).min(1).max(LIMITS.MODES),
@@ -214,6 +214,9 @@ export const manifestSchema = z.object({
  * A parsed manifest, spelled for a host from before the rename: the old `kind`, the old module id,
  * the old extension names; everything else is the same document. What a module serves at
  * `LEGACY_WELL_KNOWN`. Pure; the manifest passed in is not changed.
+ *
+ * @deprecated Removed in the next breaking release, with the pre-rename dialect: a manifest is
+ * served at `WELL_KNOWN` only, as it is.
  */
 export function legacyManifest(manifest) {
     return {
@@ -267,7 +270,7 @@ export function speaks(range, protocol = PROTOCOL) {
 /**
  * What is wrong with what a module says about the parts of an epic, as sentences a host can show; `[]` when
  * nothing is. A module has `parts` in `reacts` or a reason in `partless`; neither and both are reported. Not
- * called by `manifestSchema`: a warning now (`bun run check:parts` fails), a refusal next minor version.
+ * called by `manifestSchema`: a warning now (`bun run check:parts` fails), a refusal in the next breaking release.
  */
 export function partsDeclaration(manifest) {
     const follows = (manifest.reacts ?? []).includes('parts');

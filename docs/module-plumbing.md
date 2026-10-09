@@ -307,7 +307,8 @@ Gaps that could only be closed by changing what a 0.35.0 call does, so they were
 - **A stale `ask` says "reloading…"** whether or not anything will reload. `error` should be `PAGE_OLD`, and the cover should say the rest.
 - **`follow` probes nothing by default.** `probe` should be on.
 - **`CoverState` has no `refused` or `empty`.**
-- **`useKehikot`** can go: `useHost` and `hostStore` share nothing with it.
+- **`useKehikot`** can go: `useHost` and `hostStore` share nothing with it. *Deprecated in 0.37*, with every name that says `roadmap` — the list is in [CHANGELOG.md](../CHANGELOG.md) under 0.37.0.
+- **The parts declaration** is a refusal: a manifest that neither says `reacts: ['parts']` nor gives `partless` a sentence fails `manifestSchema`.
 
 ## What the plugin and the hook do not cover
 

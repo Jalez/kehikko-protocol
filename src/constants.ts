@@ -18,6 +18,8 @@ export const WELL_KNOWN = '/.well-known/kehikot-module.json'
  * Where a module built before the rename serves its manifest. A host asks `WELL_KNOWN` first and
  * this second; a module built against this package may serve its manifest here too, in the old
  * dialect (`legacyManifest`). See `dialect.ts`.
+ *
+ * @deprecated Removed in the next breaking release, with the pre-rename dialect. Use `WELL_KNOWN`.
  */
 export const LEGACY_WELL_KNOWN = '/.well-known/roadmap-module.json'
 
@@ -30,6 +32,8 @@ export const MANIFEST_KIND = 'kehikot.module'
 /**
  * The same word before the rename. Accepted by `manifestSchema`, and the way a
  * host knows to greet a module in its old dialect — see `dialectOfKind`.
+ *
+ * @deprecated Removed in the next breaking release, with the pre-rename dialect. Use `MANIFEST_KIND`.
  */
 export const LEGACY_MANIFEST_KIND = 'roadmap.module'
 
@@ -99,10 +103,16 @@ export const MESSAGE_PREFIX = 'kehikot.'
 /**
  * The prefix message types carried before the rename. Still accepted on
  * receive, and still sent to a party that speaks only it. See `dialect.ts`.
+ *
+ * @deprecated Removed in the next breaking release, with the pre-rename dialect. Use `MESSAGE_PREFIX`.
  */
 export const LEGACY_MESSAGE_PREFIX = 'roadmap.'
 
-/** Both prefixes a listener lets through, the current one first. */
+/**
+ * Both prefixes a listener lets through, the current one first.
+ *
+ * @deprecated Removed in the next breaking release: there is one prefix then, `MESSAGE_PREFIX`.
+ */
 export const MESSAGE_PREFIXES = [MESSAGE_PREFIX, LEGACY_MESSAGE_PREFIX] as const
 
 /** What the host says, and only the host. A module sending one of these is confused. */

@@ -598,6 +598,8 @@ host should not have to watch a module to find out what it wants.
 
 #### `legacyManifest`
 
+> **Deprecated in 0.37, removed in the next breaking release.** A manifest is served at `WELL_KNOWN` only, as it is; `kind: 'roadmap.module'` stops being read.
+
 A parsed manifest, spelled for a host from before the rename.
 
 What a module built against this package serves at `LEGACY_WELL_KNOWN`, so
@@ -639,7 +641,7 @@ is a contradiction, and is reported too.
 
 **A warning in this version, a refusal in the next.** `manifestSchema` does
 not call this, so every manifest parses as it did; a host shows the list,
-and `bun run check:parts` fails on it. From the next minor version a
+and `bun run check:parts` fails on it. From the next breaking release (still a warning in 0.37) a
 manifest that declares neither will not parse.
 
 Pure, and a function of two fields, so it takes a parsed manifest or the

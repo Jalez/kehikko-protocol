@@ -2,6 +2,8 @@
 
 Why `PROTOCOL` is 2 and what would raise it, and how both spellings of every name (`kehikot.` and `roadmap.`) are read and written.
 
+> **Deprecated in 0.37, removed in the next breaking release.** The second spelling — `roadmap.` message types, `roadmap.module`, `/.well-known/roadmap-module.json`, and everything in `dialect.ts` except `canonicalModuleId` — goes. The next breaking release reads and writes `kehikot.` only; `canonicalModuleId` stays for an id written to disk before the rename. `PROTOCOL` does not change for it: no `kehikot.` message changes meaning.
+
 This is the reasoning, not the reference: the shapes themselves, with their bounds, are in the source and show on hover. The first half is the overview that used to be in the README; the second half is the note that used to stand above each symbol in the source, under that symbol's name.
 
 Back to the [index](README.md).

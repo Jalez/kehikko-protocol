@@ -381,6 +381,8 @@ before the rename, is read when it is not set.
 
 #### `legacyRegistryDir`
 
+> **Deprecated in 0.37, removed in the next breaking release.** The next breaking release does not read `~/.roadmap/modules`; a host copies that directory into `registryDir()` once. `ROADMAP_MODULES_DIR` and `ROADMAP_ORIGIN` stop being read too: set `KEHIKOT_MODULES_DIR` and `KEHIKOT_ORIGINS`. A `roadmap.<name>.json` registration beside the one `registerAt` writes is still read.
+
 The registry before the rename, `~/.roadmap/modules` — READ, never written,
 so that what a module wrote there (`keep`, above all) is carried over the
 first time it registers in the new place. `null` when the registry was

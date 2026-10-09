@@ -910,6 +910,8 @@ moment you need it rather than capturing it.
 
 #### `useKehikot`
 
+> **Deprecated in 0.37, removed in the next breaking release.** Use `useHost` ([module-plumbing.md](module-plumbing.md)), or `hostStore` outside React. `useRoadmap`, `Roadmap` and `UseRoadmapOptions` go with it. What follows describes `useKehikot` as it is until then.
+
 Connect once, for the life of this component, and re-render when the host speaks.
 
 `events` may be rebuilt on every render — it is read through a ref, never

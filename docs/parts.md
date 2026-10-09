@@ -233,7 +233,7 @@ show the list. **In the next minor version a manifest that says neither will
 not parse.**
 
 **The check.** `bun run check:parts <module dir>…` (the bin
-`kehikko-check-parts`, from a module: `bun node_modules/kehikot-module-protocol/bin/check-parts.ts .`)
+`kehikot-check-parts` — `kehikko-check-parts` until the next breaking release — from a module: `bun node_modules/kehikot-module-protocol/bin/check-parts.ts .`)
 reads a module's `manifest.ts` and exits 1 on exactly what the manifest says:
 the module declares neither `parts` nor `partless`, declares both, or has no
 manifest that loads. It also scans the module's sources for a named import of

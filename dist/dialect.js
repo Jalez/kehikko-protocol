@@ -3,39 +3,68 @@
  * read everywhere; the old one is written only to a party known to need it. Translate at the edge:
  * `toDialect` when a message is posted, `canonical*` when one is parsed.
  * Design notes: docs/protocol-number.md.
+ *
+ * Deprecated as a whole in 0.37: the next breaking release speaks `kehikot.` only. What stays is
+ * `canonicalModuleId`, for an id that was written to disk before the rename.
  */
 import { LEGACY_MANIFEST_KIND, LEGACY_MESSAGE_PREFIX, MESSAGE_PREFIX } from './constants.js';
 /** The prefix every name carries now. */
 const PREFIX = MESSAGE_PREFIX;
 /** The prefix names carried before the rename. Read, and written only to a party that needs it. */
 const LEGACY_PREFIX = LEGACY_MESSAGE_PREFIX;
+/** @deprecated Removed in the next breaking release, with the pre-rename `roadmap.` dialect. */
 export const DIALECTS = ['kehikot', 'roadmap'];
 /**
  * The canonical spelling of a dotted name: a message type, a module id, an
  * extension name. `roadmap.x` becomes `kehikot.x`; anything else is returned
  * unchanged, including a name in somebody else's namespace.
+ *
+ * @deprecated Use `canonicalModuleId`, which is this for a module id and is what stays.
  */
 export function canonicalName(name) {
     return name.startsWith(LEGACY_PREFIX) ? PREFIX + name.slice(LEGACY_PREFIX.length) : name;
 }
-/** The pre-rename spelling of a dotted name. `kehikot.x` becomes `roadmap.x`; anything else is unchanged. */
+/**
+ * The pre-rename spelling of a dotted name. `kehikot.x` becomes `roadmap.x`; anything else is unchanged.
+ *
+ * @deprecated Removed in the next breaking release, with the pre-rename `roadmap.` dialect. Nothing replaces it.
+ */
 export function legacyName(name) {
     return name.startsWith(PREFIX) ? LEGACY_PREFIX + name.slice(PREFIX.length) : name;
 }
-/** A name spelled for one dialect. */
+/**
+ * A name spelled for one dialect.
+ *
+ * @deprecated Removed in the next breaking release, with the pre-rename `roadmap.` dialect. Nothing replaces it.
+ */
 export function nameIn(name, dialect) {
     return dialect === 'roadmap' ? legacyName(name) : canonicalName(name);
 }
 /**
  * A module's one id, whichever spelling it arrived in. `roadmap.journeys` and `kehikot.journeys`
  * are the same module, and a host keys everything it keeps about a module by this.
+ *
+ * Not deprecated: it stays, for a module id read from disk (a project's `.kehikot/` files, a
+ * registration's file name) that was written before the rename.
  */
 export const canonicalModuleId = canonicalName;
-/** A module id as an unchanged, pre-rename module or host spells it. */
+/**
+ * A module id as an unchanged, pre-rename module or host spells it.
+ *
+ * @deprecated Removed in the next breaking release, with the pre-rename `roadmap.` dialect. Nothing replaces it.
+ */
 export const legacyModuleId = legacyName;
-/** An extension name, e.g. `roadmap.notifications@1`, in its canonical spelling. */
+/**
+ * An extension name, e.g. `roadmap.notifications@1`, in its canonical spelling.
+ *
+ * @deprecated Removed in the next breaking release, with the pre-rename `roadmap.` dialect. Compare an extension name as it is written.
+ */
 export const canonicalExtension = canonicalName;
-/** Which dialect a message type is in, or `null` when it is in neither. */
+/**
+ * Which dialect a message type is in, or `null` when it is in neither.
+ *
+ * @deprecated Removed in the next breaking release, with the pre-rename `roadmap.` dialect. Nothing replaces it.
+ */
 export function dialectOfType(type) {
     if (typeof type !== 'string')
         return null;
@@ -45,7 +74,11 @@ export function dialectOfType(type) {
         return 'roadmap';
     return null;
 }
-/** Which dialect a manifest's `kind` says its module speaks. Anything unrecognised is the current one. */
+/**
+ * Which dialect a manifest's `kind` says its module speaks. Anything unrecognised is the current one.
+ *
+ * @deprecated Removed in the next breaking release, with the pre-rename `roadmap.` dialect. Nothing replaces it.
+ */
 export function dialectOfKind(kind) {
     return kind === LEGACY_MANIFEST_KIND ? 'roadmap' : 'kehikot';
 }
@@ -71,6 +104,8 @@ function contextIn(value, dialect) {
  * One message, respelled for a receiver that speaks `dialect`; applied by a sender at the moment it
  * posts. Respells the `type`, module ids (`ready.id`, `event.from`, `context.containers[].module`)
  * and extension names (`event.extension`, `params.extension` on `events.emit`). Pure: it copies.
+ *
+ * @deprecated Removed in the next breaking release, with the pre-rename `roadmap.` dialect. Post a message as it is built.
  */
 export function toDialect(message, dialect) {
     if (!isObject(message) || typeof message.type !== 'string')
@@ -95,7 +130,11 @@ export function toDialect(message, dialect) {
     }
     return out;
 }
-/** One message as received, respelled into the canonical dialect. The schemas do this too; see rule 1. */
+/**
+ * One message as received, respelled into the canonical dialect. The schemas do this too; see rule 1.
+ *
+ * @deprecated Removed in the next breaking release, with the pre-rename `roadmap.` dialect. Nothing replaces it.
+ */
 export function canonicalMessage(message) {
     return toDialect(message, 'kehikot');
 }

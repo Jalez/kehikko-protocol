@@ -2,6 +2,7 @@
  * Who may frame a module: the `frame-ancestors` a module's page should send. Read in order:
  * `KEHIKOT_ORIGINS` (space-separated list), `KEHIKOT_ORIGIN` (one), `ROADMAP_ORIGIN` (one), then
  * the defaults. A single origin is the whole answer, not an addition to the defaults.
+ * `ROADMAP_ORIGIN` is deprecated: the next breaking release does not read it.
  * Design notes: docs/serving.md.
  */
 /** Every origin a host on this machine frames a module from, unless told otherwise. */

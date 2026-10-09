@@ -4,6 +4,7 @@ import { LIMITS } from '../limits.js';
 import { dialectOfType, toDialect } from '../dialect.js';
 import { hostMessageSchema, looksLikeWireMessage, } from '../wire.js';
 import { mailbox } from './mailbox.js';
+import { deprecated } from '../deprecated.js';
 /** A refusal, as a thrown thing. Every rejection from `request` is one of these, always. */
 export class HostRefused extends Error {
     refusal;
@@ -86,6 +87,10 @@ export function connect(id, events = {}, options = {}) {
             host = ev.source ?? source.parent ?? null;
             origin = ev.origin && ev.origin !== 'null' ? ev.origin : '*';
             dialect = dialectOfType(ev.data.type) ?? 'kehikot';
+            /* Once per page, at a greeting: never per message. */
+            if (dialect === 'roadmap') {
+                deprecated('Being greeted in the pre-rename dialect (roadmap.hello)', 'Update the host framing this page: it should say kehikot.hello.');
+            }
             /* With the build that served this page, when it printed one: a host compares it with the server's now. */
             const build = pageBuild();
             send({ type: MESSAGE.READY, id, protocol: message.protocol ?? PROTOCOL, ...(build ? { build } : {}) });

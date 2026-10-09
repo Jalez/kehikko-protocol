@@ -1,18 +1,26 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { HostRefused, NOBODY_TO_ASK, connect, } from './connect.js';
 import { GREETING_GRACE_MS } from './host-store.js';
+import { deprecated } from '../deprecated.js';
 /**
  * The bridge as one React value: `useKehikot`. Optional — a second subpath the plain client never
  * imports, and a module may hand-roll all of it.
  * Design notes: docs/client.md.
+ *
+ * `useKehikot` is deprecated in 0.37 and removed in the next breaking release: `useHost` (below,
+ * from `host.ts`) is the hook, and `hostStore` in `/client` is the same thing outside React.
  */
 /* Stated beside the store, which needs them without React; still exported from here. */
 export { GREETING_GRACE_MS };
 /**
  * Connect once, for the life of this component, and re-render when the host speaks. `events` is
  * read through a ref, so it need not be memoised; `id` is the only dependency that reconnects.
+ *
+ * @deprecated Removed in the next breaking release. Use `useHost`: the same connection, with the
+ * context flattened, the theme applied, the kept state typed, and `onClear` / `onRefresh` delivered.
  */
 export function useKehikot(id, events = {}, options = {}) {
+    deprecated('useKehikot (and its alias useRoadmap)', 'Use useHost from kehikot-module-protocol/client/react.');
     const [where, setWhere] = useState('listening');
     const [context, setContext] = useState(null);
     const [state, setState] = useState(null);
@@ -96,7 +104,7 @@ export { useFocus } from './focus.js';
  * module that has not been updated still builds against this copy. Same
  * function, same types. Use `useKehikot`.
  *
- * @deprecated Renamed to `useKehikot`.
+ * @deprecated Removed in the next breaking release, with `useKehikot`. Use `useHost`.
  */
 export const useRoadmap = useKehikot;
 /* The fuller listener and the shared not-ready screen. See `host.ts` and `cover.ts`. */
