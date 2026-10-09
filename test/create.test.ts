@@ -22,16 +22,16 @@ import {
 const scratch = mkdtempSync(join(tmpdir(), 'kehikko-create-'))
 afterAll(() => rmSync(scratch, { recursive: true, force: true }))
 
-/* Every test that could touch the registry gets its own, never ~/.roadmap/modules. */
-const before = process.env.ROADMAP_MODULES_DIR
+/* Every test that could touch the registry gets its own, never a person's real one. */
+const before = process.env.KEHIKOT_MODULES_DIR
 let registry = ''
 beforeEach(() => {
   registry = mkdtempSync(join(scratch, 'registry-'))
-  process.env.ROADMAP_MODULES_DIR = registry
+  process.env.KEHIKOT_MODULES_DIR = registry
 })
 afterEach(() => {
-  if (before === undefined) delete process.env.ROADMAP_MODULES_DIR
-  else process.env.ROADMAP_MODULES_DIR = before
+  if (before === undefined) delete process.env.KEHIKOT_MODULES_DIR
+  else process.env.KEHIKOT_MODULES_DIR = before
 })
 
 function registerFake(id: string, port: number, dir = ''): void {

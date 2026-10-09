@@ -353,13 +353,13 @@ describe('against a listener that is really there', () => {
 describe('writing down where it answers', () => {
   const withRegistry = <T>(run: (where: string) => T): T => {
     const where = mkdtempSync(join(tmpdir(), 'roadmap-modules-'))
-    const before = process.env.ROADMAP_MODULES_DIR
-    process.env.ROADMAP_MODULES_DIR = where
+    const before = process.env.KEHIKOT_MODULES_DIR
+    process.env.KEHIKOT_MODULES_DIR = where
     try {
       return run(where)
     } finally {
-      if (before === undefined) delete process.env.ROADMAP_MODULES_DIR
-      else process.env.ROADMAP_MODULES_DIR = before
+      if (before === undefined) delete process.env.KEHIKOT_MODULES_DIR
+      else process.env.KEHIKOT_MODULES_DIR = before
     }
   }
 
@@ -436,15 +436,15 @@ describe('writing down where it answers', () => {
   test('a registry directory that is not there yet is made', async () => {
     const parent = mkdtempSync(join(tmpdir(), 'roadmap-home-'))
     const where = join(parent, '.roadmap', 'modules')
-    const before = process.env.ROADMAP_MODULES_DIR
-    process.env.ROADMAP_MODULES_DIR = where
+    const before = process.env.KEHIKOT_MODULES_DIR
+    process.env.KEHIKOT_MODULES_DIR = where
     try {
       expect(registryDir()).toBe(where)
       const written = registerAt({ id: ID, origin: 'http://127.0.0.1:7960', dir: parent })
       expect(await Bun.file(written.file).exists()).toBe(true)
     } finally {
-      if (before === undefined) delete process.env.ROADMAP_MODULES_DIR
-      else process.env.ROADMAP_MODULES_DIR = before
+      if (before === undefined) delete process.env.KEHIKOT_MODULES_DIR
+      else process.env.KEHIKOT_MODULES_DIR = before
     }
   })
 
