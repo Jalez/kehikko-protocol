@@ -23,6 +23,7 @@ export const JSON_KEPT = {
     },
     write: (kept) => JSON.stringify(kept),
 };
+const STEADY = ['passage', 'containers', 'parts', 'selection', 'chosen', 'kehikko'];
 const NONE = [];
 const NO_CHOICE = {};
 const text = (value) => (typeof value === 'string' && value.trim() ? value : null);
@@ -42,9 +43,9 @@ function alike(a, b) {
  * The flattened fields of a context. Pure, so a test can build a `Host` from a plain object.
  * Given the fields as they were, each one that still says the same thing IS the one it was: every
  * context is parsed afresh off the wire, and an effect that depends on `passage` should run when
- * the passage changed, not whenever the host spoke.
+ * the passage changed, not whenever the host spoke. `same` replaces that rule for the fields it names.
  */
-export function hostFields(context, was) {
+export function hostFields(context, was, same = {}) {
     const now = {
         project: text(context?.project),
         projectPath: text(context?.projectPath),
@@ -58,8 +59,9 @@ export function hostFields(context, was) {
     };
     if (!was)
         return now;
-    for (const name of ['passage', 'containers', 'parts', 'selection', 'chosen', 'kehikko']) {
-        if (alike(was[name], now[name]))
+    for (const name of STEADY) {
+        const rule = same[name];
+        if (rule ? rule(was[name], now[name]) : alike(was[name], now[name]))
             now[name] = was[name];
     }
     return now;
@@ -70,7 +72,7 @@ export function hostFields(context, was) {
  * which matters for a greeting replayed before anything has rendered.
  */
 export function hostStore(id, events = {}, options = {}) {
-    const { grace = GREETING_GRACE_MS, kept: given, applyTheme: themed = true, reloadWhenStale: reloads = true, ...connectOptions } = options;
+    const { grace = GREETING_GRACE_MS, kept: given, applyTheme: themed = true, reloadWhenStale: reloads = true, same, ...connectOptions } = options;
     const codec = given ?? JSON_KEPT;
     let standing = { where: 'listening', context: null, ...hostFields(null), theme: pageTheme() ?? 'light', kept: null };
     const hearers = new Set();
@@ -88,7 +90,7 @@ export function hostStore(id, events = {}, options = {}) {
         if (themed)
             applyTheme(theme, { remember: true });
         /* The kept state with the context, in one change, so the first hosted standing already has the remembered choice. */
-        change({ where: 'hosted', context, ...hostFields(context, standing), theme, ...(state !== undefined ? { kept: codec.read(state) } : {}) });
+        change({ where: 'hosted', context, ...hostFields(context, standing, same), theme, ...(state !== undefined ? { kept: codec.read(state) } : {}) });
     };
     const store = {
         get: () => standing,

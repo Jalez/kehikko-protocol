@@ -180,7 +180,7 @@ export type Showing = z.infer<typeof showingSchema>;
  * the current `passage` and `selection` into their setter's row. `module` is the module's id.
  */
 export declare const containerSchema: z.ZodObject<{
-    module: z.ZodEffects<z.ZodString, string, string>;
+    module: z.ZodString;
     /** Whether this container is picked out as a target on this kehikko. The host's own fact. */
     selected: z.ZodDefault<z.ZodBoolean>;
     /** What it says it is showing, or nothing. Never absent, for the reason `filters` is `{}` and not missing. */
@@ -521,7 +521,7 @@ export declare const contextSchema: z.ZodObject<{
      * when some are, only the union of what those show, and a consumer lets the person turn that off.
      */
     containers: z.ZodDefault<z.ZodArray<z.ZodObject<{
-        module: z.ZodEffects<z.ZodString, string, string>;
+        module: z.ZodString;
         /** Whether this container is picked out as a target on this kehikko. The host's own fact. */
         selected: z.ZodDefault<z.ZodBoolean>;
         /** What it says it is showing, or nothing. Never absent, for the reason `filters` is `{}` and not missing. */
@@ -745,7 +745,7 @@ export declare const contextSchema: z.ZodObject<{
      * re-reads what it shows when the entries for it move.
      */
     content: z.ZodDefault<z.ZodArray<z.ZodObject<{
-        source: z.ZodEffects<z.ZodString, string, string>;
+        source: z.ZodString;
         epic: z.ZodDefault<z.ZodNullable<z.ZodString>>;
         at: z.ZodString;
     }, "strip", z.ZodTypeAny, {
@@ -782,25 +782,6 @@ export declare const contextSchema: z.ZodObject<{
         picked?: boolean | undefined;
     }>, "many">>;
 }, "strip", z.ZodTypeAny, {
-    containers: {
-        module: string;
-        selected: boolean;
-        showing: {
-            refs: string[];
-            documents: {
-                path: string;
-                from: number | null;
-                to: number | null;
-                page: number | null;
-                quoted: string;
-                section: {
-                    from: number | null;
-                    to: number | null;
-                    title: string;
-                } | null;
-            }[];
-        };
-    }[];
     epic: string | null;
     tracker: {
         at: string | null;
@@ -829,6 +810,25 @@ export declare const contextSchema: z.ZodObject<{
         name: string;
     } | null;
     filters: Record<string, string | string[]>;
+    containers: {
+        module: string;
+        selected: boolean;
+        showing: {
+            refs: string[];
+            documents: {
+                path: string;
+                from: number | null;
+                to: number | null;
+                page: number | null;
+                quoted: string;
+                section: {
+                    from: number | null;
+                    to: number | null;
+                    title: string;
+                } | null;
+            }[];
+        };
+    }[];
     dispositions: {
         value: "done" | "wont-do" | "duplicate" | "superseded";
         at: string | null;
@@ -850,25 +850,6 @@ export declare const contextSchema: z.ZodObject<{
         files?: string[] | undefined;
     }[];
 }, {
-    containers?: {
-        module: string;
-        selected?: boolean | undefined;
-        showing?: {
-            refs?: string[] | undefined;
-            documents?: {
-                path: string;
-                from?: number | null | undefined;
-                to?: number | null | undefined;
-                page?: number | null | undefined;
-                quoted?: string | undefined;
-                section?: {
-                    title: string;
-                    from?: number | null | undefined;
-                    to?: number | null | undefined;
-                } | null | undefined;
-            }[] | undefined;
-        } | undefined;
-    }[] | undefined;
     epic?: string | null | undefined;
     tracker?: {
         at?: string | null | undefined;
@@ -897,6 +878,25 @@ export declare const contextSchema: z.ZodObject<{
         name: string;
     } | null | undefined;
     filters?: Record<string, string | string[]> | undefined;
+    containers?: {
+        module: string;
+        selected?: boolean | undefined;
+        showing?: {
+            refs?: string[] | undefined;
+            documents?: {
+                path: string;
+                from?: number | null | undefined;
+                to?: number | null | undefined;
+                page?: number | null | undefined;
+                quoted?: string | undefined;
+                section?: {
+                    title: string;
+                    from?: number | null | undefined;
+                    to?: number | null | undefined;
+                } | null | undefined;
+            }[] | undefined;
+        } | undefined;
+    }[] | undefined;
     dispositions?: {
         value: "done" | "wont-do" | "duplicate" | "superseded";
         ref: string;

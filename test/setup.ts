@@ -38,7 +38,7 @@ GlobalRegistrator.register()
  * stopped being read, the tests that set only it fell through to the default without failing.
  *
  * So it is not left to each test. Before any test file is loaded, the whole suite's registry is a
- * scratch directory — under every name the code reads — and a test that saves and restores the
+ * scratch directory — under every name the code reads, which is one — and a test that saves and restores the
  * variable restores THIS. Then, before and after every test, the registry the code would resolve
  * is checked: if it is not under the scratch directory the test fails, loudly, naming where it
  * would have written.
@@ -52,7 +52,7 @@ import { registryDir } from '../src/serve/registry.ts'
 
 const SCRATCH = mkdtempSync(join(tmpdir(), 'kehikot-protocol-tests-'))
 /* Every environment variable that decides a machine-level location this package writes to. */
-const REGISTRY_VARIABLES = ['KEHIKOT_MODULES_DIR', 'ROADMAP_MODULES_DIR'] as const
+const REGISTRY_VARIABLES = ['KEHIKOT_MODULES_DIR'] as const
 for (const name of REGISTRY_VARIABLES) process.env[name] = join(SCRATCH, 'modules')
 
 function registryIsScratch(when: string): void {

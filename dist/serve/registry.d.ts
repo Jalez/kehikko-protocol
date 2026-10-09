@@ -1,19 +1,15 @@
 /**
- * The one directory a host sweeps for registrations: `KEHIKOT_MODULES_DIR` (else
- * `ROADMAP_MODULES_DIR`) when set; `~/Library/Application Support/Kehikot/modules` on macOS;
- * `$XDG_DATA_HOME/kehikot/modules` (default `~/.local/share/kehikot/modules`) elsewhere.
- * `ROADMAP_MODULES_DIR` is deprecated: the next breaking release reads `KEHIKOT_MODULES_DIR` only.
+ * The one directory a host sweeps for registrations: `KEHIKOT_MODULES_DIR` when set;
+ * `~/Library/Application Support/Kehikot/modules` on macOS; `$XDG_DATA_HOME/kehikot/modules`
+ * (default `~/.local/share/kehikot/modules`) elsewhere.
  */
 export declare function registryDir(env?: Record<string, string | undefined>): string;
 /**
- * The registry before the rename, `~/.roadmap/modules` — READ, never written, so what a module
- * wrote there (`keep`, above all) is carried over. `null` when the registry was pointed somewhere
- * on purpose, so a test never reads a person's real one.
- *
- * @deprecated Removed in the next breaking release, which no longer reads `~/.roadmap/modules`: a
- * host copies that directory into `registryDir()` once. Nothing replaces it.
+ * The file name a module's registration had before the app was renamed (`roadmap.<name>.json`), or
+ * `null` for an id that never had one. READ, never written: a registry that was carried over from
+ * `~/.roadmap/modules` may still hold one, and what it says (`keep`, above all) is this module's.
  */
-export declare function legacyRegistryDir(env?: Record<string, string | undefined>): string | null;
+export declare function registrationBeforeRename(id: string): string | null;
 /** What one registration says. The host reads `url`, `dir`, and a `keep` this never writes. */
 export interface Registration {
     url: string;

@@ -5,7 +5,11 @@ import type { Where } from './host-store.js';
  * The one screen for every moment a module has nothing of its own to show: the kehikko mark and
  * one sentence, the module's half of the host's `ModuleCover`. See docs/module-plumbing.md.
  */
-/** Every not-ready state a module has. */
+/**
+ * Every not-ready state a module has. `coverFor` answers the first seven, which are read off the
+ * host's and the server's standing; `refused` and `empty` are a module's own findings, and it
+ * passes them itself.
+ */
 export type CoverState = 
 /** Nothing has greeted the page yet, and the grace has not run out. */
 'waiting'
@@ -20,16 +24,21 @@ export type CoverState =
 /** The module's own server did not answer. Comes with Try again. */
  | 'down'
 /** The module's server restarted under this page. The page reloads. */
- | 'stale';
+ | 'stale'
+/** Something was asked — the host, the module's own server — and said no. Give its sentence as `detail`; comes with Try again when there is an `onRetry`. */
+ | 'refused'
+/** Everything was read, and there is nothing to show. An answer, not a wait. */
+ | 'empty';
 /**
  * The sentences. One each, plain, and the same in every module. `name` is what
  * the module is called ("History"); without one it is "This app".
  */
 export declare const COVER_WORDS: Record<CoverState, (name?: string) => string>;
-/** The label on the one button, drawn for `down`. */
+/** The label on the one button, drawn for `down` and `refused`. */
 export declare const TRY_AGAIN = "Try again";
 /**
  * Which cover a host's standing calls for, or `null` when the module can draw its own screen.
+ * Never `refused` or `empty`: those are the module's to find.
  * `needs` says what the module cannot work without: a `host` (anything framing it), a `project`,
  * an `epic`. Not greeted yet is `waiting`, never `no-project`. An epic asks for a project too,
  * unless `project: false` says the module reads no project folder. Given the `server`'s standing
@@ -48,13 +57,19 @@ export declare function coverFor(host: {
 /** How this page's own server last answered (`up`, `down`, `stale`), as React state. Fed by every `ask()`. */
 export declare function useServerStanding(): ServerStanding;
 export declare const COVER_STYLE_ID = "kehikot-cover-style";
-export declare const COVER_CSS = "\n.kehikot-cover{box-sizing:border-box;flex:1 1 auto;width:100%;height:100%;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:16px;text-align:center;font:400 clamp(12px,3.2vw,14px)/1.5 ui-sans-serif,system-ui,sans-serif;color:var(--muted-foreground,oklch(0.5 0 0))}\n.dark .kehikot-cover{color:var(--muted-foreground,oklch(0.62 0 0))}\n.kehikot-cover svg{width:clamp(28px,9vw,40px);height:clamp(28px,9vw,40px);flex:none}\n.kehikot-cover svg *{stroke:currentColor;stroke-width:1.25;fill:none;stroke-linecap:square}\n.kehikot-cover p{margin:0;max-width:40ch;text-wrap:balance}\n.kehikot-cover p[data-detail]{font-size:.86em;opacity:.8;overflow-wrap:anywhere}\n.kehikot-cover button{font:inherit;color:var(--foreground,inherit);background:transparent;border:1px solid var(--border,currentColor);border-radius:6px;padding:3px 10px;cursor:pointer}\n.kehikot-cover button:hover{background:var(--accent,transparent)}\n.kehikot-cover button:focus-visible{outline:2px solid var(--ring,currentColor);outline-offset:2px}\n.kehikot-cover[data-working=true] svg g{animation:kehikot-cover-breathe 3.4s ease-in-out infinite}\n@keyframes kehikot-cover-breathe{0%,100%{opacity:1}50%{opacity:.55}}\n@media (prefers-reduced-motion:reduce){.kehikot-cover[data-working=true] svg g{animation:none}}\n@media (max-height:150px){.kehikot-cover{gap:6px;padding:8px}.kehikot-cover svg{display:none}}\n";
+export declare const COVER_CSS = "\n.kehikot-cover{box-sizing:border-box;flex:1 1 auto;width:100%;height:100%;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:16px;text-align:center;font:400 clamp(12px,3.2vw,14px)/1.5 ui-sans-serif,system-ui,sans-serif;color:var(--muted-foreground,oklch(0.5 0 0))}\n.dark .kehikot-cover{color:var(--muted-foreground,oklch(0.62 0 0))}\n.kehikot-cover svg{width:clamp(28px,9vw,40px);height:clamp(28px,9vw,40px);flex:none}\n.kehikot-cover svg *{stroke:currentColor;stroke-width:1.25;fill:none;stroke-linecap:square}\n.kehikot-cover p{margin:0;max-width:40ch;text-wrap:balance}\n.kehikot-cover p[data-detail]{font-size:.86em;opacity:.8;overflow-wrap:anywhere}\n.kehikot-cover button{font:inherit;color:var(--foreground,inherit);background:transparent;border:1px solid var(--border,currentColor);border-radius:6px;padding:3px 10px;cursor:pointer}\n.kehikot-cover button:hover{background:var(--accent,transparent)}\n.kehikot-cover button:focus-visible{outline:2px solid var(--ring,currentColor);outline-offset:2px}\n.kehikot-cover[data-working=true] svg g{animation:kehikot-cover-breathe 3.4s ease-in-out infinite}\n@keyframes kehikot-cover-breathe{0%,100%{opacity:1}50%{opacity:.55}}\n@media (prefers-reduced-motion:reduce){.kehikot-cover[data-working=true] svg g{animation:none}}\n@media (max-height:150px){.kehikot-cover{gap:6px;padding:8px}.kehikot-cover svg{display:none}}\n.kehikot-cover[data-strip=true]{flex:none;height:auto;flex-direction:row;justify-content:space-between;gap:8px;padding:4px 8px;text-align:left;font-size:11px;border-top:1px solid var(--border,currentColor)}\n.kehikot-cover[data-strip=true] p{max-width:none;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}\n.kehikot-cover[data-strip=true] p[data-detail]{display:none}\n.kehikot-cover[data-strip=true] button{flex:none;padding:1px 8px}\n";
 export interface CoverProps {
     state: CoverState;
     /** What the module is called, for the sentences that name it. */
     name?: string;
-    /** For `down`: ask again. Without it no button is drawn. */
+    /** For `down` and `refused`: ask again. Without it no button is drawn. */
     onRetry?: () => void;
+    /**
+     * `true` draws one line instead of the whole container: the sentence, and the button beside it,
+     * along the bottom edge of something that stays on screen — a terminal's last output, under a
+     * server that stopped. No mark, no second line.
+     */
+    strip?: boolean;
     /** A second, smaller line: the server's own sentence, a path. */
     detail?: string | null;
     /** The sentence, when a module has a better one for this state. */
@@ -62,6 +77,8 @@ export interface CoverProps {
 }
 /**
  * Draw a not-ready state. Fills a parent that has a height (or is a flex column) and centres in
- * it; otherwise it is as tall as its content. `stale` reloads the page once, a moment later.
+ * it; otherwise it is as tall as its content; with `strip`, one line. `stale` reloads the page
+ * once, a moment later — and says "reloading…" only while that is true: when the reload cannot be
+ * started (it was tried a moment ago and the page is still old) the sentence is the fact alone.
  */
-export declare function Cover({ state, name, onRetry, detail, children }: CoverProps): ReactElement;
+export declare function Cover({ state, name, onRetry, detail, strip, children }: CoverProps): ReactElement;

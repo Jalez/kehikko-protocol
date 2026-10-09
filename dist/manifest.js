@@ -1,7 +1,6 @@
 import { z } from 'zod';
-import { LEGACY_MANIFEST_KIND, MANIFEST_KIND, PROTOCOL } from './constants.js';
+import { MANIFEST_KIND, PROTOCOL } from './constants.js';
 import { LIMITS } from './limits.js';
-import { canonicalName, legacyName } from './dialect.js';
 import { MODE_ID, MODULE_ID } from './ids.js';
 import { buildSchema } from './build.js';
 /**
@@ -84,24 +83,15 @@ export const TAG_NAMES = Object.keys(TAGS);
    can put in a heading or a search box and never a sentence or a path. The
    length is `LIMITS.TAG`, said here because a regex cannot read a constant. */
 const tag = z.string().regex(new RegExp(`^[a-z][a-z0-9-]{0,${LIMITS.TAG - 1}}$`));
-/* An extension name, canonical once parsed: `roadmap.notifications@1` is
-   read as `kehikot.notifications@1`. See `dialect.ts`. */
-const extensionName = z.string().min(1).max(LIMITS.EXTENSION).transform(canonicalName);
-export const manifestSchema = z.object({
-    /**
-     * The word that makes this a manifest claim rather than a hopeful GET. Either spelling is
-     * accepted and handed back as it was said: `roadmap.module` is a module from before the rename.
-     * See `dialectOfKind`.
-     */
-    kind: z.enum([MANIFEST_KIND, LEGACY_MANIFEST_KIND]),
+/* An extension name, as written. */
+const extensionName = z.string().min(1).max(LIMITS.EXTENSION);
+/** Every field of a manifest, before the one rule that needs two of them. See `manifestSchema`. */
+const manifestFields = z.object({
+    /** The word that makes this a manifest claim rather than a hopeful GET. */
+    kind: z.literal(MANIFEST_KIND),
     /** Which protocol this module was built against, as a single integer. */
     protocol: z.number().int().min(1),
-    /**
-     * Canonical once parsed: `roadmap.journeys` is read as `kehikot.journeys`,
-     * the same module under the name it has had since the rename. See
-     * `canonicalModuleId`.
-     */
-    id: z.string().regex(MODULE_ID, 'lowercase reverse-DNS: letters, digits, dots and dashes').transform(canonicalName),
+    id: z.string().regex(MODULE_ID, 'lowercase reverse-DNS: letters, digits, dots and dashes'),
     name: z.string().min(1).max(LIMITS.NAME),
     /**
      * The module's own version. Shown to a person; this protocol never parses or compares it, and it
@@ -168,8 +158,8 @@ export const manifestSchema = z.object({
     reacts: z.array(z.string().min(1).max(LIMITS.REACTION)).max(LIMITS.REACTIONS).default([]),
     /**
      * Why this module has nothing to narrow to the picked parts, in one sentence, for a module that
-     * does not say `reacts: ['parts']` (0.34.0). Optional and never defaulted. A module that says
-     * neither is reported by `partsDeclaration`, not refused; the next breaking release refuses it.
+     * does not say `reacts: ['parts']`. Optional and never defaulted; a manifest says one or the
+     * other, and `manifestSchema` refuses one that says neither or both (`partsDeclaration`).
      */
     partless: z.string().trim().min(1).max(LIMITS.SUMMARY).optional(),
     modes: z.array(modeSchema).min(1).max(LIMITS.MODES),
@@ -211,24 +201,16 @@ export const manifestSchema = z.object({
     build: buildSchema.optional().catch(undefined),
 });
 /**
- * A parsed manifest, spelled for a host from before the rename: the old `kind`, the old module id,
- * the old extension names; everything else is the same document. What a module serves at
- * `LEGACY_WELL_KNOWN`. Pure; the manifest passed in is not changed.
- *
- * @deprecated Removed in the next breaking release, with the pre-rename dialect: a manifest is
- * served at `WELL_KNOWN` only, as it is.
+ * The manifest. Every field above, and one rule over two of them: a module either follows the
+ * picked parts (`reacts` has `parts`) or says in `partless` why it has nothing to narrow. A
+ * manifest that says neither, or both, does not parse, and the issue is the sentence saying what
+ * to add (`partsDeclaration`). A `ZodEffects`, so it has no `.shape`; nothing else changed.
  */
-export function legacyManifest(manifest) {
-    return {
-        ...manifest,
-        kind: LEGACY_MANIFEST_KIND,
-        id: legacyName(manifest.id),
-        extensions: {
-            emits: manifest.extensions.emits.map(legacyName),
-            consumes: manifest.extensions.consumes.map(legacyName),
-        },
-    };
-}
+export const manifestSchema = manifestFields.superRefine((manifest, context) => {
+    for (const message of partsDeclaration(manifest)) {
+        context.addIssue({ code: z.ZodIssueCode.custom, path: ['partless'], message });
+    }
+});
 /**
  * Does a range include a protocol number? Space-separated comparisons against an integer (`>=1 <2`,
  * or bare `1`), all of which must hold; anything unreadable names nothing (false). Pure, a reading
@@ -268,9 +250,10 @@ export function speaks(range, protocol = PROTOCOL) {
     return true;
 }
 /**
- * What is wrong with what a module says about the parts of an epic, as sentences a host can show; `[]` when
- * nothing is. A module has `parts` in `reacts` or a reason in `partless`; neither and both are reported. Not
- * called by `manifestSchema`: a warning now (`bun run check:parts` fails), a refusal in the next breaking release.
+ * What is wrong with what a module says about the parts of an epic, as sentences a person can act on; `[]`
+ * when nothing is. A module has `parts` in `reacts` or a reason in `partless`; neither and both are reported.
+ * `manifestSchema` refuses a manifest this reports, with these sentences as the issues; call it directly to
+ * say the same thing about an object that has not been parsed.
  */
 export function partsDeclaration(manifest) {
     const follows = (manifest.reacts ?? []).includes('parts');

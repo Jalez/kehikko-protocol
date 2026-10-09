@@ -122,6 +122,7 @@ describe('where a build is said', () => {
     version: '1.0.0',
     entry: '/app',
     modes: [{ id: 'main', label: 'Main' }],
+    partless: 'An example with nothing in it that belongs to a part.',
   })
 
   function get(path: string) {

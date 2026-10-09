@@ -1,6 +1,6 @@
-import { createElement, useEffect, useInsertionEffect, useSyncExternalStore, type ReactElement } from 'react'
+import { createElement, useEffect, useInsertionEffect, useState, useSyncExternalStore, type ReactElement } from 'react'
 
-import { PAGE_STALE, STALE_RELOAD_MS, onServerStanding, reloadStalePage, serverStanding, type ServerStanding } from './ask.js'
+import { PAGE_OLD, PAGE_STALE, STALE_RELOAD_MS, onServerStanding, reloadStalePage, serverStanding, type ServerStanding } from './ask.js'
 import type { Where } from './host-store.js'
 
 /**
@@ -8,7 +8,11 @@ import type { Where } from './host-store.js'
  * one sentence, the module's half of the host's `ModuleCover`. See docs/module-plumbing.md.
  */
 
-/** Every not-ready state a module has. */
+/**
+ * Every not-ready state a module has. `coverFor` answers the first seven, which are read off the
+ * host's and the server's standing; `refused` and `empty` are a module's own findings, and it
+ * passes them itself.
+ */
 export type CoverState =
   /** Nothing has greeted the page yet, and the grace has not run out. */
   | 'waiting'
@@ -24,6 +28,10 @@ export type CoverState =
   | 'down'
   /** The module's server restarted under this page. The page reloads. */
   | 'stale'
+  /** Something was asked — the host, the module's own server — and said no. Give its sentence as `detail`; comes with Try again when there is an `onRetry`. */
+  | 'refused'
+  /** Everything was read, and there is nothing to show. An answer, not a wait. */
+  | 'empty'
 
 /**
  * The sentences. One each, plain, and the same in every module. `name` is what
@@ -37,16 +45,22 @@ export const COVER_WORDS: Record<CoverState, (name?: string) => string> = {
   loading: () => 'Loading…',
   down: (name) => `${name ? `${name}${/s$/i.test(name) ? '’' : '’s'}` : 'This app’s'} own server is not answering.`,
   stale: () => PAGE_STALE,
+  refused: (name) => `${name ?? 'This app'} was told no.`,
+  empty: () => 'Nothing here yet.',
 }
 
-/** The label on the one button, drawn for `down`. */
+/** The label on the one button, drawn for `down` and `refused`. */
 export const TRY_AGAIN = 'Try again'
 
 /** The states in which something is on its way, so the mark breathes. The rest are still. */
 const WORKING: ReadonlySet<CoverState> = new Set(['waiting', 'loading', 'stale'])
 
+/** The states that come with the button, when there is something for it to do. */
+const RETRIED: ReadonlySet<CoverState> = new Set(['down', 'refused'])
+
 /**
  * Which cover a host's standing calls for, or `null` when the module can draw its own screen.
+ * Never `refused` or `empty`: those are the module's to find.
  * `needs` says what the module cannot work without: a `host` (anything framing it), a `project`,
  * an `epic`. Not greeted yet is `waiting`, never `no-project`. An epic asks for a project too,
  * unless `project: false` says the module reads no project folder. Given the `server`'s standing
@@ -92,6 +106,10 @@ export const COVER_CSS = `
 @keyframes kehikot-cover-breathe{0%,100%{opacity:1}50%{opacity:.55}}
 @media (prefers-reduced-motion:reduce){.kehikot-cover[data-working=true] svg g{animation:none}}
 @media (max-height:150px){.kehikot-cover{gap:6px;padding:8px}.kehikot-cover svg{display:none}}
+.kehikot-cover[data-strip=true]{flex:none;height:auto;flex-direction:row;justify-content:space-between;gap:8px;padding:4px 8px;text-align:left;font-size:11px;border-top:1px solid var(--border,currentColor)}
+.kehikot-cover[data-strip=true] p{max-width:none;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kehikot-cover[data-strip=true] p[data-detail]{display:none}
+.kehikot-cover[data-strip=true] button{flex:none;padding:1px 8px}
 `
 
 function style(): void {
@@ -125,8 +143,14 @@ export interface CoverProps {
   state: CoverState
   /** What the module is called, for the sentences that name it. */
   name?: string
-  /** For `down`: ask again. Without it no button is drawn. */
+  /** For `down` and `refused`: ask again. Without it no button is drawn. */
   onRetry?: () => void
+  /**
+   * `true` draws one line instead of the whole container: the sentence, and the button beside it,
+   * along the bottom edge of something that stays on screen — a terminal's last output, under a
+   * server that stopped. No mark, no second line.
+   */
+  strip?: boolean
   /** A second, smaller line: the server's own sentence, a path. */
   detail?: string | null
   /** The sentence, when a module has a better one for this state. */
@@ -135,29 +159,38 @@ export interface CoverProps {
 
 /**
  * Draw a not-ready state. Fills a parent that has a height (or is a flex column) and centres in
- * it; otherwise it is as tall as its content. `stale` reloads the page once, a moment later.
+ * it; otherwise it is as tall as its content; with `strip`, one line. `stale` reloads the page
+ * once, a moment later — and says "reloading…" only while that is true: when the reload cannot be
+ * started (it was tried a moment ago and the page is still old) the sentence is the fact alone.
  */
-export function Cover({ state, name, onRetry, detail, children }: CoverProps): ReactElement {
+export function Cover({ state, name, onRetry, detail, strip, children }: CoverProps): ReactElement {
   /* Before layout and paint, so the first frame of a cover is already styled. */
   useInsertionEffect(style, [])
 
+  /* Set when a reload was due and did not start. */
+  const [stuck, setStuck] = useState(false)
+
   useEffect(() => {
     if (state !== 'stale') return
-    const timer = setTimeout(() => reloadStalePage(), STALE_RELOAD_MS)
+    const timer = setTimeout(() => {
+      if (!reloadStalePage()) setStuck(true)
+    }, STALE_RELOAD_MS)
     return () => clearTimeout(timer)
   }, [state])
 
+  const old = state === 'stale' && stuck
   return createElement(
     'div',
     {
       className: 'kehikot-cover',
       role: 'status',
       'data-cover': state,
-      'data-working': WORKING.has(state) ? 'true' : 'false',
+      'data-working': WORKING.has(state) && !old ? 'true' : 'false',
+      ...(strip ? { 'data-strip': 'true' } : {}),
     },
-    mark(),
-    createElement('p', null, children ?? COVER_WORDS[state](name)),
-    detail ? createElement('p', { 'data-detail': '' }, detail) : null,
-    state === 'down' && onRetry ? createElement('button', { type: 'button', onClick: onRetry }, TRY_AGAIN) : null,
+    strip ? null : mark(),
+    createElement('p', null, children ?? (old ? PAGE_OLD : COVER_WORDS[state](name))),
+    detail && !strip ? createElement('p', { 'data-detail': '' }, detail) : null,
+    RETRIED.has(state) && onRetry ? createElement('button', { type: 'button', onClick: onRetry }, TRY_AGAIN) : null,
   )
 }

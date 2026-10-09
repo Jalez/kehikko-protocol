@@ -92,9 +92,9 @@ The fourteen copies agreed on the bound (a megabyte; paper 6 MB, notifications 2
 
 ## The doors (`serve/doors.ts`)
 
-`doors({ manifest, answer, stream?, build?, page, pages?, ours?, maxBodyBytes?, beatMs? })` is a Vite plugin (serve only). It goes after `serves()` and does not touch it. `doorsHandler(options, transform?)` is the same thing as a plain `(request, response, next)` handler for a module with its own server, and for tests.
+`doors({ manifest, answer, stream?, build?, page, pages?, ancestors?, openHealth?, ours?, maxBodyBytes?, beatMs? })` is a Vite plugin (serve only). It goes after `serves()` and does not touch it. `doorsHandler(options, transform?)` is the same thing as a plain `(request, response, next)` handler for a module with its own server, and for tests.
 
-- **The manifest** at `WELL_KNOWN`, and at `LEGACY_WELL_KNOWN` through `legacyManifest`. With `build`, the manifest served carries it.
+- **The manifest** at `WELL_KNOWN`, and nowhere else. With `build`, the manifest served carries it.
 - **The page** at `/app`, `/app/` and `/` (plus `pages`), through `transformIndexHtml`, with `cache-control: no-store` (the ticket is per process; a cached page has every write refused) and `content-security-policy: frame-ancestors …` from `frameAncestors()`. Eight modules sent no `cache-control`; they gain it.
 - **`answer(method, path, query, body, ticket)`** for `/healthz`, `/mcp` and `/api/*` (or whatever `ours` says). Sync or a promise. `null` hands the request on to Vite. A `Reply` is `{ status, body, headers?, raw? }`: `body` is sent as pretty-printed JSON, `null` sends none, and `raw: { bytes, type }` sends bytes or text as they are (a PDF, `text/plain`).
 - **`stream(method, path, query, emit, ticket)`**, asked first: `{ reply }` refuses with JSON, `{ close }` opens a server-sent-event stream (`: open`, events emitted while it was deciding, then each event; a `: beat` comment every 25 s; `close()` when the reader goes away), `null` is not a stream door. `emit(data, name?)` — a name makes it a named event.
@@ -127,8 +127,9 @@ Asked for, and left out. Of the fourteen modules on `doors()`, eleven run nothin
 | kind | when | `error` |
 |---|---|---|
 | `down` | `fetch` threw: nothing answered | `This app’s own server is not answering.` |
-| `stale` | a 403 marked `refused: 'ticket'` | `This page is older than its server — reloading…` |
-| `refused` | any other non-2xx, or a 2xx whose body says `ok: false` | the server's own `error` sentence (or JSON-RPC's `error.message`), else `This app’s own server answered <status>.` |
+| `stale` | a 403 marked `refused: 'ticket'` | `This page is older than its server.` (`PAGE_OLD`: the fact, whether or not anything reloads) |
+| `refused` | any other non-2xx, a 2xx whose body says `ok: false`, or a 2xx with a body that is not JSON | the server's own `error` sentence (or JSON-RPC's `error.message`), else `This app’s own server answered <status>.`; for a 2xx that is not JSON, `NOT_A_REPLY` |
+| `cancelled` | the caller's `signal` aborted | `That was cancelled.` — nothing was learned about the server, and the standing does not move |
 
 So no module is silent and none shows a raw "Failed to fetch". A refusal keeps its `body`, so a conflict's payload is still readable. `answered(asked)` returns the body or throws `AskFailed` (with `kind`, `status`, `body`) for code written around `try`/`catch`.
 
@@ -150,7 +151,7 @@ const body = replied(await ask<{ ok: boolean; held?: Held; nowhere?: boolean; er
 
 **A caller that gave up.** An aborted `ask` resolves as a refusal with `status: null`; the server's standing is not touched. It is the caller's own doing, so the caller checks its own `signal.aborted` before reading the result.
 
-**Is the server there?** `probeServer(path = '/healthz')` asks and returns the standing. It is for the page that asks nothing on a timer, which otherwise learns its server has gone only on the next press: call it from a cover's Try again before reading again, or let a stream do it (`probe`, below). `useServerStanding` could not do this by itself: it reports what the last `ask` learned and asks nothing.
+**Is the server there?** `probeServer(path = '/healthz')` asks and returns the standing. It is for the page that asks nothing on a timer, which otherwise learns its server has gone only on the next press: call it from a cover's Try again before reading again, let a stream do it (`probe`, below), or — for a page with no stream and nothing else to ask — `watchServer({ path?, every? })` from the entry, which probes every 15 s while the page is visible and once each time it is shown again, and returns the function that stops it. `useServerStanding` could not do this by itself: it reports what the last `ask` learned and asks nothing.
 
 `follow(path, onEvent, { query?, events?, probe?, onAttachment? })` is the server-sent-event side: JSON events, `connecting` / `attached` / `detached` said out loud, and a reconnect with a growing pause when `EventSource` has given up for good (which is what a server that is still starting looks like).
 
@@ -192,7 +193,7 @@ here.keep(`reply:${note.id}`, null)                      // saved, emptied, or c
 
 ## The host hook (`client/host.ts`)
 
-`useHost<Kept>(id, events?, options?)`. Built on `connect` with the same three orderings as `useKehikot` (connection stored before it listens; handlers read through a ref; the discarded mount's answer ignored) and nothing else in common, so `useKehikot` can be retired without touching it.
+`useHost<Kept>(id, events?, options?)`. Built on `connect` with three orderings that are easy to get wrong (connection stored before it listens; handlers read through a ref; the discarded mount's answer ignored) and nothing else in common, so `useKehikot` can be retired without touching it.
 
 It returns `where` (`listening` → `unhosted` after `GREETING_GRACE_MS`, or `hosted`), the whole `context`, and flattened: `project`, `projectPath`, `epic` (each `null` for an empty string too, and from 0.36.0 for one that is only spaces), `passage`, `containers`, `parts`, `selection`, `chosen` (the filter choice), `kehikko` (*0.36.0*), `theme`; then `kept` and `remember(next)`; `point(passage)`; a stable `request`; `resize`, `filters`, `clearable`, `refreshable`, `connection`, and `read()` (*0.36.0*).
 
@@ -201,7 +202,7 @@ It returns `where` (`listening` → `unhosted` after `GREETING_GRACE_MS`, or `ho
 
 - **Theme.** Every context puts `dark`/`light` on `<html>` (both spelled, so a host asking for light over a machine set to dark gets it) and remembers it for the next load's first paint. `theme` before the greeting is what the document already decided. No module toggles classes by hand.
 - **Kept state.** `options.kept` is a codec, `{ read(state): Kept | null, write(kept): string }`; the default is JSON. `read` returning `null` for anything unrecognised is the point: an older version's string gives first-run behaviour. The kept value is set before the context on the greeting, so the first hosted render already has it. `remember` holds the value and sends `state.set`, fire and forget; it does not debounce (the one module that needs that debounces its caller).
-- **Events.** `onGoto`, `onEvent`, `onHello`, `onContext`, and `onClear` / `onRefresh`. The last two matter: `useKehikot` documents that those presses arrive in its `events` and does not pass them to `connect`, so through that hook they never arrive. Here they do.
+- **Events.** `onGoto`, `onEvent`, `onHello`, `onContext`, and `onClear` / `onRefresh` — all of which arrive.
 - **Stale pages** reload, as above.
 
 ### The same thing outside React: `hostStore` (*0.36.0*)
@@ -218,7 +219,7 @@ What stays in a module: anything it derives (`pickedParts` headings, a JSON stri
 
 ## The not-ready screen (`client/cover.ts`)
 
-`<Cover state name? onRetry? detail?>`: the kehikko mark, one sentence, optionally a second smaller line, and for `down` a Try again button. `coverFor(host, { project?, epic? })` says which state a host's standing calls for, or `null`.
+`<Cover state name? onRetry? detail? strip?>`: the kehikko mark, one sentence, optionally a second smaller line, and for `down` and `refused` a Try again button. With `strip` it is one line instead — the sentence and the button, no mark — along the bottom edge of something that stays on screen. `coverFor(host, { project?, epic? })` says which state a host's standing calls for, or `null`.
 
 | state | sentence |
 |---|---|
@@ -228,7 +229,9 @@ What stays in a module: anything it derives (`pickedParts` headings, a JSON stri
 | `no-epic` | No epic is open — open one in Kehikot. |
 | `loading` | Loading… |
 | `down` | *Name*’s own server is not answering. + **Try again** (`Slides’ own server…` for a name ending in s) |
-| `stale` | This page is older than its server — reloading… |
+| `stale` | This page is older than its server — reloading… (and, when the reload could not start, `This page is older than its server.`) |
+| `refused` | *Name* was told no. — a module's own finding; give the other side's sentence as `detail` |
+| `empty` | Nothing here yet. — a module's own finding; usually worded by the module as the child |
 
 They are `COVER_WORDS[state](name)`; a module with a better sentence for a state passes it as the child. `coverFor` checks `listening` first, which is the fix for the five modules that drew "no project" (or the unhosted screen) for the first second of every load.
 
@@ -249,7 +252,7 @@ const server = useServerStanding()
 const cover = coverFor({ where, projectPath, server }) ?? (!list ? 'loading' : null)
 ```
 
-Two things asked for and not added. **More states** (`refused`, `empty`, "nothing selected"): `CoverState` is a closed union that modules index records by, so a new member breaks their build; until the next breaking release a module words its own moment with a child — `<Cover state="loading">Asking Kehikot what it last read…</Cover>`. **A shared look for a refused write**: the five modules that draw one agree on the shape (the server's sentence in a bordered line) and on nothing else (five colour tokens, three placements), and a component here would need its own stylesheet and theme fallbacks to save one `className` at each site.
+`refused` and `empty` are not read off any standing, so `coverFor` never answers them: a module that asked something and was told no, or read everything and found nothing, passes the state itself. One thing asked for and not added. **A shared look for a refused write**: the five modules that draw one agree on the shape (the server's sentence in a bordered line) and on nothing else (five colour tokens, three placements), and a component here would need its own stylesheet and theme fallbacks to save one `className` at each site.
 
 The look matches the host's `ModuleCover`: the same mark, muted, centred, one sentence; 14px with a 40px mark in an ordinary container, scaling down to 12px and 28px in one 220 wide. The mark is drawn finished and breathes only in the states where something is on its way (`waiting`, `loading`, `stale`); it does not draw itself in, because the host's cover has just done that and a container should not animate twice on the way to its content.
 
@@ -298,21 +301,29 @@ plus `x-module-build: <buildStamp>` on every answer from the doors, which is wha
 
 Three things are page-wide and outlive a test case, so a suite resets them between cases: `mailbox.forget?.()` (the backlog — a greeting posted in one case is otherwise replayed into the next; a page must never call it, see [client.md](client.md)), `resetServerStanding()` (`stale` does not heal), and `sessionStorage.clear()` for a module that uses `held`. One request through the real doors is `doorsFetch` (above).
 
-## For the next breaking release
+## What the breaking release after 0.37 changed
 
-Gaps that could only be closed by changing what a 0.35.0 call does, so they were not:
+Each of these was listed here as a gap that could only be closed by changing what a 0.35.0 call
+does. [MIGRATING.md](../MIGRATING.md) has the before and after for every one.
 
-- **An aborted `ask` is a `refused`.** It should be a kind of its own (`cancelled`). `AskFailure` is a closed union that callers switch over.
-- **A 2xx that is not JSON resolves `ok: true` with `body: null`.** A non-empty body that is not JSON should be a refusal. `replied` already treats it as one.
-- **A stale `ask` says "reloading…"** whether or not anything will reload. `error` should be `PAGE_OLD`, and the cover should say the rest.
-- **`follow` probes nothing by default.** `probe` should be on.
-- **`CoverState` has no `refused` or `empty`.**
-- **`useKehikot`** can go: `useHost` and `hostStore` share nothing with it. *Deprecated in 0.37*, with every name that says `roadmap` — the list is in [CHANGELOG.md](../CHANGELOG.md) under 0.37.0.
-- **The parts declaration** is a refusal: a manifest that neither says `reacts: ['parts']` nor gives `partless` a sentence fails `manifestSchema`.
+- **An aborted `ask` is `cancelled`**, a kind of its own: not a refusal, and not a server that stopped. `AskFailure` is `'down' | 'stale' | 'refused' | 'cancelled'`.
+- **A 2xx that is not JSON is a refusal** (`NOT_A_REPLY`, `status` kept). A 2xx with no body at all is still `ok: true, body: null`.
+- **A stale `ask` says `PAGE_OLD`** — the fact, and no promise. "reloading…" (`PAGE_STALE`) is said by the stale `Cover`, which is the thing reloading, and only while it is: a cover whose reload could not start says `PAGE_OLD` too.
+- **`CoverState` has `refused` and `empty`**, a module's own findings (`coverFor` never answers them); the button is drawn for `refused` as well as `down`.
+- **`Cover` takes `strip`**: one line — the sentence and the button — along the bottom of something that stays on screen. Terminal drew this by hand from `COVER_WORDS` and `TRY_AGAIN`.
+- **`useHost` / `hostStore` take `same`**: a page's own rule for when a field is the one it was, per field (`{ passage: (was, now) => … }`), in place of deep equality. Paper kept the passage in state of its own for this.
+- **`watchServer()`** (`/client`): `probeServer` on a clock while the page is visible, for a page that asks its server nothing else. References and atlas listened for Vite's `vite:ws:disconnect`, which exists only in development.
+- **`doors({ ancestors })`**: origins that may frame the page besides the environment's. **`doors({ openHealth: true })`**: `/healthz` readable from any origin, for a module framed on an opaque one (atlas wrote the two headers by hand). **A reply header with an empty value** takes a default off the answer: `'cache-control': ''` sends none (paper sent `private` to say the same thing).
+- **`useKehikot` is gone**, and every name that said `roadmap`.
+- **The parts declaration is a refusal**: see [manifest.md](manifest.md).
+
+Not changed, and why: **`follow` still probes nothing by default.** Turning `probe` on would make
+every test that follows a fake stream ask `/healthz` through a `fetch` it did not fake, and read
+`down`; it stays an option the three modules that follow a stream can name.
 
 ## What the plugin and the hook do not cover
 
 - **A ticket carried in the request body** (paper, terminal) or a ticket element under another id (`kehikot-paper-ticket`, `terminal-ticket`, `orchestrator-ticket`): those modules move to the header and the shared id when they move onto `ask()`.
 - **A WebSocket** (terminal) needs `server.httpServer`; it stays a plugin of its own beside `doors()`.
-- **An extra frame ancestor** (references adds one origin): set `KEHIKOT_ORIGINS`, or keep its own header.
+- **An extra frame ancestor** (references adds one origin): `doors({ ancestors: [origin] })`.
 - **A module that is not this shape at all** (atlas: Vite root `page/`, root element `#atlas`, its own wire client, a Bun production server). `doorsHandler` and `pageDocument` are usable from its `server.ts`; nothing here was tried against it.

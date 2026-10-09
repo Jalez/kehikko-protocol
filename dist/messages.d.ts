@@ -5,7 +5,7 @@ import { z } from 'zod';
  * changes, including its words. Two groups cannot share an id.
  */
 export declare const filtersSchema: z.ZodObject<{
-    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.filters">, z.ZodLiteral<string>]>, "kehikot.filters", string>;
+    type: z.ZodLiteral<"kehikot.filters">;
     groups: z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodEffects<z.ZodObject<{
         id: z.ZodEffects<z.ZodString, string, string>;
         label: z.ZodString;
@@ -107,7 +107,7 @@ export declare const filtersSchema: z.ZodObject<{
         fallback?: string | undefined;
     }[];
 }, {
-    type: string;
+    type: "kehikot.filters";
     groups: {
         label: string;
         id: string;
@@ -126,14 +126,14 @@ export type Filters = z.infer<typeof filtersSchema>;
  * after it has been asked to clear.
  */
 export declare const clearableSchema: z.ZodObject<{
-    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.clearable">, z.ZodLiteral<string>]>, "kehikot.clearable", string>;
+    type: z.ZodLiteral<"kehikot.clearable">;
     /** The words on the control, or `null` to take the control away. */
     label: z.ZodDefault<z.ZodNullable<z.ZodString>>;
 }, "strip", z.ZodTypeAny, {
     type: "kehikot.clearable";
     label: string | null;
 }, {
-    type: string;
+    type: "kehikot.clearable";
     label?: string | null | undefined;
 }>;
 export type Clearable = z.infer<typeof clearableSchema>;
@@ -142,14 +142,14 @@ export type Clearable = z.infer<typeof clearableSchema>;
  * `protocol`: no list of what to delete, no filter choice, no correlation id, and no answer.
  */
 export declare const clearSchema: z.ZodObject<{
-    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.clear">, z.ZodLiteral<string>]>, "kehikot.clear", string>;
+    type: z.ZodLiteral<"kehikot.clear">;
     protocol: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
     protocol: number;
     type: "kehikot.clear";
 }, {
     protocol: number;
-    type: string;
+    type: "kehikot.clear";
 }>;
 export type Clear = z.infer<typeof clearSchema>;
 /**
@@ -158,7 +158,7 @@ export type Clear = z.infer<typeof clearSchema>;
  * cannot say" (the host then draws no time). `busy` keeps the control and says a read is in flight.
  */
 export declare const refreshableSchema: z.ZodObject<{
-    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.refreshable">, z.ZodLiteral<string>]>, "kehikot.refreshable", string>;
+    type: z.ZodLiteral<"kehikot.refreshable">;
     /** Whether there is anything to read again right now. `false` withdraws the control. */
     can: z.ZodDefault<z.ZodBoolean>;
     /** When this module's material was last read, as the MODULE knows it. */
@@ -171,7 +171,7 @@ export declare const refreshableSchema: z.ZodObject<{
     can: boolean;
     busy: boolean;
 }, {
-    type: string;
+    type: "kehikot.refreshable";
     at?: string | null | undefined;
     can?: boolean | undefined;
     busy?: boolean | undefined;
@@ -182,14 +182,14 @@ export type Refreshable = z.infer<typeof refreshableSchema>;
  * no correlation id; what comes back is a new `kehikot.refreshable` (`busy`, then a new `at`).
  */
 export declare const refreshSchema: z.ZodObject<{
-    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.refresh">, z.ZodLiteral<string>]>, "kehikot.refresh", string>;
+    type: z.ZodLiteral<"kehikot.refresh">;
     protocol: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
     protocol: number;
     type: "kehikot.refresh";
 }, {
     protocol: number;
-    type: string;
+    type: "kehikot.refresh";
 }>;
 export type Refresh = z.infer<typeof refreshSchema>;
 /**
@@ -198,7 +198,7 @@ export type Refresh = z.infer<typeof refreshSchema>;
  * this conversation; it is not a credential and must never become one.
  */
 export declare const helloSchema: z.ZodObject<{
-    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.hello">, z.ZodLiteral<string>]>, "kehikot.hello", string>;
+    type: z.ZodLiteral<"kehikot.hello">;
     protocol: z.ZodNumber;
     session: z.ZodString;
     context: z.ZodObject<{
@@ -323,7 +323,7 @@ export declare const helloSchema: z.ZodObject<{
         }>>>;
         filters: z.ZodDefault<z.ZodEffects<z.ZodRecord<z.ZodEffects<z.ZodString, string, string>, z.ZodUnion<[z.ZodString, z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">, string[], string[]>]>>, Record<string, string | string[]>, Record<string, string | string[]>>>;
         containers: z.ZodDefault<z.ZodArray<z.ZodObject<{
-            module: z.ZodEffects<z.ZodString, string, string>;
+            module: z.ZodString;
             selected: z.ZodDefault<z.ZodBoolean>;
             showing: z.ZodDefault<z.ZodObject<{
                 refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
@@ -528,7 +528,7 @@ export declare const helloSchema: z.ZodObject<{
             refreshing?: boolean | undefined;
         }>>;
         content: z.ZodDefault<z.ZodArray<z.ZodObject<{
-            source: z.ZodEffects<z.ZodString, string, string>;
+            source: z.ZodString;
             epic: z.ZodDefault<z.ZodNullable<z.ZodString>>;
             at: z.ZodString;
         }, "strip", z.ZodTypeAny, {
@@ -560,25 +560,6 @@ export declare const helloSchema: z.ZodObject<{
             picked?: boolean | undefined;
         }>, "many">>;
     }, "strip", z.ZodTypeAny, {
-        containers: {
-            module: string;
-            selected: boolean;
-            showing: {
-                refs: string[];
-                documents: {
-                    path: string;
-                    from: number | null;
-                    to: number | null;
-                    page: number | null;
-                    quoted: string;
-                    section: {
-                        from: number | null;
-                        to: number | null;
-                        title: string;
-                    } | null;
-                }[];
-            };
-        }[];
         epic: string | null;
         tracker: {
             at: string | null;
@@ -607,6 +588,25 @@ export declare const helloSchema: z.ZodObject<{
             name: string;
         } | null;
         filters: Record<string, string | string[]>;
+        containers: {
+            module: string;
+            selected: boolean;
+            showing: {
+                refs: string[];
+                documents: {
+                    path: string;
+                    from: number | null;
+                    to: number | null;
+                    page: number | null;
+                    quoted: string;
+                    section: {
+                        from: number | null;
+                        to: number | null;
+                        title: string;
+                    } | null;
+                }[];
+            };
+        }[];
         dispositions: {
             value: "done" | "wont-do" | "duplicate" | "superseded";
             at: string | null;
@@ -628,25 +628,6 @@ export declare const helloSchema: z.ZodObject<{
             files?: string[] | undefined;
         }[];
     }, {
-        containers?: {
-            module: string;
-            selected?: boolean | undefined;
-            showing?: {
-                refs?: string[] | undefined;
-                documents?: {
-                    path: string;
-                    from?: number | null | undefined;
-                    to?: number | null | undefined;
-                    page?: number | null | undefined;
-                    quoted?: string | undefined;
-                    section?: {
-                        title: string;
-                        from?: number | null | undefined;
-                        to?: number | null | undefined;
-                    } | null | undefined;
-                }[] | undefined;
-            } | undefined;
-        }[] | undefined;
         epic?: string | null | undefined;
         tracker?: {
             at?: string | null | undefined;
@@ -675,6 +656,25 @@ export declare const helloSchema: z.ZodObject<{
             name: string;
         } | null | undefined;
         filters?: Record<string, string | string[]> | undefined;
+        containers?: {
+            module: string;
+            selected?: boolean | undefined;
+            showing?: {
+                refs?: string[] | undefined;
+                documents?: {
+                    path: string;
+                    from?: number | null | undefined;
+                    to?: number | null | undefined;
+                    page?: number | null | undefined;
+                    quoted?: string | undefined;
+                    section?: {
+                        title: string;
+                        from?: number | null | undefined;
+                        to?: number | null | undefined;
+                    } | null | undefined;
+                }[] | undefined;
+            } | undefined;
+        }[] | undefined;
         dispositions?: {
             value: "done" | "wont-do" | "duplicate" | "superseded";
             ref: string;
@@ -704,26 +704,9 @@ export declare const helloSchema: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     protocol: number;
     type: "kehikot.hello";
+    state: string | null;
+    session: string;
     context: {
-        containers: {
-            module: string;
-            selected: boolean;
-            showing: {
-                refs: string[];
-                documents: {
-                    path: string;
-                    from: number | null;
-                    to: number | null;
-                    page: number | null;
-                    quoted: string;
-                    section: {
-                        from: number | null;
-                        to: number | null;
-                        title: string;
-                    } | null;
-                }[];
-            };
-        }[];
         epic: string | null;
         tracker: {
             at: string | null;
@@ -752,6 +735,25 @@ export declare const helloSchema: z.ZodObject<{
             name: string;
         } | null;
         filters: Record<string, string | string[]>;
+        containers: {
+            module: string;
+            selected: boolean;
+            showing: {
+                refs: string[];
+                documents: {
+                    path: string;
+                    from: number | null;
+                    to: number | null;
+                    page: number | null;
+                    quoted: string;
+                    section: {
+                        from: number | null;
+                        to: number | null;
+                        title: string;
+                    } | null;
+                }[];
+            };
+        }[];
         dispositions: {
             value: "done" | "wont-do" | "duplicate" | "superseded";
             at: string | null;
@@ -773,31 +775,11 @@ export declare const helloSchema: z.ZodObject<{
             files?: string[] | undefined;
         }[];
     };
-    state: string | null;
-    session: string;
 }, {
     protocol: number;
-    type: string;
+    type: "kehikot.hello";
+    session: string;
     context: {
-        containers?: {
-            module: string;
-            selected?: boolean | undefined;
-            showing?: {
-                refs?: string[] | undefined;
-                documents?: {
-                    path: string;
-                    from?: number | null | undefined;
-                    to?: number | null | undefined;
-                    page?: number | null | undefined;
-                    quoted?: string | undefined;
-                    section?: {
-                        title: string;
-                        from?: number | null | undefined;
-                        to?: number | null | undefined;
-                    } | null | undefined;
-                }[] | undefined;
-            } | undefined;
-        }[] | undefined;
         epic?: string | null | undefined;
         tracker?: {
             at?: string | null | undefined;
@@ -826,6 +808,25 @@ export declare const helloSchema: z.ZodObject<{
             name: string;
         } | null | undefined;
         filters?: Record<string, string | string[]> | undefined;
+        containers?: {
+            module: string;
+            selected?: boolean | undefined;
+            showing?: {
+                refs?: string[] | undefined;
+                documents?: {
+                    path: string;
+                    from?: number | null | undefined;
+                    to?: number | null | undefined;
+                    page?: number | null | undefined;
+                    quoted?: string | undefined;
+                    section?: {
+                        title: string;
+                        from?: number | null | undefined;
+                        to?: number | null | undefined;
+                    } | null | undefined;
+                }[] | undefined;
+            } | undefined;
+        }[] | undefined;
         dispositions?: {
             value: "done" | "wont-do" | "duplicate" | "superseded";
             ref: string;
@@ -847,7 +848,6 @@ export declare const helloSchema: z.ZodObject<{
             picked?: boolean | undefined;
         }[] | undefined;
     };
-    session: string;
     state?: string | null | undefined;
 }>;
 /**
@@ -977,7 +977,7 @@ export declare const contextMessageSchema: z.ZodObject<{
     }>>>;
     filters: z.ZodDefault<z.ZodEffects<z.ZodRecord<z.ZodEffects<z.ZodString, string, string>, z.ZodUnion<[z.ZodString, z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">, string[], string[]>]>>, Record<string, string | string[]>, Record<string, string | string[]>>>;
     containers: z.ZodDefault<z.ZodArray<z.ZodObject<{
-        module: z.ZodEffects<z.ZodString, string, string>;
+        module: z.ZodString;
         selected: z.ZodDefault<z.ZodBoolean>;
         showing: z.ZodDefault<z.ZodObject<{
             refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
@@ -1182,7 +1182,7 @@ export declare const contextMessageSchema: z.ZodObject<{
         refreshing?: boolean | undefined;
     }>>;
     content: z.ZodDefault<z.ZodArray<z.ZodObject<{
-        source: z.ZodEffects<z.ZodString, string, string>;
+        source: z.ZodString;
         epic: z.ZodDefault<z.ZodNullable<z.ZodString>>;
         at: z.ZodString;
     }, "strip", z.ZodTypeAny, {
@@ -1214,30 +1214,11 @@ export declare const contextMessageSchema: z.ZodObject<{
         picked?: boolean | undefined;
     }>, "many">>;
 } & {
-    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.context">, z.ZodLiteral<string>]>, "kehikot.context", string>;
+    type: z.ZodLiteral<"kehikot.context">;
     protocol: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
     protocol: number;
     type: "kehikot.context";
-    containers: {
-        module: string;
-        selected: boolean;
-        showing: {
-            refs: string[];
-            documents: {
-                path: string;
-                from: number | null;
-                to: number | null;
-                page: number | null;
-                quoted: string;
-                section: {
-                    from: number | null;
-                    to: number | null;
-                    title: string;
-                } | null;
-            }[];
-        };
-    }[];
     epic: string | null;
     tracker: {
         at: string | null;
@@ -1266,6 +1247,25 @@ export declare const contextMessageSchema: z.ZodObject<{
         name: string;
     } | null;
     filters: Record<string, string | string[]>;
+    containers: {
+        module: string;
+        selected: boolean;
+        showing: {
+            refs: string[];
+            documents: {
+                path: string;
+                from: number | null;
+                to: number | null;
+                page: number | null;
+                quoted: string;
+                section: {
+                    from: number | null;
+                    to: number | null;
+                    title: string;
+                } | null;
+            }[];
+        };
+    }[];
     dispositions: {
         value: "done" | "wont-do" | "duplicate" | "superseded";
         at: string | null;
@@ -1288,26 +1288,7 @@ export declare const contextMessageSchema: z.ZodObject<{
     }[];
 }, {
     protocol: number;
-    type: string;
-    containers?: {
-        module: string;
-        selected?: boolean | undefined;
-        showing?: {
-            refs?: string[] | undefined;
-            documents?: {
-                path: string;
-                from?: number | null | undefined;
-                to?: number | null | undefined;
-                page?: number | null | undefined;
-                quoted?: string | undefined;
-                section?: {
-                    title: string;
-                    from?: number | null | undefined;
-                    to?: number | null | undefined;
-                } | null | undefined;
-            }[] | undefined;
-        } | undefined;
-    }[] | undefined;
+    type: "kehikot.context";
     epic?: string | null | undefined;
     tracker?: {
         at?: string | null | undefined;
@@ -1336,6 +1317,25 @@ export declare const contextMessageSchema: z.ZodObject<{
         name: string;
     } | null | undefined;
     filters?: Record<string, string | string[]> | undefined;
+    containers?: {
+        module: string;
+        selected?: boolean | undefined;
+        showing?: {
+            refs?: string[] | undefined;
+            documents?: {
+                path: string;
+                from?: number | null | undefined;
+                to?: number | null | undefined;
+                page?: number | null | undefined;
+                quoted?: string | undefined;
+                section?: {
+                    title: string;
+                    from?: number | null | undefined;
+                    to?: number | null | undefined;
+                } | null | undefined;
+            }[] | undefined;
+        } | undefined;
+    }[] | undefined;
     dispositions?: {
         value: "done" | "wont-do" | "duplicate" | "superseded";
         ref: string;
@@ -1370,7 +1370,7 @@ export type ResponseFailureReason = (typeof responseFailureReasons)[number];
  * `error`, a sentence for the person writing the module.
  */
 export declare const responseSchema: z.ZodDiscriminatedUnion<"ok", [z.ZodObject<{
-    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.response">, z.ZodLiteral<string>]>, "kehikot.response", string>;
+    type: z.ZodLiteral<"kehikot.response">;
     id: z.ZodString;
     ok: z.ZodLiteral<true>;
     /**
@@ -1385,12 +1385,12 @@ export declare const responseSchema: z.ZodDiscriminatedUnion<"ok", [z.ZodObject<
     ok: true;
     data?: unknown;
 }, {
-    type: string;
+    type: "kehikot.response";
     id: string;
     ok: true;
     data?: unknown;
 }>, z.ZodObject<{
-    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.response">, z.ZodLiteral<string>]>, "kehikot.response", string>;
+    type: z.ZodLiteral<"kehikot.response">;
     id: z.ZodString;
     ok: z.ZodLiteral<false>;
     reason: z.ZodEnum<["unknown-module", "unknown-method", "failed"]>;
@@ -1403,7 +1403,7 @@ export declare const responseSchema: z.ZodDiscriminatedUnion<"ok", [z.ZodObject<
     reason: "failed" | "unknown-module" | "unknown-method";
     ok: false;
 }, {
-    type: string;
+    type: "kehikot.response";
     id: string;
     reason: "failed" | "unknown-module" | "unknown-method";
     ok: false;
@@ -1415,7 +1415,7 @@ export declare const responseSchema: z.ZodDiscriminatedUnion<"ok", [z.ZodObject<
  * Mirrors the `view.goto` method, which does accept an epic alone.
  */
 export declare const gotoSchema: z.ZodEffects<z.ZodObject<{
-    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.goto">, z.ZodLiteral<string>]>, "kehikot.goto", string>;
+    type: z.ZodLiteral<"kehikot.goto">;
     id: z.ZodString;
     ref: z.ZodOptional<z.ZodString>;
     step: z.ZodOptional<z.ZodNumber>;
@@ -1427,7 +1427,7 @@ export declare const gotoSchema: z.ZodEffects<z.ZodObject<{
     ref?: string | undefined;
     step?: number | undefined;
 }, {
-    type: string;
+    type: "kehikot.goto";
     id: string;
     epic?: string | undefined;
     ref?: string | undefined;
@@ -1439,7 +1439,7 @@ export declare const gotoSchema: z.ZodEffects<z.ZodObject<{
     ref?: string | undefined;
     step?: number | undefined;
 }, {
-    type: string;
+    type: "kehikot.goto";
     id: string;
     epic?: string | undefined;
     ref?: string | undefined;
@@ -1451,14 +1451,14 @@ export declare const gotoSchema: z.ZodEffects<z.ZodObject<{
  * contents are the sender's claim. Never answered, and lost if the receiver is still loading.
  */
 export declare const eventSchema: z.ZodObject<{
-    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.event">, z.ZodLiteral<string>]>, "kehikot.event", string>;
+    type: z.ZodLiteral<"kehikot.event">;
     protocol: z.ZodNumber;
     /** The format, e.g. `kehikot.notifications@1`. Known to the host, or unsent. */
-    extension: z.ZodEffects<z.ZodString, string, string>;
+    extension: z.ZodString;
     /** Whatever that format says. Validated by the host before it left. */
     payload: z.ZodUnknown;
     /** The module that emitted it, named by the host from its own registry. */
-    from: z.ZodEffects<z.ZodString, string, string>;
+    from: z.ZodString;
     /**
      * When the host accepted it, ISO 8601. A receiver ordering by arrival would
      * be ordering by its own scheduler instead.
@@ -1480,15 +1480,15 @@ export declare const eventSchema: z.ZodObject<{
     type: "kehikot.event";
     at: string;
     from: string;
-    extension: string;
     kehikko: {
         id: number;
         name: string;
     } | null;
+    extension: string;
     payload?: unknown;
 }, {
     protocol: number;
-    type: string;
+    type: "kehikot.event";
     at: string;
     from: string;
     extension: string;
@@ -1504,8 +1504,8 @@ export declare const eventSchema: z.ZodObject<{
  * A host waits a bounded time, counted from the greeting, then says the module did not answer.
  */
 export declare const readySchema: z.ZodObject<{
-    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.ready">, z.ZodLiteral<string>]>, "kehikot.ready", string>;
-    id: z.ZodEffects<z.ZodString, string, string>;
+    type: z.ZodLiteral<"kehikot.ready">;
+    id: z.ZodString;
     protocol: z.ZodDefault<z.ZodNumber>;
     /** The build that served this page, as printed into it. A host compares it with the server's now. */
     build: z.ZodCatch<z.ZodOptional<z.ZodObject<{
@@ -1535,14 +1535,14 @@ export declare const readySchema: z.ZodObject<{
         protocol: string;
     } | undefined;
 }, {
-    type: string;
+    type: "kehikot.ready";
     id: string;
     build?: unknown;
     protocol?: number | undefined;
 }>;
 /** One question, with an id the answer will carry back. */
 export declare const requestSchema: z.ZodObject<{
-    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.request">, z.ZodLiteral<string>]>, "kehikot.request", string>;
+    type: z.ZodLiteral<"kehikot.request">;
     id: z.ZodString;
     /**
      * Bounded but not held to the list of known methods. A host may refuse one it does not have, with
@@ -1556,7 +1556,7 @@ export declare const requestSchema: z.ZodObject<{
     id: string;
     method: string;
 }, {
-    type: string;
+    type: "kehikot.request";
     id: string;
     method: string;
     params?: Record<string, unknown> | undefined;
@@ -1566,13 +1566,13 @@ export declare const requestSchema: z.ZodObject<{
  * (`clampHeight`) and may ignore it entirely.
  */
 export declare const resizeSchema: z.ZodObject<{
-    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.resize">, z.ZodLiteral<string>]>, "kehikot.resize", string>;
+    type: z.ZodLiteral<"kehikot.resize">;
     height: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
     type: "kehikot.resize";
     height: number;
 }, {
-    type: string;
+    type: "kehikot.resize";
     height: number;
 }>;
 /**
@@ -1581,7 +1581,7 @@ export declare const resizeSchema: z.ZodObject<{
  * person. A host must time out, and a timeout means `found: false`: fall back to the link.
  */
 export declare const wentSchema: z.ZodObject<{
-    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.went">, z.ZodLiteral<string>]>, "kehikot.went", string>;
+    type: z.ZodLiteral<"kehikot.went">;
     id: z.ZodString;
     found: z.ZodBoolean;
     why: z.ZodDefault<z.ZodString>;
@@ -1591,7 +1591,7 @@ export declare const wentSchema: z.ZodObject<{
     why: string;
     found: boolean;
 }, {
-    type: string;
+    type: "kehikot.went";
     id: string;
     found: boolean;
     why?: string | undefined;
@@ -1601,7 +1601,7 @@ export declare const wentSchema: z.ZodObject<{
  * is itself a union on a different key and cannot be an option of one.
  */
 export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
-    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.hello">, z.ZodLiteral<string>]>, "kehikot.hello", string>;
+    type: z.ZodLiteral<"kehikot.hello">;
     protocol: z.ZodNumber;
     session: z.ZodString;
     context: z.ZodObject<{
@@ -1726,7 +1726,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         }>>>;
         filters: z.ZodDefault<z.ZodEffects<z.ZodRecord<z.ZodEffects<z.ZodString, string, string>, z.ZodUnion<[z.ZodString, z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">, string[], string[]>]>>, Record<string, string | string[]>, Record<string, string | string[]>>>;
         containers: z.ZodDefault<z.ZodArray<z.ZodObject<{
-            module: z.ZodEffects<z.ZodString, string, string>;
+            module: z.ZodString;
             selected: z.ZodDefault<z.ZodBoolean>;
             showing: z.ZodDefault<z.ZodObject<{
                 refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
@@ -1931,7 +1931,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             refreshing?: boolean | undefined;
         }>>;
         content: z.ZodDefault<z.ZodArray<z.ZodObject<{
-            source: z.ZodEffects<z.ZodString, string, string>;
+            source: z.ZodString;
             epic: z.ZodDefault<z.ZodNullable<z.ZodString>>;
             at: z.ZodString;
         }, "strip", z.ZodTypeAny, {
@@ -1963,25 +1963,6 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             picked?: boolean | undefined;
         }>, "many">>;
     }, "strip", z.ZodTypeAny, {
-        containers: {
-            module: string;
-            selected: boolean;
-            showing: {
-                refs: string[];
-                documents: {
-                    path: string;
-                    from: number | null;
-                    to: number | null;
-                    page: number | null;
-                    quoted: string;
-                    section: {
-                        from: number | null;
-                        to: number | null;
-                        title: string;
-                    } | null;
-                }[];
-            };
-        }[];
         epic: string | null;
         tracker: {
             at: string | null;
@@ -2010,6 +1991,25 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             name: string;
         } | null;
         filters: Record<string, string | string[]>;
+        containers: {
+            module: string;
+            selected: boolean;
+            showing: {
+                refs: string[];
+                documents: {
+                    path: string;
+                    from: number | null;
+                    to: number | null;
+                    page: number | null;
+                    quoted: string;
+                    section: {
+                        from: number | null;
+                        to: number | null;
+                        title: string;
+                    } | null;
+                }[];
+            };
+        }[];
         dispositions: {
             value: "done" | "wont-do" | "duplicate" | "superseded";
             at: string | null;
@@ -2031,25 +2031,6 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             files?: string[] | undefined;
         }[];
     }, {
-        containers?: {
-            module: string;
-            selected?: boolean | undefined;
-            showing?: {
-                refs?: string[] | undefined;
-                documents?: {
-                    path: string;
-                    from?: number | null | undefined;
-                    to?: number | null | undefined;
-                    page?: number | null | undefined;
-                    quoted?: string | undefined;
-                    section?: {
-                        title: string;
-                        from?: number | null | undefined;
-                        to?: number | null | undefined;
-                    } | null | undefined;
-                }[] | undefined;
-            } | undefined;
-        }[] | undefined;
         epic?: string | null | undefined;
         tracker?: {
             at?: string | null | undefined;
@@ -2078,6 +2059,25 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             name: string;
         } | null | undefined;
         filters?: Record<string, string | string[]> | undefined;
+        containers?: {
+            module: string;
+            selected?: boolean | undefined;
+            showing?: {
+                refs?: string[] | undefined;
+                documents?: {
+                    path: string;
+                    from?: number | null | undefined;
+                    to?: number | null | undefined;
+                    page?: number | null | undefined;
+                    quoted?: string | undefined;
+                    section?: {
+                        title: string;
+                        from?: number | null | undefined;
+                        to?: number | null | undefined;
+                    } | null | undefined;
+                }[] | undefined;
+            } | undefined;
+        }[] | undefined;
         dispositions?: {
             value: "done" | "wont-do" | "duplicate" | "superseded";
             ref: string;
@@ -2107,26 +2107,9 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     protocol: number;
     type: "kehikot.hello";
+    state: string | null;
+    session: string;
     context: {
-        containers: {
-            module: string;
-            selected: boolean;
-            showing: {
-                refs: string[];
-                documents: {
-                    path: string;
-                    from: number | null;
-                    to: number | null;
-                    page: number | null;
-                    quoted: string;
-                    section: {
-                        from: number | null;
-                        to: number | null;
-                        title: string;
-                    } | null;
-                }[];
-            };
-        }[];
         epic: string | null;
         tracker: {
             at: string | null;
@@ -2155,6 +2138,25 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             name: string;
         } | null;
         filters: Record<string, string | string[]>;
+        containers: {
+            module: string;
+            selected: boolean;
+            showing: {
+                refs: string[];
+                documents: {
+                    path: string;
+                    from: number | null;
+                    to: number | null;
+                    page: number | null;
+                    quoted: string;
+                    section: {
+                        from: number | null;
+                        to: number | null;
+                        title: string;
+                    } | null;
+                }[];
+            };
+        }[];
         dispositions: {
             value: "done" | "wont-do" | "duplicate" | "superseded";
             at: string | null;
@@ -2176,31 +2178,11 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             files?: string[] | undefined;
         }[];
     };
-    state: string | null;
-    session: string;
 }, {
     protocol: number;
-    type: string;
+    type: "kehikot.hello";
+    session: string;
     context: {
-        containers?: {
-            module: string;
-            selected?: boolean | undefined;
-            showing?: {
-                refs?: string[] | undefined;
-                documents?: {
-                    path: string;
-                    from?: number | null | undefined;
-                    to?: number | null | undefined;
-                    page?: number | null | undefined;
-                    quoted?: string | undefined;
-                    section?: {
-                        title: string;
-                        from?: number | null | undefined;
-                        to?: number | null | undefined;
-                    } | null | undefined;
-                }[] | undefined;
-            } | undefined;
-        }[] | undefined;
         epic?: string | null | undefined;
         tracker?: {
             at?: string | null | undefined;
@@ -2229,6 +2211,25 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             name: string;
         } | null | undefined;
         filters?: Record<string, string | string[]> | undefined;
+        containers?: {
+            module: string;
+            selected?: boolean | undefined;
+            showing?: {
+                refs?: string[] | undefined;
+                documents?: {
+                    path: string;
+                    from?: number | null | undefined;
+                    to?: number | null | undefined;
+                    page?: number | null | undefined;
+                    quoted?: string | undefined;
+                    section?: {
+                        title: string;
+                        from?: number | null | undefined;
+                        to?: number | null | undefined;
+                    } | null | undefined;
+                }[] | undefined;
+            } | undefined;
+        }[] | undefined;
         dispositions?: {
             value: "done" | "wont-do" | "duplicate" | "superseded";
             ref: string;
@@ -2250,7 +2251,6 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             picked?: boolean | undefined;
         }[] | undefined;
     };
-    session: string;
     state?: string | null | undefined;
 }>, z.ZodObject<{
     epic: z.ZodDefault<z.ZodNullable<z.ZodString>>;
@@ -2374,7 +2374,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     }>>>;
     filters: z.ZodDefault<z.ZodEffects<z.ZodRecord<z.ZodEffects<z.ZodString, string, string>, z.ZodUnion<[z.ZodString, z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">, string[], string[]>]>>, Record<string, string | string[]>, Record<string, string | string[]>>>;
     containers: z.ZodDefault<z.ZodArray<z.ZodObject<{
-        module: z.ZodEffects<z.ZodString, string, string>;
+        module: z.ZodString;
         selected: z.ZodDefault<z.ZodBoolean>;
         showing: z.ZodDefault<z.ZodObject<{
             refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
@@ -2579,7 +2579,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         refreshing?: boolean | undefined;
     }>>;
     content: z.ZodDefault<z.ZodArray<z.ZodObject<{
-        source: z.ZodEffects<z.ZodString, string, string>;
+        source: z.ZodString;
         epic: z.ZodDefault<z.ZodNullable<z.ZodString>>;
         at: z.ZodString;
     }, "strip", z.ZodTypeAny, {
@@ -2611,30 +2611,11 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         picked?: boolean | undefined;
     }>, "many">>;
 } & {
-    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.context">, z.ZodLiteral<string>]>, "kehikot.context", string>;
+    type: z.ZodLiteral<"kehikot.context">;
     protocol: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
     protocol: number;
     type: "kehikot.context";
-    containers: {
-        module: string;
-        selected: boolean;
-        showing: {
-            refs: string[];
-            documents: {
-                path: string;
-                from: number | null;
-                to: number | null;
-                page: number | null;
-                quoted: string;
-                section: {
-                    from: number | null;
-                    to: number | null;
-                    title: string;
-                } | null;
-            }[];
-        };
-    }[];
     epic: string | null;
     tracker: {
         at: string | null;
@@ -2663,6 +2644,25 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         name: string;
     } | null;
     filters: Record<string, string | string[]>;
+    containers: {
+        module: string;
+        selected: boolean;
+        showing: {
+            refs: string[];
+            documents: {
+                path: string;
+                from: number | null;
+                to: number | null;
+                page: number | null;
+                quoted: string;
+                section: {
+                    from: number | null;
+                    to: number | null;
+                    title: string;
+                } | null;
+            }[];
+        };
+    }[];
     dispositions: {
         value: "done" | "wont-do" | "duplicate" | "superseded";
         at: string | null;
@@ -2685,26 +2685,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     }[];
 }, {
     protocol: number;
-    type: string;
-    containers?: {
-        module: string;
-        selected?: boolean | undefined;
-        showing?: {
-            refs?: string[] | undefined;
-            documents?: {
-                path: string;
-                from?: number | null | undefined;
-                to?: number | null | undefined;
-                page?: number | null | undefined;
-                quoted?: string | undefined;
-                section?: {
-                    title: string;
-                    from?: number | null | undefined;
-                    to?: number | null | undefined;
-                } | null | undefined;
-            }[] | undefined;
-        } | undefined;
-    }[] | undefined;
+    type: "kehikot.context";
     epic?: string | null | undefined;
     tracker?: {
         at?: string | null | undefined;
@@ -2733,6 +2714,25 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         name: string;
     } | null | undefined;
     filters?: Record<string, string | string[]> | undefined;
+    containers?: {
+        module: string;
+        selected?: boolean | undefined;
+        showing?: {
+            refs?: string[] | undefined;
+            documents?: {
+                path: string;
+                from?: number | null | undefined;
+                to?: number | null | undefined;
+                page?: number | null | undefined;
+                quoted?: string | undefined;
+                section?: {
+                    title: string;
+                    from?: number | null | undefined;
+                    to?: number | null | undefined;
+                } | null | undefined;
+            }[] | undefined;
+        } | undefined;
+    }[] | undefined;
     dispositions?: {
         value: "done" | "wont-do" | "duplicate" | "superseded";
         ref: string;
@@ -2754,7 +2754,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         picked?: boolean | undefined;
     }[] | undefined;
 }>, z.ZodDiscriminatedUnion<"ok", [z.ZodObject<{
-    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.response">, z.ZodLiteral<string>]>, "kehikot.response", string>;
+    type: z.ZodLiteral<"kehikot.response">;
     id: z.ZodString;
     ok: z.ZodLiteral<true>;
     /**
@@ -2769,12 +2769,12 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     ok: true;
     data?: unknown;
 }, {
-    type: string;
+    type: "kehikot.response";
     id: string;
     ok: true;
     data?: unknown;
 }>, z.ZodObject<{
-    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.response">, z.ZodLiteral<string>]>, "kehikot.response", string>;
+    type: z.ZodLiteral<"kehikot.response">;
     id: z.ZodString;
     ok: z.ZodLiteral<false>;
     reason: z.ZodEnum<["unknown-module", "unknown-method", "failed"]>;
@@ -2787,13 +2787,13 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     reason: "failed" | "unknown-module" | "unknown-method";
     ok: false;
 }, {
-    type: string;
+    type: "kehikot.response";
     id: string;
     reason: "failed" | "unknown-module" | "unknown-method";
     ok: false;
     error?: string | undefined;
 }>]>, z.ZodEffects<z.ZodObject<{
-    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.goto">, z.ZodLiteral<string>]>, "kehikot.goto", string>;
+    type: z.ZodLiteral<"kehikot.goto">;
     id: z.ZodString;
     ref: z.ZodOptional<z.ZodString>;
     step: z.ZodOptional<z.ZodNumber>;
@@ -2805,7 +2805,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     ref?: string | undefined;
     step?: number | undefined;
 }, {
-    type: string;
+    type: "kehikot.goto";
     id: string;
     epic?: string | undefined;
     ref?: string | undefined;
@@ -2817,20 +2817,20 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     ref?: string | undefined;
     step?: number | undefined;
 }, {
-    type: string;
+    type: "kehikot.goto";
     id: string;
     epic?: string | undefined;
     ref?: string | undefined;
     step?: number | undefined;
 }>, z.ZodObject<{
-    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.event">, z.ZodLiteral<string>]>, "kehikot.event", string>;
+    type: z.ZodLiteral<"kehikot.event">;
     protocol: z.ZodNumber;
     /** The format, e.g. `kehikot.notifications@1`. Known to the host, or unsent. */
-    extension: z.ZodEffects<z.ZodString, string, string>;
+    extension: z.ZodString;
     /** Whatever that format says. Validated by the host before it left. */
     payload: z.ZodUnknown;
     /** The module that emitted it, named by the host from its own registry. */
-    from: z.ZodEffects<z.ZodString, string, string>;
+    from: z.ZodString;
     /**
      * When the host accepted it, ISO 8601. A receiver ordering by arrival would
      * be ordering by its own scheduler instead.
@@ -2852,15 +2852,15 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     type: "kehikot.event";
     at: string;
     from: string;
-    extension: string;
     kehikko: {
         id: number;
         name: string;
     } | null;
+    extension: string;
     payload?: unknown;
 }, {
     protocol: number;
-    type: string;
+    type: "kehikot.event";
     at: string;
     from: string;
     extension: string;
@@ -2870,28 +2870,28 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     } | null | undefined;
     payload?: unknown;
 }>, z.ZodObject<{
-    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.clear">, z.ZodLiteral<string>]>, "kehikot.clear", string>;
+    type: z.ZodLiteral<"kehikot.clear">;
     protocol: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
     protocol: number;
     type: "kehikot.clear";
 }, {
     protocol: number;
-    type: string;
+    type: "kehikot.clear";
 }>, z.ZodObject<{
-    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.refresh">, z.ZodLiteral<string>]>, "kehikot.refresh", string>;
+    type: z.ZodLiteral<"kehikot.refresh">;
     protocol: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
     protocol: number;
     type: "kehikot.refresh";
 }, {
     protocol: number;
-    type: string;
+    type: "kehikot.refresh";
 }>]>;
 export type HostMessage = z.infer<typeof hostMessageSchema>;
 export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
-    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.ready">, z.ZodLiteral<string>]>, "kehikot.ready", string>;
-    id: z.ZodEffects<z.ZodString, string, string>;
+    type: z.ZodLiteral<"kehikot.ready">;
+    id: z.ZodString;
     protocol: z.ZodDefault<z.ZodNumber>;
     /** The build that served this page, as printed into it. A host compares it with the server's now. */
     build: z.ZodCatch<z.ZodOptional<z.ZodObject<{
@@ -2921,12 +2921,12 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         protocol: string;
     } | undefined;
 }, {
-    type: string;
+    type: "kehikot.ready";
     id: string;
     build?: unknown;
     protocol?: number | undefined;
 }>, z.ZodObject<{
-    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.request">, z.ZodLiteral<string>]>, "kehikot.request", string>;
+    type: z.ZodLiteral<"kehikot.request">;
     id: z.ZodString;
     /**
      * Bounded but not held to the list of known methods. A host may refuse one it does not have, with
@@ -2940,21 +2940,21 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
     id: string;
     method: string;
 }, {
-    type: string;
+    type: "kehikot.request";
     id: string;
     method: string;
     params?: Record<string, unknown> | undefined;
 }>, z.ZodObject<{
-    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.resize">, z.ZodLiteral<string>]>, "kehikot.resize", string>;
+    type: z.ZodLiteral<"kehikot.resize">;
     height: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
     type: "kehikot.resize";
     height: number;
 }, {
-    type: string;
+    type: "kehikot.resize";
     height: number;
 }>, z.ZodObject<{
-    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.went">, z.ZodLiteral<string>]>, "kehikot.went", string>;
+    type: z.ZodLiteral<"kehikot.went">;
     id: z.ZodString;
     found: z.ZodBoolean;
     why: z.ZodDefault<z.ZodString>;
@@ -2964,12 +2964,12 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
     why: string;
     found: boolean;
 }, {
-    type: string;
+    type: "kehikot.went";
     id: string;
     found: boolean;
     why?: string | undefined;
 }>, z.ZodObject<{
-    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.filters">, z.ZodLiteral<string>]>, "kehikot.filters", string>;
+    type: z.ZodLiteral<"kehikot.filters">;
     groups: z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodEffects<z.ZodObject<{
         id: z.ZodEffects<z.ZodString, string, string>;
         label: z.ZodString;
@@ -3071,7 +3071,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         fallback?: string | undefined;
     }[];
 }, {
-    type: string;
+    type: "kehikot.filters";
     groups: {
         label: string;
         id: string;
@@ -3083,17 +3083,17 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         fallback?: string | undefined;
     }[];
 }>, z.ZodObject<{
-    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.clearable">, z.ZodLiteral<string>]>, "kehikot.clearable", string>;
+    type: z.ZodLiteral<"kehikot.clearable">;
     /** The words on the control, or `null` to take the control away. */
     label: z.ZodDefault<z.ZodNullable<z.ZodString>>;
 }, "strip", z.ZodTypeAny, {
     type: "kehikot.clearable";
     label: string | null;
 }, {
-    type: string;
+    type: "kehikot.clearable";
     label?: string | null | undefined;
 }>, z.ZodObject<{
-    type: z.ZodEffects<z.ZodUnion<[z.ZodLiteral<"kehikot.refreshable">, z.ZodLiteral<string>]>, "kehikot.refreshable", string>;
+    type: z.ZodLiteral<"kehikot.refreshable">;
     /** Whether there is anything to read again right now. `false` withdraws the control. */
     can: z.ZodDefault<z.ZodBoolean>;
     /** When this module's material was last read, as the MODULE knows it. */
@@ -3106,7 +3106,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
     can: boolean;
     busy: boolean;
 }, {
-    type: string;
+    type: "kehikot.refreshable";
     at?: string | null | undefined;
     can?: boolean | undefined;
     busy?: boolean | undefined;
@@ -3124,7 +3124,7 @@ export type Resize = z.infer<typeof resizeSchema>;
 export type Went = z.infer<typeof wentSchema>;
 /**
  * Is this worth parsing at all? The cheap first filter: true when the value is an object whose
- * `type` starts `kehikot.` or the older `roadmap.`. Says nothing about validity or the sender.
+ * `type` starts `kehikot.`. Says nothing about validity or the sender.
  */
 export declare function looksLikeWireMessage(value: unknown): value is {
     type: string;

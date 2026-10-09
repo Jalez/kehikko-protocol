@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import { LIMITS } from './limits.js';
-import { canonicalName } from './dialect.js';
 import { trackerSignalSchema } from './tracker.js';
 import { contentSignalSchema } from './content.js';
 import { EPIC_SLUG, MODULE_ID } from './ids.js';
@@ -49,7 +48,7 @@ export const showingSchema = z.object({
  * the current `passage` and `selection` into their setter's row. `module` is the module's id.
  */
 export const containerSchema = z.object({
-    module: z.string().regex(MODULE_ID).transform(canonicalName),
+    module: z.string().regex(MODULE_ID),
     /** Whether this container is picked out as a target on this kehikko. The host's own fact. */
     selected: z.boolean().default(false),
     /** What it says it is showing, or nothing. Never absent, for the reason `filters` is `{}` and not missing. */

@@ -277,8 +277,7 @@ A refused connection means nothing is listening — but `free()` has already
 What a document on that port makes the program serving it. Pure.
 
 The `kind` word is checked before the id, which is the whole reason that word
-exists: a JSON document that does not say `kehikot.module` (or `roadmap.module`,
-its spelling before the rename) is not a manifest
+exists: a JSON document that does not say `kehikot.module` is not a manifest
 however many of the other fields it happens to have, and a program with an
 `id` field is not thereby a module. Without that check a module could be
 talked out of starting by any JSON server that happened to have an `id`.
@@ -365,10 +364,10 @@ platform keeps an app's own data — and `$XDG_DATA_HOME/kehikot/modules`
 host reads first; see `machineDirs.ts` in the host.
 
 It used to be `~/.roadmap/modules`, named after the app before it was called
-Kehikot. Modules built against an older copy of this package still write
-there, and the host still reads it as a fallback, so nothing is lost by a
-module moving: it writes the new place, and where an id is in both, the
-newer file wins in the host.
+Kehikot. This package no longer reads that directory: a host copies it into
+the new one once, the first time the new one is made (`migrateMachineData`
+in the host), and reads the old one as a fallback itself. What this package
+still reads is a FILE NAME — see `registerAt.earlier`.
 
 ##### `KEHIKOT_MODULES_DIR` is honoured, and that is not a convenience
 
@@ -377,16 +376,7 @@ registry would be a test that ADOPTS a module onto their canvas, and the
 only way to notice is a container appearing in an app the test never
 opened. The host reads the same variable, so a whole second registry is a
 directory and an environment variable away. `ROADMAP_MODULES_DIR`, its name
-before the rename, is read when it is not set.
-
-#### `legacyRegistryDir`
-
-> **Deprecated in 0.37, removed in the next breaking release.** The next breaking release does not read `~/.roadmap/modules`; a host copies that directory into `registryDir()` once. `ROADMAP_MODULES_DIR` and `ROADMAP_ORIGIN` stop being read too: set `KEHIKOT_MODULES_DIR` and `KEHIKOT_ORIGINS`. A `roadmap.<name>.json` registration beside the one `registerAt` writes is still read.
-
-The registry before the rename, `~/.roadmap/modules` — READ, never written,
-so that what a module wrote there (`keep`, above all) is carried over the
-first time it registers in the new place. `null` when the registry was
-pointed somewhere on purpose, so a test never reads a person's real one.
+before the rename, is not read.
 
 #### `registerAt`
 
@@ -449,10 +439,14 @@ Refused here rather than joined. A filename derived from an id is a PATH
 
 #### `registerAt.earlier`
 
-What this module said last time, wherever it said it: under this id; under
-     the same id spelled as before the rename (`roadmap.x`), beside it or in
-     the old `~/.roadmap/modules`. Only read — the older files are left exactly
-     as they are, for a host that has not been updated.
+What this module said last time: under this id, or in the file it had
+     before the rename (`roadmap.x.json`) beside it — which is where a registry
+     carried over from `~/.roadmap/modules` still has it, with the `keep` a
+     person set. Only read, never written: the older file is left exactly as
+     it is. This, `claim` (which looks there for where the module last moved
+     to) and `neighbourPorts` (which does not count it as a neighbour) are
+     the whole of what this package still reads from before the rename on a
+     person's machine.
 
 #### `registerAt.kept`
 
@@ -507,12 +501,6 @@ one whose registration says it lives somewhere else entirely.
 So a neighbour's stated port is treated as occupied even when nothing is
 listening on it. A registration is a claim, and this is the one place in the
 system where reading somebody's claim is cheaper than discovering it.
-
-#### `neighbourPorts.legacy`
-
-And the pre-rename registry too, when this is the real one: a module that
-     has not been updated still states its port there, and that claim is just
-     as much a claim.
 
 #### Inside `neighbourPorts`
 
@@ -652,10 +640,18 @@ its page from by default.
 
 ##### The order things are read in
 
-`KEHIKOT_ORIGINS` (a list), then `KEHIKOT_ORIGIN` (one), then
-`ROADMAP_ORIGIN` (one, its name before the rename), then the defaults. A
-single origin is honoured as the whole answer rather than added to the
+`KEHIKOT_ORIGINS` (a list), then `KEHIKOT_ORIGIN` (one), then the defaults.
+A single origin is honoured as the whole answer rather than added to the
 defaults, because somebody who set it meant exactly that host.
+`ROADMAP_ORIGIN`, the name before the rename, is not read.
+
+##### `also`: an origin the module itself names
+
+`frameOrigins(env, also)` and `frameAncestors(env, also)` take a second
+argument: origins added to whatever the environment said, deduplicated. It is
+what `doors({ ancestors })` passes. The call site is a development harness on
+a port of its own (references' stub host on 7821), which used to be said by
+writing `process.env.KEHIKOT_ORIGINS` from `vite.config.ts`.
 
 ### `src/create/index.ts`
 

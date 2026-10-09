@@ -46,8 +46,9 @@ describe('the signal in the context', () => {
     ])
   })
 
-  test('a module id said the old way is read as the one it is now', () => {
-    expect(contentSignalSchema.parse([{ source: 'roadmap.journeys', at: at(1) }])[0]!.source).toBe('kehikot.journeys')
+  test('a module id is carried as it was said: there is one spelling, and nothing is respelled', () => {
+    expect(contentSignalSchema.parse([{ source: 'kehikot.journeys', at: at(1) }])[0]!.source).toBe('kehikot.journeys')
+    expect(contentSignalSchema.parse([{ source: 'roadmap.journeys', at: at(1) }])[0]!.source).toBe('roadmap.journeys')
   })
 
   test('it is bounded', () => {

@@ -42,9 +42,7 @@
   },
   "bin": {
     "kehikot-create": "./bin/create.ts",
-    "kehikot-check-parts": "./bin/check-parts.ts",
-    "kehikko-create": "./bin/create.ts",
-    "kehikko-check-parts": "./bin/check-parts.ts"
+    "kehikot-check-parts": "./bin/check-parts.ts"
   },
   "files": [
     "dist",

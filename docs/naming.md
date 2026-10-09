@@ -2,8 +2,8 @@
 
 > **Confirmed by the owner (2026-10-10).** `kehikot` is the shared namespace — the product, the
 > package, the wire, ids, the `.kehikot/` folder; `kehikko` is one canvas, and the host and the
-> repositories named after it; `roadmap` is the retired prototype's name and is on its way out of
-> this package (deprecated in 0.37, removed in the next breaking release). The exceptions below are
+> repositories named after it; `roadmap` is the retired prototype's name, and since the breaking release
+> after 0.37 this package neither exports nor writes it. The exceptions below are
 > listed rather than fixed, except where a line says otherwise.
 
 *Kehikko* is Finnish for a frame; *kehikot* is the plural.
@@ -22,7 +22,8 @@ host and every module have to spell the same way:
 | module ids and extension names | `kehikot.paper`, `kehikot.journeys`, `kehikot.notifications@1`, `kehikot.calls@1` |
 | project data | `<project>/.kehikot/<module>/`, `KEHIKOT_DIR`, `KEHIKOT_IGNORE` |
 | shared environment variables | `KEHIKOT_ORIGINS`, `KEHIKOT_ORIGIN`, `KEHIKOT_MODULES_DIR`, and in the host `KEHIKOT_FRAME_DB`, `KEHIKOT_SEED_PROJECT`, `KEHIKOT_VERSIONS_DIR`, `KEHIKOT_INSTALLS_DIR` |
-| API identifiers | `useKehikot`, `Kehikot`, `UseKehikotOptions`, `kehikotDir`, `ignoresKehikot`, `withKehikotIgnored`, `withoutKehikotIgnored` |
+| API identifiers | `kehikotDir`, `ignoresKehikot`, `withKehikotIgnored`, `withoutKehikotIgnored` |
+| this package's bins | `kehikot-create`, `kehikot-check-parts` |
 | source annotations | `// kehikot-storage: allow <reason>` |
 
 **`kehikko` (singular) names one frame, in two senses:**
@@ -48,24 +49,26 @@ host that draws it together with the repositories named after that host.*
 - **Module repositories against module ids.** `kehikko-slides` is the repository of the module
   whose id is `kehikot.slides` and whose data is in `.kehikot/slides/`. `create` writes both:
   `~/Projects/kehikko-<name>` and `kehikot.<name>`.
-- **This package's bins.** Since 0.37 they are also `kehikot-create` and `kehikot-check-parts`, which is what the rule says; the singular names are deprecated. `kehikko-create` and `kehikko-check-parts` took the singular although
-  they ship in the plural-named package and act on modules, not on a canvas or the host. By the
-  rule above they would be `kehikot-*`; they follow the repository's name instead.
 - **The host's environment variables are split.** Variables the host shares with modules are
   `KEHIKOT_*`, but so are several only the host reads (`KEHIKOT_FRAME_DB`, `KEHIKOT_SEED_PROJECT`,
   `KEHIKOT_SCAN_PROJECTS`), beside host-only ones spelled `KEHIKKO_*`. There is no visible line
   between the two groups.
 - **`.kehikot/kehikko/`.** Both spellings in one path: the shared folder, then the host's own
   folder in it — consistent with the rule, and the place it is easiest to mistype.
-- **The legacy names are neither** (and, in this package, deprecated in 0.37). `roadmap.` on the wire, `roadmap-module.json`,
-  `roadmap.module`, `ROADMAP_ORIGIN`, `ROADMAP_MODULES_DIR`, `ROADMAP_FRAME_DB`, `useRoadmap`,
-  `~/.roadmap/`, and `.kehikot/roadmap/{epics,state}/` in the host's older notes are the old product
-  name, still read everywhere and still written in a few places (`KEHIKKO_ROADMAP_DIR` carries the
-  singular and the legacy name together).
+- **The legacy names are neither, and are gone from this package.** `roadmap.` on the wire,
+  `roadmap-module.json`, `roadmap.module`, `ROADMAP_ORIGIN`, `ROADMAP_MODULES_DIR` and `useRoadmap`
+  were the old product name; none is exported, read off the wire or written. Three readings of
+  what is already on a disk remain (`canonicalModuleId`, `moduleFolder`, a `roadmap.<name>.json`
+  registration) — see [protocol-number.md](protocol-number.md). What is left elsewhere is the
+  host's: `ROADMAP_FRAME_DB`, `~/.roadmap/`, `.kehikot/roadmap/{epics,state}/` and
+  `KEHIKKO_ROADMAP_DIR` (the singular and the legacy name together).
+- **A module's own hook file.** `template/src/wire/use-kehikot.ts`, and the same file in several
+  modules, is the module's wrapper around `useHost` and exports a function called `useKehikot`. It
+  is a file in a module, not part of this package's surface, and was left as it is.
 - **Prose.** Comments and documents write "a Kehikot host" (the product's host) and "the kehikko"
   (the canvas) and occasionally use "kehikko" for the app as a whole.
 
-## What would need deciding
+## What would still need deciding
 
-Whether the bins should be `kehikot-*`; whether host-only environment variables should all be
-`KEHIKKO_*`; and whether repositories keep the singular. None of it is changed here.
+Whether host-only environment variables should all be `KEHIKKO_*`, and whether repositories keep
+the singular. Neither is this package's to change.

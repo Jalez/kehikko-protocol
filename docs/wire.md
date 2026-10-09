@@ -147,17 +147,6 @@ Under `/.well-known/` because that is where a program publishes a fact about
 itself that some other program came looking for, and because it cannot
 collide with whatever the module's own pages are called.
 
-#### `LEGACY_WELL_KNOWN`
-
-> **Deprecated in 0.37, removed in the next breaking release.** Use `WELL_KNOWN`.
-
-Where a module built before the rename serves its manifest.
-
-A host asks `WELL_KNOWN` first and this second, so an unchanged module is
-still found. A module built against this package may serve its manifest here
-too, in the old dialect (`legacyManifest`), so an unchanged host still finds
-it. See `dialect.ts`.
-
 #### `MANIFEST_KIND`
 
 The word that makes a manifest a claim rather than a hopeful GET.
@@ -253,14 +242,12 @@ from anything else that has a handle on it. The type check is what tells a
 
 #### `messageType`
 
-A message type, read in either spelling and handed back in the current one.
+A message type: the one literal, in the one spelling.
 
-Every message schema below uses this for its `type`, so a host built
-against this package reads `roadmap.ready` from a module that has not been
-updated, and a module built against it reads `roadmap.hello` from a host
-that has not been. Downstream of a parse there is only the `kehikot.`
-spelling, and code comparing `message.type === MESSAGE.READY` is right for
-both. Sending in the old spelling is `toDialect`'s job; see `dialect.ts`.
+Until the breaking release after 0.37 every schema read two spellings of its `type` — `kehikot.`
+and the pre-rename `roadmap.` — and handed back the first. There is one now. A message that
+says `roadmap.hello` is not a wire message: `looksLikeWireMessage` drops it and no schema reads
+it.
 
 #### `helloSchema`
 
@@ -542,8 +529,7 @@ Is this worth parsing at all?
 The cheap first filter, before a schema is run over a `MessageEvent` from a
 window that receives messages from everything. It says nothing about whether
 the message is valid or whether the sender is anybody — it says the value is
-an object with a `type` that starts `kehikot.` — or `roadmap.`, the same
-protocol before the rename, which is still read (see `dialect.ts`) — and that
+an object with a `type` that starts `kehikot.`, and that
 is what separates a message meant for this protocol from the several that
 are not.
 

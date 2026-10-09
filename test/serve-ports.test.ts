@@ -149,7 +149,7 @@ describe('claiming, against probes that answer on demand', () => {
     const got = await claim({
       id: ID,
       prefer: 7960,
-      registry: join(tmpdir(), 'roadmap-registry-that-is-not-there'),
+      registry: join(tmpdir(), 'kehikot-registry-that-is-not-there'),
       probes: probes(new Set([7960]), { at: 'stranger', why: 'something answered 404' }),
     })
     expect(got.status).toBe('claimed')
@@ -164,7 +164,7 @@ describe('claiming, against probes that answer on demand', () => {
     const got = await claim({
       id: ID,
       prefer: 7960,
-      registry: join(tmpdir(), 'roadmap-registry-that-is-not-there'),
+      registry: join(tmpdir(), 'kehikot-registry-that-is-not-there'),
       probes: probes(new Set([7960]), { at: 'module', id: 'kehikot.notes' }),
     })
     expect(got.status === 'claimed' && got.why).toBe('kehikot.notes is answering there')
@@ -175,7 +175,7 @@ describe('claiming, against probes that answer on demand', () => {
       id: ID,
       prefer: 7960,
       span: 3,
-      registry: join(tmpdir(), 'roadmap-registry-that-is-not-there'),
+      registry: join(tmpdir(), 'kehikot-registry-that-is-not-there'),
       probes: {
         free: () => Promise.resolve(false),
         identify: () => Promise.resolve({ at: 'stranger', why: 'something is there' }),
@@ -197,7 +197,7 @@ describe('claiming, against probes that answer on demand', () => {
    * its own copy on 7961 to start a second one on 7962.
    */
   test('its own copy on the port it drifted to last time is found before drifting again', async () => {
-    const where = mkdtempSync(join(tmpdir(), 'roadmap-modules-'))
+    const where = mkdtempSync(join(tmpdir(), 'kehikot-modules-'))
     writeFileSync(join(where, `${ID}.json`), JSON.stringify({ url: 'http://127.0.0.1:7961', dir: '/x' }))
 
     const got = await claim({
@@ -223,7 +223,7 @@ describe('claiming, against probes that answer on demand', () => {
      and a module that refused to start because of a line in a file would be one
      nobody could start again after a crash. */
   test('a stale registration pointing at somebody else does not stop the start', async () => {
-    const where = mkdtempSync(join(tmpdir(), 'roadmap-modules-'))
+    const where = mkdtempSync(join(tmpdir(), 'kehikot-modules-'))
     writeFileSync(join(where, `${ID}.json`), JSON.stringify({ url: 'http://127.0.0.1:7961', dir: '/x' }))
 
     const got = await claim({
@@ -244,7 +244,7 @@ describe('claiming, against probes that answer on demand', () => {
   })
 
   test('a neighbour’s registered port is stepped over while drifting', async () => {
-    const where = mkdtempSync(join(tmpdir(), 'roadmap-modules-'))
+    const where = mkdtempSync(join(tmpdir(), 'kehikot-modules-'))
     writeFileSync(join(where, 'kehikot.notes.json'), JSON.stringify({ url: 'http://127.0.0.1:7961', dir: '/x' }))
     writeFileSync(join(where, `${ID}.json`), JSON.stringify({ url: 'http://127.0.0.1:7960', dir: '/x' }))
 
@@ -319,7 +319,7 @@ describe('against a listener that is really there', () => {
       const got = await claim({
         id: ID,
         prefer: port,
-        registry: join(tmpdir(), 'roadmap-registry-that-is-not-there'),
+        registry: join(tmpdir(), 'kehikot-registry-that-is-not-there'),
       })
       expect(got.status).toBe('claimed')
       expect(got.moved).toBe(true)
@@ -352,7 +352,7 @@ describe('against a listener that is really there', () => {
 
 describe('writing down where it answers', () => {
   const withRegistry = <T>(run: (where: string) => T): T => {
-    const where = mkdtempSync(join(tmpdir(), 'roadmap-modules-'))
+    const where = mkdtempSync(join(tmpdir(), 'kehikot-modules-'))
     const before = process.env.KEHIKOT_MODULES_DIR
     process.env.KEHIKOT_MODULES_DIR = where
     try {
@@ -431,11 +431,11 @@ describe('writing down where it answers', () => {
   })
 
   /* The directory is created rather than assumed. A first module on a machine
-     with no `~/.roadmap` would otherwise fail to register and start anyway,
+     with no registry yet would otherwise fail to register and start anyway,
      which is the silent nonexistence this whole file exists to prevent. */
   test('a registry directory that is not there yet is made', async () => {
-    const parent = mkdtempSync(join(tmpdir(), 'roadmap-home-'))
-    const where = join(parent, '.roadmap', 'modules')
+    const parent = mkdtempSync(join(tmpdir(), 'kehikot-home-'))
+    const where = join(parent, 'Kehikot', 'modules')
     const before = process.env.KEHIKOT_MODULES_DIR
     process.env.KEHIKOT_MODULES_DIR = where
     try {
@@ -478,7 +478,7 @@ describe('writing down where it answers', () => {
 
 describe('reading the neighbours', () => {
   test('collects every other module’s port and never this module’s own', () => {
-    const where = mkdtempSync(join(tmpdir(), 'roadmap-modules-'))
+    const where = mkdtempSync(join(tmpdir(), 'kehikot-modules-'))
     writeFileSync(join(where, 'kehikot.notes.json'), JSON.stringify({ url: 'http://127.0.0.1:7940', dir: '/a' }))
     writeFileSync(join(where, 'kehikot.paper.json'), JSON.stringify({ url: 'http://127.0.0.1:7950', dir: '/b' }))
     writeFileSync(join(where, `${ID}.json`), JSON.stringify({ url: 'http://127.0.0.1:7960', dir: '/c' }))
@@ -490,7 +490,7 @@ describe('reading the neighbours', () => {
      one module the drift will not step over, which is a smaller failure than a
      module refusing to start because somebody left a note in the folder. */
   test('a directory that is not there, and files that are not registrations, are simply nothing', () => {
-    const where = mkdtempSync(join(tmpdir(), 'roadmap-modules-'))
+    const where = mkdtempSync(join(tmpdir(), 'kehikot-modules-'))
     mkdirSync(join(where, 'a-folder'), { recursive: true })
     writeFileSync(join(where, 'README.txt'), 'not a registration')
     writeFileSync(join(where, 'kehikot.broken.json'), 'this is not json')
@@ -501,7 +501,7 @@ describe('reading the neighbours', () => {
   })
 
   test('reads a registration that names no directory rather than discarding it', () => {
-    const where = mkdtempSync(join(tmpdir(), 'roadmap-modules-'))
+    const where = mkdtempSync(join(tmpdir(), 'kehikot-modules-'))
     const file = join(where, 'kehikot.terminal.json')
     writeFileSync(file, JSON.stringify({ url: 'http://127.0.0.1:7930' }))
     expect(readRegistration(file)).toEqual({ url: 'http://127.0.0.1:7930', dir: '' })
@@ -531,5 +531,46 @@ describe('which port is preferred', () => {
     expect(preferred(7960, { PORT: 'yes please' })).toBe(7960)
     expect(preferred(7960, { PORT: '0' })).toBe(7960)
     expect(preferred(7960, { PORT: '99999' })).toBe(7960)
+  })
+})
+
+describe('what is still read from before the rename, and what is not', () => {
+  const ID_ = 'kehikot.example'
+  const withRegistry = <T>(run: (where: string) => T): T => {
+    const where = mkdtempSync(join(tmpdir(), 'kehikot-modules-'))
+    const before = process.env.KEHIKOT_MODULES_DIR
+    process.env.KEHIKOT_MODULES_DIR = where
+    try {
+      return run(where)
+    } finally {
+      if (before === undefined) delete process.env.KEHIKOT_MODULES_DIR
+      else process.env.KEHIKOT_MODULES_DIR = before
+    }
+  }
+
+  test('one variable names the registry; the one from before the rename is not read', () => {
+    expect(registryDir({ KEHIKOT_MODULES_DIR: '/m' })).toBe('/m')
+    expect(registryDir({ ROADMAP_MODULES_DIR: '/old', HOME: '/Users/x' })).not.toBe('/old')
+    expect(registryDir({ HOME: '/Users/x' })).not.toContain('.roadmap')
+  })
+
+  test('a registration left under the old file name is read — its keep carried over — and left as it is', () => {
+    withRegistry((where) => {
+      const old = join(where, 'roadmap.example.json')
+      const said = JSON.stringify({ url: 'http://127.0.0.1:7960', dir: '/Users/x/one', keep: true })
+      writeFileSync(old, said)
+      const written = registerAt({ id: ID_, origin: 'http://127.0.0.1:7961', dir: '/Users/x/one' })
+      expect(written.file).toBe(join(where, 'kehikot.example.json'))
+      expect(written.was).toEqual({ url: 'http://127.0.0.1:7960', dir: '/Users/x/one' })
+      expect((JSON.parse(readFileSync(written.file, 'utf8')) as { keep?: boolean }).keep).toBe(true)
+      expect(readFileSync(old, 'utf8')).toBe(said)
+      /* And its port is this module's own, not a neighbour's. */
+      expect(neighbourPorts(ID_, where)).toEqual(new Set())
+    })
+  })
+
+  test('a document that calls itself by the old word is a stranger', () => {
+    expect(readManifest(JSON.stringify({ kind: 'kehikot.module', id: ID_ }))).toEqual({ at: 'module', id: ID_ })
+    expect(readManifest(JSON.stringify({ kind: 'roadmap.module', id: 'roadmap.example' })).at).toBe('stranger')
   })
 })

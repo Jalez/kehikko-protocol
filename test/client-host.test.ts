@@ -17,7 +17,7 @@ import {
   type Host,
   type UseHostOptions,
 } from '../src/client/react.js'
-import { ask } from '../src/client/index.js'
+import { PAGE_OLD, PAGE_STALE, ask } from '../src/client/index.js'
 
 const ID = 'kehikot.example'
 
@@ -184,6 +184,30 @@ describe('useHost: the flattened context', () => {
     expect(third.parts).toBe(second.parts)
     expect(third.containers).toBe(second.containers)
     expect(third.chosen).toBe(second.chosen)
+  })
+
+  test('a page may say what "the same" means for a field: `same` replaces the deep comparison for that one', async () => {
+    const SHOWN = {
+      ...CONTEXT,
+      passage: { path: 'paper/main.tex', page: null, from: 10, to: 20, quoted: 'the seam', section: { title: 'Methods', from: 0, to: 100 } },
+    }
+    /* Paper's rule: a passage whose section ends somewhere else is still the same passage. */
+    const samePlace = (was: HostStanding['passage'], now: HostStanding['passage']) =>
+      was !== null && now !== null && was.path === now.path && was.from === now.from && was.to === now.to && was.section?.title === now.section?.title
+    const { box, post } = inbox(speaker(), hello(SHOWN))
+    const page = await render({}, { source: box, same: { passage: samePlace } })
+    const first = page.read()
+
+    await act(async () => post({ type: MESSAGE.CONTEXT, protocol: PROTOCOL, ...SHOWN, passage: { ...SHOWN.passage, section: { ...SHOWN.passage.section, to: 140 } } }))
+    expect(page.read().passage).toBe(first.passage)
+    /* The whole context still says what the host said. */
+    expect(page.read().context?.passage?.section?.to).toBe(140)
+
+    await act(async () => post({ type: MESSAGE.CONTEXT, protocol: PROTOCOL, ...SHOWN, passage: { ...SHOWN.passage, from: 11 } }))
+    expect(page.read().passage).not.toBe(first.passage)
+    /* A field with no rule of its own is compared as before. */
+    expect(page.read().parts).toBe(first.parts)
+    expect(hostFields(page.read().context, first, { parts: () => false }).parts).not.toBe(first.parts)
   })
 
   test('`read` is the standing ahead of the render: what a replayed handler finds', async () => {
@@ -558,7 +582,7 @@ describe('the cover', () => {
     expect(css).toContain('.dark .kehikot-cover')
     expect(css).toContain('var(--muted-foreground')
     expect(css).toContain('prefers-reduced-motion')
-    expect(css.length).toBeLessThan(2000)
+    expect(css.length).toBeLessThan(2500)
   })
 
   test('down offers Try again, which re-asks; no other state has a button', async () => {
@@ -577,6 +601,66 @@ describe('the cover', () => {
     await act(async () => (buttons[0] as HTMLButtonElement).click())
     expect(asked).toBe(1)
     expect(container.querySelector('[data-detail]')?.textContent).toBe('connection refused')
+  })
+
+  test('refused and empty are a module’s own findings: `coverFor` never answers them, and they are still', async () => {
+    const container = await mount(
+      createElement(
+        'div',
+        null,
+        createElement(Cover, { state: 'refused', name: 'References', detail: 'no tracker is configured', onRetry: () => {} }),
+        createElement(Cover, { state: 'refused' }),
+        createElement(Cover, { state: 'empty' }, 'This project’s tracker has nothing in it.'),
+      ),
+    )
+    const [refused, bare, empty] = [...container.querySelectorAll('.kehikot-cover')]
+    expect(refused?.getAttribute('data-cover')).toBe('refused')
+    expect(refused?.querySelector('p')?.textContent).toBe('References was told no.')
+    expect(refused?.querySelector('[data-detail]')?.textContent).toBe('no tracker is configured')
+    expect(refused?.querySelector('button')?.textContent).toBe(TRY_AGAIN)
+    /* With nothing to try there is no button. */
+    expect(bare?.querySelector('button')).toBe(null)
+    expect(bare?.querySelector('p')?.textContent).toBe('This app was told no.')
+    expect(empty?.querySelector('p')?.textContent).toBe('This project’s tracker has nothing in it.')
+    expect(COVER_WORDS.empty()).toBe('Nothing here yet.')
+    expect(container.querySelectorAll('[data-working="true"]').length).toBe(0)
+  })
+
+  test('a strip is one line: the sentence and the button, no mark, no second line', async () => {
+    let asked = 0
+    const container = await mount(createElement(Cover, { state: 'down', name: 'Terminal', strip: true, detail: 'connection refused', onRetry: () => void asked++ }))
+    const cover = container.querySelector('.kehikot-cover')
+    expect(cover?.getAttribute('data-strip')).toBe('true')
+    expect(cover?.getAttribute('data-cover')).toBe('down')
+    expect(cover?.getAttribute('role')).toBe('status')
+    expect(cover?.querySelector('svg')).toBe(null)
+    expect(cover?.querySelectorAll('p').length).toBe(1)
+    expect(cover?.querySelector('p')?.textContent).toBe(COVER_WORDS.down('Terminal'))
+    await act(async () => (cover?.querySelector('button') as HTMLButtonElement).click())
+    expect(asked).toBe(1)
+    expect(document.getElementById(COVER_STYLE_ID)?.textContent).toContain('[data-strip=true]')
+    /* And a whole cover says nothing about being one. */
+    const whole = await mount(createElement(Cover, { state: 'down' }))
+    expect(whole.querySelector('.kehikot-cover')?.hasAttribute('data-strip')).toBe(false)
+  })
+
+  test('a stale cover that cannot reload stops saying it is reloading', async () => {
+    const real = location.reload
+    let reloads = 0
+    Object.defineProperty(location, 'reload', { configurable: true, value: () => void reloads++ })
+    /* A reload was started a moment ago, and the page that came back is still old. */
+    sessionStorage.setItem('kehikot.reloaded', String(Date.now()))
+    try {
+      const container = await mount(createElement(Cover, { state: 'stale' }))
+      expect(container.querySelector('p')?.textContent).toBe(PAGE_STALE)
+      await act(async () => void (await new Promise((resolve) => setTimeout(resolve, 1000))))
+      expect(reloads).toBe(0)
+      expect(container.querySelector('p')?.textContent).toBe(PAGE_OLD)
+      expect(container.querySelector('.kehikot-cover')?.getAttribute('data-working')).toBe('false')
+    } finally {
+      Object.defineProperty(location, 'reload', { configurable: true, value: real })
+      sessionStorage.removeItem('kehikot.reloaded')
+    }
   })
 
   test('a module’s own sentence replaces the shared one', async () => {

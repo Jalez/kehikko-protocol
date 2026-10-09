@@ -5,7 +5,6 @@ import {
   clampHeight,
 } from '../constants.js'
 import { LIMITS } from '../limits.js'
-import { dialectOfType, toDialect, type Dialect } from '../dialect.js'
 import {
   hostMessageSchema,
   looksLikeWireMessage,
@@ -17,7 +16,6 @@ import {
 } from '../wire.js'
 
 import { mailbox, type MessageSource } from './mailbox.js'
-import { deprecated } from '../deprecated.js'
 
 /**
  * The bridge: one conversation with one window, in the shape this package's schemas define.
@@ -178,13 +176,9 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
   let counter = 0
   const nextId = () => `${Date.now().toString(36)}-${(counter += 1).toString(36)}`
 
-  /* Which spelling the host greeted us in, and so the one we answer in. Everything this file
-     builds is canonical, and is respelled only in `send`. See `dialect.ts`. */
-  let dialect: Dialect = 'kehikot'
-
   const send = (message: unknown) => {
     if (!host) return
-    host.postMessage(toDialect(message, dialect), origin)
+    host.postMessage(message, origin)
   }
 
   const settle = (correlation: string, outcome: { ok: true; data: unknown } | { ok: false; refusal: Refusal }) => {
@@ -209,11 +203,6 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
          becomes the one we answer, and `ready` goes back every time. */
       host = (ev.source as Window | null) ?? source.parent ?? null
       origin = ev.origin && ev.origin !== 'null' ? ev.origin : '*'
-      dialect = dialectOfType((ev.data as { type: string }).type) ?? 'kehikot'
-      /* Once per page, at a greeting: never per message. */
-      if (dialect === 'roadmap') {
-        deprecated('Being greeted in the pre-rename dialect (roadmap.hello)', 'Update the host framing this page: it should say kehikot.hello.')
-      }
       /* With the build that served this page, when it printed one: a host compares it with the server's now. */
       const build = pageBuild()
       send({ type: MESSAGE.READY, id, protocol: message.protocol ?? PROTOCOL, ...(build ? { build } : {}) })

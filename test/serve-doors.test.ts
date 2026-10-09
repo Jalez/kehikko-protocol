@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import { EventEmitter } from 'node:events'
 
-import { BUILD_HEADER, LEGACY_WELL_KNOWN, TICKET_HEADER, WELL_KNOWN, buildStamp, manifestSchema, type Manifest } from '../src/index.js'
+import { BUILD_HEADER, TICKET_HEADER, WELL_KNOWN, buildStamp, manifestSchema, type Manifest } from '../src/index.js'
 import {
   doors,
   doorsFetch,
@@ -27,6 +27,7 @@ const MANIFEST: Manifest = manifestSchema.parse({
   version: '1.0.0',
   entry: '/app',
   modes: [{ id: 'main', label: 'Main' }],
+  partless: 'An example with nothing in it that belongs to a part.',
 })
 
 const TICKET = mintTicket()
@@ -98,14 +99,15 @@ function call(
 const json = (sent: { chunks: string[] }) => JSON.parse(sent.chunks.join('')) as Record<string, unknown>
 
 describe('the doors', () => {
-  test('serve the manifest at both well-known paths, the legacy one in the legacy spelling', async () => {
+  test('serve the manifest at the well-known path, and at no other', async () => {
     const now = await call('GET', WELL_KNOWN).done
     expect(now.status).toBe(200)
     expect(now.headers['content-type']).toBe('application/json; charset=utf-8')
     expect(json(now).kind).toBe('kehikot.module')
-    const legacy = await call('GET', LEGACY_WELL_KNOWN).done
-    expect(json(legacy).kind).toBe('roadmap.module')
-    expect(json(legacy).id).toBe('roadmap.example')
+    /* The path a host asked before the rename is nobody's now: it goes on to whatever is behind the doors. */
+    const before = await call('GET', '/.well-known/roadmap-module.json').done
+    expect(before.nexted).toBe(true)
+    expect(before.ended).toBe(false)
   })
 
   test('serve the page at /app, /app/ and /, transformed, uncached, and framed only by a host', async () => {
@@ -287,13 +289,13 @@ describe('the doors as a fetch handler', () => {
   const through = doorsFetch({ manifest: MANIFEST, answer, stream, build: BUILD, page: { title: 'Example', ticket: TICKET } })
   const at = (path: string, init?: RequestInit) => through(new Request(`http://127.0.0.1:9000${path}`, init))
 
-  test('the manifest at both paths, with the build, stamped and uncached', async () => {
+  test('the manifest, with the build, stamped and uncached', async () => {
     const found = await at(WELL_KNOWN)
     expect(found?.status).toBe(200)
     expect(found?.headers.get(BUILD_HEADER)).toBe(buildStamp(BUILD))
     expect(found?.headers.get('cache-control')).toBe('no-store')
     expect(((await found?.json()) as { build: unknown }).build).toEqual(BUILD)
-    expect(((await (await at(LEGACY_WELL_KNOWN))?.json()) as { kind: string }).kind).toBe('roadmap.module')
+    expect(await at('/.well-known/roadmap-module.json')).toBe(null)
   })
 
   test('the page at /app, /app/ and /, with the same headers as the other form', async () => {
@@ -409,5 +411,48 @@ describe('the body reader', () => {
     const request = new FakeRequest('GET', '/')
     expect(await readJsonBody(request as never)).toEqual({ ok: true, body: null })
     expect(request.listenerCount('data')).toBe(0)
+  })
+})
+
+describe('what a module may say about its doors', () => {
+  test('`ancestors` adds origins that may frame the page to the ones the environment names', async () => {
+    const before = { list: process.env.KEHIKOT_ORIGINS, one: process.env.KEHIKOT_ORIGIN }
+    process.env.KEHIKOT_ORIGINS = 'http://127.0.0.1:4181'
+    delete process.env.KEHIKOT_ORIGIN
+    try {
+      const plain = await call('GET', '/app').done
+      expect(plain.headers['content-security-policy']).toBe("frame-ancestors 'self' http://127.0.0.1:4181")
+      const page = await call('GET', '/app', { options: { ancestors: ['http://127.0.0.1:7821', 'http://127.0.0.1:4181'] } }).done
+      expect(page.headers['content-security-policy']).toBe("frame-ancestors 'self' http://127.0.0.1:4181 http://127.0.0.1:7821")
+      const through = doorsFetch({ manifest: MANIFEST, answer, page: { title: 'Example' }, ancestors: ['http://127.0.0.1:7821'] })
+      expect((await through(new Request('http://127.0.0.1:9000/')))?.headers.get('content-security-policy')).toContain('http://127.0.0.1:7821')
+    } finally {
+      if (before.list === undefined) delete process.env.KEHIKOT_ORIGINS
+      else process.env.KEHIKOT_ORIGINS = before.list
+      if (before.one !== undefined) process.env.KEHIKOT_ORIGIN = before.one
+    }
+  })
+
+  test('`openHealth` lets any page read the health check and its build — that door, and no other', async () => {
+    const closed = await call('GET', '/healthz').done
+    expect(closed.headers['access-control-allow-origin']).toBeUndefined()
+    const open = await call('GET', '/healthz', { options: { openHealth: true } }).done
+    expect(open.headers['access-control-allow-origin']).toBe('*')
+    expect(open.headers['access-control-expose-headers']).toBe(BUILD_HEADER)
+    const other = await call('GET', '/api/value', { options: { openHealth: true } }).done
+    expect(other.headers['access-control-allow-origin']).toBeUndefined()
+    const page = await call('GET', '/app', { options: { openHealth: true } }).done
+    expect(page.headers['access-control-allow-origin']).toBeUndefined()
+    const through = doorsFetch({ manifest: MANIFEST, answer, page: { title: 'Example' }, openHealth: true })
+    expect((await through(new Request('http://127.0.0.1:9000/healthz')))?.headers.get('access-control-allow-origin')).toBe('*')
+  })
+
+  test('an empty header value takes a default off the answer: the way to send no cache-control', async () => {
+    const bytes: Answer = () => ({ status: 200, body: null, raw: { bytes: 'x', type: 'text/plain' }, headers: { 'Cache-Control': '', 'x-content-type-options': 'nosniff' } })
+    const sent = await call('GET', '/api/bytes', { options: { answer: bytes } }).done
+    expect('cache-control' in sent.headers).toBe(false)
+    expect(sent.headers['x-content-type-options']).toBe('nosniff')
+    const through = doorsFetch({ manifest: MANIFEST, answer: bytes, page: { title: 'Example' } })
+    expect((await through(new Request('http://127.0.0.1:9000/api/bytes')))?.headers.get('cache-control')).toBe(null)
   })
 })

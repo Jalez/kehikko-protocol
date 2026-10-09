@@ -56,7 +56,7 @@ export declare function free(port: number, host?: string): Promise<boolean>;
 export declare function identify(port: number, timeoutMs?: number): Promise<Occupant>;
 /**
  * What a document on that port makes the program serving it. Pure. `kind` must be `kehikot.module`
- * (or `roadmap.module`, its spelling before the rename) before the id counts for anything.
+ * before the id counts for anything.
  */
 export declare function readManifest(text: string, path?: string): Occupant;
 export interface ClaimOptions {

@@ -6,7 +6,7 @@
  */
 export { claim, free, identify, originFor, readManifest, sayClaim, search, verdict, DRIFT_SPAN, IDENTIFY_TIMEOUT_MS, LOOPBACK, } from './ports.js';
 export { DEFAULT_FRAME_ORIGINS, frameAncestors, frameOrigins } from './origins.js';
-export { legacyRegistryDir, neighbourPorts, portOf, readRegistration, registerAt, registryDir, } from './registry.js';
+export { neighbourPorts, portOf, readRegistration, registerAt, registryDir, } from './registry.js';
 export { preferred, serves, } from './plugin.js';
 export { readJourney, readJourneys } from './journeys.js';
 /* The shared plumbing of a module's server: its page, its ticket, its doors. */

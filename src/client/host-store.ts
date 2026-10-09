@@ -60,7 +60,19 @@ export interface HostStoreOptions<Kept = unknown> extends ConnectOptions {
    * once, a moment after `ask()` notices (see `reloadWhenStale`).
    */
   reloadWhenStale?: boolean
+  /**
+   * When a field of the context counts as the one it was, for a page whose rule is looser than
+   * "says the same thing all the way down": a passage whose section ends somewhere else is still
+   * the same passage. Per field; a field without a rule here is compared deeply. Read at mount.
+   */
+  same?: Steadiness
 }
+
+/** The fields of a standing that keep their identity while they say the same thing. */
+export type SteadyField = 'passage' | 'containers' | 'parts' | 'selection' | 'chosen' | 'kehikko'
+
+/** A page's own rule for "the same", per field: `(was, now) => true` keeps the object it was. */
+export type Steadiness = { [Field in SteadyField]?: (was: HostFields[Field], now: HostFields[Field]) => boolean }
 
 /** The flattened fields of a context: what a screen reads, each `null` or empty rather than absent. */
 export interface HostFields {
@@ -126,6 +138,7 @@ export interface HostStore<Kept = unknown> extends HostActions<Kept> {
   connection: () => Connection | null
 }
 
+const STEADY: readonly SteadyField[] = ['passage', 'containers', 'parts', 'selection', 'chosen', 'kehikko']
 const NONE: readonly never[] = []
 const NO_CHOICE: FilterChoice = {}
 const text = (value: unknown): string | null => (typeof value === 'string' && value.trim() ? value : null)
@@ -144,9 +157,9 @@ function alike(a: unknown, b: unknown): boolean {
  * The flattened fields of a context. Pure, so a test can build a `Host` from a plain object.
  * Given the fields as they were, each one that still says the same thing IS the one it was: every
  * context is parsed afresh off the wire, and an effect that depends on `passage` should run when
- * the passage changed, not whenever the host spoke.
+ * the passage changed, not whenever the host spoke. `same` replaces that rule for the fields it names.
  */
-export function hostFields(context: ModuleContext | null, was?: HostFields): HostFields {
+export function hostFields(context: ModuleContext | null, was?: HostFields, same: Steadiness = {}): HostFields {
   const now: HostFields = {
     project: text(context?.project),
     projectPath: text(context?.projectPath),
@@ -159,8 +172,9 @@ export function hostFields(context: ModuleContext | null, was?: HostFields): Hos
     kehikko: context?.kehikko ?? null,
   }
   if (!was) return now
-  for (const name of ['passage', 'containers', 'parts', 'selection', 'chosen', 'kehikko'] as const) {
-    if (alike(was[name], now[name])) (now as unknown as Record<string, unknown>)[name] = was[name]
+  for (const name of STEADY) {
+    const rule = same[name] as ((a: unknown, b: unknown) => boolean) | undefined
+    if (rule ? rule(was[name], now[name]) : alike(was[name], now[name])) (now as unknown as Record<string, unknown>)[name] = was[name]
   }
   return now
 }
@@ -175,7 +189,7 @@ export function hostStore<Kept = unknown>(
   events: HostEvents = {},
   options: HostStoreOptions<Kept> = {},
 ): HostStore<Kept> {
-  const { grace = GREETING_GRACE_MS, kept: given, applyTheme: themed = true, reloadWhenStale: reloads = true, ...connectOptions } = options
+  const { grace = GREETING_GRACE_MS, kept: given, applyTheme: themed = true, reloadWhenStale: reloads = true, same, ...connectOptions } = options
   const codec = given ?? (JSON_KEPT as KeptCodec<Kept>)
 
   let standing: HostStanding<Kept> = { where: 'listening', context: null, ...hostFields(null), theme: pageTheme() ?? 'light', kept: null }
@@ -194,7 +208,7 @@ export function hostStore<Kept = unknown>(
     const theme: PageTheme = context.theme === 'dark' ? 'dark' : 'light'
     if (themed) applyTheme(theme, { remember: true })
     /* The kept state with the context, in one change, so the first hosted standing already has the remembered choice. */
-    change({ where: 'hosted', context, ...hostFields(context, standing), theme, ...(state !== undefined ? { kept: codec.read(state) } : {}) })
+    change({ where: 'hosted', context, ...hostFields(context, standing, same), theme, ...(state !== undefined ? { kept: codec.read(state) } : {}) })
   }
 
   const store: HostStore<Kept> = {

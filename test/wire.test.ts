@@ -2,13 +2,17 @@ import { describe, expect, test } from 'bun:test'
 import {
   MAX_HEIGHT,
   MESSAGE,
+  MESSAGE_PREFIX,
   LIMITS,
   MIN_HEIGHT,
+  canonicalModuleId,
   clampHeight,
   contextSchema,
   gotoSchema,
   hostMessageSchema,
   looksLikeWireMessage,
+  manifestSchema,
+  moduleFolder,
   moduleMessageSchema,
   passageSchema,
   responseSchema,
@@ -318,5 +322,32 @@ describe('a passage says where somebody is pointing, and how precisely', () => {
     })
     expect(hello.type).toBe(MESSAGE.HELLO)
     if (hello.type === MESSAGE.HELLO) expect(hello.context.passage?.quoted).toBe('so')
+  })
+})
+
+describe('one spelling', () => {
+  test('a message that says `roadmap.` is not a wire message, and no schema reads it', () => {
+    const hello = { type: 'kehikot.hello', protocol: 2, session: 's1', context: { epic: 'a-epic', project: null, theme: 'dark' } }
+    expect(looksLikeWireMessage(hello)).toBe(true)
+    expect(hostMessageSchema.safeParse(hello).success).toBe(true)
+    const before = { ...hello, type: 'roadmap.hello' }
+    expect(looksLikeWireMessage(before)).toBe(false)
+    expect(hostMessageSchema.safeParse(before).success).toBe(false)
+    expect(MESSAGE_PREFIX).toBe('kehikot.')
+  })
+
+  test('an id written to disk before the rename is still read as the module it is', () => {
+    expect(canonicalModuleId('roadmap.journeys')).toBe('kehikot.journeys')
+    expect(canonicalModuleId('kehikot.journeys')).toBe('kehikot.journeys')
+    expect(canonicalModuleId('com.example.thing')).toBe('com.example.thing')
+    expect(moduleFolder('roadmap.journeys')).toBe(moduleFolder('kehikot.journeys'))
+  })
+
+  test('a manifest that calls itself by the old word is not a manifest', () => {
+    const manifest = { kind: 'kehikot.module', protocol: 2, id: 'kehikot.example', name: 'Example', entry: '/app', modes: [{ id: 'main', label: 'Main' }], partless: 'Nothing in it belongs to a part.' }
+    expect(manifestSchema.safeParse(manifest).success).toBe(true)
+    expect(manifestSchema.safeParse({ ...manifest, kind: 'roadmap.module' }).success).toBe(false)
+    /* An id is carried as written: nothing is respelled on the way in. */
+    expect(manifestSchema.parse({ ...manifest, id: 'roadmap.example' }).id).toBe('roadmap.example')
   })
 })
