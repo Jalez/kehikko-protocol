@@ -854,6 +854,16 @@ optional `partless`:
 partless: 'A terminal: nothing in it belongs to an epic.',
 ```
 
+What such a sentence looks like, for the modules that have nothing a part
+could own: a file browser ("Lists the repository's files; a part owns files of
+the paper, not of the repository."), a source view ("One passage, and no list
+to narrow."), a diff or a review ("The pull request the person selected."), a
+history ("Commits carry no part."), an atlas ("Above epics."), a terminal ("A
+shell."), notifications ("Events carry no ref, epic or part."). A module whose
+items are each tied to SEVERAL things — a bibliography entry cited from three
+files, a slide with a linked section and four citations — is not one of these:
+it answers with all its anchors, and is in front when any one is.
+
 `partsDeclaration(manifest)` returns what is wrong — saying neither, or both —
 as sentences. **In this version that is a warning:** `manifestSchema` does not
 call it, every existing manifest parses to exactly what it did, and a host may
@@ -867,6 +877,13 @@ declares neither, or declares `parts` and no source file imports a focus
 helper from this package (`useFocus`, `narrowToFocus`, `anchorInFocus`,
 `fileInFocus`, `refInFocus`, `partInFocus`). It cannot see whether the
 narrowing is right; it sees that the rule in use is this one.
+
+**Which build of this package a module has.** Every module depends on this
+package at git `#main`, which floats: each install holds whichever commit its
+lockfile pinned, so two modules on one canvas can hold two builds. A module
+that says `reacts: ['parts']` through these helpers needs 0.34.0 or later in
+its lockfile. Bringing every module under the requirement should pin each to a
+protocol version rather than to `#main`.
 
 ## An epic's steps are kept once, and this is the shape they are kept in
 
