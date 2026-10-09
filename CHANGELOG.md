@@ -7,7 +7,7 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
-## Unreleased — the breaking release (`1.0.0-draft`; the number is the owner's to set)
+## 1.0.0 — 2026-10-10
 
 Removes what 0.37.0 deprecated, makes the parts declaration a refusal, and changes four answers
 that could not change without breaking a 0.36.0 call. **[MIGRATING.md](MIGRATING.md) has the

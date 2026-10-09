@@ -1,4 +1,4 @@
-# Migrating from 0.36 / 0.37 to the breaking release
+# Migrating from 0.36 / 0.37 to 1.0.0
 
 Everything that was removed, renamed, or answers differently — before → after. 0.37.0 marked each
 removal `@deprecated`; this release takes them out. `PROTOCOL` is still 2: no `kehikot.` message
