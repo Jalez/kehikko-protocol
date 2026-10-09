@@ -35,3 +35,5 @@ export interface BodyOptions {
  * asked words that itself; too large is the one thing refused here, as 413.
  */
 export declare function readJsonBody(request: BodySource, options?: BodyOptions): Promise<BodyRead>;
+/** The same reading, of a `Request`: bounded as it arrives, so a body past the bound is never held whole. */
+export declare function readJsonRequest(request: Request, options?: BodyOptions): Promise<BodyRead>;

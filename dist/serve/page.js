@@ -21,14 +21,39 @@ export function themeScript() {
         + 'if(t){d.classList.remove(t==="dark"?"light":"dark");d.classList.add(t)}'
         + '})()');
 }
+const islandOf = (id, value) => `<script id="${id}" type="application/json">${island(value)}</script>`;
+/**
+ * Put this process's ticket and build into a page that was built ahead of it (`vite build` over a
+ * `pageDocument` written without either): each island is replaced where the built page has one and
+ * added before `</body>` where it has none. No placeholder to agree on, and the escaping is here.
+ */
+export function fillPage(html, filled) {
+    let page = html;
+    for (const [id, value] of [
+        [TICKET_ELEMENT, typeof filled.ticket === 'string' ? filled.ticket : null],
+        [BUILD_ELEMENT, filled.build ?? null],
+    ]) {
+        if (value === null)
+            continue;
+        const was = new RegExp(`<script id="${id}" type="application/json">[^<]*</script>`);
+        /* A function, so `$&` in a ticket is a dollar and an ampersand. */
+        if (was.test(page))
+            page = page.replace(was, () => islandOf(id, value));
+        else if (page.includes('</body>'))
+            page = page.replace('</body>', () => `${islandOf(id, value)}\n</body>`);
+        else
+            page += `${islandOf(id, value)}\n`;
+    }
+    return page;
+}
 export function pageDocument(options) {
     const light = colour(options.background?.light, PAGE_BACKGROUND.light);
     const dark = colour(options.background?.dark, PAGE_BACKGROUND.dark);
     const ticket = typeof options.ticket === 'string'
-        ? `<script id="${TICKET_ELEMENT}" type="application/json">${island(options.ticket)}</script>\n`
+        ? `${islandOf(TICKET_ELEMENT, options.ticket)}\n`
         : '';
     const build = options.build
-        ? `<script id="${BUILD_ELEMENT}" type="application/json">${island(options.build)}</script>\n`
+        ? `${islandOf(BUILD_ELEMENT, options.build)}\n`
         : '';
     return `<!doctype html>
 <html lang="${escapeHtml(options.lang ?? 'en')}">

@@ -19,6 +19,44 @@ Internal only; nothing a consumer can observe. No version change.
 - `dist/` no longer carries `.map` files. CI builds, checks that the committed `dist/` matches the
   source, typechecks and runs the tests.
 
+## 0.36.0 — 2026-10-09
+
+The gaps fourteen modules found adopting the shared plumbing. All additive: every option is off
+unless named, and a call written for 0.35.0 does what it did, with the four exceptions listed last.
+`PROTOCOL` is still 2. See [docs/module-plumbing.md](docs/module-plumbing.md).
+
+- `/client`: `held(name, read?)` — what a page holds across a reload of itself, written as it
+  changes to `sessionStorage`, keyed by scope and target, every access in a `try`; `heldDraft`,
+  `Draft`. It replaces the `store/held.ts` four modules each wrote, and `any()` is the answer to
+  "is something typed and not sent?".
+- `/client`: `ask` takes `ticket: true` (the ticket on a GET), `keepalive: true` (a save from
+  `pagehide`; dropped past `KEEPALIVE_BYTES`), and a list in `query` for a key that repeats.
+  `replied(asked)` for a door whose "no" is an answer of its own shape; `probeServer()` for a page
+  that asks nothing on a timer; `PAGE_OLD`, `NOT_A_REPLY`.
+- `/client`: `follow` takes `events` (named events, handed over with their name) and `probe` (ask
+  the server whenever the stream drops, so a refused stream and a stopped server can be told apart).
+- `/client`: `hostStore` — everything `useHost` arranges, outside React. `useHost` is now a thin
+  binding over it. Both gain `kehikko`; `useHost` gains `read()`, the standing ahead of the render.
+- `/client/react`: `coverFor` takes `needs.host`, honours `project: false` beside `epic: true`, and
+  given the `server`'s standing answers `stale` and `down` too.
+- `/serve`: `doorsFetch` — the same doors from a `Request` to a `Response`, for `Bun.serve` and for
+  tests; `fillPage` — the ticket and the build put into a page built ahead of its server;
+  `readJsonRequest`.
+- Documented rather than built: the host's half of an exact first paint (`?theme=`), that Vite's
+  own client reloads a page before any hook can run, `mailbox.forget` for a test suite, that a
+  refusal's sentence is `error`, and what is left for the next breaking release.
+
+What a module that changes nothing will see differently:
+
+- Every answer from `doors()` carries `cache-control: no-store` (the page and streams already
+  did), unless the reply names its own. A reply's header names are sent in lower case.
+- A stream door's socket is set to no-delay, its response carries `x-module-build`, and `close()`
+  is called once when the reader's going is reported as an `error`.
+- `passage`, `chosen`, `parts`, `containers` and `selection` from `useHost` keep their identity
+  while they are deeply equal, so an effect that depends on one runs when it changed rather than on
+  every context.
+- `project`, `projectPath` and `epic` from `useHost` are `null` for a string that is only spaces.
+
 ## 0.35.0 — 2026-10-09
 
 The plumbing every module typed out for itself, once. All additive; `PROTOCOL` is still 2 and

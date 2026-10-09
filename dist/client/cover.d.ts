@@ -1,6 +1,6 @@
 import { type ReactElement } from 'react';
 import { type ServerStanding } from './ask.js';
-import type { Where } from './react.js';
+import type { Where } from './host-store.js';
 /**
  * The one screen for every moment a module has nothing of its own to show: the kehikko mark and
  * one sentence, the module's half of the host's `ModuleCover`. See docs/module-plumbing.md.
@@ -30,13 +30,18 @@ export declare const COVER_WORDS: Record<CoverState, (name?: string) => string>;
 export declare const TRY_AGAIN = "Try again";
 /**
  * Which cover a host's standing calls for, or `null` when the module can draw its own screen.
- * `needs` says what the module cannot work without. Not greeted yet is `waiting`, never `no-project`.
+ * `needs` says what the module cannot work without: a `host` (anything framing it), a `project`,
+ * an `epic`. Not greeted yet is `waiting`, never `no-project`. An epic asks for a project too,
+ * unless `project: false` says the module reads no project folder. Given the `server`'s standing
+ * as well, the answer covers that: `stale` before everything, `down` after what the host lacks.
  */
 export declare function coverFor(host: {
     where: Where;
     projectPath: string | null;
     epic?: string | null;
+    server?: ServerStanding;
 }, needs?: {
+    host?: boolean;
     project?: boolean;
     epic?: boolean;
 }): CoverState | null;

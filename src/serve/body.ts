@@ -67,6 +67,34 @@ export function readJsonBody(request: BodySource, options: BodyOptions = {}): Pr
   })
 }
 
+/** The same reading, of a `Request`: bounded as it arrives, so a body past the bound is never held whole. */
+export async function readJsonRequest(request: Request, options: BodyOptions = {}): Promise<BodyRead> {
+  const max = options.maxBytes ?? MAX_BODY_BYTES
+  const methods = options.methods ?? BODY_METHODS
+  if (!methods.includes(request.method.toUpperCase()) || !request.body) return { ok: true, body: null }
+  if (Number(request.headers.get('content-length') ?? 0) > max) return { ok: false, status: 413, error: BODY_TOO_LARGE }
+
+  const chunks: Uint8Array[] = []
+  let size = 0
+  const reader = request.body.getReader()
+  try {
+    for (;;) {
+      const { done, value } = await reader.read()
+      if (done) break
+      size += value.length
+      if (size > max) {
+        void reader.cancel().catch(() => {})
+        return { ok: false, status: 413, error: BODY_TOO_LARGE }
+      }
+      chunks.push(value)
+    }
+  } catch {
+    /* The sender went away mid-body. What arrived is not a request. */
+    return { ok: true, body: null }
+  }
+  return { ok: true, body: parse(chunks) }
+}
+
 function parse(chunks: Uint8Array[]): Record<string, unknown> | null {
   if (!chunks.length) return null
   try {

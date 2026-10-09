@@ -1,6 +1,7 @@
 import { BUILD_HEADER, buildStamp } from '../build.js';
 import { TICKET_ELEMENT, TICKET_HEADER, TICKET_REFUSED } from '../page.js';
 import { pageBuild } from './build.js';
+import { withQuery } from './query.js';
 /**
  * A page asking its own server, with every failure as one typed result: `ask` never throws and
  * never hands back a raw response. See docs/module-plumbing.md.
@@ -24,6 +25,15 @@ export function ticket() {
 export const SERVER_DOWN = 'This app’s own server is not answering.';
 /** What a reader is told while a page older than its server reloads. */
 export const PAGE_STALE = 'This page is older than its server — reloading…';
+/**
+ * The same fact for a page that is not about to reload — one that turned `reloadWhenStale` off —
+ * to say in place of a failure's `error`, which is always `PAGE_STALE`.
+ */
+export const PAGE_OLD = 'This page is older than its server.';
+/** What `replied` says of a 2xx that carried no JSON object. */
+export const NOT_A_REPLY = 'This app’s own server answered with something that is not a reply.';
+/** The most a browser will carry in a `keepalive` request is 64 KiB across all of them; this leaves room. */
+export const KEEPALIVE_BYTES = 48_000;
 let standing = 'up';
 const watchers = new Set();
 function stand(next) {
@@ -63,26 +73,24 @@ function sentence(body) {
  */
 export async function ask(path, options = {}) {
     const method = (options.method ?? (options.body === undefined ? 'GET' : 'POST')).toUpperCase();
-    const query = new URLSearchParams();
-    for (const [name, value] of Object.entries(options.query ?? {})) {
-        if (value !== null && value !== undefined)
-            query.set(name, String(value));
-    }
-    const text = query.toString();
-    const url = text ? `${path}${path.includes('?') ? '&' : '?'}${text}` : path;
+    const url = withQuery(path, options.query);
     const headers = {};
     if (options.body !== undefined)
         headers['content-type'] = 'application/json';
-    if (method !== 'GET' && method !== 'HEAD')
+    if (options.ticket ?? (method !== 'GET' && method !== 'HEAD'))
         headers[TICKET_HEADER] = ticket();
+    const sent = options.body === undefined ? undefined : JSON.stringify(options.body);
+    /* Three bytes a character is the most UTF-8 spends on one UTF-16 unit, so most bodies are never encoded to be measured. */
+    const outlives = options.keepalive === true && (!sent || sent.length * 3 <= KEEPALIVE_BYTES || new TextEncoder().encode(sent).length <= KEEPALIVE_BYTES);
     let response;
     try {
         response = await (options.fetch ?? fetch)(url, {
             method,
             headers,
-            body: options.body === undefined ? undefined : JSON.stringify(options.body),
+            body: sent,
             signal: options.signal,
             cache: 'no-store',
+            ...(outlives ? { keepalive: true } : {}),
         });
     }
     catch (caught) {
@@ -136,6 +144,33 @@ export function answered(asked) {
     if (asked.ok)
         return asked.body;
     throw new AskFailed(asked);
+}
+/**
+ * What the server itself said, whether that was yes or no, for a door whose "no" is an answer of
+ * its own shape (`{ ok: false, nowhere: true }`, a conflict with what is there now). A refusal's
+ * body comes back with `ok: false` and the sentence as `error`; `T` describes both. Thrown as
+ * `AskFailed`: nothing answered, a stale page, and an answer that is not a JSON object.
+ */
+export function replied(asked) {
+    const body = asked.body;
+    const object = typeof body === 'object' && body !== null && !Array.isArray(body);
+    if (asked.ok) {
+        if (object)
+            return body;
+        throw new AskFailed({ kind: 'refused', status: asked.status, error: NOT_A_REPLY, body });
+    }
+    if (asked.kind === 'refused' && asked.status !== null && object)
+        return { ...body, ok: false, error: asked.error };
+    throw new AskFailed(asked);
+}
+/**
+ * Ask the server whether it is there, for a page that asks nothing on a timer: the answer is the
+ * standing, which is also what `useServerStanding` and the covers read. Any door of the module's
+ * that answers a GET will do; `/healthz` is the one every module has.
+ */
+export async function probeServer(path = '/healthz', options = {}) {
+    await ask(path, options);
+    return standing;
 }
 /**
  * Reload a page that is older than its server — once: a second call within `within` ms does

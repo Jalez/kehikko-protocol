@@ -19,20 +19,26 @@ export const TRY_AGAIN = 'Try again';
 const WORKING = new Set(['waiting', 'loading', 'stale']);
 /**
  * Which cover a host's standing calls for, or `null` when the module can draw its own screen.
- * `needs` says what the module cannot work without. Not greeted yet is `waiting`, never `no-project`.
+ * `needs` says what the module cannot work without: a `host` (anything framing it), a `project`,
+ * an `epic`. Not greeted yet is `waiting`, never `no-project`. An epic asks for a project too,
+ * unless `project: false` says the module reads no project folder. Given the `server`'s standing
+ * as well, the answer covers that: `stale` before everything, `down` after what the host lacks.
  */
 export function coverFor(host, needs = { project: true }) {
+    if (host.server === 'stale')
+        return 'stale';
     if (host.where === 'listening')
         return 'waiting';
-    if (!needs.project && !needs.epic)
-        return null;
+    const down = host.server === 'down' ? 'down' : null;
+    if (!needs.host && !needs.project && !needs.epic)
+        return down;
     if (host.where === 'unhosted')
         return 'unhosted';
-    if ((needs.project || needs.epic) && !host.projectPath)
+    if ((needs.project ?? needs.epic) && !host.projectPath)
         return 'no-project';
     if (needs.epic && !host.epic)
         return 'no-epic';
-    return null;
+    return down;
 }
 /** How this page's own server last answered (`up`, `down`, `stale`), as React state. Fed by every `ask()`. */
 export function useServerStanding() {

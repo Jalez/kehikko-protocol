@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { HostRefused, NOBODY_TO_ASK, connect, } from './connect.js';
+import { GREETING_GRACE_MS } from './host-store.js';
 /**
  * The bridge as one React value: `useKehikot`. Optional — a second subpath the plain client never
  * imports, and a module may hand-roll all of it.
  * Design notes: docs/client.md.
  */
-/** How long, in ms, a page stays `listening` before it will say nobody is there (`unhosted`). */
-export const GREETING_GRACE_MS = 700;
+/* Stated beside the store, which needs them without React; still exported from here. */
+export { GREETING_GRACE_MS };
 /**
  * Connect once, for the life of this component, and re-render when the host speaks. `events` is
  * read through a ref, so it need not be memoised; `id` is the only dependency that reconnects.
@@ -100,4 +101,5 @@ export { useFocus } from './focus.js';
 export const useRoadmap = useKehikot;
 /* The fuller listener and the shared not-ready screen. See `host.ts` and `cover.ts`. */
 export { useHost, hostFields, JSON_KEPT } from './host.js';
+export {} from './host-store.js';
 export { Cover, coverFor, useServerStanding, COVER_CSS, COVER_STYLE_ID, COVER_WORDS, TRY_AGAIN, } from './cover.js';

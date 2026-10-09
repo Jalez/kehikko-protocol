@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, test } from 'bun:test'
 
 import { PAGE_BACKGROUND, THEME_KEY } from '../src/index.js'
-import { mintTicket, pageDocument, refuseTicket, sameTicket, themeScript, ticketOf } from '../src/serve/index.js'
+import { establishBuild, fillPage, mintTicket, pageDocument, refuseTicket, sameTicket, themeScript, ticketOf } from '../src/serve/index.js'
 
 describe('the page document', () => {
   const html = pageDocument({ title: 'History', ticket: 'abc' })
@@ -58,6 +58,32 @@ describe('the page document', () => {
     expect(own).toContain(`html.light{background:${PAGE_BACKGROUND.light};`)
     expect(own).toContain('src="/src/boot.ts"')
     expect(own).toContain('<link rel="icon" href="data:,">\n</head>')
+  })
+})
+
+describe('a page built ahead of its server', () => {
+  const build = establishBuild({ version: '1.0.0', commit: null })
+  const read = (html: string, id: string) => JSON.parse(new RegExp(`<script id="${id}" type="application/json">(.*?)</script>`).exec(html)?.[1] ?? 'null') as unknown
+
+  test('filled, it is the page the server would have written itself', () => {
+    const built = pageDocument({ title: 'Example', ticket: '', build: { ...build, started: 'then' } })
+    expect(fillPage(built, { ticket: 'the-ticket', build })).toBe(pageDocument({ title: 'Example', ticket: 'the-ticket', build }))
+  })
+
+  test('a page built without the islands gains them, before the end of the body', () => {
+    const filled = fillPage(pageDocument({ title: 'Example' }), { ticket: 'the-ticket', build })
+    expect(read(filled, 'ticket')).toBe('the-ticket')
+    expect(read(filled, 'build')).toEqual(build)
+    expect(filled.indexOf('id="build"')).toBeLessThan(filled.indexOf('</body>'))
+    /* And nothing asked for is nothing changed. */
+    expect(fillPage(pageDocument({ title: 'Example' }), {})).toBe(pageDocument({ title: 'Example' }))
+  })
+
+  test('a ticket cannot close its element or be read as a replacement pattern', () => {
+    const nasty = '</script><script>alert(1)</script>$&$1'
+    const filled = fillPage(pageDocument({ title: 'Example', ticket: '' }), { ticket: nasty })
+    expect(read(filled, 'ticket')).toBe(nasty)
+    expect(filled.match(/<script/g)?.length).toBe(3)
   })
 })
 

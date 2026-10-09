@@ -1,3 +1,4 @@
+import { type Query } from './query.js';
 /**
  * A page asking its own server, with every failure as one typed result: `ask` never throws and
  * never hands back a raw response. See docs/module-plumbing.md.
@@ -25,10 +26,21 @@ export type Asked<T> = {
 export interface AskOptions {
     /** Default `GET`, or `POST` when there is a `body`. */
     method?: string;
-    /** Appended to the path as a query string. `null` and `undefined` values are left out. */
-    query?: Record<string, string | number | boolean | null | undefined>;
+    /** Appended to the path as a query string. `null` and `undefined` values are left out; a list repeats its key. */
+    query?: Query;
     /** Sent as JSON. */
     body?: unknown;
+    /**
+     * `true` carries the ticket on a GET too, for a door that fences its reads. Default: every
+     * method but GET and HEAD carries it.
+     */
+    ticket?: boolean;
+    /**
+     * `true` asks the browser to finish the request after the page has gone: a save sent from
+     * `pagehide`. Left off, quietly, for a body past `KEEPALIVE_BYTES` — a browser refuses those outright.
+     */
+    keepalive?: boolean;
+    /** Stops the asking. The result is then a refusal with no status; a caller that aborts checks its own `signal.aborted`. */
     signal?: AbortSignal;
     /** For tests. Default: the page's own `fetch`. */
     fetch?: typeof fetch;
@@ -37,6 +49,15 @@ export interface AskOptions {
 export declare const SERVER_DOWN = "This app\u2019s own server is not answering.";
 /** What a reader is told while a page older than its server reloads. */
 export declare const PAGE_STALE = "This page is older than its server \u2014 reloading\u2026";
+/**
+ * The same fact for a page that is not about to reload — one that turned `reloadWhenStale` off —
+ * to say in place of a failure's `error`, which is always `PAGE_STALE`.
+ */
+export declare const PAGE_OLD = "This page is older than its server.";
+/** What `replied` says of a 2xx that carried no JSON object. */
+export declare const NOT_A_REPLY = "This app\u2019s own server answered with something that is not a reply.";
+/** The most a browser will carry in a `keepalive` request is 64 KiB across all of them; this leaves room. */
+export declare const KEEPALIVE_BYTES = 48000;
 export type ServerStanding = 'up' | 'down' | 'stale';
 /** How this page's own server last answered: `up`, `down` (nothing answered) or `stale` (it refused the ticket). */
 export declare function serverStanding(): ServerStanding;
@@ -63,6 +84,19 @@ export declare class AskFailed extends Error {
 }
 /** The body of an `ask` that worked, or an `AskFailed` thrown for one that did not. */
 export declare function answered<T>(asked: Asked<T>): T;
+/**
+ * What the server itself said, whether that was yes or no, for a door whose "no" is an answer of
+ * its own shape (`{ ok: false, nowhere: true }`, a conflict with what is there now). A refusal's
+ * body comes back with `ok: false` and the sentence as `error`; `T` describes both. Thrown as
+ * `AskFailed`: nothing answered, a stale page, and an answer that is not a JSON object.
+ */
+export declare function replied<T extends object>(asked: Asked<T | null>): T;
+/**
+ * Ask the server whether it is there, for a page that asks nothing on a timer: the answer is the
+ * standing, which is also what `useServerStanding` and the covers read. Any door of the module's
+ * that answers a GET will do; `/healthz` is the one every module has.
+ */
+export declare function probeServer(path?: string, options?: Pick<AskOptions, 'fetch' | 'signal'>): Promise<ServerStanding>;
 /**
  * Reload a page that is older than its server — once: a second call within `within` ms does
  * nothing, so a server that refuses even a fresh page cannot make a loop. Returns whether a reload

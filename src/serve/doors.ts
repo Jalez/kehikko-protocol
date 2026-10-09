@@ -1,5 +1,6 @@
 import { BUILD_HEADER, LEGACY_WELL_KNOWN, WELL_KNOWN, buildStamp, legacyManifest, type Build, type Manifest } from '../index.js'
-import { BODY_TOO_LARGE, readJsonBody, type BodySource } from './body.js'
+import { TICKET_HEADER } from '../page.js'
+import { BODY_TOO_LARGE, readJsonBody, readJsonRequest, type BodySource } from './body.js'
 import { frameAncestors } from './origins.js'
 import { pageDocument, type PageOptions } from './page.js'
 import { ticketOf } from './ticket.js'
@@ -76,6 +77,8 @@ export interface DoorRequest extends BodySource {
   url?: string
   originalUrl?: string
   headers: Record<string, string | string[] | undefined>
+  /** Asked not to hold small writes back when a stream opens on it, so an event leaves when it is emitted. */
+  socket?: { setNoDelay?(on?: boolean): unknown } | null
   on(event: 'data', listener: (chunk: Uint8Array) => void): unknown
   on(event: 'end' | 'close', listener: () => void): unknown
   on(event: 'error', listener: (error: Error) => void): unknown
@@ -96,6 +99,57 @@ export const PAGE_PATHS: readonly string[] = ['/app', '/app/', '/']
 
 const oursByDefault = (path: string) => path === '/healthz' || path === '/mcp' || path.startsWith('/api/')
 
+/** What both forms of the doors work out once, from the options. */
+function standing(options: DoorsOptions) {
+  const build = options.build
+  return {
+    pages: new Set([...PAGE_PATHS, ...(options.pages ?? [])]),
+    ours: options.ours ?? oursByDefault,
+    build,
+    manifest: build ? { ...options.manifest, build } : options.manifest,
+    stamp: build ? buildStamp(build) : null,
+    document: typeof options.page === 'function' ? options.page : () => pageDocument({ build, ...(options.page as PageOptions) }),
+  }
+}
+
+/**
+ * A reply as headers and a payload. Nothing the doors send may be cached — an answer is this
+ * process's, now — unless the reply names a `cache-control` of its own.
+ */
+function wire(reply: Reply, stamp: string | null): { headers: Record<string, string>; payload: string | Uint8Array | null } {
+  const headers: Record<string, string> = { 'cache-control': 'no-store' }
+  if (stamp) headers[BUILD_HEADER] = stamp
+  for (const [name, value] of Object.entries(reply.headers ?? {})) headers[name.toLowerCase()] = value
+  if (reply.raw) return { headers: { ...headers, 'content-type': reply.raw.type }, payload: reply.raw.bytes }
+  if (reply.body === null || reply.body === undefined) return { headers, payload: null }
+  return { headers: { ...headers, 'content-type': 'application/json; charset=utf-8' }, payload: JSON.stringify(reply.body, null, 2) }
+}
+
+/** The headers of the page: never cached (the ticket is per process), framed by a host or by nothing. */
+const pageHeaders = (): Record<string, string> => ({
+  'content-type': 'text/html; charset=utf-8',
+  'cache-control': 'no-store',
+  'content-security-policy': frameAncestors(),
+})
+
+const STREAM_HEADERS: Record<string, string> = {
+  'content-type': 'text/event-stream; charset=utf-8',
+  'cache-control': 'no-store',
+  connection: 'keep-alive',
+  'x-accel-buffering': 'no',
+}
+
+const frame = (data: unknown, name?: string) =>
+  `${name ? `event: ${name.replace(/[\r\n]/g, '')}\n` : ''}data: ${JSON.stringify(data)}\n\n`
+
+/** The health check says which build is answering, without each module spelling it. */
+function healthy(reply: Reply, path: string, build: Build | undefined): Reply {
+  const body = reply.body
+  return build && path === '/healthz' && body && typeof body === 'object' && !Array.isArray(body)
+    ? { ...reply, body: { ...(body as Record<string, unknown>), build } }
+    : reply
+}
+
 /**
  * The doors as a plain node handler — `(request, response, next)` — for a
  * module that is not served by Vite, and for tests. `transform` is where Vite's
@@ -105,13 +159,7 @@ export function doorsHandler(
   options: DoorsOptions,
   transform?: (html: string, url: string, originalUrl?: string) => Promise<string>,
 ): DoorHandler {
-  const pages = new Set([...PAGE_PATHS, ...(options.pages ?? [])])
-  const ours = options.ours ?? oursByDefault
-  const build = options.build
-  const manifest = build ? { ...options.manifest, build } : options.manifest
-  const stamp = build ? buildStamp(build) : null
-  const document =
-    typeof options.page === 'function' ? options.page : () => pageDocument({ build, ...(options.page as PageOptions) })
+  const { pages, ours, build, manifest, stamp, document } = standing(options)
 
   return (request, response, next) => {
     const url = new URL(request.url ?? '/', 'http://127.0.0.1')
@@ -119,16 +167,11 @@ export function doorsHandler(
     const method = (request.method ?? 'GET').toUpperCase()
 
     const send = (reply: Reply) => {
+      const { headers, payload } = wire(reply, stamp)
       response.statusCode = reply.status
-      if (stamp) response.setHeader(BUILD_HEADER, stamp)
-      for (const [name, value] of Object.entries(reply.headers ?? {})) response.setHeader(name, value)
-      if (reply.raw) {
-        response.setHeader('content-type', reply.raw.type)
-        return void response.end(reply.raw.bytes)
-      }
-      if (reply.body === null || reply.body === undefined) return void response.end()
-      response.setHeader('content-type', 'application/json; charset=utf-8')
-      response.end(JSON.stringify(reply.body, null, 2))
+      for (const [name, value] of Object.entries(headers)) response.setHeader(name, value)
+      if (payload === null) response.end()
+      else response.end(payload)
     }
 
     if (path === WELL_KNOWN) return send({ status: 200, body: manifest })
@@ -140,11 +183,7 @@ export function doorsHandler(
       void (transform ? transform(built, request.url ?? '/app', request.originalUrl) : Promise.resolve(built))
         .then((html) => {
           response.statusCode = 200
-          response.setHeader('content-type', 'text/html; charset=utf-8')
-          /* The ticket is per process; a cached page would have every write refused. */
-          response.setHeader('cache-control', 'no-store')
-          /* Framed by a host or by nothing. Which hosts: see `frameOrigins`. */
-          response.setHeader('content-security-policy', frameAncestors())
+          for (const [name, value] of Object.entries(pageHeaders())) response.setHeader(name, value)
           response.end(html)
         })
         .catch(next)
@@ -157,8 +196,7 @@ export function doorsHandler(
     if (options.stream) {
       const early: [unknown, string | undefined][] = []
       let opened = false
-      const event = (data: unknown, name?: string) =>
-        response.write(`${name ? `event: ${name.replace(/[\r\n]/g, '')}\n` : ''}data: ${JSON.stringify(data)}\n\n`)
+      const event = (data: unknown, name?: string) => response.write(frame(data, name))
       /* An event emitted while the door is still deciding is held until the stream is open. */
       const live = options.stream(
         method,
@@ -170,19 +208,29 @@ export function doorsHandler(
       if (live && 'reply' in live) return send(live.reply)
       if (live) {
         response.statusCode = 200
-        response.setHeader('content-type', 'text/event-stream; charset=utf-8')
-        response.setHeader('cache-control', 'no-store')
-        response.setHeader('connection', 'keep-alive')
-        response.setHeader('x-accel-buffering', 'no')
+        for (const [name, value] of Object.entries(STREAM_HEADERS)) response.setHeader(name, value)
+        if (stamp) response.setHeader(BUILD_HEADER, stamp)
+        /* An event is a few bytes; held back for more, a live line arrives a beat late. */
+        try {
+          request.socket?.setNoDelay?.(true)
+        } catch {
+          /* A socket that is already gone. The close below says so. */
+        }
         response.flushHeaders?.()
         response.write(': open\n\n')
         opened = true
         for (const [data, name] of early.splice(0)) event(data, name)
         const beat = setInterval(() => response.write(': beat\n\n'), options.beatMs ?? 25_000)
-        request.on('close', () => {
+        /* Once, whichever of the two a reader that went away is reported as: node fires both on some failures. */
+        let gone = false
+        const leave = () => {
+          if (gone) return
+          gone = true
           clearInterval(beat)
           live.close()
-        })
+        }
+        request.on('close', leave)
+        request.on('error', leave)
         return
       }
     }
@@ -195,12 +243,91 @@ export function doorsHandler(
         }
         const reply = await options.answer(method, path, url.searchParams, read.body, ticket)
         if (!reply) return next()
-        /* The health check says which build is answering, without each module spelling it. */
-        const body = reply.body
-        const healthy = build && path === '/healthz' && body && typeof body === 'object' && !Array.isArray(body)
-        send(healthy ? { ...reply, body: { ...(body as Record<string, unknown>), build } } : reply)
+        send(healthy(reply, path, build))
       })
       .catch(next)
+  }
+}
+
+/** The doors for a server that speaks `Request` and `Response`. `null` is "not ours". */
+export type DoorFetch = (request: Request) => Promise<Response | null>
+
+/**
+ * The same doors as one function from a `Request` to a `Response`, for a server that is not node's
+ * (`Bun.serve`, a test): `fetch: async (request) => (await doors(request)) ?? notFound()`. `null`
+ * is what `next()` is in the other form — the module's own assets, or its 404. `transform` is as
+ * in `doorsHandler`; a page built ahead of time is `page: () => fillPage(built, { ticket, build })`.
+ */
+export function doorsFetch(options: DoorsOptions, transform?: (html: string, url: string) => Promise<string>): DoorFetch {
+  const { pages, ours, build, manifest, stamp, document } = standing(options)
+
+  const send = (reply: Reply): Response => {
+    const { headers, payload } = wire(reply, stamp)
+    return new Response(payload as BodyInit | null, { status: reply.status, headers })
+  }
+
+  return async (request) => {
+    const url = new URL(request.url)
+    const path = url.pathname
+    const method = request.method.toUpperCase()
+
+    if (path === WELL_KNOWN) return send({ status: 200, body: manifest })
+    if (path === LEGACY_WELL_KNOWN) return send({ status: 200, body: legacyManifest(manifest) })
+
+    if (pages.has(path)) {
+      const built = document()
+      return new Response(transform ? await transform(built, `${path}${url.search}`) : built, { status: 200, headers: pageHeaders() })
+    }
+
+    if (!ours(path)) return null
+    const ticket = request.headers.get(TICKET_HEADER) || null
+
+    if (options.stream) {
+      const bytes = new TextEncoder()
+      const early: string[] = []
+      let pipe: ReadableStreamDefaultController<Uint8Array> | null = null
+      const write = (text: string) => {
+        try {
+          pipe?.enqueue(bytes.encode(text))
+        } catch {
+          /* The reader has gone; `leave` is on its way. */
+        }
+      }
+      const live = options.stream(method, path, url.searchParams, (data, name) => (pipe ? write(frame(data, name)) : early.push(frame(data, name))), ticket)
+      if (live && 'reply' in live) return send(live.reply)
+      if (live) {
+        let beat: ReturnType<typeof setInterval> | null = null
+        let gone = false
+        const leave = () => {
+          if (gone) return
+          gone = true
+          if (beat !== null) clearInterval(beat)
+          live.close()
+          try {
+            pipe?.close()
+          } catch {
+            /* Already closed by the reader. */
+          }
+        }
+        const body = new ReadableStream<Uint8Array>({
+          start(controller) {
+            pipe = controller
+            write(': open\n\n')
+            for (const text of early.splice(0)) write(text)
+            beat = setInterval(() => write(': beat\n\n'), options.beatMs ?? 25_000)
+            if (request.signal.aborted) leave()
+            else request.signal.addEventListener('abort', leave)
+          },
+          cancel: leave,
+        })
+        return new Response(body, { status: 200, headers: stamp ? { ...STREAM_HEADERS, [BUILD_HEADER]: stamp } : STREAM_HEADERS })
+      }
+    }
+
+    const read = await readJsonRequest(request, { maxBytes: options.maxBodyBytes })
+    if (!read.ok) return send({ status: read.status, body: { ok: false, error: BODY_TOO_LARGE }, headers: { connection: 'close' } })
+    const reply = await options.answer(method, path, url.searchParams, read.body, ticket)
+    return reply ? send(healthy(reply, path, build)) : null
   }
 }
 

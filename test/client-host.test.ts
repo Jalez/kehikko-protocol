@@ -3,7 +3,7 @@ import { StrictMode, act, createElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 
 import { MESSAGE, PROTOCOL, THEME_KEY } from '../src/index.js'
-import { makeMailbox, resetServerStanding, type HostEvents } from '../src/client/index.js'
+import { hostStore, makeMailbox, resetServerStanding, type HostEvents, type HostStanding } from '../src/client/index.js'
 import {
   COVER_STYLE_ID,
   COVER_WORDS,
@@ -140,6 +140,68 @@ describe('useHost: the flattened context', () => {
     expect(none.parts).toEqual([])
     /* The same empty array every time, so an effect depending on it does not re-run. */
     expect(hostFields(null).parts).toBe(none.parts)
+  })
+
+  test('a project that is only spaces is no project either', () => {
+    expect(hostFields({ project: ' ', projectPath: '  ', epic: '\t' } as never)).toMatchObject({ project: null, projectPath: null, epic: null })
+    expect(hostFields({ projectPath: '/work/my thesis ' } as never).projectPath).toBe('/work/my thesis ')
+  })
+
+  test('which kehikko the page is on is on the value', async () => {
+    const page = await render({}, { source: inbox(speaker(), hello({ ...CONTEXT, kehikko: { id: 2, name: 'Writing' } })).box })
+    expect(page.read().kehikko).toEqual({ id: 2, name: 'Writing' })
+    expect(hostFields(null).kehikko).toBeNull()
+  })
+
+  test('a field that still says the same thing is the same object, so an effect on it runs when it changed', async () => {
+    const SHOWN = {
+      ...CONTEXT,
+      kehikko: { id: 2, name: 'Writing' },
+      passage: { path: 'paper/main.tex', page: null, from: 10, to: 20, quoted: 'the seam' },
+      containers: [{ module: 'kehikot.paper', selected: true, showing: { refs: [], documents: [{ path: 'paper/main.tex' }] } }],
+    }
+    const { box, post } = inbox(speaker(), hello(SHOWN))
+    const page = await render({}, { source: box })
+    const first = page.read()
+    expect(first.passage?.quoted).toBe('the seam')
+
+    /* The host says everything again — a tab shown again — and only the epic is different. */
+    await act(async () => post({ type: MESSAGE.CONTEXT, protocol: PROTOCOL, ...SHOWN, epic: 'b-epic' }))
+    const second = page.read()
+    expect(second.epic).toBe('b-epic')
+    expect(second.context).not.toBe(first.context)
+    for (const name of ['passage', 'chosen', 'parts', 'containers', 'selection', 'kehikko'] as const) {
+      expect(second[name]).toBe(first[name] as never)
+      expect(second.context?.[name === 'chosen' ? 'filters' : name]).not.toBe(first[name] as never)
+    }
+
+    /* One that did change is new, and the rest still are not. */
+    await act(async () => post({ type: MESSAGE.CONTEXT, protocol: PROTOCOL, ...SHOWN, epic: 'b-epic', passage: { ...SHOWN.passage, to: 21 }, selection: ['gh#41', 'gh#42'] }))
+    const third = page.read()
+    expect(third.passage).not.toBe(second.passage)
+    expect(third.passage?.to).toBe(21)
+    expect(third.selection).toEqual(['gh#41', 'gh#42'])
+    expect(third.parts).toBe(second.parts)
+    expect(third.containers).toBe(second.containers)
+    expect(third.chosen).toBe(second.chosen)
+  })
+
+  test('`read` is the standing ahead of the render: what a replayed handler finds', async () => {
+    const { box, post } = inbox(speaker(), hello(CONTEXT))
+    const found: (string | null)[] = []
+    let host: Host | null = null
+    function Probe() {
+      host = useHost(ID, { onHello: () => found.push(host?.read().projectPath ?? null), onContext: () => found.push(host?.read().projectPath ?? null) }, { source: box })
+      return null
+    }
+    await mount(createElement(Probe))
+    const read = (host as unknown as Host).read
+    /* The greeting was replayed inside the effect, before React had drawn it. */
+    expect(found.at(-1)).toBe('/work/thesis')
+    await act(async () => post({ type: MESSAGE.CONTEXT, protocol: PROTOCOL, ...CONTEXT, projectPath: '/work/other' }))
+    expect(found.at(-1)).toBe('/work/other')
+    expect((host as unknown as Host).read).toBe(read)
+    expect(read().projectPath).toBe('/work/other')
   })
 
   test('a later context replaces it', async () => {
@@ -290,6 +352,163 @@ describe('coverFor', () => {
   test('a module that needs nothing is only ever waiting', () => {
     expect(coverFor(at('unhosted'), {})).toBeNull()
     expect(coverFor(at('hosted'), {})).toBeNull()
+    expect(coverFor(at('unhosted'), { project: false })).toBeNull()
+  })
+
+  test('a module that needs a host and no project can say so', () => {
+    expect(coverFor(at('listening'), { host: true })).toBe('waiting')
+    expect(coverFor(at('unhosted'), { host: true })).toBe('unhosted')
+    expect(coverFor(at('hosted'), { host: true })).toBeNull()
+  })
+
+  test('a module that needs an epic and reads no project folder is asked for the epic, not the project', () => {
+    expect(coverFor(at('unhosted'), { project: false, epic: true })).toBe('unhosted')
+    expect(coverFor(at('hosted'), { project: false, epic: true })).toBe('no-epic')
+    expect(coverFor(at('hosted', null, 'e'), { project: false, epic: true })).toBeNull()
+    /* Without saying so, an epic still asks for its project first. */
+    expect(coverFor(at('hosted', null, 'e'), { epic: true })).toBe('no-project')
+  })
+
+  test('given the server’s standing it is the whole ladder: stale first, down after what the host lacks', () => {
+    const with_ = (server: 'up' | 'down' | 'stale', where: Host['where'], projectPath: string | null = null) => ({ where, projectPath, server })
+    expect(coverFor(with_('stale', 'listening'))).toBe('stale')
+    expect(coverFor(with_('stale', 'hosted', '/p'))).toBe('stale')
+    expect(coverFor(with_('down', 'listening'))).toBe('waiting')
+    expect(coverFor(with_('down', 'unhosted'))).toBe('unhosted')
+    expect(coverFor(with_('down', 'hosted'))).toBe('no-project')
+    expect(coverFor(with_('down', 'hosted', '/p'))).toBe('down')
+    expect(coverFor(with_('down', 'unhosted'), {})).toBe('down')
+    expect(coverFor(with_('up', 'hosted', '/p'))).toBeNull()
+  })
+})
+
+describe('hostStore: the same host, outside React', () => {
+  const stores: { stop(): void }[] = []
+  afterEach(() => {
+    for (const one of stores.splice(0)) one.stop()
+  })
+  const store = <Kept = unknown>(...given: Parameters<typeof hostStore<Kept>>) => {
+    const made = hostStore<Kept>(...given)
+    stores.push(made)
+    return made
+  }
+
+  test('nothing is heard before start; then the greeting that already arrived is the standing, and the handler finds it there', () => {
+    const host = speaker()
+    const found: (string | null)[] = []
+    const live = store(ID, { onHello: () => found.push(live.get().projectPath) }, { source: inbox(host, hello(CONTEXT, '{"tab":"b"}')).box })
+    expect(live.get()).toMatchObject({ where: 'listening', context: null, projectPath: null, kept: null })
+    expect(host.said).toEqual([])
+    const changes: HostStanding[] = []
+    live.subscribe(() => changes.push(live.get()))
+    expect(live.start()).toBe(live)
+    expect(live.get()).toMatchObject({ where: 'hosted', project: 'Thesis', projectPath: '/work/thesis', epic: 'a-epic', theme: 'dark', kept: { tab: 'b' } })
+    /* One change for the greeting — the kept state and the context together — and the page was told after it. */
+    expect(changes.length).toBe(1)
+    expect(found).toEqual(['/work/thesis'])
+    expect(host.said[0]?.type).toBe(MESSAGE.READY)
+    expect(document.documentElement.classList.contains('dark')).toBe(true)
+    expect(localStorage.getItem(THEME_KEY)).toBe('dark')
+  })
+
+  test('the standing is the same object until something changes', () => {
+    const { box, post } = inbox(speaker(), hello(CONTEXT))
+    const live = store(ID, {}, { source: box }).start()
+    const first = live.get()
+    expect(live.get()).toBe(first)
+    post({ type: MESSAGE.CONTEXT, protocol: PROTOCOL, ...CONTEXT, epic: 'b-epic' })
+    expect(live.get()).not.toBe(first)
+    expect(live.get().parts).toBe(first.parts)
+  })
+
+  test('unhosted once the grace has run out, with the system’s theme when the document decided none', async () => {
+    const live = store(ID, {}, { source: inbox(speaker(), null).box, grace: 20 }).start()
+    expect(live.get().where).toBe('listening')
+    await new Promise((resolve) => setTimeout(resolve, 50))
+    expect(live.get().where).toBe('unhosted')
+    expect(['dark', 'light']).toContain(document.documentElement.className)
+    expect(live.get().theme).toBe(document.documentElement.className as never)
+  })
+
+  test('`applyTheme: false` leaves <html> alone, and `grace: 0` never concludes anything from silence', async () => {
+    const live = store(ID, {}, { source: inbox(speaker(), hello(CONTEXT)).box, applyTheme: false }).start()
+    expect(live.get().theme).toBe('dark')
+    expect(document.documentElement.className).toBe('')
+    const silent = store(ID, {}, { source: inbox(speaker(), null).box, grace: 0 }).start()
+    await new Promise((resolve) => setTimeout(resolve, 20))
+    expect(silent.get().where).toBe('listening')
+  })
+
+  test('a stale page reloads, unless told not to', async () => {
+    const reloads: number[] = []
+    const real = window.location.reload
+    Object.defineProperty(window.location, 'reload', { configurable: true, value: () => reloads.push(Date.now()) })
+    const real_ = setTimeout
+    try {
+      const stale = () => ask('/api/write', { body: {}, fetch: (async () => new Response('{"ok":false,"error":"x","refused":"ticket"}', { status: 403 })) as unknown as typeof fetch })
+      store(ID, {}, { source: inbox(speaker(), null).box, reloadWhenStale: false }).start()
+      await stale()
+      await new Promise((resolve) => real_(resolve, 1000))
+      expect(reloads.length).toBe(0)
+      resetServerStanding()
+      sessionStorage.removeItem('kehikot.reloaded')
+      store(ID, {}, { source: inbox(speaker(), null).box }).start()
+      await stale()
+      await new Promise((resolve) => real_(resolve, 1000))
+      expect(reloads.length).toBe(1)
+    } finally {
+      Object.defineProperty(window.location, 'reload', { configurable: true, value: real })
+      sessionStorage.removeItem('kehikot.reloaded')
+    }
+  })
+
+  test('remember, point and request go to the host; with nobody there, remember still holds and request refuses', async () => {
+    const host = speaker()
+    const live = store<{ tab: string }>(ID, {}, { source: inbox(host, hello(CONTEXT)).box }).start()
+    live.remember({ tab: 'c' })
+    live.point(null)
+    expect(live.get().kept).toEqual({ tab: 'c' })
+    const asked = host.said.filter((one) => one.type === MESSAGE.REQUEST)
+    expect(asked.map((one) => [one.method, one.params])).toEqual([
+      ['state.set', { state: '{"tab":"c"}' }],
+      ['passage.set', { passage: null }],
+    ])
+
+    const nobody = speaker()
+    const alone = store<{ tab: string }>(ID, {}, { source: inbox(nobody, null).box }).start()
+    alone.remember({ tab: 'd' })
+    alone.point(null)
+    expect(alone.get().kept).toEqual({ tab: 'd' })
+    expect(nobody.said).toEqual([])
+    await expect(alone.request('epics.list')).rejects.toThrow('Nothing has greeted this page')
+    await expect(store(ID).request('epics.list')).rejects.toThrow('Nothing has greeted this page')
+  })
+
+  test('goto, clear and refresh reach the page; with no goto handler the host is told there is nothing to walk to', () => {
+    const host = speaker()
+    const { box, post } = inbox(host, hello(CONTEXT))
+    const heard: string[] = []
+    store(ID, { onClear: () => heard.push('clear'), onRefresh: () => heard.push('refresh') }, { source: box }).start()
+    post({ type: MESSAGE.CLEAR, protocol: PROTOCOL })
+    post({ type: MESSAGE.REFRESH, protocol: PROTOCOL })
+    post({ type: MESSAGE.GOTO, protocol: PROTOCOL, id: 'g1', ref: 'gh#41' })
+    expect(heard).toEqual(['clear', 'refresh'])
+    const went = host.said.find((one) => one.type === MESSAGE.WENT) as unknown as { found: boolean; why: string }
+    expect(went.found).toBe(false)
+    expect(went.why).toBe('This app is not showing anything that can be walked to.')
+  })
+
+  test('a stopped store says nothing more, and starting is once', () => {
+    const { box, post } = inbox(speaker(), hello(CONTEXT))
+    const heard: string[] = []
+    const live = store(ID, { onContext: () => heard.push('context') }, { source: box }).start()
+    live.start()
+    let changes = 0
+    live.subscribe(() => (changes += 1))
+    live.stop()
+    post({ type: MESSAGE.CONTEXT, protocol: PROTOCOL, ...CONTEXT, epic: 'b-epic' })
+    expect([changes, heard, live.get().epic, live.connection()]).toEqual([0, [], 'a-epic', null])
+    expect(live.start().connection()).toBeNull()
   })
 })
 

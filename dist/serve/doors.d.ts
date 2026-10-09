@@ -63,6 +63,10 @@ export interface DoorRequest extends BodySource {
     url?: string;
     originalUrl?: string;
     headers: Record<string, string | string[] | undefined>;
+    /** Asked not to hold small writes back when a stream opens on it, so an event leaves when it is emitted. */
+    socket?: {
+        setNoDelay?(on?: boolean): unknown;
+    } | null;
     on(event: 'data', listener: (chunk: Uint8Array) => void): unknown;
     on(event: 'end' | 'close', listener: () => void): unknown;
     on(event: 'error', listener: (error: Error) => void): unknown;
@@ -83,6 +87,15 @@ export declare const PAGE_PATHS: readonly string[];
  * `transformIndexHtml` goes; without one the document is sent as built.
  */
 export declare function doorsHandler(options: DoorsOptions, transform?: (html: string, url: string, originalUrl?: string) => Promise<string>): DoorHandler;
+/** The doors for a server that speaks `Request` and `Response`. `null` is "not ours". */
+export type DoorFetch = (request: Request) => Promise<Response | null>;
+/**
+ * The same doors as one function from a `Request` to a `Response`, for a server that is not node's
+ * (`Bun.serve`, a test): `fetch: async (request) => (await doors(request)) ?? notFound()`. `null`
+ * is what `next()` is in the other form — the module's own assets, or its 404. `transform` is as
+ * in `doorsHandler`; a page built ahead of time is `page: () => fillPage(built, { ticket, build })`.
+ */
+export declare function doorsFetch(options: DoorsOptions, transform?: (html: string, url: string) => Promise<string>): DoorFetch;
 /** The part of Vite's dev server the plugin touches. */
 export interface DoorsServerLike {
     middlewares: {

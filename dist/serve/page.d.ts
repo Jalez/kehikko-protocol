@@ -33,4 +33,13 @@ export interface PageOptions {
 export declare const FRAMED_DEFAULT_THEME: PageTheme;
 /** The blocking script. It cannot import, so the names it needs are written into it; nothing in it throws. */
 export declare function themeScript(): string;
+/**
+ * Put this process's ticket and build into a page that was built ahead of it (`vite build` over a
+ * `pageDocument` written without either): each island is replaced where the built page has one and
+ * added before `</body>` where it has none. No placeholder to agree on, and the escaping is here.
+ */
+export declare function fillPage(html: string, filled: {
+    ticket?: string | null;
+    build?: Build | null;
+}): string;
 export declare function pageDocument(options: PageOptions): string;
