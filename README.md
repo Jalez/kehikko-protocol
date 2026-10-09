@@ -83,7 +83,7 @@ And behind two subpaths, which are not shapes and say so:
 | | |
 |---|---|
 | `kehikot-module-protocol/client` | `connect`, `mailbox`, `HostRefused` — the module half of the wire, for a page that would rather not write it again. Browser code, kept out of the front door so a Bun process can import shapes without it. **A convenience: a module may hand-roll its wire and be perfectly conforming.** |
-| `kehikot-module-protocol/client/react` | `useKehikot` (once `useRoadmap`, still exported as an alias), and `useFocus` (0.34.0), the parts focus as one value. Optional; `react` is an optional peer dependency and `client` does not import it. |
+| `kehikot-module-protocol/client/react` | `useHost`, `Cover` and `coverFor`, and `useFocus` (0.34.0), the parts focus as one value. `useKehikot` and its alias `useRoadmap` are deprecated in 0.37 — use `useHost`. Optional; `react` is an optional peer dependency and `client` does not import it. |
 
 ## Where the reasoning is
 
@@ -110,6 +110,12 @@ The source says what each field is and what it is bounded by, in a line or three
 | [Packaging](PACKAGING.md) | How this package is consumed straight from git, and why `dist/` is committed. |
 
 ## Renamed from "roadmap", and what a module has to change
+
+> **Deprecated in 0.37, removed in the next breaking release.** Everything in this section that
+> reads or writes a `roadmap` spelling — the second dialect, `LEGACY_WELL_KNOWN`, `legacyManifest`,
+> `toDialect`, `useRoadmap`, `ROADMAP_ORIGIN`, `ROADMAP_MODULES_DIR` — is marked `@deprecated` and
+> goes, with the old `useKehikot`. The full list, with what replaces each name, is in
+> [CHANGELOG.md](CHANGELOG.md) under 0.37.0.
 
 This package was `roadmap-module-protocol`, and every name it put on the wire
 said `roadmap.`. The app is Kehikot now, and since 0.25.0 the names say
@@ -191,6 +197,7 @@ The same list with what each version exported is in [CHANGELOG.md](CHANGELOG.md)
 
 | version | date | what it added |
 |---|---|---|
+| 0.37.0 | 2026-10-10 | Deprecations only, nothing removed: everything named after "roadmap" (the second dialect, `LEGACY_*`, `legacyManifest`, `toDialect`, `useRoadmap`, `ROADMAP_*`), the old `useKehikot`, and the `kehikko-*` bin names (now also `kehikot-*`). See [CHANGELOG.md](CHANGELOG.md). |
 | 0.36.0 | 2026-10-09 | The plumbing's gaps, closed: `held` (unsaved work across a reload), `hostStore` (the host outside React), `doorsFetch` and `fillPage` (a `Bun.serve` module and its built page), `replied`, `probeServer`, `ask`'s `ticket`/`keepalive`/repeated `query`, `follow`'s `events`/`probe`, `coverFor`'s `host` and `server`. See [module plumbing](docs/module-plumbing.md). |
 | 0.35.0 | 2026-10-09 | The shared plumbing of a module: `pageDocument`, `mintTicket`/`refuseTicket`, `readJsonBody`, the `doors()` plugin, `ask`/`follow`, `useHost`, `Cover`/`coverFor`, and a build identity (`establishBuild`, `compareBuilds`, the manifest's and `ready`'s optional `build`, `PACKAGE_VERSION`). See [module plumbing](docs/module-plumbing.md). |
 | 0.34.1 | 2026-10-09 | `focusSentence(…, { total })` and `useFocus().narrow(…, { total: true })`: the sentence may say how many of how many. |

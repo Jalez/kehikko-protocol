@@ -7,9 +7,56 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
-## Unreleased
+## 0.37.0 — 2026-10-10
 
-Internal only; nothing a consumer can observe. No version change.
+The deprecation release before the next breaking one. **Additive: nothing is removed and nothing
+a 0.36.0 call does has changed.** Everything the next breaking release removes is marked
+`@deprecated` in source with what replaces it, and listed here. `PROTOCOL` is still 2.
+
+### Deprecated in 0.37, removed in the next breaking release
+
+| deprecated | use instead |
+|---|---|
+| `useKehikot`, `Kehikot`, `UseKehikotOptions` (`/client/react`) | `useHost`, `Host`, `UseHostOptions` — or `hostStore` outside React |
+| `useRoadmap`, `Roadmap`, `UseRoadmapOptions` (`/client/react`) | the same |
+| `LEGACY_WELL_KNOWN`, `legacyManifest`, and the manifest served at `/.well-known/roadmap-module.json` | `WELL_KNOWN`; a manifest is served there only |
+| `LEGACY_MANIFEST_KIND`, and `kind: 'roadmap.module'` read by `manifestSchema` and `readManifest` | `MANIFEST_KIND` |
+| `LEGACY_MESSAGE_PREFIX`, `MESSAGE_PREFIXES`, and `roadmap.*` message types read by every schema | `MESSAGE_PREFIX`, `MESSAGE.*` |
+| `Dialect`, `DIALECTS`, `toDialect`, `canonicalMessage`, `dialectOfType`, `dialectOfKind`, `nameIn`, `legacyName`, `legacyModuleId` | nothing: there is one spelling. Post a message as it is built |
+| `canonicalName`, `canonicalExtension` | `canonicalModuleId` for a module id read from disk; compare an extension name as written |
+| `connect()` answering in the dialect it was greeted in | nothing: it answers `kehikot.` |
+| `legacyRegistryDir` and reading `~/.roadmap/modules` (`/serve`) | nothing: a host copies that directory into `registryDir()` once |
+| the environment variables `ROADMAP_MODULES_DIR`, `ROADMAP_ORIGIN` | `KEHIKOT_MODULES_DIR`, `KEHIKOT_ORIGINS` |
+| the bins `kehikko-create`, `kehikko-check-parts` | `kehikot-create`, `kehikot-check-parts` (both names work in 0.37) |
+
+What is **not** deprecated, although it reads a pre-rename spelling: `canonicalModuleId` and
+`moduleFolder('roadmap.x')` (ids written to disk before the rename), and `registerAt` reading a
+`roadmap.<name>.json` registration beside the one it writes.
+
+Still a warning in 0.37, a refusal in the next breaking release: a manifest that neither says
+`reacts: ['parts']` nor gives `partless` a sentence (`partsDeclaration`).
+
+Calls that will answer differently in the next breaking release, listed so a module can find its
+call sites now ([docs/module-plumbing.md](docs/module-plumbing.md), "For the next breaking release"):
+an aborted `ask` becomes a kind of its own instead of `refused`; a 2xx that is not JSON stops
+resolving `ok: true, body: null`; a stale `ask`'s `error` stops saying "reloading…"; `CoverState`
+gains members.
+
+### Said at runtime, once, in development only
+
+Three paths say so on `console.warn` the first time they are exercised — never per message, and
+never when `NODE_ENV` is `production` or `test`, so no suite reads differently:
+
+- `useKehikot` (and `useRoadmap`) being called;
+- `ROADMAP_MODULES_DIR` or `ROADMAP_ORIGIN` being the variable that decided;
+- `connect()` being greeted with `roadmap.hello`.
+
+### Added
+
+- The bins under the package's own spelling, `kehikot-create` and `kehikot-check-parts`, beside the
+  old names.
+
+### Internal (carried from Unreleased; nothing a consumer can observe)
 
 - `wire.ts` split into `passage.ts`, `filters.ts`, `context.ts` and `messages.ts` (and still
   re-exports all of them); `LIMITS` moved to `limits.ts`; schema fragments that were written more

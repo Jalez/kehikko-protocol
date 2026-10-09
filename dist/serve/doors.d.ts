@@ -32,7 +32,10 @@ export type Stream = (method: string, path: string, query: URLSearchParams, emit
     close: () => void;
 } | null;
 export interface DoorsOptions {
-    /** Served at both well-known paths, the legacy one in the legacy spelling. */
+    /**
+     * Served at both well-known paths, the legacy one in the legacy spelling. The legacy path is
+     * deprecated: the next breaking release answers `WELL_KNOWN` only.
+     */
     manifest: Manifest;
     answer: Answer;
     stream?: Stream;

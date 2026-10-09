@@ -149,6 +149,8 @@ collide with whatever the module's own pages are called.
 
 #### `LEGACY_WELL_KNOWN`
 
+> **Deprecated in 0.37, removed in the next breaking release.** Use `WELL_KNOWN`.
+
 Where a module built before the rename serves its manifest.
 
 A host asks `WELL_KNOWN` first and this second, so an unchanged module is

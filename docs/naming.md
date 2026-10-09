@@ -1,8 +1,10 @@
 # `kehikko` and `kehikot`: which spelling goes where
 
-> **Inferred — to be confirmed by the owner.** This is the rule the code follows today, read off
-> its identifiers, environment variables, bins, wire names, folders and repository names. Nothing
-> was renamed to make it true, and the exceptions below are listed rather than fixed.
+> **Confirmed by the owner (2026-10-10).** `kehikot` is the shared namespace — the product, the
+> package, the wire, ids, the `.kehikot/` folder; `kehikko` is one canvas, and the host and the
+> repositories named after it; `roadmap` is the retired prototype's name and is on its way out of
+> this package (deprecated in 0.37, removed in the next breaking release). The exceptions below are
+> listed rather than fixed, except where a line says otherwise.
 
 *Kehikko* is Finnish for a frame; *kehikot* is the plural.
 
@@ -46,7 +48,7 @@ host that draws it together with the repositories named after that host.*
 - **Module repositories against module ids.** `kehikko-slides` is the repository of the module
   whose id is `kehikot.slides` and whose data is in `.kehikot/slides/`. `create` writes both:
   `~/Projects/kehikko-<name>` and `kehikot.<name>`.
-- **This package's bins.** `kehikko-create` and `kehikko-check-parts` take the singular although
+- **This package's bins.** Since 0.37 they are also `kehikot-create` and `kehikot-check-parts`, which is what the rule says; the singular names are deprecated. `kehikko-create` and `kehikko-check-parts` took the singular although
   they ship in the plural-named package and act on modules, not on a canvas or the host. By the
   rule above they would be `kehikot-*`; they follow the repository's name instead.
 - **The host's environment variables are split.** Variables the host shares with modules are
@@ -55,7 +57,7 @@ host that draws it together with the repositories named after that host.*
   between the two groups.
 - **`.kehikot/kehikko/`.** Both spellings in one path: the shared folder, then the host's own
   folder in it — consistent with the rule, and the place it is easiest to mistype.
-- **The legacy names are neither.** `roadmap.` on the wire, `roadmap-module.json`,
+- **The legacy names are neither** (and, in this package, deprecated in 0.37). `roadmap.` on the wire, `roadmap-module.json`,
   `roadmap.module`, `ROADMAP_ORIGIN`, `ROADMAP_MODULES_DIR`, `ROADMAP_FRAME_DB`, `useRoadmap`,
   `~/.roadmap/`, and `.kehikot/roadmap/{epics,state}/` in the host's older notes are the old product
   name, still read everywhere and still written in a few places (`KEHIKKO_ROADMAP_DIR` carries the
