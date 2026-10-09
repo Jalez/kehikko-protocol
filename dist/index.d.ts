@@ -18,4 +18,5 @@ export { PART_ID, partSchema, partsSchema, pickedParts, isFocused, refInFocus, p
 export { JOURNEYS_MODULE, JOURNEYS_FILE, journeyStepSchema, journeyGroupSchema, stepsFromSchema, journeyRecordSchema, journeysDocumentSchema, journeyIn, journeySlugs, stepsOf, stepPart, partIdsOf, partsOf, type JourneyPart, type JourneyStep, type JourneyGroup, type StepsFrom, type JourneyRecord, type JourneysDocument, type JourneySteps, } from './journey.js';
 export { CONTENT_HOST, contentChangeSchema, contentSignalSchema, contentStamp, type ContentChange, type ContentSignal, } from './content.js';
 export { notificationPayload, callPayload, EXTENSIONS, EXTENSION_NAMES, known, schemaFor, type NotificationPayload, type CallPayload, type ExtensionFormat, } from './extensions.js';
+export { CITE_STATUSES, CITE_MARKER, parseSource, serialiseSource, uncitable, markersIn, replaceMarkers, normaliseQuote, findQuote, resolveSource, linesOf, type CitedSource, type CiteStatus, type CitedRange, type CitationView, type MarkerScan, } from './citations.js';
 //# sourceMappingURL=index.d.ts.map

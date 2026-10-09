@@ -51,12 +51,12 @@ declare const modeSchema: z.ZodObject<{
      */
     scope: z.ZodDefault<z.ZodEnum<["epic", "global"]>>;
 }, "strip", z.ZodTypeAny, {
-    id: string;
     label: string;
+    id: string;
     scope: "epic" | "global";
 }, {
-    id: string;
     label: string;
+    id: string;
     scope?: "epic" | "global" | undefined;
 }>;
 export type ModuleMode = z.infer<typeof modeSchema>;
@@ -448,12 +448,12 @@ export declare const manifestSchema: z.ZodObject<{
          */
         scope: z.ZodDefault<z.ZodEnum<["epic", "global"]>>;
     }, "strip", z.ZodTypeAny, {
-        id: string;
         label: string;
+        id: string;
         scope: "epic" | "global";
     }, {
-        id: string;
         label: string;
+        id: string;
         scope?: "epic" | "global" | undefined;
     }>, "many">;
     /**
@@ -549,8 +549,8 @@ export declare const manifestSchema: z.ZodObject<{
     };
     reacts: string[];
     modes: {
-        id: string;
         label: string;
+        id: string;
         scope: "epic" | "global";
     }[];
     declares: {
@@ -573,8 +573,8 @@ export declare const manifestSchema: z.ZodObject<{
     name: string;
     entry: string;
     modes: {
-        id: string;
         label: string;
+        id: string;
         scope?: "epic" | "global" | undefined;
     }[];
     summary?: string | undefined;

@@ -45,12 +45,12 @@ export declare const contentChangeSchema: z.ZodObject<{
     epic: z.ZodDefault<z.ZodNullable<z.ZodString>>;
     at: z.ZodString;
 }, "strip", z.ZodTypeAny, {
-    source: string;
     at: string;
+    source: string;
     epic: string | null;
 }, {
-    source: string;
     at: string;
+    source: string;
     epic?: string | null | undefined;
 }>;
 export type ContentChange = z.infer<typeof contentChangeSchema>;
@@ -69,12 +69,12 @@ export declare const contentSignalSchema: z.ZodArray<z.ZodObject<{
     epic: z.ZodDefault<z.ZodNullable<z.ZodString>>;
     at: z.ZodString;
 }, "strip", z.ZodTypeAny, {
-    source: string;
     at: string;
+    source: string;
     epic: string | null;
 }, {
-    source: string;
     at: string;
+    source: string;
     epic?: string | null | undefined;
 }>, "many">;
 export type ContentSignal = z.infer<typeof contentSignalSchema>;

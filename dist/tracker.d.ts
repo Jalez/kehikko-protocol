@@ -394,8 +394,8 @@ export declare const trackerSourceSchema: z.ZodObject<{
     error: z.ZodDefault<z.ZodNullable<z.ZodString>>;
     refreshing: z.ZodDefault<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
-    host: string;
     at: string | null;
+    host: string;
     tracker: "github" | "gitlab";
     repo: string;
     default: boolean;
@@ -471,8 +471,8 @@ export declare const trackerReadingResult: z.ZodObject<{
         error: z.ZodDefault<z.ZodNullable<z.ZodString>>;
         refreshing: z.ZodDefault<z.ZodBoolean>;
     }, "strip", z.ZodTypeAny, {
-        host: string;
         at: string | null;
+        host: string;
         tracker: "github" | "gitlab";
         repo: string;
         default: boolean;
@@ -692,8 +692,8 @@ export declare const trackerReadingResult: z.ZodObject<{
     at: string | null;
     refreshing: boolean;
     sources: {
-        host: string;
         at: string | null;
+        host: string;
         tracker: "github" | "gitlab";
         repo: string;
         default: boolean;
