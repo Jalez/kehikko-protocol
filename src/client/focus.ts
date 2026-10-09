@@ -26,12 +26,13 @@ export interface Focus {
   /**
    * A list narrowed to the picked parts, and the sentence about what was left out (`''` when nothing
    * is picked). `noun` is what one item is called (`'note'`, or `['entry', 'entries']`); `keep` holds
-   * on to what the person is in the middle of, as in `narrowToFocus`.
+   * on to what the person is in the middle of, as in `narrowToFocus`; `total: true` has the sentence
+   * say how many items there were (`2 of 3 notes are outside …`).
    */
   narrow: <T>(
     items: readonly T[],
     anchorOf: (item: T) => Anchors,
-    options?: { noun?: string | readonly [string, string]; keep?: (item: T) => boolean },
+    options?: { noun?: string | readonly [string, string]; keep?: (item: T) => boolean; total?: boolean },
   ) => Narrowed<T> & { sentence: string }
 }
 
@@ -56,7 +57,8 @@ export function useFocus(context: { parts?: readonly EpicPart[]; epic?: string |
       inFocus: (anchor) => anchorInFocus(parts, anchor, epic),
       narrow: (items, anchorOf, options = {}) => {
         const narrowed = narrowToFocus(parts, items, anchorOf, { epic, keep: options.keep })
-        return { ...narrowed, sentence: focusSentence(parts, narrowed.outside, options.noun) }
+        const total = options.total ? { total: items.length } : undefined
+        return { ...narrowed, sentence: focusSentence(parts, narrowed.outside, options.noun, total) }
       },
     }),
     [parts, epic],

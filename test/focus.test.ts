@@ -157,6 +157,24 @@ describe('focusSentence', () => {
     expect(focusSentence(PARTS(true, false), 2, ['entry', 'entries'])).toBe('2 entries outside the picked part (The posting seam).')
   })
 
+  test('with a total: how many of how many, the noun counted by the total and the verb by the outside', () => {
+    const seam = PARTS(true, false)
+    expect(focusSentence(seam, 2, 'question', { total: 3 })).toBe('2 of 3 questions are outside the picked part (The posting seam).')
+    expect(focusSentence(seam, 1, 'question', { total: 3 })).toBe('1 of 3 questions is outside the picked part (The posting seam).')
+    expect(focusSentence(seam, 1, 'question', { total: 1 })).toBe('1 of 1 question is outside the picked part (The posting seam).')
+    expect(focusSentence(seam, 0, 'question', { total: 1 })).toBe('0 of 1 question are outside the picked part (The posting seam).')
+    expect(focusSentence(seam, 0, ['entry', 'entries'], { total: 0 })).toBe('0 of 0 entries are outside the picked part (The posting seam).')
+    /* A qualifier is the caller's, and rides in the noun. */
+    expect(focusSentence(PARTS(true, true), 2, ['reference shown here', 'references shown here'], { total: 3 })).toBe(
+      '2 of 3 references shown here are outside the 2 picked parts (The posting seam, What the tests check).',
+    )
+    expect(focusSentence(PARTS(false, false), 2, 'question', { total: 3 })).toBe('')
+  })
+
+  test('without one, or with an empty options object, it is the sentence it was', () => {
+    expect(focusSentence(PARTS(true, false), 3, 'question', {})).toBe(focusSentence(PARTS(true, false), 3, 'question'))
+  })
+
   test('and where the control is', () => {
     expect(FOCUS_WHERE).toContain('host’s bar')
   })

@@ -190,6 +190,7 @@ The same list with what each version exported is in [CHANGELOG.md](CHANGELOG.md)
 
 | version | date | what it added |
 |---|---|---|
+| 0.34.1 | 2026-10-09 | `focusSentence(…, { total })` and `useFocus().narrow(…, { total: true })`: the sentence may say how many of how many. |
 | 0.34.0 | 2026-10-09 | Every module's data is part-specific by one rule: `Anchor`, `anchorInFocus`, `narrowToFocus`, `focusSentence`, `FOCUS_WHERE`, `sameParts`, `partsDeclaration`, `useFocus`, and the manifest's `partless`. See [parts](docs/parts.md). |
 | 0.33.0 | 2026-10-09 | Citations: the `[^n]: <path> \| "<quote>"` line and the rule for finding its words again (`parseSource`, `findQuote`, `resolveSource`, `CITE_STATUSES`). See [citations](docs/citations.md). |
 | 0.32.0 | 2026-10-07 | A part may own files of the epic's paper: `files` on a group and a part, `partFile`, `paperFileOf`, `fileInFocus`, `pickedFiles`, `partsOfFile`, `PAPER_MODULE`. |

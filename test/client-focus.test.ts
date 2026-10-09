@@ -62,6 +62,8 @@ test('picked parts narrow, count and say', () => {
   const out = last().narrow(NOTES, (note) => ({ file: note.file }), { noun: 'note', keep: (note) => note.id === 'c' })
   expect(out.shown.map((note) => note.id)).toEqual(['a', 'c'])
   expect(out).toMatchObject({ outside: 2, kept: 1, sentence: '2 notes outside the picked part (The posting seam).' })
+  const counted = last().narrow(NOTES, (note) => ({ file: note.file }), { noun: 'note', total: true })
+  expect(counted.sentence).toBe(`2 of ${NOTES.length} notes are outside the picked part (The posting seam).`)
 })
 
 test('the epic is what a file is compared under', () => {

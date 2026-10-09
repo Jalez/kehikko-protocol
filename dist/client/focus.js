@@ -19,7 +19,8 @@ export function useFocus(context) {
         inFocus: (anchor) => anchorInFocus(parts, anchor, epic),
         narrow: (items, anchorOf, options = {}) => {
             const narrowed = narrowToFocus(parts, items, anchorOf, { epic, keep: options.keep });
-            return { ...narrowed, sentence: focusSentence(parts, narrowed.outside, options.noun) };
+            const total = options.total ? { total: items.length } : undefined;
+            return { ...narrowed, sentence: focusSentence(parts, narrowed.outside, options.noun, total) };
         },
     }), [parts, epic]);
 }

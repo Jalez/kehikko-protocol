@@ -170,9 +170,12 @@ export declare function narrowToFocus<T>(parts: readonly EpicPart[], items: read
 /**
  * The sentence a module says while parts are picked: `3 questions outside the picked part (Heading).`
  * `''` when nothing is picked; `0 … outside` is said. `noun` names one item; give `[one, many]`
- * where adding an `s` is wrong.
+ * where adding an `s` is wrong. With `total` — how many items the count was taken over — it reads
+ * `2 of 3 questions are outside the picked part (Heading).`
  */
-export declare function focusSentence(parts: readonly EpicPart[], outside: number, noun?: string | readonly [one: string, many: string]): string;
+export declare function focusSentence(parts: readonly EpicPart[], outside: number, noun?: string | readonly [one: string, many: string], options?: {
+    total?: number;
+}): string;
 /**
  * Where the control is, for the sentence's tooltip or the line under an empty
  * pane: it is never on the module's own page.
