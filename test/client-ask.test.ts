@@ -3,11 +3,16 @@ import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 import { TICKET_HEADER } from '../src/index.js'
 import {
   AskFailed,
+  KEEPALIVE_BYTES,
+  NOT_A_REPLY,
+  PAGE_OLD,
   PAGE_STALE,
   SERVER_DOWN,
   answered,
   ask,
   follow,
+  probeServer,
+  replied,
   onServerStanding,
   resetServerStanding,
   serverStanding,
@@ -171,6 +176,127 @@ describe('ask', () => {
   })
 })
 
+describe('ask: what a call may add', () => {
+  test('a key given a list is repeated, in order, and the gaps in it are left out', async () => {
+    const { fetch, calls } = server(() => json(200, {}))
+    await ask('/api/here', { query: { epic: 'e', doc: ['a.tex', null, 'b c.tex'], refs: [] }, fetch })
+    expect(calls[0]?.url).toBe('/api/here?epic=e&doc=a.tex&doc=b+c.tex')
+    await ask('/api/here?x=1', { query: { doc: ['a'] }, fetch })
+    expect(calls[1]?.url).toBe('/api/here?x=1&doc=a')
+  })
+
+  test('`ticket: true` carries the ticket on a read; `ticket: false` leaves it off a write', async () => {
+    const { fetch, calls } = server(() => json(200, {}))
+    await ask('/api/quiz', { ticket: true, fetch })
+    await ask('/api/open', { body: {}, ticket: false, fetch })
+    expect(calls[0]?.init.method).toBe('GET')
+    expect((calls[0]?.init.headers as Record<string, string>)[TICKET_HEADER]).toBe('the-ticket')
+    expect((calls[1]?.init.headers as Record<string, string>)[TICKET_HEADER]).toBeUndefined()
+  })
+
+  test('`keepalive` is asked of the browser only when asked for, and only for a body it will carry', async () => {
+    const { fetch, calls } = server(() => json(200, {}))
+    await ask('/api/quiz', { body: { text: 'short' }, fetch })
+    await ask('/api/quiz', { body: { text: 'short' }, keepalive: true, fetch })
+    await ask('/api/quiz', { body: { text: 'ä'.repeat(KEEPALIVE_BYTES / 2) }, keepalive: true, fetch })
+    await ask('/api/quiz', { body: { text: 'ä'.repeat(KEEPALIVE_BYTES / 3) }, keepalive: true, fetch })
+    expect(calls.map((call) => call.init.keepalive)).toEqual([undefined, true, undefined, true])
+    /* Too large to outlive the page, it is still sent. */
+    expect(String(calls[2]?.init.body).length).toBeGreaterThan(KEEPALIVE_BYTES / 2)
+  })
+
+  test('a call that names none of them sends exactly what 0.35.0 sent', async () => {
+    const { fetch, calls } = server(() => json(200, {}))
+    await ask('/api/value', { query: { a: 1 }, fetch })
+    await ask('/api/value', { body: { a: 1 }, fetch })
+    expect(calls[0]).toEqual({ url: '/api/value?a=1', init: { method: 'GET', headers: {}, body: undefined, signal: undefined, cache: 'no-store' } })
+    expect(calls[1]).toEqual({
+      url: '/api/value',
+      init: {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', [TICKET_HEADER]: 'the-ticket' },
+        body: '{"a":1}',
+        signal: undefined,
+        cache: 'no-store',
+      },
+    })
+  })
+
+  test('a stale page’s sentence is still the reloading one; `PAGE_OLD` is the same fact without the promise', async () => {
+    const refusal = refuseTicket('old', 'new')
+    const asked = await ask('/api/value', { body: {}, fetch: server(() => json(403, refusal?.body)).fetch })
+    expect(asked.ok === false && asked.error).toBe(PAGE_STALE)
+    expect(PAGE_STALE.startsWith(PAGE_OLD.slice(0, -1))).toBe(true)
+    expect(PAGE_OLD).not.toContain('reloading')
+  })
+})
+
+describe('replied', () => {
+  type Held = { ok: boolean; held?: string; nowhere?: boolean; error?: string }
+
+  test('a yes is the body', async () => {
+    const asked = await ask<Held>('/api/checklist', { fetch: server(() => json(200, { ok: true, held: 'a' })).fetch })
+    expect(replied(asked)).toEqual({ ok: true, held: 'a' })
+  })
+
+  test('a no is the server’s own body too, with the sentence: at 200, and at a refusing status', async () => {
+    const soft = await ask<Held>('/api/checklist', { fetch: server(() => json(200, { ok: false, nowhere: true, error: 'no project is open.' })).fetch })
+    expect(replied(soft)).toEqual({ ok: false, nowhere: true, error: 'no project is open.' })
+    const conflict = await ask<Held>('/api/quiz', { body: {}, fetch: server(() => json(409, { error: 'The file moved.', held: 'theirs' })).fetch })
+    expect(replied(conflict)).toEqual({ ok: false, error: 'The file moved.', held: 'theirs' })
+    /* A no that said nothing still has a sentence. */
+    const silent = await ask<Held>('/api/quiz', { fetch: server(() => json(400, { nowhere: false })).fetch })
+    expect(replied(silent).error).toBe('This app’s own server answered 400.')
+  })
+
+  test('nothing answering, a stale page and a refusal with no body are thrown, as `answered` throws them', async () => {
+    const down = (async () => {
+      throw new TypeError('Failed to fetch')
+    }) as unknown as typeof globalThis.fetch
+    const refusal = refuseTicket('old', 'new')
+    for (const [fetch, kind] of [
+      [down, 'down'],
+      [server(() => json(403, refusal?.body)).fetch, 'stale'],
+      [server(() => new Response('<html>', { status: 500 })).fetch, 'refused'],
+    ] as const) {
+      const asked = await ask<Held>('/api/checklist', { body: {}, fetch })
+      expect(() => replied(asked)).toThrow(AskFailed)
+      expect(asked.ok === false && asked.kind).toBe(kind)
+    }
+  })
+
+  test('a 2xx that carried no JSON object is not a reply', async () => {
+    for (const reply of [() => new Response('<!doctype html>', { status: 200 }), () => json(200, [1, 2]), () => new Response(null, { status: 204 })]) {
+      const asked = await ask<Held>('/api/checklist', { fetch: server(reply).fetch })
+      /* `ask` itself is as it was: ok, with whatever parsed. */
+      expect(asked.ok).toBe(true)
+      try {
+        replied(asked)
+        throw new Error('did not throw')
+      } catch (caught) {
+        expect((caught as AskFailed).message).toBe(NOT_A_REPLY)
+        expect((caught as AskFailed).kind).toBe('refused')
+      }
+    }
+  })
+})
+
+describe('probeServer', () => {
+  test('asks the health check and says the standing: up, down, and up again', async () => {
+    const { fetch, calls } = server(() => json(200, { ok: true }))
+    expect(await probeServer(undefined, { fetch })).toBe('up')
+    expect(calls[0]?.url).toBe('/healthz')
+    expect(calls[0]?.init.method).toBe('GET')
+    const down = (async () => {
+      throw new TypeError('Failed to fetch')
+    }) as unknown as typeof globalThis.fetch
+    expect(await probeServer('./healthz', { fetch: down })).toBe('down')
+    expect(serverStanding()).toBe('down')
+    expect(await probeServer('./healthz', { fetch })).toBe('up')
+    expect(calls[1]?.url).toBe('./healthz')
+  })
+})
+
 describe('follow', () => {
   class FakeSource {
     static made: FakeSource[] = []
@@ -179,8 +305,12 @@ describe('follow', () => {
     onmessage: ((message: { data: string }) => void) | null = null
     onerror: (() => void) | null = null
     closed = false
+    named = new Map<string, (message: { data: string }) => void>()
     constructor(public url: string) {
       FakeSource.made.push(this)
+    }
+    addEventListener(name: string, listener: (message: { data: string }) => void) {
+      this.named.set(name, listener)
     }
     close() {
       this.closed = true
@@ -236,6 +366,57 @@ describe('follow', () => {
     second?.onerror?.()
     await new Promise((resolve) => setTimeout(resolve, 20))
     expect(FakeSource.made.length).toBe(2)
+  })
+
+  test('named events are heard when they are listed, with the name; unnamed ones as before', () => {
+    const heard: unknown[][] = []
+    const stop = follow('/api/events', (...said) => heard.push(said), { events: ['line', 'ended'], EventSource: Source })
+    const source = FakeSource.made[0]
+    expect([...(source?.named.keys() ?? [])]).toEqual(['line', 'ended'])
+    source?.onmessage?.({ data: '{"plain":true}' })
+    source?.named.get('line')?.({ data: '{"text":"ok 1"}' })
+    source?.named.get('ended')?.({ data: 'not json' })
+    expect(heard).toEqual([[{ plain: true }], [{ text: 'ok 1' }, 'line']])
+    stop()
+    /* A late one, after the stop, is nobody's. */
+    source?.named.get('line')?.({ data: '{"text":"late"}' })
+    expect(heard.length).toBe(2)
+  })
+
+  test('with none listed, none is listened for', () => {
+    follow('/api/watch', () => {}, { EventSource: Source })()
+    expect(FakeSource.made[0]?.named.size).toBe(0)
+  })
+
+  test('`probe` asks the server each time the stream drops, so the standing says why; without it nothing is asked', async () => {
+    const real = globalThis.fetch
+    const asked: string[] = []
+    globalThis.fetch = (async (url: string) => {
+      asked.push(url)
+      throw new TypeError('Failed to fetch')
+    }) as unknown as typeof fetch
+    try {
+      const quiet = follow('/api/watch', () => {}, { EventSource: Source })
+      FakeSource.made[0]?.onerror?.()
+      quiet()
+      await new Promise((resolve) => setTimeout(resolve, 5))
+      expect(asked).toEqual([])
+      expect(serverStanding()).toBe('up')
+
+      const stop = follow('/api/watch', () => {}, { probe: true, EventSource: Source })
+      FakeSource.made[1]?.onerror?.()
+      await new Promise((resolve) => setTimeout(resolve, 5))
+      expect(asked).toEqual(['/healthz'])
+      expect(serverStanding()).toBe('down')
+      stop()
+
+      const other = follow('/api/watch', () => {}, { probe: './api/state', EventSource: Source })
+      FakeSource.made[2]?.onerror?.()
+      other()
+      expect(asked).toEqual(['/healthz', './api/state'])
+    } finally {
+      globalThis.fetch = real
+    }
   })
 
   test('where there is no EventSource it says detached and does nothing', () => {

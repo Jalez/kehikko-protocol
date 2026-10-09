@@ -1,120 +1,35 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import type { CanvasContainer, EpicPart, FilterChoice, FilterGroup, ModuleContext, Passage } from '../index.js'
-import type { PageTheme } from '../page.js'
+import type { FilterGroup, Passage } from '../index.js'
+import { HostRefused, NOBODY_TO_ASK, type AskOptions, type Connection, type HostEvents } from './connect.js'
 import {
-  HostRefused,
-  NOBODY_TO_ASK,
-  connect,
-  type AskOptions,
-  type ConnectOptions,
-  type Connection,
-  type HostEvents,
-} from './connect.js'
-import { GREETING_GRACE_MS, type Where } from './react.js'
-import { reloadWhenStale } from './ask.js'
-import { applyTheme, pageTheme, systemTheme } from './theme.js'
+  JSON_KEPT,
+  hostStore,
+  type HostActions,
+  type HostStanding,
+  type HostStore,
+  type HostStoreOptions,
+  type KeptCodec,
+} from './host-store.js'
 
 /**
  * The host, as one React value with everything a screen reads already on it: the theme on `<html>`,
- * the flattened context, the kept state. Built on `connect`, sharing nothing with `useKehikot` but
- * its three orderings, so that hook can be retired. See docs/module-plumbing.md.
+ * the flattened context, the kept state. A thin binding over `hostStore` (`host-store.ts`), which
+ * is the same thing for a page whose state lives outside React. See docs/module-plumbing.md.
  */
 
-/** How the string a host keeps for a module becomes a value, and back. */
-export interface KeptCodec<Kept> {
-  /** `null` for anything unrecognised: an older version's string should give first-run behaviour, not a guess. */
-  read: (state: string | null) => Kept | null
-  write: (kept: Kept) => string
-}
+export { JSON_KEPT, hostFields, type KeptCodec } from './host-store.js'
 
-/** The default: JSON, and `null` for anything that does not parse. */
-export const JSON_KEPT: KeptCodec<unknown> = {
-  read: (state) => {
-    if (state === null) return null
-    try {
-      return JSON.parse(state) as unknown
-    } catch {
-      return null
-    }
-  },
-  write: (kept) => JSON.stringify(kept),
-}
+export type UseHostOptions<Kept = unknown> = HostStoreOptions<Kept>
 
-export interface UseHostOptions<Kept = unknown> extends ConnectOptions {
-  /** Override `GREETING_GRACE_MS`, or pass `0` to never conclude "unhosted" from silence. */
-  grace?: number
-  /** How the kept state is read and written. Default `JSON_KEPT`. Read at mount. */
-  kept?: KeptCodec<Kept>
-  /** `false` leaves `<html>` alone. Default `true`: the host's theme is put on it. */
-  applyTheme?: boolean
+export interface Host<Kept = unknown> extends HostStanding<Kept>, HostActions<Kept> {
   /**
-   * `false` leaves a page that is older than its own server as it is. Default `true`: it reloads,
-   * once, a moment after `ask()` notices (see `reloadWhenStale`).
+   * The standing right now, ahead of the render: for a handler (`onEvent`, `onClear`), which can
+   * be called for a message replayed before React has drawn the greeting it followed. Stable.
    */
-  reloadWhenStale?: boolean
-}
-
-export interface Host<Kept = unknown> {
-  /** `listening` for under a second, then `unhosted`, or `hosted` from the greeting on. */
-  where: Where
-  /** The whole context as the host last said it, or `null` before the greeting. */
-  context: ModuleContext | null
-  /** What the open project is called. A name, not a path. */
-  project: string | null
-  /** The absolute directory of the open project. `null` also for an empty string. */
-  projectPath: string | null
-  epic: string | null
-  passage: Passage | null
-  containers: readonly CanvasContainer[]
-  /** The parts of the open epic, with which are picked out. Empty is the whole epic. */
-  parts: readonly EpicPart[]
-  selection: readonly string[]
-  /** What the person chose in the filters this page offered with `filters()`. */
-  chosen: FilterChoice
-  /** What is on `<html>`: the host's theme once it has said one, the page's own first guess before. */
-  theme: PageTheme
-  /** What the host kept for this module, read through the codec. `null` when nothing, or nothing recognised. */
-  kept: Kept | null
-  /**
-   * Keep a value with the host (`state.set`) and hold it here. Fire and
-   * forget: a host may refuse, and then the choice holds for this session.
-   * Silent when nothing is framing the page.
-   */
-  remember: (next: Kept) => void
-  /**
-   * Say which passage this page is pointing at (`passage.set`), or `null` for
-   * none. Fire and forget, like `remember`.
-   */
-  point: (passage: Passage | null) => void
-  /** Ask the host something. Rejects with `HostRefused`, always; safe before the greeting. Stable. */
-  request: (method: string, params?: Record<string, unknown>, options?: AskOptions) => Promise<unknown>
-  resize: (height: number) => void
-  filters: (groups: FilterGroup[]) => void
-  clearable: (label: string | null) => void
-  refreshable: (state: { can?: boolean; at?: string | null; busy?: boolean }) => void
+  read: () => HostStanding<Kept>
   /** The live connection, or `null` between mounts. Read it when needed rather than capturing it. */
   connection: () => Connection | null
-}
-
-const NONE: readonly never[] = []
-const NO_CHOICE: FilterChoice = {}
-const text = (value: unknown): string | null => (typeof value === 'string' && value ? value : null)
-
-/** The flattened fields of a context. Pure, so a test can build a `Host` from a plain object. */
-export function hostFields(
-  context: ModuleContext | null,
-): Pick<Host, 'project' | 'projectPath' | 'epic' | 'passage' | 'containers' | 'parts' | 'selection' | 'chosen'> {
-  return {
-    project: text(context?.project),
-    projectPath: text(context?.projectPath),
-    epic: text(context?.epic),
-    passage: context?.passage ?? null,
-    containers: context?.containers ?? NONE,
-    parts: context?.parts ?? NONE,
-    selection: context?.selection ?? NONE,
-    chosen: context?.filters ?? NO_CHOICE,
-  }
 }
 
 /**
@@ -126,93 +41,47 @@ export function useHost<Kept = unknown>(
   events: HostEvents = {},
   options: UseHostOptions<Kept> = {},
 ): Host<Kept> {
-  const [where, setWhere] = useState<Where>('listening')
-  const [context, setContext] = useState<ModuleContext | null>(null)
-  const [kept, setKept] = useState<Kept | null>(null)
-  const [theme, setTheme] = useState<PageTheme>(() => pageTheme() ?? 'light')
+  /* An unstarted store is only its first standing: `listening`, and the theme the document decided. */
+  const [standing, setStanding] = useState<HostStanding<Kept>>(() => hostStore<Kept>(id).get())
+  const drawn = useRef(standing)
+  drawn.current = standing
 
-  const held = useRef<Connection | null>(null)
+  const held = useRef<HostStore<Kept> | null>(null)
   const handlers = useRef(events)
   handlers.current = events
   const settings = useRef(options)
   settings.current = options
 
   useEffect(() => {
-    const { grace = GREETING_GRACE_MS, kept: codec, applyTheme: themed = true, reloadWhenStale: _reload, ...connectOptions } = settings.current
-    const read = (codec ?? (JSON_KEPT as KeptCodec<Kept>)).read
-
-    const arrived = (next: ModuleContext) => {
-      const said: PageTheme = next.theme === 'dark' ? 'dark' : 'light'
-      if (themed) applyTheme(said, { remember: true })
-      setTheme(said)
-      setWhere('hosted')
-      setContext(next)
-    }
-
-    const live = connect(
+    const mounted = settings.current
+    const read = (mounted.kept ?? (JSON_KEPT as KeptCodec<Kept>)).read
+    const live = hostStore<Kept>(
       id,
       {
-        onHello: (next, state) => {
-          /* The discarded mount's answer must not overwrite the live one; see `useKehikot`. */
-          if (held.current !== live) return
-          /* Before the context, so the first hosted render already has the remembered choice. */
-          if (state !== undefined) setKept(read(state))
-          arrived(next)
-          handlers.current.onHello?.(next, state)
-        },
-        onContext: (next) => {
-          if (held.current !== live) return
-          arrived(next)
-          handlers.current.onContext?.(next)
-        },
+        onHello: (context, state) => handlers.current.onHello?.(context, state),
+        onContext: (context) => handlers.current.onContext?.(context),
         onGoto: (message, answer) => {
-          /* Not guarded: the host is waiting on this one. Whichever mount hears it answers. */
           const handler = handlers.current.onGoto
           if (handler) handler(message, answer)
           else answer(false, 'This app is not showing anything that can be walked to.')
         },
-        onEvent: (event) => {
-          if (held.current !== live) return
-          handlers.current.onEvent?.(event)
-        },
-        onClear: () => {
-          if (held.current !== live) return
-          handlers.current.onClear?.()
-        },
-        onRefresh: () => {
-          if (held.current !== live) return
-          handlers.current.onRefresh?.()
-        },
+        onEvent: (event) => handlers.current.onEvent?.(event),
+        onClear: () => handlers.current.onClear?.(),
+        onRefresh: () => handlers.current.onRefresh?.(),
       },
-      connectOptions,
+      /* The codec is read at mount and written through whichever one is current. */
+      { ...mounted, kept: { read, write: (kept) => (settings.current.kept ?? (JSON_KEPT as KeptCodec<Kept>)).write(kept) } },
     )
-
-    /* Stored BEFORE it listens: the mailbox replays synchronously inside `listen`. */
+    /* Stored BEFORE it starts: the mailbox replays synchronously inside `start`. */
     held.current = live
-    live.listen()
-
-    const timer =
-      grace > 0
-        ? setTimeout(() => {
-            if (held.current !== live || live.greeted()) return
-            setWhere((was) => (was === 'listening' ? 'unhosted' : was))
-            /* Nobody will say a theme. If the document decided none, the system's is the answer. */
-            if (themed && pageTheme() === null) {
-              const own = systemTheme()
-              applyTheme(own)
-              setTheme(own)
-            }
-          }, grace)
-        : null
+    live.subscribe(() => setStanding(live.get()))
+    live.start()
 
     return () => {
-      if (timer !== null) clearTimeout(timer)
       live.stop()
       if (held.current === live) held.current = null
     }
   }, [id])
-
-  useEffect(() => (settings.current.reloadWhenStale === false ? undefined : reloadWhenStale()), [])
 
   const request = useCallback((method: string, params: Record<string, unknown> = {}, asking?: AskOptions) => {
     const live = held.current
@@ -221,21 +90,12 @@ export function useHost<Kept = unknown>(
   }, [])
 
   const remember = useCallback((next: Kept) => {
-    setKept(next)
     const live = held.current
-    if (!live || !live.greeted()) return
-    const write = (settings.current.kept ?? (JSON_KEPT as KeptCodec<Kept>)).write
-    void live.request('state.set', { state: write(next) }).catch(() => {
-      /* Reported nowhere on purpose: the choice holds for this session. */
-    })
+    if (live) live.remember(next)
+    else setStanding((was) => ({ ...was, kept: next }))
   }, [])
 
-  const point = useCallback((passage: Passage | null) => {
-    const live = held.current
-    if (!live || !live.greeted()) return
-    void live.request('passage.set', { passage }).catch(() => {})
-  }, [])
-
+  const point = useCallback((passage: Passage | null) => held.current?.point(passage), [])
   const resize = useCallback((height: number) => held.current?.resize(height), [])
   const filters = useCallback((groups: FilterGroup[]) => held.current?.filters(groups), [])
   const clearable = useCallback((label: string | null) => held.current?.clearable(label), [])
@@ -243,24 +103,11 @@ export function useHost<Kept = unknown>(
     (state: { can?: boolean; at?: string | null; busy?: boolean }) => held.current?.refreshable(state),
     [],
   )
-  const connection = useCallback(() => held.current, [])
+  const connection = useCallback(() => held.current?.connection() ?? null, [])
+  const read = useCallback(() => held.current?.get() ?? drawn.current, [])
 
   return useMemo(
-    () => ({
-      where,
-      context,
-      ...hostFields(context),
-      theme,
-      kept,
-      remember,
-      point,
-      request,
-      resize,
-      filters,
-      clearable,
-      refreshable,
-      connection,
-    }),
-    [where, context, theme, kept, remember, point, request, resize, filters, clearable, refreshable, connection],
+    () => ({ ...standing, remember, point, request, resize, filters, clearable, refreshable, connection, read }),
+    [standing, remember, point, request, resize, filters, clearable, refreshable, connection, read],
   )
 }

@@ -10,6 +10,7 @@ import {
   type ConnectOptions,
   type HostEvents,
 } from './connect.js'
+import { GREETING_GRACE_MS, type Where } from './host-store.js'
 
 /**
  * The bridge as one React value: `useKehikot`. Optional — a second subpath the plain client never
@@ -17,14 +18,8 @@ import {
  * Design notes: docs/client.md.
  */
 
-/** How long, in ms, a page stays `listening` before it will say nobody is there (`unhosted`). */
-export const GREETING_GRACE_MS = 700
-
-/**
- * Whether anything is framing this page: `listening` (not heard yet, under a second), `unhosted`
- * (nobody is there, the standalone case) or `hosted`.
- */
-export type Where = 'listening' | 'unhosted' | 'hosted'
+/* Stated beside the store, which needs them without React; still exported from here. */
+export { GREETING_GRACE_MS, type Where }
 
 export interface UseKehikotOptions extends ConnectOptions {
   /** Override `GREETING_GRACE_MS`, or pass `0` to say "unhosted" the moment the first paint lands. */
@@ -179,6 +174,7 @@ export type UseRoadmapOptions = UseKehikotOptions
 
 /* The fuller listener and the shared not-ready screen. See `host.ts` and `cover.ts`. */
 export { useHost, hostFields, JSON_KEPT, type Host, type KeptCodec, type UseHostOptions } from './host.js'
+export { type HostActions, type HostFields, type HostStanding } from './host-store.js'
 export {
   Cover,
   coverFor,

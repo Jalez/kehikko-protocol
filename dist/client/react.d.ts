@@ -1,17 +1,12 @@
 import type { FilterGroup, ModuleContext } from '../wire.js';
 import { type Connection, type AskOptions, type ConnectOptions, type HostEvents } from './connect.js';
+import { GREETING_GRACE_MS, type Where } from './host-store.js';
 /**
  * The bridge as one React value: `useKehikot`. Optional — a second subpath the plain client never
  * imports, and a module may hand-roll all of it.
  * Design notes: docs/client.md.
  */
-/** How long, in ms, a page stays `listening` before it will say nobody is there (`unhosted`). */
-export declare const GREETING_GRACE_MS = 700;
-/**
- * Whether anything is framing this page: `listening` (not heard yet, under a second), `unhosted`
- * (nobody is there, the standalone case) or `hosted`.
- */
-export type Where = 'listening' | 'unhosted' | 'hosted';
+export { GREETING_GRACE_MS, type Where };
 export interface UseKehikotOptions extends ConnectOptions {
     /** Override `GREETING_GRACE_MS`, or pass `0` to say "unhosted" the moment the first paint lands. */
     grace?: number;
@@ -74,4 +69,5 @@ export type Roadmap = Kehikot;
 /** @deprecated Renamed to `UseKehikotOptions`. */
 export type UseRoadmapOptions = UseKehikotOptions;
 export { useHost, hostFields, JSON_KEPT, type Host, type KeptCodec, type UseHostOptions } from './host.js';
+export { type HostActions, type HostFields, type HostStanding } from './host-store.js';
 export { Cover, coverFor, useServerStanding, COVER_CSS, COVER_STYLE_ID, COVER_WORDS, TRY_AGAIN, type CoverProps, type CoverState, } from './cover.js';

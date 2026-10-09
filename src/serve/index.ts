@@ -48,14 +48,16 @@ export {
 export { readJourney, readJourneys } from './journeys.js'
 
 /* The shared plumbing of a module's server: its page, its ticket, its doors. */
-export { pageDocument, themeScript, FRAMED_DEFAULT_THEME, type PageOptions } from './page.js'
+export { fillPage, pageDocument, themeScript, FRAMED_DEFAULT_THEME, type PageOptions } from './page.js'
 export { mintTicket, refuseTicket, sameTicket, ticketOf, TICKET_REFUSAL } from './ticket.js'
-export { readJsonBody, BODY_METHODS, BODY_TOO_LARGE, MAX_BODY_BYTES, type BodyOptions, type BodyRead, type BodySource } from './body.js'
+export { readJsonBody, readJsonRequest, BODY_METHODS, BODY_TOO_LARGE, MAX_BODY_BYTES, type BodyOptions, type BodyRead, type BodySource } from './body.js'
 export {
   doors,
+  doorsFetch,
   doorsHandler,
   PAGE_PATHS,
   type Answer,
+  type DoorFetch,
   type DoorHandler,
   type DoorRequest,
   type DoorResponse,

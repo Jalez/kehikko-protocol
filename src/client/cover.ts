@@ -1,7 +1,7 @@
 import { createElement, useEffect, useInsertionEffect, useSyncExternalStore, type ReactElement } from 'react'
 
 import { PAGE_STALE, STALE_RELOAD_MS, onServerStanding, reloadStalePage, serverStanding, type ServerStanding } from './ask.js'
-import type { Where } from './react.js'
+import type { Where } from './host-store.js'
 
 /**
  * The one screen for every moment a module has nothing of its own to show: the kehikko mark and
@@ -47,18 +47,23 @@ const WORKING: ReadonlySet<CoverState> = new Set(['waiting', 'loading', 'stale']
 
 /**
  * Which cover a host's standing calls for, or `null` when the module can draw its own screen.
- * `needs` says what the module cannot work without. Not greeted yet is `waiting`, never `no-project`.
+ * `needs` says what the module cannot work without: a `host` (anything framing it), a `project`,
+ * an `epic`. Not greeted yet is `waiting`, never `no-project`. An epic asks for a project too,
+ * unless `project: false` says the module reads no project folder. Given the `server`'s standing
+ * as well, the answer covers that: `stale` before everything, `down` after what the host lacks.
  */
 export function coverFor(
-  host: { where: Where; projectPath: string | null; epic?: string | null },
-  needs: { project?: boolean; epic?: boolean } = { project: true },
+  host: { where: Where; projectPath: string | null; epic?: string | null; server?: ServerStanding },
+  needs: { host?: boolean; project?: boolean; epic?: boolean } = { project: true },
 ): CoverState | null {
+  if (host.server === 'stale') return 'stale'
   if (host.where === 'listening') return 'waiting'
-  if (!needs.project && !needs.epic) return null
+  const down = host.server === 'down' ? 'down' : null
+  if (!needs.host && !needs.project && !needs.epic) return down
   if (host.where === 'unhosted') return 'unhosted'
-  if ((needs.project || needs.epic) && !host.projectPath) return 'no-project'
+  if ((needs.project ?? needs.epic) && !host.projectPath) return 'no-project'
   if (needs.epic && !host.epic) return 'no-epic'
-  return null
+  return down
 }
 
 /** How this page's own server last answered (`up`, `down`, `stale`), as React state. Fed by every `ask()`. */

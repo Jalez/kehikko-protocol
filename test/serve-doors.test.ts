@@ -1,10 +1,14 @@
 import { describe, expect, test } from 'bun:test'
 import { EventEmitter } from 'node:events'
 
-import { LEGACY_WELL_KNOWN, WELL_KNOWN, manifestSchema, type Manifest } from '../src/index.js'
+import { BUILD_HEADER, LEGACY_WELL_KNOWN, TICKET_HEADER, WELL_KNOWN, buildStamp, manifestSchema, type Manifest } from '../src/index.js'
 import {
   doors,
+  doorsFetch,
   doorsHandler,
+  establishBuild,
+  fillPage,
+  pageDocument,
   frameAncestors,
   mintTicket,
   readJsonBody,
@@ -221,6 +225,156 @@ describe('a stream door', () => {
 
   test('what is not a stream door goes on to answer', async () => {
     expect(json(await call('GET', '/api/echo?q=x', { options: { stream } }).done).q).toBe('x')
+  })
+})
+
+describe('what the doors send is never cached', () => {
+  test('an answer, a refusal, an answer with no body and the manifest all say no-store', async () => {
+    for (const [method, url] of [['GET', '/api/echo?q=x'], ['GET', '/api/nowhere'], ['POST', '/api/later'], ['GET', WELL_KNOWN]] as const) {
+      expect((await call(method, url).done).headers['cache-control']).toBe('no-store')
+    }
+  })
+
+  test('unless the reply names its own, in whatever case', async () => {
+    const own: Answer = () => ({ status: 200, body: { ok: true }, headers: { 'Cache-Control': 'max-age=60' } })
+    const sent = await call('GET', '/api/figure', { options: { answer: own } }).done
+    expect(sent.headers['cache-control']).toBe('max-age=60')
+    expect(sent.headers['Cache-Control']).toBeUndefined()
+  })
+})
+
+describe('a stream door and its socket', () => {
+  const stream: Stream = (_method, path) => (path === '/api/watch' ? { close: () => void closed.push('once') } : null)
+  const closed: string[] = []
+
+  test('the socket is told not to hold events back, and a reader reported gone twice is closed once', () => {
+    const delays: unknown[] = []
+    const handler = doorsHandler({ manifest: MANIFEST, answer, stream, page: { title: 'Example' } })
+    const request = Object.assign(new FakeRequest('GET', '/api/watch'), { socket: { setNoDelay: (on: boolean) => void delays.push(on) } })
+    handler(request as never, { statusCode: 0, setHeader: () => {}, write: () => {}, end: () => {} }, () => {})
+    expect(delays).toEqual([true])
+    request.emit('error', new Error('ECONNRESET'))
+    request.emit('close')
+    expect(closed).toEqual(['once'])
+  })
+
+  test('a request with no socket, or one that throws, still opens', () => {
+    const handler = doorsHandler({ manifest: MANIFEST, answer, stream, page: { title: 'Example' } })
+    const request = Object.assign(new FakeRequest('GET', '/api/watch'), {
+      socket: {
+        setNoDelay: () => {
+          throw new Error('gone')
+        },
+      },
+    })
+    const written: string[] = []
+    handler(request as never, { statusCode: 0, setHeader: () => {}, write: (chunk: string) => void written.push(chunk), end: () => {} }, () => {})
+    expect(written).toEqual([': open\n\n'])
+    request.emit('close')
+  })
+})
+
+describe('the doors as a fetch handler', () => {
+  const BUILD = establishBuild({ version: '1.0.0', commit: null })
+  const closed: string[] = []
+  const stream: Stream = (method, path, query, emit) => {
+    if (method !== 'GET' || path !== '/api/watch') return null
+    if (!query.get('project')) return { reply: { status: 400, body: { ok: false, error: 'which project?' } } }
+    emit({ early: true })
+    setTimeout(() => emit({ line: 1 }, 'line'), 5)
+    return { close: () => void closed.push('watch') }
+  }
+  const through = doorsFetch({ manifest: MANIFEST, answer, stream, build: BUILD, page: { title: 'Example', ticket: TICKET } })
+  const at = (path: string, init?: RequestInit) => through(new Request(`http://127.0.0.1:9000${path}`, init))
+
+  test('the manifest at both paths, with the build, stamped and uncached', async () => {
+    const found = await at(WELL_KNOWN)
+    expect(found?.status).toBe(200)
+    expect(found?.headers.get(BUILD_HEADER)).toBe(buildStamp(BUILD))
+    expect(found?.headers.get('cache-control')).toBe('no-store')
+    expect(((await found?.json()) as { build: unknown }).build).toEqual(BUILD)
+    expect(((await (await at(LEGACY_WELL_KNOWN))?.json()) as { kind: string }).kind).toBe('roadmap.module')
+  })
+
+  test('the page at /app, /app/ and /, with the same headers as the other form', async () => {
+    for (const path of ['/app', '/app/', '/', '/app?theme=light']) {
+      const page = await at(path)
+      expect(page?.headers.get('content-type')).toBe('text/html; charset=utf-8')
+      expect(page?.headers.get('cache-control')).toBe('no-store')
+      expect(page?.headers.get('content-security-policy')).toBe(frameAncestors())
+      expect(await page?.text()).toBe(pageDocument({ title: 'Example', ticket: TICKET, build: BUILD }))
+    }
+  })
+
+  test('a page built ahead of the server, and a transform', async () => {
+    const built = pageDocument({ title: 'Example', entry: './assets/main-abc.js' })
+    const own = doorsFetch({ manifest: MANIFEST, answer, page: () => fillPage(built, { ticket: TICKET, build: BUILD }) }, async (html, url) =>
+      html.replace('</head>', `<!--${url}--></head>`),
+    )
+    const text = (await (await own(new Request('http://127.0.0.1:9000/app?theme=dark')))?.text()) ?? ''
+    expect(text).toContain(`<script id="ticket" type="application/json">"${TICKET}"</script>`)
+    expect(text).toContain('<!--/app?theme=dark--></head>')
+  })
+
+  test('what is not theirs is null: the module’s own assets, or its 404', async () => {
+    expect(await at('/assets/main.js')).toBeNull()
+    expect(await at('/api/../src/main.tsx')).toBeNull()
+    const none = doorsFetch({ manifest: MANIFEST, answer: () => null, page: { title: 'Example' } })
+    expect(await none(new Request('http://127.0.0.1:9000/api/unknown'))).toBeNull()
+  })
+
+  test('a request reaches answer with its query, body and ticket; the health check says the build', async () => {
+    expect(await (await at('/api/echo?q=hello'))?.json()).toEqual({ q: 'hello' })
+    const wrote = await at('/api/write', { method: 'POST', body: '{"a":1}', headers: { [TICKET_HEADER]: TICKET } })
+    expect(await wrote?.json()).toEqual({ ok: true, got: { a: 1 } })
+    const refused = await at('/api/write', { method: 'POST', body: '{"a":1}' })
+    expect(refused?.status).toBe(403)
+    expect(((await refused?.json()) as { refused: string }).refused).toBe('ticket')
+    expect(((await (await at('/healthz'))?.json()) as { build: unknown }).build).toEqual(BUILD)
+    const later = await at('/api/later', { method: 'POST' })
+    expect([later?.status, later?.headers.get('x-own'), await later?.text()]).toEqual([202, 'yes', ''])
+  })
+
+  test('a body that is not a JSON object is null, and one past the bound is a 413 answer never asks about', async () => {
+    const wrote = await at('/api/write', { method: 'POST', body: '[1,2]', headers: { [TICKET_HEADER]: TICKET } })
+    expect(((await wrote?.json()) as { got: unknown }).got).toBeNull()
+    let asked = 0
+    const small = doorsFetch({ manifest: MANIFEST, answer: () => ((asked += 1), { status: 200, body: {} }), page: { title: 'Example' }, maxBodyBytes: 16 })
+    const big = () => new Request('http://127.0.0.1:9000/api/write', { method: 'POST', body: JSON.stringify({ text: 'x'.repeat(64) }) })
+    expect((await small(big()))?.status).toBe(413)
+    /* And when nothing said how long it is: counted as it arrives. */
+    const unsized = new Request('http://127.0.0.1:9000/api/write', {
+      method: 'POST',
+      body: new ReadableStream({
+        start(controller) {
+          controller.enqueue(new TextEncoder().encode('{"text":"'))
+          controller.enqueue(new TextEncoder().encode('x'.repeat(64)))
+          controller.close()
+        },
+      }),
+      duplex: 'half',
+    } as RequestInit)
+    const sent = await small(unsized)
+    expect(sent?.status).toBe(413)
+    expect(((await sent?.json()) as { ok: boolean }).ok).toBe(false)
+    expect(asked).toBe(0)
+  })
+
+  test('a stream door opens, names its events, and closes once when the reader goes', async () => {
+    const control = new AbortController()
+    const opened = await at('/api/watch?project=p', { signal: control.signal })
+    expect(opened?.headers.get('content-type')).toBe('text/event-stream; charset=utf-8')
+    const reader = opened?.body?.getReader()
+    const text = new TextDecoder()
+    let heard = ''
+    while (!heard.includes('event: line')) heard += text.decode((await reader?.read())?.value)
+    expect(heard).toBe(': open\n\ndata: {"early":true}\n\nevent: line\ndata: {"line":1}\n\n')
+    closed.length = 0
+    control.abort()
+    await reader?.cancel().catch(() => {})
+    expect(closed).toEqual(['watch'])
+    const refused = await at('/api/watch')
+    expect([refused?.status, ((await refused?.json()) as { error: string }).error]).toEqual([400, 'which project?'])
   })
 })
 

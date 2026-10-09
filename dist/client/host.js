@@ -1,129 +1,55 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { HostRefused, NOBODY_TO_ASK, connect, } from './connect.js';
-import { GREETING_GRACE_MS } from './react.js';
-import { reloadWhenStale } from './ask.js';
-import { applyTheme, pageTheme, systemTheme } from './theme.js';
-/** The default: JSON, and `null` for anything that does not parse. */
-export const JSON_KEPT = {
-    read: (state) => {
-        if (state === null)
-            return null;
-        try {
-            return JSON.parse(state);
-        }
-        catch {
-            return null;
-        }
-    },
-    write: (kept) => JSON.stringify(kept),
-};
-const NONE = [];
-const NO_CHOICE = {};
-const text = (value) => (typeof value === 'string' && value ? value : null);
-/** The flattened fields of a context. Pure, so a test can build a `Host` from a plain object. */
-export function hostFields(context) {
-    return {
-        project: text(context?.project),
-        projectPath: text(context?.projectPath),
-        epic: text(context?.epic),
-        passage: context?.passage ?? null,
-        containers: context?.containers ?? NONE,
-        parts: context?.parts ?? NONE,
-        selection: context?.selection ?? NONE,
-        chosen: context?.filters ?? NO_CHOICE,
-    };
-}
+import { HostRefused, NOBODY_TO_ASK } from './connect.js';
+import { JSON_KEPT, hostStore, } from './host-store.js';
+/**
+ * The host, as one React value with everything a screen reads already on it: the theme on `<html>`,
+ * the flattened context, the kept state. A thin binding over `hostStore` (`host-store.ts`), which
+ * is the same thing for a page whose state lives outside React. See docs/module-plumbing.md.
+ */
+export { JSON_KEPT, hostFields } from './host-store.js';
 /**
  * Connect once for the life of the component. `events` may be rebuilt on every
  * render — it is read through a ref — so `onGoto` needs no memoising.
  */
 export function useHost(id, events = {}, options = {}) {
-    const [where, setWhere] = useState('listening');
-    const [context, setContext] = useState(null);
-    const [kept, setKept] = useState(null);
-    const [theme, setTheme] = useState(() => pageTheme() ?? 'light');
+    /* An unstarted store is only its first standing: `listening`, and the theme the document decided. */
+    const [standing, setStanding] = useState(() => hostStore(id).get());
+    const drawn = useRef(standing);
+    drawn.current = standing;
     const held = useRef(null);
     const handlers = useRef(events);
     handlers.current = events;
     const settings = useRef(options);
     settings.current = options;
     useEffect(() => {
-        const { grace = GREETING_GRACE_MS, kept: codec, applyTheme: themed = true, reloadWhenStale: _reload, ...connectOptions } = settings.current;
-        const read = (codec ?? JSON_KEPT).read;
-        const arrived = (next) => {
-            const said = next.theme === 'dark' ? 'dark' : 'light';
-            if (themed)
-                applyTheme(said, { remember: true });
-            setTheme(said);
-            setWhere('hosted');
-            setContext(next);
-        };
-        const live = connect(id, {
-            onHello: (next, state) => {
-                /* The discarded mount's answer must not overwrite the live one; see `useKehikot`. */
-                if (held.current !== live)
-                    return;
-                /* Before the context, so the first hosted render already has the remembered choice. */
-                if (state !== undefined)
-                    setKept(read(state));
-                arrived(next);
-                handlers.current.onHello?.(next, state);
-            },
-            onContext: (next) => {
-                if (held.current !== live)
-                    return;
-                arrived(next);
-                handlers.current.onContext?.(next);
-            },
+        const mounted = settings.current;
+        const read = (mounted.kept ?? JSON_KEPT).read;
+        const live = hostStore(id, {
+            onHello: (context, state) => handlers.current.onHello?.(context, state),
+            onContext: (context) => handlers.current.onContext?.(context),
             onGoto: (message, answer) => {
-                /* Not guarded: the host is waiting on this one. Whichever mount hears it answers. */
                 const handler = handlers.current.onGoto;
                 if (handler)
                     handler(message, answer);
                 else
                     answer(false, 'This app is not showing anything that can be walked to.');
             },
-            onEvent: (event) => {
-                if (held.current !== live)
-                    return;
-                handlers.current.onEvent?.(event);
-            },
-            onClear: () => {
-                if (held.current !== live)
-                    return;
-                handlers.current.onClear?.();
-            },
-            onRefresh: () => {
-                if (held.current !== live)
-                    return;
-                handlers.current.onRefresh?.();
-            },
-        }, connectOptions);
-        /* Stored BEFORE it listens: the mailbox replays synchronously inside `listen`. */
+            onEvent: (event) => handlers.current.onEvent?.(event),
+            onClear: () => handlers.current.onClear?.(),
+            onRefresh: () => handlers.current.onRefresh?.(),
+        }, 
+        /* The codec is read at mount and written through whichever one is current. */
+        { ...mounted, kept: { read, write: (kept) => (settings.current.kept ?? JSON_KEPT).write(kept) } });
+        /* Stored BEFORE it starts: the mailbox replays synchronously inside `start`. */
         held.current = live;
-        live.listen();
-        const timer = grace > 0
-            ? setTimeout(() => {
-                if (held.current !== live || live.greeted())
-                    return;
-                setWhere((was) => (was === 'listening' ? 'unhosted' : was));
-                /* Nobody will say a theme. If the document decided none, the system's is the answer. */
-                if (themed && pageTheme() === null) {
-                    const own = systemTheme();
-                    applyTheme(own);
-                    setTheme(own);
-                }
-            }, grace)
-            : null;
+        live.subscribe(() => setStanding(live.get()));
+        live.start();
         return () => {
-            if (timer !== null)
-                clearTimeout(timer);
             live.stop();
             if (held.current === live)
                 held.current = null;
         };
     }, [id]);
-    useEffect(() => (settings.current.reloadWhenStale === false ? undefined : reloadWhenStale()), []);
     const request = useCallback((method, params = {}, asking) => {
         const live = held.current;
         if (live)
@@ -131,39 +57,18 @@ export function useHost(id, events = {}, options = {}) {
         return Promise.reject(new HostRefused({ reason: 'silent', error: NOBODY_TO_ASK }));
     }, []);
     const remember = useCallback((next) => {
-        setKept(next);
         const live = held.current;
-        if (!live || !live.greeted())
-            return;
-        const write = (settings.current.kept ?? JSON_KEPT).write;
-        void live.request('state.set', { state: write(next) }).catch(() => {
-            /* Reported nowhere on purpose: the choice holds for this session. */
-        });
+        if (live)
+            live.remember(next);
+        else
+            setStanding((was) => ({ ...was, kept: next }));
     }, []);
-    const point = useCallback((passage) => {
-        const live = held.current;
-        if (!live || !live.greeted())
-            return;
-        void live.request('passage.set', { passage }).catch(() => { });
-    }, []);
+    const point = useCallback((passage) => held.current?.point(passage), []);
     const resize = useCallback((height) => held.current?.resize(height), []);
     const filters = useCallback((groups) => held.current?.filters(groups), []);
     const clearable = useCallback((label) => held.current?.clearable(label), []);
     const refreshable = useCallback((state) => held.current?.refreshable(state), []);
-    const connection = useCallback(() => held.current, []);
-    return useMemo(() => ({
-        where,
-        context,
-        ...hostFields(context),
-        theme,
-        kept,
-        remember,
-        point,
-        request,
-        resize,
-        filters,
-        clearable,
-        refreshable,
-        connection,
-    }), [where, context, theme, kept, remember, point, request, resize, filters, clearable, refreshable, connection]);
+    const connection = useCallback(() => held.current?.connection() ?? null, []);
+    const read = useCallback(() => held.current?.get() ?? drawn.current, []);
+    return useMemo(() => ({ ...standing, remember, point, request, resize, filters, clearable, refreshable, connection, read }), [standing, remember, point, request, resize, filters, clearable, refreshable, connection, read]);
 }
