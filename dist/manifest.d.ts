@@ -223,23 +223,43 @@ export declare const manifestSchema: z.ZodObject<{
          */
         prompt: z.ZodDefault<z.ZodBoolean>;
     }, "strip", z.ZodTypeAny, {
-        prompt: boolean;
         protocol: string;
+        prompt: boolean;
         uses: string[];
         storage: boolean;
     }, {
-        prompt?: boolean | undefined;
         protocol?: string | undefined;
+        prompt?: boolean | undefined;
         uses?: string[] | undefined;
         storage?: boolean | undefined;
     }>>;
+    /**
+     * What the server answering is built from, and when it started. Optional, added by `doors()`;
+     * a malformed one reads as absent rather than failing the manifest. See `build.ts`.
+     */
+    build: z.ZodCatch<z.ZodOptional<z.ZodObject<{
+        version: z.ZodString;
+        commit: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+        started: z.ZodString;
+        protocol: z.ZodString;
+    }, "strip", z.ZodTypeAny, {
+        version: string;
+        commit: string | null;
+        started: string;
+        protocol: string;
+    }, {
+        version: string;
+        started: string;
+        protocol: string;
+        commit?: string | null | undefined;
+    }>>>;
 }, "strip", z.ZodTypeAny, {
+    version: string;
+    protocol: number;
     id: string;
     name: string;
     summary: string;
     kind: "kehikot.module" | "roadmap.module";
-    protocol: number;
-    version: string;
     dataVersion: number;
     tags: string[];
     guidance: string;
@@ -255,11 +275,17 @@ export declare const manifestSchema: z.ZodObject<{
         scope: "epic" | "global";
     }[];
     declares: {
-        prompt: boolean;
         protocol: string;
+        prompt: boolean;
         uses: string[];
         storage: boolean;
     };
+    build?: {
+        version: string;
+        commit: string | null;
+        started: string;
+        protocol: string;
+    } | undefined;
     icon?: string | undefined;
     health?: string | undefined;
     mcp?: {
@@ -269,18 +295,19 @@ export declare const manifestSchema: z.ZodObject<{
     } | undefined;
     partless?: string | undefined;
 }, {
+    protocol: number;
     id: string;
     name: string;
     kind: "kehikot.module" | "roadmap.module";
-    protocol: number;
     entry: string;
     modes: {
         label: string;
         id: string;
         scope?: "epic" | "global" | undefined;
     }[];
-    summary?: string | undefined;
+    build?: unknown;
     version?: string | undefined;
+    summary?: string | undefined;
     dataVersion?: number | undefined;
     tags?: string[] | undefined;
     guidance?: string | undefined;
@@ -298,8 +325,8 @@ export declare const manifestSchema: z.ZodObject<{
     reacts?: string[] | undefined;
     partless?: string | undefined;
     declares?: {
-        prompt?: boolean | undefined;
         protocol?: string | undefined;
+        prompt?: boolean | undefined;
         uses?: string[] | undefined;
         storage?: boolean | undefined;
     } | undefined;

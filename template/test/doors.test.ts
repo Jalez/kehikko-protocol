@@ -38,6 +38,8 @@ describe('the doors', () => {
   test('a write without this page’s ticket is refused, and one with it is kept', () => {
     const body = { projectPath: project, value: 'hello' }
     expect(answer('POST', '/api/value', none, body, null)?.status).toBe(403)
+    /* Marked, so the page's `ask()` knows it is older than this server and reloads. */
+    expect((answer('POST', '/api/value', none, body, 'old')?.body as { refused?: string }).refused).toBe('ticket')
     expect(answer('POST', '/api/value', none, body, 'not-the-ticket')?.status).toBe(403)
     expect(answer('POST', '/api/value', none, body, TICKET)?.status).toBe(200)
 

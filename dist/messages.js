@@ -3,6 +3,7 @@ import { MESSAGE, MESSAGE_PREFIXES, PROTOCOL } from './constants.js';
 import { LIMITS } from './limits.js';
 import { canonicalName, legacyName } from './dialect.js';
 import { EPIC_SLUG, MODULE_ID } from './ids.js';
+import { buildSchema } from './build.js';
 import { contextSchema } from './context.js';
 import { filterGroupSchema } from './filters.js';
 import { gotoRef, kehikkoSchema, stepNumber } from './fragments.js';
@@ -191,6 +192,8 @@ export const readySchema = z.object({
     /* Canonical once parsed: an unchanged module still answers as `roadmap.x`. */
     id: z.string().regex(MODULE_ID).transform(canonicalName),
     protocol: z.number().int().min(1).default(PROTOCOL),
+    /** The build that served this page, as printed into it. A host compares it with the server's now. */
+    build: buildSchema.optional().catch(undefined),
 });
 /** One question, with an id the answer will carry back. */
 export const requestSchema = z.object({

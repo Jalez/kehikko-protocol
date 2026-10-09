@@ -51,12 +51,12 @@ export declare const filterGroupSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
      */
     fallback: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
 }, "strip", z.ZodTypeAny, {
-    label: string;
-    id: string;
     options: {
         label: string;
         id: string;
     }[];
+    label: string;
+    id: string;
     kind?: "choice" | "text" | "toggles" | undefined;
     fallback?: string | undefined;
 }, {
@@ -69,12 +69,12 @@ export declare const filterGroupSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
     kind?: "choice" | "text" | "toggles" | undefined;
     fallback?: string | undefined;
 }>, {
-    label: string;
-    id: string;
     options: {
         label: string;
         id: string;
     }[];
+    label: string;
+    id: string;
     kind?: "choice" | "text" | "toggles" | undefined;
     fallback?: string | undefined;
 }, {
@@ -87,12 +87,12 @@ export declare const filterGroupSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
     kind?: "choice" | "text" | "toggles" | undefined;
     fallback?: string | undefined;
 }>, {
-    label: string;
-    id: string;
     options: {
         label: string;
         id: string;
     }[];
+    label: string;
+    id: string;
     kind?: "choice" | "text" | "toggles" | undefined;
     fallback?: string | undefined;
 }, {

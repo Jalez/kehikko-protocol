@@ -3,6 +3,7 @@ import { LEGACY_MANIFEST_KIND, MANIFEST_KIND, PROTOCOL } from './constants.js';
 import { LIMITS } from './limits.js';
 import { canonicalName, legacyName } from './dialect.js';
 import { MODE_ID, MODULE_ID } from './ids.js';
+import { buildSchema } from './build.js';
 /**
  * What a module says about itself when a host asks: the manifest schema, the words it suggests (`REACTS_TO`,
  * `TAGS`), and the pure readers `speaks` and `partsDeclaration`. Every string in the schema has a `max` from
@@ -203,6 +204,11 @@ export const manifestSchema = z.object({
         prompt: z.boolean().default(false),
     })
         .default({ protocol: `>=${PROTOCOL}`, uses: [], storage: false, prompt: false }),
+    /**
+     * What the server answering is built from, and when it started. Optional, added by `doors()`;
+     * a malformed one reads as absent rather than failing the manifest. See `build.ts`.
+     */
+    build: buildSchema.optional().catch(undefined),
 });
 /**
  * A parsed manifest, spelled for a host from before the rename: the old `kind`, the old module id,

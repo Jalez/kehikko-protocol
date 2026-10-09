@@ -73,3 +73,5 @@ export declare const useRoadmap: typeof useKehikot;
 export type Roadmap = Kehikot;
 /** @deprecated Renamed to `UseKehikotOptions`. */
 export type UseRoadmapOptions = UseKehikotOptions;
+export { useHost, hostFields, JSON_KEPT, type Host, type KeptCodec, type UseHostOptions } from './host.js';
+export { Cover, coverFor, useServerStanding, COVER_CSS, COVER_STYLE_ID, COVER_WORDS, TRY_AGAIN, type CoverProps, type CoverState, } from './cover.js';

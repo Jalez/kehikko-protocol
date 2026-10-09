@@ -1,4 +1,5 @@
 import { KEHIKOT_DIR } from 'kehikot-module-protocol'
+import { establishBuild, mintTicket, refuseTicket, type Reply } from 'kehikot-module-protocol/serve'
 
 import { ID, MANIFEST, VERSION } from './manifest.ts'
 import { FILE, readValue, writeValue } from './store.ts'
@@ -6,32 +7,30 @@ import { FILE, readValue, writeValue } from './store.ts'
 /**
  * Every door but the page, as one pure function: `answer` takes a request and
  * returns a status and a body, or `null` for "not ours, let Vite have it".
- * `vite.config.ts` is the only thing that touches a socket, which is what lets
+ * `doors()` in vite.config.ts is the only thing that touches a socket, which is what lets
  * the tests call this directly.
  */
 
 /**
  * The ticket a page write has to carry.
  *
- * Minted per process and printed into `/app` (see `page/document.ts`), so only
- * this app's own page holds it. Loopback is a fence around the machine, not
- * around the programs on it: without this, anything that found the port could
- * write. Reads are ungated, and `/mcp` is ungated because an agent has no page
- * to have been handed a ticket by.
+ * Minted per process and printed into `/app` by `doors()` in vite.config.ts,
+ * so only this app's own page holds it. Loopback is a fence around the
+ * machine, not around the programs on it: without this, anything that found
+ * the port could write. Reads are ungated, and `/mcp` is ungated because an
+ * agent has no page to have been handed a ticket by.
  */
-export const TICKET = crypto.randomUUID()
+export const TICKET = mintTicket()
 
-/** The header the page sends the ticket in. */
-export const TICKET_HEADER = 'x-module-ticket'
+/**
+ * What this process is built from, and when it started. `doors()` says it in the manifest, at
+ * `/healthz`, in the page and on every answer, so a page — and a host — can tell when the server
+ * behind a page is no longer the one that served it.
+ */
+export const BUILD = establishBuild({ version: VERSION, dir: import.meta.dirname })
 
 /** Writes are bounded; nothing this app keeps is anywhere near this size. */
 export const MAX_VALUE_BYTES = 100_000
-
-export interface Reply {
-  status: number
-  /** `null` means "answer with no body", which is what a notification gets. */
-  body: unknown
-}
 
 const ok = (body: unknown): Reply => ({ status: 200, body })
 const bad = (why: string, status = 400): Reply => ({ status, body: { ok: false, error: why } })
@@ -126,7 +125,8 @@ export function answer(
   }
 
   if (path === '/api/value' && method === 'POST') {
-    if (ticket !== TICKET) return bad('that press did not come from this app’s own page', 403)
+    const refused = refuseTicket(ticket, TICKET)
+    if (refused) return refused
     if (!body) return bad('that was not a request')
     if (JSON.stringify(body.value ?? null).length > MAX_VALUE_BYTES) return bad('that value is too large to keep', 413)
     const projectPath = typeof body.projectPath === 'string' ? body.projectPath : null
