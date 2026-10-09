@@ -5,37 +5,13 @@ import { pathToFileURL } from 'node:url'
 import { partsDeclaration } from '../manifest.js'
 
 /**
- * `bun run check:parts <module dir>…`: does a module do what its manifest says
- * about the parts of an epic?
- *
- * The requirement is in `parts.ts`: every item of a module's data is anchored
- * to a part by a file, a ref or a part id, or the module says why it has none.
- * `partsDeclaration` reads the manifest's half of that, and that half is what
- * this FAILS on: a module that declares neither, declares both, or whose
- * manifest cannot be loaded.
- *
- * It also looks through the sources for an import of the protocol's focus
- * helpers, and that is ADVICE, never a failure. It is a regex over import
- * text: `import * as`, a re-export through a wrapper file or a dynamic import
- * all get past it, and any import at all satisfies it. So a module that says
- * `reacts: ['parts']` and shows no such import gets a NOTE saying what was
- * looked for, for a person to read; whether the narrowing is right is a
- * review's question and no scan's.
- *
- * Node-only and behind no entry point in `exports`, like `create/`: it is run
- * from a checkout or a module's `node_modules` (`bin/check-parts.ts`), never
- * imported by a page. Read-only.
+ * `bun run check:parts <module dir>…`: does a module do what its manifest says about an epic's parts?
+ * Fails only on the manifest (`partsDeclaration`: neither, both, or unloadable); the import scan for
+ * focus helpers is advice, never a failure. Node-only, read-only, behind no entry point in `exports`.
+ * Design notes: docs/parts.md.
  */
 
-/**
- * The functions that ARE the rule. Importing any one of them from this
- * package is using it.
- *
- * The last three are the ones the rule delegates to, and they stay on the
- * list: Paper, Journeys, References, Checklist and Tests followed the parts
- * with them before `useFocus` existed, and leaving them out would put a note
- * on five modules that do exactly what the requirement asks.
- */
+/** The functions that are the rule. Importing any one of them from this package is using it. */
 export const FOCUS_HELPERS = [
   'useFocus',
   'narrowToFocus',

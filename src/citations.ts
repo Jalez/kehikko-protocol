@@ -1,42 +1,8 @@
 /**
- * Citations: which exact words of which file a piece of writing rests on,
- * written down as one line and found again.
- *
- * Two modules cite a paper this way — a slide and a quiz question — and they
- * have to agree to the character, because a person edits both files by hand
- * and an agent reads the same four answers from each. So the line's syntax and
- * the rule for "found" are here, once.
- *
- * ## The line
- *
- * `[^1]: <project-relative path> | "<exact words>"`, and a `[^1]` in the text
- * is the place that rests on it. By the words, not by byte offsets: words
- * survive edits above them, and when they do not, the citation can SAY it is
- * adrift rather than quietly point at whatever moved into its bytes.
- *
- * ## Why whitespace is not significant, and nothing else is forgiven
- *
- * A paper's source wraps its sentences wherever its editor did, and a quote is
- * one line. So a run of whitespace in the quote matches any run of whitespace
- * in the file, and that is the only latitude. Forgiving more — case,
- * punctuation, LaTeX markup — would let a quote match words the paper no
- * longer says, which is the one failure a citation exists to make visible.
- *
- * ## The four answers
- *
- * - `holds`: the words are in the file exactly once. The range is where.
- * - `ambiguous`: they are in it more than once. The range is the first, and
- *   the fix is a longer quote; a citation that could mean two places means
- *   neither.
- * - `adrift`: they are not in it. The paper changed under the citation.
- * - `unreadable`: the file is not there, or not inside the project.
- *
- * ## What is not here
- *
- * Reading the file. Every function takes the file's TEXT (or `null` for a file
- * that could not be read), so nothing in this package opens anything: a module
- * reads the cited file behind its own fence and hands the text in. Which is
- * also why every rule here is a unit test.
+ * Citations: the `[^1]: <project-relative path> | "<exact words>"` source line, the `[^1]` marker,
+ * and the rule for finding the words again. Only whitespace runs are forgiven in a match (not case,
+ * punctuation or markup). Functions take the file's TEXT (`null`: unreadable); nothing here opens a file.
+ * Design notes: docs/citations.md.
  */
 
 /** One passage a text rests on: a file of the project, and its exact words there. */
@@ -49,7 +15,10 @@ export interface CitedSource {
   quote: string
 }
 
-/** What looking for a source's words in its file came to. See the four answers above. */
+/**
+ * What looking for a source's words in its file came to. `holds`: found exactly once. `ambiguous`: more
+ * than once, the range is the first. `adrift`: not in the file. `unreadable`: no file, or outside the project.
+ */
 export const CITE_STATUSES = ['holds', 'ambiguous', 'adrift', 'unreadable'] as const
 export type CiteStatus = (typeof CITE_STATUSES)[number]
 
@@ -101,10 +70,8 @@ export function serialiseSource(source: CitedSource): string {
 }
 
 /**
- * Why a source cannot be written as a source line, or null when it can. The
- * path must be relative, inside the project and hold no `|`; the quote is one
- * line. A reading of the strings: the module that opens the file keeps its own
- * fence.
+ * Why a source cannot be written as a source line, or null when it can. The path must be relative,
+ * inside the project and hold no `|`; the quote is one line. Checks the strings only, not the file.
  */
 export function uncitable(source: Pick<CitedSource, 'path' | 'quote'>): string | null {
   if (!source.path || /[|\n]/.test(source.path)) return `the source path "${source.path.slice(0, 80)}" is empty or has | or a line break in it.`

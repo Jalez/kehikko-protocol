@@ -7,46 +7,10 @@ import { canonicalName, legacyName } from '../dialect.js'
 import { neighbourPorts, portOf, readRegistration, registryDir } from './registry.js'
 
 /**
- * Which port this module binds, decided rather than assumed.
- *
- * ## What this replaces
- *
- * `exec bunx vite --port "${PORT:-7960}" --strictPort`. On a taken port that
- * prints `Error: Port 7960 is already in use` and exits 1, which is a module
- * that does not start because of a program it has nothing to do with. `--host`
- * and `--strictPort` were doing the only thing they could: fail, loudly, and
- * leave the remedy to a person editing two files in one repository and then
- * remembering the registry is now stale.
- *
- * ## Drift, and the argument against failing loudly
- *
- * The choice made here is to MOVE rather than die, and it is a choice with a
- * real cost: a drifted module is not where a person expects it, so
- * `curl 127.0.0.1:7960` answers with somebody else. Two things pay for that.
- * The move is shouted on stdout naming both numbers, and the registry — which is
- * the only thing that decides what the host talks to — is rewritten to the port
- * actually bound. The address a person reads on a module's container is
- * therefore right even when the number in their head is not.
- *
- * The common case is deliberately untouched. If the preferred port is free it is
- * taken, with no probe, no search and no message: somebody typing
- * `curl 127.0.0.1:7960` after starting a module by hand must get their module,
- * and a system that sometimes moved for reasons of its own would have thrown
- * that away to solve a collision that had not happened.
- *
- * ## The one case that must NOT drift
- *
- * If the program already on that port answers the manifest with THIS module's
- * own id, this module is already running, and a second copy is not a fallback —
- * it is a fault. Two copies means two stores writing the same files, two MCP
- * doors a client can be pointed at, two committers on one repository, and a host
- * framing whichever of them the registry happens to name. That state has no
- * symptom that reads as "you started it twice"; it reads as data disappearing.
- *
- * It is also the most common collision here now, because the host starts modules
- * on its own AND a person runs `./run.sh` in a terminal. So it exits, cleanly,
- * with a sentence naming the address — the answer to "start it" when it is
- * already started is "it is already there", not "here is another one".
+ * Which port this module binds, decided rather than assumed. A taken preferred port means moving
+ * (said on stdout, recorded in the registry) rather than dying — except when the occupant answers
+ * with THIS module's own id: then it is already running, and nothing starts.
+ * Design notes: docs/serving.md.
  */
 
 /** Loopback, and only loopback. A module is a program on this machine. */
@@ -80,14 +44,7 @@ export type Verdict =
   | { take: 'nothing'; because: 'already-running' }
   | { take: 'another'; because: string }
 
-/**
- * The decision, as a function of who is there and nothing else.
- *
- * Split out from `claim` because everything else in that function is a socket, a
- * timeout or a filesystem, and a rule about WHAT TO DO tested through three of
- * those is a rule nobody will change with confidence later. This part is a
- * table; it is tested as one.
- */
+/** The decision, as a function of who is there and nothing else. Pure. */
 export function verdict(id: string, occupant: Occupant): Verdict {
   if (occupant.at === 'free') return { take: 'preferred' }
   if (occupant.at === 'module' && occupant.id === canonicalName(id)) return { take: 'nothing', because: 'already-running' }
@@ -96,13 +53,8 @@ export function verdict(id: string, occupant: Occupant): Verdict {
 }
 
 /**
- * The first port at or after `from` that neither `taken` nor `reserved` claims.
- *
- * Pure over its two predicates so the walk itself can be tested without binding
- * a socket. Bounded by `span` and by the top of the port range, and it returns
- * `null` rather than throwing: a caller who has walked sixty-four consecutive
- * occupied ports is not in a situation any exception message improves, and the
- * one sentence worth printing belongs to whoever knows the module's name.
+ * The first port at or after `from` that neither `taken` nor `reserved` claims. Pure. Bounded by
+ * `span` and by the top of the port range; returns `null` rather than throwing when none is found.
  */
 export function search(
   from: number,
@@ -117,18 +69,8 @@ export function search(
 }
 
 /**
- * Whether a port can be bound, asked the only way that cannot be wrong.
- *
- * By binding it. A connect-and-see probe answers "nothing is listening", which
- * is a different question — a socket held by another process in a state that
- * refuses connections is still a socket Vite will fail to bind — and the failure
- * that matters here is the bind, so the bind is what is tried.
- *
- * There is a race between this closing and Vite opening, and it is not closed
- * here because it cannot be: the port has to be released before the thing that
- * wants it can take it. It is survived instead — `serves()` leaves `strictPort`
- * off and reads the port back off the listening server, so losing this race
- * costs one number in a log line and nothing else.
+ * Whether a port can be bound, asked by binding it and releasing it. The port can be taken again
+ * before the caller binds it; `serves()` survives that by leaving `strictPort` off.
  */
 export function free(port: number, host = LOOPBACK): Promise<boolean> {
   return new Promise((resolve) => {
@@ -140,23 +82,12 @@ export function free(port: number, host = LOOPBACK): Promise<boolean> {
 }
 
 /**
- * Ask whoever holds a port what they are.
- *
- * `node:http` rather than `fetch`, and deliberately. This file is imported by a
- * Vite config, which runs under Node and under Bun and, in this package's own
- * suite, under a preloaded happy-dom that installs a `fetch` of its own. A
- * request to loopback should not depend on which of those three provided the
- * global. `node:http` is the same request in all of them.
- *
- * Bounded in time and in bytes for the reason the host's `fetchManifest` gives:
- * whoever is on that port is a stranger, and a reader with no deadline hangs on
- * a program that accepts a connection and then says nothing.
+ * Ask whoever holds a port what they are, over `node:http` rather than `fetch`. Bounded in time
+ * and in bytes: a program that says nothing within `timeoutMs` is a stranger.
  */
 export async function identify(port: number, timeoutMs = IDENTIFY_TIMEOUT_MS): Promise<Occupant> {
-  /* The current path first, then the one a module from before the rename
-     serves — but only after a plain "not here", so a module answering the
-     first path is asked once, and a program that answered anything but 404
-     there is judged on what it said. */
+  /* The current path first, then the pre-rename one — but only after a plain 404, so a module
+     answering the first path is asked once. */
   const first = await peek(port, WELL_KNOWN, timeoutMs)
   if (first.at !== 'stranger' || !first.notHere) return strip(first)
   return strip(await peek(port, LEGACY_WELL_KNOWN, timeoutMs))
@@ -201,23 +132,15 @@ function peek(port: number, path: string, timeoutMs: number): Promise<Occupant &
       request.destroy()
       done({ at: 'stranger', why: `something took the port and did not answer within ${timeoutMs}ms` })
     })
-    /* A refused connection means nothing is listening — but `free()` has already
-       decided that question, and this is only ever called after it said no. So
-       an error here is a program that was there a moment ago, which is a
-       stranger for every purpose that follows. */
+    /* Only ever called after `free()` said no, so an error here is a program that was there a
+       moment ago: a stranger. */
     request.on('error', () => done({ at: 'stranger', why: 'something took the port and would not talk' }))
   })
 }
 
 /**
- * What a document on that port makes the program serving it. Pure.
- *
- * The `kind` word is checked before the id, which is the whole reason that word
- * exists: a JSON document that does not say `kehikot.module` (or `roadmap.module`,
- * its spelling before the rename) is not a manifest
- * however many of the other fields it happens to have, and a program with an
- * `id` field is not thereby a module. Without that check a module could be
- * talked out of starting by any JSON server that happened to have an `id`.
+ * What a document on that port makes the program serving it. Pure. `kind` must be `kehikot.module`
+ * (or `roadmap.module`, its spelling before the rename) before the id counts for anything.
  */
 export function readManifest(text: string, path: string = WELL_KNOWN): Occupant {
   let parsed: unknown
@@ -281,14 +204,8 @@ export type Claimed =
     }
 
 /**
- * Decide which port this module should bind.
- *
- * It returns rather than exiting, including in the already-running case, and
- * that is on purpose: a library that calls `process.exit` is a library whose
- * most important branch cannot be tested, and this one has a whole suite aimed
- * at exactly that branch. The exit belongs to the caller who knows it is a
- * program rather than a test — see `serves()` in `plugin.ts`, and `sayClaim()`
- * for the sentence.
+ * Decide which port this module should bind. Returns rather than exiting, including in the
+ * already-running case; the exit belongs to the caller — see `serves()` in `plugin.ts`, and `sayClaim()`.
  */
 export async function claim({
   id,
@@ -301,9 +218,8 @@ export async function claim({
   const isFree = probes.free ?? free
   const ask = probes.identify ?? identify
 
-  /* The common case, and it is deliberately the cheapest one: no manifest
-     fetched, no registry read, no message printed. Nothing about starting a
-     module on a machine where nothing is wrong should cost a round trip. */
+  /* The common case, and deliberately the cheapest: no manifest fetched, no registry read, no
+     message printed. */
   if (await isFree(prefer)) {
     return { status: 'claimed', id, prefer, port: prefer, origin: originFor(prefer), moved: false, why: null }
   }
@@ -322,33 +238,13 @@ export async function claim({
     }
   }
 
-  /* `take === 'preferred'` cannot be reached here: `verdict` only says it for a
-     free port, and this port was not free. The fallback sentence exists so that
-     the rule stays a table `verdict` owns rather than a shape this function
-     re-derives — if a fourth occupant is ever added, the compiler asks about it
-     there and this keeps drifting rather than crashing. */
+  /* `take === 'preferred'` cannot be reached here: `verdict` only says it for a free port. The
+     fallback sentence keeps this drifting rather than crashing if an occupant is ever added. */
   const because = said.take === 'another' ? said.because : `something is listening on ${prefer}`
 
   /**
-   * Before drifting: is this module already answering where it last said it was?
-   *
-   * This was found by running the thing rather than by thinking about it, and it
-   * is the second start after a first one has already drifted. The squatter is
-   * still on 7960, so the preferred port is occupied by a stranger, so the
-   * already-running check above never fires — and the module walks past its own
-   * running copy on 7961 to start a SECOND one on 7962. Two stores, two MCP
-   * doors, two committers, which is precisely the state that check exists to
-   * make impossible, arriving through the one door it did not cover.
-   *
-   * So the module's own registration is consulted, and only in the drift path.
-   * It costs one file read and one request in a case that is already going
-   * slowly, and it costs the common case nothing at all.
-   *
-   * The registration is a hint and never an authority. It is asked the same
-   * question the preferred port was asked, and only an answer carrying THIS id
-   * stops the start — a stale file naming a port somebody else now holds says
-   * nothing about whether this module is running, and treating it as if it did
-   * would be a module refusing to start because of a line in a file.
+   * Before drifting: is this module already answering where its registration last said it was?
+   * The registration is a hint, never an authority — only an answer carrying THIS id stops the start.
    */
   const mine = portOf(
     (readRegistration(join(registry, `${id}.json`)) ?? readRegistration(join(registry, `${legacyName(id)}.json`)))?.url ?? '',
@@ -391,13 +287,7 @@ export async function claim({
   return { status: 'claimed', id, prefer, port, origin: originFor(port), moved: true, why: because }
 }
 
-/**
- * The sentence, written once so every module says it the same way.
- *
- * Loud on purpose. A drift that scrolled past in the same grey as everything
- * else would be a module answering somewhere nobody looks, which is the cost of
- * drifting and the only part of it a person can act on.
- */
+/** The sentence for each outcome, written once so every module says it the same way. */
 export function sayClaim(claimed: Claimed): string {
   switch (claimed.status) {
     case 'already-running':

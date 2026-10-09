@@ -8,11 +8,9 @@ import { moduleFolder } from '../project.js';
 import { originFor } from '../serve/ports.js';
 import { portOf, readRegistration, registerAt, registryDir } from '../serve/registry.js';
 /**
- * `bun run create <name>`: a new module, generated from `template/`.
- *
- * Node-only, like `/serve`, and deliberately not behind any entry point in
- * `exports`: it is run from a checkout (`bin/create.ts`), never imported by a
- * module. Every step is its own function so the tests can take them apart.
+ * `bun run create <name>`: a new module, generated from `template/`. Node-only and behind no entry
+ * point in `exports`: run from a checkout (`bin/create.ts`), never imported by a module.
+ * Design notes: docs/serving.md.
  */
 /** The lowest port a new module is given. Everything below it was handed out by hand. */
 export const PORT_FLOOR = 7960;
@@ -22,12 +20,8 @@ export const PLACEHOLDERS = ['__MODULE_ID__', '__MODULE_NAME__', '__MODULE_FOLDE
 /** A short name, lowercase, dashes between words: `slides`, `reading-list`. */
 const NAME = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
 /**
- * Everything a module is called, from the one word a person typed.
- *
- * Narrower than `MODULE_ID` on purpose: the name also becomes a package name,
- * a directory, a header name and a folder, and a dot in any of those is a
- * question nobody needs to answer. The id is still checked against the
- * protocol's own rule, so the two can never disagree.
+ * Everything a module is called, from the one word a person typed. Narrower than `MODULE_ID`: no dots.
+ * Throws when the name is not lowercase words joined by dashes, or the id fails `MODULE_ID`.
  */
 export function namesFor(raw) {
     const short = raw.trim();
@@ -58,10 +52,8 @@ export function fill(text, values) {
     return out;
 }
 /**
- * The ports already spoken for: every registered module's url, and the
- * `PREFERRED_PORT` in each registered checkout's `manifest.ts` where one can be
- * read. A module that is not registered is not visible here, and that is
- * accepted — the plugin moves a module off a taken port when it starts.
+ * The ports already spoken for: every registered module's url, and the `PREFERRED_PORT` in each
+ * registered checkout's `manifest.ts` where one can be read. An unregistered module is not seen here.
  */
 export function takenPorts(where = registryDir()) {
     const taken = new Set();

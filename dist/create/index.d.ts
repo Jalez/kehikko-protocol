@@ -1,9 +1,7 @@
 /**
- * `bun run create <name>`: a new module, generated from `template/`.
- *
- * Node-only, like `/serve`, and deliberately not behind any entry point in
- * `exports`: it is run from a checkout (`bin/create.ts`), never imported by a
- * module. Every step is its own function so the tests can take them apart.
+ * `bun run create <name>`: a new module, generated from `template/`. Node-only and behind no entry
+ * point in `exports`: run from a checkout (`bin/create.ts`), never imported by a module.
+ * Design notes: docs/serving.md.
  */
 /** The lowest port a new module is given. Everything below it was handed out by hand. */
 export declare const PORT_FLOOR = 7960;
@@ -22,22 +20,16 @@ export interface Names {
     pkg: string;
 }
 /**
- * Everything a module is called, from the one word a person typed.
- *
- * Narrower than `MODULE_ID` on purpose: the name also becomes a package name,
- * a directory, a header name and a folder, and a dot in any of those is a
- * question nobody needs to answer. The id is still checked against the
- * protocol's own rule, so the two can never disagree.
+ * Everything a module is called, from the one word a person typed. Narrower than `MODULE_ID`: no dots.
+ * Throws when the name is not lowercase words joined by dashes, or the id fails `MODULE_ID`.
  */
 export declare function namesFor(raw: string): Names;
 export declare function placeholderValues(names: Names, port: number): Record<Placeholder, string>;
 /** Every placeholder replaced, everywhere it appears. Anything else in the text is left alone. */
 export declare function fill(text: string, values: Record<Placeholder, string>): string;
 /**
- * The ports already spoken for: every registered module's url, and the
- * `PREFERRED_PORT` in each registered checkout's `manifest.ts` where one can be
- * read. A module that is not registered is not visible here, and that is
- * accepted — the plugin moves a module off a taken port when it starts.
+ * The ports already spoken for: every registered module's url, and the `PREFERRED_PORT` in each
+ * registered checkout's `manifest.ts` where one can be read. An unregistered module is not seen here.
  */
 export declare function takenPorts(where?: string): Set<number>;
 /**
@@ -60,10 +52,8 @@ export interface CreateOptions {
     /** Write the registration, putting the module on this machine's host. */
     register?: boolean;
     /**
-     * What the new module's `kehikot-module-protocol` dependency says, instead of
-     * the GitHub source — e.g. `file:/path/to/this/checkout`. The protocol's own
-     * test uses it so a generated module is tested against the protocol as it is
-     * now, offline.
+     * What the new module's `kehikot-module-protocol` dependency says, instead of the GitHub source,
+     * e.g. `file:/path/to/this/checkout`. Used by the protocol's own test to run offline.
      */
     protocolSource?: string;
     /** Each step can be skipped, for tests. All default to true. */

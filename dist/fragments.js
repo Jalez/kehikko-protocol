@@ -1,12 +1,9 @@
 import { z } from 'zod';
 import { LIMITS } from './limits.js';
 /**
- * Schema fragments that more than one file spells, written once.
- *
- * Nothing here is exported from the package. Each is a piece several schemas
- * share — a reference, a step number, the kehikko something happened on — and
- * a second copy of any of them is a bound that can be changed in one place and
- * forgotten in another.
+ * Schema fragments that more than one file spells, written once: a reference, a step number, the
+ * kehikko something happened on. Nothing here is exported from the package.
+ * Design notes: docs/wire.md.
  */
 /** A reference like `gh#41`, `gl#340`, `gh:owner/repo#12`. The same bound wherever one appears. */
 export const ref = z.string().min(1).max(LIMITS.REF);

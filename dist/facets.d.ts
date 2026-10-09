@@ -4,13 +4,8 @@ export type RefKind = 'issue' | 'change';
 /** Where it is. `merged` only ever applies to a change. */
 export type RefState = 'open' | 'closed' | 'merged';
 /**
- * Every facet, and the words for it in a menu called "hide".
- *
- * Kind × state first, because "hide closed MRs/PRs, keep closed issues" is the
- * combination that made this file: a closed issue is usually finished work and
- * a closed change is usually abandoned, and the two must be separately
- * hideable. Then why a closed ref closed, from a person's mark or the
- * tracker's reason — see `dispositionOf`.
+ * Every facet, and the words for it in a menu called "hide": kind × state, then why a closed ref
+ * closed, from a person's mark or the tracker's reason (see `dispositionOf`).
  */
 export declare const FACETS: {
     readonly 'issue:open': "open issues";
@@ -41,13 +36,9 @@ export interface Sighting {
 /** Where the disposition being shown came from. A person's mark always wins. */
 export type DispositionSource = 'person' | 'tracker';
 /**
- * Why a closed reference closed, as far as the tracker says, or null.
- *
- * A DEFAULT, never a mark: a module showing it says it came from the tracker.
- * A merged change is done. GitHub's reason maps one-to-one where it has one;
- * a GitLab issue closed with a merged change under it is done. Everything else
- * closed has no reason anybody can read, and returns null — "closed, reason
- * unknown", which is a state a person is asked to settle, not one to guess.
+ * Why a closed reference closed, as far as the tracker says, or null when it gives no readable
+ * reason. A default, never a mark: a module showing it says it came from the tracker. A merged
+ * change is done, as is a GitLab issue closed with a merged change under it.
  */
 export declare function deriveDisposition(sighting: Sighting): DispositionValue | null;
 /** The disposition a module should show for one ref, and whose it is. */
@@ -59,11 +50,9 @@ export interface Shown {
     mark: Disposition | null;
 }
 /**
- * Put a person's mark and the tracker's reason together, the mark winning.
- *
- * `marks` is `context.dispositions`, whole; this finds the ref's own row. A
- * closed ref with neither is `unknown` with no source — the case a module
- * should flag for somebody to decide rather than count either way.
+ * Put a person's mark and the tracker's reason together, the mark winning. `marks` is
+ * `context.dispositions`, whole. A closed ref with neither is `unknown` with no source: flag it
+ * for somebody to decide rather than count it either way.
  */
 export declare function dispositionOf(ref: string, sighting: Sighting | null, marks: readonly Disposition[]): Shown;
 /**
@@ -92,12 +81,8 @@ export declare const HIDE_GROUP = "hide";
 /** A `toggles` group offering the facets, ready to go into `kehikot.filters`. */
 export declare function offer(options?: OfferOptions): FilterGroup;
 /**
- * The facets switched on under one toggles group, from `context.filters`.
- *
- * Anything that is not a list — nothing chosen, or a string left over from a
- * host or a version that had no toggles — is the resting state, which is
- * nothing hidden. Ids this vocabulary does not know are dropped, for the
- * reason a module drops any choice it does not recognise.
+ * The facets switched on under one toggles group, from `context.filters`. Anything that is not a
+ * list is the resting state, nothing hidden; ids this vocabulary does not know are dropped.
  */
 export declare function hiddenIn(choice: FilterChoice, group?: string): Facet[];
 /** What survived a filter, and how many did not — so a module can say "3 hidden by the filter". */
@@ -106,12 +91,8 @@ export interface Sifted<T> {
     hidden: number;
 }
 /**
- * Keep the rows none of whose facets are hidden.
- *
- * `facetsOfRow` is the module's own: it knows how to read a sighting off its
- * rows and where its marks are. A row that cannot be read — no sighting at all
- * — has no facets and is never hidden, because a filter that hides what it
- * cannot see is a filter that loses things silently.
+ * Keep the rows none of whose facets are hidden. `facetsOfRow` is the module's own reading of a
+ * row; a row with no facets is never hidden.
  */
 export declare function sift<T>(rows: readonly T[], hidden: readonly string[], facetsOfRow: (row: T) => readonly string[]): Sifted<T>;
 /** How many rows each facet would hide on its own, for `offer({ counts })`. */
