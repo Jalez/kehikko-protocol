@@ -254,19 +254,26 @@ export function narrowToFocus<T>(
 /**
  * The sentence a module says while parts are picked: `3 questions outside the picked part (Heading).`
  * `''` when nothing is picked; `0 … outside` is said. `noun` names one item; give `[one, many]`
- * where adding an `s` is wrong.
+ * where adding an `s` is wrong. With `total` — how many items the count was taken over — it reads
+ * `2 of 3 questions are outside the picked part (Heading).`
  */
 export function focusSentence(
   parts: readonly EpicPart[],
   outside: number,
   noun: string | readonly [one: string, many: string] = 'item',
+  options: { total?: number } = {},
 ): string {
   const picked = pickedParts(parts)
   if (picked.length === 0) return ''
   const [one, many] = typeof noun === 'string' ? [noun, `${noun}s`] : noun
   const where = picked.length === 1 ? 'the picked part' : `the ${picked.length} picked parts`
   const names = picked.map((part) => part.heading || part.id).join(', ')
-  return `${outside} ${outside === 1 ? one : many} outside ${where} (${names}).`
+  const { total } = options
+  const count =
+    total === undefined
+      ? `${outside} ${outside === 1 ? one : many}`
+      : `${outside} of ${total} ${total === 1 ? one : many} ${outside === 1 ? 'is' : 'are'}`
+  return `${count} outside ${where} (${names}).`
 }
 
 /**

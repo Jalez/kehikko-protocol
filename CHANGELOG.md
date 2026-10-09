@@ -19,6 +19,14 @@ Internal only; nothing a consumer can observe. No version change.
 - `dist/` no longer carries `.map` files. CI builds, checks that the committed `dist/` matches the
   source, typechecks and runs the tests.
 
+## 0.34.1 — 2026-10-09
+
+`focusSentence` takes an optional fourth argument, `{ total }`: with it the sentence says how many
+of how many — `2 of 3 references are outside the picked part (The seam).` — for a module that marks
+what is outside instead of removing it, where the reader can see the total and would miss it.
+`useFocus().narrow` takes `total: true` and passes the length of the list. Without the option the
+sentence is what it was, byte for byte.
+
 ## 0.34.0 — 2026-10-09
 
 Every module's data is part-specific, by one rule. `Anchor` (`{ file } | { ref } | { part }`),

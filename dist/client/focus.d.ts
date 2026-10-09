@@ -14,11 +14,13 @@ export interface Focus {
     /**
      * A list narrowed to the picked parts, and the sentence about what was left out (`''` when nothing
      * is picked). `noun` is what one item is called (`'note'`, or `['entry', 'entries']`); `keep` holds
-     * on to what the person is in the middle of, as in `narrowToFocus`.
+     * on to what the person is in the middle of, as in `narrowToFocus`; `total: true` has the sentence
+     * say how many items there were (`2 of 3 notes are outside …`).
      */
     narrow: <T>(items: readonly T[], anchorOf: (item: T) => Anchors, options?: {
         noun?: string | readonly [string, string];
         keep?: (item: T) => boolean;
+        total?: boolean;
     }) => Narrowed<T> & {
         sentence: string;
     };

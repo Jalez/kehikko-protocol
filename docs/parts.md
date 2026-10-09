@@ -728,6 +728,18 @@ items are outside them, and which parts.
 IS said: a focus that hides nothing today is still a focus, and it is how a
 person sees that this pane is following their ticks.
 
+With `{ total }` (0.34.1) it says how many of how many:
+
+    2 of 3 references are outside the picked part (The posting seam).
+    1 of 3 references is outside the picked part (The posting seam).
+
+The noun is counted by the total and the verb by the number outside. It is
+for a module that marks what is outside rather than removing it: every item
+is still on screen, so the total is a number the reader can check. A
+qualifier is the module's own and rides in the noun —
+`['reference shown here', 'references shown here']`. `useFocus().narrow`
+takes `total: true` and passes the length of the list it was given.
+
 The wording is the Checklist module's, which is the References module's
 (`14 outside the picked part · The posting seam`) with the noun in it and a
 full stop — a sentence that can stand alone in a pane. `noun` is what the
