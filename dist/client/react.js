@@ -143,6 +143,9 @@ export function useKehikot(id, events = {}, options = {}) {
     const connection = useCallback(() => held.current, []);
     return useMemo(() => ({ where, context, state, request, resize, filters, clearable, refreshable, connection }), [where, context, state, request, resize, filters, clearable, refreshable, connection]);
 }
+/* The parts focus, beside the bridge: the same entry, a hook that needs no
+   connection. See `focus.ts`. */
+export { useFocus } from './focus.js';
 /**
  * The names this hook and its types had before the app was renamed, kept so a
  * module that has not been updated still builds against this copy. Same

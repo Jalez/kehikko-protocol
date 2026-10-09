@@ -127,6 +127,7 @@ export interface Kehikot {
  * listener during whatever millisecond the host chose to greet in.
  */
 export declare function useKehikot(id: string, events?: HostEvents, options?: UseKehikotOptions): Kehikot;
+export { useFocus, type Focus } from './focus.js';
 /**
  * The names this hook and its types had before the app was renamed, kept so a
  * module that has not been updated still builds against this copy. Same

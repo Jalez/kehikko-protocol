@@ -388,4 +388,92 @@ export function focusCount(parts, items, inFocus) {
             shown += 1;
     return { shown, outside: items.length - shown };
 }
+/**
+ * Whether an anchored thing is in front of the person. THE rule.
+ *
+ * True when nothing is picked out. Otherwise true exactly when one of its
+ * anchors is in a picked part, each asked of the function above that owns the
+ * question. Something with no anchor is in no PICKED part: outside the focus,
+ * and counted — the same answer as a step with no `part`, a ref no part lists
+ * and a file no part names.
+ *
+ * `epic` is `context.epic`, for `fileInFocus`. Pass it.
+ */
+export function anchorInFocus(parts, anchor, epic) {
+    if (!isFocused(parts))
+        return true;
+    if (!anchor)
+        return false;
+    const anchors = Array.isArray(anchor) ? anchor : [anchor];
+    return anchors.some((one) => 'file' in one
+        ? fileInFocus(parts, one.file, epic)
+        : 'ref' in one
+            ? refInFocus(parts, one.ref)
+            : partInFocus(parts, one.part));
+}
+/**
+ * A list, narrowed to the picked parts: the items in front, and how many are
+ * not.
+ *
+ * `anchorOf` is the whole of what a module writes. `keep` is for the one thing
+ * a tick in another control must never do, which is take away what somebody's
+ * hands are in — the note being written, the question on screen. An item it
+ * answers true for is drawn though it is outside, and is still COUNTED
+ * outside, because it is; `kept` says how many, so the page can say why they
+ * are there.
+ */
+export function narrowToFocus(parts, items, anchorOf, epic, keep) {
+    if (!isFocused(parts))
+        return { shown: [...items], outside: 0, kept: 0 };
+    const inFocus = (item) => anchorInFocus(parts, anchorOf(item), epic);
+    const { outside } = focusCount(parts, items, inFocus);
+    let kept = 0;
+    const shown = items.filter((item) => {
+        if (inFocus(item))
+            return true;
+        if (!keep?.(item))
+            return false;
+        kept += 1;
+        return true;
+    });
+    return { shown, outside, kept };
+}
+/**
+ * The sentence every module says while parts are picked: how many of its
+ * items are outside them, and which parts.
+ *
+ *     3 questions outside the picked part (The posting seam).
+ *     1 note outside the 2 picked parts (The posting seam, What the tests check).
+ *
+ * `''` when nothing is picked, which is the cue to draw nothing. `0 … outside`
+ * IS said: a focus that hides nothing today is still a focus, and it is how a
+ * person sees that this pane is following their ticks.
+ *
+ * The wording is the Checklist module's, which is the References module's
+ * (`14 outside the picked part · The posting seam`) with the noun in it and a
+ * full stop — a sentence that can stand alone in a pane. `noun` is what the
+ * module calls one item; give `[one, many]` where adding an `s` is wrong.
+ */
+export function focusSentence(parts, outside, noun = 'item') {
+    const picked = pickedParts(parts);
+    if (picked.length === 0)
+        return '';
+    const [one, many] = typeof noun === 'string' ? [noun, `${noun}s`] : noun;
+    const where = picked.length === 1 ? 'the picked part' : `the ${picked.length} picked parts`;
+    const names = picked.map((part) => part.heading || part.id).join(', ');
+    return `${outside} ${outside === 1 ? one : many} outside ${where} (${names}).`;
+}
+/**
+ * Where the control is, for the sentence's tooltip or the line under an empty
+ * pane: it is never on the module's own page.
+ */
+export const FOCUS_WHERE = 'Parts are picked in the host’s bar, beside the epic. Unpick them there to see the rest.';
+/**
+ * Two lists of parts, by value: what `context.parts` is compared with before
+ * a page is redrawn for it. A host re-sends the context after every change
+ * anywhere on the canvas, and the list is the same list on nearly all of them.
+ */
+export function sameParts(a, b) {
+    return a === b || JSON.stringify(a) === JSON.stringify(b);
+}
 //# sourceMappingURL=parts.js.map

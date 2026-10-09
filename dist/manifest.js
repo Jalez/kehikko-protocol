@@ -430,6 +430,23 @@ export const manifestSchema = z.object({
      * a list they cannot trust. Empty is the honest and common answer.
      */
     reacts: z.array(z.string().min(1).max(LIMITS.REACTION)).max(LIMITS.REACTIONS).default([]),
+    /**
+     * Why this module has nothing to narrow to the picked parts — one sentence,
+     * for the module that does not say `reacts: ['parts']` (0.34.0).
+     *
+     * Every item of a module's data is anchored to a part of the epic by a
+     * file, a ref or a part id (`Anchor` in `parts.ts`), and a module that holds
+     * such items follows the picked parts. Some hold none: a terminal, a list of
+     * notifications, a canvas of every project. Those say so HERE, in words a
+     * person can read in a registry — "A terminal: nothing in it belongs to an
+     * epic." — so that "does not follow the parts" is a statement somebody made
+     * and not something nobody got round to.
+     *
+     * OPTIONAL and never defaulted, so a manifest written before this parses to
+     * exactly what it did. A module that says neither is REPORTED by
+     * `partsDeclaration`, not refused; the next version refuses it.
+     */
+    partless: z.string().trim().min(1).max(LIMITS.SUMMARY).optional(),
     modes: z.array(modeSchema).min(1).max(LIMITS.MODES),
     /**
      * What the module says about itself and its host, as distinct from what it
@@ -571,6 +588,39 @@ export function speaks(range, protocol = PROTOCOL) {
         }
     }
     return true;
+}
+/**
+ * What is wrong with what a module says about the parts of an epic — as
+ * sentences a host can show, and `[]` when nothing is.
+ *
+ * The requirement (0.34.0): a module either follows the picked parts
+ * (`reacts` has `parts`) or says in `partless` why it has nothing to narrow.
+ * Saying NEITHER is the case this exists to find: a module nobody has asked
+ * the question of, which shows the whole epic whatever is ticked. Saying both
+ * is a contradiction, and is reported too.
+ *
+ * **A warning in this version, a refusal in the next.** `manifestSchema` does
+ * not call this, so every manifest parses as it did; a host shows the list,
+ * and `bun run check:parts` fails on it. From the next minor version a
+ * manifest that declares neither will not parse.
+ *
+ * Pure, and a function of two fields, so it takes a parsed manifest or the
+ * object a module is about to hand to `manifestSchema.parse`.
+ */
+export function partsDeclaration(manifest) {
+    const follows = (manifest.reacts ?? []).includes('parts');
+    const why = manifest.partless?.trim() ?? '';
+    const who = manifest.id || 'This module';
+    if (follows && why) {
+        return [`${who} says it reacts to parts and also says why it has nothing to narrow (partless). It is one or the other.`];
+    }
+    if (!follows && !why) {
+        return [
+            `${who} does not say how it relates to the parts of an epic. Add 'parts' to reacts and narrow with the `
+                + 'protocol’s focus helpers, or set partless to one sentence saying why nothing in it belongs to a part.',
+        ];
+    }
+    return [];
 }
 export const MODULE_CONDITIONS = ['ready', 'incompatible', 'silent'];
 //# sourceMappingURL=manifest.js.map
