@@ -24,4 +24,3 @@ export const kehikkoSchema = z.object({ id: z.number().int(), name: z.string().m
 export const bothEndsOrNeither = (span) => (span.from === null) === (span.to === null);
 /** A span that names its ends ends after it starts. */
 export const endsAfterStart = (span) => span.from === null || span.to === null || span.to > span.from;
-//# sourceMappingURL=fragments.js.map

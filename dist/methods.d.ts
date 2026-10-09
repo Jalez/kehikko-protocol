@@ -770,4 +770,3 @@ export type ProjectPickResult = z.infer<typeof projectPickResult>;
 export declare const methodResults: Partial<Record<Method, z.ZodTypeAny>>;
 /** The schema for one method's answer, or nothing — which means unspecified. */
 export declare function resultSchemaFor(method: string): z.ZodTypeAny | undefined;
-//# sourceMappingURL=methods.d.ts.map

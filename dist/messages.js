@@ -258,4 +258,3 @@ export function looksLikeWireMessage(value) {
         typeof value.type === 'string' &&
         MESSAGE_PREFIXES.some((prefix) => value.type.startsWith(prefix)));
 }
-//# sourceMappingURL=messages.js.map

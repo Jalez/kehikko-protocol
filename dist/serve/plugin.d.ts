@@ -49,4 +49,3 @@ export interface ServesPlugin {
  */
 export declare function preferred(prefer: number, env?: Record<string, string | undefined>): number;
 export declare function serves({ id, prefer, dir, span, timeoutMs }: ServesOptions): ServesPlugin;
-//# sourceMappingURL=plugin.d.ts.map

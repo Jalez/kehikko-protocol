@@ -86,4 +86,3 @@ export declare const USAGE = "usage: bun run create <name> [--dir <path>] [--reg
 export declare function parseArgs(argv: string[]): Args | string;
 /** What to do next, printed after a successful create. */
 export declare function nextSteps(created: Created): string;
-//# sourceMappingURL=index.d.ts.map

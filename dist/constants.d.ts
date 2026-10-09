@@ -115,4 +115,3 @@ export declare const REFRESH_EVERY_MAX = 1440;
  * It is not the check: the host runs its own copy of this over the raw value it was handed.
  */
 export declare function clampHeight(height: number): number;
-//# sourceMappingURL=constants.d.ts.map

@@ -80,4 +80,3 @@ export declare function findQuote(file: string, quote: string): {
 export declare function resolveSource(source: CitedSource, file: string | null): CitationView;
 /** "lines 31–33" or "line 31". */
 export declare function linesOf(at: Pick<CitedRange, 'line' | 'endLine'>): string;
-//# sourceMappingURL=citations.d.ts.map

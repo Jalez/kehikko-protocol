@@ -27,4 +27,3 @@ export declare function slugFrom(text: string): string;
  * own. See the hazard on `MODULE_ID`; a `Map` keyed by id is better still where you can have one.
  */
 export declare function own<T>(record: Record<string, T>, key: string): T | undefined;
-//# sourceMappingURL=ids.d.ts.map

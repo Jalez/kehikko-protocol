@@ -38,4 +38,3 @@ export function readJourneys(projectPath) {
 export function readJourney(projectPath, slug) {
     return journeyIn(readJourneys(projectPath), slug);
 }
-//# sourceMappingURL=journeys.js.map

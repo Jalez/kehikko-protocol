@@ -56,4 +56,3 @@ export declare function contentStamp(content: readonly ContentChange[] | undefin
     sources: readonly string[];
     epic?: string | null;
 }): string;
-//# sourceMappingURL=content.d.ts.map

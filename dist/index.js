@@ -20,4 +20,3 @@ export { JOURNEYS_MODULE, JOURNEYS_FILE, journeyStepSchema, journeyGroupSchema, 
 export { CONTENT_HOST, contentChangeSchema, contentSignalSchema, contentStamp, } from './content.js';
 export { notificationPayload, callPayload, EXTENSIONS, EXTENSION_NAMES, known, schemaFor, } from './extensions.js';
 export { CITE_STATUSES, CITE_MARKER, parseSource, serialiseSource, uncitable, markersIn, replaceMarkers, normaliseQuote, findQuote, resolveSource, linesOf, } from './citations.js';
-//# sourceMappingURL=index.js.map

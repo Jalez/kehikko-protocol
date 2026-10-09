@@ -339,4 +339,3 @@ export declare function partsDeclaration(manifest: {
 export type ModuleCondition = 'ready' | 'incompatible' | 'silent';
 export declare const MODULE_CONDITIONS: readonly ["ready", "incompatible", "silent"];
 export {};
-//# sourceMappingURL=manifest.d.ts.map

@@ -804,4 +804,3 @@ export declare function spellTrackerRef(name: {
     number: number;
     isDefault: boolean;
 }): string;
-//# sourceMappingURL=tracker.d.ts.map

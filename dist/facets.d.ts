@@ -97,4 +97,3 @@ export interface Sifted<T> {
 export declare function sift<T>(rows: readonly T[], hidden: readonly string[], facetsOfRow: (row: T) => readonly string[]): Sifted<T>;
 /** How many rows each facet would hide on its own, for `offer({ counts })`. */
 export declare function countFacets<T>(rows: readonly T[], facetsOfRow: (row: T) => readonly string[]): Partial<Record<Facet, number>>;
-//# sourceMappingURL=facets.d.ts.map

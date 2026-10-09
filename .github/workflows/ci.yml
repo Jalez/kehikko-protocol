@@ -1,0 +1,46 @@
+# Every push to main and every pull request: build, prove the committed dist/
+# is what the source builds, typecheck, test.
+#
+# dist/ is committed because consumers install this package straight from git
+# and cannot build it themselves (PACKAGING.md). A dist/ that has drifted from
+# src/ ships last week's contract without an error anywhere, so this is the
+# check that matters most here.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install
+        run: bun install --frozen-lockfile
+
+      - name: Build
+        run: bun run build
+
+      - name: The committed dist/ matches the source
+        run: |
+          git diff --exit-code dist
+          # and nothing new or left over: an untracked file is a build nobody committed
+          test -z "$(git status --porcelain dist)" || { git status --porcelain dist; exit 1; }
+
+      - name: Typecheck
+        run: bun run typecheck
+
+      - name: Test
+        run: bun test

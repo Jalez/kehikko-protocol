@@ -232,4 +232,3 @@ export function nextSteps(created) {
     lines.push(`  gh repo create ${created.names.pkg} --private --source . --push   # after a first commit`);
     return lines.join('\n');
 }
-//# sourceMappingURL=index.js.map

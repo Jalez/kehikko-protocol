@@ -28,4 +28,3 @@ export function frameOrigins(env = process.env) {
 export function frameAncestors(env = process.env) {
     return `frame-ancestors 'self' ${frameOrigins(env).join(' ')}`;
 }
-//# sourceMappingURL=origins.js.map

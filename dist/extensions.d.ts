@@ -75,4 +75,3 @@ export declare function known(extension: string): boolean;
  * not a router: delivery, to whom and under whose name, belongs to whoever is delivering.
  */
 export declare function schemaFor(extension: string): z.ZodTypeAny | undefined;
-//# sourceMappingURL=extensions.d.ts.map

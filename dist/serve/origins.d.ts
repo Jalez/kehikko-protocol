@@ -10,4 +10,3 @@ export declare const DEFAULT_FRAME_ORIGINS: readonly ["http://127.0.0.1:4181", "
 export declare function frameOrigins(env?: Record<string, string | undefined>): string[];
 /** The whole `content-security-policy` value: the module itself, and the hosts that may frame it. */
 export declare function frameAncestors(env?: Record<string, string | undefined>): string;
-//# sourceMappingURL=origins.d.ts.map

@@ -222,4 +222,3 @@ export function connect(id, events = {}, options = {}) {
         },
     };
 }
-//# sourceMappingURL=connect.js.map

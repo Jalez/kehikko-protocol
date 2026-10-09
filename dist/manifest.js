@@ -279,4 +279,3 @@ export function partsDeclaration(manifest) {
     return [];
 }
 export const MODULE_CONDITIONS = ['ready', 'incompatible', 'silent'];
-//# sourceMappingURL=manifest.js.map

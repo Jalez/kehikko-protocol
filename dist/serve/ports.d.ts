@@ -106,4 +106,3 @@ export type Claimed = {
 export declare function claim({ id, prefer, span, timeoutMs, registry, probes, }: ClaimOptions): Promise<Claimed>;
 /** The sentence for each outcome, written once so every module says it the same way. */
 export declare function sayClaim(claimed: Claimed): string;
-//# sourceMappingURL=ports.d.ts.map

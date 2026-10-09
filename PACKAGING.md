@@ -1,11 +1,14 @@
 # How this package is consumed, and why it took three tries
 
-`exports` points at `dist/`. `dist/` is **not** in the repository. It is built
-by `prepare`, which runs when a consumer installs this package — so what a
-consumer gets is compiled from the exact commit it pinned, every time.
+`exports` points at `dist/`, and `dist/` **is committed** — the compiled `.js`
+and `.d.ts`, without source maps. Consumers install this package straight from
+git, a git dependency arrives without devDependencies, so there is nothing on
+the consumer's side that could build it: the repository has to be the artifact.
+CI rebuilds on every push and pull request and fails if the committed `dist/`
+is not what the source builds.
 
-Three arrangements were tried. The two that failed are worth writing down,
-because each looked correct until something specific broke.
+Four arrangements were tried to get here. The three that failed are worth
+writing down, because each looked correct until something specific broke.
 
 ## 1. `exports` pointing at a `dist/` nobody built
 
@@ -65,8 +68,15 @@ tests as you would anyway, and a `dist/` that no longer matches shows up
 immediately as a dirty working tree. Committing a stale build now requires
 never having run the suite.
 
-That is weaker than a guarantee and it is the strongest thing available at this
-size. The real fix is publishing to npm, where `prepublishOnly` builds and the
+And CI does not trust that either: `.github/workflows/ci.yml` builds from a
+clean checkout and fails when `git diff --exit-code dist` is not empty, or when
+the build leaves a file in `dist/` that is not committed.
+
+Source maps are not committed. Nothing consumed them — no consumer's bundler or
+`tsconfig` reads into this package's `dist/` — and they were half the files in
+it. `src/` still ships beside `dist/`, so the source is there to read.
+
+That is still weaker than publishing. The real fix is publishing to npm, where `prepublishOnly` builds and the
 consumer receives a compiled package with no git in the path at all — and this
 is ready for that day without changes.
 
@@ -74,4 +84,6 @@ is ready for that day without changes.
 
 `prepublishOnly` runs the same build, so `npm publish` produces a conventional
 package. Nothing here has to change for that; `files` already carries `dist` and
-`src`, the latter so source maps resolve for anybody debugging into it.
+`src`, the latter so the source can be read beside the build (turn `sourceMap`
+and `declarationMap` back on in `tsconfig.json` for a published package, where
+the maps cost a registry nothing).

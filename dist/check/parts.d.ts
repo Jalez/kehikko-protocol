@@ -44,4 +44,3 @@ export declare function manifestOf(dir: string): Promise<{
 export declare function checkModule(dir: string): Promise<PartsCheck>;
 /** What the command prints for one module. */
 export declare function said(check: PartsCheck): string;
-//# sourceMappingURL=parts.d.ts.map

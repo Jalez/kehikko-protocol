@@ -31,4 +31,3 @@ export declare function makeMailbox(target: Listenable | undefined): MessageSour
  */
 export declare const mailbox: MessageSource;
 export {};
-//# sourceMappingURL=mailbox.d.ts.map

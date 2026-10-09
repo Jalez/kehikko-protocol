@@ -186,6 +186,7 @@ the template cannot drift from the protocol silently.
 ## Versions
 
 `PROTOCOL` has been 2 throughout: every version below added something a module may ignore.
+The same list with what each version exported is in [CHANGELOG.md](CHANGELOG.md).
 
 | version | date | what it added |
 |---|---|---|
@@ -212,3 +213,6 @@ bun test        # what a bound refuses, what a bad id refuses, that a version is
                 # starts and stops, because injected probes cannot show that the real ones agree
 bun run build   # tsc to dist/
 ```
+
+`dist/` is committed (see [PACKAGING.md](PACKAGING.md)), so a change to `src/` is committed together
+with the build it produces. CI (`.github/workflows/ci.yml`) rebuilds and fails when the two disagree.

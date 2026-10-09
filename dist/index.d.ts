@@ -20,4 +20,3 @@ export { JOURNEYS_MODULE, JOURNEYS_FILE, journeyStepSchema, journeyGroupSchema, 
 export { CONTENT_HOST, contentChangeSchema, contentSignalSchema, contentStamp, type ContentChange, type ContentSignal, } from './content.js';
 export { notificationPayload, callPayload, EXTENSIONS, EXTENSION_NAMES, known, schemaFor, type NotificationPayload, type CallPayload, type ExtensionFormat, } from './extensions.js';
 export { CITE_STATUSES, CITE_MARKER, parseSource, serialiseSource, uncitable, markersIn, replaceMarkers, normaliseQuote, findQuote, resolveSource, linesOf, type CitedSource, type CiteStatus, type CitedRange, type CitationView, type MarkerScan, } from './citations.js';
-//# sourceMappingURL=index.d.ts.map

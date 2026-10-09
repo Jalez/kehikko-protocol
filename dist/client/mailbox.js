@@ -44,4 +44,3 @@ export function makeMailbox(target) {
  * everything that has already arrived. Outside a browser nothing ever posts to it; it does not crash.
  */
 export const mailbox = makeMailbox(typeof window === 'undefined' ? undefined : window);
-//# sourceMappingURL=mailbox.js.map

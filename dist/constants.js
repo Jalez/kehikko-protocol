@@ -134,4 +134,3 @@ export function clampHeight(height) {
         return MIN_HEIGHT;
     return Math.max(MIN_HEIGHT, Math.min(Math.round(height), MAX_HEIGHT));
 }
-//# sourceMappingURL=constants.js.map

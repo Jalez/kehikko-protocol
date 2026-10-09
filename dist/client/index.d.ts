@@ -6,4 +6,3 @@
  */
 export { mailbox, makeMailbox, KEEP, type MessageSource } from './mailbox.js';
 export { connect, HostRefused, ANSWER_WITHIN_MS, PERSON_ANSWERS_WITHIN_MS, GOTO_BACKSTOP_MS, NOBODY_TO_ASK, type AskOptions, type Connection, type ConnectOptions, type HostEvents, type Refusal, } from './connect.js';
-//# sourceMappingURL=index.d.ts.map

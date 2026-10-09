@@ -123,4 +123,3 @@ export function countFacets(rows, facetsOfRow) {
     }
     return counts;
 }
-//# sourceMappingURL=facets.js.map

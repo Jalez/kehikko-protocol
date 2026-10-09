@@ -117,4 +117,3 @@ export function resolveSource(source, file) {
 export function linesOf(at) {
     return at.line === at.endLine ? `line ${at.line}` : `lines ${at.line}–${at.endLine}`;
 }
-//# sourceMappingURL=citations.js.map

@@ -99,4 +99,3 @@ export function toDialect(message, dialect) {
 export function canonicalMessage(message) {
     return toDialect(message, 'kehikot');
 }
-//# sourceMappingURL=dialect.js.map
