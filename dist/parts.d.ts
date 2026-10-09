@@ -227,15 +227,15 @@ export declare const partSchema: z.ZodObject<{
     files: z.ZodOptional<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">>;
 }, "strip", z.ZodTypeAny, {
     id: string;
-    refs: string[];
     heading: string;
+    refs: string[];
     picked: boolean;
     files?: string[] | undefined;
 }, {
     id: string;
-    refs?: string[] | undefined;
     files?: string[] | undefined;
     heading?: string | undefined;
+    refs?: string[] | undefined;
     picked?: boolean | undefined;
 }>;
 export type EpicPart = z.infer<typeof partSchema>;
@@ -275,15 +275,15 @@ export declare const partsSchema: z.ZodArray<z.ZodObject<{
     files: z.ZodOptional<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">>;
 }, "strip", z.ZodTypeAny, {
     id: string;
-    refs: string[];
     heading: string;
+    refs: string[];
     picked: boolean;
     files?: string[] | undefined;
 }, {
     id: string;
-    refs?: string[] | undefined;
     files?: string[] | undefined;
     heading?: string | undefined;
+    refs?: string[] | undefined;
     picked?: boolean | undefined;
 }>, "many">;
 /** The parts a person has picked out. Empty when the whole epic is in front of them. */

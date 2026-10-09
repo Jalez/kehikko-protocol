@@ -23,14 +23,14 @@ export declare const notificationPayload: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     message: string;
     epic: string;
-    level: "info" | "attention" | "done" | "blocked";
     refs: string[];
+    level: "done" | "info" | "attention" | "blocked";
     step?: number | undefined;
 }, {
     message: string;
     epic: string;
-    level?: "info" | "attention" | "done" | "blocked" | undefined;
     refs?: string[] | undefined;
+    level?: "done" | "info" | "attention" | "blocked" | undefined;
     step?: number | undefined;
 }>;
 export type NotificationPayload = z.infer<typeof notificationPayload>;
@@ -64,17 +64,17 @@ export declare const callPayload: z.ZodObject<{
     /** Free, short, and only worth showing when the call failed. */
     why: z.ZodDefault<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
+    why: string;
     refs: string[];
     target: string;
     ok: boolean;
     ms: number;
-    why: string;
 }, {
     target: string;
     ok: boolean;
     ms: number;
-    refs?: string[] | undefined;
     why?: string | undefined;
+    refs?: string[] | undefined;
 }>;
 export type CallPayload = z.infer<typeof callPayload>;
 export interface ExtensionFormat {

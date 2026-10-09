@@ -5,6 +5,7 @@
  * what a spelling looks like, and whether a program answering to that spelling
  * is allowed to do anything at all is a question this package never asks.
  */
+import { LIMITS } from './limits.js';
 /**
  * A module's id.
  *
@@ -75,7 +76,7 @@ export const MODE_ID = /^[a-z0-9][a-z0-9-]{0,30}$/;
  * name and a protocol between a host and a module is the wrong place to write
  * it down. The module that owns journeys owns their names.
  */
-export const EPIC_SLUG = /^[a-z0-9-]{1,80}$/;
+export const EPIC_SLUG = new RegExp(`^[a-z0-9-]{1,${LIMITS.EPIC_SLUG}}$`);
 /**
  * A slug out of a line of prose, the way a person would write one by hand.
  *
@@ -112,7 +113,7 @@ export function slugFrom(text) {
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-+|-+$/g, '')
-        .slice(0, 80)
+        .slice(0, LIMITS.EPIC_SLUG)
         .replace(/-+$/, '');
 }
 /**

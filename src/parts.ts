@@ -1,6 +1,7 @@
 import { z } from 'zod'
-import { LIMITS } from './constants.js'
+import { LIMITS } from './limits.js'
 import { EPIC_SLUG } from './ids.js'
+import { ref } from './fragments.js'
 import { KEHIKOT_DIR, moduleFolder } from './project.js'
 
 /**
@@ -133,7 +134,7 @@ import { KEHIKOT_DIR, moduleFolder } from './project.js'
  * reference no part lists, it is in no PICKED part: outside the focus, and
  * counted. Naming `main.tex` in a part is allowed and means what it says.
  */
-export const PART_ID = /^[a-z0-9-]{1,80}$/
+export const PART_ID = new RegExp(EPIC_SLUG.source)
 
 /**
  * The module whose folder a paper is kept in.
@@ -245,7 +246,7 @@ export const partSchema = z.object({
   /** What a person calls it. Drawn as given; never compared. */
   heading: z.string().max(LIMITS.TITLE).default(''),
   /** The references the host says belong to this part. Never absent, for the reason `showing` never is. */
-  refs: z.array(z.string().min(1).max(LIMITS.REF)).max(LIMITS.PART_REFS).default([]),
+  refs: z.array(ref).max(LIMITS.PART_REFS).default([]),
   /** Whether a person has picked this part out. None picked means the whole epic. */
   picked: z.boolean().default(false),
   /**

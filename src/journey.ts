@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { LIMITS } from './constants.js'
+import { LIMITS } from './limits.js'
 import { EPIC_SLUG, slugFrom } from './ids.js'
 import { PART_ID, partFile } from './parts.js'
 

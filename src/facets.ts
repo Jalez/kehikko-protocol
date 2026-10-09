@@ -22,7 +22,7 @@
  * A facet is an id and a word. Adding one — `draft`, `unassigned` — is an entry
  * in `FACETS` and a line in `facetsOf`, not a change in every module.
  */
-import { LIMITS } from './constants.js'
+import { LIMITS } from './limits.js'
 import type { Disposition, DispositionValue, FilterChoice, FilterGroup } from './wire.js'
 
 /** What a reference is, as far as a filter cares: a piece of work, or a change to code. */

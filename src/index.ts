@@ -24,9 +24,10 @@ export {
   REFRESH_EVERY_MIN,
   REFRESH_EVERY_MAX,
   clampHeight,
-  LIMITS,
   type MessageType,
 } from './constants.js'
+
+export { LIMITS } from './limits.js'
 
 export { MODULE_ID, MODE_ID, EPIC_SLUG, own, slugFrom } from './ids.js'
 

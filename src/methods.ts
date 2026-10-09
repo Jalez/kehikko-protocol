@@ -1,7 +1,8 @@
 import { z } from 'zod'
-import { LIMITS } from './constants.js'
+import { LIMITS } from './limits.js'
 import { canonicalName } from './dialect.js'
 import { EPIC_SLUG } from './ids.js'
+import { gotoRef, ref, stepNumber } from './fragments.js'
 /**
  * The one import this file makes from the other half of the wire.
  *
@@ -285,9 +286,6 @@ export const METHOD_NAMES = Object.keys(METHODS) as Method[]
  */
 const epic = z.string().regex(EPIC_SLUG, 'an epic slug is lowercase letters, digits and dashes')
 
-/** A reference like `gh#41`, `gl#340`, `gh:owner/repo#12`. */
-const ref = z.string().min(1).max(LIMITS.REF)
-
 /**
  * The three stages a module may report.
  *
@@ -357,7 +355,7 @@ export const methodParams = {
   'view.goto': z
     .object({
       epic: epic.optional(),
-      step: z.number().int().min(1).max(999).optional(),
+      step: stepNumber.optional(),
       /**
        * Bounded at `GOTO_REF` rather than `REF`, and REFUSED rather than
        * clipped. The receiver that exists today clips its inbound ref to 200
@@ -366,7 +364,7 @@ export const methodParams = {
        * somebody confidently to the wrong place is worse than telling them the
        * ask was malformed.
        */
-      ref: z.string().min(1).max(LIMITS.GOTO_REF).optional(),
+      ref: gotoRef.optional(),
     })
     .refine((g) => g.epic !== undefined || g.step !== undefined || g.ref !== undefined, {
       message: 'view.goto has to name an epic, a step or a ref; a call that names nothing asks for nothing',
@@ -395,7 +393,7 @@ export const methodParams = {
    * to move into, the same reason `epic` is nullable rather than optional.
    */
   'selection.set': z.object({
-    refs: z.array(z.string().min(1).max(LIMITS.REF)).max(LIMITS.REFS),
+    refs: z.array(ref).max(LIMITS.REFS),
   }),
 
   /**
@@ -515,7 +513,7 @@ export const methodParams = {
    * when broadcast, with nothing anywhere saying so.
    */
   'showing.set': z.object({
-    refs: z.array(z.string().min(1).max(LIMITS.REF)).max(LIMITS.REFS),
+    refs: z.array(ref).max(LIMITS.REFS),
     documents: z.array(passageSchema).max(LIMITS.SHOWING_DOCUMENTS),
   }),
 

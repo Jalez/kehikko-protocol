@@ -313,20 +313,20 @@ export declare const methodParams: {
         ref: z.ZodOptional<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
         epic?: string | undefined;
-        step?: number | undefined;
         ref?: string | undefined;
+        step?: number | undefined;
     }, {
         epic?: string | undefined;
-        step?: number | undefined;
         ref?: string | undefined;
+        step?: number | undefined;
     }>, {
         epic?: string | undefined;
-        step?: number | undefined;
         ref?: string | undefined;
+        step?: number | undefined;
     }, {
         epic?: string | undefined;
-        step?: number | undefined;
         ref?: string | undefined;
+        step?: number | undefined;
     }>;
     /**
      * Say which references the person has picked out.
@@ -880,8 +880,8 @@ export declare const methodParams: {
         project?: true | undefined;
     }, {
         epic?: string | undefined;
-        refs?: string[] | undefined;
         detail?: "summary" | "detail" | undefined;
+        refs?: string[] | undefined;
         project?: true | undefined;
     }>, {
         detail: "summary" | "detail";
@@ -890,8 +890,8 @@ export declare const methodParams: {
         project?: true | undefined;
     }, {
         epic?: string | undefined;
-        refs?: string[] | undefined;
         detail?: "summary" | "detail" | undefined;
+        refs?: string[] | undefined;
         project?: true | undefined;
     }>, {
         detail: "summary" | "detail";
@@ -900,8 +900,8 @@ export declare const methodParams: {
         project?: true | undefined;
     }, {
         epic?: string | undefined;
-        refs?: string[] | undefined;
         detail?: "summary" | "detail" | undefined;
+        refs?: string[] | undefined;
         project?: true | undefined;
     }>;
     /**
@@ -1061,8 +1061,8 @@ export declare const navigationResult: z.ZodObject<{
     why: z.ZodDefault<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     epic: string | null;
-    why: string;
     outcome: "declined" | "moved" | "no-such-target";
+    why: string;
 }, {
     outcome: "declined" | "moved" | "no-such-target";
     epic?: string | null | undefined;
@@ -1244,8 +1244,8 @@ export declare const projectPickResult: z.ZodObject<{
     }>>>;
     why: z.ZodDefault<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    why: string;
     outcome: "declined" | "picked" | "cancelled";
+    why: string;
     project: {
         path: string;
         name: string;

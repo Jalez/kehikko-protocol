@@ -539,22 +539,22 @@ export declare const manifestSchema: z.ZodObject<{
          */
         prompt: z.ZodDefault<z.ZodBoolean>;
     }, "strip", z.ZodTypeAny, {
-        protocol: string;
         prompt: boolean;
+        protocol: string;
         uses: string[];
         storage: boolean;
     }, {
-        protocol?: string | undefined;
         prompt?: boolean | undefined;
+        protocol?: string | undefined;
         uses?: string[] | undefined;
         storage?: boolean | undefined;
     }>>;
 }, "strip", z.ZodTypeAny, {
     id: string;
+    name: string;
     summary: string;
     kind: "kehikot.module" | "roadmap.module";
     protocol: number;
-    name: string;
     version: string;
     dataVersion: number;
     tags: string[];
@@ -571,8 +571,8 @@ export declare const manifestSchema: z.ZodObject<{
         scope: "epic" | "global";
     }[];
     declares: {
-        protocol: string;
         prompt: boolean;
+        protocol: string;
         uses: string[];
         storage: boolean;
     };
@@ -586,9 +586,9 @@ export declare const manifestSchema: z.ZodObject<{
     partless?: string | undefined;
 }, {
     id: string;
+    name: string;
     kind: "kehikot.module" | "roadmap.module";
     protocol: number;
-    name: string;
     entry: string;
     modes: {
         label: string;
@@ -614,8 +614,8 @@ export declare const manifestSchema: z.ZodObject<{
     reacts?: string[] | undefined;
     partless?: string | undefined;
     declares?: {
-        protocol?: string | undefined;
         prompt?: boolean | undefined;
+        protocol?: string | undefined;
         uses?: string[] | undefined;
         storage?: boolean | undefined;
     } | undefined;

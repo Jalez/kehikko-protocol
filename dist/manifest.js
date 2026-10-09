@@ -1,5 +1,6 @@
 import { z } from 'zod';
-import { LEGACY_MANIFEST_KIND, LIMITS, MANIFEST_KIND, PROTOCOL } from './constants.js';
+import { LEGACY_MANIFEST_KIND, MANIFEST_KIND, PROTOCOL } from './constants.js';
+import { LIMITS } from './limits.js';
 import { canonicalName, legacyName } from './dialect.js';
 import { MODE_ID, MODULE_ID } from './ids.js';
 /**
