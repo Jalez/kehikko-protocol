@@ -117,8 +117,8 @@ unvalidated is one a future consumer has to distrust.
 
 A name this version of the protocol can check, which is the only kind worth accepting.
 
-Either spelling: `roadmap.notifications@1` is `kehikot.notifications@1` as an
-unchanged module still names it. See `dialect.ts`.
+Exact: the name as `EXTENSIONS` spells it. The pre-rename spelling
+(`roadmap.notifications@1`) is not known.
 
 #### `schemaFor`
 

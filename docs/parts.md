@@ -233,7 +233,7 @@ show the list. **In the next minor version a manifest that says neither will
 not parse.**
 
 **The check.** `bun run check:parts <module dir>…` (the bin
-`kehikot-check-parts` — `kehikko-check-parts` until the next breaking release — from a module: `bun node_modules/kehikot-module-protocol/bin/check-parts.ts .`)
+`kehikot-check-parts`, from a module: `bun node_modules/kehikot-module-protocol/bin/check-parts.ts .`)
 reads a module's `manifest.ts` and exits 1 on exactly what the manifest says:
 the module declares neither `parts` nor `partless`, declares both, or has no
 manifest that loads. It also scans the module's sources for a named import of
@@ -1126,7 +1126,7 @@ The parts focus as one React value: the rule, the count and the sentence,
 so that a module writes `anchorOf(item)` and where the sentence is drawn,
 and nothing else.
 
-It is here and not in `useKehikot` because half the modules keep the context
+It is here and not in `useHost` because half the modules keep the context
 in a hook of their own, and this has to work for those too: it takes
 whatever of the context the page is holding — the whole `ModuleContext`, or
 `{ parts, epic }` — and wants nothing from the connection.

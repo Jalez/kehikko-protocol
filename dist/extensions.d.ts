@@ -66,8 +66,8 @@ export interface ExtensionFormat {
 export declare const EXTENSIONS: Record<string, ExtensionFormat>;
 export declare const EXTENSION_NAMES: string[];
 /**
- * A name this version of the protocol can check, which is the only kind worth accepting. Either
- * spelling: `roadmap.notifications@1` is `kehikot.notifications@1`. See `dialect.ts`.
+ * A name this version of the protocol can check, which is the only kind worth accepting. Exact:
+ * the name as `EXTENSIONS` spells it.
  */
 export declare function known(extension: string): boolean;
 /**

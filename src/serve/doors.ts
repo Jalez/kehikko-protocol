@@ -1,4 +1,4 @@
-import { BUILD_HEADER, LEGACY_WELL_KNOWN, WELL_KNOWN, buildStamp, legacyManifest, type Build, type Manifest } from '../index.js'
+import { BUILD_HEADER, WELL_KNOWN, buildStamp, type Build, type Manifest } from '../index.js'
 import { TICKET_HEADER } from '../page.js'
 import { BODY_TOO_LARGE, readJsonBody, readJsonRequest, type BodySource } from './body.js'
 import { frameAncestors } from './origins.js'
@@ -15,7 +15,10 @@ export interface Reply {
   status: number
   /** Sent as JSON. `null` is "answer with no body", which is what a notification gets. */
   body: unknown
-  /** Extra response headers. */
+  /**
+   * Extra response headers. An empty value takes a header the doors would otherwise send off the
+   * answer: `'cache-control': ''` is "send no `cache-control`", for bytes a browser may keep.
+   */
   headers?: Record<string, string>
   /** Sent as it is, with this content type, instead of `body` as JSON: a PDF, plain text. */
   raw?: { bytes: Uint8Array | string; type: string }
@@ -45,10 +48,7 @@ export type Stream = (
 ) => { reply: Reply } | { close: () => void } | null
 
 export interface DoorsOptions {
-  /**
-   * Served at both well-known paths, the legacy one in the legacy spelling. The legacy path is
-   * deprecated: the next breaking release answers `WELL_KNOWN` only.
-   */
+  /** Served at `WELL_KNOWN`. */
   manifest: Manifest
   answer: Answer
   stream?: Stream
@@ -64,6 +64,18 @@ export interface DoorsOptions {
   page: PageOptions | (() => string)
   /** Paths that serve the page besides `/app`, `/app/` and `/`. */
   pages?: readonly string[]
+  /**
+   * Origins that may frame the page besides the ones the environment names (`frameOrigins`): a
+   * development harness on a port of its own. Added to the page's `frame-ancestors`.
+   */
+  ancestors?: readonly string[]
+  /**
+   * `true` lets a page on any origin read the health check: `/healthz` answers with
+   * `access-control-allow-origin: *` and exposes the build header. For a module framed WITHOUT
+   * `allow-same-origin` (its manifest declares no storage), whose page is on an opaque origin and
+   * could not otherwise `probeServer()`. Off by default: no other door is opened by it.
+   */
+  openHealth?: boolean
   /**
    * Which paths go to `answer` and `stream`. Default: `/healthz`, `/mcp`, and
    * anything under `/api/`. Everything else is left to Vite unread.
@@ -112,28 +124,33 @@ function standing(options: DoorsOptions) {
     manifest: build ? { ...options.manifest, build } : options.manifest,
     stamp: build ? buildStamp(build) : null,
     document: typeof options.page === 'function' ? options.page : () => pageDocument({ build, ...(options.page as PageOptions) }),
+    /* Worked out per request: who may frame the page is read from the environment as it is then. */
+    pageHeaders: (): Record<string, string> => ({
+      'content-type': 'text/html; charset=utf-8',
+      /* Never cached: the ticket is per process. */
+      'cache-control': 'no-store',
+      'content-security-policy': frameAncestors(process.env, options.ancestors),
+    }),
+    open: options.openHealth === true,
   }
 }
 
 /**
  * A reply as headers and a payload. Nothing the doors send may be cached — an answer is this
- * process's, now — unless the reply names a `cache-control` of its own.
+ * process's, now — unless the reply names a `cache-control` of its own, or an empty one for none.
  */
 function wire(reply: Reply, stamp: string | null): { headers: Record<string, string>; payload: string | Uint8Array | null } {
   const headers: Record<string, string> = { 'cache-control': 'no-store' }
   if (stamp) headers[BUILD_HEADER] = stamp
-  for (const [name, value] of Object.entries(reply.headers ?? {})) headers[name.toLowerCase()] = value
+  for (const [name, value] of Object.entries(reply.headers ?? {})) {
+    /* An empty value is "do not send this one": the only way to answer with no `cache-control`. */
+    if (value === '') delete headers[name.toLowerCase()]
+    else headers[name.toLowerCase()] = value
+  }
   if (reply.raw) return { headers: { ...headers, 'content-type': reply.raw.type }, payload: reply.raw.bytes }
   if (reply.body === null || reply.body === undefined) return { headers, payload: null }
   return { headers: { ...headers, 'content-type': 'application/json; charset=utf-8' }, payload: JSON.stringify(reply.body, null, 2) }
 }
-
-/** The headers of the page: never cached (the ticket is per process), framed by a host or by nothing. */
-const pageHeaders = (): Record<string, string> => ({
-  'content-type': 'text/html; charset=utf-8',
-  'cache-control': 'no-store',
-  'content-security-policy': frameAncestors(),
-})
 
 const STREAM_HEADERS: Record<string, string> = {
   'content-type': 'text/event-stream; charset=utf-8',
@@ -145,12 +162,18 @@ const STREAM_HEADERS: Record<string, string> = {
 const frame = (data: unknown, name?: string) =>
   `${name ? `event: ${name.replace(/[\r\n]/g, '')}\n` : ''}data: ${JSON.stringify(data)}\n\n`
 
-/** The health check says which build is answering, without each module spelling it. */
-function healthy(reply: Reply, path: string, build: Build | undefined): Reply {
+/** What lets a page on another origin — an opaque one — read the health check, and the build on it. */
+const OPEN_HEALTH: Record<string, string> = { 'access-control-allow-origin': '*', 'access-control-expose-headers': BUILD_HEADER }
+
+/**
+ * The health check says which build is answering, without each module spelling it; and, for a
+ * module that asked (`openHealth`), that any page may read it. A header the reply names wins.
+ */
+function healthy(reply: Reply, path: string, build: Build | undefined, open: boolean): Reply {
+  if (path !== '/healthz') return reply
   const body = reply.body
-  return build && path === '/healthz' && body && typeof body === 'object' && !Array.isArray(body)
-    ? { ...reply, body: { ...(body as Record<string, unknown>), build } }
-    : reply
+  const said = build && body && typeof body === 'object' && !Array.isArray(body) ? { ...reply, body: { ...(body as Record<string, unknown>), build } } : reply
+  return open ? { ...said, headers: { ...OPEN_HEALTH, ...said.headers } } : said
 }
 
 /**
@@ -162,7 +185,7 @@ export function doorsHandler(
   options: DoorsOptions,
   transform?: (html: string, url: string, originalUrl?: string) => Promise<string>,
 ): DoorHandler {
-  const { pages, ours, build, manifest, stamp, document } = standing(options)
+  const { pages, ours, build, manifest, stamp, document, pageHeaders, open } = standing(options)
 
   return (request, response, next) => {
     const url = new URL(request.url ?? '/', 'http://127.0.0.1')
@@ -178,8 +201,6 @@ export function doorsHandler(
     }
 
     if (path === WELL_KNOWN) return send({ status: 200, body: manifest })
-    /* The spelling a host from before the rename asks for, so that host still finds this module. */
-    if (path === LEGACY_WELL_KNOWN) return send({ status: 200, body: legacyManifest(manifest) })
 
     if (pages.has(path)) {
       const built = document()
@@ -246,7 +267,7 @@ export function doorsHandler(
         }
         const reply = await options.answer(method, path, url.searchParams, read.body, ticket)
         if (!reply) return next()
-        send(healthy(reply, path, build))
+        send(healthy(reply, path, build, open))
       })
       .catch(next)
   }
@@ -262,7 +283,7 @@ export type DoorFetch = (request: Request) => Promise<Response | null>
  * in `doorsHandler`; a page built ahead of time is `page: () => fillPage(built, { ticket, build })`.
  */
 export function doorsFetch(options: DoorsOptions, transform?: (html: string, url: string) => Promise<string>): DoorFetch {
-  const { pages, ours, build, manifest, stamp, document } = standing(options)
+  const { pages, ours, build, manifest, stamp, document, pageHeaders, open } = standing(options)
 
   const send = (reply: Reply): Response => {
     const { headers, payload } = wire(reply, stamp)
@@ -275,7 +296,6 @@ export function doorsFetch(options: DoorsOptions, transform?: (html: string, url
     const method = request.method.toUpperCase()
 
     if (path === WELL_KNOWN) return send({ status: 200, body: manifest })
-    if (path === LEGACY_WELL_KNOWN) return send({ status: 200, body: legacyManifest(manifest) })
 
     if (pages.has(path)) {
       const built = document()
@@ -330,7 +350,7 @@ export function doorsFetch(options: DoorsOptions, transform?: (html: string, url
     const read = await readJsonRequest(request, { maxBytes: options.maxBodyBytes })
     if (!read.ok) return send({ status: read.status, body: { ok: false, error: BODY_TOO_LARGE }, headers: { connection: 'close' } })
     const reply = await options.answer(method, path, url.searchParams, read.body, ticket)
-    return reply ? send(healthy(reply, path, build)) : null
+    return reply ? send(healthy(reply, path, build, open)) : null
   }
 }
 

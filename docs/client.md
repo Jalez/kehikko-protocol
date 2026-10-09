@@ -12,7 +12,7 @@ Back to the [index](README.md).
 
 ```
 import { connect } from 'kehikot-module-protocol/client'
-import { useKehikot } from 'kehikot-module-protocol/client/react'   // optional again
+import { useHost } from 'kehikot-module-protocol/client/react'   // optional again
 ```
 
 Twelve modules wrote the same `postMessage` handshake by hand — 7,519 lines of
@@ -670,13 +670,6 @@ And the last refresh state, replayed for the same reason and with one of
      that no longer exists. A missing control is a thing somebody notices; a
      stale timestamp is a thing they believe.
 
-#### `connect.dialect`
-
-Which spelling the host greeted us in, and so the one we answer in. A host
-     from before the rename greets with `roadmap.hello` and hears nothing else;
-     a current one greets with `kehikot.hello`. Everything this file builds is
-     canonical, and is respelled only here, on the way out. See `dialect.ts`.
-
 #### `connect.settle.pending`
 
 A late answer to a question nobody is waiting for is dropped, quietly.
@@ -820,8 +813,7 @@ See the note in `index.ts`.
 
 What it adds over calling `connect` yourself is three orderings that are easy
 to get wrong and silent when you do — the store-before-listen split, the
-handler refs, and the discarded-mount guard. Each is described where it
-happens.
+handler refs, and the discarded-mount guard.
 
 #### `GREETING_GRACE_MS`
 
@@ -846,121 +838,14 @@ there": one lasts under a second and the other is the standalone case a module
 is expected to work in. Drawing the second while in the first is the flicker
 the grace above exists to prevent.
 
-#### `Kehikot.context`
+#### `useHost`
 
-The whole context, as the host last said it, or null before the greeting.
+The hook is `useHost`, and it is described with the rest of the shared plumbing in
+[module-plumbing.md](module-plumbing.md): the flattened context, the theme, the kept state, and
+the handlers. It is a thin binding over `hostStore` (`host-store.ts`), which keeps the three
+orderings above — the connection stored before it listens, the handlers read when a message
+arrives, a stopped store's answer never overwriting the live one — outside React.
 
-Whole and not picked apart, deliberately: a hook that returned a chosen few
-fields would be the enumerated-context bug wearing a different hat, and
-every field the protocol grows would stop at this line. Read what you need.
-
-#### `Kehikot.request`
-
-Ask the host something. Rejects with `HostRefused`, always. Safe before the
-greeting: it refuses.
-
-`options.within` is this one question's deadline — see `AskOptions`. It is
-threaded through rather than dropped because the hook is how most modules
-ask anything, and a question that waits on a person is unaskable through a
-wrapper that only knows the connection's clock.
-
-#### `Kehikot.filters`
-
-Say what this page can be narrowed by. The host draws the control; the
-choice comes back in `context.filters`.
-
-Stable across renders, so it can be called from an effect whose only other
-dependency is whatever made the offer change — which is the ordinary
-pattern, because a label that carries a count changes whenever the count
-does.
-
-#### `Kehikot.clearable`
-
-Say that what this page shows can be cleared, and what to call it. `null`
-takes the control away.
-
-Stable across renders like `filters`, and for the same reason: the ordinary
-call site is an effect whose only real dependency is whatever the label
-counts, so this must not be one of the things that changed.
-
-The press arrives at `onClear` in the `events` given to this hook. Nothing
-comes back through the context and there is no state to read here — the
-host relays a press and learns nothing about what went.
-
-#### `Kehikot.refreshable`
-
-Say that this page can read its material again, and when it last did.
-
-Stable across renders like `filters` and `clearable`, and the ordinary call
-site is the same shape: an effect whose dependency is the reading, calling
-this with a new `at` whenever one arrives.
-
-The press arrives at `onRefresh` in the `events` given to this hook. `at` is
-the module's fact about its own data, and a host never infers one — see
-`refreshableSchema` for the four ways such a guess is wrong.
-
-#### `Kehikot.connection`
-
-The live connection, or null between mounts.
-
-Here because a page with its own machinery — a poll that emits, a store that
-asks — needs the same connection the hook is holding, and building a second
-one would be a second `ready` and a second backlog replay. Read it at the
-moment you need it rather than capturing it.
-
-#### `useKehikot`
-
-> **Deprecated in 0.37, removed in the next breaking release.** Use `useHost` ([module-plumbing.md](module-plumbing.md)), or `hostStore` outside React. `useRoadmap`, `Roadmap` and `UseRoadmapOptions` go with it. What follows describes `useKehikot` as it is until then.
-
-Connect once, for the life of this component, and re-render when the host speaks.
-
-`events` may be rebuilt on every render — it is read through a ref, never
-captured — so there is no need to memoise it at the call site. `id` is the
-only dependency, because reconnecting is a second `ready` and a torn-down
-listener during whatever millisecond the host chose to greet in.
-
-#### `useKehikot.handlers`
-
-The handlers, held in a ref and read at the moment a message arrives.
-
-A view rebuilds `onGoto` whenever its rows change, and connecting to the
-window again on every render would mean a torn-down listener during the one
-millisecond a host chose to greet in. So the listener is established once
-and always calls the newest handler — which is also the only one that knows
-what is currently on screen.
-
-#### Inside `useKehikot.live.onHello`
-
-The discarded mount's answer must not overwrite the live one.
-
-`StrictMode` mounts, unmounts and mounts again. The first
-connection is stopped in the first cleanup, but a message already
-in flight — or, far more often, one being replayed out of the
-mailbox's backlog — can still reach its handlers, and the mailbox
-replays to EVERY subscriber including the doomed one. Without this
-line the second mount's fresh context is overwritten by the first
-mount's stale one, in the order the two happen to be delivered, and
-the page draws a greeting it has since been told to forget.
-
-It is one comparison and it is the difference between a
-double-mounted page that is right and one that is right most of the
-time.
-
-#### `useKehikot.live.onGoto.handler`
-
-Not guarded, and that is deliberate: the host is WAITING on this
-             one, and a discarded mount refusing to answer is a reference that
-             sits out the host's timeout. Whichever mount hears it answers it.
-
-#### Inside `useKehikot`
-
-Stored BEFORE it is told to listen, and the order is the whole of a bug
-that made two modules hang. The mailbox replays synchronously inside
-`listen`, so anything reading this ref from a handler must find it
-already assigned. See `listen` in `connect.ts`.
-
-#### Inside `useKehikot.request`
-
-Refused in the connection's own words rather than a second spelling of
-       them, so a caller sees one sentence for "nobody is there" whichever side
-       of the mount it asked from.
+The first hook, `useKehikot` (once `useRoadmap`), was deprecated in 0.37 and is gone: it
+returned the raw context and a `state` string, and never delivered `onClear` or `onRefresh`.
+[MIGRATING.md](../MIGRATING.md) has the before and after.

@@ -23,15 +23,17 @@ export function ticket() {
 }
 /** What a reader is told when nothing answered. One sentence, the same in every module. */
 export const SERVER_DOWN = 'This app’s own server is not answering.';
-/** What a reader is told while a page older than its server reloads. */
-export const PAGE_STALE = 'This page is older than its server — reloading…';
 /**
- * The same fact for a page that is not about to reload — one that turned `reloadWhenStale` off —
- * to say in place of a failure's `error`, which is always `PAGE_STALE`.
+ * The fact, and nothing about what happens next: what a stale `ask` says as its `error`, whether
+ * or not anything is about to reload. A page that keeps unsaved words says this beside them.
  */
 export const PAGE_OLD = 'This page is older than its server.';
-/** What `replied` says of a 2xx that carried no JSON object. */
+/** The same fact while a reload is on its way: what the stale `Cover` says, because it is the one reloading. */
+export const PAGE_STALE = 'This page is older than its server — reloading…';
+/** What is said of a 2xx that carried something other than JSON, and by `replied` of one that carried no object. */
 export const NOT_A_REPLY = 'This app’s own server answered with something that is not a reply.';
+/** What a cancelled `ask` says. */
+export const CANCELLED = 'That was cancelled.';
 /** The most a browser will carry in a `keepalive` request is 64 KiB across all of them; this leaves room. */
 export const KEEPALIVE_BYTES = 48_000;
 let standing = 'up';
@@ -69,7 +71,9 @@ function sentence(body) {
 }
 /**
  * Ask this page's own server; relative paths, one origin. Anything but a GET carries the ticket.
- * A 2xx whose body says `ok: false` is a refusal, and a refusal keeps its `body`.
+ * A 2xx whose body says `ok: false` is a refusal, and a refusal keeps its `body`. A 2xx with no
+ * body at all is `ok: true, body: null`; a 2xx with a body that is not JSON is a refusal
+ * (`NOT_A_REPLY`) — something answered on this path, and it was not this module's door.
  */
 export async function ask(path, options = {}) {
     const method = (options.method ?? (options.body === undefined ? 'GET' : 'POST')).toUpperCase();
@@ -94,17 +98,30 @@ export async function ask(path, options = {}) {
         });
     }
     catch (caught) {
-        /* A caller that gave up is not a server that stopped. */
+        /* A caller that gave up is not a server that stopped, and not a server that said no. */
         if (options.signal?.aborted)
-            return { ok: false, kind: 'refused', status: null, error: 'That was cancelled.', body: null };
+            return { ok: false, kind: 'cancelled', status: null, error: CANCELLED, body: null };
         stand('down');
         void caught;
         return { ok: false, kind: 'down', status: null, error: SERVER_DOWN, body: null };
     }
-    const body = response.status === 204 ? null : await response.json().catch(() => null);
+    /* Read as text first: an empty body and a body that is not JSON are different answers. */
+    let body = null;
+    let unreadable = false;
+    if (response.status !== 204) {
+        const text = await response.text().catch(() => '');
+        if (text.trim()) {
+            try {
+                body = JSON.parse(text);
+            }
+            catch {
+                unreadable = true;
+            }
+        }
+    }
     if (response.status === 403 && body?.refused === TICKET_REFUSED) {
         stand('stale');
-        return { ok: false, kind: 'stale', status: 403, error: PAGE_STALE, body };
+        return { ok: false, kind: 'stale', status: 403, error: PAGE_OLD, body };
     }
     /* The server answering is not the process that served this page: every write from here would be
        refused. The answer itself still stands — a read from the new server is a true read. */
@@ -124,6 +141,9 @@ export async function ask(path, options = {}) {
             body,
         };
     }
+    /* A 2xx that is not JSON: HTML from whatever is behind the doors, a proxy's page. Not an answer. */
+    if (unreadable)
+        return { ok: false, kind: 'refused', status: response.status, error: NOT_A_REPLY, body: null };
     return { ok: true, status: response.status, body: body };
 }
 /** A failed `ask`, for code written around `try`/`catch`. `message` is the sentence. */
@@ -171,6 +191,30 @@ export function replied(asked) {
 export async function probeServer(path = '/healthz', options = {}) {
     await ask(path, options);
     return standing;
+}
+/** How often `watchServer` asks, in ms, unless told otherwise. */
+export const WATCH_SERVER_MS = 15_000;
+/**
+ * Keep asking whether the server is there, for a page that never asks it anything else — one whose
+ * rows all come from the host — and so would never notice it had stopped: `probeServer` every
+ * `every` ms while the page is visible, and once each time it becomes visible again. The answer is
+ * the standing the covers read. Returns the function that stops watching. A page on an opaque
+ * origin needs its server's `openHealth` (`doors`) for the answer to be readable.
+ */
+export function watchServer(options = {}) {
+    if (typeof document === 'undefined')
+        return () => { };
+    const every = typeof options.every === 'number' && options.every > 0 ? options.every : WATCH_SERVER_MS;
+    const knock = () => {
+        if (document.visibilityState !== 'hidden')
+            void probeServer(options.path, { fetch: options.fetch });
+    };
+    const timer = setInterval(knock, every);
+    document.addEventListener('visibilitychange', knock);
+    return () => {
+        clearInterval(timer);
+        document.removeEventListener('visibilitychange', knock);
+    };
 }
 /**
  * Reload a page that is older than its server — once: a second call within `within` ms does

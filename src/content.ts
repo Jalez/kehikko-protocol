@@ -1,6 +1,5 @@
 import { z } from 'zod'
 import { LIMITS } from './limits.js'
-import { canonicalName } from './dialect.js'
 import { EPIC_SLUG, MODULE_ID } from './ids.js'
 
 /**
@@ -23,7 +22,7 @@ const instant = z.string().datetime({ offset: true })
  * "any epic of this source".
  */
 export const contentChangeSchema = z.object({
-  source: z.string().regex(MODULE_ID).transform(canonicalName),
+  source: z.string().regex(MODULE_ID),
   epic: z.string().regex(EPIC_SLUG).nullable().default(null),
   at: instant,
 })

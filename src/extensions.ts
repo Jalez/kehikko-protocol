@@ -1,6 +1,5 @@
 import { z } from 'zod'
 import { LIMITS } from './limits.js'
-import { canonicalName } from './dialect.js'
 import { EPIC_SLUG } from './ids.js'
 import { ref } from './fragments.js'
 
@@ -76,11 +75,11 @@ export const EXTENSIONS: Record<string, ExtensionFormat> = {
 export const EXTENSION_NAMES = Object.keys(EXTENSIONS)
 
 /**
- * A name this version of the protocol can check, which is the only kind worth accepting. Either
- * spelling: `roadmap.notifications@1` is `kehikot.notifications@1`. See `dialect.ts`.
+ * A name this version of the protocol can check, which is the only kind worth accepting. Exact:
+ * the name as `EXTENSIONS` spells it.
  */
 export function known(extension: string): boolean {
-  return Object.hasOwn(EXTENSIONS, canonicalName(extension))
+  return Object.hasOwn(EXTENSIONS, extension)
 }
 
 /**
@@ -88,6 +87,5 @@ export function known(extension: string): boolean {
  * not a router: delivery, to whom and under whose name, belongs to whoever is delivering.
  */
 export function schemaFor(extension: string): z.ZodTypeAny | undefined {
-  const name = canonicalName(extension)
-  return Object.hasOwn(EXTENSIONS, name) ? EXTENSIONS[name]?.payload : undefined
+  return Object.hasOwn(EXTENSIONS, extension) ? EXTENSIONS[extension]?.payload : undefined
 }

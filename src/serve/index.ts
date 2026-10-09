@@ -26,7 +26,6 @@ export {
 export { DEFAULT_FRAME_ORIGINS, frameAncestors, frameOrigins } from './origins.js'
 
 export {
-  legacyRegistryDir,
   neighbourPorts,
   portOf,
   readRegistration,

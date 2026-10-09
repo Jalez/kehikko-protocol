@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { LEGACY_MANIFEST_KIND } from './constants.js';
 /**
  * What a module says about itself when a host asks: the manifest schema, the words it suggests (`REACTS_TO`,
  * `TAGS`), and the pure readers `speaks` and `partsDeclaration`. Every string in the schema has a `max` from
@@ -81,21 +80,18 @@ export declare const TAGS: {
 };
 export type Tag = keyof typeof TAGS;
 export declare const TAG_NAMES: Tag[];
-export declare const manifestSchema: z.ZodObject<{
-    /**
-     * The word that makes this a manifest claim rather than a hopeful GET. Either spelling is
-     * accepted and handed back as it was said: `roadmap.module` is a module from before the rename.
-     * See `dialectOfKind`.
-     */
-    kind: z.ZodEnum<["kehikot.module", "roadmap.module"]>;
+/**
+ * The manifest. Every field above, and one rule over two of them: a module either follows the
+ * picked parts (`reacts` has `parts`) or says in `partless` why it has nothing to narrow. A
+ * manifest that says neither, or both, does not parse, and the issue is the sentence saying what
+ * to add (`partsDeclaration`). A `ZodEffects`, so it has no `.shape`; nothing else changed.
+ */
+export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
+    /** The word that makes this a manifest claim rather than a hopeful GET. */
+    kind: z.ZodLiteral<"kehikot.module">;
     /** Which protocol this module was built against, as a single integer. */
     protocol: z.ZodNumber;
-    /**
-     * Canonical once parsed: `roadmap.journeys` is read as `kehikot.journeys`,
-     * the same module under the name it has had since the rename. See
-     * `canonicalModuleId`.
-     */
-    id: z.ZodEffects<z.ZodString, string, string>;
+    id: z.ZodString;
     name: z.ZodString;
     /**
      * The module's own version. Shown to a person; this protocol never parses or compares it, and it
@@ -155,8 +151,8 @@ export declare const manifestSchema: z.ZodObject<{
      * that does not know a name does not route it.
      */
     extensions: z.ZodDefault<z.ZodObject<{
-        emits: z.ZodDefault<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">>;
-        consumes: z.ZodDefault<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">>;
+        emits: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
+        consumes: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
     }, "strip", z.ZodTypeAny, {
         emits: string[];
         consumes: string[];
@@ -172,8 +168,8 @@ export declare const manifestSchema: z.ZodObject<{
     reacts: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
     /**
      * Why this module has nothing to narrow to the picked parts, in one sentence, for a module that
-     * does not say `reacts: ['parts']` (0.34.0). Optional and never defaulted. A module that says
-     * neither is reported by `partsDeclaration`, not refused; the next breaking release refuses it.
+     * does not say `reacts: ['parts']`. Optional and never defaulted; a manifest says one or the
+     * other, and `manifestSchema` refuses one that says neither or both (`partsDeclaration`).
      */
     partless: z.ZodOptional<z.ZodString>;
     modes: z.ZodArray<z.ZodObject<{
@@ -259,7 +255,7 @@ export declare const manifestSchema: z.ZodObject<{
     id: string;
     name: string;
     summary: string;
-    kind: "kehikot.module" | "roadmap.module";
+    kind: "kehikot.module";
     dataVersion: number;
     tags: string[];
     guidance: string;
@@ -298,7 +294,84 @@ export declare const manifestSchema: z.ZodObject<{
     protocol: number;
     id: string;
     name: string;
-    kind: "kehikot.module" | "roadmap.module";
+    kind: "kehikot.module";
+    entry: string;
+    modes: {
+        label: string;
+        id: string;
+        scope?: "epic" | "global" | undefined;
+    }[];
+    build?: unknown;
+    version?: string | undefined;
+    summary?: string | undefined;
+    dataVersion?: number | undefined;
+    tags?: string[] | undefined;
+    guidance?: string | undefined;
+    icon?: string | undefined;
+    health?: string | undefined;
+    mcp?: {
+        url: string;
+        transport?: "http" | "sse" | "stdio" | undefined;
+        about?: string | undefined;
+    } | undefined;
+    extensions?: {
+        emits?: string[] | undefined;
+        consumes?: string[] | undefined;
+    } | undefined;
+    reacts?: string[] | undefined;
+    partless?: string | undefined;
+    declares?: {
+        protocol?: string | undefined;
+        prompt?: boolean | undefined;
+        uses?: string[] | undefined;
+        storage?: boolean | undefined;
+    } | undefined;
+}>, {
+    version: string;
+    protocol: number;
+    id: string;
+    name: string;
+    summary: string;
+    kind: "kehikot.module";
+    dataVersion: number;
+    tags: string[];
+    guidance: string;
+    entry: string;
+    extensions: {
+        emits: string[];
+        consumes: string[];
+    };
+    reacts: string[];
+    modes: {
+        label: string;
+        id: string;
+        scope: "epic" | "global";
+    }[];
+    declares: {
+        protocol: string;
+        prompt: boolean;
+        uses: string[];
+        storage: boolean;
+    };
+    build?: {
+        version: string;
+        commit: string | null;
+        started: string;
+        protocol: string;
+    } | undefined;
+    icon?: string | undefined;
+    health?: string | undefined;
+    mcp?: {
+        url: string;
+        transport: "http" | "sse" | "stdio";
+        about: string;
+    } | undefined;
+    partless?: string | undefined;
+}, {
+    protocol: number;
+    id: string;
+    name: string;
+    kind: "kehikot.module";
     entry: string;
     modes: {
         label: string;
@@ -335,26 +408,16 @@ export type Manifest = z.infer<typeof manifestSchema>;
 /** What a module author writes, before defaults are filled in. */
 export type ManifestInput = z.input<typeof manifestSchema>;
 /**
- * A parsed manifest, spelled for a host from before the rename: the old `kind`, the old module id,
- * the old extension names; everything else is the same document. What a module serves at
- * `LEGACY_WELL_KNOWN`. Pure; the manifest passed in is not changed.
- *
- * @deprecated Removed in the next breaking release, with the pre-rename dialect: a manifest is
- * served at `WELL_KNOWN` only, as it is.
- */
-export declare function legacyManifest(manifest: Manifest): Omit<Manifest, 'kind'> & {
-    kind: typeof LEGACY_MANIFEST_KIND;
-};
-/**
  * Does a range include a protocol number? Space-separated comparisons against an integer (`>=1 <2`,
  * or bare `1`), all of which must hold; anything unreadable names nothing (false). Pure, a reading
  * not a decision: a host must also compare its own protocol number against `manifest.protocol`.
  */
 export declare function speaks(range: string, protocol?: number): boolean;
 /**
- * What is wrong with what a module says about the parts of an epic, as sentences a host can show; `[]` when
- * nothing is. A module has `parts` in `reacts` or a reason in `partless`; neither and both are reported. Not
- * called by `manifestSchema`: a warning now (`bun run check:parts` fails), a refusal in the next breaking release.
+ * What is wrong with what a module says about the parts of an epic, as sentences a person can act on; `[]`
+ * when nothing is. A module has `parts` in `reacts` or a reason in `partless`; neither and both are reported.
+ * `manifestSchema` refuses a manifest this reports, with these sentences as the issues; call it directly to
+ * say the same thing about an object that has not been parsed.
  */
 export declare function partsDeclaration(manifest: {
     id?: string;

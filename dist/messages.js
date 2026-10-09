@@ -1,7 +1,6 @@
 import { z } from 'zod';
-import { MESSAGE, MESSAGE_PREFIXES, PROTOCOL } from './constants.js';
+import { MESSAGE, MESSAGE_PREFIX, PROTOCOL } from './constants.js';
 import { LIMITS } from './limits.js';
-import { canonicalName, legacyName } from './dialect.js';
 import { EPIC_SLUG, MODULE_ID } from './ids.js';
 import { buildSchema } from './build.js';
 import { contextSchema } from './context.js';
@@ -12,12 +11,9 @@ import { gotoRef, kehikkoSchema, stepNumber } from './fragments.js';
  * a framed, cross-origin module. Parse both directions: a module validates what the host sends too.
  * Design notes: docs/wire.md, and docs/filters.md for filters, clearing and refreshing.
  */
-/**
- * A message type, read in either spelling (`kehikot.` or the older `roadmap.`) and handed back in
- * the current one. Sending in the old spelling is `toDialect`'s job; see `dialect.ts`.
- */
+/** A message type: the one literal, in the one spelling. */
 function messageType(type) {
-    return z.union([z.literal(type), z.literal(legacyName(type))]).transform(() => type);
+    return z.literal(type);
 }
 /** The id correlating a question with its answer, or a `goto` with its `went`. */
 const correlation = z.string().min(1).max(LIMITS.CORRELATION);
@@ -166,11 +162,11 @@ export const eventSchema = z.object({
     type: messageType(MESSAGE.EVENT),
     protocol: z.number().int().min(1),
     /** The format, e.g. `kehikot.notifications@1`. Known to the host, or unsent. */
-    extension: z.string().min(1).max(LIMITS.EXTENSION).transform(canonicalName),
+    extension: z.string().min(1).max(LIMITS.EXTENSION),
     /** Whatever that format says. Validated by the host before it left. */
     payload: z.unknown(),
     /** The module that emitted it, named by the host from its own registry. */
-    from: z.string().regex(MODULE_ID).transform(canonicalName),
+    from: z.string().regex(MODULE_ID),
     /**
      * When the host accepted it, ISO 8601. A receiver ordering by arrival would
      * be ordering by its own scheduler instead.
@@ -189,8 +185,7 @@ export const eventSchema = z.object({
  */
 export const readySchema = z.object({
     type: messageType(MESSAGE.READY),
-    /* Canonical once parsed: an unchanged module still answers as `roadmap.x`. */
-    id: z.string().regex(MODULE_ID).transform(canonicalName),
+    id: z.string().regex(MODULE_ID),
     protocol: z.number().int().min(1).default(PROTOCOL),
     /** The build that served this page, as printed into it. A host compares it with the server's now. */
     build: buildSchema.optional().catch(undefined),
@@ -252,12 +247,12 @@ export const moduleMessageSchema = z.union([
 ]);
 /**
  * Is this worth parsing at all? The cheap first filter: true when the value is an object whose
- * `type` starts `kehikot.` or the older `roadmap.`. Says nothing about validity or the sender.
+ * `type` starts `kehikot.`. Says nothing about validity or the sender.
  */
 export function looksLikeWireMessage(value) {
     return (typeof value === 'object' &&
         value !== null &&
         'type' in value &&
         typeof value.type === 'string' &&
-        MESSAGE_PREFIXES.some((prefix) => value.type.startsWith(prefix)));
+        value.type.startsWith(MESSAGE_PREFIX));
 }

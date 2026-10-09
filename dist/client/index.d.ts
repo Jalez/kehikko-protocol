@@ -6,10 +6,10 @@
  */
 export { mailbox, makeMailbox, KEEP, type MessageSource } from './mailbox.js';
 export { connect, HostRefused, ANSWER_WITHIN_MS, PERSON_ANSWERS_WITHIN_MS, GOTO_BACKSTOP_MS, NOBODY_TO_ASK, type AskOptions, type Connection, type ConnectOptions, type HostEvents, type Refusal, } from './connect.js';
-export { ask, answered, replied, probeServer, ticket, AskFailed, onServerStanding, serverStanding, resetServerStanding, reloadStalePage, reloadWhenStale, STALE_RELOAD_MS, PAGE_STALE, PAGE_OLD, NOT_A_REPLY, KEEPALIVE_BYTES, SERVER_DOWN, type AskFailure, type Asked, type AskOptions as AskServerOptions, type ServerStanding, } from './ask.js';
+export { ask, answered, replied, probeServer, watchServer, ticket, AskFailed, onServerStanding, serverStanding, resetServerStanding, reloadStalePage, reloadWhenStale, STALE_RELOAD_MS, PAGE_STALE, PAGE_OLD, NOT_A_REPLY, CANCELLED, WATCH_SERVER_MS, KEEPALIVE_BYTES, SERVER_DOWN, type AskFailure, type Asked, type AskOptions as AskServerOptions, type ServerStanding, } from './ask.js';
 export { follow, type Attachment, type FollowOptions } from './stream.js';
 export { type Query, type QueryValue } from './query.js';
 export { applyTheme, pageTheme, systemTheme } from './theme.js';
 export { pageBuild } from './build.js';
 export { held, heldDraft, type Draft, type Held, type HeldAt, type HeldReader } from './held.js';
-export { hostStore, hostFields, GREETING_GRACE_MS, JSON_KEPT, type HostActions, type HostFields, type HostStanding, type HostStore, type HostStoreOptions, type KeptCodec, type Where, } from './host-store.js';
+export { hostStore, hostFields, GREETING_GRACE_MS, JSON_KEPT, type HostActions, type HostFields, type HostStanding, type HostStore, type HostStoreOptions, type KeptCodec, type SteadyField, type Steadiness, type Where, } from './host-store.js';

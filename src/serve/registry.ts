@@ -2,21 +2,15 @@ import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
 
-import { canonicalName, legacyName } from '../dialect.js'
-import { MODULE_ID } from '../ids.js'
-import { deprecated } from '../deprecated.js'
+import { ID_PREFIX_BEFORE_RENAME, MODULE_ID, canonicalModuleId } from '../ids.js'
 
 /**
- * The one directory a host sweeps for registrations: `KEHIKOT_MODULES_DIR` (else
- * `ROADMAP_MODULES_DIR`) when set; `~/Library/Application Support/Kehikot/modules` on macOS;
- * `$XDG_DATA_HOME/kehikot/modules` (default `~/.local/share/kehikot/modules`) elsewhere.
- * `ROADMAP_MODULES_DIR` is deprecated: the next breaking release reads `KEHIKOT_MODULES_DIR` only.
+ * The one directory a host sweeps for registrations: `KEHIKOT_MODULES_DIR` when set;
+ * `~/Library/Application Support/Kehikot/modules` on macOS; `$XDG_DATA_HOME/kehikot/modules`
+ * (default `~/.local/share/kehikot/modules`) elsewhere.
  */
 export function registryDir(env: Record<string, string | undefined> = process.env): string {
-  if (!env.KEHIKOT_MODULES_DIR && env.ROADMAP_MODULES_DIR) {
-    deprecated('The environment variable ROADMAP_MODULES_DIR', 'Set KEHIKOT_MODULES_DIR.')
-  }
-  const said = env.KEHIKOT_MODULES_DIR || env.ROADMAP_MODULES_DIR
+  const said = env.KEHIKOT_MODULES_DIR
   if (said) return said
   const home = env.HOME || homedir()
   if (process.platform === 'darwin') return join(home, 'Library', 'Application Support', 'Kehikot', 'modules')
@@ -24,16 +18,12 @@ export function registryDir(env: Record<string, string | undefined> = process.en
 }
 
 /**
- * The registry before the rename, `~/.roadmap/modules` — READ, never written, so what a module
- * wrote there (`keep`, above all) is carried over. `null` when the registry was pointed somewhere
- * on purpose, so a test never reads a person's real one.
- *
- * @deprecated Removed in the next breaking release, which no longer reads `~/.roadmap/modules`: a
- * host copies that directory into `registryDir()` once. Nothing replaces it.
+ * The file name a module's registration had before the app was renamed (`roadmap.<name>.json`), or
+ * `null` for an id that never had one. READ, never written: a registry that was carried over from
+ * `~/.roadmap/modules` may still hold one, and what it says (`keep`, above all) is this module's.
  */
-export function legacyRegistryDir(env: Record<string, string | undefined> = process.env): string | null {
-  if (env.KEHIKOT_MODULES_DIR || env.ROADMAP_MODULES_DIR) return null
-  return join(env.HOME || homedir(), '.roadmap', 'modules')
+export function registrationBeforeRename(id: string): string | null {
+  return id.startsWith('kehikot.') ? `${ID_PREFIX_BEFORE_RENAME}${id.slice('kehikot.'.length)}.json` : null
 }
 
 /** What one registration says. The host reads `url`, `dir`, and a `keep` this never writes. */
@@ -61,8 +51,8 @@ export function registerAt({ id, origin, dir }: { id: string; origin: string; di
 
   const where = registryDir()
   const file = join(where, `${id}.json`)
-  /* What this module said last time: under this id or its pre-rename one (`roadmap.x`), here or
-     in the old `~/.roadmap/modules`. Only read — the older files are left exactly as they are. */
+  /* What this module said last time: under this id, or in the file it had before the rename
+     (`roadmap.x.json`) beside it. Only read — the older file is left exactly as it is. */
   const earlier = earlierFiles(id, where, file)
   const before = earlier.map(readRegistration).find((r) => r !== null) ?? null
 
@@ -77,18 +67,10 @@ export function registerAt({ id, origin, dir }: { id: string; origin: string; di
   return { id, url: origin, dir, file, was }
 }
 
-/* This module's file, then the files that are the same module under its
-   pre-rename id, nearest first. See `registerAt`. */
+/* This module's file, then the one it had before the rename, in the same directory. See `registerAt`. */
 function earlierFiles(id: string, where: string, file: string): string[] {
-  const files = [file]
-  const old = legacyName(id)
-  if (old !== id) files.push(join(where, `${old}.json`))
-  const legacy = legacyRegistryDir()
-  if (legacy && legacy !== where) {
-    files.push(join(legacy, `${id}.json`))
-    if (old !== id) files.push(join(legacy, `${old}.json`))
-  }
-  return files
+  const old = registrationBeforeRename(id)
+  return old ? [file, join(where, old)] : [file]
 }
 
 /**
@@ -127,29 +109,24 @@ export function readRegistration(file: string): Registration | null {
  * port is treated as occupied even when nothing is listening on it.
  */
 export function neighbourPorts(selfId: string, where = registryDir()): Set<number> {
-  /* And the pre-rename registry too, when this is the real one: a claim stated there is just as
-     much a claim. */
-  const legacy = where === registryDir() ? legacyRegistryDir() : null
   const ports = new Set<number>()
-  for (const dir of legacy && legacy !== where ? [where, legacy] : [where]) {
-    let names: string[]
-    try {
-      names = readdirSync(dir)
-    } catch {
-      /* No registry directory yet. The first module on a clean machine is not an error. */
-      continue
-    }
-    for (const name of names) {
-      if (!name.endsWith('.json')) continue
-      const id = name.slice(0, -'.json'.length)
-      /* Compared canonically: `roadmap.x.json` is this same module under its
-         pre-rename id, and its port is our own, not a neighbour's. */
-      if (canonicalName(id) === canonicalName(selfId) || !MODULE_ID.test(id)) continue
-      const registration = readRegistration(join(dir, name))
-      if (!registration) continue
-      const port = portOf(registration.url)
-      if (port !== null) ports.add(port)
-    }
+  let names: string[]
+  try {
+    names = readdirSync(where)
+  } catch {
+    /* No registry directory yet. The first module on a clean machine is not an error. */
+    return ports
+  }
+  for (const name of names) {
+    if (!name.endsWith('.json')) continue
+    const id = name.slice(0, -'.json'.length)
+    /* Compared canonically: a `roadmap.x.json` left from before the rename is this same module,
+       and its port is our own, not a neighbour's. */
+    if (canonicalModuleId(id) === canonicalModuleId(selfId) || !MODULE_ID.test(id)) continue
+    const registration = readRegistration(join(where, name))
+    if (!registration) continue
+    const port = portOf(registration.url)
+    if (port !== null) ports.add(port)
   }
   return ports
 }

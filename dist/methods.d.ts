@@ -605,7 +605,7 @@ export declare const methodParams: {
         epic?: string | undefined;
     }>;
     readonly 'events.emit': z.ZodObject<{
-        extension: z.ZodEffects<z.ZodString, string, string>;
+        extension: z.ZodString;
         /**
          * Unknown here, and checked against the named extension's own schema by whoever routes it; see
          * `./extensions.js`. So this method can carry an extension this version of the package has

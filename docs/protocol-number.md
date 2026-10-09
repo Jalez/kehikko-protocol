@@ -1,8 +1,7 @@
-# The protocol number, and the rename from "roadmap"
+# The protocol number, and what is left of the rename from "roadmap"
 
-Why `PROTOCOL` is 2 and what would raise it, and how both spellings of every name (`kehikot.` and `roadmap.`) are read and written.
+Why `PROTOCOL` is 2 and what would raise it, and the one place a name from before the rename is still read.
 
-> **Deprecated in 0.37, removed in the next breaking release.** The second spelling — `roadmap.` message types, `roadmap.module`, `/.well-known/roadmap-module.json`, and everything in `dialect.ts` except `canonicalModuleId` — goes. The next breaking release reads and writes `kehikot.` only; `canonicalModuleId` stays for an id written to disk before the rename. `PROTOCOL` does not change for it: no `kehikot.` message changes meaning.
 
 This is the reasoning, not the reference: the shapes themselves, with their bounds, are in the source and show on hover. The first half is the overview that used to be in the README; the second half is the note that used to stand above each symbol in the source, under that symbol's name.
 
@@ -141,105 +140,46 @@ removed.
 
 #### A note in `src/constants.ts`
 
-##### And why the rename did not raise it either
+##### And why neither the rename nor its removal raised it
 
-Every name on the wire changed spelling — `roadmap.hello` became
-`kehikot.hello`, `roadmap.module` became `kehikot.module`, the well-known
-path, the extension names and the module ids with them — when the app that
-was once called "roadmap" became Kehikot. That LOOKS like the condition above:
-existing messages changing name. It is not, because nothing changed meaning
-and nothing was taken away. Both spellings are read everywhere, and the old
-one is still written to anybody known to speak only it — see `dialect.ts`.
-A module built against the old names keeps working against a new host, and a
-module built against the new ones keeps working against an old host. Two
-programs that could speak yesterday can speak today, which is the only thing
-this number is for, so it stays where it is.
+Every name on the wire changed spelling in 0.25.0 — `roadmap.hello` became `kehikot.hello`,
+`roadmap.module` became `kehikot.module`, the well-known path, the extension names and the module
+ids with them — when the app that was once called "roadmap" became Kehikot. Nothing changed
+meaning, and for twelve versions both spellings were read everywhere and the old one was written
+to anybody known to speak only it (`dialect.ts`: `toDialect`, `legacyManifest`,
+`LEGACY_WELL_KNOWN`), so the number stayed where it was.
 
-The essay above says there are no aliases for the epic/journey rename, and
-that is not contradicted here. That rename removed a confusion and an alias
-would have kept it alive. This one removes a NAME, and the alias keeps
-nothing alive but the modules that have not been updated yet.
+The breaking release after 0.37 took the second spelling away, and the number still did not
+move, for the same reason read the other way: no `kehikot.` message changed meaning, and no field
+changed shape. A module built against 0.25.0 or later and a host built against this version say
+exactly what they said to each other yesterday. What stopped working is a module or a host from
+before 0.25.0, which was already speaking a spelling of protocol 2 that nothing has written by
+default for twelve versions — and of which there is no copy left to run: every module and the
+host are on 0.36.0 or later, and no module has a tagged version from before the rename that a
+project could pin.
 
-### `src/dialect.ts`
+### What is still read from before the rename
 
-#### About `src/dialect.ts`
+Three things, all of them on somebody's DISK rather than on the wire, all read and never written:
 
-The two spellings of one protocol, and the only place that knows there are two.
+| what | where | read by |
+|---|---|---|
+| a module id spelled `roadmap.<name>` | a project's `.kehikot/` files, a host's database, an argument somebody typed | `canonicalModuleId(id)` (`ids.ts`) — a host calls it on what it reads back; no schema here applies it |
+| the folder a module's data is in | `<project>/.kehikot/<name>/` | `moduleFolder('roadmap.<name>')` is `<name>`, the same folder as `kehikot.<name>` — the rename moved no data |
+| a registration named `roadmap.<name>.json` | the registry (`registryDir()`), carried over from `~/.roadmap/modules` by a host | `registerAt` (so `keep` survives), `claim` and `neighbourPorts` (`serve/registry.ts`) |
 
-##### Why there are two
-
-This protocol was first written for an app called "roadmap", and every name
-it put on the wire said so: `roadmap.hello`, `roadmap.module`,
-`/.well-known/roadmap-module.json`, `roadmap.notifications@1`, and module ids
-like `roadmap.journeys`. The app is called Kehikot now and the names say
-`kehikot.` — but a module is a program somebody runs from their own
-checkout, pinned to whatever copy of this package it last installed, and it
-does not change on the day the host does. A host that only spoke the new
-names would greet every one of those modules in a language it cannot hear,
-and the failure would be silence: no error, an empty container, a "did not
-answer" sentence about a program that is running fine.
-
-So for at least one version, BOTH spellings are read, everywhere, and the
-old one is written only to a party known to need it.
-
-##### The rules, which are the whole design
-
- 1. **One canonical name.** Inside a host and inside a module, everything is
-    the `kehikot.` spelling. Every schema in this package that reads a
-    message type, a module id or an extension name accepts either spelling
-    and hands back the canonical one, so code downstream of a parse never
-    compares against two strings.
- 2. **Receive both.** `looksLikeWireMessage` lets either prefix through, and
-    every schema accepts either type.
- 3. **Send in the other side's dialect.** A host knows which dialect a module
-    speaks before it says a word to it: the manifest's `kind` says, because a
-    module built against an older copy of this package serves
-    `roadmap.module`. A host greets such a module with `roadmap.hello` (see
-    `toDialect`), and the module's own old client answers in kind. A module
-    built against this copy answers in whatever dialect it was GREETED in —
-    `connect()` remembers the greeting's prefix — so it is understood by an
-    old host and a new one alike.
- 4. **Translate at the edge and nowhere else.** `toDialect` is applied at
-    the moment a message is posted and `canonical*` at the moment one is
-    parsed. Nothing in between knows a second spelling exists.
-
-##### Why the protocol number did not move
-
-See the essay on `PROTOCOL` in `constants.ts`: a module built against the
-old names keeps working against a new host, and a new module keeps working
-against an old host (it answers in the dialect it was greeted in, and can
-serve its manifest at the old path too — see `legacyManifest`). Nothing that
-already had a meaning lost it, which is the test.
-
-#### `Dialect`
-
-Which spelling one side speaks.
-
-`kehikot` is this package. `roadmap` is every copy of it from before the
-rename, which is still what an unchanged module or an older host speaks.
+What is NOT read any more, and who reads it instead: `~/.roadmap/modules` and
+`~/.roadmap/frame.sqlite` (the host copies both into its machine directory once, and reads the
+old registry as a fallback itself); `<project>/.kehikot/roadmap/` (the host's own folder before it
+was `.kehikot/kehikko/`; the host moves it); `ROADMAP_MODULES_DIR` and `ROADMAP_ORIGIN` (set
+`KEHIKOT_MODULES_DIR` and `KEHIKOT_ORIGINS`).
 
 #### `canonicalModuleId`
 
-A module's one id, whichever spelling it arrived in.
+A module's one id, whichever spelling it was stored in.
 
-`roadmap.journeys` and `kehikot.journeys` are the SAME module — the one
-named before the rename and after it — and a host keys everything it keeps
-about a module by this. A registration file, a manifest, a placement in an
-old database and an MCP call naming the old id all land on one row.
-
-#### `toDialect`
-
-One message, respelled for a receiver that speaks `dialect`.
-
-Applied by a sender at the moment it posts, so everything before that moment
-is canonical. For the `kehikot` dialect it respells nothing old into new
-except what was already canonical — a no-op on anything this package built.
-
-What it touches, and why each is here: the `type`; the module ids a message
-carries (`ready.id`, `event.from`, `context.containers[].module`, in a
-`hello` and in a `context`) because an unchanged module compares them with
-its own `roadmap.` id; and the extension names (`event.extension`, and
-`params.extension` on an `events.emit` request) because an unchanged party
-looks them up by the old spelling. Nothing else on the wire is a dotted name.
-
-Pure: the message is copied, never edited.
+`roadmap.journeys` and `kehikot.journeys` are the SAME module — the one named before the rename
+and after it — and a host keys everything it keeps about a module by this. A registration file, a
+placement in an old database and an MCP call naming the old id all land on one row. Nothing on
+the wire is respelled: a manifest, a `ready` or an event that says `roadmap.x` is carried as it
+was said, and is simply another id.

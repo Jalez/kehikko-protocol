@@ -7,6 +7,65 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 1.0.0 — 2026-10-10
+
+Removes what 0.37.0 deprecated, makes the parts declaration a refusal, and changes four answers
+that could not change without breaking a 0.36.0 call. **[MIGRATING.md](MIGRATING.md) has the
+before and after for every line here.** `PROTOCOL` is still 2: no `kehikot.` message changed
+meaning, so a module and a host can move in either order.
+
+### Removed
+
+- The pre-rename dialect, whole: `roadmap.*` message types are not read, `kind: 'roadmap.module'`
+  is not a manifest, `/.well-known/roadmap-module.json` is not answered or asked, and `connect()`
+  answers `kehikot.` only. `LEGACY_WELL_KNOWN`, `LEGACY_MANIFEST_KIND`, `LEGACY_MESSAGE_PREFIX`,
+  `MESSAGE_PREFIXES`, `legacyManifest`, `Dialect`, `DIALECTS`, `toDialect`, `canonicalMessage`,
+  `dialectOfType`, `dialectOfKind`, `nameIn`, `legacyName`, `legacyModuleId`, `canonicalName`,
+  `canonicalExtension`. No schema respells an id or an extension name.
+- `useKehikot`, `Kehikot`, `UseKehikotOptions`, and `useRoadmap`, `Roadmap`, `UseRoadmapOptions`
+  (`/client/react`). `useHost` is the hook.
+- `legacyRegistryDir`, and reading `~/.roadmap/modules`. `ROADMAP_MODULES_DIR` and
+  `ROADMAP_ORIGIN` are not read.
+- The bin names `kehikko-create` and `kehikko-check-parts`; they are `kehikot-create` and
+  `kehikot-check-parts`.
+
+### Still read from before the rename — on disk, never written
+
+`canonicalModuleId('roadmap.x')` (kept, now in `ids.ts`), `moduleFolder('roadmap.x')`, and a
+`roadmap.<name>.json` registration beside the one `registerAt` writes. See
+[docs/protocol-number.md](docs/protocol-number.md).
+
+### Changed
+
+- **`manifestSchema` refuses a manifest that says neither `reacts: ['parts']` nor `partless`**
+  (or both), with the sentence saying what to add. It is a refined schema now and has no `.shape`.
+- **`ask()`**: an aborted ask is `kind: 'cancelled'` (`AskFailure` gains the member; `CANCELLED`);
+  a 2xx with a body that is not JSON is a refusal (`NOT_A_REPLY`) instead of `ok: true, body: null`;
+  a stale failure's `error` is `PAGE_OLD` instead of the sentence that promised a reload.
+- **`CoverState`** gains `refused` and `empty`; `Cover` draws its button for `refused` too, and a
+  stale cover that could not reload stops saying it is reloading.
+
+### Added, each in place of code a module wrote by hand
+
+- `Cover`'s `strip` (terminal's one-line strip); `useHost` / `hostStore`'s `same`, with
+  `Steadiness` and `SteadyField` (paper's own rule for "the same passage"); `watchServer` and
+  `WATCH_SERVER_MS` (references' and atlas's `vite:ws:disconnect` listener).
+- `doors({ ancestors })` and `frameOrigins(env, also)` / `frameAncestors(env, also)` (references
+  writing `process.env.KEHIKOT_ORIGINS`); `doors({ openHealth: true })` (atlas's CORS headers on
+  `/healthz`); an empty reply header value sends no such header (paper's `cache-control: private`).
+
+### Not changed, and why
+
+- `follow` still probes nothing by default: turning `probe` on makes every test that follows a
+  fake stream ask `/healthz` through a `fetch` it did not fake.
+- Exports no consumer imports today but which are the contract itself (a schema per message, the
+  result types, the tracker shapes) stay: a module may hand-roll its wire against them.
+
+### Tests
+
+- The suite's preload points the module registry at a scratch directory and fails any test that
+  leaves it resolving anywhere else (added in 0.37.0's branch; here it names the one variable left).
+
 ## 0.37.0 — 2026-10-10
 
 The deprecation release before the next breaking one. **Additive: nothing is removed and nothing

@@ -5,8 +5,8 @@
  * Design notes: docs/project-data.md.
  */
 
-import { MESSAGE_PREFIXES } from './constants.js'
-import { MODULE_ID } from './ids.js'
+import { MESSAGE_PREFIX } from './constants.js'
+import { ID_PREFIX_BEFORE_RENAME, MODULE_ID } from './ids.js'
 
 /**
  * The folder in a project that holds the app's data, spelled once; this is the only place it is
@@ -46,7 +46,8 @@ export function moduleFolder(moduleId: string): string {
         + 'from data — it is checked rather than trusted.',
     )
   }
-  const prefix = MESSAGE_PREFIXES.find((p) => moduleId.startsWith(p))
+  /* The pre-rename prefix is taken off too: an id stored before 0.25.0 names the same folder. */
+  const prefix = [MESSAGE_PREFIX, ID_PREFIX_BEFORE_RENAME].find((p) => moduleId.startsWith(p))
   const name = prefix ? moduleId.slice(prefix.length) : moduleId
   if (!MODULE_FOLDER.test(name)) {
     throw new Error(

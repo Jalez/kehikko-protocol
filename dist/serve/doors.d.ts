@@ -10,7 +10,10 @@ export interface Reply {
     status: number;
     /** Sent as JSON. `null` is "answer with no body", which is what a notification gets. */
     body: unknown;
-    /** Extra response headers. */
+    /**
+     * Extra response headers. An empty value takes a header the doors would otherwise send off the
+     * answer: `'cache-control': ''` is "send no `cache-control`", for bytes a browser may keep.
+     */
     headers?: Record<string, string>;
     /** Sent as it is, with this content type, instead of `body` as JSON: a PDF, plain text. */
     raw?: {
@@ -32,10 +35,7 @@ export type Stream = (method: string, path: string, query: URLSearchParams, emit
     close: () => void;
 } | null;
 export interface DoorsOptions {
-    /**
-     * Served at both well-known paths, the legacy one in the legacy spelling. The legacy path is
-     * deprecated: the next breaking release answers `WELL_KNOWN` only.
-     */
+    /** Served at `WELL_KNOWN`. */
     manifest: Manifest;
     answer: Answer;
     stream?: Stream;
@@ -51,6 +51,18 @@ export interface DoorsOptions {
     page: PageOptions | (() => string);
     /** Paths that serve the page besides `/app`, `/app/` and `/`. */
     pages?: readonly string[];
+    /**
+     * Origins that may frame the page besides the ones the environment names (`frameOrigins`): a
+     * development harness on a port of its own. Added to the page's `frame-ancestors`.
+     */
+    ancestors?: readonly string[];
+    /**
+     * `true` lets a page on any origin read the health check: `/healthz` answers with
+     * `access-control-allow-origin: *` and exposes the build header. For a module framed WITHOUT
+     * `allow-same-origin` (its manifest declares no storage), whose page is on an opaque origin and
+     * could not otherwise `probeServer()`. Off by default: no other door is opened by it.
+     */
+    openHealth?: boolean;
     /**
      * Which paths go to `answer` and `stream`. Default: `/healthz`, `/mcp`, and
      * anything under `/api/`. Everything else is left to Vite unread.

@@ -17,6 +17,8 @@ const minimal = {
   name: 'Checklist',
   entry: '/app',
   modes: [{ id: 'checklist', label: 'Checklist' }],
+  /* The smallest manifest says how it stands to the parts of an epic: one of the two answers. */
+  partless: 'Its lists are a project’s, not an epic’s, so nothing in it belongs to a part.',
 }
 
 describe('a manifest at its smallest', () => {

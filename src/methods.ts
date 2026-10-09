@@ -1,6 +1,5 @@
 import { z } from 'zod'
 import { LIMITS } from './limits.js'
-import { canonicalName } from './dialect.js'
 import { EPIC_SLUG } from './ids.js'
 import { gotoRef, ref, stepNumber } from './fragments.js'
 /**
@@ -275,7 +274,7 @@ export const methodParams = {
   'content.changed': z.object({ epic: epic.optional() }),
   'events.emit': z.object({
     /* Canonical once parsed, whichever spelling the module used. See `dialect.ts`. */
-    extension: z.string().min(1).max(LIMITS.EXTENSION).transform(canonicalName),
+    extension: z.string().min(1).max(LIMITS.EXTENSION),
     /**
      * Unknown here, and checked against the named extension's own schema by whoever routes it; see
      * `./extensions.js`. So this method can carry an extension this version of the package has

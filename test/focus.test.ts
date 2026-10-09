@@ -199,10 +199,10 @@ describe('what a manifest says about parts', () => {
     modes: [{ id: 'example', label: 'Example', scope: 'epic' }],
   }
 
-  test('a manifest written before 0.34.0 parses to what it did: no partless key at all', () => {
-    const parsed = manifestSchema.parse(base)
+  test('a module that follows the parts carries no partless key at all', () => {
+    const parsed = manifestSchema.parse({ ...base, reacts: ['parts'] })
     expect('partless' in parsed).toBe(false)
-    expect(parsed.reacts).toEqual([])
+    expect(parsed.reacts).toEqual(['parts'])
   })
 
   test('partless is one bounded sentence', () => {
@@ -218,15 +218,36 @@ describe('what a manifest says about parts', () => {
     expect(partsDeclaration(manifestSchema.parse({ ...base, partless: 'A terminal.' }))).toEqual([])
   })
 
-  test('saying neither is reported — a warning: the manifest still parses', () => {
-    const parsed = manifestSchema.parse({ ...base, reacts: ['passage'] })
-    const warnings = partsDeclaration(parsed)
-    expect(warnings).toHaveLength(1)
-    expect(warnings[0]).toContain('kehikot.example does not say how it relates to the parts')
+  test('saying neither is refused, and the issue is the sentence saying what to add', () => {
+    const neither = { ...base, reacts: ['passage'] }
+    const said = partsDeclaration(neither)
+    expect(said).toHaveLength(1)
+    expect(said[0]).toContain('kehikot.example does not say how it relates to the parts')
+    expect(said[0]).toContain("Add 'parts' to reacts")
+    expect(said[0]).toContain('set partless to one sentence')
+
+    const parsed = manifestSchema.safeParse(neither)
+    expect(parsed.success).toBe(false)
+    if (parsed.success) return
+    expect(parsed.error.issues).toHaveLength(1)
+    expect(parsed.error.issues[0]?.message).toBe(said[0]!)
+    expect(parsed.error.issues[0]?.path).toEqual(['partless'])
+    /* A manifest that says nothing at all about parts — every one written before 0.34.0 — is the same case. */
+    expect(manifestSchema.safeParse(base).success).toBe(false)
   })
 
-  test('saying both is reported too', () => {
-    expect(partsDeclaration({ id: 'kehikot.example', reacts: ['parts'], partless: 'Nothing.' })[0]).toContain('one or the other')
+  test('saying both is refused too', () => {
+    const both = { ...base, reacts: ['parts'], partless: 'Nothing.' }
+    expect(partsDeclaration(both)[0]).toContain('one or the other')
+    const parsed = manifestSchema.safeParse(both)
+    expect(parsed.success).toBe(false)
+    if (!parsed.success) expect(parsed.error.issues[0]?.message).toContain('one or the other')
+  })
+
+  test('a manifest that is wrong in another way is told about that, not about parts', () => {
+    const parsed = manifestSchema.safeParse({ ...base, reacts: ['parts'], name: '' })
+    expect(parsed.success).toBe(false)
+    if (!parsed.success) expect(parsed.error.issues.map((issue) => issue.path[0])).toEqual(['name'])
   })
 
   test('it reads an unparsed manifest as well', () => {

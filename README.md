@@ -83,7 +83,7 @@ And behind two subpaths, which are not shapes and say so:
 | | |
 |---|---|
 | `kehikot-module-protocol/client` | `connect`, `mailbox`, `HostRefused` — the module half of the wire, for a page that would rather not write it again. Browser code, kept out of the front door so a Bun process can import shapes without it. **A convenience: a module may hand-roll its wire and be perfectly conforming.** |
-| `kehikot-module-protocol/client/react` | `useHost`, `Cover` and `coverFor`, and `useFocus` (0.34.0), the parts focus as one value. `useKehikot` and its alias `useRoadmap` are deprecated in 0.37 — use `useHost`. Optional; `react` is an optional peer dependency and `client` does not import it. |
+| `kehikot-module-protocol/client/react` | `useHost`, `Cover` and `coverFor`, and `useFocus` (0.34.0), the parts focus as one value. Optional; `react` is an optional peer dependency and `client` does not import it. |
 
 ## Where the reasoning is
 
@@ -97,7 +97,7 @@ The source says what each field is and what it is bounded by, in a line or three
 | [The manifest](docs/manifest.md) | What a module says about itself at the well-known path: every field of `manifestSchema`, what a module says it reacts to, its tags, and how a protocol range is read. |
 | [Names and ids](docs/ids.md) | The patterns for a module id, a mode id and an epic slug, the one derivation of a slug from prose, and the lookup that does not fall through a prototype. |
 | [Limits](docs/limits.md) | Why every string and every list is bounded, and the reasoning behind each number in `LIMITS`. |
-| [The protocol number, and the rename from "roadmap"](docs/protocol-number.md) | Why `PROTOCOL` is 2 and what would raise it, and how both spellings of every name (`kehikot.` and `roadmap.`) are read and written. |
+| [The protocol number, and what is left of the rename from "roadmap"](docs/protocol-number.md) | Why `PROTOCOL` is 2 and what would raise it, and the three places a name from before the rename is still read from disk. |
 | [Where a module keeps a project's data](docs/project-data.md) | The `.kehikot/` folder inside a project, the folder each module gets in it, and the lines a project's `.gitignore` gains. |
 | [Parts of an epic, focus, and the record of an epic's steps](docs/parts.md) | The parts an epic is divided into, what it means for some of them to be picked out, the one rule for whether a thing is in focus, the files a part owns, and the on-disk record of an epic's steps that parts are read from. |
 | [Trackers](docs/tracker.md) | One reading of GitHub and GitLab shared by every module: the row a host hands back, what is missing and why, refreshing, and how a reference is spelled. |
@@ -109,62 +109,23 @@ The source says what each field is and what it is bounded by, in a line or three
 | [The shared plumbing of a module](docs/module-plumbing.md) | What every module used to type out for itself, behind `/serve`, `/client` and `/client/react`: the page document and its first paint, the write ticket, the JSON body reader, the `doors()` plugin, `ask()`, `useHost`, the one not-ready screen `Cover`, and the build identity. |
 | [Packaging](PACKAGING.md) | How this package is consumed straight from git, and why `dist/` is committed. |
 
-## Renamed from "roadmap", and what a module has to change
+## Once "roadmap", and what is left of it
 
-> **Deprecated in 0.37, removed in the next breaking release.** Everything in this section that
-> reads or writes a `roadmap` spelling — the second dialect, `LEGACY_WELL_KNOWN`, `legacyManifest`,
-> `toDialect`, `useRoadmap`, `ROADMAP_ORIGIN`, `ROADMAP_MODULES_DIR` — is marked `@deprecated` and
-> goes, with the old `useKehikot`. The full list, with what replaces each name, is in
-> [CHANGELOG.md](CHANGELOG.md) under 0.37.0.
+This package was `roadmap-module-protocol` until 0.25.0, and every name it put on the wire said
+`roadmap.`. From 0.25.0 to 0.37.0 both spellings were read and the old one was still written to
+a party that needed it. **That is over: there is one spelling, `kehikot.`**, and nothing here
+exports, reads off the wire or writes the old one — no second dialect, no
+`/.well-known/roadmap-module.json`, no `kind: 'roadmap.module'`, no `ROADMAP_*` environment
+variable, no `useRoadmap`.
 
-This package was `roadmap-module-protocol`, and every name it put on the wire
-said `roadmap.`. The app is Kehikot now, and since 0.25.0 the names say
-`kehikot.`. Nothing about the protocol changed meaning, so `PROTOCOL` is still
-2 — see [the protocol number](docs/protocol-number.md) for why, and for the design of the
-two dialects.
+Three things on a person's disk are still read, never written: a module id stored as
+`roadmap.<name>` (`canonicalModuleId`), the folder that id names (`moduleFolder`), and a
+registration file named `roadmap.<name>.json` beside the one `registerAt` writes. See
+[the protocol number](docs/protocol-number.md).
 
-**Both spellings work, in both directions, for at least one version:**
-
-- A host reads either spelling of everything: `roadmap.*` and `kehikot.*`
-  messages, both manifest kinds, both well-known paths (new first), both
-  spellings of an extension name, and `roadmap.x` as the same module as
-  `kehikot.x`. Every schema here hands back the `kehikot.` spelling.
-- A host greets a module in the dialect its manifest's `kind` says it speaks,
-  so an unchanged module is greeted with `roadmap.hello` and hears everything
-  after it in `roadmap.` too (`toDialect`).
-- `connect()` answers in whatever dialect it was greeted in, so a module built
-  against this version works under a host from before the rename as well.
-- `moduleFolder('roadmap.x')` and `moduleFolder('kehikot.x')` are both `x`:
-  no module's data moves.
-
-**What a module changes, when it moves to this version:**
-
-1. `package.json`: the dependency key becomes `kehikot-module-protocol`, same
-   git URL (`git+ssh://git@github.com/Jalez/kehikko-protocol.git#main`). Then
-   `bun install` and commit `bun.lock`.
-2. Imports: `roadmap-module-protocol…` becomes `kehikot-module-protocol…`
-   (`/client`, `/client/react`, `/serve`, `/facets`). `useRoadmap` is
-   `useKehikot` (the old names are deprecated aliases).
-3. The manifest: `kind: MANIFEST_KIND` (now `kehikot.module`) and the id
-   `kehikot.<name>` instead of `roadmap.<name>`. The host treats both ids as
-   one module, so its placements, state and registration carry over.
-4. Serve the manifest at `WELL_KNOWN` (`/.well-known/kehikot-module.json`) —
-   and, to stay visible to a host from before the rename, also at
-   `LEGACY_WELL_KNOWN` with `legacyManifest(MANIFEST)`.
-5. Message types: only a module that spells them by hand (rather than through
-   `MESSAGE` and `connect()`) has anything to change — use `MESSAGE.*`, or
-   `toDialect` if it posts its own.
-6. Extension names: `kehikot.notifications@1`, `kehikot.calls@1` in
-   `extensions.emits`/`consumes` and in `events.emit`.
-7. `vite.config.ts`: `frame-ancestors` from `frameAncestors()` in `/serve`,
-   which reads `KEHIKOT_ORIGINS` (the space-separated list a host passes:
-   development page, desktop app page, Tauri window), then `KEHIKOT_ORIGIN`,
-   then `ROADMAP_ORIGIN`, then every origin a host here serves from.
-8. `run.sh`: `bun install --frozen-lockfile` whenever `bun.lock` or
-   `package.json` is newer than the last install — see `template/run.sh`.
-9. `register.ts` needs nothing: `registerAt` now writes the Kehikot machine
-   directory (`~/Library/Application Support/Kehikot/modules`), reading what the
-   old `roadmap.x.json` said (`keep` above all) and leaving that file alone.
+Moving a module or a host onto this version from 0.36.0 or 0.37.0:
+[MIGRATING.md](MIGRATING.md) has the before and after for every removal, rename and changed
+answer.
 
 ## Making a new module
 
@@ -197,6 +158,7 @@ The same list with what each version exported is in [CHANGELOG.md](CHANGELOG.md)
 
 | version | date | what it added |
 |---|---|---|
+| 1.0.0 | 2026-10-10 | The breaking release: removes everything 0.37.0 deprecated (the `roadmap` dialect, `LEGACY_*`, `useKehikot`/`useRoadmap`, the `ROADMAP_*` variables), makes the parts declaration a refusal, renames the bins to `kehikot-*`. See [MIGRATING.md](MIGRATING.md). |
 | 0.37.0 | 2026-10-10 | Deprecations only, nothing removed: everything named after "roadmap" (the second dialect, `LEGACY_*`, `legacyManifest`, `toDialect`, `useRoadmap`, `ROADMAP_*`), the old `useKehikot`, and the `kehikko-*` bin names (now also `kehikot-*`). See [CHANGELOG.md](CHANGELOG.md). |
 | 0.36.0 | 2026-10-09 | The plumbing's gaps, closed: `held` (unsaved work across a reload), `hostStore` (the host outside React), `doorsFetch` and `fillPage` (a `Bun.serve` module and its built page), `replied`, `probeServer`, `ask`'s `ticket`/`keepalive`/repeated `query`, `follow`'s `events`/`probe`, `coverFor`'s `host` and `server`. See [module plumbing](docs/module-plumbing.md). |
 | 0.35.0 | 2026-10-09 | The shared plumbing of a module: `pageDocument`, `mintTicket`/`refuseTicket`, `readJsonBody`, the `doors()` plugin, `ask`/`follow`, `useHost`, `Cover`/`coverFor`, and a build identity (`establishBuild`, `compareBuilds`, the manifest's and `ready`'s optional `build`, `PACKAGE_VERSION`). See [module plumbing](docs/module-plumbing.md). |

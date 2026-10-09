@@ -15,7 +15,7 @@ export declare const CONTENT_HOST = "host";
  * "any epic of this source".
  */
 export declare const contentChangeSchema: z.ZodObject<{
-    source: z.ZodEffects<z.ZodString, string, string>;
+    source: z.ZodString;
     epic: z.ZodDefault<z.ZodNullable<z.ZodString>>;
     at: z.ZodString;
 }, "strip", z.ZodTypeAny, {
@@ -34,7 +34,7 @@ export type ContentChange = z.infer<typeof contentChangeSchema>;
  * began keeping count. A dropped entry costs a module one unneeded re-read, never a change.
  */
 export declare const contentSignalSchema: z.ZodArray<z.ZodObject<{
-    source: z.ZodEffects<z.ZodString, string, string>;
+    source: z.ZodString;
     epic: z.ZodDefault<z.ZodNullable<z.ZodString>>;
     at: z.ZodString;
 }, "strip", z.ZodTypeAny, {

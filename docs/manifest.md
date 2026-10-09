@@ -332,10 +332,8 @@ The word that makes this a claim rather than a hopeful GET. Something else
 entirely may be listening on the port a host asked, and it must not be
 possible for that something to become a tab by accident.
 
-Either spelling is accepted, and it is handed back AS IT WAS SAID rather
-than respelled, because it is the one place a host learns which dialect
-the module speaks before it greets it: `roadmap.module` is a module built
-against this package from before the rename. See `dialectOfKind`.
+One spelling. `roadmap.module`, the word before the rename, was read until the
+breaking release after 0.37 and is not a manifest now.
 
 #### `manifestSchema.version`
 
@@ -596,21 +594,6 @@ other declaration here exists: somebody deciding whether to run a
 program should be able to read what it expects before it runs, and a
 host should not have to watch a module to find out what it wants.
 
-#### `legacyManifest`
-
-> **Deprecated in 0.37, removed in the next breaking release.** A manifest is served at `WELL_KNOWN` only, as it is; `kind: 'roadmap.module'` stops being read.
-
-A parsed manifest, spelled for a host from before the rename.
-
-What a module built against this package serves at `LEGACY_WELL_KNOWN`, so
-a host that has not been updated still finds it: the old `kind`, the old
-module id, the old extension names. Everything else is the same document.
-That host then greets the module with `roadmap.hello`, and `connect()`
-answers in the dialect it was greeted in, so the module is the same module
-to both hosts.
-
-Pure. The manifest passed in is not changed.
-
 #### `speaks`
 
 Does a range include a protocol number?
@@ -631,7 +614,7 @@ protocol 9 is not an argument for anything.
 #### `partsDeclaration`
 
 What is wrong with what a module says about the parts of an epic — as
-sentences a host can show, and `[]` when nothing is.
+sentences a person can act on, and `[]` when nothing is.
 
 The requirement (0.34.0): a module either follows the picked parts
 (`reacts` has `parts`) or says in `partless` why it has nothing to narrow.
@@ -639,10 +622,17 @@ Saying NEITHER is the case this exists to find: a module nobody has asked
 the question of, which shows the whole epic whatever is ticked. Saying both
 is a contradiction, and is reported too.
 
-**A warning in this version, a refusal in the next.** `manifestSchema` does
-not call this, so every manifest parses as it did; a host shows the list,
-and `bun run check:parts` fails on it. From the next breaking release (still a warning in 0.37) a
-manifest that declares neither will not parse.
+**A refusal.** It was a warning from 0.34.0 to 0.37.0. Now `manifestSchema`
+calls this, and a manifest that says neither, or both, does not parse: the
+issue is on `partless`, and its message is the sentence here — which says
+what to add (`'parts'` in `reacts`, with the focus helpers; or `partless`,
+one sentence saying why nothing in the module belongs to a part).
+`bun run check:parts` says the same thing about a module directory.
+
+That makes `manifestSchema` a refined schema (a `ZodEffects`): `parse`,
+`safeParse` and the inferred types are what they were, and it has no
+`.shape`. A manifest that is wrong in another way as well is told about
+both.
 
 Pure, and a function of two fields, so it takes a parsed manifest or the
 object a module is about to hand to `manifestSchema.parse`.

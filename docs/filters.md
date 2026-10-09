@@ -114,7 +114,7 @@ live.clearable(`clear ${shown.length} shown`)   // and `null` to withdraw it
 ```
 
 ```ts
-useKehikot(id, {
+useHost(id, {
   onClear: () => forget(shown.map((one) => one.id)),   // exactly what is on screen
 })
 ```

@@ -2,9 +2,8 @@ import { get as httpGet } from 'node:http'
 import { createServer } from 'node:net'
 import { join } from 'node:path'
 
-import { LEGACY_MANIFEST_KIND, LEGACY_WELL_KNOWN, MANIFEST_KIND, WELL_KNOWN } from '../constants.js'
-import { canonicalName, legacyName } from '../dialect.js'
-import { neighbourPorts, portOf, readRegistration, registryDir } from './registry.js'
+import { MANIFEST_KIND, WELL_KNOWN } from '../constants.js'
+import { neighbourPorts, portOf, readRegistration, registrationBeforeRename, registryDir } from './registry.js'
 
 /**
  * Which port this module binds, decided rather than assumed. A taken preferred port means moving
@@ -47,7 +46,7 @@ export type Verdict =
 /** The decision, as a function of who is there and nothing else. Pure. */
 export function verdict(id: string, occupant: Occupant): Verdict {
   if (occupant.at === 'free') return { take: 'preferred' }
-  if (occupant.at === 'module' && occupant.id === canonicalName(id)) return { take: 'nothing', because: 'already-running' }
+  if (occupant.at === 'module' && occupant.id === id) return { take: 'nothing', because: 'already-running' }
   if (occupant.at === 'module') return { take: 'another', because: `${occupant.id} is answering there` }
   return { take: 'another', because: occupant.why }
 }
@@ -86,22 +85,13 @@ export function free(port: number, host = LOOPBACK): Promise<boolean> {
  * and in bytes: a program that says nothing within `timeoutMs` is a stranger.
  */
 export async function identify(port: number, timeoutMs = IDENTIFY_TIMEOUT_MS): Promise<Occupant> {
-  /* The current path first, then the pre-rename one — but only after a plain 404, so a module
-     answering the first path is asked once. */
-  const first = await peek(port, WELL_KNOWN, timeoutMs)
-  if (first.at !== 'stranger' || !first.notHere) return strip(first)
-  return strip(await peek(port, LEGACY_WELL_KNOWN, timeoutMs))
+  return peek(port, WELL_KNOWN, timeoutMs)
 }
 
-function strip(occupant: Occupant & { notHere?: boolean }): Occupant {
-  if (occupant.at !== 'stranger') return occupant
-  return { at: 'stranger', why: occupant.why }
-}
-
-function peek(port: number, path: string, timeoutMs: number): Promise<Occupant & { notHere?: boolean }> {
+function peek(port: number, path: string, timeoutMs: number): Promise<Occupant> {
   return new Promise((resolve) => {
     let settled = false
-    const done = (occupant: Occupant & { notHere?: boolean }) => {
+    const done = (occupant: Occupant) => {
       if (settled) return
       settled = true
       resolve(occupant)
@@ -112,7 +102,7 @@ function peek(port: number, path: string, timeoutMs: number): Promise<Occupant &
       (response) => {
         if (response.statusCode !== 200) {
           response.resume()
-          return done({ at: 'stranger', why: `something answered ${response.statusCode} at ${path}`, notHere: response.statusCode === 404 })
+          return done({ at: 'stranger', why: `something answered ${response.statusCode} at ${path}` })
         }
         let text = ''
         response.setEncoding('utf8')
@@ -140,7 +130,7 @@ function peek(port: number, path: string, timeoutMs: number): Promise<Occupant &
 
 /**
  * What a document on that port makes the program serving it. Pure. `kind` must be `kehikot.module`
- * (or `roadmap.module`, its spelling before the rename) before the id counts for anything.
+ * before the id counts for anything.
  */
 export function readManifest(text: string, path: string = WELL_KNOWN): Occupant {
   let parsed: unknown
@@ -153,12 +143,10 @@ export function readManifest(text: string, path: string = WELL_KNOWN): Occupant 
     return { at: 'stranger', why: `something is serving JSON that is not a manifest at ${path}` }
   }
   const { kind, id } = parsed as { kind?: unknown; id?: unknown }
-  if ((kind !== MANIFEST_KIND && kind !== LEGACY_MANIFEST_KIND) || typeof id !== 'string') {
+  if (kind !== MANIFEST_KIND || typeof id !== 'string') {
     return { at: 'stranger', why: `something is serving a document that does not call itself ${MANIFEST_KIND}` }
   }
-  /* Canonical, so a module from before the rename (`roadmap.x`) is recognised
-     as the same module as `kehikot.x`. See `dialect.ts`. */
-  return { at: 'module', id: canonicalName(id) }
+  return { at: 'module', id }
 }
 
 export interface ClaimOptions {
@@ -246,12 +234,13 @@ export async function claim({
    * Before drifting: is this module already answering where its registration last said it was?
    * The registration is a hint, never an authority — only an answer carrying THIS id stops the start.
    */
+  const before = registrationBeforeRename(id)
   const mine = portOf(
-    (readRegistration(join(registry, `${id}.json`)) ?? readRegistration(join(registry, `${legacyName(id)}.json`)))?.url ?? '',
+    (readRegistration(join(registry, `${id}.json`)) ?? (before ? readRegistration(join(registry, before)) : null))?.url ?? '',
   )
   if (mine !== null && mine !== prefer && !(await isFree(mine))) {
     const there = await ask(mine, timeoutMs)
-    if (there.at === 'module' && there.id === canonicalName(id)) {
+    if (there.at === 'module' && there.id === id) {
       return {
         status: 'already-running',
         id,

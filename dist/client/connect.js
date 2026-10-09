@@ -1,10 +1,8 @@
 import { pageBuild } from './build.js';
 import { MESSAGE, PROTOCOL, clampHeight, } from '../constants.js';
 import { LIMITS } from '../limits.js';
-import { dialectOfType, toDialect } from '../dialect.js';
 import { hostMessageSchema, looksLikeWireMessage, } from '../wire.js';
 import { mailbox } from './mailbox.js';
-import { deprecated } from '../deprecated.js';
 /** A refusal, as a thrown thing. Every rejection from `request` is one of these, always. */
 export class HostRefused extends Error {
     refusal;
@@ -52,13 +50,10 @@ export function connect(id, events = {}, options = {}) {
     const waiting = new Map();
     let counter = 0;
     const nextId = () => `${Date.now().toString(36)}-${(counter += 1).toString(36)}`;
-    /* Which spelling the host greeted us in, and so the one we answer in. Everything this file
-       builds is canonical, and is respelled only in `send`. See `dialect.ts`. */
-    let dialect = 'kehikot';
     const send = (message) => {
         if (!host)
             return;
-        host.postMessage(toDialect(message, dialect), origin);
+        host.postMessage(message, origin);
     };
     const settle = (correlation, outcome) => {
         /* A late answer to a question nobody is waiting for is dropped, quietly. */
@@ -86,11 +81,6 @@ export function connect(id, events = {}, options = {}) {
                becomes the one we answer, and `ready` goes back every time. */
             host = ev.source ?? source.parent ?? null;
             origin = ev.origin && ev.origin !== 'null' ? ev.origin : '*';
-            dialect = dialectOfType(ev.data.type) ?? 'kehikot';
-            /* Once per page, at a greeting: never per message. */
-            if (dialect === 'roadmap') {
-                deprecated('Being greeted in the pre-rename dialect (roadmap.hello)', 'Update the host framing this page: it should say kehikot.hello.');
-            }
             /* With the build that served this page, when it printed one: a host compares it with the server's now. */
             const build = pageBuild();
             send({ type: MESSAGE.READY, id, protocol: message.protocol ?? PROTOCOL, ...(build ? { build } : {}) });

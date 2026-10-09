@@ -34,7 +34,19 @@ export interface HostStoreOptions<Kept = unknown> extends ConnectOptions {
      * once, a moment after `ask()` notices (see `reloadWhenStale`).
      */
     reloadWhenStale?: boolean;
+    /**
+     * When a field of the context counts as the one it was, for a page whose rule is looser than
+     * "says the same thing all the way down": a passage whose section ends somewhere else is still
+     * the same passage. Per field; a field without a rule here is compared deeply. Read at mount.
+     */
+    same?: Steadiness;
 }
+/** The fields of a standing that keep their identity while they say the same thing. */
+export type SteadyField = 'passage' | 'containers' | 'parts' | 'selection' | 'chosen' | 'kehikko';
+/** A page's own rule for "the same", per field: `(was, now) => true` keeps the object it was. */
+export type Steadiness = {
+    [Field in SteadyField]?: (was: HostFields[Field], now: HostFields[Field]) => boolean;
+};
 /** The flattened fields of a context: what a screen reads, each `null` or empty rather than absent. */
 export interface HostFields {
     /** What the open project is called. A name, not a path. */
@@ -103,9 +115,9 @@ export interface HostStore<Kept = unknown> extends HostActions<Kept> {
  * The flattened fields of a context. Pure, so a test can build a `Host` from a plain object.
  * Given the fields as they were, each one that still says the same thing IS the one it was: every
  * context is parsed afresh off the wire, and an effect that depends on `passage` should run when
- * the passage changed, not whenever the host spoke.
+ * the passage changed, not whenever the host spoke. `same` replaces that rule for the fields it names.
  */
-export declare function hostFields(context: ModuleContext | null, was?: HostFields): HostFields;
+export declare function hostFields(context: ModuleContext | null, was?: HostFields, same?: Steadiness): HostFields;
 /**
  * Build the store. Nothing is heard until `start()`. `events` are the page's own handlers, called
  * AFTER the standing has changed — so a handler that reads `get()` finds what it was just told,

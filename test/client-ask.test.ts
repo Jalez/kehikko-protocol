@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 
 import { TICKET_HEADER } from '../src/index.js'
 import {
+  CANCELLED,
   AskFailed,
   KEEPALIVE_BYTES,
   NOT_A_REPLY,
@@ -13,6 +14,8 @@ import {
   follow,
   probeServer,
   replied,
+  watchServer,
+  WATCH_SERVER_MS,
   onServerStanding,
   resetServerStanding,
   serverStanding,
@@ -128,7 +131,8 @@ describe('ask', () => {
     const asked = await ask('/api/value', { body: {}, fetch })
     stop()
     expect(asked.ok === false && asked.kind).toBe('stale')
-    expect(asked.ok === false && asked.error).toBe(PAGE_STALE)
+    /* The fact, and no promise: whether anything reloads is the page's business, not `ask`'s. */
+    expect(asked.ok === false && asked.error).toBe(PAGE_OLD)
     expect(heard).toEqual(['stale'])
     /* And it does not heal: the ticket in this document will never be right again. */
     await ask('/api/value', { fetch: server(() => json(200, {})).fetch })
@@ -159,8 +163,25 @@ describe('ask', () => {
       throw new DOMException('aborted', 'AbortError')
     }) as unknown as typeof globalThis.fetch
     const asked = await ask('/api/value', { signal: control.signal, fetch })
-    expect(asked.ok === false && asked.kind).toBe('refused')
+    /* And not a server that said no, either: a kind of its own, with no status. */
+    expect(asked).toEqual({ ok: false, kind: 'cancelled', status: null, error: CANCELLED, body: null })
     expect(serverStanding()).toBe('up')
+    /* `replied` throws it like the other answers that are not the server's. */
+    expect(() => replied(asked as never)).toThrow(AskFailed)
+  })
+
+  test('a 2xx with a body that is not JSON is a refusal; a 2xx with no body at all is an answer', async () => {
+    const html = await ask('/api/value', { fetch: server(() => new Response('<!doctype html><title>Vite</title>', { status: 200 })).fetch })
+    expect(html).toEqual({ ok: false, kind: 'refused', status: 200, error: NOT_A_REPLY, body: null })
+    /* Something answered, so the server is there. */
+    expect(serverStanding()).toBe('up')
+    for (const empty of [() => new Response(null, { status: 204 }), () => new Response('', { status: 200 }), () => new Response('  \n', { status: 202 })]) {
+      const asked = await ask('/api/value', { body: {}, fetch: server(empty).fetch })
+      expect(asked.ok && asked.body).toBe(null)
+    }
+    /* Outside 2xx nothing changed: the status is the sentence. */
+    const missing = await ask('/api/value', { fetch: server(() => new Response('Not found', { status: 404 })).fetch })
+    expect(missing.ok === false && missing.error).toBe('This app’s own server answered 404.')
   })
 
   test('`answered` gives the body, or throws the sentence with its kind', async () => {
@@ -222,10 +243,10 @@ describe('ask: what a call may add', () => {
     })
   })
 
-  test('a stale page’s sentence is still the reloading one; `PAGE_OLD` is the same fact without the promise', async () => {
+  test('a stale page’s sentence promises nothing; `PAGE_STALE` is the same fact while a reload is on its way', async () => {
     const refusal = refuseTicket('old', 'new')
     const asked = await ask('/api/value', { body: {}, fetch: server(() => json(403, refusal?.body)).fetch })
-    expect(asked.ok === false && asked.error).toBe(PAGE_STALE)
+    expect(asked.ok === false && asked.error).toBe(PAGE_OLD)
     expect(PAGE_STALE.startsWith(PAGE_OLD.slice(0, -1))).toBe(true)
     expect(PAGE_OLD).not.toContain('reloading')
   })
@@ -268,8 +289,6 @@ describe('replied', () => {
   test('a 2xx that carried no JSON object is not a reply', async () => {
     for (const reply of [() => new Response('<!doctype html>', { status: 200 }), () => json(200, [1, 2]), () => new Response(null, { status: 204 })]) {
       const asked = await ask<Held>('/api/checklist', { fetch: server(reply).fetch })
-      /* `ask` itself is as it was: ok, with whatever parsed. */
-      expect(asked.ok).toBe(true)
       try {
         replied(asked)
         throw new Error('did not throw')
@@ -429,5 +448,55 @@ describe('follow', () => {
       ;(globalThis as { EventSource?: unknown }).EventSource = real
     }
     expect(said).toEqual(['detached'])
+  })
+})
+
+describe('watchServer: a page that asks its server nothing else', () => {
+  test('asks on a clock while the page is visible, and the answer is the standing', async () => {
+    let up = true
+    let asked = 0
+    const fetch = (async (url: string) => {
+      asked++
+      expect(url).toBe('/healthz')
+      if (!up) throw new TypeError('Load failed')
+      return json(200, { ok: true })
+    }) as unknown as typeof globalThis.fetch
+    const stop = watchServer({ every: 20, fetch })
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 70))
+      expect(asked).toBeGreaterThanOrEqual(2)
+      expect(serverStanding()).toBe('up')
+      up = false
+      await new Promise((resolve) => setTimeout(resolve, 50))
+      expect(serverStanding()).toBe('down')
+      up = true
+      await new Promise((resolve) => setTimeout(resolve, 50))
+      expect(serverStanding()).toBe('up')
+    } finally {
+      stop()
+    }
+    const then = asked
+    await new Promise((resolve) => setTimeout(resolve, 60))
+    expect(asked).toBe(then)
+    expect(WATCH_SERVER_MS).toBeGreaterThanOrEqual(5_000)
+  })
+
+  test('asks at once when the page is shown again, on the door it was given', async () => {
+    const paths: string[] = []
+    const fetch = (async (url: string) => {
+      paths.push(url)
+      return json(200, { ok: true })
+    }) as unknown as typeof globalThis.fetch
+    const stop = watchServer({ path: './healthz', every: 60_000, fetch })
+    try {
+      document.dispatchEvent(new Event('visibilitychange'))
+      await new Promise((resolve) => setTimeout(resolve, 10))
+      expect(paths).toEqual(['./healthz'])
+    } finally {
+      stop()
+    }
+    document.dispatchEvent(new Event('visibilitychange'))
+    await new Promise((resolve) => setTimeout(resolve, 10))
+    expect(paths.length).toBe(1)
   })
 })
