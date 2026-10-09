@@ -1,9 +1,9 @@
 import {
-  LIMITS,
   MESSAGE,
   PROTOCOL,
   clampHeight,
 } from '../constants.js'
+import { LIMITS } from '../limits.js'
 import { dialectOfType, toDialect, type Dialect } from '../dialect.js'
 import {
   hostMessageSchema,

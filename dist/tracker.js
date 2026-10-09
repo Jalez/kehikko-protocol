@@ -1,5 +1,6 @@
 import { z } from 'zod';
-import { LIMITS } from './constants.js';
+import { LIMITS } from './limits.js';
+import { ref } from './fragments.js';
 /**
  * The shared tracker reading: what the issues, merge requests and pull requests
  * a project names last said about themselves, read ONCE by the host and handed
@@ -82,7 +83,6 @@ export const REVIEW_STATES = ['approved', 'changes-requested', 'required'];
  * only the change's own claim.
  */
 export const LINK_RELATIONS = ['closes', 'closed-by'];
-const ref = z.string().min(1).max(LIMITS.REF);
 const instant = z.string().datetime({ offset: true });
 const word = z.string().max(LIMITS.TRACKER_WORD);
 const person = z.string().min(1).max(LIMITS.TRACKER_PERSON);

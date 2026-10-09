@@ -1,7 +1,8 @@
 import { z } from 'zod'
-import { LIMITS } from './constants.js'
+import { LIMITS } from './limits.js'
 import { canonicalName } from './dialect.js'
 import { EPIC_SLUG } from './ids.js'
+import { ref } from './fragments.js'
 
 /**
  * The formats modules agree on, so the panels that show them can leave.
@@ -58,7 +59,7 @@ import { EPIC_SLUG } from './ids.js'
 const epic = z.string().regex(EPIC_SLUG, 'an epic slug is lowercase letters, digits and dashes')
 
 /** A reference like `gh#41`. The same bound wherever one appears. */
-const refs = z.array(z.string().min(1).max(LIMITS.REF)).max(LIMITS.REFS).default([])
+const refs = z.array(ref).max(LIMITS.REFS).default([])
 
 /**
  * `kehikot.notifications@1` — a line on a notification panel: what happened,

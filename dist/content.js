@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { LIMITS } from './constants.js';
+import { LIMITS } from './limits.js';
 import { canonicalName } from './dialect.js';
 import { EPIC_SLUG, MODULE_ID } from './ids.js';
 /**

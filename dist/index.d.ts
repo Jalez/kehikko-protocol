@@ -6,7 +6,8 @@
  * a file, opens a socket, holds state, or decides anything — see the README for
  * why that rule is load-bearing rather than tidy.
  */
-export { PROTOCOL, WELL_KNOWN, LEGACY_WELL_KNOWN, MANIFEST_KIND, LEGACY_MANIFEST_KIND, MESSAGE, MESSAGE_PREFIX, LEGACY_MESSAGE_PREFIX, MESSAGE_PREFIXES, HOST_MESSAGES, MODULE_MESSAGES, MIN_HEIGHT, MAX_HEIGHT, REFRESH_EVERY_MIN, REFRESH_EVERY_MAX, clampHeight, LIMITS, type MessageType, } from './constants.js';
+export { PROTOCOL, WELL_KNOWN, LEGACY_WELL_KNOWN, MANIFEST_KIND, LEGACY_MANIFEST_KIND, MESSAGE, MESSAGE_PREFIX, LEGACY_MESSAGE_PREFIX, MESSAGE_PREFIXES, HOST_MESSAGES, MODULE_MESSAGES, MIN_HEIGHT, MAX_HEIGHT, REFRESH_EVERY_MIN, REFRESH_EVERY_MAX, clampHeight, type MessageType, } from './constants.js';
+export { LIMITS } from './limits.js';
 export { MODULE_ID, MODE_ID, EPIC_SLUG, own, slugFrom } from './ids.js';
 export { DIALECTS, canonicalName, legacyName, nameIn, canonicalModuleId, legacyModuleId, canonicalExtension, dialectOfType, dialectOfKind, toDialect, canonicalMessage, type Dialect, } from './dialect.js';
 export { KEHIKOT_DIR, DATA_FILE, MODULE_FOLDER, KEHIKOT_IGNORE, moduleFolder, kehikotDir, moduleDir, moduleFile, within, ignoresKehikot, withKehikotIgnored, withoutKehikotIgnored, } from './project.js';

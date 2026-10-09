@@ -1,4 +1,5 @@
-import { LIMITS, MESSAGE, PROTOCOL, clampHeight, } from '../constants.js';
+import { MESSAGE, PROTOCOL, clampHeight, } from '../constants.js';
+import { LIMITS } from '../limits.js';
 import { dialectOfType, toDialect } from '../dialect.js';
 import { hostMessageSchema, looksLikeWireMessage, } from '../wire.js';
 import { mailbox } from './mailbox.js';

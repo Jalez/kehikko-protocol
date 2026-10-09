@@ -1,5 +1,6 @@
 import { z } from 'zod'
-import { LIMITS } from './constants.js'
+import { LIMITS } from './limits.js'
+import { ref } from './fragments.js'
 
 /**
  * The shared tracker reading: what the issues, merge requests and pull requests
@@ -95,7 +96,6 @@ export type ReviewState = (typeof REVIEW_STATES)[number]
 export const LINK_RELATIONS = ['closes', 'closed-by'] as const
 export type LinkRelation = (typeof LINK_RELATIONS)[number]
 
-const ref = z.string().min(1).max(LIMITS.REF)
 const instant = z.string().datetime({ offset: true })
 const word = z.string().max(LIMITS.TRACKER_WORD)
 const person = z.string().min(1).max(LIMITS.TRACKER_PERSON)

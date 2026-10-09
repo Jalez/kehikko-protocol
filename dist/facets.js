@@ -22,7 +22,7 @@
  * A facet is an id and a word. Adding one — `draft`, `unassigned` — is an entry
  * in `FACETS` and a line in `facetsOf`, not a change in every module.
  */
-import { LIMITS } from './constants.js';
+import { LIMITS } from './limits.js';
 /**
  * Every facet, and the words for it in a menu called "hide".
  *
