@@ -158,6 +158,7 @@ The same list with what each version exported is in [CHANGELOG.md](CHANGELOG.md)
 
 | version | date | what it added |
 |---|---|---|
+| 1.0.0 | 2026-10-10 | The breaking release: removes everything 0.37.0 deprecated (the `roadmap` dialect, `LEGACY_*`, `useKehikot`/`useRoadmap`, the `ROADMAP_*` variables), makes the parts declaration a refusal, renames the bins to `kehikot-*`. See [MIGRATING.md](MIGRATING.md). |
 | 0.37.0 | 2026-10-10 | Deprecations only, nothing removed: everything named after "roadmap" (the second dialect, `LEGACY_*`, `legacyManifest`, `toDialect`, `useRoadmap`, `ROADMAP_*`), the old `useKehikot`, and the `kehikko-*` bin names (now also `kehikot-*`). See [CHANGELOG.md](CHANGELOG.md). |
 | 0.36.0 | 2026-10-09 | The plumbing's gaps, closed: `held` (unsaved work across a reload), `hostStore` (the host outside React), `doorsFetch` and `fillPage` (a `Bun.serve` module and its built page), `replied`, `probeServer`, `ask`'s `ticket`/`keepalive`/repeated `query`, `follow`'s `events`/`probe`, `coverFor`'s `host` and `server`. See [module plumbing](docs/module-plumbing.md). |
 | 0.35.0 | 2026-10-09 | The shared plumbing of a module: `pageDocument`, `mintTicket`/`refuseTicket`, `readJsonBody`, the `doors()` plugin, `ask`/`follow`, `useHost`, `Cover`/`coverFor`, and a build identity (`establishBuild`, `compareBuilds`, the manifest's and `ready`'s optional `build`, `PACKAGE_VERSION`). See [module plumbing](docs/module-plumbing.md). |
