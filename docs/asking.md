@@ -93,15 +93,17 @@ The sentence it already wrote stays in `content`, for a person and for an agent.
 ```ts
 return {
   content: [{ type: 'text', text: said }],
-  structuredContent: { outcome: watching ? 'shown' : presenting ? 'declined' : 'unseen', pages: watching, why },
+  structuredContent: { outcome, pages, why, deck, index /* and whatever else Slides counts: open, hidden, stale, presenting */ },
 }
 ```
 
 | `outcome` | means | what a caller does |
 |---|---|---|
-| `shown` | at least one open page was pointed at it; `pages` says how many | go on. `pages` is pages pointed, not people who saw it |
-| `unseen` | no page is open to see it; nobody was shown anything | bring the module into view (`view.fold`, or ask the person), then ask again |
-| `declined` | a page is open and would not move: a talk is being given, the person holds the page | do not retry in a loop; say so |
+| `shown` | at least one open page is showing it; `pages` says how many | go on. `pages` is pages, not people who saw it |
+| `unseen` | no page is open to see it, or none is known to be showing it (a hidden window, a page that did not say) | bring the module into view (`view.fold`, or ask the person), then ask again |
+| `declined` | the open pages would not move: a talk is being given, a page holds unsaved text without that slide | do not retry in a loop; say so |
+
+How sure `shown` is depends on the module. Slides' pages report back what they did with each pointing, so its `pages` counts pages that said the slide is on screen in a window that is not hidden. A module whose pages do not report counts the pages it sent the pointing to, and says so in its description. Either way the word is the module's best knowledge, and `pages` is never people.
 
 A slide that does not exist is not an outcome. The tool refuses (`isError: true`) and names the slides the deck has, as it does today: the caller made a mistake a retry will not fix.
 

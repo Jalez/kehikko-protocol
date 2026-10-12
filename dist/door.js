@@ -46,15 +46,17 @@ export function doorContext(args, before = DOOR_ARGUMENTS_BEFORE) {
  * Was it shown?
  * ------------------------------------------------------------------------ */
 /**
- * What became of being asked to show something. `shown`: at least one open page was pointed at it.
- * `unseen`: no page is open to see it, so nobody was shown anything. `declined`: a page is open and
- * would not move — a talk is being given, the person holds the page. A subject that does not exist
+ * What became of being asked to show something. `shown`: at least one open page is showing it.
+ * `unseen`: no page is open to see it, or none is known to be showing it (a hidden window, a page
+ * that did not say). `declined`: the open pages would not move — a talk is being given, a page holds
+ * unsaved text without it. A subject that does not exist
  * is not an outcome: the tool refuses (`isError`) and names what does.
  */
 export const SHOW_OUTCOMES = ['shown', 'unseen', 'declined'];
 /**
- * A `show` tool's `structuredContent`. `pages` is how many open pages were pointed, which is not
- * how many people saw it. Other fields pass through. Showing saves nothing: the person can turn
+ * A `show` tool's `structuredContent`. `pages` is how many open pages are showing it as far as the
+ * module can tell — the pages that said so, for a module whose pages report back; the pages it was
+ * sent to, for one whose pages do not. Never how many people saw it. Other fields pass through. Showing saves nothing: the person can turn
  * the page away, and the answer is the same whether or not they do.
  */
 export const showAnswerSchema = z
@@ -68,8 +70,8 @@ export const showAnswerSchema = z
 export const SHOW_OUTPUT_SCHEMA = {
     type: 'object',
     properties: {
-        outcome: { type: 'string', enum: [...SHOW_OUTCOMES], description: 'shown: an open page was pointed. unseen: no page is open to see it. declined: a page is open and would not move.' },
-        pages: { type: 'integer', minimum: 0, description: 'How many open pages were pointed. Not how many people saw it.' },
+        outcome: { type: 'string', enum: [...SHOW_OUTCOMES], description: 'shown: at least one open page is showing it. unseen: no page is open, or none is known to be showing it. declined: the open pages would not move.' },
+        pages: { type: 'integer', minimum: 0, description: 'How many open pages are showing it, as far as the module can tell. Not how many people saw it.' },
         why: { type: 'string', maxLength: LIMITS.REASON },
     },
     required: ['outcome', 'pages'],

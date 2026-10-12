@@ -32,16 +32,18 @@ export declare function doorContext(args: Record<string, unknown>, before?: Part
     deprecated: string[];
 };
 /**
- * What became of being asked to show something. `shown`: at least one open page was pointed at it.
- * `unseen`: no page is open to see it, so nobody was shown anything. `declined`: a page is open and
- * would not move — a talk is being given, the person holds the page. A subject that does not exist
+ * What became of being asked to show something. `shown`: at least one open page is showing it.
+ * `unseen`: no page is open to see it, or none is known to be showing it (a hidden window, a page
+ * that did not say). `declined`: the open pages would not move — a talk is being given, a page holds
+ * unsaved text without it. A subject that does not exist
  * is not an outcome: the tool refuses (`isError`) and names what does.
  */
 export declare const SHOW_OUTCOMES: readonly ["shown", "unseen", "declined"];
 export type ShowOutcome = (typeof SHOW_OUTCOMES)[number];
 /**
- * A `show` tool's `structuredContent`. `pages` is how many open pages were pointed, which is not
- * how many people saw it. Other fields pass through. Showing saves nothing: the person can turn
+ * A `show` tool's `structuredContent`. `pages` is how many open pages are showing it as far as the
+ * module can tell — the pages that said so, for a module whose pages report back; the pages it was
+ * sent to, for one whose pages do not. Never how many people saw it. Other fields pass through. Showing saves nothing: the person can turn
  * the page away, and the answer is the same whether or not they do.
  */
 export declare const showAnswerSchema: z.ZodObject<{
@@ -65,12 +67,12 @@ export declare const SHOW_OUTPUT_SCHEMA: {
         readonly outcome: {
             readonly type: "string";
             readonly enum: readonly ["shown", "unseen", "declined"];
-            readonly description: "shown: an open page was pointed. unseen: no page is open to see it. declined: a page is open and would not move.";
+            readonly description: "shown: at least one open page is showing it. unseen: no page is open, or none is known to be showing it. declined: the open pages would not move.";
         };
         readonly pages: {
             readonly type: "integer";
             readonly minimum: 0;
-            readonly description: "How many open pages were pointed. Not how many people saw it.";
+            readonly description: "How many open pages are showing it, as far as the module can tell. Not how many people saw it.";
         };
         readonly why: {
             readonly type: "string";
