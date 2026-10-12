@@ -4,9 +4,10 @@ import { pathToFileURL } from 'node:url';
 import { partsDeclaration } from '../manifest.js';
 /**
  * `bun run check:parts <module dir>…`: does a module do what its manifest says about an epic's parts?
- * Fails only on the manifest (`partsDeclaration`: neither, both, or unloadable); the import scan for
- * focus helpers is advice, never a failure. Node-only, read-only, behind no entry point in `exports`.
- * Design notes: docs/parts.md.
+ * Fails only on the manifest (`partsDeclaration`: neither, both, or unloadable). Everything read out of
+ * the sources is advice, never a failure: whether a focus helper is imported, and, from 1.2.0, what of
+ * the contract in docs/parts.md can be seen in text (`contractNotes`). Node-only, read-only, behind no
+ * entry point in `exports`.
  */
 /** The functions that are the rule. Importing any one of them from this package is using it. */
 export const FOCUS_HELPERS = [
@@ -18,17 +19,80 @@ export const FOCUS_HELPERS = [
     'partInFocus',
 ];
 const IMPORT = /import\s+(?:type\s+)?\{([^}]*)\}\s*from\s*['"]kehikot-module-protocol(?:\/client\/react)?['"]/g;
-/** The focus helpers one source file imports from the protocol, by the name they are exported under. */
-export function focusImports(text) {
+/** Which of `names` one source file imports from the protocol, by the name they are exported under. */
+function importsOf(text, names) {
     const found = new Set();
     for (const match of text.matchAll(IMPORT)) {
         for (const piece of (match[1] ?? '').split(',')) {
             const name = piece.trim().replace(/^type\s+/, '').split(/\s+as\s+/)[0]?.trim();
-            if (name && FOCUS_HELPERS.includes(name))
+            if (name && names.includes(name))
                 found.add(name);
         }
     }
     return [...found];
+}
+/** The focus helpers one source file imports from the protocol, by the name they are exported under. */
+export function focusImports(text) {
+    return importsOf(text, FOCUS_HELPERS);
+}
+/** The two that narrow a LIST by the one rule. A module that follows parts goes through one of them. */
+const NARROWERS = ['useFocus', 'narrowToFocus'];
+/** What 1.2.0 deprecated for parts: the standing count line, and the names of two modules. */
+export const DEPRECATED_FOR_PARTS = ['focusSentence', 'FOCUS_WHERE', 'paperFileOf', 'PAPER_MODULE', 'pickedFiles', 'JOURNEYS_MODULE', 'partsOf'];
+/**
+ * Reasons `partless` is no longer for. A module is partless when it has no item that could carry an
+ * anchor, or when it is not about one epic at all; not because somebody chose, because narrowing would
+ * hide a selection (`keep` holds it), or because a part's files are "the paper's" (they are documents).
+ */
+const NOT_A_REASON = [
+    [/\b(?:chose|chosen|decided|prefers?)\b[^.]*\bnot\b/i, 'a choice is not a reason under one rule'],
+    [/\bwould hide\b|\bhides? (?:their|its|the) (?:own )?selection\b/i, 'what a person selected is passed as `keep` and is never hidden'],
+    [/\bof the paper\b|\bpaper(?:'|’)s files\b/i, 'from 1.2.0 a part\u2019s documents are project-relative, so any file can be in one'],
+];
+/**
+ * What of the contract can be seen in a module's files, as notes for a person: a module that follows
+ * parts and narrows through neither `useFocus().narrow` nor `narrowToFocus`, passes no `keep`, or still
+ * imports what 1.2.0 deprecated; a `partless` whose reason the contract no longer accepts. Text only,
+ * so each is a hint and none is a verdict. Pure.
+ */
+export function contractNotes(manifest, sources) {
+    const who = manifest.id || 'This module';
+    const notes = [];
+    const follows = (manifest.reacts ?? []).includes('parts');
+    const why = manifest.partless?.trim() ?? '';
+    if (!follows) {
+        for (const [pattern, because] of NOT_A_REASON) {
+            if (!pattern.test(why))
+                continue;
+            notes.push(`${who} is partless because "${why}" — ${because}. partless is for a module with no item that could carry an `
+                + 'anchor, or one that is not about one epic at all. If its items have a ref, a file or a part, it follows the parts.');
+            break;
+        }
+        return notes;
+    }
+    const helpers = sources.flatMap((source) => focusImports(source.text));
+    if (helpers.length === 0)
+        return notes;
+    const narrows = sources.some((source) => /\.narrow\s*(?:<[^>]*>)?\s*\(|\bnarrowToFocus\s*(?:<[^>]*>)?\s*\(/.test(source.text));
+    if (!helpers.some((name) => NARROWERS.includes(name)) || !narrows) {
+        notes.push(`${who} follows the parts with ${[...new Set(helpers)].join(', ')} and this scan found no call of useFocus().narrow or `
+            + 'narrowToFocus. If it narrows a list, it does so by a rule of its own, which is the second rule the contract exists to '
+            + 'prevent: give each item its anchors in one anchorOf(item) and narrow the list through the protocol. A module that '
+            + 'follows the pick and has no list to narrow can leave this.');
+    }
+    else if (!sources.some((source) => /\bkeep\b\s*[:,}]/.test(source.text))) {
+        notes.push(`${who} narrows and this scan found no keep passed. What a person is in the middle of — an editor with unsaved words, `
+            + 'the item they selected or opened — is passed as keep and stays drawn under any pick.');
+    }
+    const old = sources.flatMap((source) => {
+        const names = importsOf(source.text, DEPRECATED_FOR_PARTS);
+        return names.length ? [`${source.path}: ${names.join(', ')}`] : [];
+    });
+    if (old.length) {
+        notes.push(`${who} imports what 1.2.0 deprecated for parts (${old.join('; ')}). No standing line about the pick is drawn `
+            + '(emptySaid, only in a view the pick left empty), and a part names no module (documents, a { file } anchor).');
+    }
+    return notes;
 }
 /** The check itself, over a manifest and the module's sources. Pure. */
 export function checkParts(manifest, sources) {
@@ -45,6 +109,8 @@ export function checkParts(manifest, sources) {
             + 'text only and misses `import * as`, a wrapper’s re-export and a dynamic import. If the module narrows by a '
             + 'rule of its own, use the protocol’s.');
     }
+    if (failures.length === 0)
+        notes.push(...contractNotes(manifest, sources));
     return {
         module: manifest.id || 'This module',
         declares: follows ? 'follows' : manifest.partless?.trim() ? 'partless' : 'undeclared',

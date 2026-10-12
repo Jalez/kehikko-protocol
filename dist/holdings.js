@@ -1,0 +1,113 @@
+import { EPIC_SLUG } from './ids.js';
+import { LIMITS } from './limits.js';
+import { PART_ID, partDocument } from './parts.js';
+/**
+ * What a module holds for the parts of a project's epics, as it publishes it: `parts.json` in its own
+ * folder, `{ version, epics: { <epic>: { <part id>: { documents, refs } } } }`. Shapes and pure readers
+ * only; the file is opened behind `/serve` (`readHoldings`, `writeHoldings`). No module is named here.
+ * Design notes: docs/parts.md.
+ */
+/** The file, in a module's own folder: `moduleFile(projectPath, moduleId, HOLDINGS_FILE)` is `.kehikot/<module>/parts.json`. */
+export const HOLDINGS_FILE = 'parts';
+/** The format's number, written as `version`. A reader opens a later one and reads what it knows. */
+export const HOLDINGS_VERSION = 1;
+/** Short strings out of whatever is there, each through `one`, once each, at most `most`. */
+function listed(raw, one, most, into = []) {
+    if (!Array.isArray(raw))
+        return into;
+    for (const entry of raw) {
+        if (into.length >= most)
+            break;
+        const said = one(entry);
+        if (said !== null && !into.includes(said))
+            into.push(said);
+    }
+    return into;
+}
+const refOf = (entry) => {
+    if (typeof entry !== 'string')
+        return null;
+    const ref = entry.trim();
+    return ref && ref.length <= LIMITS.REF ? ref : null;
+};
+/**
+ * What one part holds, read off anything: documents in `partDocument`'s form and refs as short
+ * strings, once each, bounded by `LIMITS.PART_DOCUMENTS` and `LIMITS.PART_REFS`. Junk costs the entry
+ * it is in. Null when nothing usable is left, so a part a module holds nothing for is not listed.
+ */
+export function partHoldings(raw) {
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw))
+        return null;
+    const { documents, refs } = raw;
+    const held = {
+        documents: listed(documents, partDocument, LIMITS.PART_DOCUMENTS),
+        refs: listed(refs, refOf, LIMITS.PART_REFS),
+    };
+    return held.documents.length + held.refs.length > 0 ? held : null;
+}
+/** One epic's holdings out of anything: every own key that is a `PART_ID` with something held, at most `LIMITS.PARTS`. */
+export function epicHoldings(raw) {
+    const out = {};
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw))
+        return out;
+    let count = 0;
+    for (const [id, value] of Object.entries(raw)) {
+        if (count >= LIMITS.PARTS)
+            break;
+        if (!PART_ID.test(id))
+            continue;
+        const held = partHoldings(value);
+        if (held === null)
+            continue;
+        out[id] = held;
+        count += 1;
+    }
+    return out;
+}
+/**
+ * Everything one module's parsed `parts.json` says, or `{}`: never throws. Read per epic and per part,
+ * so one bad entry costs that entry. An epic key that is not an `EPIC_SLUG`, and an epic with nothing
+ * held, are left out; at most `LIMITS.HOLDINGS_EPICS` epics are read.
+ */
+export function holdingsIn(document) {
+    const out = {};
+    if (!document || typeof document !== 'object' || Array.isArray(document))
+        return out;
+    const epics = document.epics;
+    if (!epics || typeof epics !== 'object' || Array.isArray(epics))
+        return out;
+    let count = 0;
+    for (const [slug, value] of Object.entries(epics)) {
+        if (count >= LIMITS.HOLDINGS_EPICS)
+            break;
+        if (!EPIC_SLUG.test(slug))
+            continue;
+        const held = epicHoldings(value);
+        if (Object.keys(held).length === 0)
+            continue;
+        out[slug] = held;
+        count += 1;
+    }
+    return out;
+}
+/**
+ * Two readings as one: `more` added to `into`, per epic and part, once each and in order, under the
+ * same bounds. `into` is changed and returned. What makes a part's documents the union of what every
+ * module said, with none of them named.
+ */
+export function joinHoldings(into, more) {
+    for (const [slug, parts] of Object.entries(more)) {
+        const epic = Object.hasOwn(into, slug) ? into[slug] : (into[slug] = {});
+        for (const [id, held] of Object.entries(parts)) {
+            if (!Object.hasOwn(epic, id)) {
+                if (Object.keys(epic).length >= LIMITS.PARTS)
+                    continue;
+                epic[id] = { documents: [], refs: [] };
+            }
+            const part = epic[id];
+            listed(held.documents, partDocument, LIMITS.PART_DOCUMENTS, part.documents);
+            listed(held.refs, refOf, LIMITS.PART_REFS, part.refs);
+        }
+    }
+    return into;
+}

@@ -82,3 +82,44 @@ test('a re-sent context with the same parts is the same value; a tick is a new o
   expect(last().focused).toBe(false)
   expect(seen.length).toBe(3)
 })
+
+test('empty (1.2.0): the one sentence, only when the pick left nothing of a list that had something', () => {
+  const { last, render } = mount({ epic: 'thesis', parts: parts(true) })
+  const anchorOf = (note: (typeof NOTES)[number]) => ({ file: note.file })
+  /* Something is shown: nothing is said about the pick. */
+  expect(last().narrow(NOTES, anchorOf, { noun: 'note' }).empty).toBe('')
+  /* The pick left nothing. */
+  const none = last().narrow(NOTES.slice(1), anchorOf, { noun: 'note' })
+  expect(none.shown).toEqual([])
+  expect(none.empty).toBe('No note is in the picked part.')
+  /* What is in hand is drawn, so the view is not empty. */
+  expect(last().narrow(NOTES.slice(1), anchorOf, { noun: 'note', keep: (note) => note.id === 'b' }).empty).toBe('')
+  /* A list with nothing in it is the module's own empty state, not the pick's. */
+  expect(last().narrow([], anchorOf, { noun: 'note' }).empty).toBe('')
+  /* The older [one, many] noun gives its singular. */
+  expect(last().narrow(NOTES.slice(1), anchorOf, { noun: ['entry', 'entries'] }).empty).toBe('No entry is in the picked part.')
+  render({ epic: 'thesis', parts: parts(false) })
+  expect(last().narrow(NOTES.slice(1), anchorOf, { noun: 'note' }).empty).toBe('')
+})
+
+test('documents and the whole-epic anchor through the hook: the project is the context’s', () => {
+  const project = '/home/a/proj'
+  const listed: EpicPart[] = [
+    { id: 'seam', heading: 'Seam', refs: [], picked: true, documents: ['src/seam.ts'] },
+    { id: 'rest', heading: 'Rest', refs: [], picked: false, documents: ['src/rest.ts'] },
+  ]
+  const { last, render, seen } = mount({ epic: 'thesis', projectPath: project, parts: listed })
+  expect(last().inFocus({ file: `${project}/src/seam.ts` })).toBe(true)
+  expect(last().inFocus({ file: `${project}/src/rest.ts` })).toBe(false)
+  expect(last().inFocus({ whole: true })).toBe(true)
+  const rows = [{ file: `${project}/src/rest.ts`, whole: false }, { file: '', whole: true }]
+  const narrowed = last().narrow(rows, (row) => (row.whole ? { whole: true } : { file: row.file }), { noun: 'file' })
+  expect(narrowed.shown).toEqual([rows[1]!])
+  /* The same context again is the same value; another project is not. */
+  const held = last()
+  render({ epic: 'thesis', projectPath: project, parts: listed.map((part) => ({ ...part })) })
+  expect(seen.at(-1)).toBe(held)
+  render({ epic: 'thesis', projectPath: '/home/a/other', parts: listed })
+  expect(seen.at(-1)).not.toBe(held)
+  expect(last().inFocus({ file: `${project}/src/seam.ts` })).toBe(false)
+})

@@ -322,14 +322,27 @@ so the bound is on what people wrote, which is the small number.
 
 #### `LIMITS.PARTS`
 
-How many parts of the open epic one context may list. See `parts.ts`.
+How many parts one epic may have, and so how many one context may list.
+See `parts.ts`.
 
-Thirty-two. A part is a heading a person wrote to divide one epic, and an
-epic with more than a handful has stopped being divided and started being
-indexed. Like `CONTAINERS`, this bounds a list a HOST built out of its own
-material, so it protects a module from a host: a module reading
-`context.parts` knows the size of the list it is about to draw a checkbox
-for.
+A hundred and twenty-eight. It was thirty-two until 1.2.0, on the argument
+that an epic with more than a handful of parts had stopped being divided.
+That stopped being true when a part became something a module keeps one of:
+a part may be one step of a journey, journeys of more than thirty-two steps
+exist (one real one has thirty-eight), and past the limit a step was a part
+no host could list. Like `CONTAINERS`, this bounds a list a HOST built out
+of its own material, so a module reading `context.parts` knows the size of
+the list it may be handed.
+
+A module built with this package before 1.2.0 holds the old number in its
+own schema and refuses a whole context that lists more. So a host does not
+send such a module more than `PARTS_BEFORE_1_2` (32): `partsFor(parts,
+manifest.build?.protocol)` keeps every picked part and fills with the rest
+in order.
+
+What a context can weigh at the bounds is a host's concern, as it always
+was: a part's `refs` may already be 256 strings. A host sends the first of
+anything past a bound and is expected to say so on its own screen.
 
 #### `LIMITS.PART_REFS`
 
@@ -356,6 +369,28 @@ time, so it is the small number: `PARTS`' number and not `PART_REFS`',
 which bounds what a tracker can pile under a heading. Like `PART_REFS`
 this rides in a context that is broadcast to every frame, and a part with
 more files than this sends the first of them.
+
+#### `LIMITS.PART_DOCUMENTS`, `LIMITS.PART_DOCUMENT`
+
+How many documents one part may list, and how long one document's name may
+be (1.2.0). See `partDocument` in `parts.ts`.
+
+Sixty-four, and five hundred and twelve. A document is named relative to
+the PROJECT, so it is `PART_FILE` plus the folders in front of it
+(`.kehikot/<module>/<epic>/`, an epic's slug being up to eighty): every
+name `files` could hold has a document that says the same file. The count
+is twice `PART_FILES` because the list is no longer one module's: it is the
+union of what every module holds for the part. The same two numbers bound
+what one module writes for one part in its `parts.json`.
+
+#### `LIMITS.HOLDINGS_EPICS`, `LIMITS.HOLDINGS_BYTES`, `LIMITS.HOLDINGS_MODULES`
+
+What a reader of `parts.json` will open (1.2.0): at most 512 epics a file,
+4 MB a file, 128 module folders a project. A host reads these files on its
+own schedule from folders any program may have written, so the reading is
+bounded in every direction. Past a bound the first are read and the rest
+are not; a file over the byte bound is skipped whole, because half a JSON
+document is not a smaller document.
 
 #### `LIMITS.PART_FILE`
 

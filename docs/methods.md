@@ -61,6 +61,17 @@ of module ids, `fold` and `unfold`, and answers with `foldResult`: an outcome
 and the containers this call changed, which is the list that puts them back.
 The rules it keeps and the putting-back are in [asking](asking.md#bringing-the-module-into-view-viewfold).
 
+### Asking the host to edit an epic's list of parts
+
+`parts.set` (1.2.0, capability `parts:set`) is how a module, or the host's own
+page, asks for one edit of the list: `{ epic, add: { name, after? } }`,
+`{ epic, rename: { id, name } }`, `{ epic, move: { id, after? } }` or
+`{ epic, remove: { id } }`. The host is the list's only writer; it makes a new
+part's id and never changes one. It answers with `partsSetResult`: an outcome
+(`changed`, `unchanged`, `declined`, `no-such-part`), the list as it then
+stands, the id the call was about, and `why`. All four are `ok: true`. The
+rules a host keeps are in [parts](parts.md#partsset-asking-the-host-to-edit-the-list).
+
 ### Asking the person which project, without being told what projects there are
 
 A module is handed one `projectPath` and may read what the host named. That is
@@ -391,6 +402,18 @@ Say that the material this module keeps changed. See `content.changed` and
 A permission although it writes nothing, for the reason `passage:set` is
 one: it moves every other container on the canvas. A module that reported
 without cause would have each of them re-reading on its say-so.
+
+#### `CAPABILITIES.parts:set`
+
+Ask the host to add, rename, move or remove a part of an epic (1.2.0). See
+`parts.set`.
+
+A write into the epic, and a shared one: the list comes back to every module
+in `context.parts`. It is a request for the reason `filters.set` is one — the
+list has one writer, the host, and a module that wrote it itself would be the
+second. A module offers the edit on a person's press: "a part for each
+chapter", "a part for this new step". It is not for a module to keep the list
+in step with its own data on its own judgement.
 
 #### `METHODS`
 
@@ -727,6 +750,46 @@ same reason `disposition.set` carries none.
 
 Reported AFTER the write has landed, so a container that re-reads at once
 reads the new material.
+
+#### `methodParams.parts.set`
+
+One edit of an epic's list of parts; answered with `partsSetResult`.
+
+##### One edit a call, and the epic is named
+
+Exactly one of `add`, `rename`, `move`, `remove`. Four methods would have
+been four capabilities for one act, and a list of edits would need an answer
+about each. `epic` is required although the open epic is usually the one
+meant: this is written into somebody's project, a module may be pinned to an
+epic that is no longer the open one, and "whichever is open when the request
+lands" is not something to write a file on.
+
+##### The module never names an id for a new part
+
+`add` carries a name and a place. The id is the host's to make
+(`partIdFor`), because the host is where two requests for "Methods" meet, and
+it comes back in the answer's `id`. An `id` a module put in `add` is not part
+of the shape and is dropped.
+
+##### `after`
+
+Right after that part; `null` is first; absent is last. One spelling for
+`add` and `move`, and no index: a position counted by a module is a position
+in a list that may have changed since it was sent.
+
+##### Refused, not clipped
+
+A name longer than `LIMITS.TITLE`, an empty one, an id that is not a
+`PART_ID`, a part moved to after itself. A clipped name is a name nobody
+typed.
+
+#### `PARTS_SET_OUTCOMES`
+
+`changed`, `unchanged`, `declined`, `no-such-part`: `foldResult`'s outcomes,
+for the same reasons. A refusal is `ok: true` with a sentence in `why`,
+because "an epic has at most 128 parts" is something the module shows a
+person, not a fault in its call. `parts` is the list after the call in every
+outcome, so a caller never has to wait for the next context to draw it.
 
 #### `methodParams.events.emit.payload`
 

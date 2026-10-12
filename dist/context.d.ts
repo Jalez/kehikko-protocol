@@ -780,9 +780,9 @@ export declare const contextSchema: z.ZodObject<{
         epic?: string | null | undefined;
     }>, "many">>;
     /**
-     * The parts of the open epic, and which the person has picked out; see `parts.ts`. `[]` when
-     * nothing is narrowed. No module sets it; it belongs to the epic, not a kehikko. With parts picked
-     * a module shows what `refInFocus`, `partInFocus` and `fileInFocus` admit, and says it has narrowed.
+     * The parts of the open epic, and which the person has picked out; see `parts.ts`. `[]` when the
+     * epic has none. No module sets the pick; the list belongs to the epic, not a kehikko, and a module
+     * asks for an edit of it with `parts.set`. With parts picked a module shows what `anchorInFocus` admits.
      */
     parts: z.ZodDefault<z.ZodArray<z.ZodObject<{
         id: z.ZodString;
@@ -790,18 +790,21 @@ export declare const contextSchema: z.ZodObject<{
         refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
         picked: z.ZodDefault<z.ZodBoolean>;
         files: z.ZodOptional<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">>;
+        documents: z.ZodOptional<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">>;
     }, "strip", z.ZodTypeAny, {
         id: string;
         heading: string;
         refs: string[];
         picked: boolean;
         files?: string[] | undefined;
+        documents?: string[] | undefined;
     }, {
         id: string;
         files?: string[] | undefined;
         heading?: string | undefined;
         refs?: string[] | undefined;
         picked?: boolean | undefined;
+        documents?: string[] | undefined;
     }>, "many">>;
 }, "strip", z.ZodTypeAny, {
     epic: string | null;
@@ -809,8 +812,16 @@ export declare const contextSchema: z.ZodObject<{
         at: string | null;
         refreshing: boolean;
     };
-    project: string | null;
     projectPath: string | null;
+    parts: {
+        id: string;
+        heading: string;
+        refs: string[];
+        picked: boolean;
+        files?: string[] | undefined;
+        documents?: string[] | undefined;
+    }[];
+    project: string | null;
     theme: "light" | "dark";
     selection: string[];
     passage: {
@@ -866,21 +877,22 @@ export declare const contextSchema: z.ZodObject<{
         source: string;
         epic: string | null;
     }[];
-    parts: {
-        id: string;
-        heading: string;
-        refs: string[];
-        picked: boolean;
-        files?: string[] | undefined;
-    }[];
 }, {
     epic?: string | null | undefined;
     tracker?: {
         at?: string | null | undefined;
         refreshing?: boolean | undefined;
     } | undefined;
-    project?: string | null | undefined;
     projectPath?: string | null | undefined;
+    parts?: {
+        id: string;
+        files?: string[] | undefined;
+        heading?: string | undefined;
+        refs?: string[] | undefined;
+        picked?: boolean | undefined;
+        documents?: string[] | undefined;
+    }[] | undefined;
+    project?: string | null | undefined;
     theme?: "light" | "dark" | undefined;
     selection?: string[] | undefined;
     passage?: {
@@ -935,13 +947,6 @@ export declare const contextSchema: z.ZodObject<{
         at: string;
         source: string;
         epic?: string | null | undefined;
-    }[] | undefined;
-    parts?: {
-        id: string;
-        files?: string[] | undefined;
-        heading?: string | undefined;
-        refs?: string[] | undefined;
-        picked?: boolean | undefined;
     }[] | undefined;
 }>;
 export type ModuleContext = z.infer<typeof contextSchema>;

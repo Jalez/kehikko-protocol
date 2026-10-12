@@ -7,6 +7,83 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 1.2.0 — 2026-10-12
+
+Parts belong to the epic and name no module. **Additive: nothing a 1.1.0 or 1.0.0 call does has
+changed**, and `PROTOCOL` is still 2. Every consumer's own tests and typecheck were run against
+1.1.1 and against this build. Design, the contract and a worked module:
+[docs/parts.md](docs/parts.md). Before → after for the deprecations: [MIGRATING.md](MIGRATING.md).
+
+A host does two things in the change that moves it here: list `parts.set` beside the methods it
+answers (its own start-up guard asks), and send a module built before 1.2.0 no more than 32 parts
+(`partsFor`).
+
+### Added: what a module holds for a part
+
+- **`parts.json`**, one per module per project, `<project>/.kehikot/<module>/parts.json`:
+  `{ version, epics: { <epic>: { <part id>: { documents, refs } } } }`. `HOLDINGS_FILE`,
+  `HOLDINGS_VERSION`, `PartHoldings`, `EpicHoldings`, `ProjectHoldings`.
+- `/serve`: **`writeHoldings(projectPath, moduleId, epic, holdings)`** — one module, one epic;
+  atomic; every other epic and unknown key kept; synchronous from read to rename — and
+  **`readHoldings(projectPath)`**, which asks every folder under `.kehikot/` and unions what they
+  say, naming no module, tolerant of junk and bounded. `HoldingsWritten`.
+- `LIMITS.HOLDINGS_EPICS`, `HOLDINGS_BYTES`, `HOLDINGS_MODULES`.
+
+### Added: documents, the module-agnostic successor of `files`
+
+- **`documents`** on a part (`partSchema`): project-relative paths, whichever module keeps them.
+  Optional and not defaulted, like `files`.
+- **`documentOf(path, projectPath?)`**, the one normalisation; `partDocument`, `isPartDocument`,
+  `pickedDocuments`. `LIMITS.PART_DOCUMENTS` (64), `LIMITS.PART_DOCUMENT` (512).
+- `fileInFocus`, `partsOfFile`, `anchorInFocus` take an optional **`projectPath`**; `narrowToFocus`
+  takes it in `options`; `useFocus` reads `context.projectPath`. A `{ file }` anchor matches a
+  picked part's `documents`, and, exactly as before, its `files`.
+
+### Added: the whole-epic anchor
+
+- **`{ whole: true }`** in `Anchor`: the item is about the epic itself or the whole of its paper,
+  so it belongs to every part and is in front under any pick. Not the absence of an anchor, which
+  is still hidden under a pick.
+
+### Added: the epic's own list, and asking for an edit of it
+
+- **`listedPartSchema`** (`{ id, name }`), **`partListSchema`**, `ListedPart`: the list a host
+  keeps in the epic's file.
+- **`partIdFor(name, taken)`**: the id a new part is given, once; a rename never changes it.
+- The method **`parts.set`** under the capability `parts:set`: `{ epic, add: { name, after? } }`,
+  `{ epic, rename: { id, name } }`, `{ epic, move: { id, after? } }`, `{ epic, remove: { id } }`,
+  answered with **`partsSetResult`** (`PARTS_SET_OUTCOMES`: `changed`, `unchanged`, `declined`,
+  `no-such-part`; `parts`, `id`, `why`). A host without it answers `unknown-method`.
+- **`partsFor(parts, builtWith)`** and `PARTS_BEFORE_1_2`: what a host sends a module whose schema
+  stops at 32 parts.
+
+### Added: one sentence for an empty view
+
+- **`emptySaid(parts, noun)`**: `No note is in the picked part.` / `…parts.`, `''` when nothing is
+  picked. `useFocus().narrow(...)` also returns it as **`empty`**: the sentence when the pick left
+  nothing of a list that had something, `''` otherwise.
+
+### Changed: `LIMITS.PARTS` 32 → 128
+
+A part may be one step of a journey, and journeys of more than thirty-two steps exist. `partsSchema`,
+`partListSchema`, `partIdsOf` and `partsOf` follow the number. The one thing that does not is a
+module already built: see `partsFor`.
+
+### Changed: `kehikot-check-parts` knows the contract
+
+Still fails only on the manifest. New notes, never failures (`contractNotes`): a module that
+follows parts without `useFocus().narrow` or `narrowToFocus`, or with no `keep`, or that imports
+what this release deprecated; a `partless` whose reason the contract no longer accepts. A module
+narrowing with `fileInFocus` alone used to get no note and now gets the first.
+
+### Deprecated (marked `@deprecated`; all unchanged)
+
+- `focusSentence`, `FOCUS_WHERE`, and `narrow(...).sentence`: the standing count line.
+  `docs/parts.md` and `docs/wire.md` no longer require it.
+- `partSchema.files`, `pickedFiles`, `paperFileOf`, `PAPER_MODULE`.
+- `partsOf`, `partIdsOf`, `JourneyPart`; `JOURNEYS_MODULE` and `readJourneys` as where an epic's
+  parts are. Steps are still read through them.
+
 ## 1.1.1 — 2026-10-12
 
 What a door requires of a request, stated in one place and held to. No new message, no new

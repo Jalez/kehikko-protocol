@@ -114,8 +114,11 @@ export declare const LIMITS: {
      * list; a module derives that with `deriveDisposition` in `facets.ts`.
      */
     readonly DISPOSITIONS: 256;
-    /** How many parts of the open epic one context may list. See `parts.ts`. */
-    readonly PARTS: 32;
+    /**
+     * How many parts one epic may have, and so how many one context may list. See `parts.ts`. 32 until
+     * 1.2.0: a part may be one step of a journey, and journeys of more than thirty-two steps exist.
+     */
+    readonly PARTS: 128;
     /**
      * How many references one part may list. A host that has more under one heading sends the first
      * of them and is expected to say so on its own screen.
@@ -131,6 +134,22 @@ export declare const LIMITS: {
      * (`parts/posting-seam.tex`), not an absolute path, which `PATH` bounds.
      */
     readonly PART_FILE: 256;
+    /**
+     * How many documents one part may list in a context, and how many one module may publish for one
+     * part in its `parts.json`. A host sends the first of them. See `partDocument` in `parts.ts`.
+     */
+    readonly PART_DOCUMENTS: 64;
+    /**
+     * How long one document's name may be, in characters: a path relative to the PROJECT
+     * (`.kehikot/paper/<epic>/parts/posting-seam.tex`), so longer than `PART_FILE` by the folders in front.
+     */
+    readonly PART_DOCUMENT: 512;
+    /** How many epics one module's `parts.json` is read for. A file with more is read for the first of them. */
+    readonly HOLDINGS_EPICS: 512;
+    /** As much of one module's `parts.json` as a reader will open, in bytes. A larger file is skipped whole. */
+    readonly HOLDINGS_BYTES: number;
+    /** How many module folders under `.kehikot/` a reader of holdings looks in. */
+    readonly HOLDINGS_MODULES: 128;
     /**
      * How many places in documents one container may say it is showing. Each entry is a whole
      * `passage`, with `quoted` bounded at `QUOTE`; a module saying what it shows should leave `quoted`

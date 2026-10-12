@@ -1134,15 +1134,23 @@ selection.
 ##### What a consumer does with it, said once
 
 When no part is picked, the whole epic is in front of the person and a
-module shows what it always showed. When some are, it shows what belongs
-to THOSE — `refInFocus` for a reference, `partInFocus` for a step that was
-assigned to a part, `fileInFocus` for a file of the epic's paper, which a
-part may own (`files`, each relative to the paper's folder; absent from a
-host older than 0.32.0, and read as none) — and it SAYS that it has narrowed and by how much:
-"showing 6 · 14 outside the picked parts", in its own header, with a way
-to see them. A focus that hides things and says nothing is the failure
-this field was designed against, and the reason every part is listed with
-its refs rather than only the picked ones.
+module shows what it always showed. When some are, it shows an item exactly
+when one of the item's anchors is in a picked part: `anchorInFocus`, through
+`useFocus().narrow` or `narrowToFocus`. An anchor is a part's id, a document
+(`documents`, project-relative, from 1.2.0; `files`, paper-relative and
+deprecated, beside it), a reference, or `{ whole: true }` for an item about
+the whole epic.
+
+It says NOTHING about the pick while anything is shown — no count, no
+"outside" line, no part names in its header; the host's bar says what is
+picked, and the room is the module's content's. The one exception is a view
+the pick left empty, which says one sentence where the items would have
+been (`emptySaid`). Until 1.2.0 this paragraph required a standing count
+line; every module has since removed it. The contract is in
+[parts.md](parts.md#the-contract-for-a-module-that-follows-parts).
+
+A module asks for an edit of the list with `parts.set` and never sets the
+pick.
 
 Empty rather than absent, for the reason every other field here is. An
 epic with no parts, no epic at all, and a host that has never heard of

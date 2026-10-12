@@ -75,6 +75,12 @@ export declare const CAPABILITIES: {
      * nothing, but moves every other container on the canvas to re-read.
      */
     readonly 'content:report': "Tell every module on the canvas that the material this one keeps has changed, so they read it again.";
+    /**
+     * Ask the host to edit the open project's list of an epic's parts: add one, rename one, move one,
+     * remove one. See `parts.set`. A write into the epic, read back by every module in `context.parts`.
+     * The host is the list's only writer and decides; a module offers the edit on a person's press.
+     */
+    readonly 'parts:set': "Ask the host to add, rename, move or remove a part of an epic. The host decides, and every module is told.";
 };
 export type Capability = keyof typeof CAPABILITIES;
 export declare const CAPABILITY_NAMES: Capability[];
@@ -102,6 +108,7 @@ export declare const METHODS: {
     readonly 'tracker.get': "trackers:read";
     readonly 'tracker.refresh': "trackers:refresh";
     readonly 'content.changed': "content:report";
+    readonly 'parts.set': "parts:set";
 };
 export type Method = keyof typeof METHODS;
 export declare const METHOD_NAMES: Method[];
@@ -637,6 +644,157 @@ export declare const methodParams: {
     }, {
         epic?: string | undefined;
     }>;
+    /**
+     * Ask the host to make ONE edit to an epic's list of parts; answered with `partsSetResult`, which carries the
+     * list as it then stands. Exactly one of `add`, `rename`, `move`, `remove`. `epic` is required: the edit is
+     * written down, so it names what it is for. The HOST makes a new part's id (`partIdFor`), and no edit changes one.
+     */
+    readonly 'parts.set': z.ZodEffects<z.ZodEffects<z.ZodObject<{
+        epic: z.ZodString;
+        /** A new part, called `name`, placed by `after`. The answer's `id` is the id the host gave it. */
+        add: z.ZodOptional<z.ZodObject<{
+            name: z.ZodString;
+            after: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+        }, "strip", z.ZodTypeAny, {
+            name: string;
+            after?: string | null | undefined;
+        }, {
+            name: string;
+            after?: string | null | undefined;
+        }>>;
+        /** Another name for the part `id`. Its id, its place and everything filed under it stay. */
+        rename: z.ZodOptional<z.ZodObject<{
+            id: z.ZodString;
+            name: z.ZodString;
+        }, "strip", z.ZodTypeAny, {
+            id: string;
+            name: string;
+        }, {
+            id: string;
+            name: string;
+        }>>;
+        /** The part `id`, placed by `after`. */
+        move: z.ZodOptional<z.ZodObject<{
+            id: z.ZodString;
+            after: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+        }, "strip", z.ZodTypeAny, {
+            id: string;
+            after?: string | null | undefined;
+        }, {
+            id: string;
+            after?: string | null | undefined;
+        }>>;
+        /** The part `id` leaves the list. What modules filed under it is theirs and is not touched. */
+        remove: z.ZodOptional<z.ZodObject<{
+            id: z.ZodString;
+        }, "strip", z.ZodTypeAny, {
+            id: string;
+        }, {
+            id: string;
+        }>>;
+    }, "strip", z.ZodTypeAny, {
+        epic: string;
+        add?: {
+            name: string;
+            after?: string | null | undefined;
+        } | undefined;
+        rename?: {
+            id: string;
+            name: string;
+        } | undefined;
+        move?: {
+            id: string;
+            after?: string | null | undefined;
+        } | undefined;
+        remove?: {
+            id: string;
+        } | undefined;
+    }, {
+        epic: string;
+        add?: {
+            name: string;
+            after?: string | null | undefined;
+        } | undefined;
+        rename?: {
+            id: string;
+            name: string;
+        } | undefined;
+        move?: {
+            id: string;
+            after?: string | null | undefined;
+        } | undefined;
+        remove?: {
+            id: string;
+        } | undefined;
+    }>, {
+        epic: string;
+        add?: {
+            name: string;
+            after?: string | null | undefined;
+        } | undefined;
+        rename?: {
+            id: string;
+            name: string;
+        } | undefined;
+        move?: {
+            id: string;
+            after?: string | null | undefined;
+        } | undefined;
+        remove?: {
+            id: string;
+        } | undefined;
+    }, {
+        epic: string;
+        add?: {
+            name: string;
+            after?: string | null | undefined;
+        } | undefined;
+        rename?: {
+            id: string;
+            name: string;
+        } | undefined;
+        move?: {
+            id: string;
+            after?: string | null | undefined;
+        } | undefined;
+        remove?: {
+            id: string;
+        } | undefined;
+    }>, {
+        epic: string;
+        add?: {
+            name: string;
+            after?: string | null | undefined;
+        } | undefined;
+        rename?: {
+            id: string;
+            name: string;
+        } | undefined;
+        move?: {
+            id: string;
+            after?: string | null | undefined;
+        } | undefined;
+        remove?: {
+            id: string;
+        } | undefined;
+    }, {
+        epic: string;
+        add?: {
+            name: string;
+            after?: string | null | undefined;
+        } | undefined;
+        rename?: {
+            id: string;
+            name: string;
+        } | undefined;
+        move?: {
+            id: string;
+            after?: string | null | undefined;
+        } | undefined;
+        remove?: {
+            id: string;
+        } | undefined;
+    }>;
     readonly 'events.emit': z.ZodObject<{
         extension: z.ZodString;
         /**
@@ -706,6 +864,56 @@ export declare const foldResult: z.ZodObject<{
     unfolded?: string[] | undefined;
 }>;
 export type FoldResult = z.infer<typeof foldResult>;
+/**
+ * What became of a `parts.set`; all four are `ok: true`. `changed`: the list is different now. `unchanged`:
+ * it already was as asked (the same name, the same place). `declined`: the host will not, and `why` says so
+ * (no such epic, the list is full, not now). `no-such-part`: an `id` or an `after` names no part; nothing changed.
+ */
+export declare const PARTS_SET_OUTCOMES: readonly ["changed", "unchanged", "declined", "no-such-part"];
+export type PartsSetOutcome = (typeof PARTS_SET_OUTCOMES)[number];
+/**
+ * `parts` is the epic's whole list after the call, in order, whatever the outcome (`[]` when the host
+ * has no such epic to answer about). `id` is the part the call was about: for `add`, the id the host
+ * made; null when nothing was. A refusal's sentence is `why`, for a person to read.
+ */
+export declare const partsSetResult: z.ZodObject<{
+    outcome: z.ZodEnum<["changed", "unchanged", "declined", "no-such-part"]>;
+    parts: z.ZodDefault<z.ZodEffects<z.ZodArray<z.ZodObject<{
+        id: z.ZodString;
+        name: z.ZodString;
+    }, "strip", z.ZodTypeAny, {
+        id: string;
+        name: string;
+    }, {
+        id: string;
+        name: string;
+    }>, "many">, {
+        id: string;
+        name: string;
+    }[], {
+        id: string;
+        name: string;
+    }[]>>;
+    id: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+    why: z.ZodDefault<z.ZodString>;
+}, "strip", z.ZodTypeAny, {
+    id: string | null;
+    outcome: "changed" | "declined" | "unchanged" | "no-such-part";
+    why: string;
+    parts: {
+        id: string;
+        name: string;
+    }[];
+}, {
+    outcome: "changed" | "declined" | "unchanged" | "no-such-part";
+    id?: string | null | undefined;
+    why?: string | undefined;
+    parts?: {
+        id: string;
+        name: string;
+    }[] | undefined;
+}>;
+export type PartsSetResult = z.infer<typeof partsSetResult>;
 /**
  * The least an `epics.list` can answer with. `slug` is required: it is the argument to every other
  * call. `title` and `project` are optional and bounded. Every other field passes through untouched.

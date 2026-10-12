@@ -8,6 +8,7 @@ import { gotoRef, ref, stepNumber } from './fragments.js';
  */
 import { DISPOSITIONS, filterChoiceSchema, passageSchema } from './wire.js';
 import { TRACKER_DETAILS, trackerReadingResult, trackerRefreshResult } from './tracker.js';
+import { PART_ID, partListSchema } from './parts.js';
 /**
  * The questions a module can ask, by name and by shape: capabilities, methods, each method's
  * params, and a few result schemas. No answering is here: no dispatch table, no handlers. A
@@ -85,6 +86,12 @@ export const CAPABILITIES = {
      * nothing, but moves every other container on the canvas to re-read.
      */
     'content:report': 'Tell every module on the canvas that the material this one keeps has changed, so they read it again.',
+    /**
+     * Ask the host to edit the open project's list of an epic's parts: add one, rename one, move one,
+     * remove one. See `parts.set`. A write into the epic, read back by every module in `context.parts`.
+     * The host is the list's only writer and decides; a module offers the edit on a person's press.
+     */
+    'parts:set': 'Ask the host to add, rename, move or remove a part of an epic. The host decides, and every module is told.',
 };
 export const CAPABILITY_NAMES = Object.keys(CAPABILITIES);
 /**
@@ -111,6 +118,7 @@ export const METHODS = {
     'tracker.get': 'trackers:read',
     'tracker.refresh': 'trackers:refresh',
     'content.changed': 'content:report',
+    'parts.set': 'parts:set',
 };
 export const METHOD_NAMES = Object.keys(METHODS);
 /**
@@ -134,6 +142,11 @@ const trackerScope = {
     epic: epic.optional(),
     project: z.literal(true).optional(),
 };
+/** A part's name as somebody typed it: trimmed, not empty, at most `LIMITS.TITLE`. Refused, not clipped, when longer. */
+const partName = z.string().trim().min(1).max(LIMITS.TITLE);
+const partId = z.string().regex(PART_ID, 'a part id is lowercase letters, digits and dashes');
+/** Where a part goes: right after this part, or first with `null`. Absent means last. */
+const after = partId.nullable().optional();
 const oneScope = (scope) => [scope.refs, scope.epic, scope.project].filter((one) => one !== undefined).length === 1;
 const ONE_SCOPE = 'name exactly one of refs, epic or project';
 export const methodParams = {
@@ -273,6 +286,29 @@ export const methodParams = {
      * `at` are the host's facts, not params. Report AFTER the write has landed.
      */
     'content.changed': z.object({ epic: epic.optional() }),
+    /**
+     * Ask the host to make ONE edit to an epic's list of parts; answered with `partsSetResult`, which carries the
+     * list as it then stands. Exactly one of `add`, `rename`, `move`, `remove`. `epic` is required: the edit is
+     * written down, so it names what it is for. The HOST makes a new part's id (`partIdFor`), and no edit changes one.
+     */
+    'parts.set': z
+        .object({
+        epic,
+        /** A new part, called `name`, placed by `after`. The answer's `id` is the id the host gave it. */
+        add: z.object({ name: partName, after }).optional(),
+        /** Another name for the part `id`. Its id, its place and everything filed under it stay. */
+        rename: z.object({ id: partId, name: partName }).optional(),
+        /** The part `id`, placed by `after`. */
+        move: z.object({ id: partId, after }).optional(),
+        /** The part `id` leaves the list. What modules filed under it is theirs and is not touched. */
+        remove: z.object({ id: partId }).optional(),
+    })
+        .refine((p) => [p.add, p.rename, p.move, p.remove].filter((one) => one !== undefined).length === 1, {
+        message: 'parts.set makes one edit: name exactly one of add, rename, move or remove',
+    })
+        .refine((p) => p.move === undefined || p.move.after !== p.move.id, {
+        message: 'a part cannot be moved to after itself',
+    }),
     'events.emit': z.object({
         /* Canonical once parsed, whichever spelling the module used. See `dialect.ts`. */
         extension: z.string().min(1).max(LIMITS.EXTENSION),
@@ -314,6 +350,23 @@ export const foldResult = z.object({
     outcome: z.enum(FOLD_OUTCOMES),
     folded: z.array(z.string().regex(MODULE_ID)).max(LIMITS.CONTAINERS).default([]),
     unfolded: z.array(z.string().regex(MODULE_ID)).max(LIMITS.CONTAINERS).default([]),
+    why: z.string().max(LIMITS.REASON).default(''),
+});
+/**
+ * What became of a `parts.set`; all four are `ok: true`. `changed`: the list is different now. `unchanged`:
+ * it already was as asked (the same name, the same place). `declined`: the host will not, and `why` says so
+ * (no such epic, the list is full, not now). `no-such-part`: an `id` or an `after` names no part; nothing changed.
+ */
+export const PARTS_SET_OUTCOMES = ['changed', 'unchanged', 'declined', 'no-such-part'];
+/**
+ * `parts` is the epic's whole list after the call, in order, whatever the outcome (`[]` when the host
+ * has no such epic to answer about). `id` is the part the call was about: for `add`, the id the host
+ * made; null when nothing was. A refusal's sentence is `why`, for a person to read.
+ */
+export const partsSetResult = z.object({
+    outcome: z.enum(PARTS_SET_OUTCOMES),
+    parts: partListSchema.default([]),
+    id: z.string().regex(PART_ID).nullable().default(null),
     why: z.string().max(LIMITS.REASON).default(''),
 });
 /**
@@ -370,6 +423,7 @@ export const methodResults = {
      */
     'tracker.get': trackerReadingResult,
     'tracker.refresh': trackerRefreshResult,
+    'parts.set': partsSetResult,
 };
 /** The schema for one method's answer, or nothing — which means unspecified. */
 export function resultSchemaFor(method) {

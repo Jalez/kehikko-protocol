@@ -534,12 +534,21 @@ Why this module has nothing to narrow to the picked parts — one sentence,
 for the module that does not say `reacts: ['parts']` (0.34.0).
 
 Every item of a module's data is anchored to a part of the epic by a
-file, a ref or a part id (`Anchor` in `parts.ts`), and a module that holds
-such items follows the picked parts. Some hold none: a terminal, a list of
-notifications, a canvas of every project. Those say so HERE, in words a
-person can read in a registry — "A terminal: nothing in it belongs to an
-epic." — so that "does not follow the parts" is a statement somebody made
-and not something nobody got round to.
+document, a ref or a part id, or to the whole epic (`Anchor` in `parts.ts`),
+and a module that holds such items follows the picked parts. A module is
+partless for one of two reasons only (1.2.0): it has no item that could
+carry an anchor — "A terminal: nothing in it belongs to an epic." — or it is
+not about one epic at all, its scope being the project or the machine — "A
+log across projects and epics; it sits above any one epic's parts." A module
+that shows the one thing a person selected says that: "Shows one selected
+change, which is always in hand." It says so HERE, in words a person can read
+in a registry, so that "does not follow the parts" is a statement somebody
+made and not something nobody got round to.
+
+Not reasons: that somebody chose not to narrow; that narrowing would hide
+what a person selected (`keep` holds it); that a part's files are the
+paper's and this module's are not (a part's `documents` are project-relative
+and can name any file). `kehikot-check-parts` prints a note for those.
 
 OPTIONAL and never defaulted, so a manifest written before this parses to
 exactly what it did. A module that says neither is REPORTED by

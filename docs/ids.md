@@ -43,11 +43,31 @@ So what matters about an id is how long it means the same thing.
 |---|---|---|
 | a module id (`MODULE_ID`) | the manifest, `containers[].module`, `event.from` | always: the module's author chose it |
 | an epic slug (`EPIC_SLUG`) | `context.epic` | for as long as the epic's file is in the project; it travels with the project |
-| a part id (`PART_ID`) | `context.parts[].id` | while the part's heading (or its explicit id) stands: it is derived from it by `slugFrom` |
+| a part id (`PART_ID`) | `context.parts[].id`, `parts.set`'s answer | for as long as the part is in the epic's list: through a rename and a reorder. The host makes it once, when the part is added (`partIdFor`), and never changes it |
+| a part's **name** | `context.parts[].heading` | **only until somebody rewords it.** Draw it; never file anything under it |
 | a ref (`gh#41`) | `context.selection`, `containers[].showing.refs` | as long as the tracker keeps the number |
 | `projectPath` | `context.projectPath` | on this machine, until the folder is moved |
 | a kehikko's **`key`** (`KEHIKKO_KEY`) | `context.kehikko.key`, `event.kehikko.key` | for as long as the kehikko exists: through a rename, a reorder, the project being removed from the host and added again, and on another machine |
 | a kehikko's **`id`** | `context.kehikko.id`, `event.kehikko.id` | **only for the life of one host's database** |
+
+**A part's id is what to store; its name is not.** A module that keeps one thing per part files
+it under `context.parts[].id`. The name beside it (`heading` in a context, `name` in the epic's
+own list) is what a person calls the part today, and a rename changes the name and nothing else.
+Two parts may come to have the same name; no two have the same id. Before 1.2.0 an id written
+nowhere was derived from the heading on every read, so rewording a heading could move it; a host
+on 1.2.0 writes the id into the epic's own file the first time the list is edited, and it stands
+from then on.
+
+Three things to know when storing one:
+
+- **A removed part's id names nothing.** What a module filed under it stays in the module's own
+  data; under a pick it is in no picked part, and with nothing picked it is shown like anything
+  else. Nobody deletes it for the module.
+- **An id can come back.** A new part is told apart from the ids in the list *now*, so a part
+  added under the name of one that was removed gets the same id, and what is still filed under
+  it is the new part's.
+- **It is unique within an epic**, not across epics: file under the epic's slug and then the
+  part's id, as `parts.json` does.
 
 **`kehikko.id` is a row number. Do not store it.** The host hands out the next integer whenever a
 kehikko becomes a row, and a kehikko becomes a row again each time its project is added: one
@@ -179,8 +199,8 @@ then trimmed of a trailing dash again, because a cut can land on one.
 
 The empty string for a line with nothing usable in it. Not a fallback, not
 `untitled`: "!!!" has no slug, and the caller is the one who knows what to
-do about that — a host making an epic refuses with a sentence, and `partsOf`
-calls the part `part-<n>`.
+do about that — a host making an epic refuses with a sentence, `partIdFor`
+calls a new part `part`, and the deprecated `partsOf` calls one `part-<n>`.
 
 ##### Why a derivation is in a package of shapes
 

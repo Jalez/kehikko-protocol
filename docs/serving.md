@@ -101,10 +101,11 @@ exact thing the two client files are listed for.
 
 The rule at the top of this README is unbroken, which is worth saying because a
 file that decides a port looks like a counterexample. Nothing in `/serve` that decides
-anything is ever run by the host. (One thing in it IS run by a host and decides
-nothing: `readJourneys`, which opens the file an epic's steps are kept in — it
-is here because it reads a disk, and its judgement is `journeyIn` behind the
-front door.) The host reads the registry and asks each address what it is,
+anything is ever run by the host. (Two things in it ARE run by a host and decide
+nothing: `readJourneys`, which opens the file an epic's steps are kept in, and
+`readHoldings` (1.2.0), which opens every module's `parts.json`. They are here
+because they read a disk; the shapes and the judgement are behind the front
+door.) The host reads the registry and asks each address what it is,
 and would reach identical conclusions about a module that had never heard of this
 file. What is here is a *module's* own housekeeping — where to bind, what to
 write down about itself — and both of those were already the module's to decide.
@@ -140,8 +141,8 @@ other into the wrong process.
 
 The rule about decisions is unbroken here, which is worth being explicit
 about, because a file that decides a port looks like a counterexample. Nothing
-in this directory that DECIDES anything is ever run by the host. (One thing
-here is run by a host, and it decides nothing: `readJourneys`, below.) The
+in this directory that DECIDES anything is ever run by the host. (Two things
+here are run by a host, and decide nothing: `readJourneys` and `readHoldings`, below.) The
 host reads the registry and asks each address what it is, and it would reach exactly the same conclusions
 about a module that had never heard of this file. What is written here is a
 MODULE's own housekeeping — where to bind, what to write down about itself —
@@ -159,6 +160,10 @@ each.
 - `readJourneys` and `readJourney` open the file an epic's steps are kept
   in. Here because they read a disk, and for no other reason: the shape and
   the judgement are `journey.ts` behind the front door. See `journeys.ts`.
+
+- `writeHoldings` (1.2.0) is how a module publishes what it holds for an
+  epic's parts, in `parts.json` in its own folder, and `readHoldings` is how
+  a host reads every module's. See [parts.md](parts.md#what-a-module-holds-for-a-part-partsjson).
 
 The first two are exported on their own because a module that does not use
 Vite is an ordinary module, and because the plugin's timing — claim before the

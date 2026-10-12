@@ -103,3 +103,39 @@ longer does: `registerAt` then writes into the real registry, which a running ho
 - This package's own suite sets it once, in its preload, and fails any test that leaves the
   registry resolving outside a scratch directory (`test/setup.ts`). A module whose tests call
   `registerAt`, `serves()` or `claim` can copy that.
+
+# Moving from 1.1.0 (or 1.0.0) to 1.2.0
+
+Nothing has to change: 1.2.0 is additive, and every consumer's own tests and typecheck were run
+against 1.1.0 and against it. Two things a **host** does in the change that moves it, and what is
+deprecated for everybody.
+
+## A host: two edits in the same change
+
+- **List `parts.set`** in `src/host/division.ts`. The host's own guard refuses to start against a
+  protocol that names a method it does not answer; a case that answers `declined` is enough until
+  the host keeps the list. (The same step `view.fold` needed for 1.1.0.)
+- **`LIMITS.PARTS` is 128.** A module built with a package before 1.2.0 still refuses a context
+  that lists more than 32 parts, and drops the whole message. Send each module
+  `partsFor(parts, manifest.build?.protocol)`. A test that used "99 parts" to mean "more than the
+  limit" should say `LIMITS.PARTS + 5`.
+
+## Deprecated: before → after
+
+All of these still work exactly as they did, and are marked `@deprecated`.
+
+| before | after |
+|---|---|
+| `focus.narrow(...).sentence`, `focusSentence(parts, outside, noun)`, `<p title={FOCUS_WHERE}>` | nothing while anything is shown. In a view the pick left empty: `focus.narrow(...).empty`, or `emptySaid(parts, noun)` — `No note is in the picked part.` |
+| a module's own "no … in the picked part(s)" sentence | `emptySaid(parts, noun)`, with the noun in the singular |
+| `part.files`, `pickedFiles(parts)` | `part.documents`, `pickedDocuments(parts)`: project-relative |
+| `paperFileOf(path, epic)`, a comparison through `PAPER_MODULE` | `fileInFocus(parts, path, epic, projectPath)` or a `{ file: path }` anchor; `documentOf(path, projectPath)` when the name itself is wanted |
+| `useFocus({ parts, epic })` | `useFocus({ parts, epic, projectPath })` (or the whole context), so a file outside `.kehikot/` can be compared |
+| a filter built on `fileInFocus` / `refInFocus` / `partInFocus` / `anchorInFocus` | one `anchorOf(item)` and `useFocus().narrow(items, anchorOf, { noun, keep })` |
+| an item held against the whole paper or epic, shown under a pick by a rule of the module's own | the anchor `{ whole: true }` |
+| `partsOf(record)`, `partIdsOf(groups)`, `JourneyPart`; `JOURNEYS_MODULE` and `readJourneys` to find an epic's parts | a host: the epic's own list (`partListSchema`), `partIdFor`, `readHoldings`. A module: `context.parts` |
+| writing the list of parts into a module's own file | `host.request('parts.set', { epic, add: { name } })`, and `writeHoldings` for what the module holds per part |
+| `partless` because somebody chose, or because narrowing would hide a selection | `reacts: ['parts']` with `keep`; or a sentence saying the module has nothing that could carry an anchor, or is not about one epic |
+
+`kehikot-check-parts` prints a note for each of these it can see in a module's files. It still
+fails only on the manifest.
