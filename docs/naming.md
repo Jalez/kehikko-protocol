@@ -29,7 +29,7 @@ host and every module have to spell the same way:
 **`kehikko` (singular) names one frame, in two senses:**
 
 1. **One canvas** — a single arrangement of containers around a project and an epic.
-   `context.kehikko` (`{ id, name }`), `event.kehikko`, the internal `kehikkoSchema`, and the prose
+   `context.kehikko` (`{ id, name, key? }`), `event.kehikko`, the internal `kehikkoSchema`, and the prose
    "on this kehikko".
 2. **The host program, and by extension the repositories** — the thing that draws a kehikko.
    The host's repository and package are `kehikko`; its MCP server is `kehikko`; its binary is

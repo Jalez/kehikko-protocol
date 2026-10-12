@@ -7,7 +7,9 @@ import {
   MIN_HEIGHT,
   canonicalModuleId,
   clampHeight,
+  KEHIKKO_KEY,
   contextSchema,
+  eventSchema,
   gotoSchema,
   hostMessageSchema,
   looksLikeWireMessage,
@@ -161,6 +163,44 @@ describe('context says what the host is in a position to know', () => {
     expect(legacy).not.toHaveProperty('slug')
     expect(legacy).not.toHaveProperty('journey')
     expect(legacy.epic).toBe(null)
+  })
+})
+
+describe('a kehikko has a number for now and a key for keeps', () => {
+  const said = { type: MESSAGE.CONTEXT, protocol: 2, theme: 'light' }
+  const event = { type: MESSAGE.EVENT, protocol: 2, extension: 'kehikot.notifications@1', payload: {}, from: 'kehikot.paper', at: '2026-10-12T10:00:00.000Z' }
+
+  test('a host that does not send a key is saying exactly what it said before', () => {
+    const kehikko = contextSchema.parse({ ...said, kehikko: { id: 2, name: 'writing' } }).kehikko
+    expect(kehikko).toEqual({ id: 2, name: 'writing' })
+    /* Absent, not `undefined` under a name and not null: a module spreading it writes what it always wrote. */
+    expect(Object.keys(kehikko ?? {})).toEqual(['id', 'name'])
+    expect(contextSchema.parse(said).kehikko).toBeNull()
+  })
+
+  test('the key arrives beside the number, in a context and in an event', () => {
+    const kehikko = { id: 28, name: 'writing', key: '4072c9e5' }
+    expect(contextSchema.parse({ ...said, kehikko }).kehikko).toEqual(kehikko)
+    expect(eventSchema.parse({ ...event, kehikko }).kehikko).toEqual(kehikko)
+    expect(hostMessageSchema.parse({ ...said, kehikko }).type).toBe(MESSAGE.CONTEXT)
+  })
+
+  test('the number moved 2 → 9 → 28 and the key did not, which is the whole reason there are two', () => {
+    const keys = [2, 9, 28].map((id) => contextSchema.parse({ ...said, kehikko: { id, name: 'writing', key: '4072c9e5' } }).kehikko?.key)
+    expect(new Set(keys).size).toBe(1)
+  })
+
+  test('a key is what the host writes in a project\'s file: eight hex characters, or a word a person chose', () => {
+    for (const key of ['4072c9e5', 'writing', 'review-2', 'ab', '12345678', 'a'.repeat(32)]) expect(KEHIKKO_KEY.test(key)).toBe(true)
+    for (const key of ['', 'a', 'Writing', '-writing', 'writing-', 'my canvas', 'a.b', 'a/b', 'a;b', 'a=b', 'a'.repeat(33)]) {
+      expect(KEHIKKO_KEY.test(key)).toBe(false)
+    }
+  })
+
+  test('a key that is not one is refused, not sent on as an identity nobody wrote', () => {
+    expect(contextSchema.safeParse({ ...said, kehikko: { id: 2, name: 'writing', key: 'Writing' } }).success).toBe(false)
+    expect(contextSchema.safeParse({ ...said, kehikko: { id: 2, name: 'writing', key: null } }).success).toBe(false)
+    expect(eventSchema.safeParse({ ...event, kehikko: { id: 2, name: 'writing', key: 7 } }).success).toBe(false)
   })
 })
 

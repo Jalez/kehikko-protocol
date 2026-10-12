@@ -25,7 +25,7 @@ export {
 
 export { LIMITS } from './limits.js'
 
-export { MODULE_ID, MODE_ID, EPIC_SLUG, canonicalModuleId, own, slugFrom } from './ids.js'
+export { MODULE_ID, MODE_ID, EPIC_SLUG, KEHIKKO_KEY, canonicalModuleId, own, slugFrom } from './ids.js'
 
 export {
   KEHIKOT_DIR,

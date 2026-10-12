@@ -100,7 +100,8 @@ export const contextSchema = z.object({
     prompt: z.string().max(LIMITS.PROMPT).nullable().default(null),
     /**
      * Which kehikko (canvas) this context is about. Null when the host has no canvases; compare with
-     * an event's `kehikko` to tell near from far.
+     * an event's `kehikko` to tell near from far. Anything written down per kehikko is written under
+     * its `key`, not its `id`: see `kehikkoSchema`.
      */
     kehikko: kehikkoSchema.nullable().default(null),
     /**
