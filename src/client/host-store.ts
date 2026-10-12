@@ -1,4 +1,4 @@
-import type { CanvasContainer, EpicPart, FilterChoice, FilterGroup, ModuleContext, Passage } from '../index.js'
+import type { CanvasContainer, EpicPart, FilterChoice, FilterGroup, HeaderItemInput, ModuleContext, Passage } from '../index.js'
 import type { PageTheme } from '../page.js'
 import {
   HostRefused,
@@ -123,6 +123,8 @@ export interface HostActions<Kept = unknown> {
   filters: (groups: FilterGroup[]) => void
   clearable: (label: string | null) => void
   refreshable: (state: { can?: boolean; at?: string | null; busy?: boolean }) => void
+  /** Declare this page's header items, whole (`kehikot.header`); `[]` withdraws them. See `Connection.header`. */
+  header: (items: HeaderItemInput[]) => void
 }
 
 export interface HostStore<Kept = unknown> extends HostActions<Kept> {
@@ -249,6 +251,8 @@ export function hostStore<Kept = unknown>(
           onRefresh: () => {
             if (!stopped) events.onRefresh?.()
           },
+          /* Only when the page takes presses: without a listener the connection answers for it. */
+          ...(events.onPress ? { onPress: (press) => (stopped ? false : events.onPress!(press)) } : {}),
         },
         connectOptions,
       )
@@ -305,6 +309,7 @@ export function hostStore<Kept = unknown>(
     filters: (groups) => live?.filters(groups),
     clearable: (label) => live?.clearable(label),
     refreshable: (state) => live?.refreshable(state),
+    header: (items) => live?.header(items),
     connection: () => live,
   }
   return store

@@ -62,7 +62,7 @@ Concretely, the things this package deliberately does not do:
 |---|---|
 | `manifestSchema`, `Manifest` | What a module says about itself, served at `WELL_KNOWN`. Every string bounded. |
 | `speaks(range, protocol)` | Whether a protocol range includes a number. A reading, not a decision. |
-| `helloSchema` … `wentSchema` | The eight messages, and `hostMessageSchema` / `moduleMessageSchema` to parse a direction at a time. |
+| `helloSchema` … `wentSchema` | The messages, and `hostMessageSchema` / `moduleMessageSchema` to parse a direction at a time. |
 | `notificationPayload`, `callPayload`, `EXTENSIONS` | The versioned formats modules send each other through a host. |
 | `PROTOCOL`, `WELL_KNOWN`, `MANIFEST_KIND`, `MESSAGE`, `LIMITS` | One spelling and one number each, so two packages cannot disagree. |
 | `METHODS`, `methodParams`, `CAPABILITIES` | The questions a module can ask, by name and by shape. |
@@ -77,6 +77,9 @@ Concretely, the things this package deliberately does not do:
 | `journeyRecordSchema`, `journeyStepSchema`, `journeyGroupSchema`, `stepsFromSchema`, `journeysDocumentSchema`, `journeyIn`, `journeySlugs`, `stepsOf`, `stepPart`, `JOURNEYS_MODULE`, `JOURNEYS_FILE` | An epic's steps and groups as a project keeps them on disk: the one shape the module that writes them and a host that reads them both import. |
 | `partsOf`, `partIdsOf`, `JourneyPart`, `slugFrom` | The parts of an epic read off its record, and the one derivation of a part's id from its heading: what a host composes `context.parts` from and what the module that edits steps checks a step's `part` against. |
 | `parseSource`, `serialiseSource`, `uncitable`, `markersIn`, `replaceMarkers`, `CITE_MARKER`, `normaliseQuote`, `findQuote`, `resolveSource`, `linesOf`, `CITE_STATUSES`, `CitedSource`, `CitedRange`, `CitationView` | A citation (0.33.0): the `[^n]: <path> \| "<quote>"` line two modules write, the markers that name it, and the one rule for finding its words in a file again — `holds`, `ambiguous`, `adrift` or `unreadable`. |
+| `headerSchema`, `headerItemSchema`, `pressSchema`, `pressedSchema`, `pressRefusal`, `HEADER_MENUS`, `HEADER_KINDS`, `RUN_STATES` | The header (1.1.0): the switches, toggles, jumps and runs a module declares for the host to draw in a container's View, Go and Run menus, the press relayed back, and the one rule for a press that cannot be taken. |
+| `mcp.subjects` in the manifest, `showAnswerSchema`, `doneAnswerSchema`, `doneAnswer`, `SHOW_OUTPUT_SCHEMA`, `DONE_OUTPUT_SCHEMA`, `doorContext`, `DOOR_ARGUMENTS`, `doorToolSchema`, `toolEffect` | A module's MCP door (1.1.0): which tool shows a kind of thing, lets go of it and answers "is it done?", the two answers a caller reads as a state, the one spelling of the context arguments, and what a tool says about only reading. |
+| `foldResult`, `FOLD_OUTCOMES`, and `folded` on a container | `view.fold` (1.1.0): a module asking the host to fold or unfold containers, and what became of it. |
 
 And behind two subpaths, which are not shapes and say so:
 
@@ -103,6 +106,8 @@ The source says what each field is and what it is bounded by, in a line or three
 | [Trackers](docs/tracker.md) | One reading of GitHub and GitLab shared by every module: the row a host hands back, what is missing and why, refreshing, and how a reference is spelled. |
 | [Content changes](docs/content.md) | How a container is told that the material it shows has changed, and how a module reports a change of its own. |
 | [Citations](docs/citations.md) | The one way a citation is written and the one rule for finding its words in a file again. |
+| [Asking a module to show something, and whether it is done](docs/asking.md) | What a module's MCP door can be asked (1.1.0): the manifest's `mcp.subjects`, the show and done answers, read-only tools, the `project` and `epic` arguments, `check:door`, reading another module's manifest, and `view.fold`. |
+| [The header](docs/header.md) | The switches, toggles, jumps and runs a module declares and the host draws (1.1.0): `kehikot.header`, `press`, `pressed`, who may press, and what a receiver does with a message type it does not know. |
 | [Extension payloads](docs/extensions.md) | The versioned formats modules send each other through a host: notifications and calls. |
 | [The client library](docs/client.md) | The module half of the wire behind `/client` and `/client/react`: `connect`, the mailbox, and the hooks. A convenience, never a requirement. |
 | [Serving a module: ports, the registry, frame origins, and the template](docs/serving.md) | The node-only half behind `/serve` — which port a module binds, where it writes down that it exists, which origins may frame it — and the generator that makes a new module from `template/`. |
@@ -158,6 +163,7 @@ The same list with what each version exported is in [CHANGELOG.md](CHANGELOG.md)
 
 | version | date | what it added |
 |---|---|---|
+| 1.1.0 | 2026-10-12 | Additive. The header: `kehikot.header`, `kehikot.press`, `kehikot.pressed`, `useHost().header()`, `onPress`. A module's door: the manifest's `mcp.subjects`, the show and done answers, `doorContext` (`project`, `epic`), `toolEffect`, `kehikot-check-door`, `readNeighbour` / `listTools` in `/serve`. `view.fold` and `containers[].folded`. See [asking](docs/asking.md) and [the header](docs/header.md). |
 | 1.0.0 | 2026-10-10 | The breaking release: removes everything 0.37.0 deprecated (the `roadmap` dialect, `LEGACY_*`, `useKehikot`/`useRoadmap`, the `ROADMAP_*` variables), makes the parts declaration a refusal, renames the bins to `kehikot-*`. See [MIGRATING.md](MIGRATING.md). |
 | 0.37.0 | 2026-10-10 | Deprecations only, nothing removed: everything named after "roadmap" (the second dialect, `LEGACY_*`, `legacyManifest`, `toDialect`, `useRoadmap`, `ROADMAP_*`), the old `useKehikot`, and the `kehikko-*` bin names (now also `kehikot-*`). See [CHANGELOG.md](CHANGELOG.md). |
 | 0.36.0 | 2026-10-09 | The plumbing's gaps, closed: `held` (unsaved work across a reload), `hostStore` (the host outside React), `doorsFetch` and `fillPage` (a `Bun.serve` module and its built page), `replied`, `probeServer`, `ask`'s `ticket`/`keepalive`/repeated `query`, `follow`'s `events`/`probe`, `coverFor`'s `host` and `server`. See [module plumbing](docs/module-plumbing.md). |

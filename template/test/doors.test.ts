@@ -50,7 +50,13 @@ describe('the doors', () => {
   test('the MCP door lists its tool and answers it', () => {
     expect(answer('GET', '/mcp', none, null, null)?.status).toBe(405)
     expect(rpc('tools/list').result?.tools?.map((one) => one.name)).toEqual(['read_value'])
-    const called = rpc('tools/call', { name: 'read_value', arguments: { projectPath: project } })
+    const called = rpc('tools/call', { name: 'read_value', arguments: { project } })
     expect(called.result?.isError).toBeUndefined()
+  })
+
+  test('every tool says whether it only reads, and spells the project `project`', () => {
+    const tools = rpc('tools/list').result?.tools as { name: string; annotations?: { readOnlyHint?: boolean }; inputSchema: { properties: object } }[]
+    for (const tool of tools) expect(typeof tool.annotations?.readOnlyHint).toBe('boolean')
+    expect(Object.keys(tools[0]!.inputSchema.properties)).toEqual(['project'])
   })
 })

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import type { FilterGroup, Passage } from '../index.js'
+import type { FilterGroup, HeaderItemInput, Passage } from '../index.js'
 import { HostRefused, NOBODY_TO_ASK, type AskOptions, type Connection, type HostEvents } from './connect.js'
 import {
   JSON_KEPT,
@@ -68,6 +68,8 @@ export function useHost<Kept = unknown>(
         onEvent: (event) => handlers.current.onEvent?.(event),
         onClear: () => handlers.current.onClear?.(),
         onRefresh: () => handlers.current.onRefresh?.(),
+        /* Always given, and read through the ref: a handler added on a later render is heard. */
+        onPress: (press) => (handlers.current.onPress ? handlers.current.onPress(press) : 'This app declared that item and does not take presses.'),
       },
       /* The codec is read at mount and written through whichever one is current. */
       { ...mounted, kept: { read, write: (kept) => (settings.current.kept ?? (JSON_KEPT as KeptCodec<Kept>)).write(kept) } },
@@ -103,11 +105,12 @@ export function useHost<Kept = unknown>(
     (state: { can?: boolean; at?: string | null; busy?: boolean }) => held.current?.refreshable(state),
     [],
   )
+  const header = useCallback((items: HeaderItemInput[]) => held.current?.header(items), [])
   const connection = useCallback(() => held.current?.connection() ?? null, [])
   const read = useCallback(() => held.current?.get() ?? drawn.current, [])
 
   return useMemo(
-    () => ({ ...standing, remember, point, request, resize, filters, clearable, refreshable, connection, read }),
-    [standing, remember, point, request, resize, filters, clearable, refreshable, connection, read],
+    () => ({ ...standing, remember, point, request, resize, filters, clearable, refreshable, header, connection, read }),
+    [standing, remember, point, request, resize, filters, clearable, refreshable, header, connection, read],
   )
 }

@@ -37,6 +37,8 @@ export function useHost(id, events = {}, options = {}) {
             onEvent: (event) => handlers.current.onEvent?.(event),
             onClear: () => handlers.current.onClear?.(),
             onRefresh: () => handlers.current.onRefresh?.(),
+            /* Always given, and read through the ref: a handler added on a later render is heard. */
+            onPress: (press) => (handlers.current.onPress ? handlers.current.onPress(press) : 'This app declared that item and does not take presses.'),
         }, 
         /* The codec is read at mount and written through whichever one is current. */
         { ...mounted, kept: { read, write: (kept) => (settings.current.kept ?? JSON_KEPT).write(kept) } });
@@ -68,7 +70,8 @@ export function useHost(id, events = {}, options = {}) {
     const filters = useCallback((groups) => held.current?.filters(groups), []);
     const clearable = useCallback((label) => held.current?.clearable(label), []);
     const refreshable = useCallback((state) => held.current?.refreshable(state), []);
+    const header = useCallback((items) => held.current?.header(items), []);
     const connection = useCallback(() => held.current?.connection() ?? null, []);
     const read = useCallback(() => held.current?.get() ?? drawn.current, []);
-    return useMemo(() => ({ ...standing, remember, point, request, resize, filters, clearable, refreshable, connection, read }), [standing, remember, point, request, resize, filters, clearable, refreshable, connection, read]);
+    return useMemo(() => ({ ...standing, remember, point, request, resize, filters, clearable, refreshable, header, connection, read }), [standing, remember, point, request, resize, filters, clearable, refreshable, header, connection, read]);
 }

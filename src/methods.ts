@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { LIMITS } from './limits.js'
-import { EPIC_SLUG } from './ids.js'
+import { EPIC_SLUG, MODULE_ID } from './ids.js'
 import { gotoRef, ref, stepNumber } from './fragments.js'
 /**
  * `passageSchema` and `filterChoiceSchema` come from `wire.ts` so that both directions share one
@@ -29,6 +29,11 @@ export const CAPABILITIES = {
   'events:emit': 'Send an extension payload: a notification, a report of its own calls.',
   /** Asks the host to MOVE; reads and writes nothing. See `view.goto`. */
   'view:navigate': 'Ask the host to show a particular epic, step or reference. The host decides.',
+  /**
+   * Asks the host to FOLD or UNFOLD containers; moves, resizes, removes and reorders nothing. See
+   * `view.fold`. The host decides, shows it happening and says who asked.
+   */
+  'view:fold': 'Ask the host to fold containers to their headers or unfold them. The host decides, and you see it happen.',
   /**
    * Say which references the person has picked out. A SHARED write: the selection goes into the
    * context every framed module receives.
@@ -101,6 +106,7 @@ export const METHODS = {
   'stage.report': 'stage:report',
   'events.emit': 'events:emit',
   'view.goto': 'view:navigate',
+  'view.fold': 'view:fold',
   'selection.set': 'selection:set',
   'passage.set': 'passage:set',
   'filters.set': 'filters:set',
@@ -171,6 +177,22 @@ export const methodParams = {
     })
     .refine((g) => g.epic !== undefined || g.step !== undefined || g.ref !== undefined, {
       message: 'view.goto has to name an epic, a step or a ref; a call that names nothing asks for nothing',
+    }),
+  /**
+   * Ask the host to fold containers to their headers, unfold them, or both; answered with
+   * `foldResult`. Each list names module ids on this kehikko (`context.containers`); a call naming
+   * none, or one id in both, is refused. A container already as asked is left alone. Folding only.
+   */
+  'view.fold': z
+    .object({
+      fold: z.array(z.string().regex(MODULE_ID)).max(LIMITS.CONTAINERS).default([]),
+      unfold: z.array(z.string().regex(MODULE_ID)).max(LIMITS.CONTAINERS).default([]),
+    })
+    .refine((f) => f.fold.length + f.unfold.length > 0, {
+      message: 'view.fold has to name a container to fold or to unfold; a call that names none asks for nothing',
+    })
+    .refine((f) => !f.fold.some((id) => f.unfold.includes(id)), {
+      message: 'a container cannot be in both fold and unfold',
     }),
   /**
    * Say which references the person has picked out. Refs only, never their kinds: the host relays
@@ -307,6 +329,28 @@ export const navigationResult = z.object({
 export type NavigationResult = z.infer<typeof navigationResult>
 
 /**
+ * What became of a `view.fold`; all four are `ok: true`. `changed`: at least one container was folded or
+ * unfolded. `unchanged`: every one was already as asked. `declined`: the host will not, right now.
+ * `no-such-container`: an id is not on this kehikko, and nothing was changed.
+ */
+export const FOLD_OUTCOMES = ['changed', 'unchanged', 'declined', 'no-such-container'] as const
+export type FoldOutcome = (typeof FOLD_OUTCOMES)[number]
+
+/**
+ * `folded` and `unfolded` are what THIS call changed, and nothing it left alone: handed back the
+ * other way round (`{ fold: unfolded, unfold: folded }`) they put the canvas as it was. A caller
+ * that puts things back leaves out any container whose `folded` in `context.containers` has moved
+ * since, because a person moved it.
+ */
+export const foldResult = z.object({
+  outcome: z.enum(FOLD_OUTCOMES),
+  folded: z.array(z.string().regex(MODULE_ID)).max(LIMITS.CONTAINERS).default([]),
+  unfolded: z.array(z.string().regex(MODULE_ID)).max(LIMITS.CONTAINERS).default([]),
+  why: z.string().max(LIMITS.REASON).default(''),
+})
+export type FoldResult = z.infer<typeof foldResult>
+
+/**
  * The least an `epics.list` can answer with. `slug` is required: it is the argument to every other
  * call. `title` and `project` are optional and bounded. Every other field passes through untouched.
  * There is no bound on how many epics come back.
@@ -361,6 +405,7 @@ export type ProjectPickResult = z.infer<typeof projectPickResult>
 export const methodResults: Partial<Record<Method, z.ZodTypeAny>> = {
   'epics.list': epicsListResult,
   'view.goto': navigationResult,
+  'view.fold': foldResult,
   'projects.pick': projectPickResult,
   /**
    * The tracker reading is specified though it is a host's material, and the

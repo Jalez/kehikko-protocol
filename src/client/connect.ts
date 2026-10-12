@@ -6,12 +6,17 @@ import {
 } from '../constants.js'
 import { LIMITS } from '../limits.js'
 import {
+  headerItemsSchema,
   hostMessageSchema,
   looksLikeWireMessage,
+  pressRefusal,
   type FilterGroup,
   type Goto,
+  type HeaderItem,
+  type HeaderItemInput,
   type ModuleContext,
   type ModuleEvent,
+  type Press,
   type ResponseFailureReason,
 } from '../wire.js'
 
@@ -53,6 +58,19 @@ export const PERSON_ANSWERS_WITHIN_MS = 5 * 60_000
  */
 export const GOTO_BACKSTOP_MS = 500
 
+/**
+ * How long, in ms, an `onPress` listener has to say whether it took a press before the backstop
+ * answers "not taken" for it. Long enough to ask the page's own server to start something; a run
+ * that takes longer answers at once and reports through its header.
+ */
+export const PRESS_BACKSTOP_MS = 2_000
+
+/**
+ * What an `onPress` listener says about one press: nothing or `true` for "taken", a sentence for
+ * "not taken, and this is why", `false` for "not taken". A promise of any of them is waited for.
+ */
+export type PressAnswer = void | boolean | string
+
 /** What a question asked before any greeting is refused with. The React hook says the same between mounts. */
 export const NOBODY_TO_ASK = 'Nothing has greeted this page, so there is nobody to ask.'
 
@@ -88,6 +106,14 @@ export interface HostEvents {
    * two it was. No reply — call `refreshable` with `busy: true` going in and with `at` coming out.
    */
   onRefresh?: () => void
+  /**
+   * One of this page's header items was pressed, by a person in the host's menus or by an agent
+   * through the host: `item` is its id, `value` the option chosen (switch, go) or the state wanted
+   * (toggle). Only reaches a page that declared the item with `header`; a press the last header
+   * cannot take is refused before this is called. Do it, declare the header again, and return
+   * nothing — or return the sentence saying why not. `connect` answers the host exactly once.
+   */
+  onPress?: (press: Pick<Press, 'item' | 'value'>) => PressAnswer | Promise<PressAnswer>
 }
 
 /**
@@ -106,6 +132,8 @@ export interface ConnectOptions {
   answerWithin?: number
   /** Override `GOTO_BACKSTOP_MS`. Shorten it freely; lengthening it past the host's own timeout does nothing. */
   gotoBackstop?: number
+  /** Override `PRESS_BACKSTOP_MS`. */
+  pressBackstop?: number
 }
 
 export interface Connection {
@@ -139,6 +167,13 @@ export interface Connection {
    * module's own fact, `null` for "I cannot say"; `can: false` withdraws the control.
    */
   refreshable: (state: { can?: boolean; at?: string | null; busy?: boolean }) => void
+  /**
+   * Say which switches, toggles, jumps and runs this page has, so the host can draw them in the
+   * container's menus. The whole list every time; `[]` withdraws it. Fire and forget, remembered
+   * and replayed on every greeting. Call it again whenever anything in it changes, including after
+   * `onPress`: the host draws what was last declared and holds no state of its own.
+   */
+  header: (items: HeaderItemInput[]) => void
   /** Whether anything has greeted us yet. */
   greeted: () => boolean
   /** Stop listening. Every question still waiting is refused rather than left hanging. */
@@ -153,6 +188,7 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
   const source = options.source ?? mailbox
   const answerWithin = options.answerWithin ?? ANSWER_WITHIN_MS
   const gotoBackstop = options.gotoBackstop ?? GOTO_BACKSTOP_MS
+  const pressBackstop = options.pressBackstop ?? PRESS_BACKSTOP_MS
 
   let host: Window | null = null
   let origin = '*'
@@ -166,6 +202,9 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
   let clearing: { label: string | null } | null = null
   /* The last refresh state, replayed likewise; what is replayed carries `at`. */
   let refreshing: { can: boolean; at: string | null; busy: boolean } | null = null
+  /* The last header, replayed likewise, as it was written; and as parsed, to judge a press by. */
+  let heading: HeaderItemInput[] | null = null
+  let declared: HeaderItem[] = []
 
   /** Correlation id -> the promise waiting on it. A `Map`, per the protocol's note on lookups. */
   const waiting = new Map<
@@ -211,6 +250,7 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
       if (offered !== null) send({ type: MESSAGE.FILTERS, groups: offered })
       if (clearing !== null) send({ type: MESSAGE.CLEARABLE, label: clearing.label })
       if (refreshing !== null) send({ type: MESSAGE.REFRESHABLE, ...refreshing })
+      if (heading !== null) send({ type: MESSAGE.HEADER, items: heading })
       events.onHello?.(message.context, message.state)
       return
     }
@@ -245,6 +285,35 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
 
     if (message.type === MESSAGE.REFRESH) {
       events.onRefresh?.()
+      return
+    }
+
+    if (message.type === MESSAGE.PRESS) {
+      /* Answered exactly once, like a `goto`: whatever the listener returns, throws or forgets. */
+      let answered = false
+      const answer = (ok: boolean, why = '') => {
+        if (answered) return
+        answered = true
+        clearTimeout(backstop)
+        send({ type: MESSAGE.PRESSED, id: message.id, ok, why: why.slice(0, LIMITS.REASON) })
+      }
+      const backstop = setTimeout(() => answer(false, 'This app did not say whether it took that press.'), pressBackstop)
+      const press = { item: message.item, ...(message.value !== undefined ? { value: message.value } : {}) }
+      /* Judged against what is declared NOW: the header may have changed since the menu was drawn. */
+      const refused = pressRefusal(declared, press)
+      if (refused !== null) answer(false, refused)
+      else if (!events.onPress) answer(false, 'This app declared that item and does not take presses.')
+      else {
+        const taken = (said: PressAnswer) => answer(said === undefined || said === true, typeof said === 'string' ? said : '')
+        const failed = () => answer(false, 'This app failed while doing that.')
+        try {
+          const said = events.onPress(press)
+          if (said instanceof Promise) said.then(taken, failed)
+          else taken(said)
+        } catch {
+          failed()
+        }
+      }
       return
     }
 
@@ -336,6 +405,15 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
         busy: state.busy ?? false,
       }
       send({ type: MESSAGE.REFRESHABLE, ...refreshing })
+    },
+
+    header(items) {
+      /* Kept before it is sent, like the filter offer. A list that does not parse is still sent —
+         the host is the one that reports it — and no press is taken against it. */
+      heading = items
+      const parsed = headerItemsSchema.safeParse(items)
+      declared = parsed.success ? parsed.data : []
+      send({ type: MESSAGE.HEADER, items })
     },
 
     greeted: () => host !== null,

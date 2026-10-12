@@ -7,6 +7,71 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 1.1.0 — 2026-10-12
+
+Two additions in one release, and nothing else. **Additive: nothing a 1.0.0 call does has
+changed**, and `PROTOCOL` is still 2. Every consumer's own tests and typecheck were run against
+1.0.0 and against this build.
+
+### Added: a module's door can say what it can be asked ([#28](https://github.com/Jalez/kehikko-protocol/issues/28))
+
+Design and worked examples (Slides' "show slide 6", Learning's "is question X answered"):
+[docs/asking.md](docs/asking.md).
+
+- The manifest's **`mcp.subjects`**: per kind of thing, the tool that shows one (`show`), lets go
+  (`release`) and answers "is it done?" (`done`). `ModuleSubject`. Empty by default.
+- The two answers a caller reads as a state, not a sentence: **`showAnswerSchema`**
+  (`SHOW_OUTCOMES`: `shown`, `unseen`, `declined`; `pages`) and **`doneAnswerSchema`**
+  (`DONE_STATES`: `done`, `waiting`, `unavailable`, `unknown`; `doneAnswer(items)`), with
+  `SHOW_OUTPUT_SCHEMA` and `DONE_OUTPUT_SCHEMA` for a tool's `outputSchema`.
+- One spelling for the context arguments, **`project`** and **`epic`** (`DOOR_ARGUMENTS`), and
+  `doorContext(args)`, which still reads `projectPath` (`DOOR_ARGUMENTS_BEFORE`).
+- Read-only in MCP's own form: `doorToolSchema` and **`toolEffect(tool)`** (`reads`, `writes`,
+  `destroys`, `unstated`).
+- **`kehikot-check-door`** (`bun run check:door`): hints from a module's files; with `--running`,
+  holds the started door to its manifest. The work is in `src/check/door.ts`.
+- `/serve`: **`readNeighbour(id)`**, `readNeighbours()`, `doorOf`, `listTools(door)` — another
+  module's manifest and door, from the registry and the module's own well-known path.
+
+### Added: the header ([kehikko#62](https://github.com/Jalez/kehikko/issues/62), step 1)
+
+Design, limits and the Paper example: [docs/header.md](docs/header.md).
+
+- **`kehikot.header`** (module → host: `items`, whole), **`kehikot.press`** (host → module) and
+  **`kehikot.pressed`** (module → host): `headerSchema`, `headerItemSchema`, `headerItemsSchema`,
+  `headerOptionSchema`, `pressSchema`, `pressedSchema`, `pressValueSchema`; `HEADER_KINDS`,
+  `HEADER_MENUS`, `HEADER_MENU_NAMES`, `RUN_STATES`; `pressRefusal(items, press)`.
+- The client: `Connection.header(items)`, replayed on every greeting; `HostEvents.onPress`,
+  answered exactly once (`PRESS_BACKSTOP_MS`, `PressAnswer`); the same on `hostStore` and
+  `useHost`.
+- `LIMITS.HEADER_*`.
+- The template: `src/components/header-menus.tsx`, the copy an unhosted page draws; one declared
+  toggle as the example.
+
+### Added: folding ([kehikko#61](https://github.com/Jalez/kehikko/issues/61), the module half)
+
+- The method **`view.fold`** under the capability `view:fold`, answered with `foldResult`
+  (`FOLD_OUTCOMES`). A host without it answers `unknown-method`.
+- `containerSchema.folded`: whether a container is folded to its header. Optional; absent from a
+  host that does not say.
+
+### Changed in the template only
+
+- Its example tool takes `project` (and still reads `projectPath`), and says
+  `annotations: { readOnlyHint: true }`.
+
+### Not changed, and why
+
+- `kehikot.clearable` and `kehikot.refreshable` stay and are not deprecated: folding them into Run
+  items is the proposal's last step, and a breaking one.
+- A host built on 1.0.0 reports a `kehikot.header` as a message it could not read. That is the
+  host's to change (docs/header.md, "A message type the other side does not know"), and it is why
+  the host moves to 1.1.0 before any module declares a header.
+
+- The host refuses to start against a protocol that names a method it does not answer (the guard
+  in its `src/host/division.ts`), so the host's move to 1.1.0 lists `view.fold` in the same
+  change. With that one line its suite is as it was (1283 passing).
+
 ## 1.0.0 — 2026-10-10
 
 Removes what 0.37.0 deprecated, makes the parts declaration a refusal, and changes four answers

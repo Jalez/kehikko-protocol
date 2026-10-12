@@ -60,6 +60,13 @@ export const containerSchema = z.object({
   module: z.string().regex(MODULE_ID),
   /** Whether this container is picked out as a target on this kehikko. The host's own fact. */
   selected: z.boolean().default(false),
+  /**
+   * Whether this container is folded to its header. The host's own fact, changed by a person's
+   * press, by `view.fold` and by an agent at the host's door. Absent from a host that does not say,
+   * which a reader takes as not folded. Optional, not defaulted, so a host that builds this list by
+   * hand is not made to say it.
+   */
+  folded: z.boolean().optional(),
   /** What it says it is showing, or nothing. Never absent, for the reason `filters` is `{}` and not missing. */
   showing: showingSchema.default({}),
 })

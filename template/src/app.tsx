@@ -1,16 +1,40 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
+import { headerItemsSchema, type HeaderItem, type PressValue } from 'kehikot-module-protocol'
 import { Cover, coverFor, useServerStanding } from 'kehikot-module-protocol/client/react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { HeaderMenus } from '@/components/header-menus'
 import { Input } from '@/components/ui/input'
 import { Switcher, type Item } from '@/switcher'
 import { api as realApi, type Api } from '@/wire/api'
 import { useKehikot, type Host } from '@/wire/use-kehikot'
 
+/**
+ * What this module puts in its container's menus: one toggle, as the example. Add a `switch` for
+ * views, a `go` for places to jump to and a `run` for acts; the host draws them (View, Go, Run)
+ * and reports a press. The module owns the state: every change is declared again, whole.
+ */
+export function headerItems(details: boolean): HeaderItem[] {
+  return headerItemsSchema.parse([{ kind: 'toggle', id: 'details', label: 'What the host said', checked: details }])
+}
+
+type Press = { item: string; value?: PressValue }
+
 export function App() {
-  return <Screen host={useKehikot()} />
+  const [details, setDetails] = useState(true)
+  /* One handler for a press from the host's menus and for one from this page's own copy of them. */
+  const press = ({ item, value }: Press) => {
+    if (item !== 'details' || typeof value !== 'boolean') return `__MODULE_NAME__ has nothing called "${item}" to press.`
+    setDetails(value)
+  }
+  const host = useKehikot({ onPress: press })
+  const items = useMemo(() => headerItems(details), [details])
+  /* Declared at mount and again whenever anything in it changes; replayed by the client on every greeting. */
+  const { header } = host
+  useEffect(() => header(items), [header, items])
+  return <Screen host={host} items={items} onPress={press} />
 }
 
 /**
@@ -18,7 +42,18 @@ export function App() {
  * this module and keeping one value in the project. Rendered from a plain
  * `Host`, so a test can draw it with a fake context (see test/render.test.tsx).
  */
-export function Screen({ host, api = realApi }: { host: Host; api?: Api }) {
+export function Screen({
+  host,
+  api = realApi,
+  items = headerItems(true),
+  onPress = () => {},
+}: {
+  host: Host
+  api?: Api
+  items?: HeaderItem[]
+  onPress?: (press: Press) => void
+}) {
+  const details = items.some((item) => item.kind === 'toggle' && item.id === 'details' && item.checked)
   /* What this page's own server last did, learned by every `ask()`: it stopped, or it restarted under this page. */
   const server = useServerStanding()
   const [again, setAgain] = useState(0)
@@ -27,9 +62,9 @@ export function Screen({ host, api = realApi }: { host: Host; api?: Api }) {
 
   return (
     <div className="flex h-screen flex-col text-sm">
-      <Header host={host} />
+      <Header host={host} menus={items} onPress={onPress} />
       <main className="flex min-h-0 flex-1 flex-col gap-4 overflow-auto p-3">
-        {cover ? <Cover state={cover} name="__MODULE_NAME__" onRetry={() => setAgain((n) => n + 1)} /> : <Context host={host} />}
+        {cover ? <Cover state={cover} name="__MODULE_NAME__" onRetry={() => setAgain((n) => n + 1)} /> : details ? <Context host={host} /> : null}
         {host.projectPath && server !== 'stale' ? (
           <Stored key={again} hidden={cover !== null} projectPath={host.projectPath} api={api} />
         ) : null}
@@ -38,7 +73,7 @@ export function Screen({ host, api = realApi }: { host: Host; api?: Api }) {
   )
 }
 
-function Header({ host }: { host: Host }) {
+function Header({ host, menus, onPress }: { host: Host; menus: HeaderItem[]; onPress(press: Press): void }) {
   const [items, setItems] = useState<Item[]>([
     { id: 'first', name: 'First' },
     { id: 'second', name: 'Second' },
@@ -68,6 +103,8 @@ function Header({ host }: { host: Host }) {
           return true
         }}
       />
+      {/* Hosted, the host draws these in the container's own header. Alone, the page does. */}
+      {host.where === 'unhosted' ? <HeaderMenus items={menus} onPress={onPress} /> : null}
       <Badge variant="outline" className="ml-auto" data-testid="where">
         {host.where}
       </Badge>

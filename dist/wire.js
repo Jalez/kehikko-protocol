@@ -5,5 +5,6 @@
  */
 export * from './passage.js';
 export * from './filters.js';
+export * from './header.js';
 export * from './context.js';
 export * from './messages.js';

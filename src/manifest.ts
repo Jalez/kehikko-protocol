@@ -97,6 +97,36 @@ export const TAG_NAMES = Object.keys(TAGS) as Tag[]
    length is `LIMITS.TAG`, said here because a regex cannot read a constant. */
 const tag = z.string().regex(new RegExp(`^[a-z][a-z0-9-]{0,${LIMITS.TAG - 1}}$`))
 
+/** The name of a tool at an MCP door, in MCP's own alphabet. */
+const toolName = z.string().regex(new RegExp(`^[A-Za-z0-9_.-]{1,${LIMITS.TOOL}}$`), 'a tool name: letters, digits, _ . and -')
+
+/**
+ * One kind of thing a module can be asked to show, or to answer for, and the tools at its MCP door
+ * that do it. `show` points the open page at one (and saves nothing); `release` lets go of what
+ * `show` held, and is absent when a pointing holds nothing; `done` answers "is this done?". Each
+ * tool spells its context arguments `project` and `epic`. See docs/asking.md and `door.ts`.
+ */
+const subjectSchema = z
+  .object({
+    /** The word for the kind, as a caller would say it: `slide`, `question`, `flow`. Unique in a module. */
+    kind: tag,
+    /** What one of these is, in a line, for somebody choosing what to ask for. */
+    about: z.string().max(LIMITS.SUMMARY).default(''),
+    /** The tool that shows one. It answers with `showAnswerSchema`, and must be read-only. */
+    show: toolName.optional(),
+    /** The tool that stops showing. Called with the context arguments and nothing else. */
+    release: toolName.optional(),
+    /** The tool that says whether one is done. It answers with `doneAnswerSchema`, and must be read-only. */
+    done: toolName.optional(),
+  })
+  .refine((subject) => subject.show !== undefined || subject.done !== undefined, {
+    message: 'a subject names the tool that shows it, the tool that says whether it is done, or both',
+  })
+  .refine((subject) => subject.release === undefined || subject.show !== undefined, {
+    message: 'a subject that can be let go of has to be one that can be shown',
+  })
+export type ModuleSubject = z.infer<typeof subjectSchema>
+
 /* An extension name, as written. */
 const extensionName = z.string().min(1).max(LIMITS.EXTENSION)
 
@@ -152,6 +182,17 @@ const manifestFields = z.object({
       transport: z.enum(['http', 'sse', 'stdio']).default('http'),
       /** What an agent would be connecting to, in one line, for the list. */
       about: z.string().max(LIMITS.SUMMARY).default(''),
+      /**
+       * What this door can be asked to show and to answer for, by kind. The declaration that lets a
+       * caller who has never heard of this module find "the tool that points". Empty by default.
+       */
+      subjects: z
+        .array(subjectSchema)
+        .max(LIMITS.SUBJECTS)
+        .refine((subjects) => new Set(subjects.map((s) => s.kind)).size === subjects.length, {
+          message: 'two subjects cannot share a kind',
+        })
+        .default([]),
     })
     .optional(),
   /**

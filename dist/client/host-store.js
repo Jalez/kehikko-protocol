@@ -135,6 +135,8 @@ export function hostStore(id, events = {}, options = {}) {
                     if (!stopped)
                         events.onRefresh?.();
                 },
+                /* Only when the page takes presses: without a listener the connection answers for it. */
+                ...(events.onPress ? { onPress: (press) => (stopped ? false : events.onPress(press)) } : {}),
             }, connectOptions);
             /* Stored BEFORE it listens: the mailbox replays synchronously inside `listen`. */
             live = connection;
@@ -190,6 +192,7 @@ export function hostStore(id, events = {}, options = {}) {
         filters: (groups) => live?.filters(groups),
         clearable: (label) => live?.clearable(label),
         refreshable: (state) => live?.refreshable(state),
+        header: (items) => live?.header(items),
         connection: () => live,
     };
     return store;

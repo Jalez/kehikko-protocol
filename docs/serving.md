@@ -508,6 +508,18 @@ No registry directory yet. The first module on a clean machine is not an
          error, and a drift that refused to happen because nobody had registered
          anything would be a strange first experience.
 
+### `src/serve/neighbours.ts`
+
+#### `readNeighbour`
+
+Another module's manifest, from the registry and the module's own well-known path (1.1.0).
+
+`readRegistration` gives a URL and a directory, and until now the name, what
+a module reacts to and where its MCP door is came only from fetching its
+manifest by hand. This is that fetch, once: bounded, timed out, parsed with
+`manifestSchema`, and refused when the answer carries another id. It writes
+nothing. Why it exists, and `listTools` beside it, is in [asking](asking.md).
+
 ### `src/serve/plugin.ts`
 
 #### `ServesOptions`

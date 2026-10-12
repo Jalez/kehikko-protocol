@@ -81,6 +81,61 @@ export declare const TAGS: {
 export type Tag = keyof typeof TAGS;
 export declare const TAG_NAMES: Tag[];
 /**
+ * One kind of thing a module can be asked to show, or to answer for, and the tools at its MCP door
+ * that do it. `show` points the open page at one (and saves nothing); `release` lets go of what
+ * `show` held, and is absent when a pointing holds nothing; `done` answers "is this done?". Each
+ * tool spells its context arguments `project` and `epic`. See docs/asking.md and `door.ts`.
+ */
+declare const subjectSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
+    /** The word for the kind, as a caller would say it: `slide`, `question`, `flow`. Unique in a module. */
+    kind: z.ZodString;
+    /** What one of these is, in a line, for somebody choosing what to ask for. */
+    about: z.ZodDefault<z.ZodString>;
+    /** The tool that shows one. It answers with `showAnswerSchema`, and must be read-only. */
+    show: z.ZodOptional<z.ZodString>;
+    /** The tool that stops showing. Called with the context arguments and nothing else. */
+    release: z.ZodOptional<z.ZodString>;
+    /** The tool that says whether one is done. It answers with `doneAnswerSchema`, and must be read-only. */
+    done: z.ZodOptional<z.ZodString>;
+}, "strip", z.ZodTypeAny, {
+    kind: string;
+    about: string;
+    done?: string | undefined;
+    show?: string | undefined;
+    release?: string | undefined;
+}, {
+    kind: string;
+    done?: string | undefined;
+    about?: string | undefined;
+    show?: string | undefined;
+    release?: string | undefined;
+}>, {
+    kind: string;
+    about: string;
+    done?: string | undefined;
+    show?: string | undefined;
+    release?: string | undefined;
+}, {
+    kind: string;
+    done?: string | undefined;
+    about?: string | undefined;
+    show?: string | undefined;
+    release?: string | undefined;
+}>, {
+    kind: string;
+    about: string;
+    done?: string | undefined;
+    show?: string | undefined;
+    release?: string | undefined;
+}, {
+    kind: string;
+    done?: string | undefined;
+    about?: string | undefined;
+    show?: string | undefined;
+    release?: string | undefined;
+}>;
+export type ModuleSubject = z.infer<typeof subjectSchema>;
+/**
  * The manifest. Every field above, and one rule over two of them: a module either follows the
  * picked parts (`reacts` has `parts`) or says in `partless` why it has nothing to narrow. A
  * manifest that says neither, or both, does not parse, and the issue is the sentence saying what
@@ -136,14 +191,92 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         transport: z.ZodDefault<z.ZodEnum<["http", "sse", "stdio"]>>;
         /** What an agent would be connecting to, in one line, for the list. */
         about: z.ZodDefault<z.ZodString>;
+        /**
+         * What this door can be asked to show and to answer for, by kind. The declaration that lets a
+         * caller who has never heard of this module find "the tool that points". Empty by default.
+         */
+        subjects: z.ZodDefault<z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodEffects<z.ZodObject<{
+            /** The word for the kind, as a caller would say it: `slide`, `question`, `flow`. Unique in a module. */
+            kind: z.ZodString;
+            /** What one of these is, in a line, for somebody choosing what to ask for. */
+            about: z.ZodDefault<z.ZodString>;
+            /** The tool that shows one. It answers with `showAnswerSchema`, and must be read-only. */
+            show: z.ZodOptional<z.ZodString>;
+            /** The tool that stops showing. Called with the context arguments and nothing else. */
+            release: z.ZodOptional<z.ZodString>;
+            /** The tool that says whether one is done. It answers with `doneAnswerSchema`, and must be read-only. */
+            done: z.ZodOptional<z.ZodString>;
+        }, "strip", z.ZodTypeAny, {
+            kind: string;
+            about: string;
+            done?: string | undefined;
+            show?: string | undefined;
+            release?: string | undefined;
+        }, {
+            kind: string;
+            done?: string | undefined;
+            about?: string | undefined;
+            show?: string | undefined;
+            release?: string | undefined;
+        }>, {
+            kind: string;
+            about: string;
+            done?: string | undefined;
+            show?: string | undefined;
+            release?: string | undefined;
+        }, {
+            kind: string;
+            done?: string | undefined;
+            about?: string | undefined;
+            show?: string | undefined;
+            release?: string | undefined;
+        }>, {
+            kind: string;
+            about: string;
+            done?: string | undefined;
+            show?: string | undefined;
+            release?: string | undefined;
+        }, {
+            kind: string;
+            done?: string | undefined;
+            about?: string | undefined;
+            show?: string | undefined;
+            release?: string | undefined;
+        }>, "many">, {
+            kind: string;
+            about: string;
+            done?: string | undefined;
+            show?: string | undefined;
+            release?: string | undefined;
+        }[], {
+            kind: string;
+            done?: string | undefined;
+            about?: string | undefined;
+            show?: string | undefined;
+            release?: string | undefined;
+        }[]>>;
     }, "strip", z.ZodTypeAny, {
         url: string;
-        transport: "http" | "sse" | "stdio";
         about: string;
+        transport: "http" | "sse" | "stdio";
+        subjects: {
+            kind: string;
+            about: string;
+            done?: string | undefined;
+            show?: string | undefined;
+            release?: string | undefined;
+        }[];
     }, {
         url: string;
-        transport?: "http" | "sse" | "stdio" | undefined;
         about?: string | undefined;
+        transport?: "http" | "sse" | "stdio" | undefined;
+        subjects?: {
+            kind: string;
+            done?: string | undefined;
+            about?: string | undefined;
+            show?: string | undefined;
+            release?: string | undefined;
+        }[] | undefined;
     }>>;
     /**
      * The formats this module speaks, by name and version: `emits` is what it will send, `consumes`
@@ -286,8 +419,15 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     health?: string | undefined;
     mcp?: {
         url: string;
-        transport: "http" | "sse" | "stdio";
         about: string;
+        transport: "http" | "sse" | "stdio";
+        subjects: {
+            kind: string;
+            about: string;
+            done?: string | undefined;
+            show?: string | undefined;
+            release?: string | undefined;
+        }[];
     } | undefined;
     partless?: string | undefined;
 }, {
@@ -304,15 +444,22 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     build?: unknown;
     version?: string | undefined;
     summary?: string | undefined;
+    icon?: string | undefined;
     dataVersion?: number | undefined;
     tags?: string[] | undefined;
     guidance?: string | undefined;
-    icon?: string | undefined;
     health?: string | undefined;
     mcp?: {
         url: string;
-        transport?: "http" | "sse" | "stdio" | undefined;
         about?: string | undefined;
+        transport?: "http" | "sse" | "stdio" | undefined;
+        subjects?: {
+            kind: string;
+            done?: string | undefined;
+            about?: string | undefined;
+            show?: string | undefined;
+            release?: string | undefined;
+        }[] | undefined;
     } | undefined;
     extensions?: {
         emits?: string[] | undefined;
@@ -363,8 +510,15 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     health?: string | undefined;
     mcp?: {
         url: string;
-        transport: "http" | "sse" | "stdio";
         about: string;
+        transport: "http" | "sse" | "stdio";
+        subjects: {
+            kind: string;
+            about: string;
+            done?: string | undefined;
+            show?: string | undefined;
+            release?: string | undefined;
+        }[];
     } | undefined;
     partless?: string | undefined;
 }, {
@@ -381,15 +535,22 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     build?: unknown;
     version?: string | undefined;
     summary?: string | undefined;
+    icon?: string | undefined;
     dataVersion?: number | undefined;
     tags?: string[] | undefined;
     guidance?: string | undefined;
-    icon?: string | undefined;
     health?: string | undefined;
     mcp?: {
         url: string;
-        transport?: "http" | "sse" | "stdio" | undefined;
         about?: string | undefined;
+        transport?: "http" | "sse" | "stdio" | undefined;
+        subjects?: {
+            kind: string;
+            done?: string | undefined;
+            about?: string | undefined;
+            show?: string | undefined;
+            release?: string | undefined;
+        }[] | undefined;
     } | undefined;
     extensions?: {
         emits?: string[] | undefined;

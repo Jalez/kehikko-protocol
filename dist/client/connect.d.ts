@@ -1,4 +1,4 @@
-import { type FilterGroup, type Goto, type ModuleContext, type ModuleEvent, type ResponseFailureReason } from '../wire.js';
+import { type FilterGroup, type Goto, type HeaderItemInput, type ModuleContext, type ModuleEvent, type Press, type ResponseFailureReason } from '../wire.js';
 import { type MessageSource } from './mailbox.js';
 /**
  * The bridge: one conversation with one window, in the shape this package's schemas define.
@@ -31,6 +31,17 @@ export declare const PERSON_ANSWERS_WITHIN_MS: number;
  * than the host's own timeout.
  */
 export declare const GOTO_BACKSTOP_MS = 500;
+/**
+ * How long, in ms, an `onPress` listener has to say whether it took a press before the backstop
+ * answers "not taken" for it. Long enough to ask the page's own server to start something; a run
+ * that takes longer answers at once and reports through its header.
+ */
+export declare const PRESS_BACKSTOP_MS = 2000;
+/**
+ * What an `onPress` listener says about one press: nothing or `true` for "taken", a sentence for
+ * "not taken, and this is why", `false` for "not taken". A promise of any of them is waited for.
+ */
+export type PressAnswer = void | boolean | string;
 /** What a question asked before any greeting is refused with. The React hook says the same between mounts. */
 export declare const NOBODY_TO_ASK = "Nothing has greeted this page, so there is nobody to ask.";
 export interface HostEvents {
@@ -65,6 +76,14 @@ export interface HostEvents {
      * two it was. No reply — call `refreshable` with `busy: true` going in and with `at` coming out.
      */
     onRefresh?: () => void;
+    /**
+     * One of this page's header items was pressed, by a person in the host's menus or by an agent
+     * through the host: `item` is its id, `value` the option chosen (switch, go) or the state wanted
+     * (toggle). Only reaches a page that declared the item with `header`; a press the last header
+     * cannot take is refused before this is called. Do it, declare the header again, and return
+     * nothing — or return the sentence saying why not. `connect` answers the host exactly once.
+     */
+    onPress?: (press: Pick<Press, 'item' | 'value'>) => PressAnswer | Promise<PressAnswer>;
 }
 /**
  * What a single question may say about itself, beyond its params. A ceiling on waiting, never a
@@ -81,6 +100,8 @@ export interface ConnectOptions {
     answerWithin?: number;
     /** Override `GOTO_BACKSTOP_MS`. Shorten it freely; lengthening it past the host's own timeout does nothing. */
     gotoBackstop?: number;
+    /** Override `PRESS_BACKSTOP_MS`. */
+    pressBackstop?: number;
 }
 export interface Connection {
     /**
@@ -117,6 +138,13 @@ export interface Connection {
         at?: string | null;
         busy?: boolean;
     }) => void;
+    /**
+     * Say which switches, toggles, jumps and runs this page has, so the host can draw them in the
+     * container's menus. The whole list every time; `[]` withdraws it. Fire and forget, remembered
+     * and replayed on every greeting. Call it again whenever anything in it changes, including after
+     * `onPress`: the host draws what was last declared and holds no state of its own.
+     */
+    header: (items: HeaderItemInput[]) => void;
     /** Whether anything has greeted us yet. */
     greeted: () => boolean;
     /** Stop listening. Every question still waiting is refused rather than left hanging. */

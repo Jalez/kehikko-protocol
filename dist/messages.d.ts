@@ -168,13 +168,13 @@ export declare const refreshableSchema: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     type: "kehikot.refreshable";
     at: string | null;
-    can: boolean;
     busy: boolean;
+    can: boolean;
 }, {
     type: "kehikot.refreshable";
     at?: string | null | undefined;
-    can?: boolean | undefined;
     busy?: boolean | undefined;
+    can?: boolean | undefined;
 }>;
 export type Refreshable = z.infer<typeof refreshableSchema>;
 /**
@@ -192,6 +192,531 @@ export declare const refreshSchema: z.ZodObject<{
     type: "kehikot.refresh";
 }>;
 export type Refresh = z.infer<typeof refreshSchema>;
+/**
+ * Module → host. Every header item this module has, whole, every time: it replaces, never merges,
+ * and an empty `items` takes the module's menus away. Sent again whenever anything in it changes —
+ * a switch moved, a run went busy — including right after a press. See `header.ts`.
+ */
+export declare const headerSchema: z.ZodObject<{
+    type: z.ZodLiteral<"kehikot.header">;
+    items: z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodDiscriminatedUnion<"kind", [z.ZodObject<{
+        options: z.ZodArray<z.ZodObject<{
+            id: z.ZodEffects<z.ZodString, string, string>;
+            label: z.ZodString;
+        }, "strip", z.ZodTypeAny, {
+            label: string;
+            id: string;
+        }, {
+            label: string;
+            id: string;
+        }>, "many">;
+        value: z.ZodEffects<z.ZodString, string, string>;
+        id: z.ZodEffects<z.ZodString, string, string>;
+        label: z.ZodString;
+        icon: z.ZodOptional<z.ZodString>;
+        shortcut: z.ZodOptional<z.ZodString>;
+        group: z.ZodOptional<z.ZodString>;
+        agents: z.ZodDefault<z.ZodBoolean>;
+        tool: z.ZodOptional<z.ZodString>;
+        kind: z.ZodLiteral<"switch">;
+    }, "strip", z.ZodTypeAny, {
+        value: string;
+        options: {
+            label: string;
+            id: string;
+        }[];
+        label: string;
+        id: string;
+        kind: "switch";
+        agents: boolean;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        tool?: string | undefined;
+    }, {
+        value: string;
+        options: {
+            label: string;
+            id: string;
+        }[];
+        label: string;
+        id: string;
+        kind: "switch";
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+    }>, z.ZodObject<{
+        checked: z.ZodBoolean;
+        id: z.ZodEffects<z.ZodString, string, string>;
+        label: z.ZodString;
+        icon: z.ZodOptional<z.ZodString>;
+        shortcut: z.ZodOptional<z.ZodString>;
+        group: z.ZodOptional<z.ZodString>;
+        agents: z.ZodDefault<z.ZodBoolean>;
+        tool: z.ZodOptional<z.ZodString>;
+        kind: z.ZodLiteral<"toggle">;
+    }, "strip", z.ZodTypeAny, {
+        label: string;
+        id: string;
+        kind: "toggle";
+        agents: boolean;
+        checked: boolean;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        tool?: string | undefined;
+    }, {
+        label: string;
+        id: string;
+        kind: "toggle";
+        checked: boolean;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+    }>, z.ZodObject<{
+        options: z.ZodArray<z.ZodObject<{
+            id: z.ZodEffects<z.ZodString, string, string>;
+            label: z.ZodString;
+        }, "strip", z.ZodTypeAny, {
+            label: string;
+            id: string;
+        }, {
+            label: string;
+            id: string;
+        }>, "many">;
+        id: z.ZodEffects<z.ZodString, string, string>;
+        label: z.ZodString;
+        icon: z.ZodOptional<z.ZodString>;
+        shortcut: z.ZodOptional<z.ZodString>;
+        group: z.ZodOptional<z.ZodString>;
+        agents: z.ZodDefault<z.ZodBoolean>;
+        tool: z.ZodOptional<z.ZodString>;
+        kind: z.ZodLiteral<"go">;
+    }, "strip", z.ZodTypeAny, {
+        options: {
+            label: string;
+            id: string;
+        }[];
+        label: string;
+        id: string;
+        kind: "go";
+        agents: boolean;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        tool?: string | undefined;
+    }, {
+        options: {
+            label: string;
+            id: string;
+        }[];
+        label: string;
+        id: string;
+        kind: "go";
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+    }>, z.ZodObject<{
+        state: z.ZodDefault<z.ZodEnum<["idle", "busy", "failed"]>>;
+        result: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+        disabled: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+        confirm: z.ZodDefault<z.ZodBoolean>;
+        id: z.ZodEffects<z.ZodString, string, string>;
+        label: z.ZodString;
+        icon: z.ZodOptional<z.ZodString>;
+        shortcut: z.ZodOptional<z.ZodString>;
+        group: z.ZodOptional<z.ZodString>;
+        agents: z.ZodDefault<z.ZodBoolean>;
+        tool: z.ZodOptional<z.ZodString>;
+        kind: z.ZodLiteral<"run">;
+    }, "strip", z.ZodTypeAny, {
+        label: string;
+        id: string;
+        kind: "run";
+        state: "failed" | "idle" | "busy";
+        agents: boolean;
+        result: string | null;
+        disabled: string | null;
+        confirm: boolean;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        tool?: string | undefined;
+    }, {
+        label: string;
+        id: string;
+        kind: "run";
+        state?: "failed" | "idle" | "busy" | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+        result?: string | null | undefined;
+        disabled?: string | null | undefined;
+        confirm?: boolean | undefined;
+    }>]>, {
+        value: string;
+        options: {
+            label: string;
+            id: string;
+        }[];
+        label: string;
+        id: string;
+        kind: "switch";
+        agents: boolean;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        tool?: string | undefined;
+    } | {
+        label: string;
+        id: string;
+        kind: "toggle";
+        agents: boolean;
+        checked: boolean;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        tool?: string | undefined;
+    } | {
+        options: {
+            label: string;
+            id: string;
+        }[];
+        label: string;
+        id: string;
+        kind: "go";
+        agents: boolean;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        tool?: string | undefined;
+    } | {
+        label: string;
+        id: string;
+        kind: "run";
+        state: "failed" | "idle" | "busy";
+        agents: boolean;
+        result: string | null;
+        disabled: string | null;
+        confirm: boolean;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        tool?: string | undefined;
+    }, {
+        value: string;
+        options: {
+            label: string;
+            id: string;
+        }[];
+        label: string;
+        id: string;
+        kind: "switch";
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+    } | {
+        label: string;
+        id: string;
+        kind: "toggle";
+        checked: boolean;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+    } | {
+        options: {
+            label: string;
+            id: string;
+        }[];
+        label: string;
+        id: string;
+        kind: "go";
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+    } | {
+        label: string;
+        id: string;
+        kind: "run";
+        state?: "failed" | "idle" | "busy" | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+        result?: string | null | undefined;
+        disabled?: string | null | undefined;
+        confirm?: boolean | undefined;
+    }>, "many">, ({
+        value: string;
+        options: {
+            label: string;
+            id: string;
+        }[];
+        label: string;
+        id: string;
+        kind: "switch";
+        agents: boolean;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        tool?: string | undefined;
+    } | {
+        label: string;
+        id: string;
+        kind: "toggle";
+        agents: boolean;
+        checked: boolean;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        tool?: string | undefined;
+    } | {
+        options: {
+            label: string;
+            id: string;
+        }[];
+        label: string;
+        id: string;
+        kind: "go";
+        agents: boolean;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        tool?: string | undefined;
+    } | {
+        label: string;
+        id: string;
+        kind: "run";
+        state: "failed" | "idle" | "busy";
+        agents: boolean;
+        result: string | null;
+        disabled: string | null;
+        confirm: boolean;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        tool?: string | undefined;
+    })[], ({
+        value: string;
+        options: {
+            label: string;
+            id: string;
+        }[];
+        label: string;
+        id: string;
+        kind: "switch";
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+    } | {
+        label: string;
+        id: string;
+        kind: "toggle";
+        checked: boolean;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+    } | {
+        options: {
+            label: string;
+            id: string;
+        }[];
+        label: string;
+        id: string;
+        kind: "go";
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+    } | {
+        label: string;
+        id: string;
+        kind: "run";
+        state?: "failed" | "idle" | "busy" | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+        result?: string | null | undefined;
+        disabled?: string | null | undefined;
+        confirm?: boolean | undefined;
+    })[]>;
+}, "strip", z.ZodTypeAny, {
+    type: "kehikot.header";
+    items: ({
+        value: string;
+        options: {
+            label: string;
+            id: string;
+        }[];
+        label: string;
+        id: string;
+        kind: "switch";
+        agents: boolean;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        tool?: string | undefined;
+    } | {
+        label: string;
+        id: string;
+        kind: "toggle";
+        agents: boolean;
+        checked: boolean;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        tool?: string | undefined;
+    } | {
+        options: {
+            label: string;
+            id: string;
+        }[];
+        label: string;
+        id: string;
+        kind: "go";
+        agents: boolean;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        tool?: string | undefined;
+    } | {
+        label: string;
+        id: string;
+        kind: "run";
+        state: "failed" | "idle" | "busy";
+        agents: boolean;
+        result: string | null;
+        disabled: string | null;
+        confirm: boolean;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        tool?: string | undefined;
+    })[];
+}, {
+    type: "kehikot.header";
+    items: ({
+        value: string;
+        options: {
+            label: string;
+            id: string;
+        }[];
+        label: string;
+        id: string;
+        kind: "switch";
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+    } | {
+        label: string;
+        id: string;
+        kind: "toggle";
+        checked: boolean;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+    } | {
+        options: {
+            label: string;
+            id: string;
+        }[];
+        label: string;
+        id: string;
+        kind: "go";
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+    } | {
+        label: string;
+        id: string;
+        kind: "run";
+        state?: "failed" | "idle" | "busy" | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+        result?: string | null | undefined;
+        disabled?: string | null | undefined;
+        confirm?: boolean | undefined;
+    })[];
+}>;
+export type Header = z.infer<typeof headerSchema>;
+/**
+ * Host → module. One item was pressed. `value` is the option chosen for a switch or a go item, the
+ * state wanted for a toggle (so a press delivered twice does not flip twice), and absent for a run.
+ * `id` pairs it with its `pressed`. A host sends this only for an item in the module's last header,
+ * after any arm of its own, and must time out: no `pressed` means the press was not taken.
+ */
+export declare const pressSchema: z.ZodObject<{
+    type: z.ZodLiteral<"kehikot.press">;
+    protocol: z.ZodNumber;
+    id: z.ZodString;
+    item: z.ZodString;
+    value: z.ZodOptional<z.ZodUnion<[z.ZodEffects<z.ZodString, string, string>, z.ZodBoolean]>>;
+}, "strip", z.ZodTypeAny, {
+    protocol: number;
+    type: "kehikot.press";
+    id: string;
+    item: string;
+    value?: string | boolean | undefined;
+}, {
+    protocol: number;
+    type: "kehikot.press";
+    id: string;
+    item: string;
+    value?: string | boolean | undefined;
+}>;
+export type Press = z.infer<typeof pressSchema>;
+/**
+ * Module → host. What became of one press: taken, or not and why. "Taken" is not "finished": a run
+ * that takes a minute answers at once and says how it is going by declaring its header again.
+ */
+export declare const pressedSchema: z.ZodObject<{
+    type: z.ZodLiteral<"kehikot.pressed">;
+    id: z.ZodString;
+    ok: z.ZodBoolean;
+    why: z.ZodDefault<z.ZodString>;
+}, "strip", z.ZodTypeAny, {
+    type: "kehikot.pressed";
+    id: string;
+    why: string;
+    ok: boolean;
+}, {
+    type: "kehikot.pressed";
+    id: string;
+    ok: boolean;
+    why?: string | undefined;
+}>;
+export type Pressed = z.infer<typeof pressedSchema>;
 /**
  * Host → module. Hello: the whole of what a module is given without asking, sent on every frame
  * load. `protocol` is what the two sides settled on when the manifest was read. `session` names
@@ -325,6 +850,7 @@ export declare const helloSchema: z.ZodObject<{
         containers: z.ZodDefault<z.ZodArray<z.ZodObject<{
             module: z.ZodString;
             selected: z.ZodDefault<z.ZodBoolean>;
+            folded: z.ZodOptional<z.ZodBoolean>;
             showing: z.ZodDefault<z.ZodObject<{
                 refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
                 documents: z.ZodDefault<z.ZodArray<z.ZodEffects<z.ZodEffects<z.ZodObject<{
@@ -476,9 +1002,11 @@ export declare const helloSchema: z.ZodObject<{
                     } | null;
                 }[];
             };
+            folded?: boolean | undefined;
         }, {
             module: string;
             selected?: boolean | undefined;
+            folded?: boolean | undefined;
             showing?: {
                 refs?: string[] | undefined;
                 documents?: {
@@ -606,6 +1134,7 @@ export declare const helloSchema: z.ZodObject<{
                     } | null;
                 }[];
             };
+            folded?: boolean | undefined;
         }[];
         dispositions: {
             value: "done" | "wont-do" | "duplicate" | "superseded";
@@ -659,6 +1188,7 @@ export declare const helloSchema: z.ZodObject<{
         containers?: {
             module: string;
             selected?: boolean | undefined;
+            folded?: boolean | undefined;
             showing?: {
                 refs?: string[] | undefined;
                 documents?: {
@@ -753,6 +1283,7 @@ export declare const helloSchema: z.ZodObject<{
                     } | null;
                 }[];
             };
+            folded?: boolean | undefined;
         }[];
         dispositions: {
             value: "done" | "wont-do" | "duplicate" | "superseded";
@@ -811,6 +1342,7 @@ export declare const helloSchema: z.ZodObject<{
         containers?: {
             module: string;
             selected?: boolean | undefined;
+            folded?: boolean | undefined;
             showing?: {
                 refs?: string[] | undefined;
                 documents?: {
@@ -979,6 +1511,7 @@ export declare const contextMessageSchema: z.ZodObject<{
     containers: z.ZodDefault<z.ZodArray<z.ZodObject<{
         module: z.ZodString;
         selected: z.ZodDefault<z.ZodBoolean>;
+        folded: z.ZodOptional<z.ZodBoolean>;
         showing: z.ZodDefault<z.ZodObject<{
             refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
             documents: z.ZodDefault<z.ZodArray<z.ZodEffects<z.ZodEffects<z.ZodObject<{
@@ -1130,9 +1663,11 @@ export declare const contextMessageSchema: z.ZodObject<{
                 } | null;
             }[];
         };
+        folded?: boolean | undefined;
     }, {
         module: string;
         selected?: boolean | undefined;
+        folded?: boolean | undefined;
         showing?: {
             refs?: string[] | undefined;
             documents?: {
@@ -1265,6 +1800,7 @@ export declare const contextMessageSchema: z.ZodObject<{
                 } | null;
             }[];
         };
+        folded?: boolean | undefined;
     }[];
     dispositions: {
         value: "done" | "wont-do" | "duplicate" | "superseded";
@@ -1320,6 +1856,7 @@ export declare const contextMessageSchema: z.ZodObject<{
     containers?: {
         module: string;
         selected?: boolean | undefined;
+        folded?: boolean | undefined;
         showing?: {
             refs?: string[] | undefined;
             documents?: {
@@ -1728,6 +2265,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         containers: z.ZodDefault<z.ZodArray<z.ZodObject<{
             module: z.ZodString;
             selected: z.ZodDefault<z.ZodBoolean>;
+            folded: z.ZodOptional<z.ZodBoolean>;
             showing: z.ZodDefault<z.ZodObject<{
                 refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
                 documents: z.ZodDefault<z.ZodArray<z.ZodEffects<z.ZodEffects<z.ZodObject<{
@@ -1879,9 +2417,11 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
                     } | null;
                 }[];
             };
+            folded?: boolean | undefined;
         }, {
             module: string;
             selected?: boolean | undefined;
+            folded?: boolean | undefined;
             showing?: {
                 refs?: string[] | undefined;
                 documents?: {
@@ -2009,6 +2549,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
                     } | null;
                 }[];
             };
+            folded?: boolean | undefined;
         }[];
         dispositions: {
             value: "done" | "wont-do" | "duplicate" | "superseded";
@@ -2062,6 +2603,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         containers?: {
             module: string;
             selected?: boolean | undefined;
+            folded?: boolean | undefined;
             showing?: {
                 refs?: string[] | undefined;
                 documents?: {
@@ -2156,6 +2698,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
                     } | null;
                 }[];
             };
+            folded?: boolean | undefined;
         }[];
         dispositions: {
             value: "done" | "wont-do" | "duplicate" | "superseded";
@@ -2214,6 +2757,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         containers?: {
             module: string;
             selected?: boolean | undefined;
+            folded?: boolean | undefined;
             showing?: {
                 refs?: string[] | undefined;
                 documents?: {
@@ -2376,6 +2920,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     containers: z.ZodDefault<z.ZodArray<z.ZodObject<{
         module: z.ZodString;
         selected: z.ZodDefault<z.ZodBoolean>;
+        folded: z.ZodOptional<z.ZodBoolean>;
         showing: z.ZodDefault<z.ZodObject<{
             refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
             documents: z.ZodDefault<z.ZodArray<z.ZodEffects<z.ZodEffects<z.ZodObject<{
@@ -2527,9 +3072,11 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
                 } | null;
             }[];
         };
+        folded?: boolean | undefined;
     }, {
         module: string;
         selected?: boolean | undefined;
+        folded?: boolean | undefined;
         showing?: {
             refs?: string[] | undefined;
             documents?: {
@@ -2662,6 +3209,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
                 } | null;
             }[];
         };
+        folded?: boolean | undefined;
     }[];
     dispositions: {
         value: "done" | "wont-do" | "duplicate" | "superseded";
@@ -2717,6 +3265,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     containers?: {
         module: string;
         selected?: boolean | undefined;
+        folded?: boolean | undefined;
         showing?: {
             refs?: string[] | undefined;
             documents?: {
@@ -2887,6 +3436,24 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
 }, {
     protocol: number;
     type: "kehikot.refresh";
+}>, z.ZodObject<{
+    type: z.ZodLiteral<"kehikot.press">;
+    protocol: z.ZodNumber;
+    id: z.ZodString;
+    item: z.ZodString;
+    value: z.ZodOptional<z.ZodUnion<[z.ZodEffects<z.ZodString, string, string>, z.ZodBoolean]>>;
+}, "strip", z.ZodTypeAny, {
+    protocol: number;
+    type: "kehikot.press";
+    id: string;
+    item: string;
+    value?: string | boolean | undefined;
+}, {
+    protocol: number;
+    type: "kehikot.press";
+    id: string;
+    item: string;
+    value?: string | boolean | undefined;
 }>]>;
 export type HostMessage = z.infer<typeof hostMessageSchema>;
 export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
@@ -3103,13 +3670,499 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     type: "kehikot.refreshable";
     at: string | null;
-    can: boolean;
     busy: boolean;
+    can: boolean;
 }, {
     type: "kehikot.refreshable";
     at?: string | null | undefined;
-    can?: boolean | undefined;
     busy?: boolean | undefined;
+    can?: boolean | undefined;
+}>, z.ZodObject<{
+    type: z.ZodLiteral<"kehikot.header">;
+    items: z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodDiscriminatedUnion<"kind", [z.ZodObject<{
+        options: z.ZodArray<z.ZodObject<{
+            id: z.ZodEffects<z.ZodString, string, string>;
+            label: z.ZodString;
+        }, "strip", z.ZodTypeAny, {
+            label: string;
+            id: string;
+        }, {
+            label: string;
+            id: string;
+        }>, "many">;
+        value: z.ZodEffects<z.ZodString, string, string>;
+        id: z.ZodEffects<z.ZodString, string, string>;
+        label: z.ZodString;
+        icon: z.ZodOptional<z.ZodString>;
+        shortcut: z.ZodOptional<z.ZodString>;
+        group: z.ZodOptional<z.ZodString>;
+        agents: z.ZodDefault<z.ZodBoolean>;
+        tool: z.ZodOptional<z.ZodString>;
+        kind: z.ZodLiteral<"switch">;
+    }, "strip", z.ZodTypeAny, {
+        value: string;
+        options: {
+            label: string;
+            id: string;
+        }[];
+        label: string;
+        id: string;
+        kind: "switch";
+        agents: boolean;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        tool?: string | undefined;
+    }, {
+        value: string;
+        options: {
+            label: string;
+            id: string;
+        }[];
+        label: string;
+        id: string;
+        kind: "switch";
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+    }>, z.ZodObject<{
+        checked: z.ZodBoolean;
+        id: z.ZodEffects<z.ZodString, string, string>;
+        label: z.ZodString;
+        icon: z.ZodOptional<z.ZodString>;
+        shortcut: z.ZodOptional<z.ZodString>;
+        group: z.ZodOptional<z.ZodString>;
+        agents: z.ZodDefault<z.ZodBoolean>;
+        tool: z.ZodOptional<z.ZodString>;
+        kind: z.ZodLiteral<"toggle">;
+    }, "strip", z.ZodTypeAny, {
+        label: string;
+        id: string;
+        kind: "toggle";
+        agents: boolean;
+        checked: boolean;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        tool?: string | undefined;
+    }, {
+        label: string;
+        id: string;
+        kind: "toggle";
+        checked: boolean;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+    }>, z.ZodObject<{
+        options: z.ZodArray<z.ZodObject<{
+            id: z.ZodEffects<z.ZodString, string, string>;
+            label: z.ZodString;
+        }, "strip", z.ZodTypeAny, {
+            label: string;
+            id: string;
+        }, {
+            label: string;
+            id: string;
+        }>, "many">;
+        id: z.ZodEffects<z.ZodString, string, string>;
+        label: z.ZodString;
+        icon: z.ZodOptional<z.ZodString>;
+        shortcut: z.ZodOptional<z.ZodString>;
+        group: z.ZodOptional<z.ZodString>;
+        agents: z.ZodDefault<z.ZodBoolean>;
+        tool: z.ZodOptional<z.ZodString>;
+        kind: z.ZodLiteral<"go">;
+    }, "strip", z.ZodTypeAny, {
+        options: {
+            label: string;
+            id: string;
+        }[];
+        label: string;
+        id: string;
+        kind: "go";
+        agents: boolean;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        tool?: string | undefined;
+    }, {
+        options: {
+            label: string;
+            id: string;
+        }[];
+        label: string;
+        id: string;
+        kind: "go";
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+    }>, z.ZodObject<{
+        state: z.ZodDefault<z.ZodEnum<["idle", "busy", "failed"]>>;
+        result: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+        disabled: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+        confirm: z.ZodDefault<z.ZodBoolean>;
+        id: z.ZodEffects<z.ZodString, string, string>;
+        label: z.ZodString;
+        icon: z.ZodOptional<z.ZodString>;
+        shortcut: z.ZodOptional<z.ZodString>;
+        group: z.ZodOptional<z.ZodString>;
+        agents: z.ZodDefault<z.ZodBoolean>;
+        tool: z.ZodOptional<z.ZodString>;
+        kind: z.ZodLiteral<"run">;
+    }, "strip", z.ZodTypeAny, {
+        label: string;
+        id: string;
+        kind: "run";
+        state: "failed" | "idle" | "busy";
+        agents: boolean;
+        result: string | null;
+        disabled: string | null;
+        confirm: boolean;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        tool?: string | undefined;
+    }, {
+        label: string;
+        id: string;
+        kind: "run";
+        state?: "failed" | "idle" | "busy" | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+        result?: string | null | undefined;
+        disabled?: string | null | undefined;
+        confirm?: boolean | undefined;
+    }>]>, {
+        value: string;
+        options: {
+            label: string;
+            id: string;
+        }[];
+        label: string;
+        id: string;
+        kind: "switch";
+        agents: boolean;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        tool?: string | undefined;
+    } | {
+        label: string;
+        id: string;
+        kind: "toggle";
+        agents: boolean;
+        checked: boolean;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        tool?: string | undefined;
+    } | {
+        options: {
+            label: string;
+            id: string;
+        }[];
+        label: string;
+        id: string;
+        kind: "go";
+        agents: boolean;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        tool?: string | undefined;
+    } | {
+        label: string;
+        id: string;
+        kind: "run";
+        state: "failed" | "idle" | "busy";
+        agents: boolean;
+        result: string | null;
+        disabled: string | null;
+        confirm: boolean;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        tool?: string | undefined;
+    }, {
+        value: string;
+        options: {
+            label: string;
+            id: string;
+        }[];
+        label: string;
+        id: string;
+        kind: "switch";
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+    } | {
+        label: string;
+        id: string;
+        kind: "toggle";
+        checked: boolean;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+    } | {
+        options: {
+            label: string;
+            id: string;
+        }[];
+        label: string;
+        id: string;
+        kind: "go";
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+    } | {
+        label: string;
+        id: string;
+        kind: "run";
+        state?: "failed" | "idle" | "busy" | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+        result?: string | null | undefined;
+        disabled?: string | null | undefined;
+        confirm?: boolean | undefined;
+    }>, "many">, ({
+        value: string;
+        options: {
+            label: string;
+            id: string;
+        }[];
+        label: string;
+        id: string;
+        kind: "switch";
+        agents: boolean;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        tool?: string | undefined;
+    } | {
+        label: string;
+        id: string;
+        kind: "toggle";
+        agents: boolean;
+        checked: boolean;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        tool?: string | undefined;
+    } | {
+        options: {
+            label: string;
+            id: string;
+        }[];
+        label: string;
+        id: string;
+        kind: "go";
+        agents: boolean;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        tool?: string | undefined;
+    } | {
+        label: string;
+        id: string;
+        kind: "run";
+        state: "failed" | "idle" | "busy";
+        agents: boolean;
+        result: string | null;
+        disabled: string | null;
+        confirm: boolean;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        tool?: string | undefined;
+    })[], ({
+        value: string;
+        options: {
+            label: string;
+            id: string;
+        }[];
+        label: string;
+        id: string;
+        kind: "switch";
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+    } | {
+        label: string;
+        id: string;
+        kind: "toggle";
+        checked: boolean;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+    } | {
+        options: {
+            label: string;
+            id: string;
+        }[];
+        label: string;
+        id: string;
+        kind: "go";
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+    } | {
+        label: string;
+        id: string;
+        kind: "run";
+        state?: "failed" | "idle" | "busy" | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+        result?: string | null | undefined;
+        disabled?: string | null | undefined;
+        confirm?: boolean | undefined;
+    })[]>;
+}, "strip", z.ZodTypeAny, {
+    type: "kehikot.header";
+    items: ({
+        value: string;
+        options: {
+            label: string;
+            id: string;
+        }[];
+        label: string;
+        id: string;
+        kind: "switch";
+        agents: boolean;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        tool?: string | undefined;
+    } | {
+        label: string;
+        id: string;
+        kind: "toggle";
+        agents: boolean;
+        checked: boolean;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        tool?: string | undefined;
+    } | {
+        options: {
+            label: string;
+            id: string;
+        }[];
+        label: string;
+        id: string;
+        kind: "go";
+        agents: boolean;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        tool?: string | undefined;
+    } | {
+        label: string;
+        id: string;
+        kind: "run";
+        state: "failed" | "idle" | "busy";
+        agents: boolean;
+        result: string | null;
+        disabled: string | null;
+        confirm: boolean;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        tool?: string | undefined;
+    })[];
+}, {
+    type: "kehikot.header";
+    items: ({
+        value: string;
+        options: {
+            label: string;
+            id: string;
+        }[];
+        label: string;
+        id: string;
+        kind: "switch";
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+    } | {
+        label: string;
+        id: string;
+        kind: "toggle";
+        checked: boolean;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+    } | {
+        options: {
+            label: string;
+            id: string;
+        }[];
+        label: string;
+        id: string;
+        kind: "go";
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+    } | {
+        label: string;
+        id: string;
+        kind: "run";
+        state?: "failed" | "idle" | "busy" | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        group?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+        result?: string | null | undefined;
+        disabled?: string | null | undefined;
+        confirm?: boolean | undefined;
+    })[];
+}>, z.ZodObject<{
+    type: z.ZodLiteral<"kehikot.pressed">;
+    id: z.ZodString;
+    ok: z.ZodBoolean;
+    why: z.ZodDefault<z.ZodString>;
+}, "strip", z.ZodTypeAny, {
+    type: "kehikot.pressed";
+    id: string;
+    why: string;
+    ok: boolean;
+}, {
+    type: "kehikot.pressed";
+    id: string;
+    ok: boolean;
+    why?: string | undefined;
 }>]>;
 export type ModuleMessage = z.infer<typeof moduleMessageSchema>;
 export type WireMessage = HostMessage | ModuleMessage;

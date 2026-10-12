@@ -473,6 +473,18 @@ agent can be told which tools belong to which module. Naming it in the
 manifest rather than in a second file is the point: one program, one
 document, both its doors.
 
+#### `manifestSchema.mcp.subjects`
+
+What the door can be asked to show and to answer for (1.1.0).
+
+Naming where the door is says nothing about what it is for, so one module
+could only drive another by knowing its tool names in advance. `subjects`
+names, per kind of thing, the tool that shows one, the tool that lets go and
+the tool that answers "is it done?". It sits under `mcp` because it names
+tools at that door and means nothing without one. The argument schemas are
+not repeated here: `tools/list` has them. The whole design, with Slides and
+Learning worked through, is in [asking](asking.md).
+
 #### `manifestSchema.extensions`
 
 The formats this module speaks, by name and version.
