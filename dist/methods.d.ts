@@ -19,6 +19,11 @@ export declare const CAPABILITIES: {
     /** Asks the host to MOVE; reads and writes nothing. See `view.goto`. */
     readonly 'view:navigate': "Ask the host to show a particular epic, step or reference. The host decides.";
     /**
+     * Asks the host to FOLD or UNFOLD containers; moves, resizes, removes and reorders nothing. See
+     * `view.fold`. The host decides, shows it happening and says who asked.
+     */
+    readonly 'view:fold': "Ask the host to fold containers to their headers or unfold them. The host decides, and you see it happen.";
+    /**
      * Say which references the person has picked out. A SHARED write: the selection goes into the
      * context every framed module receives.
      */
@@ -86,6 +91,7 @@ export declare const METHODS: {
     readonly 'stage.report': "stage:report";
     readonly 'events.emit': "events:emit";
     readonly 'view.goto': "view:navigate";
+    readonly 'view.fold': "view:fold";
     readonly 'selection.set': "selection:set";
     readonly 'passage.set': "passage:set";
     readonly 'filters.set': "filters:set";
@@ -161,6 +167,33 @@ export declare const methodParams: {
         epic?: string | undefined;
         ref?: string | undefined;
         step?: number | undefined;
+    }>;
+    /**
+     * Ask the host to fold containers to their headers, unfold them, or both; answered with
+     * `foldResult`. Each list names module ids on this kehikko (`context.containers`); a call naming
+     * none, or one id in both, is refused. A container already as asked is left alone. Folding only.
+     */
+    readonly 'view.fold': z.ZodEffects<z.ZodEffects<z.ZodObject<{
+        fold: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
+        unfold: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
+    }, "strip", z.ZodTypeAny, {
+        fold: string[];
+        unfold: string[];
+    }, {
+        fold?: string[] | undefined;
+        unfold?: string[] | undefined;
+    }>, {
+        fold: string[];
+        unfold: string[];
+    }, {
+        fold?: string[] | undefined;
+        unfold?: string[] | undefined;
+    }>, {
+        fold: string[];
+        unfold: string[];
+    }, {
+        fold?: string[] | undefined;
+        unfold?: string[] | undefined;
     }>;
     /**
      * Say which references the person has picked out. Refs only, never their kinds: the host relays
@@ -643,6 +676,36 @@ export declare const navigationResult: z.ZodObject<{
     why?: string | undefined;
 }>;
 export type NavigationResult = z.infer<typeof navigationResult>;
+/**
+ * What became of a `view.fold`; all four are `ok: true`. `changed`: at least one container was folded or
+ * unfolded. `unchanged`: every one was already as asked. `declined`: the host will not, right now.
+ * `no-such-container`: an id is not on this kehikko, and nothing was changed.
+ */
+export declare const FOLD_OUTCOMES: readonly ["changed", "unchanged", "declined", "no-such-container"];
+export type FoldOutcome = (typeof FOLD_OUTCOMES)[number];
+/**
+ * `folded` and `unfolded` are what THIS call changed, and nothing it left alone: handed back the
+ * other way round (`{ fold: unfolded, unfold: folded }`) they put the canvas as it was. A caller
+ * that puts things back leaves out any container whose `folded` in `context.containers` has moved
+ * since, because a person moved it.
+ */
+export declare const foldResult: z.ZodObject<{
+    outcome: z.ZodEnum<["changed", "unchanged", "declined", "no-such-container"]>;
+    folded: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
+    unfolded: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
+    why: z.ZodDefault<z.ZodString>;
+}, "strip", z.ZodTypeAny, {
+    outcome: "changed" | "declined" | "unchanged" | "no-such-container";
+    why: string;
+    folded: string[];
+    unfolded: string[];
+}, {
+    outcome: "changed" | "declined" | "unchanged" | "no-such-container";
+    why?: string | undefined;
+    folded?: string[] | undefined;
+    unfolded?: string[] | undefined;
+}>;
+export type FoldResult = z.infer<typeof foldResult>;
 /**
  * The least an `epics.list` can answer with. `slug` is required: it is the argument to every other
  * call. `title` and `project` are optional and bounded. Every other field passes through untouched.

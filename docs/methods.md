@@ -53,6 +53,14 @@ it was — the call did not happen — because collapsing "the answer is no" int
 host too old to have been asked, and those are the two futures the refusal
 design exists to keep apart.
 
+### Asking the host to fold and unfold
+
+`view.fold` (1.1.0, capability `view:fold`) is `view.goto`'s neighbour: a
+module asks, the host decides, and a decline is `ok: true`. It takes two lists
+of module ids, `fold` and `unfold`, and answers with `foldResult`: an outcome
+and the containers this call changed, which is the list that puts them back.
+The rules it keeps and the putting-back are in [asking](asking.md#bringing-the-module-into-view-viewfold).
+
 ### Asking the person which project, without being told what projects there are
 
 A module is handed one `projectPath` and may read what the host named. That is

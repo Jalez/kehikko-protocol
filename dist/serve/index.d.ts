@@ -8,6 +8,7 @@ export { claim, free, identify, originFor, readManifest, sayClaim, search, verdi
 export { DEFAULT_FRAME_ORIGINS, frameAncestors, frameOrigins } from './origins.js';
 export { neighbourPorts, portOf, readRegistration, registerAt, registryDir, type Registered, type Registration, } from './registry.js';
 export { preferred, serves, type DevServerLike, type HttpServerLike, type ServesOptions, type ServesPlugin, } from './plugin.js';
+export { doorOf, listTools, readNeighbour, readNeighbours, NEIGHBOUR_TIMEOUT_MS, type Neighbour, type NeighbourOptions, } from './neighbours.js';
 export { readJourney, readJourneys } from './journeys.js';
 export { fillPage, pageDocument, themeScript, FRAMED_DEFAULT_THEME, type PageOptions } from './page.js';
 export { mintTicket, refuseTicket, sameTicket, ticketOf, TICKET_REFUSAL } from './ticket.js';

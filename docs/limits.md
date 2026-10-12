@@ -433,6 +433,20 @@ survive being concatenated with four others without becoming the whole of
 what an agent reads. The bound is the design: if it does not fit in a
 paragraph it is documentation, and documentation goes behind a link.
 
+#### `LIMITS.HEADER_ITEMS`, `LIMITS.HEADER_OPTIONS` and the rest of the header
+
+Twenty-four items is every control the inventory behind kehikko#62 found in
+the busiest module, twice over. Sixty-four options is a paper's sections or a
+project's decks: more than the twelve a filter group gets, because a filter
+is a choice a person scans and a go item is a list a person knows. The label
+is the filter label's forty-eight. See [the header](header.md).
+
+#### `LIMITS.SUBJECTS`, `LIMITS.TOOL`, `LIMITS.SUBJECT_ID`, `LIMITS.DONE_ITEMS`
+
+A module has a handful of kinds of thing, not dozens: eight. A tool name is
+bounded where MCP bounds it. A "done?" answer lists what was asked about, and
+256 is a long quiz; a caller with more asks twice. See [asking](asking.md).
+
 #### Inside `LIMITS`
 
 The shared tracker reading. See `tracker.ts`.

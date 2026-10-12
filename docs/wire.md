@@ -660,6 +660,14 @@ last Tuesday's tick is narrowed by something the person can see and unpick.
 What was refused was a module changing its behaviour on a fact it could not
 see the end of; what is sent is a fact a person is looking at.
 
+##### `folded` is the third fact, and also the host's
+
+Whether a container is folded to its header (1.1.0). A module about to point
+another one needs to know whether there is anything for the person to see,
+and a module that unfolded something needs to know whether a person has
+moved it since. Absent from a host that does not say, which reads as not folded. See `view.fold` in
+[asking](asking.md#bringing-the-module-into-view-viewfold).
+
 ##### Every container is listed, not only the ones that have spoken
 
 A container that has said nothing still appears, with `showing` empty, and

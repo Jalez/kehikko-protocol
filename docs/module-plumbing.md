@@ -202,7 +202,7 @@ It returns `where` (`listening` → `unhosted` after `GREETING_GRACE_MS`, or `ho
 
 - **Theme.** Every context puts `dark`/`light` on `<html>` (both spelled, so a host asking for light over a machine set to dark gets it) and remembers it for the next load's first paint. `theme` before the greeting is what the document already decided. No module toggles classes by hand.
 - **Kept state.** `options.kept` is a codec, `{ read(state): Kept | null, write(kept): string }`; the default is JSON. `read` returning `null` for anything unrecognised is the point: an older version's string gives first-run behaviour. The kept value is set before the context on the greeting, so the first hosted render already has it. `remember` holds the value and sends `state.set`, fire and forget; it does not debounce (the one module that needs that debounces its caller).
-- **Events.** `onGoto`, `onEvent`, `onHello`, `onContext`, and `onClear` / `onRefresh` — all of which arrive.
+- **Events.** `onGoto`, `onEvent`, `onHello`, `onContext`, and `onClear` / `onRefresh` — all of which arrive. From 1.1.0 also `onPress`, with `header(items)` beside `filters`: see [the header](header.md).
 - **Stale pages** reload, as above.
 
 ### The same thing outside React: `hostStore` (*0.36.0*)

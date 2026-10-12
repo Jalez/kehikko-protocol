@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, test } from 'bun:test'
 import { cleanup, render, screen, waitFor } from '@testing-library/react'
 
-import { Screen } from '../src/app.tsx'
+import { Screen, headerItems } from '../src/app.tsx'
 import type { Api } from '../src/wire/api.ts'
 import type { Host } from '../src/wire/use-kehikot.ts'
 
@@ -16,6 +16,7 @@ function host(over: Partial<Host> = {}): Host {
     focus: [],
     theme: 'dark',
     request: () => Promise.resolve(null),
+    header: () => {},
     ...over,
   }
 }
@@ -52,6 +53,19 @@ describe('the screen', () => {
       expect(screen.queryByRole('button', { name: 'Save' })).toBeNull()
       cleanup()
     }
+  })
+
+  test('alone, the page draws its own header items; hosted, the host does', () => {
+    render(<Screen host={host({ where: 'unhosted' })} api={fakeApi(null)} />)
+    expect(screen.getByRole('button', { name: /View/ })).toBeDefined()
+    cleanup()
+    render(<Screen host={host()} api={fakeApi(null)} />)
+    expect(screen.queryByRole('button', { name: /View/ })).toBeNull()
+  })
+
+  test('the toggle it declares decides whether what the host said is drawn', () => {
+    render(<Screen host={host()} api={fakeApi(null)} items={headerItems(false)} />)
+    expect(screen.queryByTestId('project')).toBeNull()
   })
 
   test('the header switcher shows the open item', () => {

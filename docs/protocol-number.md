@@ -123,6 +123,20 @@ the reasoning stays visible the next time somebody adds something:
   version is not a warning label. It says whether two programs can speak, and
   these two can speak to every host and module that already existed.
 
+- `kehikot.header`, `kehikot.press` and `kehikot.pressed` (1.1.0) are three new
+  MESSAGES and pass the test the same way `clearable` and `clear` did. A
+  module that has never heard of `press` drops it, and a host only sends one
+  for an item that module declared. A host that has never heard of `header`
+  has no menus to draw it in. One thing is worth admitting: the host built on
+  1.0.0 does not DROP a module message it cannot parse, it reports it on the
+  container, so a module that declares a header there shows a fault line. The
+  two programs can still speak, which is all this number says; the order of
+  release (host first) and the rule that makes the order unnecessary next
+  time are in [the header](header.md).
+- `view.fold` is a new METHOD, answered `unknown-method` by an older host;
+  `folded` on a container and `subjects` under a manifest's `mcp` are new
+  FIELDS with defaults, stripped by a schema that does not name them.
+
 What did raise it is a rename. **Epics are not journeys**: an epic belongs to
 a project and is the host's own material; a journey is a different idea
 living in a module app of its own. The context field naming what is open, the

@@ -1,4 +1,4 @@
-import { KEHIKOT_DIR } from 'kehikot-module-protocol'
+import { KEHIKOT_DIR, doorContext } from 'kehikot-module-protocol'
 import { establishBuild, mintTicket, refuseTicket, type Reply } from 'kehikot-module-protocol/serve'
 
 import { ID, MANIFEST, VERSION } from './manifest.ts'
@@ -44,20 +44,25 @@ function tools() {
     {
       name: 'read_value',
       description:
-        'What __MODULE_NAME__ is holding for a project. Give the absolute project directory as projectPath; the '
-        + `value lives at <projectPath>/${KEHIKOT_DIR}/__MODULE_FOLDER__/${FILE}.json.`,
+        'What __MODULE_NAME__ is holding for a project. Give the absolute project directory as project; the '
+        + `value lives at <project>/${KEHIKOT_DIR}/__MODULE_FOLDER__/${FILE}.json.`,
+      /* The context arguments are spelled `project` and `epic` at every module's door (`DOOR_ARGUMENTS`). */
       inputSchema: {
         type: 'object',
-        properties: { projectPath: { type: 'string', description: 'The absolute directory of the project.' } },
-        required: ['projectPath'],
+        properties: { project: { type: 'string', description: 'The absolute directory of the project.' } },
+        required: ['project'],
       },
+      /* Said for every tool: a caller that runs tools unasked can tell one that only reads from
+         one that writes. A tool that writes says `readOnlyHint: false`, and `destructiveHint:
+         false` when it deletes and overwrites nothing. */
+      annotations: { readOnlyHint: true },
     },
   ]
 }
 
 function call(name: string, args: Record<string, unknown>): string {
   if (name === 'read_value') {
-    const read = readValue(typeof args.projectPath === 'string' ? args.projectPath : null)
+    const read = readValue(doorContext(args).project)
     if (!read.ok) throw new Error(read.error)
     return read.value === null ? 'Nothing is stored for that project yet.' : JSON.stringify(read.value, null, 2)
   }

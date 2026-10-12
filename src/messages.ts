@@ -5,6 +5,7 @@ import { EPIC_SLUG, MODULE_ID } from './ids.js'
 import { buildSchema } from './build.js'
 import { contextSchema } from './context.js'
 import { filterGroupSchema } from './filters.js'
+import { headerItemsSchema, pressValueSchema } from './header.js'
 import { gotoRef, kehikkoSchema, stepNumber } from './fragments.js'
 
 /**
@@ -92,6 +93,48 @@ export const refreshSchema = z.object({
   protocol: z.number().int().min(1),
 })
 export type Refresh = z.infer<typeof refreshSchema>
+
+/* ------------------------------------------------------------------------ *
+ * The header: what a module can be switched to, jumped to and made to run
+ * ------------------------------------------------------------------------ */
+
+/**
+ * Module → host. Every header item this module has, whole, every time: it replaces, never merges,
+ * and an empty `items` takes the module's menus away. Sent again whenever anything in it changes —
+ * a switch moved, a run went busy — including right after a press. See `header.ts`.
+ */
+export const headerSchema = z.object({
+  type: messageType(MESSAGE.HEADER),
+  items: headerItemsSchema,
+})
+export type Header = z.infer<typeof headerSchema>
+
+/**
+ * Host → module. One item was pressed. `value` is the option chosen for a switch or a go item, the
+ * state wanted for a toggle (so a press delivered twice does not flip twice), and absent for a run.
+ * `id` pairs it with its `pressed`. A host sends this only for an item in the module's last header,
+ * after any arm of its own, and must time out: no `pressed` means the press was not taken.
+ */
+export const pressSchema = z.object({
+  type: messageType(MESSAGE.PRESS),
+  protocol: z.number().int().min(1),
+  id: correlation,
+  item: z.string().min(1).max(LIMITS.HEADER_ID),
+  value: pressValueSchema.optional(),
+})
+export type Press = z.infer<typeof pressSchema>
+
+/**
+ * Module → host. What became of one press: taken, or not and why. "Taken" is not "finished": a run
+ * that takes a minute answers at once and says how it is going by declaring its header again.
+ */
+export const pressedSchema = z.object({
+  type: messageType(MESSAGE.PRESSED),
+  id: correlation,
+  ok: z.boolean(),
+  why: z.string().max(LIMITS.REASON).default(''),
+})
+export type Pressed = z.infer<typeof pressedSchema>
 
 /* ------------------------------------------------------------------------ *
  * Host → module
@@ -265,6 +308,7 @@ export const hostMessageSchema = z.union([
   eventSchema,
   clearSchema,
   refreshSchema,
+  pressSchema,
 ])
 export type HostMessage = z.infer<typeof hostMessageSchema>
 
@@ -276,6 +320,8 @@ export const moduleMessageSchema = z.union([
   filtersSchema,
   clearableSchema,
   refreshableSchema,
+  headerSchema,
+  pressedSchema,
 ])
 export type ModuleMessage = z.infer<typeof moduleMessageSchema>
 

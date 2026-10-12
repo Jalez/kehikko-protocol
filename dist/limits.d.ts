@@ -185,4 +185,28 @@ export declare const LIMITS: {
      * it did not need, never a change it did.
      */
     readonly CONTENT: 64;
+    /** How many header items one module may declare at once, over all four kinds. */
+    readonly HEADER_ITEMS: 24;
+    /** The id of a header item, or of one option of a switch or a go item, in characters. */
+    readonly HEADER_ID: 64;
+    /** The words on a header item or on one of its options. A host truncates anyway, with the full text in a `title`. */
+    readonly HEADER_LABEL: 48;
+    /** How many options one switch or one go item may offer: a paper's sections, a project's decks. */
+    readonly HEADER_OPTIONS: 64;
+    /** An icon's name, e.g. `file-text`. A host draws the ones it has and none for a name it does not know. */
+    readonly HEADER_ICON: 32;
+    /** A shortcut hint, e.g. `⌘B`. Shown beside the label; the host binds nothing from it. */
+    readonly HEADER_SHORTCUT: 16;
+    /** The heading items are gathered under inside their menu. */
+    readonly HEADER_GROUP: 24;
+    /** What a run last came to, in a word or three: `1.2 s`, `failed`, `p. 3/12`. */
+    readonly HEADER_RESULT: 32;
+    /** How many kinds of subject one module may declare. */
+    readonly SUBJECTS: 8;
+    /** The name of a tool at a module's MCP door. MCP's own bound. */
+    readonly TOOL: 64;
+    /** The id of one thing a "is this done?" answer is about: a question, a checklist item. */
+    readonly SUBJECT_ID: 128;
+    /** How many things one "is this done?" answer may list. */
+    readonly DONE_ITEMS: 256;
 };

@@ -76,6 +76,20 @@ export const MESSAGE = {
    * clock, per container, sends only to a module that offered, and never faster than `REFRESH_EVERY_MIN`.
    */
   REFRESH: 'kehikot.refresh',
+  /**
+   * Module → host. "These are the switches, toggles, jumps and runs I have." The whole list, every
+   * time: it replaces, never merges, and an empty list takes the module's menus away. Fire and
+   * forget; the module owns all the state and says it again whenever any of it changes.
+   */
+  HEADER: 'kehikot.header',
+  /**
+   * Host → module. "This item of yours was pressed", by a person in the header or by an agent
+   * through the host. Carries a correlation id and is answered by exactly one `kehikot.pressed`.
+   * Sent only to a module that declared the item.
+   */
+  PRESS: 'kehikot.press',
+  /** Module → host. "I took that press", or "I did not, and here is why." One per `press`, by its `id`. */
+  PRESSED: 'kehikot.pressed',
 } as const
 
 export type MessageType = (typeof MESSAGE)[keyof typeof MESSAGE]
@@ -83,7 +97,14 @@ export type MessageType = (typeof MESSAGE)[keyof typeof MESSAGE]
 /** The prefix every message type carries, so a listener can drop the rest cheaply. There is one spelling. */
 export const MESSAGE_PREFIX = 'kehikot.'
 
-/** What the host says, and only the host. A module sending one of these is confused. */
+/**
+ * What the host says, and only the host. A module sending one of these is confused.
+ *
+ * These two lists are also how a receiver tells a message it does not KNOW from one it cannot READ:
+ * a `kehikot.` type that is in neither list was added by a later version of this package, and is
+ * dropped without a word; a type that is listed and does not parse is a fault worth reporting.
+ * See docs/header.md, "A message type the other side does not know".
+ */
 export const HOST_MESSAGES = [
   MESSAGE.HELLO,
   MESSAGE.CONTEXT,
@@ -92,6 +113,7 @@ export const HOST_MESSAGES = [
   MESSAGE.EVENT,
   MESSAGE.CLEAR,
   MESSAGE.REFRESH,
+  MESSAGE.PRESS,
 ] as const
 
 /** And what the module says. */
@@ -103,6 +125,8 @@ export const MODULE_MESSAGES = [
   MESSAGE.FILTERS,
   MESSAGE.CLEARABLE,
   MESSAGE.REFRESHABLE,
+  MESSAGE.HEADER,
+  MESSAGE.PRESSED,
 ] as const
 
 /**

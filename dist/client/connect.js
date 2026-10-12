@@ -1,7 +1,7 @@
 import { pageBuild } from './build.js';
 import { MESSAGE, PROTOCOL, clampHeight, } from '../constants.js';
 import { LIMITS } from '../limits.js';
-import { hostMessageSchema, looksLikeWireMessage, } from '../wire.js';
+import { headerItemsSchema, hostMessageSchema, looksLikeWireMessage, pressRefusal, } from '../wire.js';
 import { mailbox } from './mailbox.js';
 /** A refusal, as a thrown thing. Every rejection from `request` is one of these, always. */
 export class HostRefused extends Error {
@@ -24,6 +24,12 @@ export const PERSON_ANSWERS_WITHIN_MS = 5 * 60_000;
  * than the host's own timeout.
  */
 export const GOTO_BACKSTOP_MS = 500;
+/**
+ * How long, in ms, an `onPress` listener has to say whether it took a press before the backstop
+ * answers "not taken" for it. Long enough to ask the page's own server to start something; a run
+ * that takes longer answers at once and reports through its header.
+ */
+export const PRESS_BACKSTOP_MS = 2_000;
 /** What a question asked before any greeting is refused with. The React hook says the same between mounts. */
 export const NOBODY_TO_ASK = 'Nothing has greeted this page, so there is nobody to ask.';
 /**
@@ -34,6 +40,7 @@ export function connect(id, events = {}, options = {}) {
     const source = options.source ?? mailbox;
     const answerWithin = options.answerWithin ?? ANSWER_WITHIN_MS;
     const gotoBackstop = options.gotoBackstop ?? GOTO_BACKSTOP_MS;
+    const pressBackstop = options.pressBackstop ?? PRESS_BACKSTOP_MS;
     let host = null;
     let origin = '*';
     let live = true;
@@ -46,6 +53,9 @@ export function connect(id, events = {}, options = {}) {
     let clearing = null;
     /* The last refresh state, replayed likewise; what is replayed carries `at`. */
     let refreshing = null;
+    /* The last header, replayed likewise, as it was written; and as parsed, to judge a press by. */
+    let heading = null;
+    let declared = [];
     /** Correlation id -> the promise waiting on it. A `Map`, per the protocol's note on lookups. */
     const waiting = new Map();
     let counter = 0;
@@ -92,6 +102,8 @@ export function connect(id, events = {}, options = {}) {
                 send({ type: MESSAGE.CLEARABLE, label: clearing.label });
             if (refreshing !== null)
                 send({ type: MESSAGE.REFRESHABLE, ...refreshing });
+            if (heading !== null)
+                send({ type: MESSAGE.HEADER, items: heading });
             events.onHello?.(message.context, message.state);
             return;
         }
@@ -123,6 +135,40 @@ export function connect(id, events = {}, options = {}) {
         }
         if (message.type === MESSAGE.REFRESH) {
             events.onRefresh?.();
+            return;
+        }
+        if (message.type === MESSAGE.PRESS) {
+            /* Answered exactly once, like a `goto`: whatever the listener returns, throws or forgets. */
+            let answered = false;
+            const answer = (ok, why = '') => {
+                if (answered)
+                    return;
+                answered = true;
+                clearTimeout(backstop);
+                send({ type: MESSAGE.PRESSED, id: message.id, ok, why: why.slice(0, LIMITS.REASON) });
+            };
+            const backstop = setTimeout(() => answer(false, 'This app did not say whether it took that press.'), pressBackstop);
+            const press = { item: message.item, ...(message.value !== undefined ? { value: message.value } : {}) };
+            /* Judged against what is declared NOW: the header may have changed since the menu was drawn. */
+            const refused = pressRefusal(declared, press);
+            if (refused !== null)
+                answer(false, refused);
+            else if (!events.onPress)
+                answer(false, 'This app declared that item and does not take presses.');
+            else {
+                const taken = (said) => answer(said === undefined || said === true, typeof said === 'string' ? said : '');
+                const failed = () => answer(false, 'This app failed while doing that.');
+                try {
+                    const said = events.onPress(press);
+                    if (said instanceof Promise)
+                        said.then(taken, failed);
+                    else
+                        taken(said);
+                }
+                catch {
+                    failed();
+                }
+            }
             return;
         }
         if (message.type === MESSAGE.GOTO) {
@@ -206,6 +252,14 @@ export function connect(id, events = {}, options = {}) {
                 busy: state.busy ?? false,
             };
             send({ type: MESSAGE.REFRESHABLE, ...refreshing });
+        },
+        header(items) {
+            /* Kept before it is sent, like the filter offer. A list that does not parse is still sent —
+               the host is the one that reports it — and no press is taken against it. */
+            heading = items;
+            const parsed = headerItemsSchema.safeParse(items);
+            declared = parsed.success ? parsed.data : [];
+            send({ type: MESSAGE.HEADER, items });
         },
         greeted: () => host !== null,
         stop() {

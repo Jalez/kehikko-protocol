@@ -183,6 +183,13 @@ export declare const containerSchema: z.ZodObject<{
     module: z.ZodString;
     /** Whether this container is picked out as a target on this kehikko. The host's own fact. */
     selected: z.ZodDefault<z.ZodBoolean>;
+    /**
+     * Whether this container is folded to its header. The host's own fact, changed by a person's
+     * press, by `view.fold` and by an agent at the host's door. Absent from a host that does not say,
+     * which a reader takes as not folded. Optional, not defaulted, so a host that builds this list by
+     * hand is not made to say it.
+     */
+    folded: z.ZodOptional<z.ZodBoolean>;
     /** What it says it is showing, or nothing. Never absent, for the reason `filters` is `{}` and not missing. */
     showing: z.ZodDefault<z.ZodObject<{
         /** The references this container is showing. The same strings `selection` carries. */
@@ -337,9 +344,11 @@ export declare const containerSchema: z.ZodObject<{
             } | null;
         }[];
     };
+    folded?: boolean | undefined;
 }, {
     module: string;
     selected?: boolean | undefined;
+    folded?: boolean | undefined;
     showing?: {
         refs?: string[] | undefined;
         documents?: {
@@ -524,6 +533,13 @@ export declare const contextSchema: z.ZodObject<{
         module: z.ZodString;
         /** Whether this container is picked out as a target on this kehikko. The host's own fact. */
         selected: z.ZodDefault<z.ZodBoolean>;
+        /**
+         * Whether this container is folded to its header. The host's own fact, changed by a person's
+         * press, by `view.fold` and by an agent at the host's door. Absent from a host that does not say,
+         * which a reader takes as not folded. Optional, not defaulted, so a host that builds this list by
+         * hand is not made to say it.
+         */
+        folded: z.ZodOptional<z.ZodBoolean>;
         /** What it says it is showing, or nothing. Never absent, for the reason `filters` is `{}` and not missing. */
         showing: z.ZodDefault<z.ZodObject<{
             /** The references this container is showing. The same strings `selection` carries. */
@@ -678,9 +694,11 @@ export declare const contextSchema: z.ZodObject<{
                 } | null;
             }[];
         };
+        folded?: boolean | undefined;
     }, {
         module: string;
         selected?: boolean | undefined;
+        folded?: boolean | undefined;
         showing?: {
             refs?: string[] | undefined;
             documents?: {
@@ -828,6 +846,7 @@ export declare const contextSchema: z.ZodObject<{
                 } | null;
             }[];
         };
+        folded?: boolean | undefined;
     }[];
     dispositions: {
         value: "done" | "wont-do" | "duplicate" | "superseded";
@@ -881,6 +900,7 @@ export declare const contextSchema: z.ZodObject<{
     containers?: {
         module: string;
         selected?: boolean | undefined;
+        folded?: boolean | undefined;
         showing?: {
             refs?: string[] | undefined;
             documents?: {
