@@ -21,6 +21,12 @@ files in there.
         notes/notes.json
         learning/questions.json
         journeys/journeys.json
+        journeys/parts.json
+
+One file name means the same thing in every module's folder (1.2.0):
+`parts.json` is what that module holds for the parts of the project's epics,
+written with `writeHoldings` and read, from every folder, with `readHoldings`.
+A module does not use the name for anything else. See [parts.md](parts.md#what-a-module-holds-for-a-part-partsjson).
 
 It is here rather than in each module because it is the same class of thing as
 `kehikot.hello`: a spelling two programs have to share, whose disagreement has

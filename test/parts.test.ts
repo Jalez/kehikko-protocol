@@ -63,7 +63,8 @@ describe('one part', () => {
     const many = Array.from({ length: LIMITS.PARTS + 1 }, (_, i) => ({ id: `part-${i}` }))
     expect(partsSchema.safeParse(many).success).toBe(false)
     expect(partsSchema.safeParse(many.slice(1)).success).toBe(true)
-    expect(LIMITS.PARTS).toBe(32)
+    /* 32 until 1.2.0. A part may be one step of a journey, and journeys of thirty-eight steps exist. */
+    expect(LIMITS.PARTS).toBe(128)
   })
 })
 

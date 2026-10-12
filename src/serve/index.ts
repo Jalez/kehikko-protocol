@@ -1,6 +1,7 @@
 /**
  * The part of a module that has to touch the machine: which port it binds (`claim`), where it says
- * so (`registerAt`), the Vite plugin that does both (`serves`), and `readJourneys`/`readJourney`.
+ * so (`registerAt`), the Vite plugin that does both (`serves`), `readJourneys`/`readJourney`, and the
+ * holdings of an epic's parts (`readHoldings`, `writeHoldings`).
  * Node-only — it binds sockets and reads and writes disk — so it stands beside the front door.
  * Design notes: docs/serving.md.
  */
@@ -56,6 +57,10 @@ export {
 } from './neighbours.js'
 
 export { readJourney, readJourneys } from './journeys.js'
+
+/* What each module holds for an epic's parts: a host reads every module's, a module writes its own. */
+export { readHoldings, writeHoldings, type HoldingsWritten } from './holdings.js'
+export { HOLDINGS_FILE, type EpicHoldings, type PartHoldings, type ProjectHoldings } from '../holdings.js'
 
 /* The shared plumbing of a module's server: its page, its ticket, its doors. */
 export { fillPage, pageDocument, themeScript, FRAMED_DEFAULT_THEME, type PageOptions } from './page.js'

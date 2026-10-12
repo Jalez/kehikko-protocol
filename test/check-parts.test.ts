@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import { spawnSync } from 'node:child_process'
 import { join } from 'node:path'
 
-import { checkModule, checkParts, focusImports, said, sourcesOf } from '../src/check/parts.js'
+import { checkModule, checkParts, contractNotes, focusImports, said, sourcesOf } from '../src/check/parts.js'
 
 /**
  * `bun run check:parts`, against small module directories in
@@ -50,9 +50,11 @@ describe('one module directory', () => {
     expect(check.notes).toHaveLength(1)
   })
 
-  test('the functions the rule delegates to count: a module narrowing with fileInFocus gets no note', () => {
+  test('the functions the rule delegates to still count as using it, and a narrowing built on them is hinted at (1.2.0), never failed', () => {
     const check = checkParts({ id: 'kehikot.paper', reacts: ['parts'] }, [{ path: 'src/focus.ts', text: "import { fileInFocus, focusCount } from 'kehikot-module-protocol'" }])
-    expect(check).toMatchObject({ failures: [], notes: [], uses: ['src/focus.ts: fileInFocus'] })
+    expect(check).toMatchObject({ failures: [], uses: ['src/focus.ts: fileInFocus'] })
+    expect(check.notes).toHaveLength(1)
+    expect(check.notes[0]).toContain('found no call of useFocus().narrow or narrowToFocus')
   })
 
   test('says neither: fails, though it uses a helper', async () => {
@@ -79,6 +81,58 @@ describe('one module directory', () => {
 
   test('the check is pure over a manifest and sources', () => {
     expect(checkParts({ id: 'kehikot.x', reacts: ['parts'] }, [{ path: 'a.ts', text: "import { narrowToFocus } from 'kehikot-module-protocol'" }]).failures).toEqual([])
+  })
+})
+
+describe('what of the contract can be seen in files (1.2.0): hints, never failures', () => {
+  const follows = { id: 'kehikot.x', reacts: ['parts'] }
+  const react = "import { useFocus } from 'kehikot-module-protocol/client/react'\n"
+
+  test('narrowing through useFocus().narrow with keep: nothing to say', () => {
+    const text = `${react}const { shown, empty } = focus.narrow(notes, anchorOf, { noun: 'note', keep: (note) => note.id === open })`
+    expect(contractNotes(follows, [{ path: 'a.tsx', text }])).toEqual([])
+    const pure = "import { narrowToFocus } from 'kehikot-module-protocol'\nnarrowToFocus(parts, steps, anchorOf, { epic, keep })"
+    expect(contractNotes(follows, [{ path: 'a.ts', text: pure }])).toEqual([])
+  })
+
+  test('the hook imported and never narrowed with: a home-made narrowing', () => {
+    const text = `${react}const shown = notes.filter((note) => focus.inFocus({ file: note.path }))`
+    const notes = contractNotes(follows, [{ path: 'a.tsx', text }])
+    expect(notes).toHaveLength(1)
+    expect(notes[0]).toContain('by a rule of its own')
+  })
+
+  test('narrowed, and nothing kept in hand', () => {
+    const notes = contractNotes(follows, [{ path: 'a.tsx', text: `${react}focus.narrow(notes, anchorOf, { noun: 'note' })` }])
+    expect(notes).toHaveLength(1)
+    expect(notes[0]).toContain('found no keep passed')
+  })
+
+  test('what 1.2.0 deprecated for parts is named, with the file', () => {
+    const text = `import { FOCUS_WHERE, paperFileOf } from 'kehikot-module-protocol'\n${react}focus.narrow(notes, anchorOf, { keep })`
+    const notes = contractNotes(follows, [{ path: 'src/app.tsx', text }])
+    expect(notes).toHaveLength(1)
+    expect(notes[0]).toContain('src/app.tsx: FOCUS_WHERE, paperFileOf')
+  })
+
+  test('a module with no helper at all gets the older note and not these', () => {
+    expect(contractNotes(follows, [{ path: 'a.ts', text: 'export const a = 1' }])).toEqual([])
+  })
+
+  test('partless, for a reason the contract no longer accepts', () => {
+    const said = (partless: string) => contractNotes({ id: 'kehikot.x', reacts: [], partless }, [])
+    expect(said('Sessions carry refs; the owner chose not to narrow them.')[0]).toContain('a choice is not a reason')
+    expect(said('Runs are keyed by ref; narrowing would hide their own selection.')[0]).toContain('passed as `keep`')
+    expect(said('Lists the repository’s files; a part owns files of the paper, not of the repository.')[0]).toContain('project-relative')
+    expect(said('A terminal: nothing in it belongs to an epic.')).toEqual([])
+    expect(said('A log across projects and epics; it sits above any one epic’s parts.')).toEqual([])
+    expect(said('Shows one selected change, which is always in hand.')).toEqual([])
+  })
+
+  test('they are notes on a passing check', () => {
+    const check = checkParts({ id: 'kehikot.x', reacts: [], partless: 'The owner chose not to narrow them.' }, [])
+    expect(check).toMatchObject({ declares: 'partless', failures: [] })
+    expect(check.notes).toHaveLength(1)
   })
 })
 

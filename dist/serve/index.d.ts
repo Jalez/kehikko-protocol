@@ -1,6 +1,7 @@
 /**
  * The part of a module that has to touch the machine: which port it binds (`claim`), where it says
- * so (`registerAt`), the Vite plugin that does both (`serves`), and `readJourneys`/`readJourney`.
+ * so (`registerAt`), the Vite plugin that does both (`serves`), `readJourneys`/`readJourney`, and the
+ * holdings of an epic's parts (`readHoldings`, `writeHoldings`).
  * Node-only — it binds sockets and reads and writes disk — so it stands beside the front door.
  * Design notes: docs/serving.md.
  */
@@ -10,6 +11,8 @@ export { neighbourPorts, portOf, readRegistration, registerAt, registryDir, type
 export { preferred, serves, type DevServerLike, type HttpServerLike, type ServesOptions, type ServesPlugin, } from './plugin.js';
 export { doorOf, listTools, readNeighbour, readNeighbours, NEIGHBOUR_TIMEOUT_MS, type Neighbour, type NeighbourOptions, } from './neighbours.js';
 export { readJourney, readJourneys } from './journeys.js';
+export { readHoldings, writeHoldings, type HoldingsWritten } from './holdings.js';
+export { HOLDINGS_FILE, type EpicHoldings, type PartHoldings, type ProjectHoldings } from '../holdings.js';
 export { fillPage, pageDocument, themeScript, FRAMED_DEFAULT_THEME, type PageOptions } from './page.js';
 export { mintTicket, refuseTicket, sameTicket, ticketOf, TICKET_REFUSAL } from './ticket.js';
 export { readJsonBody, readJsonRequest, BODY_METHODS, BODY_TOO_LARGE, MAX_BODY_BYTES, type BodyOptions, type BodyRead, type BodySource } from './body.js';

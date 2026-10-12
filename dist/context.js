@@ -135,9 +135,9 @@ export const contextSchema = z.object({
      */
     content: contentSignalSchema.default([]),
     /**
-     * The parts of the open epic, and which the person has picked out; see `parts.ts`. `[]` when
-     * nothing is narrowed. No module sets it; it belongs to the epic, not a kehikko. With parts picked
-     * a module shows what `refInFocus`, `partInFocus` and `fileInFocus` admit, and says it has narrowed.
+     * The parts of the open epic, and which the person has picked out; see `parts.ts`. `[]` when the
+     * epic has none. No module sets the pick; the list belongs to the epic, not a kehikko, and a module
+     * asks for an edit of it with `parts.set`. With parts picked a module shows what `anchorInFocus` admits.
      */
     parts: partsSchema.default([]),
 });

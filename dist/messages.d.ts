@@ -1077,18 +1077,21 @@ export declare const helloSchema: z.ZodObject<{
             refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
             picked: z.ZodDefault<z.ZodBoolean>;
             files: z.ZodOptional<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">>;
+            documents: z.ZodOptional<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">>;
         }, "strip", z.ZodTypeAny, {
             id: string;
             heading: string;
             refs: string[];
             picked: boolean;
             files?: string[] | undefined;
+            documents?: string[] | undefined;
         }, {
             id: string;
             files?: string[] | undefined;
             heading?: string | undefined;
             refs?: string[] | undefined;
             picked?: boolean | undefined;
+            documents?: string[] | undefined;
         }>, "many">>;
     }, "strip", z.ZodTypeAny, {
         epic: string | null;
@@ -1096,8 +1099,16 @@ export declare const helloSchema: z.ZodObject<{
             at: string | null;
             refreshing: boolean;
         };
-        project: string | null;
         projectPath: string | null;
+        parts: {
+            id: string;
+            heading: string;
+            refs: string[];
+            picked: boolean;
+            files?: string[] | undefined;
+            documents?: string[] | undefined;
+        }[];
+        project: string | null;
         theme: "light" | "dark";
         selection: string[];
         passage: {
@@ -1153,21 +1164,22 @@ export declare const helloSchema: z.ZodObject<{
             source: string;
             epic: string | null;
         }[];
-        parts: {
-            id: string;
-            heading: string;
-            refs: string[];
-            picked: boolean;
-            files?: string[] | undefined;
-        }[];
     }, {
         epic?: string | null | undefined;
         tracker?: {
             at?: string | null | undefined;
             refreshing?: boolean | undefined;
         } | undefined;
-        project?: string | null | undefined;
         projectPath?: string | null | undefined;
+        parts?: {
+            id: string;
+            files?: string[] | undefined;
+            heading?: string | undefined;
+            refs?: string[] | undefined;
+            picked?: boolean | undefined;
+            documents?: string[] | undefined;
+        }[] | undefined;
+        project?: string | null | undefined;
         theme?: "light" | "dark" | undefined;
         selection?: string[] | undefined;
         passage?: {
@@ -1222,13 +1234,6 @@ export declare const helloSchema: z.ZodObject<{
             at: string;
             source: string;
             epic?: string | null | undefined;
-        }[] | undefined;
-        parts?: {
-            id: string;
-            files?: string[] | undefined;
-            heading?: string | undefined;
-            refs?: string[] | undefined;
-            picked?: boolean | undefined;
         }[] | undefined;
     }>;
     /**
@@ -1247,8 +1252,16 @@ export declare const helloSchema: z.ZodObject<{
             at: string | null;
             refreshing: boolean;
         };
-        project: string | null;
         projectPath: string | null;
+        parts: {
+            id: string;
+            heading: string;
+            refs: string[];
+            picked: boolean;
+            files?: string[] | undefined;
+            documents?: string[] | undefined;
+        }[];
+        project: string | null;
         theme: "light" | "dark";
         selection: string[];
         passage: {
@@ -1304,13 +1317,6 @@ export declare const helloSchema: z.ZodObject<{
             source: string;
             epic: string | null;
         }[];
-        parts: {
-            id: string;
-            heading: string;
-            refs: string[];
-            picked: boolean;
-            files?: string[] | undefined;
-        }[];
     };
 }, {
     protocol: number;
@@ -1322,8 +1328,16 @@ export declare const helloSchema: z.ZodObject<{
             at?: string | null | undefined;
             refreshing?: boolean | undefined;
         } | undefined;
-        project?: string | null | undefined;
         projectPath?: string | null | undefined;
+        parts?: {
+            id: string;
+            files?: string[] | undefined;
+            heading?: string | undefined;
+            refs?: string[] | undefined;
+            picked?: boolean | undefined;
+            documents?: string[] | undefined;
+        }[] | undefined;
+        project?: string | null | undefined;
         theme?: "light" | "dark" | undefined;
         selection?: string[] | undefined;
         passage?: {
@@ -1378,13 +1392,6 @@ export declare const helloSchema: z.ZodObject<{
             at: string;
             source: string;
             epic?: string | null | undefined;
-        }[] | undefined;
-        parts?: {
-            id: string;
-            files?: string[] | undefined;
-            heading?: string | undefined;
-            refs?: string[] | undefined;
-            picked?: boolean | undefined;
         }[] | undefined;
     };
     state?: string | null | undefined;
@@ -1745,18 +1752,21 @@ export declare const contextMessageSchema: z.ZodObject<{
         refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
         picked: z.ZodDefault<z.ZodBoolean>;
         files: z.ZodOptional<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">>;
+        documents: z.ZodOptional<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">>;
     }, "strip", z.ZodTypeAny, {
         id: string;
         heading: string;
         refs: string[];
         picked: boolean;
         files?: string[] | undefined;
+        documents?: string[] | undefined;
     }, {
         id: string;
         files?: string[] | undefined;
         heading?: string | undefined;
         refs?: string[] | undefined;
         picked?: boolean | undefined;
+        documents?: string[] | undefined;
     }>, "many">>;
 } & {
     type: z.ZodLiteral<"kehikot.context">;
@@ -1769,8 +1779,16 @@ export declare const contextMessageSchema: z.ZodObject<{
         at: string | null;
         refreshing: boolean;
     };
-    project: string | null;
     projectPath: string | null;
+    parts: {
+        id: string;
+        heading: string;
+        refs: string[];
+        picked: boolean;
+        files?: string[] | undefined;
+        documents?: string[] | undefined;
+    }[];
+    project: string | null;
     theme: "light" | "dark";
     selection: string[];
     passage: {
@@ -1826,13 +1844,6 @@ export declare const contextMessageSchema: z.ZodObject<{
         source: string;
         epic: string | null;
     }[];
-    parts: {
-        id: string;
-        heading: string;
-        refs: string[];
-        picked: boolean;
-        files?: string[] | undefined;
-    }[];
 }, {
     protocol: number;
     type: "kehikot.context";
@@ -1841,8 +1852,16 @@ export declare const contextMessageSchema: z.ZodObject<{
         at?: string | null | undefined;
         refreshing?: boolean | undefined;
     } | undefined;
-    project?: string | null | undefined;
     projectPath?: string | null | undefined;
+    parts?: {
+        id: string;
+        files?: string[] | undefined;
+        heading?: string | undefined;
+        refs?: string[] | undefined;
+        picked?: boolean | undefined;
+        documents?: string[] | undefined;
+    }[] | undefined;
+    project?: string | null | undefined;
     theme?: "light" | "dark" | undefined;
     selection?: string[] | undefined;
     passage?: {
@@ -1897,13 +1916,6 @@ export declare const contextMessageSchema: z.ZodObject<{
         at: string;
         source: string;
         epic?: string | null | undefined;
-    }[] | undefined;
-    parts?: {
-        id: string;
-        files?: string[] | undefined;
-        heading?: string | undefined;
-        refs?: string[] | undefined;
-        picked?: boolean | undefined;
     }[] | undefined;
 }>;
 /**
@@ -2512,18 +2524,21 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
             picked: z.ZodDefault<z.ZodBoolean>;
             files: z.ZodOptional<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">>;
+            documents: z.ZodOptional<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">>;
         }, "strip", z.ZodTypeAny, {
             id: string;
             heading: string;
             refs: string[];
             picked: boolean;
             files?: string[] | undefined;
+            documents?: string[] | undefined;
         }, {
             id: string;
             files?: string[] | undefined;
             heading?: string | undefined;
             refs?: string[] | undefined;
             picked?: boolean | undefined;
+            documents?: string[] | undefined;
         }>, "many">>;
     }, "strip", z.ZodTypeAny, {
         epic: string | null;
@@ -2531,8 +2546,16 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             at: string | null;
             refreshing: boolean;
         };
-        project: string | null;
         projectPath: string | null;
+        parts: {
+            id: string;
+            heading: string;
+            refs: string[];
+            picked: boolean;
+            files?: string[] | undefined;
+            documents?: string[] | undefined;
+        }[];
+        project: string | null;
         theme: "light" | "dark";
         selection: string[];
         passage: {
@@ -2588,21 +2611,22 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             source: string;
             epic: string | null;
         }[];
-        parts: {
-            id: string;
-            heading: string;
-            refs: string[];
-            picked: boolean;
-            files?: string[] | undefined;
-        }[];
     }, {
         epic?: string | null | undefined;
         tracker?: {
             at?: string | null | undefined;
             refreshing?: boolean | undefined;
         } | undefined;
-        project?: string | null | undefined;
         projectPath?: string | null | undefined;
+        parts?: {
+            id: string;
+            files?: string[] | undefined;
+            heading?: string | undefined;
+            refs?: string[] | undefined;
+            picked?: boolean | undefined;
+            documents?: string[] | undefined;
+        }[] | undefined;
+        project?: string | null | undefined;
         theme?: "light" | "dark" | undefined;
         selection?: string[] | undefined;
         passage?: {
@@ -2657,13 +2681,6 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             at: string;
             source: string;
             epic?: string | null | undefined;
-        }[] | undefined;
-        parts?: {
-            id: string;
-            files?: string[] | undefined;
-            heading?: string | undefined;
-            refs?: string[] | undefined;
-            picked?: boolean | undefined;
         }[] | undefined;
     }>;
     /**
@@ -2682,8 +2699,16 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             at: string | null;
             refreshing: boolean;
         };
-        project: string | null;
         projectPath: string | null;
+        parts: {
+            id: string;
+            heading: string;
+            refs: string[];
+            picked: boolean;
+            files?: string[] | undefined;
+            documents?: string[] | undefined;
+        }[];
+        project: string | null;
         theme: "light" | "dark";
         selection: string[];
         passage: {
@@ -2739,13 +2764,6 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             source: string;
             epic: string | null;
         }[];
-        parts: {
-            id: string;
-            heading: string;
-            refs: string[];
-            picked: boolean;
-            files?: string[] | undefined;
-        }[];
     };
 }, {
     protocol: number;
@@ -2757,8 +2775,16 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             at?: string | null | undefined;
             refreshing?: boolean | undefined;
         } | undefined;
-        project?: string | null | undefined;
         projectPath?: string | null | undefined;
+        parts?: {
+            id: string;
+            files?: string[] | undefined;
+            heading?: string | undefined;
+            refs?: string[] | undefined;
+            picked?: boolean | undefined;
+            documents?: string[] | undefined;
+        }[] | undefined;
+        project?: string | null | undefined;
         theme?: "light" | "dark" | undefined;
         selection?: string[] | undefined;
         passage?: {
@@ -2813,13 +2839,6 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             at: string;
             source: string;
             epic?: string | null | undefined;
-        }[] | undefined;
-        parts?: {
-            id: string;
-            files?: string[] | undefined;
-            heading?: string | undefined;
-            refs?: string[] | undefined;
-            picked?: boolean | undefined;
         }[] | undefined;
     };
     state?: string | null | undefined;
@@ -3174,18 +3193,21 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
         picked: z.ZodDefault<z.ZodBoolean>;
         files: z.ZodOptional<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">>;
+        documents: z.ZodOptional<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">>;
     }, "strip", z.ZodTypeAny, {
         id: string;
         heading: string;
         refs: string[];
         picked: boolean;
         files?: string[] | undefined;
+        documents?: string[] | undefined;
     }, {
         id: string;
         files?: string[] | undefined;
         heading?: string | undefined;
         refs?: string[] | undefined;
         picked?: boolean | undefined;
+        documents?: string[] | undefined;
     }>, "many">>;
 } & {
     type: z.ZodLiteral<"kehikot.context">;
@@ -3198,8 +3220,16 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         at: string | null;
         refreshing: boolean;
     };
-    project: string | null;
     projectPath: string | null;
+    parts: {
+        id: string;
+        heading: string;
+        refs: string[];
+        picked: boolean;
+        files?: string[] | undefined;
+        documents?: string[] | undefined;
+    }[];
+    project: string | null;
     theme: "light" | "dark";
     selection: string[];
     passage: {
@@ -3255,13 +3285,6 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         source: string;
         epic: string | null;
     }[];
-    parts: {
-        id: string;
-        heading: string;
-        refs: string[];
-        picked: boolean;
-        files?: string[] | undefined;
-    }[];
 }, {
     protocol: number;
     type: "kehikot.context";
@@ -3270,8 +3293,16 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         at?: string | null | undefined;
         refreshing?: boolean | undefined;
     } | undefined;
-    project?: string | null | undefined;
     projectPath?: string | null | undefined;
+    parts?: {
+        id: string;
+        files?: string[] | undefined;
+        heading?: string | undefined;
+        refs?: string[] | undefined;
+        picked?: boolean | undefined;
+        documents?: string[] | undefined;
+    }[] | undefined;
+    project?: string | null | undefined;
     theme?: "light" | "dark" | undefined;
     selection?: string[] | undefined;
     passage?: {
@@ -3326,13 +3357,6 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         at: string;
         source: string;
         epic?: string | null | undefined;
-    }[] | undefined;
-    parts?: {
-        id: string;
-        files?: string[] | undefined;
-        heading?: string | undefined;
-        refs?: string[] | undefined;
-        picked?: boolean | undefined;
     }[] | undefined;
 }>, z.ZodDiscriminatedUnion<"ok", [z.ZodObject<{
     type: z.ZodLiteral<"kehikot.response">;

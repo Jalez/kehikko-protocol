@@ -1,13 +1,16 @@
 import { z } from 'zod';
 /**
  * An epic's steps and groups as a project keeps them, in the Journeys module's file a host reads.
- * Journeys owns the steps, the groups and the prose; a host owns the slug, the title and existence.
+ * Journeys owns the steps and the prose; a host owns the slug, the title, existence and, from 1.2.0,
+ * the list of the epic's parts (`listedPartSchema` in `parts.ts`), which `groups` used to be read as.
  * Every object is `.passthrough()` and nothing is bounded; shapes only, no I/O.
  * Design notes: docs/parts.md.
  */
 /**
  * The module that keeps the record, and the file it keeps it in:
  * `moduleFile(projectPath, JOURNEYS_MODULE, JOURNEYS_FILE)` is `<project>/.kehikot/journeys/journeys.json`.
+ * @deprecated 1.2.0, as where an epic's PARTS are: a part names no module, and nothing about parts
+ * should spell this id. Kept, and unchanged; a host that reads steps from the record still names it.
  */
 export declare const JOURNEYS_MODULE = "kehikot.journeys";
 export declare const JOURNEYS_FILE = "journeys";
@@ -1142,6 +1145,7 @@ export declare function stepPart(step: unknown): string | null;
 /**
  * One part of an epic, as read off the epic's record: `EpicPart`'s `id`, `heading` and `refs` without
  * `picked`, plus a count of the steps that say they are in the part.
+ * @deprecated 1.2.0, with `partsOf`. A part is a `ListedPart` in the epic's own file.
  */
 export interface JourneyPart {
     id: string;
@@ -1160,11 +1164,14 @@ export interface JourneyPart {
  * The id of each group's part, by position: `ids[i]` is for `groups[i]`, null where the entry is not an
  * object or is past `LIMITS.PARTS`; `[]` for a non-array. A written `id` in `PART_ID`'s class is used,
  * else `slugFrom(heading)`, else `part-<n>` (position from one); duplicates get `-2`, `-3` in order.
+ * @deprecated 1.2.0, with `partsOf`: for adopting a record's `groups` once. A new part's id is `partIdFor`'s.
  */
 export declare function partIdsOf(groups: unknown): (string | null)[];
 /**
  * Every part an epic has, in the record's order; takes anything, never throws, `[]` for a non-record.
  * A step is in a part only because its `part` names it; its refs are folded in after the listed ones.
  * Bounded by `LIMITS.PARTS`, `PART_REFS`, `PART_FILES`, `TITLE`, `REF`; an empty heading becomes the id.
+ * @deprecated 1.2.0. An epic's parts are the list in the epic's own file, and what each holds is read
+ * with `readHoldings`. Kept, and unchanged: it is how a host adopts the list of an epic that has none yet.
  */
 export declare function partsOf(record: unknown): JourneyPart[];
