@@ -1,14 +1,18 @@
 import { BUILD_HEADER, WELL_KNOWN, buildStamp, type Build, type Manifest } from '../index.js'
-import { TICKET_HEADER } from '../page.js'
-import { BODY_TOO_LARGE, readJsonBody, readJsonRequest, type BodySource } from './body.js'
-import { frameAncestors } from './origins.js'
-import { pageDocument, type PageOptions } from './page.js'
+import { ORIGINS_ELEMENT, TICKET_HEADER } from '../page.js'
+import { readJsonBody, readJsonRequest, type BodySource } from './body.js'
+import { ELSEWHERE_REFUSAL, admits, asker, type HeaderSource } from './gate.js'
+import { frameAncestors, frameOrigins } from './origins.js'
+import { fillPage, pageDocument, type PageOptions } from './page.js'
 import { ticketOf } from './ticket.js'
 
 /**
  * Every door a module answers on, served by the process that serves its page: a module is ONE
  * ORIGIN. What stays the module's is `answer`, a pure function from a request to a status and a
  * body. `/app` is claimed here before Vite's resolver sees it. See docs/module-plumbing.md.
+ *
+ * Every door answers its own page and a program on this machine, and refuses a page on another
+ * origin with 403 before `answer` is asked (`gate.ts`); a body has to say it is JSON (`body.ts`).
  */
 
 export interface Reply {
@@ -71,9 +75,10 @@ export interface DoorsOptions {
   ancestors?: readonly string[]
   /**
    * `true` lets a page on any origin read the health check: `/healthz` answers with
-   * `access-control-allow-origin: *` and exposes the build header. For a module framed WITHOUT
-   * `allow-same-origin` (its manifest declares no storage), whose page is on an opaque origin and
-   * could not otherwise `probeServer()`. Off by default: no other door is opened by it.
+   * `access-control-allow-origin: *` and exposes the build header, and a GET of it is answered
+   * wherever it came from. For a module framed WITHOUT `allow-same-origin` (its manifest declares
+   * no storage), whose page is on an opaque origin and could not otherwise `probeServer()`. Off by
+   * default: no other door is opened by it.
    */
   openHealth?: boolean
   /**
@@ -117,13 +122,36 @@ const oursByDefault = (path: string) => path === '/healthz' || path === '/mcp' |
 /** What both forms of the doors work out once, from the options. */
 function standing(options: DoorsOptions) {
   const build = options.build
+  const pages = new Set([...PAGE_PATHS, ...(options.pages ?? [])])
+  const ours = options.ours ?? oursByDefault
+  const open = options.openHealth === true
+  /* Read per request, like `frame-ancestors`: the page is told the same list its header carries. */
+  const origins = () => frameOrigins(process.env, options.ancestors)
+  const page = options.page
   return {
-    pages: new Set([...PAGE_PATHS, ...(options.pages ?? [])]),
-    ours: options.ours ?? oursByDefault,
+    pages,
+    ours,
     build,
     manifest: build ? { ...options.manifest, build } : options.manifest,
     stamp: build ? buildStamp(build) : null,
-    document: typeof options.page === 'function' ? options.page : () => pageDocument({ build, ...(options.page as PageOptions) }),
+    /* A module's own document is told who may frame it too, unless it already says. */
+    document:
+      typeof page === 'function'
+        ? () => {
+            const built = page()
+            return built.includes(`<script id="${ORIGINS_ELEMENT}"`) ? built : fillPage(built, { origins: origins() })
+          }
+        : () => pageDocument({ build, origins: origins(), ...page }),
+    /**
+     * The refusal for a request this server's doors do not answer, or `null`. Asked of every path
+     * that is the doors' own, before anything is read or routed; what is left to Vite is not asked.
+     */
+    refusal: (method: string, path: string, headers: HeaderSource, host: string | null): Reply | null => {
+      const document = pages.has(path)
+      if (!document && path !== WELL_KNOWN && !ours(path)) return null
+      if (open && path === '/healthz' && (method === 'GET' || method === 'HEAD')) return null
+      return admits(asker(headers, host), document) ? null : { status: 403, body: { ok: false, error: ELSEWHERE_REFUSAL } }
+    },
     /* Worked out per request: who may frame the page is read from the environment as it is then. */
     pageHeaders: (): Record<string, string> => ({
       'content-type': 'text/html; charset=utf-8',
@@ -131,7 +159,7 @@ function standing(options: DoorsOptions) {
       'cache-control': 'no-store',
       'content-security-policy': frameAncestors(process.env, options.ancestors),
     }),
-    open: options.openHealth === true,
+    open,
   }
 }
 
@@ -185,7 +213,7 @@ export function doorsHandler(
   options: DoorsOptions,
   transform?: (html: string, url: string, originalUrl?: string) => Promise<string>,
 ): DoorHandler {
-  const { pages, ours, build, manifest, stamp, document, pageHeaders, open } = standing(options)
+  const { pages, ours, build, manifest, stamp, document, pageHeaders, refusal, open } = standing(options)
 
   return (request, response, next) => {
     const url = new URL(request.url ?? '/', 'http://127.0.0.1')
@@ -199,6 +227,9 @@ export function doorsHandler(
       if (payload === null) response.end()
       else response.end(payload)
     }
+
+    const refused = refusal(method, path, request.headers, null)
+    if (refused) return send(refused)
 
     if (path === WELL_KNOWN) return send({ status: 200, body: manifest })
 
@@ -263,7 +294,7 @@ export function doorsHandler(
     void readJsonBody(request, { maxBytes: options.maxBodyBytes })
       .then(async (read) => {
         if (!read.ok) {
-          return send({ status: read.status, body: { ok: false, error: BODY_TOO_LARGE }, headers: { connection: 'close' } })
+          return send({ status: read.status, body: { ok: false, error: read.error }, headers: { connection: 'close' } })
         }
         const reply = await options.answer(method, path, url.searchParams, read.body, ticket)
         if (!reply) return next()
@@ -283,7 +314,7 @@ export type DoorFetch = (request: Request) => Promise<Response | null>
  * in `doorsHandler`; a page built ahead of time is `page: () => fillPage(built, { ticket, build })`.
  */
 export function doorsFetch(options: DoorsOptions, transform?: (html: string, url: string) => Promise<string>): DoorFetch {
-  const { pages, ours, build, manifest, stamp, document, pageHeaders, open } = standing(options)
+  const { pages, ours, build, manifest, stamp, document, pageHeaders, refusal, open } = standing(options)
 
   const send = (reply: Reply): Response => {
     const { headers, payload } = wire(reply, stamp)
@@ -294,6 +325,9 @@ export function doorsFetch(options: DoorsOptions, transform?: (html: string, url
     const url = new URL(request.url)
     const path = url.pathname
     const method = request.method.toUpperCase()
+
+    const refused = refusal(method, path, request.headers, url.host)
+    if (refused) return send(refused)
 
     if (path === WELL_KNOWN) return send({ status: 200, body: manifest })
 
@@ -348,7 +382,7 @@ export function doorsFetch(options: DoorsOptions, transform?: (html: string, url
     }
 
     const read = await readJsonRequest(request, { maxBytes: options.maxBodyBytes })
-    if (!read.ok) return send({ status: read.status, body: { ok: false, error: BODY_TOO_LARGE }, headers: { connection: 'close' } })
+    if (!read.ok) return send({ status: read.status, body: { ok: false, error: read.error }, headers: { connection: 'close' } })
     const reply = await options.answer(method, path, url.searchParams, read.body, ticket)
     return reply ? send(healthy(reply, path, build, open)) : null
   }

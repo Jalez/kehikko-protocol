@@ -4,7 +4,8 @@ import { registerAt } from './registry.js'
 /**
  * Options for `serves`, a module's whole port story as one line in its `vite.config.ts`:
  * `plugins: [serves({ id: ID, prefer: 7960 }), …]`. It claims a port before Vite starts and registers
- * the port actually bound once listening. Dev server only (`apply: 'serve'`); `strictPort` is off.
+ * the port actually bound once listening. Dev server only (`apply: 'serve'`); `strictPort` is off,
+ * and so is `server.cors` unless the module's own config says otherwise.
  */
 export interface ServesOptions {
   /** The module's own id. The same constant its manifest is built from. */
@@ -36,7 +37,7 @@ export interface DevServerLike {
 export interface ServesPlugin {
   name: string
   apply: 'serve'
-  config(): Promise<{ server: { host: string; port: number; strictPort: false } }>
+  config(config?: { server?: { cors?: unknown } }): Promise<{ server: { host: string; port: number; strictPort: false; cors?: false } }>
   configureServer(server: DevServerLike): void
 }
 
@@ -56,7 +57,7 @@ export function serves({ id, prefer, dir, span, timeoutMs }: ServesOptions): Ser
     name: 'kehikot-module-serves',
     apply: 'serve',
 
-    async config() {
+    async config(config) {
       claimed = await claim({ id, prefer: preferred(prefer), span, timeoutMs })
 
       if (claimed.status === 'already-running') {
@@ -74,7 +75,10 @@ export function serves({ id, prefer, dir, span, timeoutMs }: ServesOptions): Ser
       /* Loud, on stdout, naming both numbers — the port that was wanted and the one taken. */
       if (claimed.moved) console.log(sayClaim(claimed))
 
-      return { server: { host: '127.0.0.1', port: claimed.port, strictPort: false } }
+      /* No cross-origin sharing unless the module wrote `server.cors` itself: a module's page asks
+         its own origin, and Vite's own default answers other origins on this machine. */
+      const said = config?.server?.cors !== undefined
+      return { server: { host: '127.0.0.1', port: claimed.port, strictPort: false, ...(said ? {} : { cors: false as const }) } }
     },
 
     configureServer(server: DevServerLike) {

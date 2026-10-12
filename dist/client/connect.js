@@ -1,8 +1,54 @@
 import { pageBuild } from './build.js';
 import { MESSAGE, PROTOCOL, clampHeight, } from '../constants.js';
 import { LIMITS } from '../limits.js';
+import { ORIGINS_ELEMENT, originAmong } from '../page.js';
 import { headerItemsSchema, hostMessageSchema, looksLikeWireMessage, pressRefusal, } from '../wire.js';
 import { mailbox } from './mailbox.js';
+/**
+ * The bridge: one conversation with one window, in the shape this package's schemas define.
+ * A greeting is taken from an origin the page may be framed by (`mayGreet`); after it, identity is
+ * the greeting's window handle (`MessageEvent.source`), never the origin. Everything the host sends
+ * is parsed with `hostMessageSchema`. A convenience — a module may hand-roll it all.
+ * Design notes: docs/client.md.
+ */
+/**
+ * The origins this page was told it may be framed by: the island its server printed
+ * (`ORIGINS_ELEMENT`, the list sent as `frame-ancestors`), or `null` for a document that carries
+ * none — one this package's doors did not serve. Read on every greeting; it is one element.
+ */
+export function pageOrigins() {
+    if (typeof document === 'undefined')
+        return null;
+    const text = document.getElementById(ORIGINS_ELEMENT)?.textContent;
+    if (!text)
+        return null;
+    try {
+        const parsed = JSON.parse(text);
+        return Array.isArray(parsed) ? parsed.filter((one) => typeof one === 'string') : null;
+    }
+    catch {
+        return null;
+    }
+}
+/**
+ * Whether a greeting may be answered: whether the window that sent it is one this page may be
+ * framed by. `origins` is who that is; `null` is a page that was never told, which answers as it
+ * always has. Otherwise a greeting counts from an origin on the list, from the page's own origin,
+ * from the page's own window, and with no origin on it at all — an event the page's own script
+ * made, since a message from another window always carries one. Pure.
+ */
+export function mayGreet(greeting, origins, self = {}) {
+    if (origins === null)
+        return true;
+    const from = greeting.origin ?? '';
+    if (from === '')
+        return true;
+    if (self.window != null && greeting.source === self.window)
+        return true;
+    if (from !== 'null' && from === self.origin)
+        return true;
+    return originAmong(from, origins);
+}
 /** A refusal, as a thrown thing. Every rejection from `request` is one of these, always. */
 export class HostRefused extends Error {
     refusal;
@@ -60,6 +106,8 @@ export function connect(id, events = {}, options = {}) {
     const waiting = new Map();
     let counter = 0;
     const nextId = () => `${Date.now().toString(36)}-${(counter += 1).toString(36)}`;
+    /** This page's own window and origin, where there is a page. */
+    const here = () => typeof window === 'undefined' ? {} : { window, origin: typeof location === 'undefined' ? null : location.origin };
     const send = (message) => {
         if (!host)
             return;
@@ -87,6 +135,9 @@ export function connect(id, events = {}, options = {}) {
             return;
         const message = parsed.data;
         if (message.type === MESSAGE.HELLO) {
+            /* Before anything is answered: a window this page may not be framed by is not its host. */
+            if (!mayGreet(ev, options.origins ?? pageOrigins(), here()))
+                return;
             /* Answered on EVERY greeting, not only the first: the newest greeting wins, its window
                becomes the one we answer, and `ready` goes back every time. */
             host = ev.source ?? source.parent ?? null;

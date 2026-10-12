@@ -1,5 +1,5 @@
 import { BUILD_ELEMENT } from '../build.js';
-import { PAGE_BACKGROUND, ROOT_ELEMENT, THEME_KEY, THEME_PARAM, TICKET_ELEMENT } from '../page.js';
+import { ORIGINS_ELEMENT, PAGE_BACKGROUND, ROOT_ELEMENT, THEME_KEY, THEME_PARAM, TICKET_ELEMENT } from '../page.js';
 const escapeHtml = (text) => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 /** JSON that cannot close the script element it is printed into. */
 const island = (value) => JSON.stringify(value).replace(/</g, '\\u003c');
@@ -23,15 +23,17 @@ export function themeScript() {
 }
 const islandOf = (id, value) => `<script id="${id}" type="application/json">${island(value)}</script>`;
 /**
- * Put this process's ticket and build into a page that was built ahead of it (`vite build` over a
- * `pageDocument` written without either): each island is replaced where the built page has one and
- * added before `</body>` where it has none. No placeholder to agree on, and the escaping is here.
+ * Put this process's ticket and build, and the origins that may frame it, into a page that was
+ * built ahead of it (`vite build` over a `pageDocument` written without them): each island is
+ * replaced where the built page has one and added before `</body>` where it has none. No
+ * placeholder to agree on, and the escaping is here.
  */
 export function fillPage(html, filled) {
     let page = html;
     for (const [id, value] of [
         [TICKET_ELEMENT, typeof filled.ticket === 'string' ? filled.ticket : null],
         [BUILD_ELEMENT, filled.build ?? null],
+        [ORIGINS_ELEMENT, filled.origins ?? null],
     ]) {
         if (value === null)
             continue;
@@ -55,6 +57,7 @@ export function pageDocument(options) {
     const build = options.build
         ? `${islandOf(BUILD_ELEMENT, options.build)}\n`
         : '';
+    const origins = options.origins ? `${islandOf(ORIGINS_ELEMENT, options.origins)}\n` : '';
     return `<!doctype html>
 <html lang="${escapeHtml(options.lang ?? 'en')}">
 <head>
@@ -66,7 +69,7 @@ export function pageDocument(options) {
 ${options.head ? `${options.head}\n` : ''}</head>
 <body>
 <div id="${ROOT_ELEMENT}"></div>
-${ticket}${build}<script type="module" src="${escapeHtml(options.entry ?? '/src/main.tsx')}"></script>
+${ticket}${build}${origins}<script type="module" src="${escapeHtml(options.entry ?? '/src/main.tsx')}"></script>
 </body>
 </html>
 `;

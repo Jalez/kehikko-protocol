@@ -163,6 +163,7 @@ The same list with what each version exported is in [CHANGELOG.md](CHANGELOG.md)
 
 | version | date | what it added |
 |---|---|---|
+| 1.1.1 | 2026-10-12 | What a door requires of a request: it answers its own page and a program on this computer (`asker`, `admits`), a body has to be `application/json`, `serves()` sets `server.cors: false`, and a page answers a greeting only from an origin it may be framed by (`mayGreet`, the `origins` island). See [module plumbing](docs/module-plumbing.md). |
 | 1.1.0 | 2026-10-12 | Additive. The header: `kehikot.header`, `kehikot.press`, `kehikot.pressed`, `useHost().header()`, `onPress`. A module's door: the manifest's `mcp.subjects`, the show and done answers, `doorContext` (`project`, `epic`), `toolEffect`, `kehikot-check-door`, `readNeighbour` / `listTools` in `/serve`. `view.fold` and `containers[].folded`. See [asking](docs/asking.md) and [the header](docs/header.md). |
 | 1.0.0 | 2026-10-10 | The breaking release: removes everything 0.37.0 deprecated (the `roadmap` dialect, `LEGACY_*`, `useKehikot`/`useRoadmap`, the `ROADMAP_*` variables), makes the parts declaration a refusal, renames the bins to `kehikot-*`. See [MIGRATING.md](MIGRATING.md). |
 | 0.37.0 | 2026-10-10 | Deprecations only, nothing removed: everything named after "roadmap" (the second dialect, `LEGACY_*`, `legacyManifest`, `toDialect`, `useRoadmap`, `ROADMAP_*`), the old `useKehikot`, and the `kehikko-*` bin names (now also `kehikot-*`). See [CHANGELOG.md](CHANGELOG.md). |

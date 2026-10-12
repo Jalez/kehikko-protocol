@@ -337,8 +337,10 @@ export {
   ROOT_ELEMENT,
   THEME_KEY,
   THEME_PARAM,
+  ORIGINS_ELEMENT,
   TICKET_ELEMENT,
   TICKET_HEADER,
+  originAmong,
   TICKET_REFUSED,
   type PageTheme,
 } from './page.js'

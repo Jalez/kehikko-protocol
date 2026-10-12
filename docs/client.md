@@ -319,6 +319,34 @@ all: they go to that module's own `/api` over an ordinary same-origin fetch.
 Where `ev.origin` is a real origin we use it, because then it is a fact rather
 than a guess.
 
+##### And the greeting itself, from where the page may be framed (*1.1.1*)
+
+The window handle says who the conversation is with once it has started. It
+does not say who may start one, and the first greeting used to be taken from
+any window that could reach the page. The page's server already knows who may
+frame it — the list it sends as `frame-ancestors` (`frameOrigins()`) — so
+`doors()` prints that list into the document (`<script id="origins">`,
+`ORIGINS_ELEMENT`), and a greeting is answered only when `mayGreet` says so:
+
+- its `ev.origin` is on that list (written as `frame-ancestors` takes them:
+  `originAmong` reads `:*` for any port and `*.` for any name under one), or
+- it is the page's own origin, or the page's own window — a harness that
+  greets the page it is in, and a module's other page on the same origin — or
+- it carries no origin at all, which only an event made by the page's own
+  script does: a message from another window always has one, `"null"` at the
+  least.
+
+A greeting from anywhere else is dropped like a message that does not parse:
+nothing is answered, and nothing it would have started is. This is the one
+place the origin is asked, and it is asked of the host's origin, not the
+module's — a module framed on an opaque origin still reads a real
+`ev.origin` from its host.
+
+A document with no island was not served by these doors and was never told;
+it answers as it always has. Such a page — a module with a server of its own —
+passes the list itself: `fillPage(html, { origins: frameOrigins() })` on the
+server, or `connect(id, events, { origins })` in the page.
+
 ##### Parse what the host sends, too
 
 A framed page receives every message posted at its window: the host's, a dev
