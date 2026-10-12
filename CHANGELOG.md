@@ -11,7 +11,7 @@ label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING
 
 Parts belong to the epic and name no module. **Additive: nothing a 1.1.0 or 1.0.0 call does has
 changed**, and `PROTOCOL` is still 2. Every consumer's own tests and typecheck were run against
-1.1.0 and against this build. Design, the contract and a worked module:
+1.1.1 and against this build. Design, the contract and a worked module:
 [docs/parts.md](docs/parts.md). Before → after for the deprecations: [MIGRATING.md](MIGRATING.md).
 
 A host does two things in the change that moves it here: list `parts.set` beside the methods it
