@@ -476,6 +476,12 @@ project's decks: more than the twelve a filter group gets, because a filter
 is a choice a person scans and a go item is a list a person knows. The label
 is the filter label's forty-eight. See [the header](header.md).
 
+#### `LIMITS.DOOR_NAME`
+
+Forty: the name a module asks its MCP door to be registered under
+(`mcp.as`, 1.3.0). It is prefixed to every tool the door has, and a module's
+display name is forty too. See [the manifest](manifest.md).
+
 #### `LIMITS.SUBJECTS`, `LIMITS.TOOL`, `LIMITS.SUBJECT_ID`, `LIMITS.DONE_ITEMS`
 
 A module has a handful of kinds of thing, not dozens: eight. A tool name is

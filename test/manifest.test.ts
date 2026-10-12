@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { LIMITS, MODULE_ID, REACTION_NAMES, REACTS_TO, TAG_NAMES, manifestSchema, own, speaks } from '../src/index.js'
+import { DOOR_NAME, LIMITS, MODULE_ID, REACTION_NAMES, REACTS_TO, TAG_NAMES, manifestSchema, own, speaks } from '../src/index.js'
 
 /**
  * What is tested here is what would actually break somebody.
@@ -49,6 +49,50 @@ describe('a manifest at its smallest', () => {
     expect(manifestSchema.safeParse({ ...minimal, modes: [] }).success).toBe(false)
     const nine = Array.from({ length: 9 }, (_, i) => ({ id: `m${i}`, label: 'x' }))
     expect(manifestSchema.safeParse({ ...minimal, modes: nine }).success).toBe(false)
+  })
+})
+
+describe('the name a door asks to be registered under', () => {
+  const withAs = (as: unknown) => manifestSchema.safeParse({ ...minimal, mcp: { url: '/mcp', as } })
+
+  test('is absent unless the module says it, and carried as written when it does', () => {
+    const silent = manifestSchema.parse({ ...minimal, mcp: { url: '/mcp' } })
+    expect(silent.mcp?.as).toBeUndefined()
+    expect('as' in silent.mcp!).toBe(false)
+    expect(manifestSchema.parse({ ...minimal, mcp: { url: '/mcp', as: 'kehikko-claude' } }).mcp?.as).toBe('kehikko-claude')
+  })
+
+  test.each(['a', 'claude', 'kehikko-claude', 'kehikko_claude', 'a1-b2_c3', 'a'.repeat(LIMITS.DOOR_NAME)])('%s is a name', (name) => {
+    expect(withAs(name).success).toBe(true)
+    expect(DOOR_NAME.test(name)).toBe(true)
+  })
+
+  /* It becomes part of `mcp__<server>__<tool>` and an argument to a command: nothing that could be
+     read as a flag, split an argument, or be mistaken for the separator. */
+  test.each([
+    ['empty', ''],
+    ['a flag', '-s'],
+    ['a long flag', '--scope'],
+    ['a leading digit', '1claude'],
+    ['a leading underscore', '_claude'],
+    ['a capital', 'Claude'],
+    ['a space', 'kehikko claude'],
+    ['a tab', 'kehikko\tclaude'],
+    ['a trailing newline', 'claude\n'],
+    ['a quote', 'cl"aude'],
+    ['a single quote', "cl'aude"],
+    ['a dot', 'kehikot.claude'],
+    ['a slash', 'a/b'],
+    ['a dollar', 'a$b'],
+    ['a semicolon', 'a;b'],
+    ['the separator', 'a__b'],
+    ['a trailing underscore', 'claude_'],
+    ['a letter outside ASCII', 'ääni'],
+    ['one character too many', 'a'.repeat(LIMITS.DOOR_NAME + 1)],
+    ['a number', 7],
+    ['null', null],
+  ])('%s is refused', (_what, name) => {
+    expect(withAs(name).success).toBe(false)
   })
 })
 

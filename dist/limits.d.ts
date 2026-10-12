@@ -222,6 +222,8 @@ export declare const LIMITS: {
     readonly HEADER_RESULT: 32;
     /** How many kinds of subject one module may declare. */
     readonly SUBJECTS: 8;
+    /** The name a module asks its MCP door to be registered under: `mcp.as`. */
+    readonly DOOR_NAME: 40;
     /** The name of a tool at a module's MCP door. MCP's own bound. */
     readonly TOOL: 64;
     /** The id of one thing a "is this done?" answer is about: a question, a checklist item. */
