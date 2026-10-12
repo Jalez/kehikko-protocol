@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, test } from 'bun:test'
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
+import { existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
+import { spawnSync } from 'node:child_process'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
@@ -148,6 +149,67 @@ describe('writeHoldings: one module, one epic', () => {
     expect(held.refs).toHaveLength(LIMITS.PART_REFS)
     expect(held.documents[0]).toBe('d/0.tex')
   })
+
+  test('`.kehikot` itself a link out of the project: refused before anything is made through it', () => {
+    const root = project()
+    const elsewhere = project()
+    symlinkSync(elsewhere, join(root, '.kehikot'))
+    expect(() => writeHoldings(root, 'kehikot.chapters', 'thesis', { methods: { documents: ['m.tex'] } })).toThrow('resolves outside')
+    expect(readdirSync(elsewhere)).toEqual([])
+  })
+
+  test('a parts.json that is a link is never read through: nothing outside the folder is copied into it', () => {
+    const root = project()
+    const elsewhere = project()
+    writeFileSync(join(elsewhere, 'private.json'), JSON.stringify({ secret: 'not this project’s' }))
+    mkdirSync(join(root, '.kehikot', 'chapters'), { recursive: true })
+    symlinkSync(join(elsewhere, 'private.json'), fileOf(root, 'chapters'))
+    writeHoldings(root, 'kehikot.chapters', 'thesis', { methods: { documents: ['m.tex'] } })
+    expect(read(root, 'chapters')).toEqual({ version: 1, epics: { thesis: { methods: { documents: ['m.tex'], refs: [] } } } })
+    expect(lstatSync(fileOf(root, 'chapters')).isSymbolicLink()).toBe(false)
+    /* The link is what was set aside; the file it pointed at is as it was. */
+    expect(lstatSync(`${fileOf(root, 'chapters')}.unreadable`).isSymbolicLink()).toBe(true)
+    expect(JSON.parse(readFileSync(join(elsewhere, 'private.json'), 'utf8'))).toEqual({ secret: 'not this project’s' })
+  })
+
+  test('at most one unreadable file is ever kept, and a pipe of the name is set aside, not waited on', () => {
+    const root = project()
+    put(root, 'chapters', 'first junk')
+    writeHoldings(root, 'kehikot.chapters', 'thesis', { methods: { refs: ['gh#1'] } })
+    rmSync(fileOf(root, 'chapters'))
+    expect(spawnSync('mkfifo', [fileOf(root, 'chapters')]).status).toBe(0)
+    writeHoldings(root, 'kehikot.chapters', 'thesis', { methods: { refs: ['gh#2'] } })
+    expect(read(root, 'chapters').epics.thesis.methods.refs).toEqual(['gh#2'])
+    expect(readdirSync(join(root, '.kehikot', 'chapters')).sort()).toEqual(['parts.json', 'parts.json.unreadable'])
+  })
+
+  test('a document of ANOTHER project is dropped, though it has `/.kehikot/` in it; this project’s is read through a link', () => {
+    const root = project()
+    const other = project()
+    mkdirSync(join(other, '.kehikot', 'chapters'), { recursive: true })
+    writeFileSync(join(other, '.kehikot', 'chapters', 'm.tex'), '')
+    mkdirSync(join(root, '.kehikot', 'chapters'), { recursive: true })
+    writeFileSync(join(root, '.kehikot', 'chapters', 'm.tex'), '')
+    const alias = join(project(), 'alias')
+    symlinkSync(root, alias)
+    const theirs = join(other, '.kehikot', 'chapters', 'm.tex')
+    const said = writeHoldings(root, 'kehikot.chapters', 'thesis', {
+      methods: { documents: [theirs, join(alias, '.kehikot', 'chapters', 'm.tex')] },
+    })
+    expect(said?.dropped).toEqual([theirs])
+    expect(read(root, 'chapters').epics.thesis.methods.documents).toEqual(['.kehikot/chapters/m.tex'])
+  })
+
+  test('a stale temporary file of the same name, even a link, is not written through', () => {
+    const root = project()
+    const elsewhere = project()
+    writeFileSync(join(elsewhere, 'target'), 'as it was')
+    mkdirSync(join(root, '.kehikot', 'chapters'), { recursive: true })
+    symlinkSync(join(elsewhere, 'target'), `${fileOf(root, 'chapters')}.${process.pid}.tmp`)
+    writeHoldings(root, 'kehikot.chapters', 'thesis', { methods: { refs: ['gh#1'] } })
+    expect(readFileSync(join(elsewhere, 'target'), 'utf8')).toBe('as it was')
+    expect(readdirSync(join(root, '.kehikot', 'chapters'))).toEqual(['parts.json'])
+  })
 })
 
 describe('readHoldings: every module folder, and no module by name', () => {
@@ -244,5 +306,14 @@ describe('readHoldings: every module folder, and no module by name', () => {
     const held = own(own(readHoldings(root), 'thesis') ?? {}, 'methods')!
     const parts = partsSchema.parse([{ id: 'methods', heading: 'Methods', refs: held.refs, documents: held.documents }])
     expect(parts[0]).toEqual({ id: 'methods', heading: 'Methods', picked: false, refs: ['gh#1'], documents: ['.kehikot/chapters/thesis/3.tex'] })
+  })
+
+  test('only a regular file is opened: a pipe called parts.json is skipped, not waited on', () => {
+    const root = project()
+    put(root, 'alpha', { epics: { thesis: { methods: { refs: ['gh#1'] } } } })
+    mkdirSync(join(root, '.kehikot', 'pipe'), { recursive: true })
+    expect(spawnSync('mkfifo', [fileOf(root, 'pipe')]).status).toBe(0)
+    mkdirSync(join(root, '.kehikot', 'folder', 'parts.json'), { recursive: true })
+    expect(readHoldings(root)).toEqual({ thesis: { methods: { documents: [], refs: ['gh#1'] } } })
   })
 })

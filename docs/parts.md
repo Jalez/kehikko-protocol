@@ -192,18 +192,18 @@ own(own(holdings, epic) ?? {}, part.id)           // read with own(): an id may 
 **`writeHoldings(projectPath, moduleId, epic, holdings)`**
 
 - Replaces what this module's file says for **that epic**, whole. Every other epic, and every key it does not know, stays exactly as it was. `{}` takes the epic out.
-- A document may be given absolute or project-relative; it is stored project-relative (`documentOf`). One that is not under the project, and a ref that is not one, are not written and come back in `dropped`.
+- A document may be given absolute or project-relative; it is stored project-relative. An absolute one has to be under THIS project, as given or as the disk resolves it (a symlinked spelling of the project is read; another project's `/.kehikot/…` of the same relative name is not: stricter than `documentOf`, which has no disk to ask). One that is not under the project, and a ref that is not one, are not written and come back in `dropped`.
 - Once each; the first `LIMITS.PART_DOCUMENTS` (64) documents and `LIMITS.PART_REFS` (256) refs of a part are kept.
 - Atomic: a temporary file beside it, renamed. Synchronous from the read to the rename, so no other write of the same process can fall between. Writes nothing when the file already says exactly this (`changed: false`).
-- A file that is there and cannot be read as JSON is kept beside the new one as `parts.json.unreadable`, not written over.
-- `null` when there is no project. Throws for a module id, an epic slug or a part id that is not one, and for a module folder that resolves outside the project.
+- Whatever is there under the name and cannot be read as a JSON object (junk, a link, a pipe, a folder, a file without permission) is kept beside the new one as `parts.json.unreadable`, not written over and not read through. One name, so at most one is kept: the latest.
+- `null` when there is no project. Throws for a module id, an epic slug or a part id that is not one, and for a `.kehikot` or a module folder that resolves outside the project, before anything is made through it.
 - It writes under `<project>/.kehikot/<module>/` (`moduleFile`) and nowhere else.
 
 **`readHoldings(projectPath)`**
 
 - Asks every folder directly under `.kehikot/` for a `parts.json`, in name order, and unions what they say per epic and part, once each, under the same bounds. It names no module: a new module's file is read the day it is written.
 - Never throws and never writes. `{}` for no project, a relative path, no folder.
-- Junk costs the entry it is in: a file that is not JSON, an epic key that is not a slug, a part key that is not an id, a document that is absolute or has `..` in it. A file over `LIMITS.HOLDINGS_BYTES` (4 MB), and a folder or file that resolves outside the project, are skipped whole. At most `LIMITS.HOLDINGS_MODULES` folders and `LIMITS.HOLDINGS_EPICS` epics a file.
+- Junk costs the entry it is in: a file that is not JSON, an epic key that is not a slug, a part key that is not an id, a document that is absolute or has `..` in it. A file over `LIMITS.HOLDINGS_BYTES` (4 MB), a `parts.json` that is not a regular file, and a folder or file that resolves outside the project, are skipped whole. At most `LIMITS.HOLDINGS_MODULES` folders and `LIMITS.HOLDINGS_EPICS` epics a file.
 - A holding under a part id the epic's list does not have is read and is nobody's: the host unions holdings into the parts the list has.
 
 `parts.json` is a publication, not a store. A module can rebuild it from its own data at any time, and should on start.
@@ -218,7 +218,7 @@ A module does not hold that spelling; it holds an absolute path (`passage.path`)
 
 - A relative path is taken as project-relative already.
 - An absolute path under `projectPath` (`context.projectPath`) is what follows it.
-- An absolute path that is not under it is read from the **last `/.kehikot/`** in it. A module publishes a path it resolved, a host sends the project as it was typed, and under a symlink the two share no prefix; the app's folder is spelled the same in every project.
+- An absolute path that is not under it is read from the **last `/.kehikot/`** in it. A module publishes a path it resolved, a host sends the project as it was typed, and under a symlink the two share no prefix; the app's folder is spelled the same in every project. The cost, accepted: another project's file with the same name under `.kehikot/` reads as this one's. It decides only what is drawn under a pick, and a module holds items for the open project; `writeHoldings`, which writes the name down, does not take it.
 - An absolute path that is neither is no document: outside every pick.
 
 So pass the project. `useFocus(context)` takes it from the context; a page that hands `useFocus` only `{ parts, epic }` still narrows correctly for every document under `.kehikot/`, and needs `projectPath` for a file of the repository. Do not strip a prefix or match a suffix yourself.
