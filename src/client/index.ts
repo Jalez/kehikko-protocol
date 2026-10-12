@@ -9,6 +9,8 @@ export { mailbox, makeMailbox, KEEP, type MessageSource } from './mailbox.js'
 
 export {
   connect,
+  mayGreet,
+  pageOrigins,
   HostRefused,
   ANSWER_WITHIN_MS,
   PERSON_ANSWERS_WITHIN_MS,

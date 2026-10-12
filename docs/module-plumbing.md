@@ -7,6 +7,7 @@ Added in 0.35.0; 0.36.0 closed the gaps fourteen modules found adopting it (each
 | `pageDocument`, `themeScript`, `fillPage` | `/serve` | `page/document.ts`: `PAGE_SHELL`, `page(ticket)`; the placeholders of a page built ahead of its server |
 | `mintTicket`, `sameTicket`, `ticketOf`, `refuseTicket`; `TICKET_HEADER` | `/serve`, front door | `TICKET = crypto.randomUUID()`, `ticket !== TICKET`, the header's name |
 | `readJsonBody` | `/serve` | `body(request)` in `vite.config.ts` |
+| `asker`, `admits`, `saysJson` (*1.1.1*) | `/serve` | nothing: what a door requires of a request, for a module that serves one outside `doors()` |
 | `doors`, `doorsHandler`, `doorsFetch` | `/serve` | the `doors()` plugin in `vite.config.ts` (about 75 lines, plus SSE where a module had it); the `fetch` handler of a `Bun.serve` server |
 | `establishBuild`, `commitOf`; `buildSchema`, `compareBuilds`, … | `/serve`, front door | nothing: new |
 | `ticket`, `ask`, `answered`, `replied`, `probeServer`, `follow`, `pageBuild`, `applyTheme` | `/client` | `src/store/ask.ts` or `src/wire/api.ts`: the ticket reader, the `fetch` wrappers, `EventSource` |
@@ -71,7 +72,7 @@ page: () => fillPage(readFileSync(INDEX, 'utf8'), { ticket: TICKET, build: BUILD
 
 `fillPage` replaces each island where the built page has one and adds it before `</body>` where it has none, with the same escaping `pageDocument` uses. There is no placeholder for the two sides to agree on.
 
-Options: `title`, `ticket` (omit for a page that never writes), `build`, `entry` (default `/src/main.tsx`), `lang`, `background` (the two colours, when the module's palette is not the scaffold's; anything that is not plainly a colour is ignored), `head` (extra markup, trusted).
+Options: `title`, `ticket` (omit for a page that never writes), `build`, `origins` (who may frame the page; `doors()` fills it in, *1.1.1*), `entry` (default `/src/main.tsx`), `lang`, `background` (the two colours, when the module's palette is not the scaffold's; anything that is not plainly a colour is ignored), `head` (extra markup, trusted).
 
 ## The ticket (`serve/ticket.ts`)
 
@@ -89,6 +90,7 @@ The fourteen copies agreed on the bound (a megabyte; paper 6 MB, notifications 2
 - Not JSON, or JSON that is not an object (an array, a string): `null`, as in every copy. The door words the refusal itself, which matters for `/mcp`, whose refusals are JSON-RPC.
 - Too large: **413** `{ ok: false, error }` from `doors()`, and `answer` is never called. Every copy but terminal's returned `null` here, so an oversized write was called "not a request". Nothing past the bound is kept, and the rest of the request is discarded unread rather than the socket being destroyed, so the refusal can actually be delivered.
 - The bound is `maxBodyBytes` on `doors()`.
+- A body has to say it is JSON (*1.1.1*): one that arrives with any other `content-type`, or with none, is refused with **415** `{ ok: false, error }` (`BODY_NOT_JSON`) and `answer` is never called. `application/json` with parameters (`; charset=utf-8`) is JSON. A request with no body — a DELETE, a POST that only names something in its address — needs no content type. `ask()` and `listTools()` have always sent `application/json`; a hand-written `fetch` or `curl` has to as well (`curl --json '{…}'`, or `-H 'content-type: application/json'`). `saysJson(type)` is the test, for a module that reads a body itself.
 
 ## The doors (`serve/doors.ts`)
 
@@ -105,6 +107,27 @@ The fourteen copies agreed on the bound (a megabyte; paper 6 MB, notifications 2
 
 Everything that is not theirs goes to `next()` with the request unread, which Vite needs.
 
+### What a door requires of a request (*1.1.1*)
+
+A door answers a request that came from the module's own page, or from a program on this computer, and no other. It is decided before anything is read or routed, for every path that is the doors' own (the manifest, the page, and whatever `ours` says), from two headers a browser writes and a page cannot: `Origin`, and `Sec-Fetch-Site` where there is no `Origin`. `asker(headers)` reads them and `admits(who, document?)` decides:
+
+| the request | read as | a door | the page (`/app`, `pages`) |
+|---|---|---|---|
+| an `Origin` that is the address the request was sent to (its `Host`) | `page` | answers | answers |
+| no `Origin`, `Sec-Fetch-Site: same-origin` (the page's own GET, an `EventSource`, an image) | `page` | answers | answers |
+| no `Origin`, no `Sec-Fetch-Site` (`curl`, a host's server, an agent's MCP client, node, bun) | `program` | answers | answers |
+| no `Origin`, `Sec-Fetch-Site: none` (an address typed, or opened from another program) | `person` | answers | answers |
+| no `Origin`, `Sec-Fetch-Mode: navigate` from another origin (a host framing the page, a link) | `navigation` | 403 | answers |
+| any other `Origin`, `Origin: null`, or `Sec-Fetch-Site: same-site` / `cross-site` without a navigation | `elsewhere` | 403 | 403 |
+
+The refusal is `403 { ok: false, error }` (`ELSEWHERE_REFUSAL`), and `answer` and `stream` are never asked. Three things follow from the table:
+
+- **`same-site` is not `same-origin`.** Every port of `127.0.0.1` is one site, so a page served from another port of this computer is `elsewhere`, like a page from anywhere else.
+- **The page is a document, and only the page is.** A host frames `/app` from another origin, so a navigation to it is answered, and who may frame it stays `frame-ancestors`' to say. A door is not something to frame or link to from another origin.
+- **A module's page on an opaque origin is `elsewhere` to its own server**: its requests carry `Origin: null`. `openHealth` is the one door for it — a GET of `/healthz` is answered wherever it came from — and such a module asks nothing else of its own server from the page.
+
+Nothing here replaces the ticket: a program on this computer is still answered, and a write still needs the ticket the page was given. What the doors leave to Vite — source files, assets — is not asked at all; `serves()` turns the dev server's own cross-origin sharing off (`server.cors: false`) unless the module's config sets `server.cors` itself, which a module framed on an opaque origin has to, for its scripts.
+
 ### The same doors for a server that is not node's (*0.36.0*)
 
 `doorsFetch(options, transform?)` takes the same options and returns `(request: Request) => Promise<Response | null>`: every door above, with `null` where the other form calls `next()`. It is the whole `fetch` of a `Bun.serve` module —
@@ -114,7 +137,7 @@ const through = doorsFetch({ manifest: MANIFEST, answer, stream, build: BUILD, p
 Bun.serve({ hostname: '127.0.0.1', port, idleTimeout: 0, fetch: async (request) => (await through(request)) ?? asset(request) ?? notFound() })
 ```
 
-— and in a test it is one request through the real doors, header names included, with no fake request or response to build: `await through(new Request('http://x/api/write', { method: 'POST', body, headers }))`. A body is counted as it arrives and refused with the same 413; a stream is a `ReadableStream` closed when the request is aborted or the reader cancels.
+— and in a test it is one request through the real doors, header names included, with no fake request or response to build: `await through(new Request('http://x/api/write', { method: 'POST', body, headers }))`, where `headers` has `content-type: application/json` beside the ticket. A body is counted as it arrives and refused with the same 413; a stream is a `ReadableStream` closed when the request is aborted or the reader cancels.
 
 ### What `doors()` does not have: a startup hook
 
@@ -298,6 +321,8 @@ plus `x-module-build: <buildStamp>` on every answer from the doors, which is wha
 - A page that uses `useHost` or `Cover` reloads itself when it notices; a host need not reload the frame for that.
 
 ## Testing a module on the plumbing
+
+A test that sends a body through `doorsHandler` or `doorsFetch` says `content-type: application/json` on it, as `ask()` does; one that sends none of a browser's headers is read as a program and answered. A test that greets a page gives the greeting any origin it likes while the document carries no `origins` island (a test document does not); to test the refusal, pass `connect(id, events, { origins })` or add the island.
 
 Three things are page-wide and outlive a test case, so a suite resets them between cases: `mailbox.forget?.()` (the backlog — a greeting posted in one case is otherwise replayed into the next; a page must never call it, see [client.md](client.md)), `resetServerStanding()` (`stale` does not heal), and `sessionStorage.clear()` for a module that uses `held`. One request through the real doors is `doorsFetch` (above).
 

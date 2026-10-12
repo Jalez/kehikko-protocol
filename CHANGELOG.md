@@ -84,6 +84,64 @@ narrowing with `fileInFocus` alone used to get no note and now gets the first.
 - `partsOf`, `partIdsOf`, `JourneyPart`; `JOURNEYS_MODULE` and `readJourneys` as where an epic's
   parts are. Steps are still read through them.
 
+## 1.1.1 — 2026-10-12
+
+What a door requires of a request, stated in one place and held to. No new message, no new
+manifest field, and `PROTOCOL` is still 2. A module takes it by taking the version; what its own
+tests and scripts may have to change is under *What a module checks*.
+
+Design: [docs/module-plumbing.md](docs/module-plumbing.md) (the doors, the body reader),
+[docs/client.md](docs/client.md) (the greeting), [docs/serving.md](docs/serving.md) (`serves()`).
+
+### Changed: a door answers its own page and a program on this computer
+
+- `doors()`, `doorsHandler` and `doorsFetch` decide where a request came from before anything is
+  read or routed — from `Origin`, and from `Sec-Fetch-Site` where there is none — and answer the
+  manifest, the page and every door (`/healthz`, `/mcp`, `/api/*`, or `ours`) only to the module's
+  own page, a program, and a person asking directly. Anything else is **403**
+  `{ ok: false, error }` (`ELSEWHERE_REFUSAL`); `answer` and `stream` are not asked.
+- The page (`/app`, `/`, `pages`) is still opened as a document from another origin: a host frames
+  it there, and `frame-ancestors` still says who may.
+- `openHealth` is unchanged in what it is for: a GET of `/healthz` is answered wherever it came
+  from, and nothing else is.
+- New in `/serve`: **`asker(headers, host?)`**, **`admits(who, document?)`**, `Asker`,
+  `HeaderSource`, `ELSEWHERE_REFUSAL`, for a module that serves a door outside `doors()`.
+
+### Changed: a body has to say it is JSON
+
+- `readJsonBody` and `readJsonRequest` — and so every door — refuse a body that arrives with a
+  `content-type` other than `application/json`, or with none: **415** `{ ok: false, error }`
+  (`BODY_NOT_JSON`). A request with no body needs no content type. `BodyRead` gains the 415
+  refusal beside the 413; `BodySource` gains an optional `headers`.
+- New in `/serve`: **`saysJson(type)`**, `BODY_NOT_JSON`.
+- `ask()`, `listTools()`, a host's own calls and an MCP client already send `application/json`.
+
+### Changed: `serves()` turns the dev server's cross-origin sharing off
+
+- `serves()` returns `server.cors: false` beside the port. A module whose own config sets
+  `server.cors` keeps what it wrote.
+
+### Changed: a page answers a greeting only from where it may be framed
+
+- `doors()` prints the origins that may frame the page — the list it sends as `frame-ancestors` —
+  into the document (`<script id="origins">`, **`ORIGINS_ELEMENT`**), for a `pageDocument` page
+  and for a module's own document alike. `pageDocument` and `fillPage` take `origins`.
+- `connect` answers a `kehikot.hello` whose `origin` is on that list, is the page's own, or is
+  absent (an event the page made itself), and from the page's own window; any other greeting is
+  dropped. A document with no island answers as before. **`mayGreet`**, **`pageOrigins`**,
+  `ConnectOptions.origins`, and **`originAmong(origin, sources)`** on the front door.
+
+### What a module checks
+
+- **Tests and scripts that send a body** through `doorsHandler` / `doorsFetch`, or to a running
+  module with `fetch` or `curl`, say `content-type: application/json` (`curl --json`). A `Request`
+  built with a string body and no headers says `text/plain`, and is now refused with 415.
+- **A page on an opaque origin** (a manifest without `storage`) reaches its own server at
+  `/healthz` with `openHealth`, and at no other door.
+- **A module that serves its page without `doors()`** passes `origins: frameOrigins()` to
+  `pageDocument` or `fillPage`, or `origins` to `connect`.
+- Nothing changes for a host: what it asks of a module, it asks from its server.
+
 ## 1.1.0 — 2026-10-12
 
 Three additions in one release, and nothing else. **Additive: nothing a 1.0.0 call does has

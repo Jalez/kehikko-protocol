@@ -65,7 +65,8 @@ export { HOLDINGS_FILE, type EpicHoldings, type PartHoldings, type ProjectHoldin
 /* The shared plumbing of a module's server: its page, its ticket, its doors. */
 export { fillPage, pageDocument, themeScript, FRAMED_DEFAULT_THEME, type PageOptions } from './page.js'
 export { mintTicket, refuseTicket, sameTicket, ticketOf, TICKET_REFUSAL } from './ticket.js'
-export { readJsonBody, readJsonRequest, BODY_METHODS, BODY_TOO_LARGE, MAX_BODY_BYTES, type BodyOptions, type BodyRead, type BodySource } from './body.js'
+export { readJsonBody, readJsonRequest, saysJson, BODY_METHODS, BODY_NOT_JSON, BODY_TOO_LARGE, MAX_BODY_BYTES, type BodyOptions, type BodyRead, type BodySource } from './body.js'
+export { admits, asker, ELSEWHERE_REFUSAL, type Asker, type HeaderSource } from './gate.js'
 export {
   doors,
   doorsFetch,
@@ -82,5 +83,5 @@ export {
   type Reply,
   type Stream,
 } from './doors.js'
-export { TICKET_HEADER } from '../page.js'
+export { ORIGINS_ELEMENT, TICKET_HEADER, originAmong } from '../page.js'
 export { commitOf, establishBuild } from './build.js'

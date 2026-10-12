@@ -634,6 +634,16 @@ Whoever started last wins, and the losing entry is named rather than
              sees their other checkout's path scroll past knows immediately which
              one the host is about to frame.
 
+#### `serves.config` and `server.cors`
+
+`serves()` returns `server.cors: false` with the port. A module's page asks
+its own origin and needs no cross-origin sharing, and the dev server's own
+default answers other origins on this machine. A module whose config sets
+`server.cors` itself keeps what it wrote: one framed on an opaque origin has
+to say `cors: true`, because its scripts are then fetched in CORS mode with
+`Origin: null`. What the doors themselves require of a request is in
+[module-plumbing.md](module-plumbing.md#what-a-door-requires-of-a-request-111).
+
 ### `src/serve/origins.ts`
 
 #### About `src/serve/origins.ts`
@@ -661,6 +671,13 @@ its page from by default.
 A single origin is honoured as the whole answer rather than added to the
 defaults, because somebody who set it meant exactly that host.
 `ROADMAP_ORIGIN`, the name before the rename, is not read.
+
+##### The same list, told to the page
+
+`doors()` prints `frameOrigins(env, ancestors)` into the page it serves, read
+per request like the header, so the page's `connect` answers a greeting from
+one of those origins and from nowhere else ([client.md](client.md)). Whoever
+may frame the page is whoever may greet it, by construction.
 
 ##### `also`: an origin the module itself names
 

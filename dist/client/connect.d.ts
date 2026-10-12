@@ -2,10 +2,31 @@ import { type FilterGroup, type Goto, type HeaderItemInput, type ModuleContext, 
 import { type MessageSource } from './mailbox.js';
 /**
  * The bridge: one conversation with one window, in the shape this package's schemas define.
- * Identity is the greeting's window handle (`MessageEvent.source`), never the origin; everything
- * the host sends is parsed with `hostMessageSchema`. A convenience — a module may hand-roll it all.
+ * A greeting is taken from an origin the page may be framed by (`mayGreet`); after it, identity is
+ * the greeting's window handle (`MessageEvent.source`), never the origin. Everything the host sends
+ * is parsed with `hostMessageSchema`. A convenience — a module may hand-roll it all.
  * Design notes: docs/client.md.
  */
+/**
+ * The origins this page was told it may be framed by: the island its server printed
+ * (`ORIGINS_ELEMENT`, the list sent as `frame-ancestors`), or `null` for a document that carries
+ * none — one this package's doors did not serve. Read on every greeting; it is one element.
+ */
+export declare function pageOrigins(): string[] | null;
+/**
+ * Whether a greeting may be answered: whether the window that sent it is one this page may be
+ * framed by. `origins` is who that is; `null` is a page that was never told, which answers as it
+ * always has. Otherwise a greeting counts from an origin on the list, from the page's own origin,
+ * from the page's own window, and with no origin on it at all — an event the page's own script
+ * made, since a message from another window always carries one. Pure.
+ */
+export declare function mayGreet(greeting: {
+    origin?: string | null;
+    source?: unknown;
+}, origins: readonly string[] | null, self?: {
+    window?: unknown;
+    origin?: string | null;
+}): boolean;
 /**
  * Why a question came back without an answer: the protocol's three reasons, plus `silent` for a
  * timeout or a host that is not there.
@@ -102,6 +123,11 @@ export interface ConnectOptions {
     gotoBackstop?: number;
     /** Override `PRESS_BACKSTOP_MS`. */
     pressBackstop?: number;
+    /**
+     * The origins a greeting is taken from, instead of the ones the page's server printed
+     * (`pageOrigins`): for a page that is not served by this package's doors.
+     */
+    origins?: readonly string[];
 }
 export interface Connection {
     /**

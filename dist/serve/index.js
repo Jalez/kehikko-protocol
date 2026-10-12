@@ -18,7 +18,8 @@ export { HOLDINGS_FILE } from '../holdings.js';
 /* The shared plumbing of a module's server: its page, its ticket, its doors. */
 export { fillPage, pageDocument, themeScript, FRAMED_DEFAULT_THEME } from './page.js';
 export { mintTicket, refuseTicket, sameTicket, ticketOf, TICKET_REFUSAL } from './ticket.js';
-export { readJsonBody, readJsonRequest, BODY_METHODS, BODY_TOO_LARGE, MAX_BODY_BYTES } from './body.js';
+export { readJsonBody, readJsonRequest, saysJson, BODY_METHODS, BODY_NOT_JSON, BODY_TOO_LARGE, MAX_BODY_BYTES } from './body.js';
+export { admits, asker, ELSEWHERE_REFUSAL } from './gate.js';
 export { doors, doorsFetch, doorsHandler, PAGE_PATHS, } from './doors.js';
-export { TICKET_HEADER } from '../page.js';
+export { ORIGINS_ELEMENT, TICKET_HEADER, originAmong } from '../page.js';
 export { commitOf, establishBuild } from './build.js';

@@ -1,6 +1,6 @@
 import type { Build } from '../build.js'
 import { BUILD_ELEMENT } from '../build.js'
-import { PAGE_BACKGROUND, ROOT_ELEMENT, THEME_KEY, THEME_PARAM, TICKET_ELEMENT, type PageTheme } from '../page.js'
+import { ORIGINS_ELEMENT, PAGE_BACKGROUND, ROOT_ELEMENT, THEME_KEY, THEME_PARAM, TICKET_ELEMENT, type PageTheme } from '../page.js'
 
 /**
  * The document a module serves at `/app`, built per process so the write ticket and the build can
@@ -18,6 +18,11 @@ export interface PageOptions {
   ticket?: string | null
   /** This process's build, printed beside the ticket so the page can tell when its server has changed. */
   build?: Build | null
+  /**
+   * The origins that may frame this page (`frameOrigins()`), printed so the page answers a greeting
+   * from one of them only. `doors()` fills it in; a module that serves its own page passes it.
+   */
+  origins?: readonly string[] | null
   /** The module script. Default `/src/main.tsx`. */
   entry?: string
   /** Default `en`. */
@@ -61,15 +66,17 @@ export function themeScript(): string {
 const islandOf = (id: string, value: unknown) => `<script id="${id}" type="application/json">${island(value)}</script>`
 
 /**
- * Put this process's ticket and build into a page that was built ahead of it (`vite build` over a
- * `pageDocument` written without either): each island is replaced where the built page has one and
- * added before `</body>` where it has none. No placeholder to agree on, and the escaping is here.
+ * Put this process's ticket and build, and the origins that may frame it, into a page that was
+ * built ahead of it (`vite build` over a `pageDocument` written without them): each island is
+ * replaced where the built page has one and added before `</body>` where it has none. No
+ * placeholder to agree on, and the escaping is here.
  */
-export function fillPage(html: string, filled: { ticket?: string | null; build?: Build | null }): string {
+export function fillPage(html: string, filled: { ticket?: string | null; build?: Build | null; origins?: readonly string[] | null }): string {
   let page = html
   for (const [id, value] of [
     [TICKET_ELEMENT, typeof filled.ticket === 'string' ? filled.ticket : null],
     [BUILD_ELEMENT, filled.build ?? null],
+    [ORIGINS_ELEMENT, filled.origins ?? null],
   ] as const) {
     if (value === null) continue
     const was = new RegExp(`<script id="${id}" type="application/json">[^<]*</script>`)
@@ -91,6 +98,7 @@ export function pageDocument(options: PageOptions): string {
   const build = options.build
     ? `${islandOf(BUILD_ELEMENT, options.build)}\n`
     : ''
+  const origins = options.origins ? `${islandOf(ORIGINS_ELEMENT, options.origins)}\n` : ''
   return `<!doctype html>
 <html lang="${escapeHtml(options.lang ?? 'en')}">
 <head>
@@ -102,7 +110,7 @@ export function pageDocument(options: PageOptions): string {
 ${options.head ? `${options.head}\n` : ''}</head>
 <body>
 <div id="${ROOT_ELEMENT}"></div>
-${ticket}${build}<script type="module" src="${escapeHtml(options.entry ?? '/src/main.tsx')}"></script>
+${ticket}${build}${origins}<script type="module" src="${escapeHtml(options.entry ?? '/src/main.tsx')}"></script>
 </body>
 </html>
 `

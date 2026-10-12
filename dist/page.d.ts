@@ -30,3 +30,15 @@ export type PageTheme = 'light' | 'dark';
  * ships. A module with a different palette passes its own to `pageDocument`.
  */
 export declare const PAGE_BACKGROUND: Record<PageTheme, string>;
+/**
+ * The id of the JSON island the origins that may frame a page are printed into: the same list its
+ * server sends as `frame-ancestors`. The page's `connect` answers a greeting from one of them only.
+ */
+export declare const ORIGINS_ELEMENT = "origins";
+/**
+ * Whether `origin` — a `MessageEvent.origin`, an `Origin` header — is one of `sources`, each
+ * written as `frame-ancestors` takes them: `http://127.0.0.1:4170`, `http://localhost:*` for any
+ * port, `https://*.example.org` for any name under one, `*` for anywhere. Pure. An origin that is
+ * not an address (`null`, the empty string) is among nothing but `*`.
+ */
+export declare function originAmong(origin: string, sources: readonly string[]): boolean;
