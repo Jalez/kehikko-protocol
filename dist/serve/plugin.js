@@ -13,7 +13,7 @@ export function serves({ id, prefer, dir, span, timeoutMs }) {
     return {
         name: 'kehikot-module-serves',
         apply: 'serve',
-        async config() {
+        async config(config) {
             claimed = await claim({ id, prefer: preferred(prefer), span, timeoutMs });
             if (claimed.status === 'already-running') {
                 /* Exit 0, not 1: nothing failed, the thing being asked for exists. And it EXITS rather
@@ -28,7 +28,10 @@ export function serves({ id, prefer, dir, span, timeoutMs }) {
             /* Loud, on stdout, naming both numbers — the port that was wanted and the one taken. */
             if (claimed.moved)
                 console.log(sayClaim(claimed));
-            return { server: { host: '127.0.0.1', port: claimed.port, strictPort: false } };
+            /* No cross-origin sharing unless the module wrote `server.cors` itself: a module's page asks
+               its own origin, and Vite's own default answers other origins on this machine. */
+            const said = config?.server?.cors !== undefined;
+            return { server: { host: '127.0.0.1', port: claimed.port, strictPort: false, ...(said ? {} : { cors: false }) } };
         },
         configureServer(server) {
             const http = server.httpServer;

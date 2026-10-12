@@ -1,7 +1,8 @@
 /**
  * Options for `serves`, a module's whole port story as one line in its `vite.config.ts`:
  * `plugins: [serves({ id: ID, prefer: 7960 }), …]`. It claims a port before Vite starts and registers
- * the port actually bound once listening. Dev server only (`apply: 'serve'`); `strictPort` is off.
+ * the port actually bound once listening. Dev server only (`apply: 'serve'`); `strictPort` is off,
+ * and so is `server.cors` unless the module's own config says otherwise.
  */
 export interface ServesOptions {
     /** The module's own id. The same constant its manifest is built from. */
@@ -34,11 +35,16 @@ export interface DevServerLike {
 export interface ServesPlugin {
     name: string;
     apply: 'serve';
-    config(): Promise<{
+    config(config?: {
+        server?: {
+            cors?: unknown;
+        };
+    }): Promise<{
         server: {
             host: string;
             port: number;
             strictPort: false;
+            cors?: false;
         };
     }>;
     configureServer(server: DevServerLike): void;

@@ -5,6 +5,9 @@ import { type PageOptions } from './page.js';
  * Every door a module answers on, served by the process that serves its page: a module is ONE
  * ORIGIN. What stays the module's is `answer`, a pure function from a request to a status and a
  * body. `/app` is claimed here before Vite's resolver sees it. See docs/module-plumbing.md.
+ *
+ * Every door answers its own page and a program on this machine, and refuses a page on another
+ * origin with 403 before `answer` is asked (`gate.ts`); a body has to say it is JSON (`body.ts`).
  */
 export interface Reply {
     status: number;
@@ -58,9 +61,10 @@ export interface DoorsOptions {
     ancestors?: readonly string[];
     /**
      * `true` lets a page on any origin read the health check: `/healthz` answers with
-     * `access-control-allow-origin: *` and exposes the build header. For a module framed WITHOUT
-     * `allow-same-origin` (its manifest declares no storage), whose page is on an opaque origin and
-     * could not otherwise `probeServer()`. Off by default: no other door is opened by it.
+     * `access-control-allow-origin: *` and exposes the build header, and a GET of it is answered
+     * wherever it came from. For a module framed WITHOUT `allow-same-origin` (its manifest declares
+     * no storage), whose page is on an opaque origin and could not otherwise `probeServer()`. Off by
+     * default: no other door is opened by it.
      */
     openHealth?: boolean;
     /**

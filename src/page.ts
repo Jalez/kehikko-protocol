@@ -41,3 +41,36 @@ export const PAGE_BACKGROUND: Record<PageTheme, string> = {
   light: 'oklch(1 0 0)',
   dark: 'oklch(0.145 0 0)',
 }
+
+/**
+ * The id of the JSON island the origins that may frame a page are printed into: the same list its
+ * server sends as `frame-ancestors`. The page's `connect` answers a greeting from one of them only.
+ */
+export const ORIGINS_ELEMENT = 'origins'
+
+/**
+ * Whether `origin` — a `MessageEvent.origin`, an `Origin` header — is one of `sources`, each
+ * written as `frame-ancestors` takes them: `http://127.0.0.1:4170`, `http://localhost:*` for any
+ * port, `https://*.example.org` for any name under one, `*` for anywhere. Pure. An origin that is
+ * not an address (`null`, the empty string) is among nothing but `*`.
+ */
+export function originAmong(origin: string, sources: readonly string[]): boolean {
+  let asked: URL
+  try {
+    asked = new URL(origin)
+  } catch {
+    return sources.includes('*')
+  }
+  const port = (url: { protocol: string; port: string }) => url.port || (url.protocol === 'http:' ? '80' : url.protocol === 'https:' ? '443' : '')
+  return sources.some((source) => {
+    if (source === '*') return true
+    const read = /^([a-z][a-z0-9+.-]*:)\/\/([^/:]+|\[[^\]]+\])(?::(\d+|\*))?\/?$/i.exec(source)
+    if (!read) return false
+    const [, protocol, name, at] = read as unknown as [string, string, string, string | undefined]
+    if (protocol.toLowerCase() !== asked.protocol) return false
+    const host = name.toLowerCase()
+    const named = host.startsWith('*.') ? asked.hostname.endsWith(host.slice(1)) : asked.hostname === host
+    if (!named) return false
+    return at === '*' || port(asked) === (at ?? port({ protocol: asked.protocol, port: '' }))
+  })
+}

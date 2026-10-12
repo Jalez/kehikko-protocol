@@ -16,6 +16,11 @@ export interface PageOptions {
     ticket?: string | null;
     /** This process's build, printed beside the ticket so the page can tell when its server has changed. */
     build?: Build | null;
+    /**
+     * The origins that may frame this page (`frameOrigins()`), printed so the page answers a greeting
+     * from one of them only. `doors()` fills it in; a module that serves its own page passes it.
+     */
+    origins?: readonly string[] | null;
     /** The module script. Default `/src/main.tsx`. */
     entry?: string;
     /** Default `en`. */
@@ -34,12 +39,14 @@ export declare const FRAMED_DEFAULT_THEME: PageTheme;
 /** The blocking script. It cannot import, so the names it needs are written into it; nothing in it throws. */
 export declare function themeScript(): string;
 /**
- * Put this process's ticket and build into a page that was built ahead of it (`vite build` over a
- * `pageDocument` written without either): each island is replaced where the built page has one and
- * added before `</body>` where it has none. No placeholder to agree on, and the escaping is here.
+ * Put this process's ticket and build, and the origins that may frame it, into a page that was
+ * built ahead of it (`vite build` over a `pageDocument` written without them): each island is
+ * replaced where the built page has one and added before `</body>` where it has none. No
+ * placeholder to agree on, and the escaping is here.
  */
 export declare function fillPage(html: string, filled: {
     ticket?: string | null;
     build?: Build | null;
+    origins?: readonly string[] | null;
 }): string;
 export declare function pageDocument(options: PageOptions): string;

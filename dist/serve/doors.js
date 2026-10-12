@@ -1,21 +1,46 @@
 import { BUILD_HEADER, WELL_KNOWN, buildStamp } from '../index.js';
-import { TICKET_HEADER } from '../page.js';
-import { BODY_TOO_LARGE, readJsonBody, readJsonRequest } from './body.js';
-import { frameAncestors } from './origins.js';
-import { pageDocument } from './page.js';
+import { ORIGINS_ELEMENT, TICKET_HEADER } from '../page.js';
+import { readJsonBody, readJsonRequest } from './body.js';
+import { ELSEWHERE_REFUSAL, admits, asker } from './gate.js';
+import { frameAncestors, frameOrigins } from './origins.js';
+import { fillPage, pageDocument } from './page.js';
 import { ticketOf } from './ticket.js';
 export const PAGE_PATHS = ['/app', '/app/', '/'];
 const oursByDefault = (path) => path === '/healthz' || path === '/mcp' || path.startsWith('/api/');
 /** What both forms of the doors work out once, from the options. */
 function standing(options) {
     const build = options.build;
+    const pages = new Set([...PAGE_PATHS, ...(options.pages ?? [])]);
+    const ours = options.ours ?? oursByDefault;
+    const open = options.openHealth === true;
+    /* Read per request, like `frame-ancestors`: the page is told the same list its header carries. */
+    const origins = () => frameOrigins(process.env, options.ancestors);
+    const page = options.page;
     return {
-        pages: new Set([...PAGE_PATHS, ...(options.pages ?? [])]),
-        ours: options.ours ?? oursByDefault,
+        pages,
+        ours,
         build,
         manifest: build ? { ...options.manifest, build } : options.manifest,
         stamp: build ? buildStamp(build) : null,
-        document: typeof options.page === 'function' ? options.page : () => pageDocument({ build, ...options.page }),
+        /* A module's own document is told who may frame it too, unless it already says. */
+        document: typeof page === 'function'
+            ? () => {
+                const built = page();
+                return built.includes(`<script id="${ORIGINS_ELEMENT}"`) ? built : fillPage(built, { origins: origins() });
+            }
+            : () => pageDocument({ build, origins: origins(), ...page }),
+        /**
+         * The refusal for a request this server's doors do not answer, or `null`. Asked of every path
+         * that is the doors' own, before anything is read or routed; what is left to Vite is not asked.
+         */
+        refusal: (method, path, headers, host) => {
+            const document = pages.has(path);
+            if (!document && path !== WELL_KNOWN && !ours(path))
+                return null;
+            if (open && path === '/healthz' && (method === 'GET' || method === 'HEAD'))
+                return null;
+            return admits(asker(headers, host), document) ? null : { status: 403, body: { ok: false, error: ELSEWHERE_REFUSAL } };
+        },
         /* Worked out per request: who may frame the page is read from the environment as it is then. */
         pageHeaders: () => ({
             'content-type': 'text/html; charset=utf-8',
@@ -23,7 +48,7 @@ function standing(options) {
             'cache-control': 'no-store',
             'content-security-policy': frameAncestors(process.env, options.ancestors),
         }),
-        open: options.openHealth === true,
+        open,
     };
 }
 /**
@@ -73,7 +98,7 @@ function healthy(reply, path, build, open) {
  * `transformIndexHtml` goes; without one the document is sent as built.
  */
 export function doorsHandler(options, transform) {
-    const { pages, ours, build, manifest, stamp, document, pageHeaders, open } = standing(options);
+    const { pages, ours, build, manifest, stamp, document, pageHeaders, refusal, open } = standing(options);
     return (request, response, next) => {
         const url = new URL(request.url ?? '/', 'http://127.0.0.1');
         const path = url.pathname;
@@ -88,6 +113,9 @@ export function doorsHandler(options, transform) {
             else
                 response.end(payload);
         };
+        const refused = refusal(method, path, request.headers, null);
+        if (refused)
+            return send(refused);
         if (path === WELL_KNOWN)
             return send({ status: 200, body: manifest });
         if (pages.has(path)) {
@@ -150,7 +178,7 @@ export function doorsHandler(options, transform) {
         void readJsonBody(request, { maxBytes: options.maxBodyBytes })
             .then(async (read) => {
             if (!read.ok) {
-                return send({ status: read.status, body: { ok: false, error: BODY_TOO_LARGE }, headers: { connection: 'close' } });
+                return send({ status: read.status, body: { ok: false, error: read.error }, headers: { connection: 'close' } });
             }
             const reply = await options.answer(method, path, url.searchParams, read.body, ticket);
             if (!reply)
@@ -167,7 +195,7 @@ export function doorsHandler(options, transform) {
  * in `doorsHandler`; a page built ahead of time is `page: () => fillPage(built, { ticket, build })`.
  */
 export function doorsFetch(options, transform) {
-    const { pages, ours, build, manifest, stamp, document, pageHeaders, open } = standing(options);
+    const { pages, ours, build, manifest, stamp, document, pageHeaders, refusal, open } = standing(options);
     const send = (reply) => {
         const { headers, payload } = wire(reply, stamp);
         return new Response(payload, { status: reply.status, headers });
@@ -176,6 +204,9 @@ export function doorsFetch(options, transform) {
         const url = new URL(request.url);
         const path = url.pathname;
         const method = request.method.toUpperCase();
+        const refused = refusal(method, path, request.headers, url.host);
+        if (refused)
+            return send(refused);
         if (path === WELL_KNOWN)
             return send({ status: 200, body: manifest });
         if (pages.has(path)) {
@@ -236,7 +267,7 @@ export function doorsFetch(options, transform) {
         }
         const read = await readJsonRequest(request, { maxBytes: options.maxBodyBytes });
         if (!read.ok)
-            return send({ status: read.status, body: { ok: false, error: BODY_TOO_LARGE }, headers: { connection: 'close' } });
+            return send({ status: read.status, body: { ok: false, error: read.error }, headers: { connection: 'close' } });
         const reply = await options.answer(method, path, url.searchParams, read.body, ticket);
         return reply ? send(healthy(reply, path, build, open)) : null;
     };

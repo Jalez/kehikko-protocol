@@ -10,6 +10,7 @@ import {
   fillPage,
   pageDocument,
   frameAncestors,
+  frameOrigins,
   mintTicket,
   readJsonBody,
   refuseTicket,
@@ -66,7 +67,8 @@ function call(
   const handler = doorsHandler({ manifest: MANIFEST, answer, page: { title: 'Example', ticket: TICKET }, ...options }, async (html) =>
     html.replace('</head>', '<!--transformed--></head>'),
   )
-  const request = new FakeRequest(method, url, headers)
+  /* A body says it is JSON, as every sender of one does, unless the test says what it says instead. */
+  const request = new FakeRequest(method, url, body === undefined || 'content-type' in headers ? headers : { 'content-type': 'application/json', ...headers })
   const sent = { status: 0, headers: {} as Record<string, string>, chunks: [] as string[], ended: false, nexted: null as unknown }
   const done = new Promise<typeof sent>((resolve) => {
     const response = {
@@ -287,6 +289,7 @@ describe('the doors as a fetch handler', () => {
     return { close: () => void closed.push('watch') }
   }
   const through = doorsFetch({ manifest: MANIFEST, answer, stream, build: BUILD, page: { title: 'Example', ticket: TICKET } })
+  const JSON_BODY = { 'content-type': 'application/json' }
   const at = (path: string, init?: RequestInit) => through(new Request(`http://127.0.0.1:9000${path}`, init))
 
   test('the manifest, with the build, stamped and uncached', async () => {
@@ -304,7 +307,7 @@ describe('the doors as a fetch handler', () => {
       expect(page?.headers.get('content-type')).toBe('text/html; charset=utf-8')
       expect(page?.headers.get('cache-control')).toBe('no-store')
       expect(page?.headers.get('content-security-policy')).toBe(frameAncestors())
-      expect(await page?.text()).toBe(pageDocument({ title: 'Example', ticket: TICKET, build: BUILD }))
+      expect(await page?.text()).toBe(pageDocument({ title: 'Example', ticket: TICKET, build: BUILD, origins: frameOrigins() }))
     }
   })
 
@@ -327,9 +330,9 @@ describe('the doors as a fetch handler', () => {
 
   test('a request reaches answer with its query, body and ticket; the health check says the build', async () => {
     expect(await (await at('/api/echo?q=hello'))?.json()).toEqual({ q: 'hello' })
-    const wrote = await at('/api/write', { method: 'POST', body: '{"a":1}', headers: { [TICKET_HEADER]: TICKET } })
+    const wrote = await at('/api/write', { method: 'POST', body: '{"a":1}', headers: { ...JSON_BODY, [TICKET_HEADER]: TICKET } })
     expect(await wrote?.json()).toEqual({ ok: true, got: { a: 1 } })
-    const refused = await at('/api/write', { method: 'POST', body: '{"a":1}' })
+    const refused = await at('/api/write', { method: 'POST', body: '{"a":1}', headers: JSON_BODY })
     expect(refused?.status).toBe(403)
     expect(((await refused?.json()) as { refused: string }).refused).toBe('ticket')
     expect(((await (await at('/healthz'))?.json()) as { build: unknown }).build).toEqual(BUILD)
@@ -338,15 +341,16 @@ describe('the doors as a fetch handler', () => {
   })
 
   test('a body that is not a JSON object is null, and one past the bound is a 413 answer never asks about', async () => {
-    const wrote = await at('/api/write', { method: 'POST', body: '[1,2]', headers: { [TICKET_HEADER]: TICKET } })
+    const wrote = await at('/api/write', { method: 'POST', body: '[1,2]', headers: { ...JSON_BODY, [TICKET_HEADER]: TICKET } })
     expect(((await wrote?.json()) as { got: unknown }).got).toBeNull()
     let asked = 0
     const small = doorsFetch({ manifest: MANIFEST, answer: () => ((asked += 1), { status: 200, body: {} }), page: { title: 'Example' }, maxBodyBytes: 16 })
-    const big = () => new Request('http://127.0.0.1:9000/api/write', { method: 'POST', body: JSON.stringify({ text: 'x'.repeat(64) }) })
+    const big = () => new Request('http://127.0.0.1:9000/api/write', { method: 'POST', headers: JSON_BODY, body: JSON.stringify({ text: 'x'.repeat(64) }) })
     expect((await small(big()))?.status).toBe(413)
     /* And when nothing said how long it is: counted as it arrives. */
     const unsized = new Request('http://127.0.0.1:9000/api/write', {
       method: 'POST',
+      headers: JSON_BODY,
       body: new ReadableStream({
         start(controller) {
           controller.enqueue(new TextEncoder().encode('{"text":"'))
