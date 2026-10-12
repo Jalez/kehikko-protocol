@@ -202,8 +202,9 @@ export function partIdFor(name, taken) {
     const used = new Set(taken);
     const wanted = (typeof name === 'string' ? slugFrom(name.trim().slice(0, LIMITS.TITLE)) : '') || 'part';
     let id = wanted;
+    /* Cut to leave room for the number, however long it is, so the id is always a `PART_ID`. */
     for (let n = 2; used.has(id); n += 1)
-        id = `${wanted.slice(0, 76)}-${n}`;
+        id = `${wanted.slice(0, LIMITS.EPIC_SLUG - 1 - String(n).length)}-${n}`;
     return id;
 }
 /**

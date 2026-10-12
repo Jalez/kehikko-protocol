@@ -274,6 +274,13 @@ describe('the epic’s own list: an id and a name', () => {
     expect(partIdFor('Methods', ['methods'])).toBe('methods-2')
     expect(partIdFor('Methods', new Set(['methods', 'methods-2']))).toBe('methods-3')
     expect(partIdFor('…', [])).toBe('part')
+    /* Always a PART_ID, however long the name and however many are taken. */
+    const long = 'a'.repeat(200)
+    const taken = [partIdFor(long, [])]
+    for (let i = 0; i < 1100; i += 1) taken.push(partIdFor(long, taken))
+    expect(new Set(taken).size).toBe(taken.length)
+    expect(taken.every((id) => /^[a-z0-9-]{1,80}$/.test(id))).toBe(true)
+    expect(taken[1]).toBe(`${'a'.repeat(78)}-2`)
     expect(partIdFor('!!', ['part'])).toBe('part-2')
     expect(partIdFor(undefined, [])).toBe('part')
   })
