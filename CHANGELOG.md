@@ -7,6 +7,29 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 1.3.0 — 2026-10-12
+
+A module may say what its MCP door is registered as. **Additive: nothing a 1.2.0 call does has
+changed**, and `PROTOCOL` is still 2.
+
+### Added
+
+- **`mcp.as`** in the manifest: the server name an agent host should register the module's door
+  under, for a module whose id would derive a misleading one (`kehikot.claude` → `claude`). Optional
+  and not defaulted. A lowercase letter, then lowercase letters, digits, `-` and `_`; never `__`,
+  never a trailing `_`; at most 40 characters. It goes into `mcp__<server>__<tool>` and onto a
+  command line, so it cannot be read as a flag or hold whitespace or a quote.
+- **`DOOR_NAME`**, the pattern, and **`LIMITS.DOOR_NAME`** (40).
+
+### Compatibility
+
+- A host built with 1.2.0 or earlier accepts a manifest that declares `as`: the `mcp` object strips
+  a key it does not know, so the module is framed and its door is named as before. Checked against
+  the 1.2.0 build.
+- A manifest whose `as` is out of shape is refused whole by a 1.3.0 host, like any field out of
+  shape. A 1.2.0 host does not look.
+- The name is a request. A host decides what to do when two modules ask for one name.
+
 ## 1.2.0 — 2026-10-12
 
 Parts belong to the epic and name no module. **Additive: nothing a 1.1.0 or 1.0.0 call does has

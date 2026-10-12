@@ -127,6 +127,19 @@ const subjectSchema = z
   })
 export type ModuleSubject = z.infer<typeof subjectSchema>
 
+/**
+ * The shape of a door's declared name, `mcp.as`: a lowercase letter, then lowercase letters, digits,
+ * `-` and `_`. It cannot start with `-` (it is passed to a command and must never read as a flag),
+ * holds no whitespace, quote or dot, and neither holds `__` nor ends in `_`: `__` is what separates
+ * the server from the tool in `mcp__<server>__<tool>`. At most `LIMITS.DOOR_NAME` characters.
+ */
+export const DOOR_NAME = /^[a-z](?:[a-z0-9-]|_(?=[a-z0-9-]))*$/
+
+const doorName = z
+  .string()
+  .max(LIMITS.DOOR_NAME)
+  .regex(DOOR_NAME, 'a door name is a lowercase letter, then lowercase letters, digits, - and _, never __ and never ending in _')
+
 /* An extension name, as written. */
 const extensionName = z.string().min(1).max(LIMITS.EXTENSION)
 
@@ -182,6 +195,13 @@ const manifestFields = z.object({
       transport: z.enum(['http', 'sse', 'stdio']).default('http'),
       /** What an agent would be connecting to, in one line, for the list. */
       about: z.string().max(LIMITS.SUMMARY).default(''),
+      /**
+       * The server name an agent host should register this door under (1.3.0), when the module
+       * wants another than the one a host would derive from its id. It becomes part of every tool's
+       * name (`mcp__<as>__<tool>`) and an argument on a command line, so the shape is strict: see
+       * `DOOR_NAME`. Absent by default; a host that does not know the field names the door itself.
+       */
+      as: doorName.optional(),
       /**
        * What this door can be asked to show and to answer for, by kind. The declaration that lets a
        * caller who has never heard of this module find "the tool that points". Empty by default.

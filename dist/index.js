@@ -10,7 +10,7 @@ export { PROTOCOL, WELL_KNOWN, MANIFEST_KIND, MESSAGE, MESSAGE_PREFIX, HOST_MESS
 export { LIMITS } from './limits.js';
 export { MODULE_ID, MODE_ID, EPIC_SLUG, KEHIKKO_KEY, canonicalModuleId, own, slugFrom } from './ids.js';
 export { KEHIKOT_DIR, DATA_FILE, MODULE_FOLDER, KEHIKOT_IGNORE, moduleFolder, kehikotDir, moduleDir, moduleFile, within, ignoresKehikot, withKehikotIgnored, withoutKehikotIgnored, } from './project.js';
-export { manifestSchema, speaks, partsDeclaration, MODULE_CONDITIONS, REACTS_TO, REACTION_NAMES, TAGS, TAG_NAMES, } from './manifest.js';
+export { DOOR_NAME, manifestSchema, speaks, partsDeclaration, MODULE_CONDITIONS, REACTS_TO, REACTION_NAMES, TAGS, TAG_NAMES, } from './manifest.js';
 /* What a module's MCP door agrees with every other's. See `door.ts`. */
 export { DOOR_ARGUMENTS, DOOR_ARGUMENTS_BEFORE, doorContext, SHOW_OUTCOMES, showAnswerSchema, SHOW_OUTPUT_SCHEMA, DONE_STATES, doneItemSchema, doneAnswerSchema, doneAnswer, DONE_OUTPUT_SCHEMA, doorToolSchema, toolEffect, TOOL_EFFECTS, } from './door.js';
 export { CAPABILITIES, CAPABILITY_NAMES, METHODS, METHOD_NAMES, methodParams, methodResults, resultSchemaFor, navigationResult, NAVIGATION_OUTCOMES, foldResult, FOLD_OUTCOMES, partsSetResult, PARTS_SET_OUTCOMES, projectPickResult, pickedProject, PICK_OUTCOMES, epicSpine, epicsListResult, REPORTED_STAGES, } from './methods.js';

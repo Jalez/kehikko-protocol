@@ -43,6 +43,7 @@ export {
 } from './project.js'
 
 export {
+  DOOR_NAME,
   manifestSchema,
   speaks,
   partsDeclaration,

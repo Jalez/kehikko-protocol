@@ -473,6 +473,35 @@ agent can be told which tools belong to which module. Naming it in the
 manifest rather than in a second file is the point: one program, one
 document, both its doors.
 
+#### `manifestSchema.mcp.as`
+
+The name the door is registered under (1.3.0). Optional, absent by default.
+
+A host that connects an agent to a module's door has to call the server
+something, and what it has is the module's id: a host here takes the last
+segment, so `kehikot.claude` is connected as `claude`. That name is what a
+person reads in their agent's list of servers and what every tool is prefixed
+with (`mcp__<server>__<tool>`), and the module is the one who knows when the
+derived name misleads. `as` is the module saying which name it wants:
+
+```ts
+mcp: { url: '/mcp', as: 'kehikko-claude' }
+```
+
+The shape is strict because of where the name goes — into tool names and onto
+a command line (`claude mcp add <name> …`): a lowercase letter, then lowercase
+letters, digits, `-` and `_`; never `__` and never a trailing `_` (`__` is the
+separator in a tool's name); at most `LIMITS.DOOR_NAME` (40) characters. So it
+cannot be read as a flag and holds no whitespace, quote or dot. `DOOR_NAME` is
+the pattern. A manifest whose `as` is anything else is refused whole, like any
+other field out of shape.
+
+It is a request, not a reservation. Two modules may ask for the same name, or
+for the host's own; the host decides, and the one here refuses the later
+module's door with a sentence rather than registering one name twice. A host
+built before 1.3.0 parses the manifest, drops the field and names the door as
+it always did.
+
 #### `manifestSchema.mcp.subjects`
 
 What the door can be asked to show and to answer for (1.1.0).

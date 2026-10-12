@@ -136,6 +136,13 @@ declare const subjectSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
 }>;
 export type ModuleSubject = z.infer<typeof subjectSchema>;
 /**
+ * The shape of a door's declared name, `mcp.as`: a lowercase letter, then lowercase letters, digits,
+ * `-` and `_`. It cannot start with `-` (it is passed to a command and must never read as a flag),
+ * holds no whitespace, quote or dot, and neither holds `__` nor ends in `_`: `__` is what separates
+ * the server from the tool in `mcp__<server>__<tool>`. At most `LIMITS.DOOR_NAME` characters.
+ */
+export declare const DOOR_NAME: RegExp;
+/**
  * The manifest. Every field above, and one rule over two of them: a module either follows the
  * picked parts (`reacts` has `parts`) or says in `partless` why it has nothing to narrow. A
  * manifest that says neither, or both, does not parse, and the issue is the sentence saying what
@@ -191,6 +198,13 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         transport: z.ZodDefault<z.ZodEnum<["http", "sse", "stdio"]>>;
         /** What an agent would be connecting to, in one line, for the list. */
         about: z.ZodDefault<z.ZodString>;
+        /**
+         * The server name an agent host should register this door under (1.3.0), when the module
+         * wants another than the one a host would derive from its id. It becomes part of every tool's
+         * name (`mcp__<as>__<tool>`) and an argument on a command line, so the shape is strict: see
+         * `DOOR_NAME`. Absent by default; a host that does not know the field names the door itself.
+         */
+        as: z.ZodOptional<z.ZodString>;
         /**
          * What this door can be asked to show and to answer for, by kind. The declaration that lets a
          * caller who has never heard of this module find "the tool that points". Empty by default.
@@ -266,10 +280,12 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             show?: string | undefined;
             release?: string | undefined;
         }[];
+        as?: string | undefined;
     }, {
         url: string;
         about?: string | undefined;
         transport?: "http" | "sse" | "stdio" | undefined;
+        as?: string | undefined;
         subjects?: {
             kind: string;
             done?: string | undefined;
@@ -428,6 +444,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             show?: string | undefined;
             release?: string | undefined;
         }[];
+        as?: string | undefined;
     } | undefined;
     partless?: string | undefined;
 }, {
@@ -453,6 +470,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         url: string;
         about?: string | undefined;
         transport?: "http" | "sse" | "stdio" | undefined;
+        as?: string | undefined;
         subjects?: {
             kind: string;
             done?: string | undefined;
@@ -519,6 +537,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             show?: string | undefined;
             release?: string | undefined;
         }[];
+        as?: string | undefined;
     } | undefined;
     partless?: string | undefined;
 }, {
@@ -544,6 +563,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         url: string;
         about?: string | undefined;
         transport?: "http" | "sse" | "stdio" | undefined;
+        as?: string | undefined;
         subjects?: {
             kind: string;
             done?: string | undefined;
