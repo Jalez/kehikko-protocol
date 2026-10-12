@@ -21,6 +21,13 @@ export declare const ID_PREFIX_BEFORE_RENAME = "roadmap.";
  * `roadmap.` any more, and no schema here applies this.
  */
 export declare function canonicalModuleId(id: string): string;
+/**
+ * A kehikko's key: the identity of one canvas that outlives the host's database. Two to 32
+ * characters of lowercase letters, digits and dashes, neither end a dash; a host generates eight
+ * hex characters and a person may write a word. Unique within a project, not across projects. It
+ * can be all digits, so it is never told from a kehikko's `id` by its spelling.
+ */
+export declare const KEHIKKO_KEY: RegExp;
 /** A mode's id: one module's own name for one of its tabs. */
 export declare const MODE_ID: RegExp;
 /**

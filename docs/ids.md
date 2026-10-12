@@ -33,6 +33,40 @@ host this protocol came from, it was found and fixed four separate times.
 There is no version of this package that handles it for you. The lookups are in
 your process.
 
+### Which ids are stable, and which are only good for now
+
+A module that writes something down — a session, a note, a setting — files it under the ids it
+was handed, and reads it back later: after a restart, after a `git pull`, on another computer.
+So what matters about an id is how long it means the same thing.
+
+| id | where it arrives | means the same thing… |
+|---|---|---|
+| a module id (`MODULE_ID`) | the manifest, `containers[].module`, `event.from` | always: the module's author chose it |
+| an epic slug (`EPIC_SLUG`) | `context.epic` | for as long as the epic's file is in the project; it travels with the project |
+| a part id (`PART_ID`) | `context.parts[].id` | while the part's heading (or its explicit id) stands: it is derived from it by `slugFrom` |
+| a ref (`gh#41`) | `context.selection`, `containers[].showing.refs` | as long as the tracker keeps the number |
+| `projectPath` | `context.projectPath` | on this machine, until the folder is moved |
+| a kehikko's **`key`** (`KEHIKKO_KEY`) | `context.kehikko.key`, `event.kehikko.key` | for as long as the kehikko exists: through a rename, a reorder, the project being removed from the host and added again, and on another machine |
+| a kehikko's **`id`** | `context.kehikko.id`, `event.kehikko.id` | **only for the life of one host's database** |
+
+**`kehikko.id` is a row number. Do not store it.** The host hands out the next integer whenever a
+kehikko becomes a row, and a kehikko becomes a row again each time its project is added: one
+kehikko was 2, then 9, then 28, without anybody touching it. On a second machine the same kehikko
+has whatever number that database had free. It is good for exactly one thing — comparing
+`context.kehikko.id` with `event.kehikko.id` inside one running page, to tell near from far.
+
+**`kehikko.key` is what to store.** The host writes it into the project's own
+`.kehikot/kehikko/kehikot.json` beside the kehikko's name, and reads the file back by it, so it
+is the same wherever and whenever that project is opened. It is unique **within a project** and
+not across projects: two projects may both have a kehikko keyed `writing`. Store it with the
+project — inside `<project>/.kehikot/<module>/`, or keyed by the project as well.
+
+`key` is optional. A host that does not send it leaves a module with `id` alone, and a module
+that must keep something anyway falls back to `id` knowing what that costs. Tell the two apart by
+which field they came from, never by how they look: a key may be all digits (`12345678` is a
+plausible eight hex characters), so a store that holds both spells them differently —
+`key:4072c9e5` and `id:3`, say — rather than guessing later.
+
 ## Notes by symbol
 
 ### `src/ids.ts`
@@ -83,6 +117,26 @@ a `Map`, which has no prototype chain to fall through and is the better
 answer wherever the shape of the code allows one. There is no version of this
 package that does it for you, because the lookups are in your process and not
 in this one.
+
+#### `KEHIKKO_KEY`
+
+A kehikko's key: the identity of one canvas that outlives the host's database.
+
+Two to thirty-two characters of lowercase letters, digits and dashes, with a
+letter or digit at each end. The bounds are the host's, not a choice made
+here: this is the pattern the host holds a `key` in `kehikot.json` to, and
+the wire carries nothing the file could not. A host generates eight hex
+characters; a person editing the file may write a word — `writing`,
+`review`. Lowercase only, because it is compared as an identity and two
+spellings of one key would be two kehikot.
+
+No character in it can leave a directory or end a field in a delimited
+string — no dot, slash, colon, semicolon, equals or plus — so it can be a
+file name or one part of a composed key without escaping.
+
+It is unique within one project's `kehikot.json` and nowhere wider. And it
+can be all digits, which is why nothing may tell a key from an `id` by its
+shape: see "Which ids are stable" above.
 
 #### `EPIC_SLUG`
 

@@ -839,12 +839,15 @@ export declare const helloSchema: z.ZodObject<{
         kehikko: z.ZodDefault<z.ZodNullable<z.ZodObject<{
             id: z.ZodNumber;
             name: z.ZodString;
+            key: z.ZodOptional<z.ZodString>;
         }, "strip", z.ZodTypeAny, {
             id: number;
             name: string;
+            key?: string | undefined;
         }, {
             id: number;
             name: string;
+            key?: string | undefined;
         }>>>;
         filters: z.ZodDefault<z.ZodEffects<z.ZodRecord<z.ZodEffects<z.ZodString, string, string>, z.ZodUnion<[z.ZodString, z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">, string[], string[]>]>>, Record<string, string | string[]>, Record<string, string | string[]>>>;
         containers: z.ZodDefault<z.ZodArray<z.ZodObject<{
@@ -1114,6 +1117,7 @@ export declare const helloSchema: z.ZodObject<{
         kehikko: {
             id: number;
             name: string;
+            key?: string | undefined;
         } | null;
         filters: Record<string, string | string[]>;
         containers: {
@@ -1183,6 +1187,7 @@ export declare const helloSchema: z.ZodObject<{
         kehikko?: {
             id: number;
             name: string;
+            key?: string | undefined;
         } | null | undefined;
         filters?: Record<string, string | string[]> | undefined;
         containers?: {
@@ -1263,6 +1268,7 @@ export declare const helloSchema: z.ZodObject<{
         kehikko: {
             id: number;
             name: string;
+            key?: string | undefined;
         } | null;
         filters: Record<string, string | string[]>;
         containers: {
@@ -1337,6 +1343,7 @@ export declare const helloSchema: z.ZodObject<{
         kehikko?: {
             id: number;
             name: string;
+            key?: string | undefined;
         } | null | undefined;
         filters?: Record<string, string | string[]> | undefined;
         containers?: {
@@ -1500,12 +1507,15 @@ export declare const contextMessageSchema: z.ZodObject<{
     kehikko: z.ZodDefault<z.ZodNullable<z.ZodObject<{
         id: z.ZodNumber;
         name: z.ZodString;
+        key: z.ZodOptional<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
         id: number;
         name: string;
+        key?: string | undefined;
     }, {
         id: number;
         name: string;
+        key?: string | undefined;
     }>>>;
     filters: z.ZodDefault<z.ZodEffects<z.ZodRecord<z.ZodEffects<z.ZodString, string, string>, z.ZodUnion<[z.ZodString, z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">, string[], string[]>]>>, Record<string, string | string[]>, Record<string, string | string[]>>>;
     containers: z.ZodDefault<z.ZodArray<z.ZodObject<{
@@ -1780,6 +1790,7 @@ export declare const contextMessageSchema: z.ZodObject<{
     kehikko: {
         id: number;
         name: string;
+        key?: string | undefined;
     } | null;
     filters: Record<string, string | string[]>;
     containers: {
@@ -1851,6 +1862,7 @@ export declare const contextMessageSchema: z.ZodObject<{
     kehikko?: {
         id: number;
         name: string;
+        key?: string | undefined;
     } | null | undefined;
     filters?: Record<string, string | string[]> | undefined;
     containers?: {
@@ -2001,16 +2013,22 @@ export declare const eventSchema: z.ZodObject<{
      * be ordering by its own scheduler instead.
      */
     at: z.ZodString;
-    /** The kehikko it happened on, or null. Compare with `context.kehikko` to tell near from far. */
+    /**
+     * The kehikko it happened on, or null. Compare with `context.kehikko` to tell near from far; a
+     * receiver that KEEPS an event files it under the kehikko's `key` when there is one, not its `id`.
+     */
     kehikko: z.ZodDefault<z.ZodNullable<z.ZodObject<{
         id: z.ZodNumber;
         name: z.ZodString;
+        key: z.ZodOptional<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
         id: number;
         name: string;
+        key?: string | undefined;
     }, {
         id: number;
         name: string;
+        key?: string | undefined;
     }>>>;
 }, "strip", z.ZodTypeAny, {
     protocol: number;
@@ -2020,6 +2038,7 @@ export declare const eventSchema: z.ZodObject<{
     kehikko: {
         id: number;
         name: string;
+        key?: string | undefined;
     } | null;
     extension: string;
     payload?: unknown;
@@ -2032,6 +2051,7 @@ export declare const eventSchema: z.ZodObject<{
     kehikko?: {
         id: number;
         name: string;
+        key?: string | undefined;
     } | null | undefined;
     payload?: unknown;
 }>;
@@ -2254,12 +2274,15 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         kehikko: z.ZodDefault<z.ZodNullable<z.ZodObject<{
             id: z.ZodNumber;
             name: z.ZodString;
+            key: z.ZodOptional<z.ZodString>;
         }, "strip", z.ZodTypeAny, {
             id: number;
             name: string;
+            key?: string | undefined;
         }, {
             id: number;
             name: string;
+            key?: string | undefined;
         }>>>;
         filters: z.ZodDefault<z.ZodEffects<z.ZodRecord<z.ZodEffects<z.ZodString, string, string>, z.ZodUnion<[z.ZodString, z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">, string[], string[]>]>>, Record<string, string | string[]>, Record<string, string | string[]>>>;
         containers: z.ZodDefault<z.ZodArray<z.ZodObject<{
@@ -2529,6 +2552,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         kehikko: {
             id: number;
             name: string;
+            key?: string | undefined;
         } | null;
         filters: Record<string, string | string[]>;
         containers: {
@@ -2598,6 +2622,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         kehikko?: {
             id: number;
             name: string;
+            key?: string | undefined;
         } | null | undefined;
         filters?: Record<string, string | string[]> | undefined;
         containers?: {
@@ -2678,6 +2703,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         kehikko: {
             id: number;
             name: string;
+            key?: string | undefined;
         } | null;
         filters: Record<string, string | string[]>;
         containers: {
@@ -2752,6 +2778,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         kehikko?: {
             id: number;
             name: string;
+            key?: string | undefined;
         } | null | undefined;
         filters?: Record<string, string | string[]> | undefined;
         containers?: {
@@ -2909,12 +2936,15 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     kehikko: z.ZodDefault<z.ZodNullable<z.ZodObject<{
         id: z.ZodNumber;
         name: z.ZodString;
+        key: z.ZodOptional<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
         id: number;
         name: string;
+        key?: string | undefined;
     }, {
         id: number;
         name: string;
+        key?: string | undefined;
     }>>>;
     filters: z.ZodDefault<z.ZodEffects<z.ZodRecord<z.ZodEffects<z.ZodString, string, string>, z.ZodUnion<[z.ZodString, z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">, string[], string[]>]>>, Record<string, string | string[]>, Record<string, string | string[]>>>;
     containers: z.ZodDefault<z.ZodArray<z.ZodObject<{
@@ -3189,6 +3219,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     kehikko: {
         id: number;
         name: string;
+        key?: string | undefined;
     } | null;
     filters: Record<string, string | string[]>;
     containers: {
@@ -3260,6 +3291,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     kehikko?: {
         id: number;
         name: string;
+        key?: string | undefined;
     } | null | undefined;
     filters?: Record<string, string | string[]> | undefined;
     containers?: {
@@ -3385,16 +3417,22 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
      * be ordering by its own scheduler instead.
      */
     at: z.ZodString;
-    /** The kehikko it happened on, or null. Compare with `context.kehikko` to tell near from far. */
+    /**
+     * The kehikko it happened on, or null. Compare with `context.kehikko` to tell near from far; a
+     * receiver that KEEPS an event files it under the kehikko's `key` when there is one, not its `id`.
+     */
     kehikko: z.ZodDefault<z.ZodNullable<z.ZodObject<{
         id: z.ZodNumber;
         name: z.ZodString;
+        key: z.ZodOptional<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
         id: number;
         name: string;
+        key?: string | undefined;
     }, {
         id: number;
         name: string;
+        key?: string | undefined;
     }>>>;
 }, "strip", z.ZodTypeAny, {
     protocol: number;
@@ -3404,6 +3442,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     kehikko: {
         id: number;
         name: string;
+        key?: string | undefined;
     } | null;
     extension: string;
     payload?: unknown;
@@ -3416,6 +3455,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     kehikko?: {
         id: number;
         name: string;
+        key?: string | undefined;
     } | null | undefined;
     payload?: unknown;
 }>, z.ZodObject<{

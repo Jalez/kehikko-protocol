@@ -153,6 +153,30 @@ describe('useHost: the flattened context', () => {
     expect(hostFields(null).kehikko).toBeNull()
   })
 
+  test('and the key it keeps is there when the host sends one, and absent when it does not', async () => {
+    const keyed = await render({}, { source: inbox(speaker(), hello({ ...CONTEXT, kehikko: { id: 28, name: 'Writing', key: '4072c9e5' } })).box })
+    expect(keyed.read().kehikko).toEqual({ id: 28, name: 'Writing', key: '4072c9e5' })
+    expect(keyed.read().kehikko?.key).toBe('4072c9e5')
+    /* One page at a time: `mounted` is the one the suite takes down afterwards. */
+    await act(async () => mounted?.root.unmount())
+    mounted?.container.remove()
+    mounted = null
+
+    const plain = await render({}, { source: inbox(speaker(), hello({ ...CONTEXT, kehikko: { id: 2, name: 'Writing' } })).box })
+    expect(plain.read().kehikko?.key).toBeUndefined()
+    expect(Object.keys(plain.read().kehikko ?? {})).toEqual(['id', 'name'])
+  })
+
+  test('a kehikko whose number moved under the same key is a new value; the same one said again is not', () => {
+    const at = (id: number) => hostFields({ kehikko: { id, name: 'Writing', key: '4072c9e5' } } as never)
+    const first = at(2)
+    expect(hostFields({ kehikko: { id: 2, name: 'Writing', key: '4072c9e5' } } as never, first).kehikko).toBe(first.kehikko)
+    expect(hostFields({ kehikko: { id: 9, name: 'Writing', key: '4072c9e5' } } as never, first).kehikko).not.toBe(first.kehikko)
+    /* A key arriving where there was none — the host was updated under an open page — is news too. */
+    const before = hostFields({ kehikko: { id: 2, name: 'Writing' } } as never)
+    expect(hostFields({ kehikko: { id: 2, name: 'Writing', key: '4072c9e5' } } as never, before).kehikko).not.toBe(before.kehikko)
+  })
+
   test('a field that still says the same thing is the same object, so an effect on it runs when it changed', async () => {
     const SHOWN = {
       ...CONTEXT,

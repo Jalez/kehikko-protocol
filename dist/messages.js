@@ -208,7 +208,10 @@ export const eventSchema = z.object({
      * be ordering by its own scheduler instead.
      */
     at: z.string().min(1).max(40),
-    /** The kehikko it happened on, or null. Compare with `context.kehikko` to tell near from far. */
+    /**
+     * The kehikko it happened on, or null. Compare with `context.kehikko` to tell near from far; a
+     * receiver that KEEPS an event files it under the kehikko's `key` when there is one, not its `id`.
+     */
     kehikko: kehikkoSchema.nullable().default(null),
 });
 /* ------------------------------------------------------------------------ *

@@ -68,7 +68,7 @@ Concretely, the things this package deliberately does not do:
 | `METHODS`, `methodParams`, `CAPABILITIES` | The questions a module can ask, by name and by shape. |
 | `methodResults`, `resultSchemaFor` | The answers that are outcomes rather than material, and so have a shape. |
 | `navigationResult`, `projectPickResult`, `epicsListResult`, `epicSpine` | Those answers. |
-| `MODULE_ID`, `MODE_ID`, `EPIC_SLUG`, `own` | The name patterns, and one lookup that does not fall through a prototype. |
+| `MODULE_ID`, `MODE_ID`, `EPIC_SLUG`, `KEHIKKO_KEY`, `own` | The name patterns, and one lookup that does not fall through a prototype. `KEHIKKO_KEY` (1.1.0) is the spelling of `context.kehikko.key`, the identity of a canvas that is safe to store; its `id` is not ([docs/ids.md](docs/ids.md)). |
 | `KEHIKOT_DIR`, `moduleFolder`, `moduleDir`, `moduleFile`, `within` | Where a module keeps this project's data, given `context.projectPath`. |
 | `KEHIKOT_IGNORE`, `ignoresKehikot`, `withKehikotIgnored` | The lines that project's `.gitignore` gains, added once. |
 | `partSchema`, `EpicPart`, `PART_ID`, `pickedParts`, `isFocused`, `refInFocus`, `partInFocus`, `focusCount` | The parts of the open epic in `context.parts`, and whether a thing is in the ones a person picked out. |

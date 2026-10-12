@@ -506,17 +506,21 @@ export declare const contextSchema: z.ZodObject<{
     prompt: z.ZodDefault<z.ZodNullable<z.ZodString>>;
     /**
      * Which kehikko (canvas) this context is about. Null when the host has no canvases; compare with
-     * an event's `kehikko` to tell near from far.
+     * an event's `kehikko` to tell near from far. Anything written down per kehikko is written under
+     * its `key`, not its `id`: see `kehikkoSchema`.
      */
     kehikko: z.ZodDefault<z.ZodNullable<z.ZodObject<{
         id: z.ZodNumber;
         name: z.ZodString;
+        key: z.ZodOptional<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
         id: number;
         name: string;
+        key?: string | undefined;
     }, {
         id: number;
         name: string;
+        key?: string | undefined;
     }>>>;
     /**
      * Which of the filters this module offered are currently chosen for it, per container. `{}` when
@@ -826,6 +830,7 @@ export declare const contextSchema: z.ZodObject<{
     kehikko: {
         id: number;
         name: string;
+        key?: string | undefined;
     } | null;
     filters: Record<string, string | string[]>;
     containers: {
@@ -895,6 +900,7 @@ export declare const contextSchema: z.ZodObject<{
     kehikko?: {
         id: number;
         name: string;
+        key?: string | undefined;
     } | null | undefined;
     filters?: Record<string, string | string[]> | undefined;
     containers?: {

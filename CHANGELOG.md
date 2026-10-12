@@ -9,7 +9,7 @@ label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING
 
 ## 1.1.0 — 2026-10-12
 
-Two additions in one release, and nothing else. **Additive: nothing a 1.0.0 call does has
+Three additions in one release, and nothing else. **Additive: nothing a 1.0.0 call does has
 changed**, and `PROTOCOL` is still 2. Every consumer's own tests and typecheck were run against
 1.0.0 and against this build.
 
@@ -54,6 +54,23 @@ Design, limits and the Paper example: [docs/header.md](docs/header.md).
   (`FOLD_OUTCOMES`). A host without it answers `unknown-method`.
 - `containerSchema.folded`: whether a container is folded to its header. Optional; absent from a
   host that does not say.
+
+### Added: a kehikko's stable `key`
+
+Which ids last, and the table: [docs/ids.md](docs/ids.md#which-ids-are-stable-and-which-are-only-good-for-now).
+
+- **`context.kehikko.key`** and **`event.kehikko.key`** (one shape, `{ id, name, key? }`), and so
+  `host.kehikko.key` from `hostStore` and `useHost`: the key the host already keeps per kehikko in
+  the project's `.kehikot/kehikko/kehikot.json`. It survives a rename, a reorder, the project being
+  removed and added again, and another machine. Unique within a project.
+- **`KEHIKKO_KEY`**: its spelling, the host's own — two to 32 characters of lowercase letters,
+  digits and dashes, neither end a dash.
+- `id` is unchanged and is now said plainly to be a row number: good for near-or-far inside one
+  running page, and not something to store. It went 2 → 9 → 28 for one kehikko across two re-adds.
+- Optional and not defaulted. A host that does not send it and a module that does not read it are
+  exactly as they were; a parsed kehikko without one has no `key` property at all.
+- Nothing else names a kehikko: `containers` rows, `goto`, the methods, `moduleDir` and `held()`
+  scopes carry module ids, refs, slugs and paths, never a kehikko's number.
 
 ### Changed in the template only
 

@@ -439,6 +439,13 @@ the receiver is standing and this says where the event came from; comparing
 the two is the whole of a near/far filter, and it is a comparison rather
 than a rule so a module can present it however it likes.
 
+It is the same shape as `context.kehikko`, so it carries the same optional
+`key`. Comparing `id` with `id` is right for near-or-far, which is asked and
+answered inside one running page. A receiver that keeps events — a history
+of notifications, say — files them under `key` when there is one: the `id`
+it would otherwise have written down is a different kehikko's after the
+project is added again.
+
 #### `readySchema`
 
 "I heard you."
@@ -943,6 +950,35 @@ host imposes.
 Nullable because a host need not have canvases at all. A module that finds
 it null can still show everything it is sent — it simply cannot sort near
 from far, which is a smaller loss than being handed a wrong answer.
+
+##### `id`, `name` and `key`: which one to write down
+
+`{ id, name, key? }`. Three things, and only one of them is an identity that
+lasts.
+
+- `id` is the host's row number for the kehikko. It is stable while one
+  database lives and no longer: removing a project from the host and adding
+  it again gave one kehikko 2, then 9, then 28, and another machine numbers
+  it afresh. Compare it; do not store it.
+- `name` is a label a person can change, and two kehikot in one project may
+  share one. Show it; do not compare it.
+- `key` (1.1.0) is the one the host keeps in the project's own
+  `.kehikot/kehikko/kehikot.json`. It survives a rename, a reorder, a re-add
+  and a clone, and is unique within the project. Store this. Its spelling is
+  `KEHIKKO_KEY`.
+
+`key` is optional and not defaulted, for the reason `containerSchema.folded`
+is: a host that does not know the field goes on building `{ id, name }` and
+is still sending a valid context, and a module that never reads `key` is
+exactly as it was. A module that keeps something per kehikko uses `key` when
+it is there and falls back to `id` when it is not — and keeps the two apart
+in what it writes, because a key can be all digits. The table of what lasts
+how long is in [ids.md](ids.md#which-ids-are-stable-and-which-are-only-good-for-now).
+
+The host is not asked to invent anything to send it: the key already exists
+for every kehikko, and one that somehow does not match `KEHIKKO_KEY` is left
+out rather than sent, because a context refused over a label for storage
+would cost the module its epic and its project too.
 
 #### `contextSchema.filters`
 

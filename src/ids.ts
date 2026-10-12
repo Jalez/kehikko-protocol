@@ -30,6 +30,14 @@ export function canonicalModuleId(id: string): string {
   return id.startsWith(ID_PREFIX_BEFORE_RENAME) ? ID_PREFIX + id.slice(ID_PREFIX_BEFORE_RENAME.length) : id
 }
 
+/**
+ * A kehikko's key: the identity of one canvas that outlives the host's database. Two to 32
+ * characters of lowercase letters, digits and dashes, neither end a dash; a host generates eight
+ * hex characters and a person may write a word. Unique within a project, not across projects. It
+ * can be all digits, so it is never told from a kehikko's `id` by its spelling.
+ */
+export const KEHIKKO_KEY = /^[a-z0-9][a-z0-9-]{0,30}[a-z0-9]$/
+
 /** A mode's id: one module's own name for one of its tabs. */
 export const MODE_ID = /^[a-z0-9][a-z0-9-]{0,30}$/
 

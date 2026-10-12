@@ -61,7 +61,11 @@ export interface HostFields {
     selection: readonly string[];
     /** What the person chose in the filters this page offered with `filters()`. */
     chosen: FilterChoice;
-    /** Which kehikko (canvas) this page is on, or `null`. Compare with an event's `kehikko` to tell near from far. */
+    /**
+     * Which kehikko (canvas) this page is on, or `null`. Compare with an event's `kehikko` to tell
+     * near from far. `key` is the identity to store; `id` is the host's row number, which changes when
+     * a project is added again and differs between machines. `key` is absent from a host that does not send it.
+     */
     kehikko: ModuleContext['kehikko'];
 }
 /** Where the host stands, as one value. A new object whenever anything in it changed, and only then. */
