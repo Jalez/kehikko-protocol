@@ -65,13 +65,23 @@ export declare const PRESS_BACKSTOP_MS = 2000;
 export type PressAnswer = void | boolean | string;
 /** What a question asked before any greeting is refused with. The React hook says the same between mounts. */
 export declare const NOBODY_TO_ASK = "Nothing has greeted this page, so there is nobody to ask.";
+/**
+ * What a greeting says about the host itself (1.4.0). Each is `null` when the host did not say: a
+ * host before 1.4.0, which is "unknown", not "no".
+ */
+export interface HostFacts {
+    /** The methods this host will answer for this module, or `null`. `answers?.includes('parts.set')`. */
+    answers: readonly string[] | null;
+    /** Whether this host draws the module's header in its own menus, or `null`. */
+    header: boolean | null;
+}
 export interface HostEvents {
     /**
      * The greeting arrived, with its context and whatever this module last asked the host to keep.
      * `state` is `null` when the host keeps nothing: a first run, a host that does not answer
      * `state.set`, or a module that has never written any.
      */
-    onHello?: (context: ModuleContext, state: string | null) => void;
+    onHello?: (context: ModuleContext, state: string | null, host?: HostFacts) => void;
     /** The reader switched epics, or this tab was shown again. */
     onContext?: (context: ModuleContext) => void;
     /**

@@ -279,6 +279,32 @@ design where a person answered a dialog; there is nothing to list now, and a
 field here saying what a module "may" do would be this package modelling an
 approval it has no business modelling.
 
+#### `helloSchema.answers` and `helloSchema.header` (1.4.0)
+
+Two optional facts about the host, so that a module need not find them out by
+trying.
+
+`answers`: the methods this host will answer for THIS module — spoken by
+the protocol, kept by the host, and granted by the module's `declares.uses`.
+At most `LIMITS.ANSWERS` (64) names, each at most `LIMITS.METHOD`. Absent is a
+host before 1.4.0 and means *unknown*, not *none*: ask, and be refused if it
+is refused. An empty list is a host that answers nothing for this module. The
+names are not checked against `METHODS`, because a host may answer a method this
+version of the package has not heard of.
+
+The fault it comes from: Paper opened a project and sent a no-op `parts.set`
+on every open to learn whether the host answers it. With `answers` that is
+`host.answers?.includes('parts.set')` — in `useHost()` and the store, which
+carry it as `answers: readonly string[] | null` (null before the greeting and
+from an older host) — and a module that gets `null` may still probe, once.
+`onHello(context, state, facts)` has it as `facts.answers`.
+
+`header`: whether this host draws the module's declared header (`kehikot.header`)
+in its own menus. See [the header](header.md). Carried in the standing as
+`drawsHeader` (the name `header` is the action that declares one).
+
+A host before 1.4.0 parses a greeting carrying either, and strips them.
+
 #### `helloSchema.state`
 
 Whatever this module last asked the host to keep for it, verbatim.

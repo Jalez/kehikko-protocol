@@ -11,6 +11,18 @@ import { PART_ID, partDocument } from './parts.js';
 export const HOLDINGS_FILE = 'parts';
 /** The format's number, written as `version`. A reader opens a later one and reads what it knows. */
 export const HOLDINGS_VERSION = 1;
+/**
+ * The kinds of thing a module can publish for a part (1.4.0). `published` names which of them a
+ * module has SPOKEN FOR in an epic, so that saying nothing (an empty list) is different from never
+ * having said anything.
+ */
+export const HOLDING_KINDS = ['documents', 'refs'];
+/** Kinds out of whatever is there: each known one, once, in `HOLDING_KINDS` order. */
+export function holdingKinds(raw) {
+    if (!Array.isArray(raw))
+        return [];
+    return HOLDING_KINDS.filter((kind) => raw.includes(kind));
+}
 /** Short strings out of whatever is there, each through `one`, once each, at most `most`. */
 function listed(raw, one, most, into = []) {
     if (!Array.isArray(raw))
@@ -108,6 +120,66 @@ export function joinHoldings(into, more) {
             listed(held.documents, partDocument, LIMITS.PART_DOCUMENTS, part.documents);
             listed(held.refs, refOf, LIMITS.PART_REFS, part.refs);
         }
+    }
+    return into;
+}
+/**
+ * Which kinds each epic has been published for, out of one module's parsed `parts.json`, or `{}`.
+ * Never throws. An epic is spoken for in a kind when the file's `published[<epic>]` names it, and
+ * also, for a file written before 1.4.0 (no `published`), when a part of that epic holds some of
+ * that kind. At most `LIMITS.HOLDINGS_EPICS` epics.
+ */
+export function spokenIn(document) {
+    const out = {};
+    if (!document || typeof document !== 'object' || Array.isArray(document))
+        return out;
+    const said = document.published;
+    let count = 0;
+    const note = (slug, kinds) => {
+        if (!EPIC_SLUG.test(slug) || kinds.length === 0)
+            return;
+        if (!Object.hasOwn(out, slug)) {
+            if (count >= LIMITS.HOLDINGS_EPICS)
+                return;
+            out[slug] = [];
+            count += 1;
+        }
+        const own = out[slug];
+        for (const kind of kinds)
+            if (!own.includes(kind))
+                own.push(kind);
+    };
+    if (said && typeof said === 'object' && !Array.isArray(said)) {
+        for (const [slug, kinds] of Object.entries(said))
+            note(slug, holdingKinds(kinds));
+    }
+    for (const [slug, parts] of Object.entries(holdingsIn(document))) {
+        const kinds = [];
+        for (const held of Object.values(parts)) {
+            if (held.documents.length > 0 && !kinds.includes('documents'))
+                kinds.push('documents');
+            if (held.refs.length > 0 && !kinds.includes('refs'))
+                kinds.push('refs');
+        }
+        note(slug, kinds);
+    }
+    for (const kinds of Object.values(out))
+        kinds.sort((a, b) => HOLDING_KINDS.indexOf(a) - HOLDING_KINDS.indexOf(b));
+    return out;
+}
+/** Two readings as one: `more`'s kinds added to `into`'s, per epic. `into` is changed and returned. */
+export function joinSpoken(into, more) {
+    for (const [slug, kinds] of Object.entries(more)) {
+        if (!Object.hasOwn(into, slug)) {
+            if (Object.keys(into).length >= LIMITS.HOLDINGS_EPICS)
+                continue;
+            into[slug] = [];
+        }
+        const own = into[slug];
+        for (const kind of kinds)
+            if (!own.includes(kind))
+                own.push(kind);
+        own.sort((a, b) => HOLDING_KINDS.indexOf(a) - HOLDING_KINDS.indexOf(b));
     }
     return into;
 }

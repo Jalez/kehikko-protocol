@@ -155,6 +155,19 @@ export const helloSchema = z.object({
    * module's alone, which is why it is not in the context. `null` when the host keeps nothing for it.
    */
   state: z.string().max(LIMITS.MODULE_STATE).nullable().default(null),
+  /**
+   * 1.4.0. The methods this host will answer for THIS module: spoken by the protocol, kept by the
+   * host and granted by the manifest's `declares.uses`. Absent from a host before 1.4.0, which is
+   * "unknown", not "none": ask and be refused, as before. An empty list is a host that answers
+   * nothing for this module. Order carries no meaning; names are not checked against `METHODS`.
+   */
+  answers: z.array(z.string().min(1).max(LIMITS.METHOD)).max(LIMITS.ANSWERS).optional(),
+  /**
+   * 1.4.0. Whether this host draws the module's declared header (`kehikot.header`) in its own menus.
+   * Absent from a host before 1.4.0: unknown. `false` is a host that does not, so the module keeps
+   * its own control. See docs/header.md.
+   */
+  header: z.boolean().optional(),
 })
 
 /**

@@ -58,7 +58,7 @@ export function useHost<Kept = unknown>(
     const live = hostStore<Kept>(
       id,
       {
-        onHello: (context, state) => handlers.current.onHello?.(context, state),
+        onHello: (context, state, facts) => handlers.current.onHello?.(context, state, facts),
         onContext: (context) => handlers.current.onContext?.(context),
         onGoto: (message, answer) => {
           const handler = handlers.current.onGoto

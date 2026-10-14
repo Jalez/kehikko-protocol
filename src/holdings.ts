@@ -30,6 +30,23 @@ export type EpicHoldings = Record<string, PartHoldings>
 /** A project's holdings, by epic slug. Read it with `own()` too. */
 export type ProjectHoldings = Record<string, EpicHoldings>
 
+/**
+ * The kinds of thing a module can publish for a part (1.4.0). `published` names which of them a
+ * module has SPOKEN FOR in an epic, so that saying nothing (an empty list) is different from never
+ * having said anything.
+ */
+export const HOLDING_KINDS = ['documents', 'refs'] as const
+export type HoldingKind = (typeof HOLDING_KINDS)[number]
+
+/** The kinds somebody has published for each epic, by slug. Read it with `own()`. */
+export type ProjectSpoken = Record<string, HoldingKind[]>
+
+/** Kinds out of whatever is there: each known one, once, in `HOLDING_KINDS` order. */
+export function holdingKinds(raw: unknown): HoldingKind[] {
+  if (!Array.isArray(raw)) return []
+  return HOLDING_KINDS.filter((kind) => raw.includes(kind))
+}
+
 /** Short strings out of whatever is there, each through `one`, once each, at most `most`. */
 function listed(raw: unknown, one: (entry: unknown) => string | null, most: number, into: string[] = []): string[] {
   if (!Array.isArray(raw)) return into
@@ -117,6 +134,56 @@ export function joinHoldings(into: ProjectHoldings, more: ProjectHoldings): Proj
       listed(held.documents, partDocument, LIMITS.PART_DOCUMENTS, part.documents)
       listed(held.refs, refOf, LIMITS.PART_REFS, part.refs)
     }
+  }
+  return into
+}
+
+/**
+ * Which kinds each epic has been published for, out of one module's parsed `parts.json`, or `{}`.
+ * Never throws. An epic is spoken for in a kind when the file's `published[<epic>]` names it, and
+ * also, for a file written before 1.4.0 (no `published`), when a part of that epic holds some of
+ * that kind. At most `LIMITS.HOLDINGS_EPICS` epics.
+ */
+export function spokenIn(document: unknown): ProjectSpoken {
+  const out: ProjectSpoken = {}
+  if (!document || typeof document !== 'object' || Array.isArray(document)) return out
+  const said = (document as { published?: unknown }).published
+  let count = 0
+  const note = (slug: string, kinds: readonly HoldingKind[]) => {
+    if (!EPIC_SLUG.test(slug) || kinds.length === 0) return
+    if (!Object.hasOwn(out, slug)) {
+      if (count >= LIMITS.HOLDINGS_EPICS) return
+      out[slug] = []
+      count += 1
+    }
+    const own = out[slug]!
+    for (const kind of kinds) if (!own.includes(kind)) own.push(kind)
+  }
+  if (said && typeof said === 'object' && !Array.isArray(said)) {
+    for (const [slug, kinds] of Object.entries(said)) note(slug, holdingKinds(kinds))
+  }
+  for (const [slug, parts] of Object.entries(holdingsIn(document))) {
+    const kinds: HoldingKind[] = []
+    for (const held of Object.values(parts)) {
+      if (held.documents.length > 0 && !kinds.includes('documents')) kinds.push('documents')
+      if (held.refs.length > 0 && !kinds.includes('refs')) kinds.push('refs')
+    }
+    note(slug, kinds)
+  }
+  for (const kinds of Object.values(out)) kinds.sort((a, b) => HOLDING_KINDS.indexOf(a) - HOLDING_KINDS.indexOf(b))
+  return out
+}
+
+/** Two readings as one: `more`'s kinds added to `into`'s, per epic. `into` is changed and returned. */
+export function joinSpoken(into: ProjectSpoken, more: ProjectSpoken): ProjectSpoken {
+  for (const [slug, kinds] of Object.entries(more)) {
+    if (!Object.hasOwn(into, slug)) {
+      if (Object.keys(into).length >= LIMITS.HOLDINGS_EPICS) continue
+      into[slug] = []
+    }
+    const own = into[slug]!
+    for (const kind of kinds) if (!own.includes(kind)) own.push(kind)
+    own.sort((a, b) => HOLDING_KINDS.indexOf(a) - HOLDING_KINDS.indexOf(b))
   }
   return into
 }

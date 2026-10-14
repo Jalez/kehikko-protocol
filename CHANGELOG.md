@@ -7,6 +7,45 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 1.4.0 — 2026-10-14
+
+Seven small additions, each from a fault found in verification. **Additive and optional: a module built
+on 1.3.0 keeps working on a 1.4.0 host and the reverse**, and `PROTOCOL` is still 2. Every payload a
+1.4.0 module sends that a 1.3.0 host does not know is stripped by it, not refused; the tests parse each
+against the 1.3.0 build from the tag (`test/v1-4.test.ts`).
+
+### Added
+
+- **`hello.answers`** (`string[]`, at most `LIMITS.ANSWERS` = 64, each at most `LIMITS.METHOD`): the
+  methods the host will answer for this module. Absent is an older host: unknown, not none. In the
+  client: `useHost().answers` / `hostStore().get().answers` (`readonly string[] | null`) and
+  `onHello`'s third argument, `facts` (`HostFacts`).
+- **`hello.header`** (`boolean`): whether the host draws the module's header. Absent is an older host.
+  In the client: `drawsHeader` (`boolean | null`). The rule for a fallback control is in docs/header.md.
+- **`parts.json` `published`**: `{ <epic>: ('documents'|'refs')[] }`, beside `epics`, kept for empty
+  epics. `writeHoldings(…, holdings, { published? })` (default: the kinds given a list, both for `{}`);
+  `holdingsSpoken(project, epic)` in `/serve`; `HOLDING_KINDS`, `HoldingKind`, `ProjectSpoken`,
+  `spokenIn`. `HOLDINGS_VERSION` stays 1. **The file `writeHoldings` writes now always has a
+  `published` key.**
+- **`hostHasProject(path)`** in `/serve`, with `IS_PROJECT_PATH`, `isProjectResult`,
+  `hostIsProjectUrls`, `LIMITS.HOST_ASK_MS` (1500). Fails closed.
+- **`place`** on `kehikot.notifications@1`: `{ epic?, parts?: string[], kehikko? }`
+  (`LIMITS.PLACE_PARTS` = 16). **`view.goto`** takes `parts` and `kehikko` beside `epic` (refused
+  without one).
+- **`surface: 'fullscreen'`** on a `run` header item (`RUN_SURFACES`, `RunSurface`).
+
+### Changed (documentation only)
+
+- `CAPABILITIES` was described as "nothing grants one, nothing checks one". Hosts now check every
+  grant; corrected in the source and docs/methods.md, which lists the method → capability table.
+
+### Compatibility
+
+- A 1.3.0 reader parses a greeting with `answers` and `header`, a run with `surface`, a notice with
+  `place` and a `view.goto` with `parts`/`kehikko` and strips them; a 1.3.0 `readHoldings` reads a
+  1.4.0 `parts.json`, and a 1.3.0 `writeHoldings` keeps its `published`.
+- A 1.4.0 module on a 1.3.0 host sees `answers: null` and `drawsHeader: null`.
+
 ## 1.3.0 — 2026-10-12
 
 A module may say what its MCP door is registered as. **Additive: nothing a 1.2.0 call does has

@@ -644,6 +644,24 @@ to say `cors: true`, because its scripts are then fetched in CORS mode with
 `Origin: null`. What the doors themselves require of a request is in
 [module-plumbing.md](module-plumbing.md#what-a-door-requires-of-a-request-111).
 
+### `src/serve/host.ts` (1.4.0)
+
+#### `hostHasProject`
+
+A module's server is told a folder by its page, and a page's word is not the host's. Before reading
+the folder (a file tree, a source listing), the server asks the host: `hostHasProject(path)` is
+`GET /host/is-project?path=<absolute>` (`IS_PROJECT_PATH`), whose answer is `{ ok: true, project:
+boolean }` (`isProjectResult`). It resolves the host the way every other `/serve` helper does: from
+`KEHIKOT_ORIGINS` (then `KEHIKOT_ORIGIN`, then the defaults), keeping the `http(s)` loopback origins and
+skipping `tauri:` and the rest. Each origin gets `LIMITS.HOST_ASK_MS` (1500) and the first that says
+`project: true` ends it.
+
+It **fails closed**: a relative path, no host answering, a slow one, a refusal (the host answers only its
+own page and programs on this machine) and an answer of another shape are all `false`. Never throws. The
+route answers a module's server and not a module's page, so call it from the server and nowhere else.
+Use it as the gate: `if (!(await hostHasProject(path))) return 403`. It tells whether the host holds the
+folder, not whether this module may read inside it; the module still keeps its reads inside the folder.
+
 ### `src/serve/origins.ts`
 
 #### About `src/serve/origins.ts`

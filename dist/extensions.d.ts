@@ -10,18 +10,47 @@ export declare const notificationPayload: z.ZodObject<{
     level: z.ZodDefault<z.ZodEnum<["info", "attention", "done", "blocked"]>>;
     refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
     step: z.ZodOptional<z.ZodNumber>;
+    /**
+     * 1.4.0. Where a press on this line goes, more exactly than `epic` alone: parts to pick out
+     * (`context.parts` ids) and the kehikko to be on (its `key`). A panel answers a press with
+     * `view.goto` carrying the same three. Optional: a line without it goes to its epic as before, and
+     * a reader before 1.4.0 strips it.
+     */
+    place: z.ZodOptional<z.ZodObject<{
+        epic: z.ZodOptional<z.ZodString>;
+        parts: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        kehikko: z.ZodOptional<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        epic?: string | undefined;
+        parts?: string[] | undefined;
+        kehikko?: string | undefined;
+    }, {
+        epic?: string | undefined;
+        parts?: string[] | undefined;
+        kehikko?: string | undefined;
+    }>>;
 }, "strip", z.ZodTypeAny, {
     message: string;
     epic: string;
     refs: string[];
     level: "done" | "info" | "attention" | "blocked";
     step?: number | undefined;
+    place?: {
+        epic?: string | undefined;
+        parts?: string[] | undefined;
+        kehikko?: string | undefined;
+    } | undefined;
 }, {
     message: string;
     epic: string;
     refs?: string[] | undefined;
     level?: "done" | "info" | "attention" | "blocked" | undefined;
     step?: number | undefined;
+    place?: {
+        epic?: string | undefined;
+        parts?: string[] | undefined;
+        kehikko?: string | undefined;
+    } | undefined;
 }>;
 export type NotificationPayload = z.infer<typeof notificationPayload>;
 /**

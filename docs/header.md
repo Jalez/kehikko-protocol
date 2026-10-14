@@ -142,6 +142,51 @@ A page opened on its own port has no host to draw anything. `template/src/compon
 
 It is a copy and not an export because the protocol package has no Radix and no Tailwind; a module made with `kehikot-create` gets the file, and an older module copies it.
 
+## Does the host draw it? (1.4.0)
+
+A module that draws a "⋯" control of its own, for a host that does not draw headers, has until now
+had to guess. The greeting says: `hello.header` is `true` when the host draws the module's header,
+`false` when it does not, and absent from a host before 1.4.0. In the client it is
+`useHost().drawsHeader` (and `facts.header` in `onHello`): `boolean | null`.
+
+The rule, written once:
+
+- `drawsHeader === true`: draw no fallback control. The host has menus.
+- `drawsHeader === false`: draw the module's own control, as in an unhosted page.
+- `drawsHeader === null` (an older host, or no greeting yet): what Paper and Slides do today —
+  show the "⋯" fallback, and **hide it after the first `kehikot.press`**: a press arriving proves
+  the host draws the header. Keep it hidden for the session.
+
+A module may declare its header whichever way it draws; the host that does not draw it drops it.
+
+## A run may ask for full screen (1.4.0)
+
+A press is relayed to the module as a message, and a relayed press carries no user activation, so a
+module's `onPress` cannot call `requestFullscreen()` or open a pop-up: the browser refuses. The host
+can, from its own click handler. A `run` item says so:
+
+```ts
+{ kind: 'run', id: 'present', label: 'Present', surface: 'fullscreen' }
+```
+
+`surface` is optional, one value today (`RUN_SURFACES`: `'fullscreen'`), and only on a run. The
+contract, for a host:
+
+1. On the person's press of that item, **from the click handler itself** (no awaiting before it),
+   make this module's frame fill the screen, then send the ordinary `kehikot.press` and keep its
+   timeout. Do not wait for the module's answer first: activation expires.
+2. Full screen is the frame's, not the page's: the host's own chrome is hidden, the module is not
+   resized by anything but the viewport, and it still receives `resize` and its header as before.
+3. **Exit** is the host's: Escape (the browser's own), and a way back it draws when it can (a
+   corner control). On exit, send nothing; the module learns from the size change. Focus goes back to
+   the control that was pressed, or to the container's header when it is gone.
+4. A press the module refuses (`pressed` with `ok: false`) leaves full screen again at once, with
+   `why` shown.
+5. Refused for an agent's press (no person, no activation): relayed as an ordinary run, no surface.
+6. A host that does not know the field strips it and relays the press; the module should still do what
+   it can without full screen. A host that cannot go full screen (a webview that refuses) does the
+   same.
+
 ## What is not in 1.1.0
 
 - **`clearable` and `refreshable` stay**, and are not deprecated. Folding the host's clear and refresh into Run items is the last step of the proposal and a breaking one (2.0.0), after the modules that use them have moved.

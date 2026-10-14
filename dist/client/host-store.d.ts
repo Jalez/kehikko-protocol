@@ -78,6 +78,14 @@ export interface HostStanding<Kept = unknown> extends HostFields {
     theme: PageTheme;
     /** What the host kept for this module, read through the codec. `null` when nothing, or nothing recognised. */
     kept: Kept | null;
+    /**
+     * The methods this host said it will answer for this module (1.4.0), or `null` before the
+     * greeting and from a host that does not say. `answers?.includes('parts.set')` is true or
+     * false only when the host spoke; `null` means ask and see.
+     */
+    answers: readonly string[] | null;
+    /** Whether the host draws this module's header (1.4.0), or `null` when it did not say. See docs/header.md. */
+    drawsHeader: boolean | null;
 }
 /** What a page says to its host, the same from the hook and from the store. */
 export interface HostActions<Kept = unknown> {

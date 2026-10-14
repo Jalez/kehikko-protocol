@@ -162,6 +162,8 @@ export {
   HEADER_MENUS,
   HEADER_MENU_NAMES,
   RUN_STATES,
+  RUN_SURFACES,
+  type RunSurface,
   hostMessageSchema,
   moduleMessageSchema,
   looksLikeWireMessage,
@@ -285,7 +287,17 @@ export {
 } from './parts.js'
 
 /* What a module holds for an epic's parts, as it publishes it. The file is opened behind `/serve`. */
-export { HOLDINGS_FILE, HOLDINGS_VERSION, type PartHoldings, type EpicHoldings, type ProjectHoldings } from './holdings.js'
+export {
+  HOLDINGS_FILE,
+  HOLDINGS_VERSION,
+  HOLDING_KINDS,
+  spokenIn,
+  type HoldingKind,
+  type PartHoldings,
+  type EpicHoldings,
+  type ProjectHoldings,
+  type ProjectSpoken,
+} from './holdings.js'
 
 export {
   JOURNEYS_MODULE,

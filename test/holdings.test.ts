@@ -41,6 +41,7 @@ describe('writeHoldings: one module, one epic', () => {
     expect(read(root, 'chapters')).toEqual({
       version: 1,
       epics: { thesis: { methods: { documents: ['.kehikot/chapters/thesis/3_methods.tex'], refs: [] } } },
+      published: { thesis: ['documents', 'refs'] },
     })
     expect(readdirSync(root)).toEqual(['.kehikot'])
     expect(readdirSync(join(root, '.kehikot'))).toEqual(['chapters'])
@@ -84,6 +85,7 @@ describe('writeHoldings: one module, one epic', () => {
         other: { intro: { documents: ['a.tex'], refs: [], extra: true } },
         thesis: { methods: { documents: ['m.tex'], refs: [] } },
       },
+      published: { thesis: ['documents'] },
     })
   })
 
@@ -165,7 +167,7 @@ describe('writeHoldings: one module, one epic', () => {
     mkdirSync(join(root, '.kehikot', 'chapters'), { recursive: true })
     symlinkSync(join(elsewhere, 'private.json'), fileOf(root, 'chapters'))
     writeHoldings(root, 'kehikot.chapters', 'thesis', { methods: { documents: ['m.tex'] } })
-    expect(read(root, 'chapters')).toEqual({ version: 1, epics: { thesis: { methods: { documents: ['m.tex'], refs: [] } } } })
+    expect(read(root, 'chapters')).toEqual({ version: 1, epics: { thesis: { methods: { documents: ['m.tex'], refs: [] } } }, published: { thesis: ['documents'] } })
     expect(lstatSync(fileOf(root, 'chapters')).isSymbolicLink()).toBe(false)
     /* The link is what was set aside; the file it pointed at is as it was. */
     expect(lstatSync(`${fileOf(root, 'chapters')}.unreadable`).isSymbolicLink()).toBe(true)

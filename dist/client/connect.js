@@ -155,7 +155,7 @@ export function connect(id, events = {}, options = {}) {
                 send({ type: MESSAGE.REFRESHABLE, ...refreshing });
             if (heading !== null)
                 send({ type: MESSAGE.HEADER, items: heading });
-            events.onHello?.(message.context, message.state);
+            events.onHello?.(message.context, message.state, { answers: message.answers ?? null, header: message.header ?? null });
             return;
         }
         /* Everything after the greeting has to come from the window that gave it.

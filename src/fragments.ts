@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { KEHIKKO_KEY } from './ids.js'
+import { EPIC_SLUG, KEHIKKO_KEY } from './ids.js'
 import { LIMITS } from './limits.js'
 
 /**
@@ -41,6 +41,14 @@ export const kehikkoSchema = z.object({
   name: z.string().max(KEHIKKO_NAME),
   key: z.string().regex(KEHIKKO_KEY).optional(),
 })
+
+/**
+ * A place to be taken to, beyond an epic (1.4.0): which parts to pick out, and which kehikko to be
+ * on. `parts` are ids from `context.parts`, never names; `kehikko` is a kehikko's `key`, the identity
+ * that is stored, never its row number. Both are only meaningful beside an epic.
+ */
+export const placeParts = z.array(z.string().regex(EPIC_SLUG) /* a part id's shape is an epic slug's: `PART_ID` in parts.ts */).min(1).max(LIMITS.PLACE_PARTS)
+export const placeKehikko = z.string().regex(KEHIKKO_KEY)
 
 /** A span of bytes whose ends are each known or not. */
 interface Span {

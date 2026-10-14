@@ -1,4 +1,4 @@
-import { type ProjectHoldings } from '../holdings.js';
+import { type HoldingKind, type ProjectHoldings } from '../holdings.js';
 /**
  * What every module in a project holds for its epics' parts, unioned per epic and part: every folder
  * directly under `.kehikot/` is asked for a `parts.json`, by name order, and no module is named. Never
@@ -7,6 +7,14 @@ import { type ProjectHoldings } from '../holdings.js';
  * is skipped. Read with `own()`.
  */
 export declare function readHoldings(projectPath: string | null | undefined): ProjectHoldings;
+/**
+ * Which kinds of holdings anybody has published for one epic (1.4.0): `documents` and `refs`, each
+ * true when some module's `parts.json` says it spoke for that kind in this epic — also when what it
+ * said was nothing (`published`, kept by `writeHoldings` even for an empty epic). False for both
+ * means nobody has: a host may then fall back to whatever it did before parts. Same reading rules as
+ * `readHoldings`; never throws.
+ */
+export declare function holdingsSpoken(projectPath: string | null | undefined, epic: string): Record<HoldingKind, boolean>;
 /** What `writeHoldings` did. */
 export interface HoldingsWritten {
     /** The module's `parts.json`. */
@@ -28,4 +36,6 @@ export interface HoldingsWritten {
 export declare function writeHoldings(projectPath: string | null | undefined, moduleId: string, epic: string, holdings: Record<string, {
     documents?: readonly string[];
     refs?: readonly string[];
-}>): HoldingsWritten | null;
+}>, options?: {
+    published?: readonly HoldingKind[];
+}): HoldingsWritten | null;

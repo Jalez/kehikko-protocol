@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { LIMITS } from './limits.js';
 import { EPIC_SLUG, MODULE_ID } from './ids.js';
-import { gotoRef, ref, stepNumber } from './fragments.js';
+import { gotoRef, placeKehikko, placeParts, ref, stepNumber } from './fragments.js';
 /**
  * `passageSchema` and `filterChoiceSchema` come from `wire.ts` so that both directions share one
  * definition; `wire.ts` imports nothing from here.
@@ -17,8 +17,10 @@ import { PART_ID, partListSchema } from './parts.js';
  */
 /**
  * The areas of a host's material these methods touch, each with the sentence a person reads. Names
- * for a kind of question, not permissions: nothing grants one, nothing checks one, and a module
- * that declares none and calls everything is treated exactly like one that declared honestly.
+ * for a kind of question. A module's manifest asks for them (`declares.uses`) and a host holds each
+ * call to what was asked: a method is answered under its capability (`METHODS`) only when the
+ * manifest listed it. The protocol grants nothing itself; the host's check is its own, and a host
+ * before 1.4.0 may not make one. Since 1.4.0 the greeting says what will be answered (`hello.answers`).
  */
 export const CAPABILITIES = {
     'epics:read': 'Read which epics exist, and their titles, ledes and projects.',
@@ -172,9 +174,19 @@ export const methodParams = {
          * a DIFFERENT ref.
          */
         ref: gotoRef.optional(),
+        /**
+         * 1.4.0. Parts of the epic to pick out once there (`context.parts` ids). With an epic, so
+         * that a host before 1.4.0, which strips what it does not know, still goes to the epic.
+         */
+        parts: placeParts.optional(),
+        /** 1.4.0. The kehikko to be on first: its `key`. With an epic, for the same reason. */
+        kehikko: placeKehikko.optional(),
     })
         .refine((g) => g.epic !== undefined || g.step !== undefined || g.ref !== undefined, {
         message: 'view.goto has to name an epic, a step or a ref; a call that names nothing asks for nothing',
+    })
+        .refine((g) => (g.parts === undefined && g.kehikko === undefined) || g.epic !== undefined, {
+        message: 'view.goto: `parts` and `kehikko` go with the `epic` they are in',
     }),
     /**
      * Ask the host to fold containers to their headers, unfold them, or both; answered with

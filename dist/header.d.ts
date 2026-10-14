@@ -14,6 +14,12 @@ export type HeaderOption = z.infer<typeof headerOptionSchema>;
 /** The four kinds of item. The kind decides which menu an item is drawn in; see `HEADER_MENUS`. */
 export declare const HEADER_KINDS: readonly ["switch", "toggle", "go", "run"];
 export type HeaderKind = (typeof HEADER_KINDS)[number];
+/**
+ * Where a host puts a module when a run is pressed (1.4.0). `fullscreen`: the host makes this
+ * module's frame fill the screen from its own click handler, then sends the press. See docs/header.md.
+ */
+export declare const RUN_SURFACES: readonly ["fullscreen"];
+export type RunSurface = (typeof RUN_SURFACES)[number];
 /** A run is resting, in flight, or its last attempt failed. A host shows the last two on the menu's trigger. */
 export declare const RUN_STATES: readonly ["idle", "busy", "failed"];
 export type RunState = (typeof RUN_STATES)[number];
@@ -190,6 +196,12 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     disabled: z.ZodDefault<z.ZodNullable<z.ZodString>>;
     /** Whether a press arms it and a second press runs it. The arm is the host's; the module adds none. */
     confirm: z.ZodDefault<z.ZodBoolean>;
+    /**
+     * 1.4.0. Where the press lands. A relayed press carries no user activation, so a module cannot
+     * ask for full screen from `onPress`; the host can, from the person's click. Absent: the press
+     * is only relayed. A host that does not know the field strips it and relays the press.
+     */
+    surface: z.ZodOptional<z.ZodEnum<["fullscreen"]>>;
     id: z.ZodEffects<z.ZodString, string, string>;
     label: z.ZodString;
     /** An icon by name (`file-text`). A host draws the ones it has; an unknown name draws none. */
@@ -223,6 +235,7 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     shortcut?: string | undefined;
     group?: string | undefined;
     tool?: string | undefined;
+    surface?: "fullscreen" | undefined;
 }, {
     label: string;
     id: string;
@@ -236,6 +249,7 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     result?: string | null | undefined;
     disabled?: string | null | undefined;
     confirm?: boolean | undefined;
+    surface?: "fullscreen" | undefined;
 }>]>, {
     value: string;
     options: {
@@ -286,6 +300,7 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     shortcut?: string | undefined;
     group?: string | undefined;
     tool?: string | undefined;
+    surface?: "fullscreen" | undefined;
 }, {
     value: string;
     options: {
@@ -336,6 +351,7 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     result?: string | null | undefined;
     disabled?: string | null | undefined;
     confirm?: boolean | undefined;
+    surface?: "fullscreen" | undefined;
 }>;
 export type HeaderItem = z.infer<typeof headerItemSchema>;
 /** An item as a module writes it, before defaults are filled in. */
@@ -509,6 +525,12 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     disabled: z.ZodDefault<z.ZodNullable<z.ZodString>>;
     /** Whether a press arms it and a second press runs it. The arm is the host's; the module adds none. */
     confirm: z.ZodDefault<z.ZodBoolean>;
+    /**
+     * 1.4.0. Where the press lands. A relayed press carries no user activation, so a module cannot
+     * ask for full screen from `onPress`; the host can, from the person's click. Absent: the press
+     * is only relayed. A host that does not know the field strips it and relays the press.
+     */
+    surface: z.ZodOptional<z.ZodEnum<["fullscreen"]>>;
     id: z.ZodEffects<z.ZodString, string, string>;
     label: z.ZodString;
     /** An icon by name (`file-text`). A host draws the ones it has; an unknown name draws none. */
@@ -542,6 +564,7 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     shortcut?: string | undefined;
     group?: string | undefined;
     tool?: string | undefined;
+    surface?: "fullscreen" | undefined;
 }, {
     label: string;
     id: string;
@@ -555,6 +578,7 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     result?: string | null | undefined;
     disabled?: string | null | undefined;
     confirm?: boolean | undefined;
+    surface?: "fullscreen" | undefined;
 }>]>, {
     value: string;
     options: {
@@ -605,6 +629,7 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     shortcut?: string | undefined;
     group?: string | undefined;
     tool?: string | undefined;
+    surface?: "fullscreen" | undefined;
 }, {
     value: string;
     options: {
@@ -655,6 +680,7 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     result?: string | null | undefined;
     disabled?: string | null | undefined;
     confirm?: boolean | undefined;
+    surface?: "fullscreen" | undefined;
 }>, "many">, ({
     value: string;
     options: {
@@ -705,6 +731,7 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     shortcut?: string | undefined;
     group?: string | undefined;
     tool?: string | undefined;
+    surface?: "fullscreen" | undefined;
 })[], ({
     value: string;
     options: {
@@ -755,6 +782,7 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     result?: string | null | undefined;
     disabled?: string | null | undefined;
     confirm?: boolean | undefined;
+    surface?: "fullscreen" | undefined;
 })[]>;
 /**
  * Which menu each kind is drawn in. Fixed, so a module cannot scatter its items: switches and

@@ -7,14 +7,16 @@
  */
 export { claim, free, identify, originFor, readManifest, sayClaim, search, verdict, DRIFT_SPAN, IDENTIFY_TIMEOUT_MS, LOOPBACK, } from './ports.js';
 export { DEFAULT_FRAME_ORIGINS, frameAncestors, frameOrigins } from './origins.js';
+/* Whether a folder is a project the host holds: a module's server asks before it reads one. */
+export { hostHasProject, hostIsProjectUrls, IS_PROJECT_PATH, isProjectResult } from './host.js';
 export { neighbourPorts, portOf, readRegistration, registerAt, registryDir, } from './registry.js';
 export { preferred, serves, } from './plugin.js';
 /* Another module, as this one can learn of it: its manifest and the tools at its door. */
 export { doorOf, listTools, readNeighbour, readNeighbours, NEIGHBOUR_TIMEOUT_MS, } from './neighbours.js';
 export { readJourney, readJourneys } from './journeys.js';
 /* What each module holds for an epic's parts: a host reads every module's, a module writes its own. */
-export { readHoldings, writeHoldings } from './holdings.js';
-export { HOLDINGS_FILE } from '../holdings.js';
+export { holdingsSpoken, readHoldings, writeHoldings } from './holdings.js';
+export { HOLDINGS_FILE, HOLDING_KINDS } from '../holdings.js';
 /* The shared plumbing of a module's server: its page, its ticket, its doors. */
 export { fillPage, pageDocument, themeScript, FRAMED_DEFAULT_THEME } from './page.js';
 export { mintTicket, refuseTicket, sameTicket, ticketOf, TICKET_REFUSAL } from './ticket.js';

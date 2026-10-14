@@ -53,6 +53,13 @@ const common = {
 export const HEADER_KINDS = ['switch', 'toggle', 'go', 'run'] as const
 export type HeaderKind = (typeof HEADER_KINDS)[number]
 
+/**
+ * Where a host puts a module when a run is pressed (1.4.0). `fullscreen`: the host makes this
+ * module's frame fill the screen from its own click handler, then sends the press. See docs/header.md.
+ */
+export const RUN_SURFACES = ['fullscreen'] as const
+export type RunSurface = (typeof RUN_SURFACES)[number]
+
 /** A run is resting, in flight, or its last attempt failed. A host shows the last two on the menu's trigger. */
 export const RUN_STATES = ['idle', 'busy', 'failed'] as const
 export type RunState = (typeof RUN_STATES)[number]
@@ -91,6 +98,12 @@ export const headerItemSchema = z
       disabled: z.string().min(1).max(LIMITS.REASON).nullable().default(null),
       /** Whether a press arms it and a second press runs it. The arm is the host's; the module adds none. */
       confirm: z.boolean().default(false),
+      /**
+       * 1.4.0. Where the press lands. A relayed press carries no user activation, so a module cannot
+       * ask for full screen from `onPress`; the host can, from the person's click. Absent: the press
+       * is only relayed. A host that does not know the field strips it and relays the press.
+       */
+      surface: z.enum(RUN_SURFACES).optional(),
     }),
   ])
   .superRefine((item, ctx) => {
