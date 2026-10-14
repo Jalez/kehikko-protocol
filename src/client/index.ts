@@ -21,6 +21,7 @@ export {
   type Connection,
   type ConnectOptions,
   type HostEvents,
+  type HostFacts,
   type PressAnswer,
   type Refusal,
 } from './connect.js'

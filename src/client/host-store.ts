@@ -8,6 +8,7 @@ import {
   type ConnectOptions,
   type Connection,
   type HostEvents,
+  type HostFacts,
 } from './connect.js'
 import { reloadWhenStale } from './ask.js'
 import { applyTheme, pageTheme, systemTheme } from './theme.js'
@@ -106,6 +107,14 @@ export interface HostStanding<Kept = unknown> extends HostFields {
   theme: PageTheme
   /** What the host kept for this module, read through the codec. `null` when nothing, or nothing recognised. */
   kept: Kept | null
+  /**
+   * The methods this host said it will answer for this module (1.4.0), or `null` before the
+   * greeting and from a host that does not say. `answers?.includes('parts.set')` is true or
+   * false only when the host spoke; `null` means ask and see.
+   */
+  answers: readonly string[] | null
+  /** Whether the host draws this module's header (1.4.0), or `null` when it did not say. See docs/header.md. */
+  drawsHeader: boolean | null
 }
 
 /** What a page says to its host, the same from the hook and from the store. */
@@ -198,7 +207,7 @@ export function hostStore<Kept = unknown>(
   const { grace = GREETING_GRACE_MS, kept: given, applyTheme: themed = true, reloadWhenStale: reloads = true, same, ...connectOptions } = options
   const codec = given ?? (JSON_KEPT as KeptCodec<Kept>)
 
-  let standing: HostStanding<Kept> = { where: 'listening', context: null, ...hostFields(null), theme: pageTheme() ?? 'light', kept: null }
+  let standing: HostStanding<Kept> = { where: 'listening', context: null, ...hostFields(null), theme: pageTheme() ?? 'light', kept: null, answers: null, drawsHeader: null }
   const hearers = new Set<() => void>()
   let live: Connection | null = null
   let stopped = false
@@ -210,11 +219,11 @@ export function hostStore<Kept = unknown>(
     for (const heard of [...hearers]) heard()
   }
 
-  const arrived = (context: ModuleContext, state?: string | null) => {
+  const arrived = (context: ModuleContext, state?: string | null, facts?: HostFacts) => {
     const theme: PageTheme = context.theme === 'dark' ? 'dark' : 'light'
     if (themed) applyTheme(theme, { remember: true })
     /* The kept state with the context, in one change, so the first hosted standing already has the remembered choice. */
-    change({ where: 'hosted', context, ...hostFields(context, standing, same), theme, ...(state !== undefined ? { kept: codec.read(state) } : {}) })
+    change({ where: 'hosted', context, ...hostFields(context, standing, same), theme, ...(state !== undefined ? { kept: codec.read(state) } : {}), ...(facts ? { answers: facts.answers, drawsHeader: facts.header } : {}) })
   }
 
   const store: HostStore<Kept> = {
@@ -229,12 +238,12 @@ export function hostStore<Kept = unknown>(
       const connection = connect(
         id,
         {
-          onHello: (context, state) => {
+          onHello: (context, state, facts) => {
             /* A stopped store's answer must not overwrite the live one: `StrictMode` mounts twice,
                and the mailbox replays to every subscriber. */
             if (stopped) return
-            arrived(context, state)
-            events.onHello?.(context, state)
+            arrived(context, state, facts)
+            events.onHello?.(context, state, facts)
           },
           onContext: (context) => {
             if (stopped) return

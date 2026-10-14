@@ -139,3 +139,32 @@ All of these still work exactly as they did, and are marked `@deprecated`.
 
 `kehikot-check-parts` prints a note for each of these it can see in a module's files. It still
 fails only on the manifest.
+
+# Moving from 1.3.0 to 1.4.0
+
+Nothing has to change: 1.4.0 is additive and each piece is optional in both directions. What a module
+or a host **may now do**, and the order that is kind to older ones:
+
+## A host
+
+- **Fill the greeting**: `answers` (the methods it will answer for this module: protocol, kept, and
+  granted by `declares.uses`) and `header: true` when it draws the module's header.
+- **Publish who spoke**: `writeHoldings` (a host that keeps parts of its own) or the module's own call
+  now writes `published`; read `holdingsSpoken(project, epic)` before falling back to legacy files, so a
+  last part set to "no part" does not bring the fallback back.
+- **Full screen**: a `run` with `surface: 'fullscreen'` is gone full screen by the host from its own
+  click handler, then pressed (docs/header.md).
+- **`view.goto`** may carry `parts` (pick them) and `kehikko` (switch first), always with an `epic`.
+
+## A module
+
+| before | after |
+|---|---|
+| a no-op `parts.set` on every open to learn whether the host answers it | `answers?.includes('parts.set')` from `useHost()` (null: an older host; probe once as before) |
+| a "⋯" fallback shown until a press proves the host draws headers | `drawsHeader === false` shows it, `true` never does, `null` as before |
+| a server reading a folder its page named | `await hostHasProject(path)` from `kehikot-module-protocol/serve`, then read |
+| a notice that names only an epic | add `place: { parts, kehikko }`; a panel's press is `view.goto` with them |
+| a `run` that wants full screen, requested from `onPress` (refused: no activation) | `surface: 'fullscreen'` on the item |
+| "an empty publish looks like never publishing" | `writeHoldings(…, { published: ['documents'] })` and the host reads `holdingsSpoken` |
+
+Not changed: `kehikot-check-door`, `kehikot-check-parts`, `PROTOCOL`, anything on the manifest.

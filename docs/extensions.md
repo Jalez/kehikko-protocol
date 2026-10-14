@@ -74,6 +74,16 @@ an entry ON that change, and can be shown beside that change by something
 that understands nothing else about the sender. That is why `refs` is in the
 shape rather than in each sender's own prose.
 
+`place` (1.4.0, optional) says more exactly where a press should go:
+`{ epic?, parts?: string[], kehikko? }`. `parts` are ids from `context.parts` (at most
+`LIMITS.PLACE_PARTS`, 16); `kehikko` is a kehikko's `key`, not its row number; `epic` defaults to the
+payload's own. It is the same triple `view.goto` takes, on purpose: **the Notifications module's
+press is `view.goto({ epic: place.epic ?? epic, parts: place.parts, kehikko: place.kehikko })`**
+(plus `step` or a ref as before), and a line without `place` goes to its epic as it always did. A
+module that emits a line says where it happened by filling `place` from its own `context`
+(`context.epic`, the picked part ids, `context.kehikko?.key`). A reader before 1.4.0 strips it and
+shows the line as before. Notifications itself is a separate module and is not changed by this release.
+
 There is no field for who sent it, and there must never be. A by-line is
 stated by the side doing the showing, out of who it knows the sender to be. A
 sender choosing its own by-line is how a sentence nobody said ends up on a

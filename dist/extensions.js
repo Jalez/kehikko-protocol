@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { LIMITS } from './limits.js';
 import { EPIC_SLUG } from './ids.js';
-import { ref } from './fragments.js';
+import { placeKehikko, placeParts, ref } from './fragments.js';
 /**
  * The extension formats modules agree on: named, versioned payload shapes such as
  * `kehikot.notifications@1`. The version is part of the name, and an `@1` payload's fields never change.
@@ -25,6 +25,19 @@ export const notificationPayload = z.object({
     level: z.enum(['info', 'attention', 'done', 'blocked']).default('info'),
     refs,
     step: z.number().int().min(1).optional(),
+    /**
+     * 1.4.0. Where a press on this line goes, more exactly than `epic` alone: parts to pick out
+     * (`context.parts` ids) and the kehikko to be on (its `key`). A panel answers a press with
+     * `view.goto` carrying the same three. Optional: a line without it goes to its epic as before, and
+     * a reader before 1.4.0 strips it.
+     */
+    place: z
+        .object({
+        epic: epic.optional(),
+        parts: placeParts.optional(),
+        kehikko: placeKehikko.optional(),
+    })
+        .optional(),
 });
 /**
  * `kehikot.calls@1` — one call somebody made, whether or not the host made it: a module reporting

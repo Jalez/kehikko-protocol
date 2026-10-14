@@ -36,6 +36,13 @@ export declare const kehikkoSchema: z.ZodObject<{
     name: string;
     key?: string | undefined;
 }>;
+/**
+ * A place to be taken to, beyond an epic (1.4.0): which parts to pick out, and which kehikko to be
+ * on. `parts` are ids from `context.parts`, never names; `kehikko` is a kehikko's `key`, the identity
+ * that is stored, never its row number. Both are only meaningful beside an epic.
+ */
+export declare const placeParts: z.ZodArray<z.ZodString, "many">;
+export declare const placeKehikko: z.ZodString;
 /** A span of bytes whose ends are each known or not. */
 interface Span {
     from: number | null;

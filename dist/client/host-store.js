@@ -74,7 +74,7 @@ export function hostFields(context, was, same = {}) {
 export function hostStore(id, events = {}, options = {}) {
     const { grace = GREETING_GRACE_MS, kept: given, applyTheme: themed = true, reloadWhenStale: reloads = true, same, ...connectOptions } = options;
     const codec = given ?? JSON_KEPT;
-    let standing = { where: 'listening', context: null, ...hostFields(null), theme: pageTheme() ?? 'light', kept: null };
+    let standing = { where: 'listening', context: null, ...hostFields(null), theme: pageTheme() ?? 'light', kept: null, answers: null, drawsHeader: null };
     const hearers = new Set();
     let live = null;
     let stopped = false;
@@ -85,12 +85,12 @@ export function hostStore(id, events = {}, options = {}) {
         for (const heard of [...hearers])
             heard();
     };
-    const arrived = (context, state) => {
+    const arrived = (context, state, facts) => {
         const theme = context.theme === 'dark' ? 'dark' : 'light';
         if (themed)
             applyTheme(theme, { remember: true });
         /* The kept state with the context, in one change, so the first hosted standing already has the remembered choice. */
-        change({ where: 'hosted', context, ...hostFields(context, standing, same), theme, ...(state !== undefined ? { kept: codec.read(state) } : {}) });
+        change({ where: 'hosted', context, ...hostFields(context, standing, same), theme, ...(state !== undefined ? { kept: codec.read(state) } : {}), ...(facts ? { answers: facts.answers, drawsHeader: facts.header } : {}) });
     };
     const store = {
         get: () => standing,
@@ -102,13 +102,13 @@ export function hostStore(id, events = {}, options = {}) {
             if (live || stopped)
                 return store;
             const connection = connect(id, {
-                onHello: (context, state) => {
+                onHello: (context, state, facts) => {
                     /* A stopped store's answer must not overwrite the live one: `StrictMode` mounts twice,
                        and the mailbox replays to every subscriber. */
                     if (stopped)
                         return;
-                    arrived(context, state);
-                    events.onHello?.(context, state);
+                    arrived(context, state, facts);
+                    events.onHello?.(context, state, facts);
                 },
                 onContext: (context) => {
                     if (stopped)

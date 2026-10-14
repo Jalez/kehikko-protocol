@@ -199,6 +199,40 @@ own(own(holdings, epic) ?? {}, part.id)           // read with own(): an id may 
 - `null` when there is no project. Throws for a module id, an epic slug or a part id that is not one, and for a `.kehikot` or a module folder that resolves outside the project, before anything is made through it.
 - It writes under `<project>/.kehikot/<module>/` (`moduleFile`) and nowhere else.
 
+### Who has spoken: `published` (1.4.0)
+
+`writeHoldings` drops a part, and an epic, that holds nothing. So a module that publishes nothing
+looked the same as one that never published, and a host's legacy fallback (what it did before parts
+existed) came back the moment a last chapter was set to "no part". `parts.json` now also says which
+KINDS each epic has been published for, beside `epics` and not inside it, so that no part id can
+collide with it:
+
+```json
+{
+  "version": 1,
+  "epics": { "thesis": { "methods": { "documents": ["…"], "refs": [] } } },
+  "published": { "thesis": ["documents", "refs"], "notes": ["documents"] }
+}
+```
+
+`published[<epic>]` is a subset of `HOLDING_KINDS` (`documents`, `refs`), kept **even when the lists
+are empty** — `"notes"` above has no part held and has still been spoken for.
+
+- **`writeHoldings(projectPath, moduleId, epic, holdings, { published? })`**: the kinds this call
+  speaks for are `options.published` when given; otherwise each kind some part in `holdings` was given
+  a list for, an empty list included (`{ a: { documents: [] } }` speaks for `documents`); otherwise,
+  for a call that gives no part at all (`{}`), both. A module that only knows documents should pass
+  `{ published: ['documents'] }` and not claim `refs`. **Once spoken, spoken**: what a module said
+  earlier for the epic is kept and the kinds only grow.
+- **`holdingsSpoken(projectPath, epic)`** (`/serve`) → `{ documents: boolean, refs: boolean }`:
+  true for a kind when ANY module's file says it was published for that epic. Both false is
+  "nobody has", and the host's fallback is allowed. A file written before 1.4.0 (no `published`)
+  counts for the kinds its parts hold (`spokenIn`, pure, is what reads one file).
+- `readHoldings` is unchanged and still returns only what is held.
+- Compatibility: `HOLDINGS_VERSION` is still 1. A 1.3.0 `readHoldings` reads a 1.4.0 file and ignores
+  `published`; a 1.3.0 `writeHoldings` keeps it (every key it does not know is kept), so the memory
+  of who spoke survives an older module writing. Checked against the 1.3.0 build.
+
 **`readHoldings(projectPath)`**
 
 - Asks every folder directly under `.kehikot/` for a `parts.json`, in name order, and unions what they say per epic and part, once each, under the same bounds. It names no module: a new module's file is read the day it is written.

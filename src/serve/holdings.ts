@@ -4,8 +4,14 @@ import { isAbsolute } from 'node:path'
 import {
   HOLDINGS_FILE,
   HOLDINGS_VERSION,
+  HOLDING_KINDS,
+  holdingKinds,
   holdingsIn,
   joinHoldings,
+  joinSpoken,
+  spokenIn,
+  type HoldingKind,
+  type ProjectSpoken,
   partHoldings,
   type EpicHoldings,
   type PartHoldings,
@@ -41,15 +47,38 @@ function rootOf(projectPath: string | null | undefined): string | null {
  */
 export function readHoldings(projectPath: string | null | undefined): ProjectHoldings {
   const out: ProjectHoldings = {}
+  eachHoldingsFile(projectPath, (parsed) => joinHoldings(out, holdingsIn(parsed)))
+  return out
+}
+
+/**
+ * Which kinds of holdings anybody has published for one epic (1.4.0): `documents` and `refs`, each
+ * true when some module's `parts.json` says it spoke for that kind in this epic — also when what it
+ * said was nothing (`published`, kept by `writeHoldings` even for an empty epic). False for both
+ * means nobody has: a host may then fall back to whatever it did before parts. Same reading rules as
+ * `readHoldings`; never throws.
+ */
+export function holdingsSpoken(
+  projectPath: string | null | undefined,
+  epic: string,
+): Record<HoldingKind, boolean> {
+  const all: ProjectSpoken = {}
+  eachHoldingsFile(projectPath, (parsed) => joinSpoken(all, spokenIn(parsed)))
+  const kinds = Object.hasOwn(all, epic) ? all[epic]! : []
+  return { documents: kinds.includes('documents'), refs: kinds.includes('refs') }
+}
+
+/** Every module's `parts.json` under the project, parsed, by folder name; the rules `readHoldings` states. */
+function eachHoldingsFile(projectPath: string | null | undefined, each: (parsed: unknown) => void): void {
   const root = rootOf(projectPath)
   const dir = kehikotDir(projectPath)
-  if (root === null || dir === null) return out
+  if (root === null || dir === null) return
 
   let folders: string[]
   try {
     folders = readdirSync(dir).filter((name) => MODULE_FOLDER.test(name)).sort().slice(0, LIMITS.HOLDINGS_MODULES)
   } catch {
-    return out
+    return
   }
   for (const folder of folders) {
     const file = `${dir}/${folder}/${HOLDINGS_FILE}.json`
@@ -60,12 +89,11 @@ export function readHoldings(projectPath: string | null | undefined): ProjectHol
       if (!within(root, real)) continue
       const found = statSync(real)
       if (!found.isFile() || found.size > LIMITS.HOLDINGS_BYTES) continue
-      joinHoldings(out, holdingsIn(JSON.parse(readFileSync(real, 'utf8'))))
+      each(JSON.parse(readFileSync(real, 'utf8')))
     } catch {
       /* No file here, or not JSON: this folder holds nothing. */
     }
   }
-  return out
 }
 
 /**
@@ -113,6 +141,7 @@ export function writeHoldings(
   moduleId: string,
   epic: string,
   holdings: Record<string, { documents?: readonly string[]; refs?: readonly string[] }>,
+  options: { published?: readonly HoldingKind[] } = {},
 ): HoldingsWritten | null {
   const file = moduleFile(projectPath, moduleId, HOLDINGS_FILE)
   const dir = moduleDir(projectPath, moduleId)
@@ -123,6 +152,15 @@ export function writeHoldings(
   /* What is to be said, in the stored form. Nothing here has touched the disk yet. */
   const dropped: string[] = []
   const said: EpicHoldings = {}
+  /* The kinds this call speaks for (1.4.0): what `options.published` names, else each kind some part
+     was given a list for — an empty list included — else both, for a call that gives no parts. */
+  const given = Object.values(holdings ?? {})
+  const derived: HoldingKind[] = HOLDING_KINDS.filter((kind) => given.some((one) => Array.isArray(one?.[kind])))
+  const spoke: HoldingKind[] = options.published
+    ? holdingKinds([...options.published])
+    : derived.length > 0
+      ? derived
+      : [...HOLDING_KINDS]
   for (const [id, given] of Object.entries(holdings ?? {})) {
     if (!PART_ID.test(id)) throw new Error(`"${id}" is not a part's id. A part's id comes from context.parts, never from its name.`)
     const documents: string[] = []
@@ -180,7 +218,17 @@ export function writeHoldings(
   for (const [slug, value] of Object.entries(kept)) if (slug !== epic) epics[slug] = value
   if (Object.keys(said).length > 0) epics[epic] = said
 
-  const after = `${JSON.stringify({ ...whole, version: typeof whole.version === 'number' ? whole.version : HOLDINGS_VERSION, epics }, null, 2)}\n`
+  /* Who has spoken, beside `epics` and not inside it, so that no part id can collide with it and a
+     reader before 1.4.0 passes over it. Kept, per epic, as the union of what this module said. */
+  const was = whole.published && typeof whole.published === 'object' && !Array.isArray(whole.published) ? (whole.published as Record<string, unknown>) : {}
+  const published: Record<string, unknown> = { ...was }
+  published[epic] = HOLDING_KINDS.filter((kind) => spoke.includes(kind) || holdingKinds(was[epic]).includes(kind))
+  for (const slug of Object.keys(published)) {
+    if (Object.keys(published).length <= LIMITS.HOLDINGS_EPICS) break
+    if (slug !== epic) delete published[slug]
+  }
+
+  const after = `${JSON.stringify({ ...whole, version: typeof whole.version === 'number' ? whole.version : HOLDINGS_VERSION, epics, published }, null, 2)}\n`
   if (after === before) return { file, changed: false, dropped }
 
   const temporary = `${file}.${process.pid}.tmp`

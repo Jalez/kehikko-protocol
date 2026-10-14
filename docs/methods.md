@@ -260,12 +260,52 @@ different again — see `epicsListResult`.
 
 The areas of a host's material these methods touch.
 
-They are names for a KIND of question, not permissions — nothing grants one,
-nothing checks one, and a module that declares none and calls everything is
-treated exactly like a module that declared honestly. They exist so that
-`declares.uses` can say something a person can read at a glance: "this
-program reads the epics and reports where work is" is a sentence; a list of
-seven method names is not.
+They are names for a KIND of question, and a host holds every call to them
+(corrected in 1.4.0; this note used to say "nothing grants one, nothing checks
+one", which stopped being true when the host began checking). A module asks for
+capabilities in its manifest's `declares.uses`; the protocol maps each method
+to one (`METHODS`); a host answers a call only when the manifest asked for the
+capability its method belongs to, and otherwise refuses it with a sentence
+naming the capability. A name `METHODS` does not have is not a
+capability question and is `unknown-method`. The protocol itself still grants
+and checks nothing: shapes only, the check is the host's, and a host before
+the one that made it may answer everything. What the host WILL answer for a
+module is told in the greeting from 1.4.0 (`hello.answers`, see the wire notes).
+
+The two reasons the names exist are unchanged: `declares.uses` can say
+something a person can read at a glance — "this program reads the epics and
+reports where work is" is a sentence; a list of seven method names is not —
+and a module that declares none gets none of the methods below.
+
+##### Method → capability, as a host holds it
+
+| method | capability asked for in `declares.uses` |
+|---|---|
+| `epics.list` | `epics:read` |
+| `epic.get` | `epics:read` |
+| `steps.list` | `steps:read` |
+| `live.get` | `live:read` |
+| `stage.report` | `stage:report` |
+| `events.emit` | `events:emit` |
+| `view.goto` | `view:navigate` |
+| `view.fold` | `view:fold` |
+| `selection.set` | `selection:set` |
+| `passage.set` | `passage:set` |
+| `filters.set` | `filters:set` |
+| `showing.set` | `showing:set` |
+| `projects.pick` | `projects:pick` |
+| `state.set` | `state:keep` |
+| `disposition.set` | `disposition:set` |
+| `tracker.get` | `trackers:read` |
+| `tracker.refresh` | `trackers:refresh` |
+| `content.changed` | `content:report` |
+| `parts.set` | `parts:set` |
+
+The host's table is the protocol's `METHODS`, read by its `capabilityOf`
+(`src/host/grants.ts`): there is no second list to keep in step. A host keeps a
+short list of methods it answers though the capability was not declared
+(`ANSWERED_UNDECLARED`, empty today), each with one log line per call, as the
+way out for a module that is live and has not yet been fixed.
 
 The colons in the spellings are a leftover from when these were permissions,
 and they are kept rather than tidied: the punctuation was never the confusing
@@ -493,6 +533,31 @@ commonest ask there is — a module showing everything on the machine wants
 and what is refused is a call that names nothing at all. A `view.goto` with
 no target is not a request for anything; it is a call with a typo in it,
 and the sooner the author sees that the better.
+
+##### `parts` and `kehikko` (1.4.0)
+
+A press on a notification should take the person to where the thing is, and
+an epic alone is not always there: it is some parts of an epic, on one
+kehikko of several. Two optional fields say so.
+
+- `parts`: ids from `context.parts` (never names), at most
+  `LIMITS.PLACE_PARTS` (16). The host picks out exactly these in the epic it
+  has gone to, as the person would have; an id it does not have is `no-such-target`.
+- `kehikko`: a kehikko's `key` (`context.kehikko.key`), the identity that is
+  stored. The host switches to that kehikko before showing the epic; a key it
+  does not have is `no-such-target`.
+
+Both go **with an epic**, and a call that names `parts` or `kehikko` without
+one is refused. The reason is compatibility, not taste: a host before 1.4.0
+strips fields it does not know, so `{ epic, parts, kehikko }` takes it to the
+epic and no further, which is a reasonable thing to have happened, while
+`{ parts }` alone would be an empty call there and refused. `kehikot.goto`
+(host → module) is not extended: a module is walked by a ref or a step and
+has no use for the others.
+
+The same three are what a notification line's `place` carries
+(`kehikot.notifications@1`), so a panel's press is `view.goto` with
+`place.epic ?? epic`, `place.parts` and `place.kehikko`, unchanged.
 
 #### `methodParams.view.goto.ref`
 

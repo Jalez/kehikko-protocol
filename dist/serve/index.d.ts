@@ -7,12 +7,13 @@
  */
 export { claim, free, identify, originFor, readManifest, sayClaim, search, verdict, DRIFT_SPAN, IDENTIFY_TIMEOUT_MS, LOOPBACK, type Claimed, type ClaimOptions, type Occupant, type Verdict, } from './ports.js';
 export { DEFAULT_FRAME_ORIGINS, frameAncestors, frameOrigins } from './origins.js';
+export { hostHasProject, hostIsProjectUrls, IS_PROJECT_PATH, isProjectResult, type IsProjectResult } from './host.js';
 export { neighbourPorts, portOf, readRegistration, registerAt, registryDir, type Registered, type Registration, } from './registry.js';
 export { preferred, serves, type DevServerLike, type HttpServerLike, type ServesOptions, type ServesPlugin, } from './plugin.js';
 export { doorOf, listTools, readNeighbour, readNeighbours, NEIGHBOUR_TIMEOUT_MS, type Neighbour, type NeighbourOptions, } from './neighbours.js';
 export { readJourney, readJourneys } from './journeys.js';
-export { readHoldings, writeHoldings, type HoldingsWritten } from './holdings.js';
-export { HOLDINGS_FILE, type EpicHoldings, type PartHoldings, type ProjectHoldings } from '../holdings.js';
+export { holdingsSpoken, readHoldings, writeHoldings, type HoldingsWritten } from './holdings.js';
+export { HOLDINGS_FILE, HOLDING_KINDS, type HoldingKind, type EpicHoldings, type PartHoldings, type ProjectHoldings } from '../holdings.js';
 export { fillPage, pageDocument, themeScript, FRAMED_DEFAULT_THEME, type PageOptions } from './page.js';
 export { mintTicket, refuseTicket, sameTicket, ticketOf, TICKET_REFUSAL } from './ticket.js';
 export { readJsonBody, readJsonRequest, saysJson, BODY_METHODS, BODY_NOT_JSON, BODY_TOO_LARGE, MAX_BODY_BYTES, type BodyOptions, type BodyRead, type BodySource } from './body.js';

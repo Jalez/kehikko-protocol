@@ -21,6 +21,17 @@ export type EpicHoldings = Record<string, PartHoldings>;
 /** A project's holdings, by epic slug. Read it with `own()` too. */
 export type ProjectHoldings = Record<string, EpicHoldings>;
 /**
+ * The kinds of thing a module can publish for a part (1.4.0). `published` names which of them a
+ * module has SPOKEN FOR in an epic, so that saying nothing (an empty list) is different from never
+ * having said anything.
+ */
+export declare const HOLDING_KINDS: readonly ["documents", "refs"];
+export type HoldingKind = (typeof HOLDING_KINDS)[number];
+/** The kinds somebody has published for each epic, by slug. Read it with `own()`. */
+export type ProjectSpoken = Record<string, HoldingKind[]>;
+/** Kinds out of whatever is there: each known one, once, in `HOLDING_KINDS` order. */
+export declare function holdingKinds(raw: unknown): HoldingKind[];
+/**
  * What one part holds, read off anything: documents in `partDocument`'s form and refs as short
  * strings, once each, bounded by `LIMITS.PART_DOCUMENTS` and `LIMITS.PART_REFS`. Junk costs the entry
  * it is in. Null when nothing usable is left, so a part a module holds nothing for is not listed.
@@ -40,3 +51,12 @@ export declare function holdingsIn(document: unknown): ProjectHoldings;
  * module said, with none of them named.
  */
 export declare function joinHoldings(into: ProjectHoldings, more: ProjectHoldings): ProjectHoldings;
+/**
+ * Which kinds each epic has been published for, out of one module's parsed `parts.json`, or `{}`.
+ * Never throws. An epic is spoken for in a kind when the file's `published[<epic>]` names it, and
+ * also, for a file written before 1.4.0 (no `published`), when a part of that epic holds some of
+ * that kind. At most `LIMITS.HOLDINGS_EPICS` epics.
+ */
+export declare function spokenIn(document: unknown): ProjectSpoken;
+/** Two readings as one: `more`'s kinds added to `into`'s, per epic. `into` is changed and returned. */
+export declare function joinSpoken(into: ProjectSpoken, more: ProjectSpoken): ProjectSpoken;

@@ -224,6 +224,12 @@ export declare const LIMITS: {
     readonly SUBJECTS: 8;
     /** The name a module asks its MCP door to be registered under: `mcp.as`. */
     readonly DOOR_NAME: 40;
+    /** How many methods a host's greeting may list as answered (`hello.answers`, 1.4.0). */
+    readonly ANSWERS: 64;
+    /** How many parts one place (`place.parts`, a `view.goto`'s `parts`) may name. */
+    readonly PLACE_PARTS: 16;
+    /** How long the host gets to say whether a folder is a project, in ms (`hostHasProject`). */
+    readonly HOST_ASK_MS: 1500;
     /** The name of a tool at a module's MCP door. MCP's own bound. */
     readonly TOOL: 64;
     /** The id of one thing a "is this done?" answer is about: a question, a checklist item. */

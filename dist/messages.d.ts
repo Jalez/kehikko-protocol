@@ -327,6 +327,7 @@ export declare const headerSchema: z.ZodObject<{
         result: z.ZodDefault<z.ZodNullable<z.ZodString>>;
         disabled: z.ZodDefault<z.ZodNullable<z.ZodString>>;
         confirm: z.ZodDefault<z.ZodBoolean>;
+        surface: z.ZodOptional<z.ZodEnum<["fullscreen"]>>;
         id: z.ZodEffects<z.ZodString, string, string>;
         label: z.ZodString;
         icon: z.ZodOptional<z.ZodString>;
@@ -348,6 +349,7 @@ export declare const headerSchema: z.ZodObject<{
         shortcut?: string | undefined;
         group?: string | undefined;
         tool?: string | undefined;
+        surface?: "fullscreen" | undefined;
     }, {
         label: string;
         id: string;
@@ -361,6 +363,7 @@ export declare const headerSchema: z.ZodObject<{
         result?: string | null | undefined;
         disabled?: string | null | undefined;
         confirm?: boolean | undefined;
+        surface?: "fullscreen" | undefined;
     }>]>, {
         value: string;
         options: {
@@ -411,6 +414,7 @@ export declare const headerSchema: z.ZodObject<{
         shortcut?: string | undefined;
         group?: string | undefined;
         tool?: string | undefined;
+        surface?: "fullscreen" | undefined;
     }, {
         value: string;
         options: {
@@ -461,6 +465,7 @@ export declare const headerSchema: z.ZodObject<{
         result?: string | null | undefined;
         disabled?: string | null | undefined;
         confirm?: boolean | undefined;
+        surface?: "fullscreen" | undefined;
     }>, "many">, ({
         value: string;
         options: {
@@ -511,6 +516,7 @@ export declare const headerSchema: z.ZodObject<{
         shortcut?: string | undefined;
         group?: string | undefined;
         tool?: string | undefined;
+        surface?: "fullscreen" | undefined;
     })[], ({
         value: string;
         options: {
@@ -561,6 +567,7 @@ export declare const headerSchema: z.ZodObject<{
         result?: string | null | undefined;
         disabled?: string | null | undefined;
         confirm?: boolean | undefined;
+        surface?: "fullscreen" | undefined;
     })[]>;
 }, "strip", z.ZodTypeAny, {
     type: "kehikot.header";
@@ -614,6 +621,7 @@ export declare const headerSchema: z.ZodObject<{
         shortcut?: string | undefined;
         group?: string | undefined;
         tool?: string | undefined;
+        surface?: "fullscreen" | undefined;
     })[];
 }, {
     type: "kehikot.header";
@@ -667,6 +675,7 @@ export declare const headerSchema: z.ZodObject<{
         result?: string | null | undefined;
         disabled?: string | null | undefined;
         confirm?: boolean | undefined;
+        surface?: "fullscreen" | undefined;
     })[];
 }>;
 export type Header = z.infer<typeof headerSchema>;
@@ -1241,6 +1250,19 @@ export declare const helloSchema: z.ZodObject<{
      * module's alone, which is why it is not in the context. `null` when the host keeps nothing for it.
      */
     state: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+    /**
+     * 1.4.0. The methods this host will answer for THIS module: spoken by the protocol, kept by the
+     * host and granted by the manifest's `declares.uses`. Absent from a host before 1.4.0, which is
+     * "unknown", not "none": ask and be refused, as before. An empty list is a host that answers
+     * nothing for this module. Order carries no meaning; names are not checked against `METHODS`.
+     */
+    answers: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+    /**
+     * 1.4.0. Whether this host draws the module's declared header (`kehikot.header`) in its own menus.
+     * Absent from a host before 1.4.0: unknown. `false` is a host that does not, so the module keeps
+     * its own control. See docs/header.md.
+     */
+    header: z.ZodOptional<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
     protocol: number;
     type: "kehikot.hello";
@@ -1318,6 +1340,8 @@ export declare const helloSchema: z.ZodObject<{
             epic: string | null;
         }[];
     };
+    answers?: string[] | undefined;
+    header?: boolean | undefined;
 }, {
     protocol: number;
     type: "kehikot.hello";
@@ -1395,6 +1419,8 @@ export declare const helloSchema: z.ZodObject<{
         }[] | undefined;
     };
     state?: string | null | undefined;
+    answers?: string[] | undefined;
+    header?: boolean | undefined;
 }>;
 /**
  * Host → module. Which epic is open now: the `contextSchema` fields flat, not wrapped in `context`.
@@ -2688,6 +2714,19 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
      * module's alone, which is why it is not in the context. `null` when the host keeps nothing for it.
      */
     state: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+    /**
+     * 1.4.0. The methods this host will answer for THIS module: spoken by the protocol, kept by the
+     * host and granted by the manifest's `declares.uses`. Absent from a host before 1.4.0, which is
+     * "unknown", not "none": ask and be refused, as before. An empty list is a host that answers
+     * nothing for this module. Order carries no meaning; names are not checked against `METHODS`.
+     */
+    answers: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+    /**
+     * 1.4.0. Whether this host draws the module's declared header (`kehikot.header`) in its own menus.
+     * Absent from a host before 1.4.0: unknown. `false` is a host that does not, so the module keeps
+     * its own control. See docs/header.md.
+     */
+    header: z.ZodOptional<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
     protocol: number;
     type: "kehikot.hello";
@@ -2765,6 +2804,8 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             epic: string | null;
         }[];
     };
+    answers?: string[] | undefined;
+    header?: boolean | undefined;
 }, {
     protocol: number;
     type: "kehikot.hello";
@@ -2842,6 +2883,8 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         }[] | undefined;
     };
     state?: string | null | undefined;
+    answers?: string[] | undefined;
+    header?: boolean | undefined;
 }>, z.ZodObject<{
     epic: z.ZodDefault<z.ZodNullable<z.ZodString>>;
     project: z.ZodDefault<z.ZodNullable<z.ZodString>>;
@@ -3871,6 +3914,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         result: z.ZodDefault<z.ZodNullable<z.ZodString>>;
         disabled: z.ZodDefault<z.ZodNullable<z.ZodString>>;
         confirm: z.ZodDefault<z.ZodBoolean>;
+        surface: z.ZodOptional<z.ZodEnum<["fullscreen"]>>;
         id: z.ZodEffects<z.ZodString, string, string>;
         label: z.ZodString;
         icon: z.ZodOptional<z.ZodString>;
@@ -3892,6 +3936,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         shortcut?: string | undefined;
         group?: string | undefined;
         tool?: string | undefined;
+        surface?: "fullscreen" | undefined;
     }, {
         label: string;
         id: string;
@@ -3905,6 +3950,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         result?: string | null | undefined;
         disabled?: string | null | undefined;
         confirm?: boolean | undefined;
+        surface?: "fullscreen" | undefined;
     }>]>, {
         value: string;
         options: {
@@ -3955,6 +4001,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         shortcut?: string | undefined;
         group?: string | undefined;
         tool?: string | undefined;
+        surface?: "fullscreen" | undefined;
     }, {
         value: string;
         options: {
@@ -4005,6 +4052,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         result?: string | null | undefined;
         disabled?: string | null | undefined;
         confirm?: boolean | undefined;
+        surface?: "fullscreen" | undefined;
     }>, "many">, ({
         value: string;
         options: {
@@ -4055,6 +4103,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         shortcut?: string | undefined;
         group?: string | undefined;
         tool?: string | undefined;
+        surface?: "fullscreen" | undefined;
     })[], ({
         value: string;
         options: {
@@ -4105,6 +4154,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         result?: string | null | undefined;
         disabled?: string | null | undefined;
         confirm?: boolean | undefined;
+        surface?: "fullscreen" | undefined;
     })[]>;
 }, "strip", z.ZodTypeAny, {
     type: "kehikot.header";
@@ -4158,6 +4208,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         shortcut?: string | undefined;
         group?: string | undefined;
         tool?: string | undefined;
+        surface?: "fullscreen" | undefined;
     })[];
 }, {
     type: "kehikot.header";
@@ -4211,6 +4262,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         result?: string | null | undefined;
         disabled?: string | null | undefined;
         confirm?: boolean | undefined;
+        surface?: "fullscreen" | undefined;
     })[];
 }>, z.ZodObject<{
     type: z.ZodLiteral<"kehikot.pressed">;
