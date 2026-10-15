@@ -10,6 +10,13 @@ import { z } from 'zod';
  */
 export declare const ACTIVITY_STATES: readonly ["working", "attention", "done"];
 export type ActivityState = (typeof ACTIVITY_STATES)[number];
+/**
+ * How pressing an item is, by the module's own judgement (1.7.0). `urgent`: something is broken or
+ * blocked and nothing else will proceed. `normal` (the default): waiting for an answer. `low`:
+ * informational.
+ */
+export declare const ACTIVITY_PRIORITIES: readonly ["urgent", "normal", "low"];
+export type ActivityPriority = (typeof ACTIVITY_PRIORITIES)[number];
 export declare const activityItemSchema: z.ZodObject<{
     /** Stable and unique within the module: the same thing keeps its id for as long as it exists. */
     id: z.ZodString;
@@ -34,6 +41,12 @@ export declare const activityItemSchema: z.ZodObject<{
     since: z.ZodOptional<z.ZodNumber>;
     /** A sentence for a tooltip: "waiting for a permission". */
     detail: z.ZodOptional<z.ZodString>;
+    /** 1.7.0. The module's own sense of how pressing it is; absent is `normal`. A 1.6.0 host strips it. */
+    priority: z.ZodOptional<z.ZodEnum<["urgent", "normal", "low"]>>;
+    /** 1.7.0. Tracker refs (`gh#12`, `!7`) the item concerns, at most `LIMITS.ACTIVITY_REFS`. */
+    refs: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+    /** 1.7.0. A key a host may fold repeats under ("3 tests failed"); grouping is the host's display choice. */
+    group: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     id: string;
     state: "working" | "attention" | "done";
@@ -45,6 +58,9 @@ export declare const activityItemSchema: z.ZodObject<{
     } | undefined;
     since?: number | undefined;
     detail?: string | undefined;
+    priority?: "urgent" | "normal" | "low" | undefined;
+    refs?: string[] | undefined;
+    group?: string | undefined;
 }, {
     id: string;
     state: "working" | "attention" | "done";
@@ -56,6 +72,9 @@ export declare const activityItemSchema: z.ZodObject<{
     } | undefined;
     since?: number | undefined;
     detail?: string | undefined;
+    priority?: "urgent" | "normal" | "low" | undefined;
+    refs?: string[] | undefined;
+    group?: string | undefined;
 }>;
 export type ActivityItem = z.infer<typeof activityItemSchema>;
 /** The whole list, bounded, with no id twice. */
@@ -83,6 +102,12 @@ export declare const activityItemsSchema: z.ZodEffects<z.ZodArray<z.ZodObject<{
     since: z.ZodOptional<z.ZodNumber>;
     /** A sentence for a tooltip: "waiting for a permission". */
     detail: z.ZodOptional<z.ZodString>;
+    /** 1.7.0. The module's own sense of how pressing it is; absent is `normal`. A 1.6.0 host strips it. */
+    priority: z.ZodOptional<z.ZodEnum<["urgent", "normal", "low"]>>;
+    /** 1.7.0. Tracker refs (`gh#12`, `!7`) the item concerns, at most `LIMITS.ACTIVITY_REFS`. */
+    refs: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+    /** 1.7.0. A key a host may fold repeats under ("3 tests failed"); grouping is the host's display choice. */
+    group: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     id: string;
     state: "working" | "attention" | "done";
@@ -94,6 +119,9 @@ export declare const activityItemsSchema: z.ZodEffects<z.ZodArray<z.ZodObject<{
     } | undefined;
     since?: number | undefined;
     detail?: string | undefined;
+    priority?: "urgent" | "normal" | "low" | undefined;
+    refs?: string[] | undefined;
+    group?: string | undefined;
 }, {
     id: string;
     state: "working" | "attention" | "done";
@@ -105,6 +133,9 @@ export declare const activityItemsSchema: z.ZodEffects<z.ZodArray<z.ZodObject<{
     } | undefined;
     since?: number | undefined;
     detail?: string | undefined;
+    priority?: "urgent" | "normal" | "low" | undefined;
+    refs?: string[] | undefined;
+    group?: string | undefined;
 }>, "many">, {
     id: string;
     state: "working" | "attention" | "done";
@@ -116,6 +147,9 @@ export declare const activityItemsSchema: z.ZodEffects<z.ZodArray<z.ZodObject<{
     } | undefined;
     since?: number | undefined;
     detail?: string | undefined;
+    priority?: "urgent" | "normal" | "low" | undefined;
+    refs?: string[] | undefined;
+    group?: string | undefined;
 }[], {
     id: string;
     state: "working" | "attention" | "done";
@@ -127,6 +161,9 @@ export declare const activityItemsSchema: z.ZodEffects<z.ZodArray<z.ZodObject<{
     } | undefined;
     since?: number | undefined;
     detail?: string | undefined;
+    priority?: "urgent" | "normal" | "low" | undefined;
+    refs?: string[] | undefined;
+    group?: string | undefined;
 }[]>;
 /**
  * The mark of a container that holds these items: the worst state among them, `attention` over

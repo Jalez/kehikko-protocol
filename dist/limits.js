@@ -249,6 +249,10 @@ export const LIMITS = {
     ACTIVITY_LABEL: 120,
     /** An activity item's detail (1.5.0), in characters: a tooltip. */
     ACTIVITY_DETAIL: 200,
+    /** How many refs one activity item may name (1.7.0). */
+    ACTIVITY_REFS: 16,
+    /** An activity item's group key (1.7.0), in characters. */
+    ACTIVITY_GROUP: 64,
     /** How many parts one place (`place.parts`, a `view.goto`'s `parts`) may name. */
     PLACE_PARTS: 16,
     /** How long the host gets to say whether a folder is a project, in ms (`hostHasProject`). */

@@ -25,6 +25,9 @@ type ActivityItem = {
   place?: { epic?: string; parts?: string[]; kehikko?: string }
   since?: number                   // ms since the epoch at which it entered `state`
   detail?: string                  // a tooltip sentence, at most LIMITS.ACTIVITY_DETAIL (200)
+  priority?: 'urgent' | 'normal' | 'low'   // 1.7.0; absent is 'normal'
+  refs?: string[]                  // 1.7.0; tracker refs (gh#12, !7), at most LIMITS.ACTIVITY_REFS (16)
+  group?: string                   // 1.7.0; a fold key, 1..LIMITS.ACTIVITY_GROUP (64)
 }
 ```
 
@@ -90,3 +93,79 @@ What follows is the spec for the host; the protocol cannot enforce it.
    pressable by an agent beyond what `press_item` already is.
 9. **Grant.** The call is answered only when `declares.uses` named `activity:report` (as every
    capability); `hello.answers` lists `activity.set` for such a module.
+
+## One system (1.7.0)
+
+`activity.set` is the ONE way a module tells the host about what needs a person's attention, what is
+going on, and what just finished, including one-off notices. The host can therefore embed a single
+inbox; there is no separate notifications module to feed.
+
+- **An item has a life.** It opens when a module first reports it, changes state (`working` ->
+  `attention` -> `done`) as the module re-sends the list, and closes when the module drops it. The
+  host keeps each item's timeline. Open items are "now"; closed items and past transitions are
+  "earlier", the log.
+- **A one-off notice is an item** the module reports once (state `attention`, label "Tracker read
+  failed") and may drop at once. The host records it on receipt, so it stays in the log although it
+  was never in two lists.
+- **Vendor neutral.** Nothing in the protocol or in a host names a vendor or a module. A Claude
+  session is one reporter among others; a test runner, a tracker module or a build are the same shape.
+- **`events.emit` with `kehikot.notifications@1` is the legacy path for notices.** A host still
+  accepts it and maps each line into the same store as an item that is born closed. New modules use
+  `activity.set`. See [extensions](extensions.md).
+
+### New optional fields
+
+- **`priority`** (`urgent`, `normal`, `low`; absent is `normal`): the module's own sense of how
+  pressing the item is. `urgent`: something is broken or blocked and nothing else will proceed.
+  `normal`: waiting for an answer. `low`: informational. A module should be sparing with `urgent`;
+  a host may stop trusting a module that uses it for everything.
+- **`refs`**: tracker refs the item concerns (what a notice used to carry), so a host can link them
+  and filter by them. Each is a `LIMITS.REF` string, at most `LIMITS.ACTIVITY_REFS` (16).
+- **`group`**: a key under which a host may fold repeats. "3 tests failed" reported as three items
+  with the same group may show as one row with a count. Grouping is a host display choice; an item
+  is still an item with its own id and timeline.
+
+A 1.6.0 host strips all three and still takes the list (`test/v1-7.test.ts`, against the 1.6.0 tag).
+
+## What a host does with items
+
+The spec for a host's inbox; the protocol cannot enforce it.
+
+1. **Timeline store.** Per project, per module, per item id: the item and each state it has been in
+   with its `since`. Receipt of a list opens new ids, records changed state, and closes ids no longer
+   listed. Closed items stay in the log (bounded and trimmed by age by the host).
+2. **Now and earlier.** "Now" is open items; "earlier" is closed items and past transitions, newest
+   first.
+3. **Ordering of "what needs me".** State first (`attention`, then `working`, then `done`), then
+   `priority` (`urgent`, `normal`, `low`), then how long it has waited (oldest `since` first for
+   `attention`, newest first for `done`).
+4. **Next that needs me.** One control that goes to the top unseen `attention` item with
+   `view.goto` and its `place`, so a person can clear the list in order.
+5. **Scope.** A filter between this kehikko and everywhere, so a person sees what happens in other
+   kehikkos, parts and epics and can switch to them with one press.
+6. **Seen, dismiss, forget.** Seen: as in the host's contract above. Dismiss: hide an open item
+   from "now" without telling the module (it returns if its state changes). Forget: remove a closed
+   item from the log.
+7. **Attribution.** A row says who said it: the by-line comes before the claim, and is the host's,
+   out of who it knows the module to be. An item has no field for a sender, and must not.
+8. **Folding.** Items with one `group` from one module may be shown as one row with a count; a
+   press opens the members.
+9. **Silence.** Items from a module that stopped answering (crashed, removed, disconnected) are
+   closed, not kept alive as `working` or `attention`.
+10. **`events.emit` notices** (`kehikot.notifications@1`) go into the same store as items born
+    closed: `refs` to `refs`, `place` to `place`, the line to `label`.
+
+## What a module author should report
+
+- **A session waits for a permission**: `{ id: sessionId, state: 'attention', label: 'Wants to run
+  rm -rf build', priority: 'normal', place }`. Back to `working` when answered; drop or `done` when
+  the session ends.
+- **A test run failed**: `{ id: 'tests:' + runId, state: 'attention', label: 'Tests failed: 3',
+  group: 'tests', refs: ['gh#12'] }`; drop it when the next run passes.
+- **A compile failed and nothing else will build**: the same with `priority: 'urgent'`.
+- **A long job finished**: `{ id: jobId, state: 'done', label: 'Export finished', priority: 'low' }`.
+- **An unread review comment**: `{ id: 'review:' + commentId, state: 'attention', label: 'Comment
+  on !7', refs: ['!7'] }`.
+- **A one-off notice**: report it once with a fresh id and drop it in the next list.
+
+Keep ids stable for the same thing, labels short, and report only what a person would want to know.

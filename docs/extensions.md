@@ -65,6 +65,10 @@ here rather than assumed.
 
 #### `notificationPayload`
 
+**Legacy for notices (1.7.0).** New modules report a notice as an activity item with `activity.set`
+(see [activity](activity.md), "One system"). This format is still delivered; a host maps each line
+into its activity store as an item that is born closed, with `refs` and `place` kept.
+
 `kehikot.notifications@1` — a line on a notification panel: what happened,
 and on which work.
 

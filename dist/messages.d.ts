@@ -229,9 +229,9 @@ export declare const headerSchema: z.ZodObject<{
         label: string;
         kind: "switch";
         agents: boolean;
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         tool?: string | undefined;
     }, {
         id: string;
@@ -242,9 +242,9 @@ export declare const headerSchema: z.ZodObject<{
         }[];
         label: string;
         kind: "switch";
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         agents?: boolean | undefined;
         tool?: string | undefined;
     }>, z.ZodObject<{
@@ -263,18 +263,18 @@ export declare const headerSchema: z.ZodObject<{
         kind: "toggle";
         agents: boolean;
         checked: boolean;
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         tool?: string | undefined;
     }, {
         id: string;
         label: string;
         kind: "toggle";
         checked: boolean;
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         agents?: boolean | undefined;
         tool?: string | undefined;
     }>, z.ZodObject<{
@@ -305,9 +305,9 @@ export declare const headerSchema: z.ZodObject<{
         label: string;
         kind: "go";
         agents: boolean;
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         tool?: string | undefined;
     }, {
         id: string;
@@ -317,9 +317,9 @@ export declare const headerSchema: z.ZodObject<{
         }[];
         label: string;
         kind: "go";
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         agents?: boolean | undefined;
         tool?: string | undefined;
     }>, z.ZodObject<{
@@ -346,10 +346,10 @@ export declare const headerSchema: z.ZodObject<{
         result: string | null;
         disabled: string | null;
         confirm: boolean;
+        group?: string | undefined;
         pinned?: boolean | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         tool?: string | undefined;
         surface?: "fullscreen" | undefined;
     }, {
@@ -357,10 +357,10 @@ export declare const headerSchema: z.ZodObject<{
         label: string;
         kind: "run";
         state?: "failed" | "idle" | "busy" | undefined;
+        group?: string | undefined;
         pinned?: boolean | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         agents?: boolean | undefined;
         tool?: string | undefined;
         result?: string | null | undefined;
@@ -377,9 +377,9 @@ export declare const headerSchema: z.ZodObject<{
         label: string;
         kind: "switch";
         agents: boolean;
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         tool?: string | undefined;
     } | {
         id: string;
@@ -387,9 +387,9 @@ export declare const headerSchema: z.ZodObject<{
         kind: "toggle";
         agents: boolean;
         checked: boolean;
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         tool?: string | undefined;
     } | {
         id: string;
@@ -400,9 +400,9 @@ export declare const headerSchema: z.ZodObject<{
         label: string;
         kind: "go";
         agents: boolean;
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         tool?: string | undefined;
     } | {
         id: string;
@@ -413,10 +413,10 @@ export declare const headerSchema: z.ZodObject<{
         result: string | null;
         disabled: string | null;
         confirm: boolean;
+        group?: string | undefined;
         pinned?: boolean | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         tool?: string | undefined;
         surface?: "fullscreen" | undefined;
     }, {
@@ -428,9 +428,9 @@ export declare const headerSchema: z.ZodObject<{
         }[];
         label: string;
         kind: "switch";
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         agents?: boolean | undefined;
         tool?: string | undefined;
     } | {
@@ -438,9 +438,9 @@ export declare const headerSchema: z.ZodObject<{
         label: string;
         kind: "toggle";
         checked: boolean;
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         agents?: boolean | undefined;
         tool?: string | undefined;
     } | {
@@ -451,9 +451,9 @@ export declare const headerSchema: z.ZodObject<{
         }[];
         label: string;
         kind: "go";
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         agents?: boolean | undefined;
         tool?: string | undefined;
     } | {
@@ -461,10 +461,10 @@ export declare const headerSchema: z.ZodObject<{
         label: string;
         kind: "run";
         state?: "failed" | "idle" | "busy" | undefined;
+        group?: string | undefined;
         pinned?: boolean | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         agents?: boolean | undefined;
         tool?: string | undefined;
         result?: string | null | undefined;
@@ -481,9 +481,9 @@ export declare const headerSchema: z.ZodObject<{
         label: string;
         kind: "switch";
         agents: boolean;
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         tool?: string | undefined;
     } | {
         id: string;
@@ -491,9 +491,9 @@ export declare const headerSchema: z.ZodObject<{
         kind: "toggle";
         agents: boolean;
         checked: boolean;
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         tool?: string | undefined;
     } | {
         id: string;
@@ -504,9 +504,9 @@ export declare const headerSchema: z.ZodObject<{
         label: string;
         kind: "go";
         agents: boolean;
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         tool?: string | undefined;
     } | {
         id: string;
@@ -517,10 +517,10 @@ export declare const headerSchema: z.ZodObject<{
         result: string | null;
         disabled: string | null;
         confirm: boolean;
+        group?: string | undefined;
         pinned?: boolean | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         tool?: string | undefined;
         surface?: "fullscreen" | undefined;
     })[], ({
@@ -532,9 +532,9 @@ export declare const headerSchema: z.ZodObject<{
         }[];
         label: string;
         kind: "switch";
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         agents?: boolean | undefined;
         tool?: string | undefined;
     } | {
@@ -542,9 +542,9 @@ export declare const headerSchema: z.ZodObject<{
         label: string;
         kind: "toggle";
         checked: boolean;
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         agents?: boolean | undefined;
         tool?: string | undefined;
     } | {
@@ -555,9 +555,9 @@ export declare const headerSchema: z.ZodObject<{
         }[];
         label: string;
         kind: "go";
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         agents?: boolean | undefined;
         tool?: string | undefined;
     } | {
@@ -565,10 +565,10 @@ export declare const headerSchema: z.ZodObject<{
         label: string;
         kind: "run";
         state?: "failed" | "idle" | "busy" | undefined;
+        group?: string | undefined;
         pinned?: boolean | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         agents?: boolean | undefined;
         tool?: string | undefined;
         result?: string | null | undefined;
@@ -588,9 +588,9 @@ export declare const headerSchema: z.ZodObject<{
         label: string;
         kind: "switch";
         agents: boolean;
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         tool?: string | undefined;
     } | {
         id: string;
@@ -598,9 +598,9 @@ export declare const headerSchema: z.ZodObject<{
         kind: "toggle";
         agents: boolean;
         checked: boolean;
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         tool?: string | undefined;
     } | {
         id: string;
@@ -611,9 +611,9 @@ export declare const headerSchema: z.ZodObject<{
         label: string;
         kind: "go";
         agents: boolean;
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         tool?: string | undefined;
     } | {
         id: string;
@@ -624,10 +624,10 @@ export declare const headerSchema: z.ZodObject<{
         result: string | null;
         disabled: string | null;
         confirm: boolean;
+        group?: string | undefined;
         pinned?: boolean | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         tool?: string | undefined;
         surface?: "fullscreen" | undefined;
     })[];
@@ -642,9 +642,9 @@ export declare const headerSchema: z.ZodObject<{
         }[];
         label: string;
         kind: "switch";
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         agents?: boolean | undefined;
         tool?: string | undefined;
     } | {
@@ -652,9 +652,9 @@ export declare const headerSchema: z.ZodObject<{
         label: string;
         kind: "toggle";
         checked: boolean;
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         agents?: boolean | undefined;
         tool?: string | undefined;
     } | {
@@ -665,9 +665,9 @@ export declare const headerSchema: z.ZodObject<{
         }[];
         label: string;
         kind: "go";
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         agents?: boolean | undefined;
         tool?: string | undefined;
     } | {
@@ -675,10 +675,10 @@ export declare const headerSchema: z.ZodObject<{
         label: string;
         kind: "run";
         state?: "failed" | "idle" | "busy" | undefined;
+        group?: string | undefined;
         pinned?: boolean | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         agents?: boolean | undefined;
         tool?: string | undefined;
         result?: string | null | undefined;
@@ -1098,16 +1098,16 @@ export declare const helloSchema: z.ZodObject<{
             documents: z.ZodOptional<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">>;
         }, "strip", z.ZodTypeAny, {
             id: string;
-            heading: string;
             refs: string[];
+            heading: string;
             picked: boolean;
             files?: string[] | undefined;
             documents?: string[] | undefined;
         }, {
             id: string;
+            refs?: string[] | undefined;
             files?: string[] | undefined;
             heading?: string | undefined;
-            refs?: string[] | undefined;
             picked?: boolean | undefined;
             documents?: string[] | undefined;
         }>, "many">>;
@@ -1115,8 +1115,8 @@ export declare const helloSchema: z.ZodObject<{
         epic: string | null;
         parts: {
             id: string;
-            heading: string;
             refs: string[];
+            heading: string;
             picked: boolean;
             files?: string[] | undefined;
             documents?: string[] | undefined;
@@ -1186,9 +1186,9 @@ export declare const helloSchema: z.ZodObject<{
         epic?: string | null | undefined;
         parts?: {
             id: string;
+            refs?: string[] | undefined;
             files?: string[] | undefined;
             heading?: string | undefined;
-            refs?: string[] | undefined;
             picked?: boolean | undefined;
             documents?: string[] | undefined;
         }[] | undefined;
@@ -1281,8 +1281,8 @@ export declare const helloSchema: z.ZodObject<{
         epic: string | null;
         parts: {
             id: string;
-            heading: string;
             refs: string[];
+            heading: string;
             picked: boolean;
             files?: string[] | undefined;
             documents?: string[] | undefined;
@@ -1359,9 +1359,9 @@ export declare const helloSchema: z.ZodObject<{
         epic?: string | null | undefined;
         parts?: {
             id: string;
+            refs?: string[] | undefined;
             files?: string[] | undefined;
             heading?: string | undefined;
-            refs?: string[] | undefined;
             picked?: boolean | undefined;
             documents?: string[] | undefined;
         }[] | undefined;
@@ -1790,16 +1790,16 @@ export declare const contextMessageSchema: z.ZodObject<{
         documents: z.ZodOptional<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">>;
     }, "strip", z.ZodTypeAny, {
         id: string;
-        heading: string;
         refs: string[];
+        heading: string;
         picked: boolean;
         files?: string[] | undefined;
         documents?: string[] | undefined;
     }, {
         id: string;
+        refs?: string[] | undefined;
         files?: string[] | undefined;
         heading?: string | undefined;
-        refs?: string[] | undefined;
         picked?: boolean | undefined;
         documents?: string[] | undefined;
     }>, "many">>;
@@ -1811,8 +1811,8 @@ export declare const contextMessageSchema: z.ZodObject<{
     epic: string | null;
     parts: {
         id: string;
-        heading: string;
         refs: string[];
+        heading: string;
         picked: boolean;
         files?: string[] | undefined;
         documents?: string[] | undefined;
@@ -1885,9 +1885,9 @@ export declare const contextMessageSchema: z.ZodObject<{
     epic?: string | null | undefined;
     parts?: {
         id: string;
+        refs?: string[] | undefined;
         files?: string[] | undefined;
         heading?: string | undefined;
-        refs?: string[] | undefined;
         picked?: boolean | undefined;
         documents?: string[] | undefined;
     }[] | undefined;
@@ -2562,16 +2562,16 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             documents: z.ZodOptional<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">>;
         }, "strip", z.ZodTypeAny, {
             id: string;
-            heading: string;
             refs: string[];
+            heading: string;
             picked: boolean;
             files?: string[] | undefined;
             documents?: string[] | undefined;
         }, {
             id: string;
+            refs?: string[] | undefined;
             files?: string[] | undefined;
             heading?: string | undefined;
-            refs?: string[] | undefined;
             picked?: boolean | undefined;
             documents?: string[] | undefined;
         }>, "many">>;
@@ -2579,8 +2579,8 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         epic: string | null;
         parts: {
             id: string;
-            heading: string;
             refs: string[];
+            heading: string;
             picked: boolean;
             files?: string[] | undefined;
             documents?: string[] | undefined;
@@ -2650,9 +2650,9 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         epic?: string | null | undefined;
         parts?: {
             id: string;
+            refs?: string[] | undefined;
             files?: string[] | undefined;
             heading?: string | undefined;
-            refs?: string[] | undefined;
             picked?: boolean | undefined;
             documents?: string[] | undefined;
         }[] | undefined;
@@ -2745,8 +2745,8 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         epic: string | null;
         parts: {
             id: string;
-            heading: string;
             refs: string[];
+            heading: string;
             picked: boolean;
             files?: string[] | undefined;
             documents?: string[] | undefined;
@@ -2823,9 +2823,9 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         epic?: string | null | undefined;
         parts?: {
             id: string;
+            refs?: string[] | undefined;
             files?: string[] | undefined;
             heading?: string | undefined;
-            refs?: string[] | undefined;
             picked?: boolean | undefined;
             documents?: string[] | undefined;
         }[] | undefined;
@@ -3248,16 +3248,16 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         documents: z.ZodOptional<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">>;
     }, "strip", z.ZodTypeAny, {
         id: string;
-        heading: string;
         refs: string[];
+        heading: string;
         picked: boolean;
         files?: string[] | undefined;
         documents?: string[] | undefined;
     }, {
         id: string;
+        refs?: string[] | undefined;
         files?: string[] | undefined;
         heading?: string | undefined;
-        refs?: string[] | undefined;
         picked?: boolean | undefined;
         documents?: string[] | undefined;
     }>, "many">>;
@@ -3269,8 +3269,8 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     epic: string | null;
     parts: {
         id: string;
-        heading: string;
         refs: string[];
+        heading: string;
         picked: boolean;
         files?: string[] | undefined;
         documents?: string[] | undefined;
@@ -3343,9 +3343,9 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     epic?: string | null | undefined;
     parts?: {
         id: string;
+        refs?: string[] | undefined;
         files?: string[] | undefined;
         heading?: string | undefined;
-        refs?: string[] | undefined;
         picked?: boolean | undefined;
         documents?: string[] | undefined;
     }[] | undefined;
@@ -3825,9 +3825,9 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         label: string;
         kind: "switch";
         agents: boolean;
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         tool?: string | undefined;
     }, {
         id: string;
@@ -3838,9 +3838,9 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         }[];
         label: string;
         kind: "switch";
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         agents?: boolean | undefined;
         tool?: string | undefined;
     }>, z.ZodObject<{
@@ -3859,18 +3859,18 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         kind: "toggle";
         agents: boolean;
         checked: boolean;
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         tool?: string | undefined;
     }, {
         id: string;
         label: string;
         kind: "toggle";
         checked: boolean;
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         agents?: boolean | undefined;
         tool?: string | undefined;
     }>, z.ZodObject<{
@@ -3901,9 +3901,9 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         label: string;
         kind: "go";
         agents: boolean;
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         tool?: string | undefined;
     }, {
         id: string;
@@ -3913,9 +3913,9 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         }[];
         label: string;
         kind: "go";
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         agents?: boolean | undefined;
         tool?: string | undefined;
     }>, z.ZodObject<{
@@ -3942,10 +3942,10 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         result: string | null;
         disabled: string | null;
         confirm: boolean;
+        group?: string | undefined;
         pinned?: boolean | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         tool?: string | undefined;
         surface?: "fullscreen" | undefined;
     }, {
@@ -3953,10 +3953,10 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         label: string;
         kind: "run";
         state?: "failed" | "idle" | "busy" | undefined;
+        group?: string | undefined;
         pinned?: boolean | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         agents?: boolean | undefined;
         tool?: string | undefined;
         result?: string | null | undefined;
@@ -3973,9 +3973,9 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         label: string;
         kind: "switch";
         agents: boolean;
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         tool?: string | undefined;
     } | {
         id: string;
@@ -3983,9 +3983,9 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         kind: "toggle";
         agents: boolean;
         checked: boolean;
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         tool?: string | undefined;
     } | {
         id: string;
@@ -3996,9 +3996,9 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         label: string;
         kind: "go";
         agents: boolean;
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         tool?: string | undefined;
     } | {
         id: string;
@@ -4009,10 +4009,10 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         result: string | null;
         disabled: string | null;
         confirm: boolean;
+        group?: string | undefined;
         pinned?: boolean | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         tool?: string | undefined;
         surface?: "fullscreen" | undefined;
     }, {
@@ -4024,9 +4024,9 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         }[];
         label: string;
         kind: "switch";
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         agents?: boolean | undefined;
         tool?: string | undefined;
     } | {
@@ -4034,9 +4034,9 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         label: string;
         kind: "toggle";
         checked: boolean;
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         agents?: boolean | undefined;
         tool?: string | undefined;
     } | {
@@ -4047,9 +4047,9 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         }[];
         label: string;
         kind: "go";
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         agents?: boolean | undefined;
         tool?: string | undefined;
     } | {
@@ -4057,10 +4057,10 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         label: string;
         kind: "run";
         state?: "failed" | "idle" | "busy" | undefined;
+        group?: string | undefined;
         pinned?: boolean | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         agents?: boolean | undefined;
         tool?: string | undefined;
         result?: string | null | undefined;
@@ -4077,9 +4077,9 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         label: string;
         kind: "switch";
         agents: boolean;
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         tool?: string | undefined;
     } | {
         id: string;
@@ -4087,9 +4087,9 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         kind: "toggle";
         agents: boolean;
         checked: boolean;
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         tool?: string | undefined;
     } | {
         id: string;
@@ -4100,9 +4100,9 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         label: string;
         kind: "go";
         agents: boolean;
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         tool?: string | undefined;
     } | {
         id: string;
@@ -4113,10 +4113,10 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         result: string | null;
         disabled: string | null;
         confirm: boolean;
+        group?: string | undefined;
         pinned?: boolean | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         tool?: string | undefined;
         surface?: "fullscreen" | undefined;
     })[], ({
@@ -4128,9 +4128,9 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         }[];
         label: string;
         kind: "switch";
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         agents?: boolean | undefined;
         tool?: string | undefined;
     } | {
@@ -4138,9 +4138,9 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         label: string;
         kind: "toggle";
         checked: boolean;
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         agents?: boolean | undefined;
         tool?: string | undefined;
     } | {
@@ -4151,9 +4151,9 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         }[];
         label: string;
         kind: "go";
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         agents?: boolean | undefined;
         tool?: string | undefined;
     } | {
@@ -4161,10 +4161,10 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         label: string;
         kind: "run";
         state?: "failed" | "idle" | "busy" | undefined;
+        group?: string | undefined;
         pinned?: boolean | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         agents?: boolean | undefined;
         tool?: string | undefined;
         result?: string | null | undefined;
@@ -4184,9 +4184,9 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         label: string;
         kind: "switch";
         agents: boolean;
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         tool?: string | undefined;
     } | {
         id: string;
@@ -4194,9 +4194,9 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         kind: "toggle";
         agents: boolean;
         checked: boolean;
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         tool?: string | undefined;
     } | {
         id: string;
@@ -4207,9 +4207,9 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         label: string;
         kind: "go";
         agents: boolean;
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         tool?: string | undefined;
     } | {
         id: string;
@@ -4220,10 +4220,10 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         result: string | null;
         disabled: string | null;
         confirm: boolean;
+        group?: string | undefined;
         pinned?: boolean | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         tool?: string | undefined;
         surface?: "fullscreen" | undefined;
     })[];
@@ -4238,9 +4238,9 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         }[];
         label: string;
         kind: "switch";
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         agents?: boolean | undefined;
         tool?: string | undefined;
     } | {
@@ -4248,9 +4248,9 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         label: string;
         kind: "toggle";
         checked: boolean;
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         agents?: boolean | undefined;
         tool?: string | undefined;
     } | {
@@ -4261,9 +4261,9 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         }[];
         label: string;
         kind: "go";
+        group?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         agents?: boolean | undefined;
         tool?: string | undefined;
     } | {
@@ -4271,10 +4271,10 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         label: string;
         kind: "run";
         state?: "failed" | "idle" | "busy" | undefined;
+        group?: string | undefined;
         pinned?: boolean | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        group?: string | undefined;
         agents?: boolean | undefined;
         tool?: string | undefined;
         result?: string | null | undefined;

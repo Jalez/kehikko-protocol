@@ -856,6 +856,9 @@ export declare const methodParams: {
             }>>;
             since: z.ZodOptional<z.ZodNumber>;
             detail: z.ZodOptional<z.ZodString>;
+            priority: z.ZodOptional<z.ZodEnum<["urgent", "normal", "low"]>>;
+            refs: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+            group: z.ZodOptional<z.ZodString>;
         }, "strip", z.ZodTypeAny, {
             id: string;
             state: "working" | "attention" | "done";
@@ -867,6 +870,9 @@ export declare const methodParams: {
             } | undefined;
             since?: number | undefined;
             detail?: string | undefined;
+            priority?: "urgent" | "normal" | "low" | undefined;
+            refs?: string[] | undefined;
+            group?: string | undefined;
         }, {
             id: string;
             state: "working" | "attention" | "done";
@@ -878,6 +884,9 @@ export declare const methodParams: {
             } | undefined;
             since?: number | undefined;
             detail?: string | undefined;
+            priority?: "urgent" | "normal" | "low" | undefined;
+            refs?: string[] | undefined;
+            group?: string | undefined;
         }>, "many">, {
             id: string;
             state: "working" | "attention" | "done";
@@ -889,6 +898,9 @@ export declare const methodParams: {
             } | undefined;
             since?: number | undefined;
             detail?: string | undefined;
+            priority?: "urgent" | "normal" | "low" | undefined;
+            refs?: string[] | undefined;
+            group?: string | undefined;
         }[], {
             id: string;
             state: "working" | "attention" | "done";
@@ -900,6 +912,9 @@ export declare const methodParams: {
             } | undefined;
             since?: number | undefined;
             detail?: string | undefined;
+            priority?: "urgent" | "normal" | "low" | undefined;
+            refs?: string[] | undefined;
+            group?: string | undefined;
         }[]>;
     }, "strip", z.ZodTypeAny, {
         items: {
@@ -913,6 +928,9 @@ export declare const methodParams: {
             } | undefined;
             since?: number | undefined;
             detail?: string | undefined;
+            priority?: "urgent" | "normal" | "low" | undefined;
+            refs?: string[] | undefined;
+            group?: string | undefined;
         }[];
     }, {
         items: {
@@ -926,6 +944,9 @@ export declare const methodParams: {
             } | undefined;
             since?: number | undefined;
             detail?: string | undefined;
+            priority?: "urgent" | "normal" | "low" | undefined;
+            refs?: string[] | undefined;
+            group?: string | undefined;
         }[];
     }>;
     readonly 'events.emit': z.ZodObject<{
