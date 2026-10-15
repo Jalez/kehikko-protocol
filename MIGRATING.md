@@ -140,6 +140,29 @@ All of these still work exactly as they did, and are marked `@deprecated`.
 `kehikot-check-parts` prints a note for each of these it can see in a module's files. It still
 fails only on the manifest.
 
+# Moving from 1.4.0 to 1.5.0
+
+Nothing has to change: 1.5.0 is additive. See [docs/activity.md](docs/activity.md).
+
+## A host
+
+| before | after |
+|---|---|
+| no standing marks for what modules run | answer `activity.set` under `activity:report`; keep each module's list; aggregate per container (attention > working > done) and mark epics, parts, kehikot |
+| `answers` lists the granted methods | include `activity.set` for a module that declared `activity:report` |
+| `read_canvas` lists containers and header items | also list each module's activity items, with seen |
+| a notification's `place` is the only way to jump | pressing an item is `view.goto` with its `place` |
+
+## A module
+
+| before | after |
+|---|---|
+| a one-time `events.emit` notice on a transition, plus own glyphs | also `connection.activity(items)` with the whole list (needs-you → `attention`, finished → `done`, working → `working`); keep the notice if you like |
+| nothing | `declares.uses` adds `activity:report`; safe on a 1.4.0 host |
+| not knowing whether the host marks | `answers?.includes('activity.set')`; `null` means send anyway |
+
+Not changed: `PROTOCOL`, the manifest, the header.
+
 # Moving from 1.3.0 to 1.4.0
 
 Nothing has to change: 1.4.0 is additive and each piece is optional in both directions. What a module

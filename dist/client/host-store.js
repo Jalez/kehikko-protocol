@@ -193,6 +193,7 @@ export function hostStore(id, events = {}, options = {}) {
         clearable: (label) => live?.clearable(label),
         refreshable: (state) => live?.refreshable(state),
         header: (items) => live?.header(items),
+        activity: (items) => live?.activity(items),
         connection: () => live,
     };
     return store;

@@ -305,6 +305,10 @@ in its own menus. See [the header](header.md). Carried in the standing as
 
 A host before 1.4.0 parses a greeting carrying either, and strips them.
 
+From 1.5.0 `answers` also tells a module whether it will be drawn as busy: `answers?.includes('activity.set')`
+([activity](activity.md)). A module that gets `null` sends the list anyway and is refused as
+`unknown-method` by a host that does not know it; the client does this itself.
+
 #### `helloSchema.state`
 
 Whatever this module last asked the host to keep for it, verbatim.

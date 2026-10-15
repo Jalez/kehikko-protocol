@@ -15,12 +15,12 @@ declare const modeSchema: z.ZodObject<{
      */
     scope: z.ZodDefault<z.ZodEnum<["epic", "global"]>>;
 }, "strip", z.ZodTypeAny, {
-    label: string;
     id: string;
+    label: string;
     scope: "epic" | "global";
 }, {
-    label: string;
     id: string;
+    label: string;
     scope?: "epic" | "global" | undefined;
 }>;
 export type ModuleMode = z.infer<typeof modeSchema>;
@@ -331,12 +331,12 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
          */
         scope: z.ZodDefault<z.ZodEnum<["epic", "global"]>>;
     }, "strip", z.ZodTypeAny, {
-        label: string;
         id: string;
+        label: string;
         scope: "epic" | "global";
     }, {
-        label: string;
         id: string;
+        label: string;
         scope?: "epic" | "global" | undefined;
     }>, "many">;
     /**
@@ -399,10 +399,10 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         commit?: string | null | undefined;
     }>>>;
 }, "strip", z.ZodTypeAny, {
-    version: string;
-    protocol: number;
     id: string;
     name: string;
+    version: string;
+    protocol: number;
     summary: string;
     kind: "kehikot.module";
     dataVersion: number;
@@ -415,8 +415,8 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     };
     reacts: string[];
     modes: {
-        label: string;
         id: string;
+        label: string;
         scope: "epic" | "global";
     }[];
     declares: {
@@ -448,14 +448,14 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     } | undefined;
     partless?: string | undefined;
 }, {
-    protocol: number;
     id: string;
     name: string;
+    protocol: number;
     kind: "kehikot.module";
     entry: string;
     modes: {
-        label: string;
         id: string;
+        label: string;
         scope?: "epic" | "global" | undefined;
     }[];
     build?: unknown;
@@ -492,10 +492,10 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         storage?: boolean | undefined;
     } | undefined;
 }>, {
-    version: string;
-    protocol: number;
     id: string;
     name: string;
+    version: string;
+    protocol: number;
     summary: string;
     kind: "kehikot.module";
     dataVersion: number;
@@ -508,8 +508,8 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     };
     reacts: string[];
     modes: {
-        label: string;
         id: string;
+        label: string;
         scope: "epic" | "global";
     }[];
     declares: {
@@ -541,14 +541,14 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     } | undefined;
     partless?: string | undefined;
 }, {
-    protocol: number;
     id: string;
     name: string;
+    protocol: number;
     kind: "kehikot.module";
     entry: string;
     modes: {
-        label: string;
         id: string;
+        label: string;
         scope?: "epic" | "global" | undefined;
     }[];
     build?: unknown;

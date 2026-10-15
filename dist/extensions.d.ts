@@ -33,24 +33,24 @@ export declare const notificationPayload: z.ZodObject<{
     message: string;
     epic: string;
     refs: string[];
-    level: "done" | "info" | "attention" | "blocked";
-    step?: number | undefined;
+    level: "attention" | "done" | "info" | "blocked";
     place?: {
         epic?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
     } | undefined;
+    step?: number | undefined;
 }, {
     message: string;
     epic: string;
-    refs?: string[] | undefined;
-    level?: "done" | "info" | "attention" | "blocked" | undefined;
-    step?: number | undefined;
     place?: {
         epic?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
     } | undefined;
+    refs?: string[] | undefined;
+    level?: "attention" | "done" | "info" | "blocked" | undefined;
+    step?: number | undefined;
 }>;
 export type NotificationPayload = z.infer<typeof notificationPayload>;
 /**

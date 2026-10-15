@@ -1,3 +1,4 @@
+import { type ActivityItem } from '../activity.js';
 import { type FilterGroup, type Goto, type HeaderItemInput, type ModuleContext, type ModuleEvent, type Press, type ResponseFailureReason } from '../wire.js';
 import { type MessageSource } from './mailbox.js';
 /**
@@ -181,6 +182,14 @@ export interface Connection {
      * `onPress`: the host draws what was last declared and holds no state of its own.
      */
     header: (items: HeaderItemInput[]) => void;
+    /**
+     * Say what this page's things are doing now (`activity.set`, 1.5.0): the COMPLETE list, replacing
+     * what was said before; `[]` says nothing is going on. Fire and forget. A list identical to the one
+     * last taken is not sent again, the last list is re-sent after every greeting, and nothing is sent
+     * to a host whose greeting said it does not answer `activity.set` (the module simply gets no dots).
+     * A list that does not parse is dropped here, not sent. See docs/activity.md.
+     */
+    activity: (items: ActivityItem[]) => void;
     /** Whether anything has greeted us yet. */
     greeted: () => boolean;
     /** Stop listening. Every question still waiting is refused rather than left hanging. */

@@ -239,6 +239,14 @@ export const LIMITS = {
   DOOR_NAME: 40,
   /** How many methods a host's greeting may list as answered (`hello.answers`, 1.4.0). */
   ANSWERS: 64,
+  /** How many items one `activity.set` may list (1.5.0). */
+  ACTIVITY_ITEMS: 64,
+  /** The id of one activity item (1.5.0): a session id, a run id. */
+  ACTIVITY_ID: 128,
+  /** An activity item's label (1.5.0), in characters: a line a person reads. */
+  ACTIVITY_LABEL: 120,
+  /** An activity item's detail (1.5.0), in characters: a tooltip. */
+  ACTIVITY_DETAIL: 200,
   /** How many parts one place (`place.parts`, a `view.goto`'s `parts`) may name. */
   PLACE_PARTS: 16,
   /** How long the host gets to say whether a folder is a project, in ms (`hostHasProject`). */

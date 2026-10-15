@@ -83,6 +83,12 @@ export declare const CAPABILITIES: {
      * The host is the list's only writer and decides; a module offers the edit on a person's press.
      */
     readonly 'parts:set': "Ask the host to add, rename, move or remove a part of an epic. The host decides, and every module is told.";
+    /**
+     * Say what this module's things are doing NOW: working, needing the person, finished. A write into
+     * the host's marks, read back by nobody else as data; the host draws it. See `activity.set` and
+     * `activity.ts`. 1.5.0.
+     */
+    readonly 'activity:report': "Say which of the things you run are working, need your attention or have finished, so the host can mark them.";
 };
 export type Capability = keyof typeof CAPABILITIES;
 export declare const CAPABILITY_NAMES: Capability[];
@@ -111,6 +117,7 @@ export declare const METHODS: {
     readonly 'tracker.refresh': "trackers:refresh";
     readonly 'content.changed': "content:report";
     readonly 'parts.set': "parts:set";
+    readonly 'activity.set': "activity:report";
 };
 export type Method = keyof typeof METHODS;
 export declare const METHOD_NAMES: Method[];
@@ -169,39 +176,39 @@ export declare const methodParams: {
         kehikko: z.ZodOptional<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
         epic?: string | undefined;
-        ref?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
+        ref?: string | undefined;
         step?: number | undefined;
     }, {
         epic?: string | undefined;
-        ref?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
+        ref?: string | undefined;
         step?: number | undefined;
     }>, {
         epic?: string | undefined;
-        ref?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
+        ref?: string | undefined;
         step?: number | undefined;
     }, {
         epic?: string | undefined;
-        ref?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
+        ref?: string | undefined;
         step?: number | undefined;
     }>, {
         epic?: string | undefined;
-        ref?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
+        ref?: string | undefined;
         step?: number | undefined;
     }, {
         epic?: string | undefined;
-        ref?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
+        ref?: string | undefined;
         step?: number | undefined;
     }>;
     /**
@@ -557,10 +564,10 @@ export declare const methodParams: {
     }, "strip", z.ZodTypeAny, {
         ref: string;
         note: string;
-        stage: "blocked" | "working" | "in-review";
+        stage: "working" | "blocked" | "in-review";
     }, {
         ref: string;
-        stage: "blocked" | "working" | "in-review";
+        stage: "working" | "blocked" | "in-review";
         note?: string | undefined;
     }>;
     /**
@@ -605,33 +612,33 @@ export declare const methodParams: {
         epic: z.ZodOptional<z.ZodString>;
         project: z.ZodOptional<z.ZodLiteral<true>>;
     }, "strip", z.ZodTypeAny, {
-        detail: "summary" | "detail";
+        detail: "detail" | "summary";
         epic?: string | undefined;
         refs?: string[] | undefined;
         project?: true | undefined;
     }, {
         epic?: string | undefined;
-        detail?: "summary" | "detail" | undefined;
+        detail?: "detail" | "summary" | undefined;
         refs?: string[] | undefined;
         project?: true | undefined;
     }>, {
-        detail: "summary" | "detail";
+        detail: "detail" | "summary";
         epic?: string | undefined;
         refs?: string[] | undefined;
         project?: true | undefined;
     }, {
         epic?: string | undefined;
-        detail?: "summary" | "detail" | undefined;
+        detail?: "detail" | "summary" | undefined;
         refs?: string[] | undefined;
         project?: true | undefined;
     }>, {
-        detail: "summary" | "detail";
+        detail: "detail" | "summary";
         epic?: string | undefined;
         refs?: string[] | undefined;
         project?: true | undefined;
     }, {
         epic?: string | undefined;
-        detail?: "summary" | "detail" | undefined;
+        detail?: "detail" | "summary" | undefined;
         refs?: string[] | undefined;
         project?: true | undefined;
     }>;
@@ -824,6 +831,103 @@ export declare const methodParams: {
             id: string;
         } | undefined;
     }>;
+    /**
+     * 1.5.0. This module's COMPLETE list of activity items right now; answered with `activitySetResult`. Replaces,
+     * never merges: an item absent from the list is gone, and `[]` is a real call that says nothing is going on.
+     * Duplicate ids are refused. See `activity.ts`.
+     */
+    readonly 'activity.set': z.ZodObject<{
+        items: z.ZodEffects<z.ZodArray<z.ZodObject<{
+            id: z.ZodString;
+            state: z.ZodEnum<["working", "attention", "done"]>;
+            label: z.ZodString;
+            place: z.ZodOptional<z.ZodObject<{
+                epic: z.ZodOptional<z.ZodString>;
+                parts: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+                kehikko: z.ZodOptional<z.ZodString>;
+            }, "strip", z.ZodTypeAny, {
+                epic?: string | undefined;
+                parts?: string[] | undefined;
+                kehikko?: string | undefined;
+            }, {
+                epic?: string | undefined;
+                parts?: string[] | undefined;
+                kehikko?: string | undefined;
+            }>>;
+            since: z.ZodOptional<z.ZodNumber>;
+            detail: z.ZodOptional<z.ZodString>;
+        }, "strip", z.ZodTypeAny, {
+            id: string;
+            state: "working" | "attention" | "done";
+            label: string;
+            place?: {
+                epic?: string | undefined;
+                parts?: string[] | undefined;
+                kehikko?: string | undefined;
+            } | undefined;
+            since?: number | undefined;
+            detail?: string | undefined;
+        }, {
+            id: string;
+            state: "working" | "attention" | "done";
+            label: string;
+            place?: {
+                epic?: string | undefined;
+                parts?: string[] | undefined;
+                kehikko?: string | undefined;
+            } | undefined;
+            since?: number | undefined;
+            detail?: string | undefined;
+        }>, "many">, {
+            id: string;
+            state: "working" | "attention" | "done";
+            label: string;
+            place?: {
+                epic?: string | undefined;
+                parts?: string[] | undefined;
+                kehikko?: string | undefined;
+            } | undefined;
+            since?: number | undefined;
+            detail?: string | undefined;
+        }[], {
+            id: string;
+            state: "working" | "attention" | "done";
+            label: string;
+            place?: {
+                epic?: string | undefined;
+                parts?: string[] | undefined;
+                kehikko?: string | undefined;
+            } | undefined;
+            since?: number | undefined;
+            detail?: string | undefined;
+        }[]>;
+    }, "strip", z.ZodTypeAny, {
+        items: {
+            id: string;
+            state: "working" | "attention" | "done";
+            label: string;
+            place?: {
+                epic?: string | undefined;
+                parts?: string[] | undefined;
+                kehikko?: string | undefined;
+            } | undefined;
+            since?: number | undefined;
+            detail?: string | undefined;
+        }[];
+    }, {
+        items: {
+            id: string;
+            state: "working" | "attention" | "done";
+            label: string;
+            place?: {
+                epic?: string | undefined;
+                parts?: string[] | undefined;
+                kehikko?: string | undefined;
+            } | undefined;
+            since?: number | undefined;
+            detail?: string | undefined;
+        }[];
+    }>;
     readonly 'events.emit': z.ZodObject<{
         extension: z.ZodString;
         /**
@@ -927,22 +1031,42 @@ export declare const partsSetResult: z.ZodObject<{
     why: z.ZodDefault<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     id: string | null;
-    outcome: "changed" | "declined" | "unchanged" | "no-such-part";
-    why: string;
     parts: {
         id: string;
         name: string;
     }[];
+    outcome: "changed" | "declined" | "unchanged" | "no-such-part";
+    why: string;
 }, {
     outcome: "changed" | "declined" | "unchanged" | "no-such-part";
     id?: string | null | undefined;
-    why?: string | undefined;
     parts?: {
         id: string;
         name: string;
     }[] | undefined;
+    why?: string | undefined;
 }>;
 export type PartsSetResult = z.infer<typeof partsSetResult>;
+/**
+ * What became of an `activity.set`; both are `ok: true`. `taken`: the host holds the list as sent. `declined`:
+ * it will not, right now (`why` says so). `taken` is how many items it holds.
+ */
+export declare const ACTIVITY_SET_OUTCOMES: readonly ["taken", "declined"];
+export type ActivitySetOutcome = (typeof ACTIVITY_SET_OUTCOMES)[number];
+export declare const activitySetResult: z.ZodObject<{
+    outcome: z.ZodEnum<["taken", "declined"]>;
+    taken: z.ZodDefault<z.ZodNumber>;
+    why: z.ZodDefault<z.ZodString>;
+}, "strip", z.ZodTypeAny, {
+    outcome: "declined" | "taken";
+    why: string;
+    taken: number;
+}, {
+    outcome: "declined" | "taken";
+    why?: string | undefined;
+    taken?: number | undefined;
+}>;
+export type ActivitySetResult = z.infer<typeof activitySetResult>;
 /**
  * The least an `epics.list` can answer with. `slug` is required: it is the argument to every other
  * call. `title` and `project` are optional and bounded. Every other field passes through untouched.
@@ -1021,8 +1145,8 @@ export declare const pickedProject: z.ZodObject<{
     path: z.ZodString;
     name: z.ZodDefault<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    path: string;
     name: string;
+    path: string;
 }, {
     path: string;
     name?: string | undefined;
@@ -1039,8 +1163,8 @@ export declare const projectPickResult: z.ZodObject<{
         path: z.ZodString;
         name: z.ZodDefault<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
-        path: string;
         name: string;
+        path: string;
     }, {
         path: string;
         name?: string | undefined;
@@ -1050,8 +1174,8 @@ export declare const projectPickResult: z.ZodObject<{
     outcome: "declined" | "picked" | "cancelled";
     why: string;
     project: {
-        path: string;
         name: string;
+        path: string;
     } | null;
 }, {
     outcome: "declined" | "picked" | "cancelled";

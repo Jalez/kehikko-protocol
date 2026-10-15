@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import type { FilterGroup, HeaderItemInput, Passage } from '../index.js'
+import type { ActivityItem, FilterGroup, HeaderItemInput, Passage } from '../index.js'
 import { HostRefused, NOBODY_TO_ASK, type AskOptions, type Connection, type HostEvents } from './connect.js'
 import {
   JSON_KEPT,
@@ -106,11 +106,12 @@ export function useHost<Kept = unknown>(
     [],
   )
   const header = useCallback((items: HeaderItemInput[]) => held.current?.header(items), [])
+  const activity = useCallback((items: ActivityItem[]) => held.current?.activity(items), [])
   const connection = useCallback(() => held.current?.connection() ?? null, [])
   const read = useCallback(() => held.current?.get() ?? drawn.current, [])
 
   return useMemo(
-    () => ({ ...standing, remember, point, request, resize, filters, clearable, refreshable, header, connection, read }),
-    [standing, remember, point, request, resize, filters, clearable, refreshable, header, connection, read],
+    () => ({ ...standing, remember, point, request, resize, filters, clearable, refreshable, header, activity, connection, read }),
+    [standing, remember, point, request, resize, filters, clearable, refreshable, header, activity, connection, read],
   )
 }

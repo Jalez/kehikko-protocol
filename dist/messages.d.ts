@@ -14,82 +14,82 @@ export declare const filtersSchema: z.ZodObject<{
             id: z.ZodEffects<z.ZodString, string, string>;
             label: z.ZodString;
         }, "strip", z.ZodTypeAny, {
-            label: string;
             id: string;
+            label: string;
         }, {
-            label: string;
             id: string;
+            label: string;
         }>, "many">>;
         fallback: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
     }, "strip", z.ZodTypeAny, {
+        id: string;
         options: {
-            label: string;
             id: string;
+            label: string;
         }[];
         label: string;
-        id: string;
         kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
     }, {
-        label: string;
         id: string;
+        label: string;
         options?: {
-            label: string;
             id: string;
+            label: string;
         }[] | undefined;
         kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
     }>, {
+        id: string;
         options: {
-            label: string;
             id: string;
+            label: string;
         }[];
         label: string;
-        id: string;
         kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
     }, {
-        label: string;
         id: string;
+        label: string;
         options?: {
-            label: string;
             id: string;
+            label: string;
         }[] | undefined;
         kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
     }>, {
+        id: string;
         options: {
-            label: string;
             id: string;
+            label: string;
         }[];
         label: string;
-        id: string;
         kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
     }, {
-        label: string;
         id: string;
+        label: string;
         options?: {
-            label: string;
             id: string;
+            label: string;
         }[] | undefined;
         kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
     }>, "many">, {
+        id: string;
         options: {
-            label: string;
             id: string;
+            label: string;
         }[];
         label: string;
-        id: string;
         kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
     }[], {
-        label: string;
         id: string;
+        label: string;
         options?: {
-            label: string;
             id: string;
+            label: string;
         }[] | undefined;
         kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
@@ -97,23 +97,23 @@ export declare const filtersSchema: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     type: "kehikot.filters";
     groups: {
+        id: string;
         options: {
-            label: string;
             id: string;
+            label: string;
         }[];
         label: string;
-        id: string;
         kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
     }[];
 }, {
     type: "kehikot.filters";
     groups: {
-        label: string;
         id: string;
+        label: string;
         options?: {
-            label: string;
             id: string;
+            label: string;
         }[] | undefined;
         kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
@@ -145,11 +145,11 @@ export declare const clearSchema: z.ZodObject<{
     type: z.ZodLiteral<"kehikot.clear">;
     protocol: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
-    protocol: number;
     type: "kehikot.clear";
+    protocol: number;
 }, {
-    protocol: number;
     type: "kehikot.clear";
+    protocol: number;
 }>;
 export type Clear = z.infer<typeof clearSchema>;
 /**
@@ -185,11 +185,11 @@ export declare const refreshSchema: z.ZodObject<{
     type: z.ZodLiteral<"kehikot.refresh">;
     protocol: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
-    protocol: number;
     type: "kehikot.refresh";
+    protocol: number;
 }, {
-    protocol: number;
     type: "kehikot.refresh";
+    protocol: number;
 }>;
 export type Refresh = z.infer<typeof refreshSchema>;
 /**
@@ -204,11 +204,11 @@ export declare const headerSchema: z.ZodObject<{
             id: z.ZodEffects<z.ZodString, string, string>;
             label: z.ZodString;
         }, "strip", z.ZodTypeAny, {
-            label: string;
             id: string;
+            label: string;
         }, {
-            label: string;
             id: string;
+            label: string;
         }>, "many">;
         value: z.ZodEffects<z.ZodString, string, string>;
         id: z.ZodEffects<z.ZodString, string, string>;
@@ -220,13 +220,13 @@ export declare const headerSchema: z.ZodObject<{
         tool: z.ZodOptional<z.ZodString>;
         kind: z.ZodLiteral<"switch">;
     }, "strip", z.ZodTypeAny, {
+        id: string;
         value: string;
         options: {
-            label: string;
             id: string;
+            label: string;
         }[];
         label: string;
-        id: string;
         kind: "switch";
         agents: boolean;
         icon?: string | undefined;
@@ -234,13 +234,13 @@ export declare const headerSchema: z.ZodObject<{
         group?: string | undefined;
         tool?: string | undefined;
     }, {
+        id: string;
         value: string;
         options: {
-            label: string;
             id: string;
+            label: string;
         }[];
         label: string;
-        id: string;
         kind: "switch";
         icon?: string | undefined;
         shortcut?: string | undefined;
@@ -258,8 +258,8 @@ export declare const headerSchema: z.ZodObject<{
         tool: z.ZodOptional<z.ZodString>;
         kind: z.ZodLiteral<"toggle">;
     }, "strip", z.ZodTypeAny, {
-        label: string;
         id: string;
+        label: string;
         kind: "toggle";
         agents: boolean;
         checked: boolean;
@@ -268,8 +268,8 @@ export declare const headerSchema: z.ZodObject<{
         group?: string | undefined;
         tool?: string | undefined;
     }, {
-        label: string;
         id: string;
+        label: string;
         kind: "toggle";
         checked: boolean;
         icon?: string | undefined;
@@ -282,11 +282,11 @@ export declare const headerSchema: z.ZodObject<{
             id: z.ZodEffects<z.ZodString, string, string>;
             label: z.ZodString;
         }, "strip", z.ZodTypeAny, {
-            label: string;
             id: string;
+            label: string;
         }, {
-            label: string;
             id: string;
+            label: string;
         }>, "many">;
         id: z.ZodEffects<z.ZodString, string, string>;
         label: z.ZodString;
@@ -297,12 +297,12 @@ export declare const headerSchema: z.ZodObject<{
         tool: z.ZodOptional<z.ZodString>;
         kind: z.ZodLiteral<"go">;
     }, "strip", z.ZodTypeAny, {
+        id: string;
         options: {
-            label: string;
             id: string;
+            label: string;
         }[];
         label: string;
-        id: string;
         kind: "go";
         agents: boolean;
         icon?: string | undefined;
@@ -310,12 +310,12 @@ export declare const headerSchema: z.ZodObject<{
         group?: string | undefined;
         tool?: string | undefined;
     }, {
+        id: string;
         options: {
-            label: string;
             id: string;
+            label: string;
         }[];
         label: string;
-        id: string;
         kind: "go";
         icon?: string | undefined;
         shortcut?: string | undefined;
@@ -337,10 +337,10 @@ export declare const headerSchema: z.ZodObject<{
         tool: z.ZodOptional<z.ZodString>;
         kind: z.ZodLiteral<"run">;
     }, "strip", z.ZodTypeAny, {
-        label: string;
         id: string;
-        kind: "run";
         state: "failed" | "idle" | "busy";
+        label: string;
+        kind: "run";
         agents: boolean;
         result: string | null;
         disabled: string | null;
@@ -351,8 +351,8 @@ export declare const headerSchema: z.ZodObject<{
         tool?: string | undefined;
         surface?: "fullscreen" | undefined;
     }, {
-        label: string;
         id: string;
+        label: string;
         kind: "run";
         state?: "failed" | "idle" | "busy" | undefined;
         icon?: string | undefined;
@@ -365,13 +365,13 @@ export declare const headerSchema: z.ZodObject<{
         confirm?: boolean | undefined;
         surface?: "fullscreen" | undefined;
     }>]>, {
+        id: string;
         value: string;
         options: {
-            label: string;
             id: string;
+            label: string;
         }[];
         label: string;
-        id: string;
         kind: "switch";
         agents: boolean;
         icon?: string | undefined;
@@ -379,8 +379,8 @@ export declare const headerSchema: z.ZodObject<{
         group?: string | undefined;
         tool?: string | undefined;
     } | {
-        label: string;
         id: string;
+        label: string;
         kind: "toggle";
         agents: boolean;
         checked: boolean;
@@ -389,12 +389,12 @@ export declare const headerSchema: z.ZodObject<{
         group?: string | undefined;
         tool?: string | undefined;
     } | {
+        id: string;
         options: {
-            label: string;
             id: string;
+            label: string;
         }[];
         label: string;
-        id: string;
         kind: "go";
         agents: boolean;
         icon?: string | undefined;
@@ -402,10 +402,10 @@ export declare const headerSchema: z.ZodObject<{
         group?: string | undefined;
         tool?: string | undefined;
     } | {
-        label: string;
         id: string;
-        kind: "run";
         state: "failed" | "idle" | "busy";
+        label: string;
+        kind: "run";
         agents: boolean;
         result: string | null;
         disabled: string | null;
@@ -416,13 +416,13 @@ export declare const headerSchema: z.ZodObject<{
         tool?: string | undefined;
         surface?: "fullscreen" | undefined;
     }, {
+        id: string;
         value: string;
         options: {
-            label: string;
             id: string;
+            label: string;
         }[];
         label: string;
-        id: string;
         kind: "switch";
         icon?: string | undefined;
         shortcut?: string | undefined;
@@ -430,8 +430,8 @@ export declare const headerSchema: z.ZodObject<{
         agents?: boolean | undefined;
         tool?: string | undefined;
     } | {
-        label: string;
         id: string;
+        label: string;
         kind: "toggle";
         checked: boolean;
         icon?: string | undefined;
@@ -440,12 +440,12 @@ export declare const headerSchema: z.ZodObject<{
         agents?: boolean | undefined;
         tool?: string | undefined;
     } | {
+        id: string;
         options: {
-            label: string;
             id: string;
+            label: string;
         }[];
         label: string;
-        id: string;
         kind: "go";
         icon?: string | undefined;
         shortcut?: string | undefined;
@@ -453,8 +453,8 @@ export declare const headerSchema: z.ZodObject<{
         agents?: boolean | undefined;
         tool?: string | undefined;
     } | {
-        label: string;
         id: string;
+        label: string;
         kind: "run";
         state?: "failed" | "idle" | "busy" | undefined;
         icon?: string | undefined;
@@ -467,13 +467,13 @@ export declare const headerSchema: z.ZodObject<{
         confirm?: boolean | undefined;
         surface?: "fullscreen" | undefined;
     }>, "many">, ({
+        id: string;
         value: string;
         options: {
-            label: string;
             id: string;
+            label: string;
         }[];
         label: string;
-        id: string;
         kind: "switch";
         agents: boolean;
         icon?: string | undefined;
@@ -481,8 +481,8 @@ export declare const headerSchema: z.ZodObject<{
         group?: string | undefined;
         tool?: string | undefined;
     } | {
-        label: string;
         id: string;
+        label: string;
         kind: "toggle";
         agents: boolean;
         checked: boolean;
@@ -491,12 +491,12 @@ export declare const headerSchema: z.ZodObject<{
         group?: string | undefined;
         tool?: string | undefined;
     } | {
+        id: string;
         options: {
-            label: string;
             id: string;
+            label: string;
         }[];
         label: string;
-        id: string;
         kind: "go";
         agents: boolean;
         icon?: string | undefined;
@@ -504,10 +504,10 @@ export declare const headerSchema: z.ZodObject<{
         group?: string | undefined;
         tool?: string | undefined;
     } | {
-        label: string;
         id: string;
-        kind: "run";
         state: "failed" | "idle" | "busy";
+        label: string;
+        kind: "run";
         agents: boolean;
         result: string | null;
         disabled: string | null;
@@ -518,13 +518,13 @@ export declare const headerSchema: z.ZodObject<{
         tool?: string | undefined;
         surface?: "fullscreen" | undefined;
     })[], ({
+        id: string;
         value: string;
         options: {
-            label: string;
             id: string;
+            label: string;
         }[];
         label: string;
-        id: string;
         kind: "switch";
         icon?: string | undefined;
         shortcut?: string | undefined;
@@ -532,8 +532,8 @@ export declare const headerSchema: z.ZodObject<{
         agents?: boolean | undefined;
         tool?: string | undefined;
     } | {
-        label: string;
         id: string;
+        label: string;
         kind: "toggle";
         checked: boolean;
         icon?: string | undefined;
@@ -542,12 +542,12 @@ export declare const headerSchema: z.ZodObject<{
         agents?: boolean | undefined;
         tool?: string | undefined;
     } | {
+        id: string;
         options: {
-            label: string;
             id: string;
+            label: string;
         }[];
         label: string;
-        id: string;
         kind: "go";
         icon?: string | undefined;
         shortcut?: string | undefined;
@@ -555,8 +555,8 @@ export declare const headerSchema: z.ZodObject<{
         agents?: boolean | undefined;
         tool?: string | undefined;
     } | {
-        label: string;
         id: string;
+        label: string;
         kind: "run";
         state?: "failed" | "idle" | "busy" | undefined;
         icon?: string | undefined;
@@ -572,13 +572,13 @@ export declare const headerSchema: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     type: "kehikot.header";
     items: ({
+        id: string;
         value: string;
         options: {
-            label: string;
             id: string;
+            label: string;
         }[];
         label: string;
-        id: string;
         kind: "switch";
         agents: boolean;
         icon?: string | undefined;
@@ -586,8 +586,8 @@ export declare const headerSchema: z.ZodObject<{
         group?: string | undefined;
         tool?: string | undefined;
     } | {
-        label: string;
         id: string;
+        label: string;
         kind: "toggle";
         agents: boolean;
         checked: boolean;
@@ -596,12 +596,12 @@ export declare const headerSchema: z.ZodObject<{
         group?: string | undefined;
         tool?: string | undefined;
     } | {
+        id: string;
         options: {
-            label: string;
             id: string;
+            label: string;
         }[];
         label: string;
-        id: string;
         kind: "go";
         agents: boolean;
         icon?: string | undefined;
@@ -609,10 +609,10 @@ export declare const headerSchema: z.ZodObject<{
         group?: string | undefined;
         tool?: string | undefined;
     } | {
-        label: string;
         id: string;
-        kind: "run";
         state: "failed" | "idle" | "busy";
+        label: string;
+        kind: "run";
         agents: boolean;
         result: string | null;
         disabled: string | null;
@@ -626,13 +626,13 @@ export declare const headerSchema: z.ZodObject<{
 }, {
     type: "kehikot.header";
     items: ({
+        id: string;
         value: string;
         options: {
-            label: string;
             id: string;
+            label: string;
         }[];
         label: string;
-        id: string;
         kind: "switch";
         icon?: string | undefined;
         shortcut?: string | undefined;
@@ -640,8 +640,8 @@ export declare const headerSchema: z.ZodObject<{
         agents?: boolean | undefined;
         tool?: string | undefined;
     } | {
-        label: string;
         id: string;
+        label: string;
         kind: "toggle";
         checked: boolean;
         icon?: string | undefined;
@@ -650,12 +650,12 @@ export declare const headerSchema: z.ZodObject<{
         agents?: boolean | undefined;
         tool?: string | undefined;
     } | {
+        id: string;
         options: {
-            label: string;
             id: string;
+            label: string;
         }[];
         label: string;
-        id: string;
         kind: "go";
         icon?: string | undefined;
         shortcut?: string | undefined;
@@ -663,8 +663,8 @@ export declare const headerSchema: z.ZodObject<{
         agents?: boolean | undefined;
         tool?: string | undefined;
     } | {
-        label: string;
         id: string;
+        label: string;
         kind: "run";
         state?: "failed" | "idle" | "busy" | undefined;
         icon?: string | undefined;
@@ -692,15 +692,15 @@ export declare const pressSchema: z.ZodObject<{
     item: z.ZodString;
     value: z.ZodOptional<z.ZodUnion<[z.ZodEffects<z.ZodString, string, string>, z.ZodBoolean]>>;
 }, "strip", z.ZodTypeAny, {
-    protocol: number;
-    type: "kehikot.press";
     id: string;
+    type: "kehikot.press";
+    protocol: number;
     item: string;
     value?: string | boolean | undefined;
 }, {
-    protocol: number;
-    type: "kehikot.press";
     id: string;
+    type: "kehikot.press";
+    protocol: number;
     item: string;
     value?: string | boolean | undefined;
 }>;
@@ -715,13 +715,13 @@ export declare const pressedSchema: z.ZodObject<{
     ok: z.ZodBoolean;
     why: z.ZodDefault<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    type: "kehikot.pressed";
     id: string;
+    type: "kehikot.pressed";
     why: string;
     ok: boolean;
 }, {
-    type: "kehikot.pressed";
     id: string;
+    type: "kehikot.pressed";
     ok: boolean;
     why?: string | undefined;
 }>;
@@ -1073,8 +1073,8 @@ export declare const helloSchema: z.ZodObject<{
             at: z.ZodString;
         }, "strip", z.ZodTypeAny, {
             at: string;
-            source: string;
             epic: string | null;
+            source: string;
         }, {
             at: string;
             source: string;
@@ -1104,11 +1104,6 @@ export declare const helloSchema: z.ZodObject<{
         }>, "many">>;
     }, "strip", z.ZodTypeAny, {
         epic: string | null;
-        tracker: {
-            at: string | null;
-            refreshing: boolean;
-        };
-        projectPath: string | null;
         parts: {
             id: string;
             heading: string;
@@ -1117,6 +1112,16 @@ export declare const helloSchema: z.ZodObject<{
             files?: string[] | undefined;
             documents?: string[] | undefined;
         }[];
+        kehikko: {
+            id: number;
+            name: string;
+            key?: string | undefined;
+        } | null;
+        tracker: {
+            at: string | null;
+            refreshing: boolean;
+        };
+        projectPath: string | null;
         project: string | null;
         theme: "light" | "dark";
         selection: string[];
@@ -1134,11 +1139,6 @@ export declare const helloSchema: z.ZodObject<{
         } | null;
         pinned: boolean;
         prompt: string | null;
-        kehikko: {
-            id: number;
-            name: string;
-            key?: string | undefined;
-        } | null;
         filters: Record<string, string | string[]>;
         containers: {
             module: string;
@@ -1170,16 +1170,11 @@ export declare const helloSchema: z.ZodObject<{
         }[];
         content: {
             at: string;
-            source: string;
             epic: string | null;
+            source: string;
         }[];
     }, {
         epic?: string | null | undefined;
-        tracker?: {
-            at?: string | null | undefined;
-            refreshing?: boolean | undefined;
-        } | undefined;
-        projectPath?: string | null | undefined;
         parts?: {
             id: string;
             files?: string[] | undefined;
@@ -1188,6 +1183,16 @@ export declare const helloSchema: z.ZodObject<{
             picked?: boolean | undefined;
             documents?: string[] | undefined;
         }[] | undefined;
+        kehikko?: {
+            id: number;
+            name: string;
+            key?: string | undefined;
+        } | null | undefined;
+        tracker?: {
+            at?: string | null | undefined;
+            refreshing?: boolean | undefined;
+        } | undefined;
+        projectPath?: string | null | undefined;
         project?: string | null | undefined;
         theme?: "light" | "dark" | undefined;
         selection?: string[] | undefined;
@@ -1205,11 +1210,6 @@ export declare const helloSchema: z.ZodObject<{
         } | null | undefined;
         pinned?: boolean | undefined;
         prompt?: string | null | undefined;
-        kehikko?: {
-            id: number;
-            name: string;
-            key?: string | undefined;
-        } | null | undefined;
         filters?: Record<string, string | string[]> | undefined;
         containers?: {
             module: string;
@@ -1264,17 +1264,12 @@ export declare const helloSchema: z.ZodObject<{
      */
     header: z.ZodOptional<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
-    protocol: number;
     type: "kehikot.hello";
     state: string | null;
+    protocol: number;
     session: string;
     context: {
         epic: string | null;
-        tracker: {
-            at: string | null;
-            refreshing: boolean;
-        };
-        projectPath: string | null;
         parts: {
             id: string;
             heading: string;
@@ -1283,6 +1278,16 @@ export declare const helloSchema: z.ZodObject<{
             files?: string[] | undefined;
             documents?: string[] | undefined;
         }[];
+        kehikko: {
+            id: number;
+            name: string;
+            key?: string | undefined;
+        } | null;
+        tracker: {
+            at: string | null;
+            refreshing: boolean;
+        };
+        projectPath: string | null;
         project: string | null;
         theme: "light" | "dark";
         selection: string[];
@@ -1300,11 +1305,6 @@ export declare const helloSchema: z.ZodObject<{
         } | null;
         pinned: boolean;
         prompt: string | null;
-        kehikko: {
-            id: number;
-            name: string;
-            key?: string | undefined;
-        } | null;
         filters: Record<string, string | string[]>;
         containers: {
             module: string;
@@ -1336,23 +1336,18 @@ export declare const helloSchema: z.ZodObject<{
         }[];
         content: {
             at: string;
-            source: string;
             epic: string | null;
+            source: string;
         }[];
     };
     answers?: string[] | undefined;
     header?: boolean | undefined;
 }, {
-    protocol: number;
     type: "kehikot.hello";
+    protocol: number;
     session: string;
     context: {
         epic?: string | null | undefined;
-        tracker?: {
-            at?: string | null | undefined;
-            refreshing?: boolean | undefined;
-        } | undefined;
-        projectPath?: string | null | undefined;
         parts?: {
             id: string;
             files?: string[] | undefined;
@@ -1361,6 +1356,16 @@ export declare const helloSchema: z.ZodObject<{
             picked?: boolean | undefined;
             documents?: string[] | undefined;
         }[] | undefined;
+        kehikko?: {
+            id: number;
+            name: string;
+            key?: string | undefined;
+        } | null | undefined;
+        tracker?: {
+            at?: string | null | undefined;
+            refreshing?: boolean | undefined;
+        } | undefined;
+        projectPath?: string | null | undefined;
         project?: string | null | undefined;
         theme?: "light" | "dark" | undefined;
         selection?: string[] | undefined;
@@ -1378,11 +1383,6 @@ export declare const helloSchema: z.ZodObject<{
         } | null | undefined;
         pinned?: boolean | undefined;
         prompt?: string | null | undefined;
-        kehikko?: {
-            id: number;
-            name: string;
-            key?: string | undefined;
-        } | null | undefined;
         filters?: Record<string, string | string[]> | undefined;
         containers?: {
             module: string;
@@ -1765,8 +1765,8 @@ export declare const contextMessageSchema: z.ZodObject<{
         at: z.ZodString;
     }, "strip", z.ZodTypeAny, {
         at: string;
-        source: string;
         epic: string | null;
+        source: string;
     }, {
         at: string;
         source: string;
@@ -1798,14 +1798,8 @@ export declare const contextMessageSchema: z.ZodObject<{
     type: z.ZodLiteral<"kehikot.context">;
     protocol: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
-    protocol: number;
     type: "kehikot.context";
     epic: string | null;
-    tracker: {
-        at: string | null;
-        refreshing: boolean;
-    };
-    projectPath: string | null;
     parts: {
         id: string;
         heading: string;
@@ -1814,6 +1808,17 @@ export declare const contextMessageSchema: z.ZodObject<{
         files?: string[] | undefined;
         documents?: string[] | undefined;
     }[];
+    kehikko: {
+        id: number;
+        name: string;
+        key?: string | undefined;
+    } | null;
+    protocol: number;
+    tracker: {
+        at: string | null;
+        refreshing: boolean;
+    };
+    projectPath: string | null;
     project: string | null;
     theme: "light" | "dark";
     selection: string[];
@@ -1831,11 +1836,6 @@ export declare const contextMessageSchema: z.ZodObject<{
     } | null;
     pinned: boolean;
     prompt: string | null;
-    kehikko: {
-        id: number;
-        name: string;
-        key?: string | undefined;
-    } | null;
     filters: Record<string, string | string[]>;
     containers: {
         module: string;
@@ -1867,18 +1867,13 @@ export declare const contextMessageSchema: z.ZodObject<{
     }[];
     content: {
         at: string;
-        source: string;
         epic: string | null;
+        source: string;
     }[];
 }, {
-    protocol: number;
     type: "kehikot.context";
+    protocol: number;
     epic?: string | null | undefined;
-    tracker?: {
-        at?: string | null | undefined;
-        refreshing?: boolean | undefined;
-    } | undefined;
-    projectPath?: string | null | undefined;
     parts?: {
         id: string;
         files?: string[] | undefined;
@@ -1887,6 +1882,16 @@ export declare const contextMessageSchema: z.ZodObject<{
         picked?: boolean | undefined;
         documents?: string[] | undefined;
     }[] | undefined;
+    kehikko?: {
+        id: number;
+        name: string;
+        key?: string | undefined;
+    } | null | undefined;
+    tracker?: {
+        at?: string | null | undefined;
+        refreshing?: boolean | undefined;
+    } | undefined;
+    projectPath?: string | null | undefined;
     project?: string | null | undefined;
     theme?: "light" | "dark" | undefined;
     selection?: string[] | undefined;
@@ -1904,11 +1909,6 @@ export declare const contextMessageSchema: z.ZodObject<{
     } | null | undefined;
     pinned?: boolean | undefined;
     prompt?: string | null | undefined;
-    kehikko?: {
-        id: number;
-        name: string;
-        key?: string | undefined;
-    } | null | undefined;
     filters?: Record<string, string | string[]> | undefined;
     containers?: {
         module: string;
@@ -1967,13 +1967,13 @@ export declare const responseSchema: z.ZodDiscriminatedUnion<"ok", [z.ZodObject<
      */
     data: z.ZodUnknown;
 }, "strip", z.ZodTypeAny, {
-    type: "kehikot.response";
     id: string;
+    type: "kehikot.response";
     ok: true;
     data?: unknown;
 }, {
-    type: "kehikot.response";
     id: string;
+    type: "kehikot.response";
     ok: true;
     data?: unknown;
 }>, z.ZodObject<{
@@ -1984,14 +1984,14 @@ export declare const responseSchema: z.ZodDiscriminatedUnion<"ok", [z.ZodObject<
     /** The sentence for the person. Bounded because a refusal quotes the module's own text back at it. */
     error: z.ZodDefault<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    type: "kehikot.response";
     id: string;
+    type: "kehikot.response";
     error: string;
     reason: "failed" | "unknown-module" | "unknown-method";
     ok: false;
 }, {
-    type: "kehikot.response";
     id: string;
+    type: "kehikot.response";
     reason: "failed" | "unknown-module" | "unknown-method";
     ok: false;
     error?: string | undefined;
@@ -2008,26 +2008,26 @@ export declare const gotoSchema: z.ZodEffects<z.ZodObject<{
     step: z.ZodOptional<z.ZodNumber>;
     epic: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    type: "kehikot.goto";
     id: string;
+    type: "kehikot.goto";
     epic?: string | undefined;
     ref?: string | undefined;
     step?: number | undefined;
 }, {
-    type: "kehikot.goto";
     id: string;
+    type: "kehikot.goto";
     epic?: string | undefined;
     ref?: string | undefined;
     step?: number | undefined;
 }>, {
-    type: "kehikot.goto";
     id: string;
+    type: "kehikot.goto";
     epic?: string | undefined;
     ref?: string | undefined;
     step?: number | undefined;
 }, {
-    type: "kehikot.goto";
     id: string;
+    type: "kehikot.goto";
     epic?: string | undefined;
     ref?: string | undefined;
     step?: number | undefined;
@@ -2069,21 +2069,21 @@ export declare const eventSchema: z.ZodObject<{
         key?: string | undefined;
     }>>>;
 }, "strip", z.ZodTypeAny, {
-    protocol: number;
     type: "kehikot.event";
     at: string;
-    from: string;
     kehikko: {
         id: number;
         name: string;
         key?: string | undefined;
     } | null;
+    protocol: number;
+    from: string;
     extension: string;
     payload?: unknown;
 }, {
-    protocol: number;
     type: "kehikot.event";
     at: string;
+    protocol: number;
     from: string;
     extension: string;
     kehikko?: {
@@ -2120,9 +2120,9 @@ export declare const readySchema: z.ZodObject<{
         commit?: string | null | undefined;
     }>>>;
 }, "strip", z.ZodTypeAny, {
-    protocol: number;
-    type: "kehikot.ready";
     id: string;
+    type: "kehikot.ready";
+    protocol: number;
     build?: {
         version: string;
         commit: string | null;
@@ -2130,8 +2130,8 @@ export declare const readySchema: z.ZodObject<{
         protocol: string;
     } | undefined;
 }, {
-    type: "kehikot.ready";
     id: string;
+    type: "kehikot.ready";
     build?: unknown;
     protocol?: number | undefined;
 }>;
@@ -2146,13 +2146,13 @@ export declare const requestSchema: z.ZodObject<{
     method: z.ZodString;
     params: z.ZodDefault<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
 }, "strip", z.ZodTypeAny, {
+    id: string;
     params: Record<string, unknown>;
     type: "kehikot.request";
-    id: string;
     method: string;
 }, {
-    type: "kehikot.request";
     id: string;
+    type: "kehikot.request";
     method: string;
     params?: Record<string, unknown> | undefined;
 }>;
@@ -2181,13 +2181,13 @@ export declare const wentSchema: z.ZodObject<{
     found: z.ZodBoolean;
     why: z.ZodDefault<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    type: "kehikot.went";
     id: string;
+    type: "kehikot.went";
     why: string;
     found: boolean;
 }, {
-    type: "kehikot.went";
     id: string;
+    type: "kehikot.went";
     found: boolean;
     why?: string | undefined;
 }>;
@@ -2537,8 +2537,8 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             at: z.ZodString;
         }, "strip", z.ZodTypeAny, {
             at: string;
-            source: string;
             epic: string | null;
+            source: string;
         }, {
             at: string;
             source: string;
@@ -2568,11 +2568,6 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         }>, "many">>;
     }, "strip", z.ZodTypeAny, {
         epic: string | null;
-        tracker: {
-            at: string | null;
-            refreshing: boolean;
-        };
-        projectPath: string | null;
         parts: {
             id: string;
             heading: string;
@@ -2581,6 +2576,16 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             files?: string[] | undefined;
             documents?: string[] | undefined;
         }[];
+        kehikko: {
+            id: number;
+            name: string;
+            key?: string | undefined;
+        } | null;
+        tracker: {
+            at: string | null;
+            refreshing: boolean;
+        };
+        projectPath: string | null;
         project: string | null;
         theme: "light" | "dark";
         selection: string[];
@@ -2598,11 +2603,6 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         } | null;
         pinned: boolean;
         prompt: string | null;
-        kehikko: {
-            id: number;
-            name: string;
-            key?: string | undefined;
-        } | null;
         filters: Record<string, string | string[]>;
         containers: {
             module: string;
@@ -2634,16 +2634,11 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         }[];
         content: {
             at: string;
-            source: string;
             epic: string | null;
+            source: string;
         }[];
     }, {
         epic?: string | null | undefined;
-        tracker?: {
-            at?: string | null | undefined;
-            refreshing?: boolean | undefined;
-        } | undefined;
-        projectPath?: string | null | undefined;
         parts?: {
             id: string;
             files?: string[] | undefined;
@@ -2652,6 +2647,16 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             picked?: boolean | undefined;
             documents?: string[] | undefined;
         }[] | undefined;
+        kehikko?: {
+            id: number;
+            name: string;
+            key?: string | undefined;
+        } | null | undefined;
+        tracker?: {
+            at?: string | null | undefined;
+            refreshing?: boolean | undefined;
+        } | undefined;
+        projectPath?: string | null | undefined;
         project?: string | null | undefined;
         theme?: "light" | "dark" | undefined;
         selection?: string[] | undefined;
@@ -2669,11 +2674,6 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         } | null | undefined;
         pinned?: boolean | undefined;
         prompt?: string | null | undefined;
-        kehikko?: {
-            id: number;
-            name: string;
-            key?: string | undefined;
-        } | null | undefined;
         filters?: Record<string, string | string[]> | undefined;
         containers?: {
             module: string;
@@ -2728,17 +2728,12 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
      */
     header: z.ZodOptional<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
-    protocol: number;
     type: "kehikot.hello";
     state: string | null;
+    protocol: number;
     session: string;
     context: {
         epic: string | null;
-        tracker: {
-            at: string | null;
-            refreshing: boolean;
-        };
-        projectPath: string | null;
         parts: {
             id: string;
             heading: string;
@@ -2747,6 +2742,16 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             files?: string[] | undefined;
             documents?: string[] | undefined;
         }[];
+        kehikko: {
+            id: number;
+            name: string;
+            key?: string | undefined;
+        } | null;
+        tracker: {
+            at: string | null;
+            refreshing: boolean;
+        };
+        projectPath: string | null;
         project: string | null;
         theme: "light" | "dark";
         selection: string[];
@@ -2764,11 +2769,6 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         } | null;
         pinned: boolean;
         prompt: string | null;
-        kehikko: {
-            id: number;
-            name: string;
-            key?: string | undefined;
-        } | null;
         filters: Record<string, string | string[]>;
         containers: {
             module: string;
@@ -2800,23 +2800,18 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         }[];
         content: {
             at: string;
-            source: string;
             epic: string | null;
+            source: string;
         }[];
     };
     answers?: string[] | undefined;
     header?: boolean | undefined;
 }, {
-    protocol: number;
     type: "kehikot.hello";
+    protocol: number;
     session: string;
     context: {
         epic?: string | null | undefined;
-        tracker?: {
-            at?: string | null | undefined;
-            refreshing?: boolean | undefined;
-        } | undefined;
-        projectPath?: string | null | undefined;
         parts?: {
             id: string;
             files?: string[] | undefined;
@@ -2825,6 +2820,16 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             picked?: boolean | undefined;
             documents?: string[] | undefined;
         }[] | undefined;
+        kehikko?: {
+            id: number;
+            name: string;
+            key?: string | undefined;
+        } | null | undefined;
+        tracker?: {
+            at?: string | null | undefined;
+            refreshing?: boolean | undefined;
+        } | undefined;
+        projectPath?: string | null | undefined;
         project?: string | null | undefined;
         theme?: "light" | "dark" | undefined;
         selection?: string[] | undefined;
@@ -2842,11 +2847,6 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         } | null | undefined;
         pinned?: boolean | undefined;
         prompt?: string | null | undefined;
-        kehikko?: {
-            id: number;
-            name: string;
-            key?: string | undefined;
-        } | null | undefined;
         filters?: Record<string, string | string[]> | undefined;
         containers?: {
             module: string;
@@ -3223,8 +3223,8 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         at: z.ZodString;
     }, "strip", z.ZodTypeAny, {
         at: string;
-        source: string;
         epic: string | null;
+        source: string;
     }, {
         at: string;
         source: string;
@@ -3256,14 +3256,8 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     type: z.ZodLiteral<"kehikot.context">;
     protocol: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
-    protocol: number;
     type: "kehikot.context";
     epic: string | null;
-    tracker: {
-        at: string | null;
-        refreshing: boolean;
-    };
-    projectPath: string | null;
     parts: {
         id: string;
         heading: string;
@@ -3272,6 +3266,17 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         files?: string[] | undefined;
         documents?: string[] | undefined;
     }[];
+    kehikko: {
+        id: number;
+        name: string;
+        key?: string | undefined;
+    } | null;
+    protocol: number;
+    tracker: {
+        at: string | null;
+        refreshing: boolean;
+    };
+    projectPath: string | null;
     project: string | null;
     theme: "light" | "dark";
     selection: string[];
@@ -3289,11 +3294,6 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     } | null;
     pinned: boolean;
     prompt: string | null;
-    kehikko: {
-        id: number;
-        name: string;
-        key?: string | undefined;
-    } | null;
     filters: Record<string, string | string[]>;
     containers: {
         module: string;
@@ -3325,18 +3325,13 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     }[];
     content: {
         at: string;
-        source: string;
         epic: string | null;
+        source: string;
     }[];
 }, {
-    protocol: number;
     type: "kehikot.context";
+    protocol: number;
     epic?: string | null | undefined;
-    tracker?: {
-        at?: string | null | undefined;
-        refreshing?: boolean | undefined;
-    } | undefined;
-    projectPath?: string | null | undefined;
     parts?: {
         id: string;
         files?: string[] | undefined;
@@ -3345,6 +3340,16 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         picked?: boolean | undefined;
         documents?: string[] | undefined;
     }[] | undefined;
+    kehikko?: {
+        id: number;
+        name: string;
+        key?: string | undefined;
+    } | null | undefined;
+    tracker?: {
+        at?: string | null | undefined;
+        refreshing?: boolean | undefined;
+    } | undefined;
+    projectPath?: string | null | undefined;
     project?: string | null | undefined;
     theme?: "light" | "dark" | undefined;
     selection?: string[] | undefined;
@@ -3362,11 +3367,6 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     } | null | undefined;
     pinned?: boolean | undefined;
     prompt?: string | null | undefined;
-    kehikko?: {
-        id: number;
-        name: string;
-        key?: string | undefined;
-    } | null | undefined;
     filters?: Record<string, string | string[]> | undefined;
     containers?: {
         module: string;
@@ -3412,13 +3412,13 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
      */
     data: z.ZodUnknown;
 }, "strip", z.ZodTypeAny, {
-    type: "kehikot.response";
     id: string;
+    type: "kehikot.response";
     ok: true;
     data?: unknown;
 }, {
-    type: "kehikot.response";
     id: string;
+    type: "kehikot.response";
     ok: true;
     data?: unknown;
 }>, z.ZodObject<{
@@ -3429,14 +3429,14 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     /** The sentence for the person. Bounded because a refusal quotes the module's own text back at it. */
     error: z.ZodDefault<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    type: "kehikot.response";
     id: string;
+    type: "kehikot.response";
     error: string;
     reason: "failed" | "unknown-module" | "unknown-method";
     ok: false;
 }, {
-    type: "kehikot.response";
     id: string;
+    type: "kehikot.response";
     reason: "failed" | "unknown-module" | "unknown-method";
     ok: false;
     error?: string | undefined;
@@ -3447,26 +3447,26 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     step: z.ZodOptional<z.ZodNumber>;
     epic: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    type: "kehikot.goto";
     id: string;
+    type: "kehikot.goto";
     epic?: string | undefined;
     ref?: string | undefined;
     step?: number | undefined;
 }, {
-    type: "kehikot.goto";
     id: string;
+    type: "kehikot.goto";
     epic?: string | undefined;
     ref?: string | undefined;
     step?: number | undefined;
 }>, {
-    type: "kehikot.goto";
     id: string;
+    type: "kehikot.goto";
     epic?: string | undefined;
     ref?: string | undefined;
     step?: number | undefined;
 }, {
-    type: "kehikot.goto";
     id: string;
+    type: "kehikot.goto";
     epic?: string | undefined;
     ref?: string | undefined;
     step?: number | undefined;
@@ -3502,21 +3502,21 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         key?: string | undefined;
     }>>>;
 }, "strip", z.ZodTypeAny, {
-    protocol: number;
     type: "kehikot.event";
     at: string;
-    from: string;
     kehikko: {
         id: number;
         name: string;
         key?: string | undefined;
     } | null;
+    protocol: number;
+    from: string;
     extension: string;
     payload?: unknown;
 }, {
-    protocol: number;
     type: "kehikot.event";
     at: string;
+    protocol: number;
     from: string;
     extension: string;
     kehikko?: {
@@ -3529,20 +3529,20 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     type: z.ZodLiteral<"kehikot.clear">;
     protocol: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
-    protocol: number;
     type: "kehikot.clear";
+    protocol: number;
 }, {
-    protocol: number;
     type: "kehikot.clear";
+    protocol: number;
 }>, z.ZodObject<{
     type: z.ZodLiteral<"kehikot.refresh">;
     protocol: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
-    protocol: number;
     type: "kehikot.refresh";
+    protocol: number;
 }, {
-    protocol: number;
     type: "kehikot.refresh";
+    protocol: number;
 }>, z.ZodObject<{
     type: z.ZodLiteral<"kehikot.press">;
     protocol: z.ZodNumber;
@@ -3550,15 +3550,15 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     item: z.ZodString;
     value: z.ZodOptional<z.ZodUnion<[z.ZodEffects<z.ZodString, string, string>, z.ZodBoolean]>>;
 }, "strip", z.ZodTypeAny, {
-    protocol: number;
-    type: "kehikot.press";
     id: string;
+    type: "kehikot.press";
+    protocol: number;
     item: string;
     value?: string | boolean | undefined;
 }, {
-    protocol: number;
-    type: "kehikot.press";
     id: string;
+    type: "kehikot.press";
+    protocol: number;
     item: string;
     value?: string | boolean | undefined;
 }>]>;
@@ -3585,9 +3585,9 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         commit?: string | null | undefined;
     }>>>;
 }, "strip", z.ZodTypeAny, {
-    protocol: number;
-    type: "kehikot.ready";
     id: string;
+    type: "kehikot.ready";
+    protocol: number;
     build?: {
         version: string;
         commit: string | null;
@@ -3595,8 +3595,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         protocol: string;
     } | undefined;
 }, {
-    type: "kehikot.ready";
     id: string;
+    type: "kehikot.ready";
     build?: unknown;
     protocol?: number | undefined;
 }>, z.ZodObject<{
@@ -3609,13 +3609,13 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
     method: z.ZodString;
     params: z.ZodDefault<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
 }, "strip", z.ZodTypeAny, {
+    id: string;
     params: Record<string, unknown>;
     type: "kehikot.request";
-    id: string;
     method: string;
 }, {
-    type: "kehikot.request";
     id: string;
+    type: "kehikot.request";
     method: string;
     params?: Record<string, unknown> | undefined;
 }>, z.ZodObject<{
@@ -3633,13 +3633,13 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
     found: z.ZodBoolean;
     why: z.ZodDefault<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    type: "kehikot.went";
     id: string;
+    type: "kehikot.went";
     why: string;
     found: boolean;
 }, {
-    type: "kehikot.went";
     id: string;
+    type: "kehikot.went";
     found: boolean;
     why?: string | undefined;
 }>, z.ZodObject<{
@@ -3652,82 +3652,82 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
             id: z.ZodEffects<z.ZodString, string, string>;
             label: z.ZodString;
         }, "strip", z.ZodTypeAny, {
-            label: string;
             id: string;
+            label: string;
         }, {
-            label: string;
             id: string;
+            label: string;
         }>, "many">>;
         fallback: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
     }, "strip", z.ZodTypeAny, {
+        id: string;
         options: {
-            label: string;
             id: string;
+            label: string;
         }[];
         label: string;
-        id: string;
         kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
     }, {
-        label: string;
         id: string;
+        label: string;
         options?: {
-            label: string;
             id: string;
+            label: string;
         }[] | undefined;
         kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
     }>, {
+        id: string;
         options: {
-            label: string;
             id: string;
+            label: string;
         }[];
         label: string;
-        id: string;
         kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
     }, {
-        label: string;
         id: string;
+        label: string;
         options?: {
-            label: string;
             id: string;
+            label: string;
         }[] | undefined;
         kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
     }>, {
+        id: string;
         options: {
-            label: string;
             id: string;
+            label: string;
         }[];
         label: string;
-        id: string;
         kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
     }, {
-        label: string;
         id: string;
+        label: string;
         options?: {
-            label: string;
             id: string;
+            label: string;
         }[] | undefined;
         kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
     }>, "many">, {
+        id: string;
         options: {
-            label: string;
             id: string;
+            label: string;
         }[];
         label: string;
-        id: string;
         kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
     }[], {
-        label: string;
         id: string;
+        label: string;
         options?: {
-            label: string;
             id: string;
+            label: string;
         }[] | undefined;
         kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
@@ -3735,23 +3735,23 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     type: "kehikot.filters";
     groups: {
+        id: string;
         options: {
-            label: string;
             id: string;
+            label: string;
         }[];
         label: string;
-        id: string;
         kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
     }[];
 }, {
     type: "kehikot.filters";
     groups: {
-        label: string;
         id: string;
+        label: string;
         options?: {
-            label: string;
             id: string;
+            label: string;
         }[] | undefined;
         kind?: "choice" | "text" | "toggles" | undefined;
         fallback?: string | undefined;
@@ -3791,11 +3791,11 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
             id: z.ZodEffects<z.ZodString, string, string>;
             label: z.ZodString;
         }, "strip", z.ZodTypeAny, {
-            label: string;
             id: string;
+            label: string;
         }, {
-            label: string;
             id: string;
+            label: string;
         }>, "many">;
         value: z.ZodEffects<z.ZodString, string, string>;
         id: z.ZodEffects<z.ZodString, string, string>;
@@ -3807,13 +3807,13 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         tool: z.ZodOptional<z.ZodString>;
         kind: z.ZodLiteral<"switch">;
     }, "strip", z.ZodTypeAny, {
+        id: string;
         value: string;
         options: {
-            label: string;
             id: string;
+            label: string;
         }[];
         label: string;
-        id: string;
         kind: "switch";
         agents: boolean;
         icon?: string | undefined;
@@ -3821,13 +3821,13 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         group?: string | undefined;
         tool?: string | undefined;
     }, {
+        id: string;
         value: string;
         options: {
-            label: string;
             id: string;
+            label: string;
         }[];
         label: string;
-        id: string;
         kind: "switch";
         icon?: string | undefined;
         shortcut?: string | undefined;
@@ -3845,8 +3845,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         tool: z.ZodOptional<z.ZodString>;
         kind: z.ZodLiteral<"toggle">;
     }, "strip", z.ZodTypeAny, {
-        label: string;
         id: string;
+        label: string;
         kind: "toggle";
         agents: boolean;
         checked: boolean;
@@ -3855,8 +3855,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         group?: string | undefined;
         tool?: string | undefined;
     }, {
-        label: string;
         id: string;
+        label: string;
         kind: "toggle";
         checked: boolean;
         icon?: string | undefined;
@@ -3869,11 +3869,11 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
             id: z.ZodEffects<z.ZodString, string, string>;
             label: z.ZodString;
         }, "strip", z.ZodTypeAny, {
-            label: string;
             id: string;
+            label: string;
         }, {
-            label: string;
             id: string;
+            label: string;
         }>, "many">;
         id: z.ZodEffects<z.ZodString, string, string>;
         label: z.ZodString;
@@ -3884,12 +3884,12 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         tool: z.ZodOptional<z.ZodString>;
         kind: z.ZodLiteral<"go">;
     }, "strip", z.ZodTypeAny, {
+        id: string;
         options: {
-            label: string;
             id: string;
+            label: string;
         }[];
         label: string;
-        id: string;
         kind: "go";
         agents: boolean;
         icon?: string | undefined;
@@ -3897,12 +3897,12 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         group?: string | undefined;
         tool?: string | undefined;
     }, {
+        id: string;
         options: {
-            label: string;
             id: string;
+            label: string;
         }[];
         label: string;
-        id: string;
         kind: "go";
         icon?: string | undefined;
         shortcut?: string | undefined;
@@ -3924,10 +3924,10 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         tool: z.ZodOptional<z.ZodString>;
         kind: z.ZodLiteral<"run">;
     }, "strip", z.ZodTypeAny, {
-        label: string;
         id: string;
-        kind: "run";
         state: "failed" | "idle" | "busy";
+        label: string;
+        kind: "run";
         agents: boolean;
         result: string | null;
         disabled: string | null;
@@ -3938,8 +3938,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         tool?: string | undefined;
         surface?: "fullscreen" | undefined;
     }, {
-        label: string;
         id: string;
+        label: string;
         kind: "run";
         state?: "failed" | "idle" | "busy" | undefined;
         icon?: string | undefined;
@@ -3952,13 +3952,13 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         confirm?: boolean | undefined;
         surface?: "fullscreen" | undefined;
     }>]>, {
+        id: string;
         value: string;
         options: {
-            label: string;
             id: string;
+            label: string;
         }[];
         label: string;
-        id: string;
         kind: "switch";
         agents: boolean;
         icon?: string | undefined;
@@ -3966,8 +3966,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         group?: string | undefined;
         tool?: string | undefined;
     } | {
-        label: string;
         id: string;
+        label: string;
         kind: "toggle";
         agents: boolean;
         checked: boolean;
@@ -3976,12 +3976,12 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         group?: string | undefined;
         tool?: string | undefined;
     } | {
+        id: string;
         options: {
-            label: string;
             id: string;
+            label: string;
         }[];
         label: string;
-        id: string;
         kind: "go";
         agents: boolean;
         icon?: string | undefined;
@@ -3989,10 +3989,10 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         group?: string | undefined;
         tool?: string | undefined;
     } | {
-        label: string;
         id: string;
-        kind: "run";
         state: "failed" | "idle" | "busy";
+        label: string;
+        kind: "run";
         agents: boolean;
         result: string | null;
         disabled: string | null;
@@ -4003,13 +4003,13 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         tool?: string | undefined;
         surface?: "fullscreen" | undefined;
     }, {
+        id: string;
         value: string;
         options: {
-            label: string;
             id: string;
+            label: string;
         }[];
         label: string;
-        id: string;
         kind: "switch";
         icon?: string | undefined;
         shortcut?: string | undefined;
@@ -4017,8 +4017,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         agents?: boolean | undefined;
         tool?: string | undefined;
     } | {
-        label: string;
         id: string;
+        label: string;
         kind: "toggle";
         checked: boolean;
         icon?: string | undefined;
@@ -4027,12 +4027,12 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         agents?: boolean | undefined;
         tool?: string | undefined;
     } | {
+        id: string;
         options: {
-            label: string;
             id: string;
+            label: string;
         }[];
         label: string;
-        id: string;
         kind: "go";
         icon?: string | undefined;
         shortcut?: string | undefined;
@@ -4040,8 +4040,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         agents?: boolean | undefined;
         tool?: string | undefined;
     } | {
-        label: string;
         id: string;
+        label: string;
         kind: "run";
         state?: "failed" | "idle" | "busy" | undefined;
         icon?: string | undefined;
@@ -4054,13 +4054,13 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         confirm?: boolean | undefined;
         surface?: "fullscreen" | undefined;
     }>, "many">, ({
+        id: string;
         value: string;
         options: {
-            label: string;
             id: string;
+            label: string;
         }[];
         label: string;
-        id: string;
         kind: "switch";
         agents: boolean;
         icon?: string | undefined;
@@ -4068,8 +4068,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         group?: string | undefined;
         tool?: string | undefined;
     } | {
-        label: string;
         id: string;
+        label: string;
         kind: "toggle";
         agents: boolean;
         checked: boolean;
@@ -4078,12 +4078,12 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         group?: string | undefined;
         tool?: string | undefined;
     } | {
+        id: string;
         options: {
-            label: string;
             id: string;
+            label: string;
         }[];
         label: string;
-        id: string;
         kind: "go";
         agents: boolean;
         icon?: string | undefined;
@@ -4091,10 +4091,10 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         group?: string | undefined;
         tool?: string | undefined;
     } | {
-        label: string;
         id: string;
-        kind: "run";
         state: "failed" | "idle" | "busy";
+        label: string;
+        kind: "run";
         agents: boolean;
         result: string | null;
         disabled: string | null;
@@ -4105,13 +4105,13 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         tool?: string | undefined;
         surface?: "fullscreen" | undefined;
     })[], ({
+        id: string;
         value: string;
         options: {
-            label: string;
             id: string;
+            label: string;
         }[];
         label: string;
-        id: string;
         kind: "switch";
         icon?: string | undefined;
         shortcut?: string | undefined;
@@ -4119,8 +4119,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         agents?: boolean | undefined;
         tool?: string | undefined;
     } | {
-        label: string;
         id: string;
+        label: string;
         kind: "toggle";
         checked: boolean;
         icon?: string | undefined;
@@ -4129,12 +4129,12 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         agents?: boolean | undefined;
         tool?: string | undefined;
     } | {
+        id: string;
         options: {
-            label: string;
             id: string;
+            label: string;
         }[];
         label: string;
-        id: string;
         kind: "go";
         icon?: string | undefined;
         shortcut?: string | undefined;
@@ -4142,8 +4142,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         agents?: boolean | undefined;
         tool?: string | undefined;
     } | {
-        label: string;
         id: string;
+        label: string;
         kind: "run";
         state?: "failed" | "idle" | "busy" | undefined;
         icon?: string | undefined;
@@ -4159,13 +4159,13 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     type: "kehikot.header";
     items: ({
+        id: string;
         value: string;
         options: {
-            label: string;
             id: string;
+            label: string;
         }[];
         label: string;
-        id: string;
         kind: "switch";
         agents: boolean;
         icon?: string | undefined;
@@ -4173,8 +4173,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         group?: string | undefined;
         tool?: string | undefined;
     } | {
-        label: string;
         id: string;
+        label: string;
         kind: "toggle";
         agents: boolean;
         checked: boolean;
@@ -4183,12 +4183,12 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         group?: string | undefined;
         tool?: string | undefined;
     } | {
+        id: string;
         options: {
-            label: string;
             id: string;
+            label: string;
         }[];
         label: string;
-        id: string;
         kind: "go";
         agents: boolean;
         icon?: string | undefined;
@@ -4196,10 +4196,10 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         group?: string | undefined;
         tool?: string | undefined;
     } | {
-        label: string;
         id: string;
-        kind: "run";
         state: "failed" | "idle" | "busy";
+        label: string;
+        kind: "run";
         agents: boolean;
         result: string | null;
         disabled: string | null;
@@ -4213,13 +4213,13 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
 }, {
     type: "kehikot.header";
     items: ({
+        id: string;
         value: string;
         options: {
-            label: string;
             id: string;
+            label: string;
         }[];
         label: string;
-        id: string;
         kind: "switch";
         icon?: string | undefined;
         shortcut?: string | undefined;
@@ -4227,8 +4227,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         agents?: boolean | undefined;
         tool?: string | undefined;
     } | {
-        label: string;
         id: string;
+        label: string;
         kind: "toggle";
         checked: boolean;
         icon?: string | undefined;
@@ -4237,12 +4237,12 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         agents?: boolean | undefined;
         tool?: string | undefined;
     } | {
+        id: string;
         options: {
-            label: string;
             id: string;
+            label: string;
         }[];
         label: string;
-        id: string;
         kind: "go";
         icon?: string | undefined;
         shortcut?: string | undefined;
@@ -4250,8 +4250,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         agents?: boolean | undefined;
         tool?: string | undefined;
     } | {
-        label: string;
         id: string;
+        label: string;
         kind: "run";
         state?: "failed" | "idle" | "busy" | undefined;
         icon?: string | undefined;
@@ -4270,13 +4270,13 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
     ok: z.ZodBoolean;
     why: z.ZodDefault<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    type: "kehikot.pressed";
     id: string;
+    type: "kehikot.pressed";
     why: string;
     ok: boolean;
 }, {
-    type: "kehikot.pressed";
     id: string;
+    type: "kehikot.pressed";
     ok: boolean;
     why?: string | undefined;
 }>]>;

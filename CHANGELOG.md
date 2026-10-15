@@ -7,6 +7,27 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 1.5.0 — 2026-10-15
+
+One addition: what a module's things are doing now, so the host can mark it. **Additive and optional**;
+`PROTOCOL` is still 2. A 1.4.0 host does not know the method and refuses it (`unknown-method`); a
+1.4.0 reader accepts a manifest declaring `activity:report` and a greeting whose `answers` lists
+`activity.set` (`test/v1-5.test.ts`, against the 1.4.0 tag).
+
+### Added
+
+- **`activity.set`**, capability **`activity:report`**: `{ items: ActivityItem[] }`, the module's
+  COMPLETE current list (replace, never merge; `[]` is "nothing"). `ActivityItem`: `id`, `state`
+  (`working` | `attention` | `done`), `label`, optional `place` (the `kehikot.notifications@1` /
+  `view.goto` shape), `since`, `detail`. Answered with `activitySetResult` (`taken` | `declined`).
+- `LIMITS.ACTIVITY_ITEMS` (64), `ACTIVITY_ID` (128), `ACTIVITY_LABEL` (120), `ACTIVITY_DETAIL` (200).
+- `activityItemSchema`, `activityItemsSchema`, `ACTIVITY_STATES`, `worstActivity`, `placeSchema` (the
+  notification's `place`, now one definition).
+- `connection.activity(items)`, `useHost().activity`, the store's `activity`: drops an identical list,
+  replays on every greeting, sends nothing to a host whose `answers` lacks `activity.set`.
+- [docs/activity.md](docs/activity.md): the shapes and the host's contract (aggregation, where an item
+  maps, "seen", colours and reduced motion, pressing, `read_canvas`).
+
 ## 1.4.0 — 2026-10-14
 
 Seven small additions, each from a fault found in verification. **Additive and optional: a module built
