@@ -328,6 +328,7 @@ export declare const headerSchema: z.ZodObject<{
         disabled: z.ZodDefault<z.ZodNullable<z.ZodString>>;
         confirm: z.ZodDefault<z.ZodBoolean>;
         surface: z.ZodOptional<z.ZodEnum<["fullscreen"]>>;
+        pinned: z.ZodOptional<z.ZodBoolean>;
         id: z.ZodEffects<z.ZodString, string, string>;
         label: z.ZodString;
         icon: z.ZodOptional<z.ZodString>;
@@ -345,6 +346,7 @@ export declare const headerSchema: z.ZodObject<{
         result: string | null;
         disabled: string | null;
         confirm: boolean;
+        pinned?: boolean | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         group?: string | undefined;
@@ -355,6 +357,7 @@ export declare const headerSchema: z.ZodObject<{
         label: string;
         kind: "run";
         state?: "failed" | "idle" | "busy" | undefined;
+        pinned?: boolean | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         group?: string | undefined;
@@ -410,6 +413,7 @@ export declare const headerSchema: z.ZodObject<{
         result: string | null;
         disabled: string | null;
         confirm: boolean;
+        pinned?: boolean | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         group?: string | undefined;
@@ -457,6 +461,7 @@ export declare const headerSchema: z.ZodObject<{
         label: string;
         kind: "run";
         state?: "failed" | "idle" | "busy" | undefined;
+        pinned?: boolean | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         group?: string | undefined;
@@ -512,6 +517,7 @@ export declare const headerSchema: z.ZodObject<{
         result: string | null;
         disabled: string | null;
         confirm: boolean;
+        pinned?: boolean | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         group?: string | undefined;
@@ -559,6 +565,7 @@ export declare const headerSchema: z.ZodObject<{
         label: string;
         kind: "run";
         state?: "failed" | "idle" | "busy" | undefined;
+        pinned?: boolean | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         group?: string | undefined;
@@ -617,6 +624,7 @@ export declare const headerSchema: z.ZodObject<{
         result: string | null;
         disabled: string | null;
         confirm: boolean;
+        pinned?: boolean | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         group?: string | undefined;
@@ -667,6 +675,7 @@ export declare const headerSchema: z.ZodObject<{
         label: string;
         kind: "run";
         state?: "failed" | "idle" | "busy" | undefined;
+        pinned?: boolean | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         group?: string | undefined;
@@ -3915,6 +3924,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         disabled: z.ZodDefault<z.ZodNullable<z.ZodString>>;
         confirm: z.ZodDefault<z.ZodBoolean>;
         surface: z.ZodOptional<z.ZodEnum<["fullscreen"]>>;
+        pinned: z.ZodOptional<z.ZodBoolean>;
         id: z.ZodEffects<z.ZodString, string, string>;
         label: z.ZodString;
         icon: z.ZodOptional<z.ZodString>;
@@ -3932,6 +3942,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         result: string | null;
         disabled: string | null;
         confirm: boolean;
+        pinned?: boolean | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         group?: string | undefined;
@@ -3942,6 +3953,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         label: string;
         kind: "run";
         state?: "failed" | "idle" | "busy" | undefined;
+        pinned?: boolean | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         group?: string | undefined;
@@ -3997,6 +4009,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         result: string | null;
         disabled: string | null;
         confirm: boolean;
+        pinned?: boolean | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         group?: string | undefined;
@@ -4044,6 +4057,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         label: string;
         kind: "run";
         state?: "failed" | "idle" | "busy" | undefined;
+        pinned?: boolean | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         group?: string | undefined;
@@ -4099,6 +4113,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         result: string | null;
         disabled: string | null;
         confirm: boolean;
+        pinned?: boolean | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         group?: string | undefined;
@@ -4146,6 +4161,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         label: string;
         kind: "run";
         state?: "failed" | "idle" | "busy" | undefined;
+        pinned?: boolean | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         group?: string | undefined;
@@ -4204,6 +4220,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         result: string | null;
         disabled: string | null;
         confirm: boolean;
+        pinned?: boolean | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         group?: string | undefined;
@@ -4254,6 +4271,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         label: string;
         kind: "run";
         state?: "failed" | "idle" | "busy" | undefined;
+        pinned?: boolean | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         group?: string | undefined;

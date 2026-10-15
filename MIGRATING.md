@@ -140,6 +140,29 @@ All of these still work exactly as they did, and are marked `@deprecated`.
 `kehikot-check-parts` prints a note for each of these it can see in a module's files. It still
 fails only on the manifest.
 
+# Moving from 1.5.0 to 1.6.0
+
+Nothing has to change: 1.6.0 is additive. See "Pinned actions" in [docs/header.md](docs/header.md).
+
+## A host
+
+| before | after |
+|---|---|
+| every run only in the Run menu | also draw each `pinned` run (`pinnedRuns(items)`, at most 4) as an icon button left of the menus, declaration order |
+| a run's `disabled` is drawn flat in the menu | the pinned button is dimmed with the reason as tooltip, never hidden |
+| `state: 'busy'` marks the Run trigger | the pinned button shows a spinner and takes no press |
+| `icon` ignored | map `HEADER_ICONS` to your icon set; unknown name: label's first letters; `label` is tooltip and aria-label |
+| a wide container only | may drop pinned runs to the menu under about 360 px |
+
+## A module
+
+| before | after |
+|---|---|
+| `{ kind: 'run', id: 'accept', label: 'Accept' }` (menu only, two presses) | `{ kind: 'run', id: 'accept', label: 'Accept', icon: 'check', pinned: true }`; safe on a 1.5.0 host (stripped, stays in the menu) |
+| a bar of review buttons inside the page | pin accept, reject, previous, next (and edit) in the frame; keep the page for content |
+
+Not changed: `PROTOCOL`, `press`, `agents`/`tool`, the manifest.
+
 # Moving from 1.4.0 to 1.5.0
 
 Nothing has to change: 1.5.0 is additive. See [docs/activity.md](docs/activity.md).

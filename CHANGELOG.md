@@ -7,6 +7,29 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 1.6.0 — 2026-10-16
+
+One addition: a run may be drawn as a button in the container header. **Additive and optional**;
+`PROTOCOL` is still 2. A 1.5.0 reader parses a header declaring `pinned` and strips it
+(`test/v1-6.test.ts`, against the 1.5.0 tag): the item stays in the Run menu.
+
+### Added
+
+- **`pinned: true`** on a `run` header item: draw it as an icon button in the header, left of the
+  menus, in declaration order; at most `LIMITS.PINNED_MAX` (4); disabled dimmed with its reason, busy
+  a spinner, `confirm` arms on first press; may fall back to the menu when narrow.
+- `LIMITS.PINNED_MAX` (4), `pinnedRuns(items)`, `HEADER_ICONS` / `HeaderIcon`: the closed icon
+  vocabulary a module can count on (`check`, `x`, `chevron-left`, `chevron-right`, `pencil`, `play`,
+  `stop`, `refresh`, `undo`, `external`). `icon` itself is unchanged (any string up to 32); unknown
+  names draw the label's first letters.
+- docs/header.md "Pinned actions": the host's contract.
+
+### Compatibility
+
+- Press, `press_item` and `agents` are unchanged: pinned changes only drawing.
+- A 1.5.0 host drops `pinned` and keeps the item in the menu; a 1.6.0 host with a header that does not
+  declare it is unchanged.
+
 ## 1.5.0 — 2026-10-15
 
 One addition: what a module's things are doing now, so the host can mark it. **Additive and optional**;

@@ -214,6 +214,8 @@ export declare const LIMITS: {
     readonly HEADER_OPTIONS: 64;
     /** An icon's name, e.g. `file-text`. A host draws the ones it has and none for a name it does not know. */
     readonly HEADER_ICON: 32;
+    /** How many run items a host draws pinned in the container header (1.6.0); the rest stay in the Run menu. */
+    readonly PINNED_MAX: 4;
     /** A shortcut hint, e.g. `⌘B`. Shown beside the label; the host binds nothing from it. */
     readonly HEADER_SHORTCUT: 16;
     /** The heading items are gathered under inside their menu. */
