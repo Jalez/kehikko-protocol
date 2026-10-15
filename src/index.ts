@@ -130,6 +130,8 @@ export {
 
 export {
   ACTIVITY_STATES,
+  ACTIVITY_PRIORITIES,
+  type ActivityPriority,
   activityItemSchema,
   activityItemsSchema,
   worstActivity,

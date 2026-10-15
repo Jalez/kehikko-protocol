@@ -140,6 +140,30 @@ All of these still work exactly as they did, and are marked `@deprecated`.
 `kehikot-check-parts` prints a note for each of these it can see in a module's files. It still
 fails only on the manifest.
 
+# Moving from 1.6.0 to 1.7.0
+
+Nothing has to change: 1.7.0 is additive. See "One system" in [docs/activity.md](docs/activity.md).
+
+## A host
+
+| before | after |
+|---|---|
+| a separate Notifications module fed by `events.emit` | one inbox over activity items: keep a timeline per item (open, transitions, closed); now vs earlier |
+| items ordered by state, then `since` | state, then `priority` (`urgent`, `normal`, `low`), then how long it has waited |
+| each item one row | optionally fold items sharing a `group` into one row with a count |
+| `kehikot.notifications@1` shown as its own list | map into the same store as an item born closed (`refs`, `place` kept) |
+| items of a silent module kept | closed when the module stops answering |
+
+## A module
+
+| before | after |
+|---|---|
+| `events.emit` `kehikot.notifications@1` for a notice | `activity.set` with an item (`state: 'attention'`, label, `refs`), dropped from the next list |
+| every item equally pressing | `priority: 'urgent'` only for broken or blocked; `'low'` for informational |
+| three failures, three unrelated rows | same `group` on all three |
+
+Safe on a 1.6.0 host: the new fields are stripped.
+
 # Moving from 1.5.0 to 1.6.0
 
 Nothing has to change: 1.6.0 is additive. See "Pinned actions" in [docs/header.md](docs/header.md).

@@ -7,6 +7,29 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 1.7.0 — 2026-10-16
+
+One system for what needs a person: `activity.set` also carries one-off notices, with a priority,
+refs and a fold key. **Additive and optional**; `PROTOCOL` is still 2. A 1.6.0 reader parses a list
+carrying the new fields and strips them (`test/v1-7.test.ts`, against the 1.6.0 tag).
+
+### Added
+
+- `ActivityItem.priority` (`urgent` | `normal` | `low`, default `normal`), `ActivityItem.refs`
+  (tracker refs, at most `LIMITS.ACTIVITY_REFS` = 16), `ActivityItem.group` (at most
+  `LIMITS.ACTIVITY_GROUP` = 64); `ACTIVITY_PRIORITIES`, `ActivityPriority`.
+- docs/activity.md: "One system", "What a host does with items", "What a module author should report".
+
+### Changed
+
+- `kehikot.notifications@1` is documented as the legacy path for notices: still delivered, mapped by
+  the host to an item born closed. The format itself is unchanged.
+
+### Compatibility
+
+- A 1.6.0 host strips `priority`, `refs` and `group` and keeps the item. A 1.7.0 parse of a 1.6.0 list
+  is unchanged.
+
 ## 1.6.0 — 2026-10-16
 
 One addition: a run may be drawn as a button in the container header. **Additive and optional**;

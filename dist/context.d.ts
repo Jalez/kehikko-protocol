@@ -793,16 +793,16 @@ export declare const contextSchema: z.ZodObject<{
         documents: z.ZodOptional<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">>;
     }, "strip", z.ZodTypeAny, {
         id: string;
-        heading: string;
         refs: string[];
+        heading: string;
         picked: boolean;
         files?: string[] | undefined;
         documents?: string[] | undefined;
     }, {
         id: string;
+        refs?: string[] | undefined;
         files?: string[] | undefined;
         heading?: string | undefined;
-        refs?: string[] | undefined;
         picked?: boolean | undefined;
         documents?: string[] | undefined;
     }>, "many">>;
@@ -810,8 +810,8 @@ export declare const contextSchema: z.ZodObject<{
     epic: string | null;
     parts: {
         id: string;
-        heading: string;
         refs: string[];
+        heading: string;
         picked: boolean;
         files?: string[] | undefined;
         documents?: string[] | undefined;
@@ -881,9 +881,9 @@ export declare const contextSchema: z.ZodObject<{
     epic?: string | null | undefined;
     parts?: {
         id: string;
+        refs?: string[] | undefined;
         files?: string[] | undefined;
         heading?: string | undefined;
-        refs?: string[] | undefined;
         picked?: boolean | undefined;
         documents?: string[] | undefined;
     }[] | undefined;

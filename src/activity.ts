@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { LIMITS } from './limits.js'
-import { placeSchema } from './fragments.js'
+import { placeSchema, ref } from './fragments.js'
 
 /**
  * What a module's things are doing right now (1.5.0): the list `activity.set` carries, and the one
@@ -15,6 +15,14 @@ import { placeSchema } from './fragments.js'
 export const ACTIVITY_STATES = ['working', 'attention', 'done'] as const
 export type ActivityState = (typeof ACTIVITY_STATES)[number]
 
+/**
+ * How pressing an item is, by the module's own judgement (1.7.0). `urgent`: something is broken or
+ * blocked and nothing else will proceed. `normal` (the default): waiting for an answer. `low`:
+ * informational.
+ */
+export const ACTIVITY_PRIORITIES = ['urgent', 'normal', 'low'] as const
+export type ActivityPriority = (typeof ACTIVITY_PRIORITIES)[number]
+
 export const activityItemSchema = z.object({
   /** Stable and unique within the module: the same thing keeps its id for as long as it exists. */
   id: z.string().min(1).max(LIMITS.ACTIVITY_ID),
@@ -27,6 +35,12 @@ export const activityItemSchema = z.object({
   since: z.number().int().min(0).optional(),
   /** A sentence for a tooltip: "waiting for a permission". */
   detail: z.string().max(LIMITS.ACTIVITY_DETAIL).optional(),
+  /** 1.7.0. The module's own sense of how pressing it is; absent is `normal`. A 1.6.0 host strips it. */
+  priority: z.enum(ACTIVITY_PRIORITIES).optional(),
+  /** 1.7.0. Tracker refs (`gh#12`, `!7`) the item concerns, at most `LIMITS.ACTIVITY_REFS`. */
+  refs: z.array(ref).max(LIMITS.ACTIVITY_REFS).optional(),
+  /** 1.7.0. A key a host may fold repeats under ("3 tests failed"); grouping is the host's display choice. */
+  group: z.string().min(1).max(LIMITS.ACTIVITY_GROUP).optional(),
 })
 export type ActivityItem = z.infer<typeof activityItemSchema>
 
