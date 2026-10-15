@@ -101,6 +101,8 @@ export {
   FOLD_OUTCOMES,
   partsSetResult,
   PARTS_SET_OUTCOMES,
+  activitySetResult,
+  ACTIVITY_SET_OUTCOMES,
   projectPickResult,
   pickedProject,
   PICK_OUTCOMES,
@@ -116,6 +118,8 @@ export {
   type FoldResult,
   type PartsSetOutcome,
   type PartsSetResult,
+  type ActivitySetOutcome,
+  type ActivitySetResult,
   type PickOutcome,
   type PickedProject,
   type ProjectPickResult,
@@ -123,6 +127,15 @@ export {
   type EpicsListResult,
   type ReportedStage,
 } from './methods.js'
+
+export {
+  ACTIVITY_STATES,
+  activityItemSchema,
+  activityItemsSchema,
+  worstActivity,
+  type ActivityItem,
+  type ActivityState,
+} from './activity.js'
 
 export {
   contextSchema,

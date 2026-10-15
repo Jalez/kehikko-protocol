@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { LIMITS } from './limits.js'
 import { EPIC_SLUG } from './ids.js'
-import { placeKehikko, placeParts, ref } from './fragments.js'
+import { placeSchema, ref } from './fragments.js'
 
 /**
  * The extension formats modules agree on: named, versioned payload shapes such as
@@ -35,13 +35,7 @@ export const notificationPayload = z.object({
    * `view.goto` carrying the same three. Optional: a line without it goes to its epic as before, and
    * a reader before 1.4.0 strips it.
    */
-  place: z
-    .object({
-      epic: epic.optional(),
-      parts: placeParts.optional(),
-      kehikko: placeKehikko.optional(),
-    })
-    .optional(),
+  place: placeSchema.optional(),
 })
 export type NotificationPayload = z.infer<typeof notificationPayload>
 

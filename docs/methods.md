@@ -300,6 +300,7 @@ and a module that declares none gets none of the methods below.
 | `tracker.refresh` | `trackers:refresh` |
 | `content.changed` | `content:report` |
 | `parts.set` | `parts:set` |
+| `activity.set` | `activity:report` |
 
 The host's table is the protocol's `METHODS`, read by its `capabilityOf`
 (`src/host/grants.ts`): there is no second list to keep in step. A host keeps a
@@ -454,6 +455,21 @@ list has one writer, the host, and a module that wrote it itself would be the
 second. A module offers the edit on a person's press: "a part for each
 chapter", "a part for this new step". It is not for a module to keep the list
 in step with its own data on its own judgement.
+
+#### `CAPABILITIES.activity:report`
+
+Say what this module's things are doing now: working, needing the person, finished (1.5.0). See
+`activity.set` and [activity](activity.md).
+
+A write into the host's marks and nothing else: it moves nobody and writes nothing into the project.
+It is a capability of its own because it makes the host draw on the person's picker and menus about
+what a module says, and the person may want a module that has not asked for that to stay quiet.
+
+#### `methodParams.activity.set`
+
+`{ items: ActivityItem[] }`: the module's whole list, at most 64, ids distinct; replaces what was
+said before. Answered with `activitySetResult` (`outcome: 'taken' | 'declined'`, `taken`, `why`).
+The shapes, the aggregation and the host's contract are in [activity](activity.md).
 
 #### `METHODS`
 

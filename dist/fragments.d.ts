@@ -43,6 +43,23 @@ export declare const kehikkoSchema: z.ZodObject<{
  */
 export declare const placeParts: z.ZodArray<z.ZodString, "many">;
 export declare const placeKehikko: z.ZodString;
+/**
+ * A place, as a notification line and an activity item both carry it (1.4.0, 1.5.0): the epic, the
+ * parts to pick out, the kehikko to be on. A press answers with `view.goto` carrying the same three.
+ */
+export declare const placeSchema: z.ZodObject<{
+    epic: z.ZodOptional<z.ZodString>;
+    parts: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+    kehikko: z.ZodOptional<z.ZodString>;
+}, "strip", z.ZodTypeAny, {
+    epic?: string | undefined;
+    parts?: string[] | undefined;
+    kehikko?: string | undefined;
+}, {
+    epic?: string | undefined;
+    parts?: string[] | undefined;
+    kehikko?: string | undefined;
+}>;
 /** A span of bytes whose ends are each known or not. */
 interface Span {
     from: number | null;

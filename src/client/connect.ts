@@ -5,6 +5,7 @@ import {
   clampHeight,
 } from '../constants.js'
 import { LIMITS } from '../limits.js'
+import { activityItemsSchema, type ActivityItem } from '../activity.js'
 import { ORIGINS_ELEMENT, originAmong } from '../page.js'
 import {
   headerItemsSchema,
@@ -229,6 +230,14 @@ export interface Connection {
    * `onPress`: the host draws what was last declared and holds no state of its own.
    */
   header: (items: HeaderItemInput[]) => void
+  /**
+   * Say what this page's things are doing now (`activity.set`, 1.5.0): the COMPLETE list, replacing
+   * what was said before; `[]` says nothing is going on. Fire and forget. A list identical to the one
+   * last taken is not sent again, the last list is re-sent after every greeting, and nothing is sent
+   * to a host whose greeting said it does not answer `activity.set` (the module simply gets no dots).
+   * A list that does not parse is dropped here, not sent. See docs/activity.md.
+   */
+  activity: (items: ActivityItem[]) => void
   /** Whether anything has greeted us yet. */
   greeted: () => boolean
   /** Stop listening. Every question still waiting is refused rather than left hanging. */
@@ -260,6 +269,11 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
   /* The last header, replayed likewise, as it was written; and as parsed, to judge a press by. */
   let heading: HeaderItemInput[] | null = null
   let declared: HeaderItem[] = []
+  /* The last activity list, as written, and the text of the one the host last took (`null`: none yet on
+     this greeting, so the next is sent). `answered` is the greeting's `answers`, `null` when it did not say. */
+  let activityNow: ActivityItem[] | null = null
+  let activityTaken: string | null = null
+  let answered: readonly string[] | null = null
 
   /** Correlation id -> the promise waiting on it. A `Map`, per the protocol's note on lookups. */
   const waiting = new Map<
@@ -312,6 +326,9 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
       if (clearing !== null) send({ type: MESSAGE.CLEARABLE, label: clearing.label })
       if (refreshing !== null) send({ type: MESSAGE.REFRESHABLE, ...refreshing })
       if (heading !== null) send({ type: MESSAGE.HEADER, items: heading })
+      answered = message.answers ?? null
+      activityTaken = null
+      sendActivity()
       events.onHello?.(message.context, message.state, { answers: message.answers ?? null, header: message.header ?? null })
       return
     }
@@ -402,7 +419,26 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
     }
   }
 
-  return {
+  /* Sent when there is a host, a list, and a host that answers it; not again while the host has taken this very list. */
+  function sendActivity(): void {
+    if (activityNow === null || host === null) return
+    if (answered !== null && !answered.includes('activity.set')) return
+    const key = JSON.stringify(activityNow)
+    if (key === activityTaken) return
+    activityTaken = key
+    connection
+      .request('activity.set', { items: activityNow })
+      .then((answer) => {
+        const outcome = (answer as { outcome?: unknown } | null)?.outcome
+        if (outcome === 'declined' && activityTaken === key) activityTaken = null
+      })
+      .catch(() => {
+        /* Not taken: try again with the next list, even an identical one. */
+        if (activityTaken === key) activityTaken = null
+      })
+  }
+
+  const connection: Connection = {
     listen() {
       if (listening || !live) return this
       listening = true
@@ -477,6 +513,13 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
       send({ type: MESSAGE.HEADER, items })
     },
 
+    activity(items) {
+      const parsed = activityItemsSchema.safeParse(items)
+      if (!parsed.success) return
+      activityNow = parsed.data
+      sendActivity()
+    },
+
     greeted: () => host !== null,
 
     stop() {
@@ -490,4 +533,5 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
       }
     },
   }
+  return connection
 }

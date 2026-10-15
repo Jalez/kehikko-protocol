@@ -8,11 +8,11 @@ export declare const filterOptionSchema: z.ZodObject<{
     id: z.ZodEffects<z.ZodString, string, string>;
     label: z.ZodString;
 }, "strip", z.ZodTypeAny, {
-    label: string;
     id: string;
+    label: string;
 }, {
-    label: string;
     id: string;
+    label: string;
 }>;
 export type FilterOption = z.infer<typeof filterOptionSchema>;
 /**
@@ -38,11 +38,11 @@ export declare const filterGroupSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
         id: z.ZodEffects<z.ZodString, string, string>;
         label: z.ZodString;
     }, "strip", z.ZodTypeAny, {
-        label: string;
         id: string;
+        label: string;
     }, {
-        label: string;
         id: string;
+        label: string;
     }>, "many">>;
     /**
      * Which option this group is on when nobody has chosen, and what a host returns to when a stored
@@ -51,56 +51,56 @@ export declare const filterGroupSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
      */
     fallback: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
 }, "strip", z.ZodTypeAny, {
+    id: string;
     options: {
-        label: string;
         id: string;
+        label: string;
     }[];
     label: string;
-    id: string;
     kind?: "choice" | "text" | "toggles" | undefined;
     fallback?: string | undefined;
 }, {
-    label: string;
     id: string;
+    label: string;
     options?: {
-        label: string;
         id: string;
+        label: string;
     }[] | undefined;
     kind?: "choice" | "text" | "toggles" | undefined;
     fallback?: string | undefined;
 }>, {
+    id: string;
     options: {
-        label: string;
         id: string;
+        label: string;
     }[];
     label: string;
-    id: string;
     kind?: "choice" | "text" | "toggles" | undefined;
     fallback?: string | undefined;
 }, {
-    label: string;
     id: string;
+    label: string;
     options?: {
-        label: string;
         id: string;
+        label: string;
     }[] | undefined;
     kind?: "choice" | "text" | "toggles" | undefined;
     fallback?: string | undefined;
 }>, {
+    id: string;
     options: {
-        label: string;
         id: string;
+        label: string;
     }[];
     label: string;
-    id: string;
     kind?: "choice" | "text" | "toggles" | undefined;
     fallback?: string | undefined;
 }, {
-    label: string;
     id: string;
+    label: string;
     options?: {
-        label: string;
         id: string;
+        label: string;
     }[] | undefined;
     kind?: "choice" | "text" | "toggles" | undefined;
     fallback?: string | undefined;

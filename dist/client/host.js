@@ -71,7 +71,8 @@ export function useHost(id, events = {}, options = {}) {
     const clearable = useCallback((label) => held.current?.clearable(label), []);
     const refreshable = useCallback((state) => held.current?.refreshable(state), []);
     const header = useCallback((items) => held.current?.header(items), []);
+    const activity = useCallback((items) => held.current?.activity(items), []);
     const connection = useCallback(() => held.current?.connection() ?? null, []);
     const read = useCallback(() => held.current?.get() ?? drawn.current, []);
-    return useMemo(() => ({ ...standing, remember, point, request, resize, filters, clearable, refreshable, header, connection, read }), [standing, remember, point, request, resize, filters, clearable, refreshable, header, connection, read]);
+    return useMemo(() => ({ ...standing, remember, point, request, resize, filters, clearable, refreshable, header, activity, connection, read }), [standing, remember, point, request, resize, filters, clearable, refreshable, header, activity, connection, read]);
 }

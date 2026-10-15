@@ -1,6 +1,7 @@
 import { pageBuild } from './build.js';
 import { MESSAGE, PROTOCOL, clampHeight, } from '../constants.js';
 import { LIMITS } from '../limits.js';
+import { activityItemsSchema } from '../activity.js';
 import { ORIGINS_ELEMENT, originAmong } from '../page.js';
 import { headerItemsSchema, hostMessageSchema, looksLikeWireMessage, pressRefusal, } from '../wire.js';
 import { mailbox } from './mailbox.js';
@@ -102,6 +103,11 @@ export function connect(id, events = {}, options = {}) {
     /* The last header, replayed likewise, as it was written; and as parsed, to judge a press by. */
     let heading = null;
     let declared = [];
+    /* The last activity list, as written, and the text of the one the host last took (`null`: none yet on
+       this greeting, so the next is sent). `answered` is the greeting's `answers`, `null` when it did not say. */
+    let activityNow = null;
+    let activityTaken = null;
+    let answered = null;
     /** Correlation id -> the promise waiting on it. A `Map`, per the protocol's note on lookups. */
     const waiting = new Map();
     let counter = 0;
@@ -155,6 +161,9 @@ export function connect(id, events = {}, options = {}) {
                 send({ type: MESSAGE.REFRESHABLE, ...refreshing });
             if (heading !== null)
                 send({ type: MESSAGE.HEADER, items: heading });
+            answered = message.answers ?? null;
+            activityTaken = null;
+            sendActivity();
             events.onHello?.(message.context, message.state, { answers: message.answers ?? null, header: message.header ?? null });
             return;
         }
@@ -246,7 +255,30 @@ export function connect(id, events = {}, options = {}) {
             return;
         }
     };
-    return {
+    /* Sent when there is a host, a list, and a host that answers it; not again while the host has taken this very list. */
+    function sendActivity() {
+        if (activityNow === null || host === null)
+            return;
+        if (answered !== null && !answered.includes('activity.set'))
+            return;
+        const key = JSON.stringify(activityNow);
+        if (key === activityTaken)
+            return;
+        activityTaken = key;
+        connection
+            .request('activity.set', { items: activityNow })
+            .then((answer) => {
+            const outcome = answer?.outcome;
+            if (outcome === 'declined' && activityTaken === key)
+                activityTaken = null;
+        })
+            .catch(() => {
+            /* Not taken: try again with the next list, even an identical one. */
+            if (activityTaken === key)
+                activityTaken = null;
+        });
+    }
+    const connection = {
         listen() {
             if (listening || !live)
                 return this;
@@ -312,6 +344,13 @@ export function connect(id, events = {}, options = {}) {
             declared = parsed.success ? parsed.data : [];
             send({ type: MESSAGE.HEADER, items });
         },
+        activity(items) {
+            const parsed = activityItemsSchema.safeParse(items);
+            if (!parsed.success)
+                return;
+            activityNow = parsed.data;
+            sendActivity();
+        },
         greeted: () => host !== null,
         stop() {
             live = false;
@@ -324,4 +363,5 @@ export function connect(id, events = {}, options = {}) {
             }
         },
     };
+    return connection;
 }

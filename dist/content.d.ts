@@ -20,8 +20,8 @@ export declare const contentChangeSchema: z.ZodObject<{
     at: z.ZodString;
 }, "strip", z.ZodTypeAny, {
     at: string;
-    source: string;
     epic: string | null;
+    source: string;
 }, {
     at: string;
     source: string;
@@ -39,8 +39,8 @@ export declare const contentSignalSchema: z.ZodArray<z.ZodObject<{
     at: z.ZodString;
 }, "strip", z.ZodTypeAny, {
     at: string;
-    source: string;
     epic: string | null;
+    source: string;
 }, {
     at: string;
     source: string;

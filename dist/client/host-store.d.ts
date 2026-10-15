@@ -1,4 +1,4 @@
-import type { CanvasContainer, EpicPart, FilterChoice, FilterGroup, HeaderItemInput, ModuleContext, Passage } from '../index.js';
+import type { ActivityItem, CanvasContainer, EpicPart, FilterChoice, FilterGroup, HeaderItemInput, ModuleContext, Passage } from '../index.js';
 import type { PageTheme } from '../page.js';
 import { type AskOptions, type ConnectOptions, type Connection, type HostEvents } from './connect.js';
 /**
@@ -112,6 +112,8 @@ export interface HostActions<Kept = unknown> {
     }) => void;
     /** Declare this page's header items, whole (`kehikot.header`); `[]` withdraws them. See `Connection.header`. */
     header: (items: HeaderItemInput[]) => void;
+    /** Say what this page's things are doing, whole (`activity.set`, 1.5.0); `[]` for nothing. See `Connection.activity`. */
+    activity: (items: ActivityItem[]) => void;
 }
 export interface HostStore<Kept = unknown> extends HostActions<Kept> {
     /** The standing now. The same object until something changes, so it is a `useSyncExternalStore` snapshot. */

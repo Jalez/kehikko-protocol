@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { LIMITS } from './limits.js';
 import { EPIC_SLUG, MODULE_ID } from './ids.js';
 import { gotoRef, placeKehikko, placeParts, ref, stepNumber } from './fragments.js';
+import { activityItemsSchema } from './activity.js';
 /**
  * `passageSchema` and `filterChoiceSchema` come from `wire.ts` so that both directions share one
  * definition; `wire.ts` imports nothing from here.
@@ -94,6 +95,12 @@ export const CAPABILITIES = {
      * The host is the list's only writer and decides; a module offers the edit on a person's press.
      */
     'parts:set': 'Ask the host to add, rename, move or remove a part of an epic. The host decides, and every module is told.',
+    /**
+     * Say what this module's things are doing NOW: working, needing the person, finished. A write into
+     * the host's marks, read back by nobody else as data; the host draws it. See `activity.set` and
+     * `activity.ts`. 1.5.0.
+     */
+    'activity:report': 'Say which of the things you run are working, need your attention or have finished, so the host can mark them.',
 };
 export const CAPABILITY_NAMES = Object.keys(CAPABILITIES);
 /**
@@ -121,6 +128,7 @@ export const METHODS = {
     'tracker.refresh': 'trackers:refresh',
     'content.changed': 'content:report',
     'parts.set': 'parts:set',
+    'activity.set': 'activity:report',
 };
 export const METHOD_NAMES = Object.keys(METHODS);
 /**
@@ -321,6 +329,12 @@ export const methodParams = {
         .refine((p) => p.move === undefined || p.move.after !== p.move.id, {
         message: 'a part cannot be moved to after itself',
     }),
+    /**
+     * 1.5.0. This module's COMPLETE list of activity items right now; answered with `activitySetResult`. Replaces,
+     * never merges: an item absent from the list is gone, and `[]` is a real call that says nothing is going on.
+     * Duplicate ids are refused. See `activity.ts`.
+     */
+    'activity.set': z.object({ items: activityItemsSchema }),
     'events.emit': z.object({
         /* Canonical once parsed, whichever spelling the module used. See `dialect.ts`. */
         extension: z.string().min(1).max(LIMITS.EXTENSION),
@@ -382,6 +396,16 @@ export const partsSetResult = z.object({
     why: z.string().max(LIMITS.REASON).default(''),
 });
 /**
+ * What became of an `activity.set`; both are `ok: true`. `taken`: the host holds the list as sent. `declined`:
+ * it will not, right now (`why` says so). `taken` is how many items it holds.
+ */
+export const ACTIVITY_SET_OUTCOMES = ['taken', 'declined'];
+export const activitySetResult = z.object({
+    outcome: z.enum(ACTIVITY_SET_OUTCOMES),
+    taken: z.number().int().min(0).max(LIMITS.ACTIVITY_ITEMS).default(0),
+    why: z.string().max(LIMITS.REASON).default(''),
+});
+/**
  * The least an `epics.list` can answer with. `slug` is required: it is the argument to every other
  * call. `title` and `project` are optional and bounded. Every other field passes through untouched.
  * There is no bound on how many epics come back.
@@ -436,6 +460,7 @@ export const methodResults = {
     'tracker.get': trackerReadingResult,
     'tracker.refresh': trackerRefreshResult,
     'parts.set': partsSetResult,
+    'activity.set': activitySetResult,
 };
 /** The schema for one method's answer, or nothing — which means unspecified. */
 export function resultSchemaFor(method) {

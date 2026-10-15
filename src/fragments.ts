@@ -50,6 +50,16 @@ export const kehikkoSchema = z.object({
 export const placeParts = z.array(z.string().regex(EPIC_SLUG) /* a part id's shape is an epic slug's: `PART_ID` in parts.ts */).min(1).max(LIMITS.PLACE_PARTS)
 export const placeKehikko = z.string().regex(KEHIKKO_KEY)
 
+/**
+ * A place, as a notification line and an activity item both carry it (1.4.0, 1.5.0): the epic, the
+ * parts to pick out, the kehikko to be on. A press answers with `view.goto` carrying the same three.
+ */
+export const placeSchema = z.object({
+  epic: z.string().regex(EPIC_SLUG).optional(),
+  parts: placeParts.optional(),
+  kehikko: placeKehikko.optional(),
+})
+
 /** A span of bytes whose ends are each known or not. */
 interface Span {
   from: number | null

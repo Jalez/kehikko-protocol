@@ -772,8 +772,8 @@ export declare const contextSchema: z.ZodObject<{
         at: z.ZodString;
     }, "strip", z.ZodTypeAny, {
         at: string;
-        source: string;
         epic: string | null;
+        source: string;
     }, {
         at: string;
         source: string;
@@ -808,11 +808,6 @@ export declare const contextSchema: z.ZodObject<{
     }>, "many">>;
 }, "strip", z.ZodTypeAny, {
     epic: string | null;
-    tracker: {
-        at: string | null;
-        refreshing: boolean;
-    };
-    projectPath: string | null;
     parts: {
         id: string;
         heading: string;
@@ -821,6 +816,16 @@ export declare const contextSchema: z.ZodObject<{
         files?: string[] | undefined;
         documents?: string[] | undefined;
     }[];
+    kehikko: {
+        id: number;
+        name: string;
+        key?: string | undefined;
+    } | null;
+    tracker: {
+        at: string | null;
+        refreshing: boolean;
+    };
+    projectPath: string | null;
     project: string | null;
     theme: "light" | "dark";
     selection: string[];
@@ -838,11 +843,6 @@ export declare const contextSchema: z.ZodObject<{
     } | null;
     pinned: boolean;
     prompt: string | null;
-    kehikko: {
-        id: number;
-        name: string;
-        key?: string | undefined;
-    } | null;
     filters: Record<string, string | string[]>;
     containers: {
         module: string;
@@ -874,16 +874,11 @@ export declare const contextSchema: z.ZodObject<{
     }[];
     content: {
         at: string;
-        source: string;
         epic: string | null;
+        source: string;
     }[];
 }, {
     epic?: string | null | undefined;
-    tracker?: {
-        at?: string | null | undefined;
-        refreshing?: boolean | undefined;
-    } | undefined;
-    projectPath?: string | null | undefined;
     parts?: {
         id: string;
         files?: string[] | undefined;
@@ -892,6 +887,16 @@ export declare const contextSchema: z.ZodObject<{
         picked?: boolean | undefined;
         documents?: string[] | undefined;
     }[] | undefined;
+    kehikko?: {
+        id: number;
+        name: string;
+        key?: string | undefined;
+    } | null | undefined;
+    tracker?: {
+        at?: string | null | undefined;
+        refreshing?: boolean | undefined;
+    } | undefined;
+    projectPath?: string | null | undefined;
     project?: string | null | undefined;
     theme?: "light" | "dark" | undefined;
     selection?: string[] | undefined;
@@ -909,11 +914,6 @@ export declare const contextSchema: z.ZodObject<{
     } | null | undefined;
     pinned?: boolean | undefined;
     prompt?: string | null | undefined;
-    kehikko?: {
-        id: number;
-        name: string;
-        key?: string | undefined;
-    } | null | undefined;
     filters?: Record<string, string | string[]> | undefined;
     containers?: {
         module: string;
