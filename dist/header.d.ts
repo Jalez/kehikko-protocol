@@ -20,6 +20,13 @@ export type HeaderKind = (typeof HEADER_KINDS)[number];
  */
 export declare const RUN_SURFACES: readonly ["fullscreen"];
 export type RunSurface = (typeof RUN_SURFACES)[number];
+/**
+ * The icon names a module may count on a host drawing (1.6.0). A CLOSED vocabulary as a contract (a
+ * host maps each to its icon set), not a refusal: `icon` stays any short string, a host may know
+ * more, and a name it does not know draws the label's first letters. See docs/header.md.
+ */
+export declare const HEADER_ICONS: readonly ["check", "x", "chevron-left", "chevron-right", "pencil", "play", "stop", "refresh", "undo", "external"];
+export type HeaderIcon = (typeof HEADER_ICONS)[number];
 /** A run is resting, in flight, or its last attempt failed. A host shows the last two on the menu's trigger. */
 export declare const RUN_STATES: readonly ["idle", "busy", "failed"];
 export type RunState = (typeof RUN_STATES)[number];
@@ -202,6 +209,13 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
      * is only relayed. A host that does not know the field strips it and relays the press.
      */
     surface: z.ZodOptional<z.ZodEnum<["fullscreen"]>>;
+    /**
+     * 1.6.0. Draw this run as an icon button in the container header, left of the menus, as well
+     * as in the Run menu. Only drawing changes: an agent presses by id as before. At most
+     * `LIMITS.PINNED_MAX` are drawn (declaration order, see `pinnedRuns`). A host that does not
+     * know the field strips it and keeps the item in the menu.
+     */
+    pinned: z.ZodOptional<z.ZodBoolean>;
     id: z.ZodEffects<z.ZodString, string, string>;
     label: z.ZodString;
     /** An icon by name (`file-text`). A host draws the ones it has; an unknown name draws none. */
@@ -231,6 +245,7 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     result: string | null;
     disabled: string | null;
     confirm: boolean;
+    pinned?: boolean | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     group?: string | undefined;
@@ -241,6 +256,7 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     label: string;
     kind: "run";
     state?: "failed" | "idle" | "busy" | undefined;
+    pinned?: boolean | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     group?: string | undefined;
@@ -296,6 +312,7 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     result: string | null;
     disabled: string | null;
     confirm: boolean;
+    pinned?: boolean | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     group?: string | undefined;
@@ -343,6 +360,7 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     label: string;
     kind: "run";
     state?: "failed" | "idle" | "busy" | undefined;
+    pinned?: boolean | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     group?: string | undefined;
@@ -531,6 +549,13 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
      * is only relayed. A host that does not know the field strips it and relays the press.
      */
     surface: z.ZodOptional<z.ZodEnum<["fullscreen"]>>;
+    /**
+     * 1.6.0. Draw this run as an icon button in the container header, left of the menus, as well
+     * as in the Run menu. Only drawing changes: an agent presses by id as before. At most
+     * `LIMITS.PINNED_MAX` are drawn (declaration order, see `pinnedRuns`). A host that does not
+     * know the field strips it and keeps the item in the menu.
+     */
+    pinned: z.ZodOptional<z.ZodBoolean>;
     id: z.ZodEffects<z.ZodString, string, string>;
     label: z.ZodString;
     /** An icon by name (`file-text`). A host draws the ones it has; an unknown name draws none. */
@@ -560,6 +585,7 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     result: string | null;
     disabled: string | null;
     confirm: boolean;
+    pinned?: boolean | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     group?: string | undefined;
@@ -570,6 +596,7 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     label: string;
     kind: "run";
     state?: "failed" | "idle" | "busy" | undefined;
+    pinned?: boolean | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     group?: string | undefined;
@@ -625,6 +652,7 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     result: string | null;
     disabled: string | null;
     confirm: boolean;
+    pinned?: boolean | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     group?: string | undefined;
@@ -672,6 +700,7 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     label: string;
     kind: "run";
     state?: "failed" | "idle" | "busy" | undefined;
+    pinned?: boolean | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     group?: string | undefined;
@@ -727,6 +756,7 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     result: string | null;
     disabled: string | null;
     confirm: boolean;
+    pinned?: boolean | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     group?: string | undefined;
@@ -774,6 +804,7 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     label: string;
     kind: "run";
     state?: "failed" | "idle" | "busy" | undefined;
+    pinned?: boolean | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     group?: string | undefined;
@@ -784,6 +815,11 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     confirm?: boolean | undefined;
     surface?: "fullscreen" | undefined;
 })[]>;
+/**
+ * The runs a host draws as header buttons (1.6.0): those with `pinned: true`, in declaration order,
+ * the first `LIMITS.PINNED_MAX` of them. The others stay in the Run menu only.
+ */
+export declare function pinnedRuns(items: readonly HeaderItem[]): HeaderItem[];
 /**
  * Which menu each kind is drawn in. Fixed, so a module cannot scatter its items: switches and
  * toggles are View, jumps are Go, runs are Run. `frame` is the host's own menu and holds no item.

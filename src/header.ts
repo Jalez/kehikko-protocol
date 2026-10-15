@@ -60,6 +60,25 @@ export type HeaderKind = (typeof HEADER_KINDS)[number]
 export const RUN_SURFACES = ['fullscreen'] as const
 export type RunSurface = (typeof RUN_SURFACES)[number]
 
+/**
+ * The icon names a module may count on a host drawing (1.6.0). A CLOSED vocabulary as a contract (a
+ * host maps each to its icon set), not a refusal: `icon` stays any short string, a host may know
+ * more, and a name it does not know draws the label's first letters. See docs/header.md.
+ */
+export const HEADER_ICONS = [
+  'check',
+  'x',
+  'chevron-left',
+  'chevron-right',
+  'pencil',
+  'play',
+  'stop',
+  'refresh',
+  'undo',
+  'external',
+] as const
+export type HeaderIcon = (typeof HEADER_ICONS)[number]
+
 /** A run is resting, in flight, or its last attempt failed. A host shows the last two on the menu's trigger. */
 export const RUN_STATES = ['idle', 'busy', 'failed'] as const
 export type RunState = (typeof RUN_STATES)[number]
@@ -104,6 +123,13 @@ export const headerItemSchema = z
        * is only relayed. A host that does not know the field strips it and relays the press.
        */
       surface: z.enum(RUN_SURFACES).optional(),
+      /**
+       * 1.6.0. Draw this run as an icon button in the container header, left of the menus, as well
+       * as in the Run menu. Only drawing changes: an agent presses by id as before. At most
+       * `LIMITS.PINNED_MAX` are drawn (declaration order, see `pinnedRuns`). A host that does not
+       * know the field strips it and keeps the item in the menu.
+       */
+      pinned: z.boolean().optional(),
     }),
   ])
   .superRefine((item, ctx) => {
@@ -136,6 +162,14 @@ export const headerItemsSchema = z
   .refine((items) => new Set(items.map((item) => item.id)).size === items.length, {
     message: 'two header items cannot share an id',
   })
+
+/**
+ * The runs a host draws as header buttons (1.6.0): those with `pinned: true`, in declaration order,
+ * the first `LIMITS.PINNED_MAX` of them. The others stay in the Run menu only.
+ */
+export function pinnedRuns(items: readonly HeaderItem[]): HeaderItem[] {
+  return items.filter((item) => item.kind === 'run' && item.pinned === true).slice(0, LIMITS.PINNED_MAX)
+}
 
 /**
  * Which menu each kind is drawn in. Fixed, so a module cannot scatter its items: switches and

@@ -56,6 +56,7 @@ Every item has `id`, `label`, and optionally `icon` (a name such as `file-text`;
 | `HEADER_LABEL` | 48 characters, for an item and for an option |
 | `HEADER_GROUP` | 24 |
 | `HEADER_ICON` | 32 |
+| `PINNED_MAX` | 4 pinned runs drawn in the header (1.6.0) |
 | `HEADER_SHORTCUT` | 16 |
 | `HEADER_RESULT` | 32 |
 
@@ -187,10 +188,49 @@ contract, for a host:
    it can without full screen. A host that cannot go full screen (a webview that refuses) does the
    same.
 
+## Pinned actions (1.6.0)
+
+A run's place is the Run menu: two presses. For the few actions a person repeats (accept, reject,
+previous, next in a review), a module marks the run `pinned: true` and gives it an `icon`:
+
+```ts
+{ kind: 'run', id: 'accept', label: 'Accept edit', icon: 'check', pinned: true }
+{ kind: 'run', id: 'reject', label: 'Decline edit', icon: 'x', pinned: true, disabled: 'No edit is open' }
+```
+
+Both fields are optional, and `pinned` is only read on a `run` (ignored on other kinds). Only
+DRAWING changes: the item stays in the Run menu, an agent presses it by id exactly as before
+(`press_item`, `agents`, `tool` are unchanged), and `kehikot.press` is the same message.
+
+The contract, for a host:
+
+1. **Where.** Pinned runs are icon buttons in the container header, left of the View/Go/Run menus,
+   in declaration order. `pinnedRuns(items)` returns them: the `pinned` runs, at most
+   `LIMITS.PINNED_MAX` (4). A fifth and later pinned run is not drawn pinned and stays in the menu.
+2. **Name.** `label` is the tooltip and the accessible name (`aria-label`); the icon is decoration.
+3. **Icon.** `icon` is any short string (`HEADER_ICON`, 32). The vocabulary a module may count on is
+   `HEADER_ICONS`: `check`, `x`, `chevron-left`, `chevron-right`, `pencil`, `play`, `stop`,
+   `refresh`, `undo`, `external`. A host maps each to its own icon set and may know more. A name it
+   does not know (or no `icon`) is drawn as the first letters of the label.
+4. **Disabled.** A run with `disabled` is drawn dimmed, inert, with the reason as its tooltip, and
+   never hidden: the header does not jump when an edit comes and goes.
+5. **Busy.** `state: 'busy'` draws a spinner in place of the icon and the button takes no press.
+   `failed` and `result` may be shown as a title suffix or a small mark; the menu shows them too.
+6. **Confirm.** A pinned `confirm: true` run arms on the first press (the button changes, as the
+   menu entry does) and runs on the second, same timeout.
+7. **Narrow.** A host may drop pinned runs back into the menu when the container is narrower than
+   it can draw them in (suggested: under 360 px). Nothing is lost: the menu always holds every run.
+8. **Surface.** `surface: 'fullscreen'` works the same from a pinned button (from its click handler).
+9. **Folded.** Folded to its header, the container draws the pinned buttons or hides them, the host's
+   choice; the menus hide as before.
+
+A host before 1.6.0 strips `pinned` when it parses and draws the item in the Run menu only; `icon`
+was already accepted. A module needs no check: it declares the same header either way.
+
 ## What is not in 1.1.0
 
 - **`clearable` and `refreshable` stay**, and are not deprecated. Folding the host's clear and refresh into Run items is the last step of the proposal and a breaking one (2.0.0), after the modules that use them have moved.
-- **No pinned Run button.** Every run is in the menu.
+- **No pinned Run button** (changed in 1.6.0: see [Pinned actions](#pinned-actions-160)).
 - **No keyboard binding by the host.** `shortcut` is a hint to draw; the module's own page handles the key.
 
 ## A message type the other side does not know
