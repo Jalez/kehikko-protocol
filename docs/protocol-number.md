@@ -1,6 +1,6 @@
-# The protocol number, and what is left of the rename from "roadmap"
+# The protocol number
 
-Why `PROTOCOL` is 2 and what would raise it, and the one place a name from before the rename is still read.
+Why `PROTOCOL` is 2 and what would raise it.
 
 
 This is the reasoning, not the reference: the shapes themselves, with their bounds, are in the source and show on hover. The first half is the overview that used to be in the README; the second half is the note that used to stand above each symbol in the source, under that symbol's name.
@@ -151,44 +151,3 @@ there.
 There are no aliases for the old spellings, deliberately. A shim would let a
 module keep the conflation working, and the conflation is the thing being
 removed.
-
-#### A note in `src/constants.ts`
-
-##### And why neither the rename nor its removal raised it
-
-Every name on the wire changed spelling in 0.25.0 — `roadmap.hello` became `kehikot.hello`,
-`roadmap.module` became `kehikot.module`, the well-known path, the extension names and the module
-ids with them — when the app that was once called "roadmap" became Kehikot. Nothing changed
-meaning, and for twelve versions both spellings were read everywhere and the old one was written
-to anybody known to speak only it (`dialect.ts`: `toDialect`, `legacyManifest`,
-`LEGACY_WELL_KNOWN`), so the number stayed where it was.
-
-The breaking release after 0.37 took the second spelling away, and the number still did not
-move, for the same reason read the other way: no `kehikot.` message changed meaning, and no field
-changed shape. A module built against 0.25.0 or later and a host built against this version say
-exactly what they said to each other yesterday. What stopped working is a module or a host from
-before 0.25.0, which was already speaking a spelling of protocol 2 that nothing has written by
-default for twelve versions — and of which there is no copy left to run: every module and the
-host are on 0.36.0 or later, and no module has a tagged version from before the rename that a
-project could pin.
-
-### What is still read from before the rename
-
-Three things, all of them on somebody's DISK rather than on the wire, all read and never written:
-
-| what | where | read by |
-|---|---|---|
-| a module id spelled `roadmap.<name>` | a project's `.kehikot/` files, a host's database, an argument somebody typed | `canonicalModuleId(id)` (`ids.ts`) — a host calls it on what it reads back; no schema here applies it |
-| the folder a module's data is in | `<project>/.kehikot/<name>/` | `moduleFolder('roadmap.<name>')` is `<name>`, the same folder as `kehikot.<name>` — the rename moved no data |
-| a registration named `roadmap.<name>.json` | the registry (`registryDir()`) | `registerAt` (so `keep` survives), `claim` and `neighbourPorts` (`serve/registry.ts`) |
-
-
-#### `canonicalModuleId`
-
-A module's one id, whichever spelling it was stored in.
-
-`roadmap.journeys` and `kehikot.journeys` are the SAME module — the one named before the rename
-and after it — and a host keys everything it keeps about a module by this. A registration file, a
-placement in an old database and an MCP call naming the old id all land on one row. Nothing on
-the wire is respelled: a manifest, a `ready` or an event that says `roadmap.x` is carried as it
-was said, and is simply another id.

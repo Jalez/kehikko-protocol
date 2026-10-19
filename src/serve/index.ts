@@ -34,6 +34,7 @@ export {
   portOf,
   readRegistration,
   registerAt,
+  takesOver,
   registryDir,
   type Registered,
   type Registration,

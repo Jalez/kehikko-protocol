@@ -339,7 +339,7 @@ does. [MIGRATING.md](../MIGRATING.md) has the before and after for every one.
 - **`useHost` / `hostStore` take `same`**: a page's own rule for when a field is the one it was, per field (`{ passage: (was, now) => … }`), in place of deep equality. Paper kept the passage in state of its own for this.
 - **`watchServer()`** (`/client`): `probeServer` on a clock while the page is visible, for a page that asks its server nothing else. References and atlas listened for Vite's `vite:ws:disconnect`, which exists only in development.
 - **`doors({ ancestors })`**: origins that may frame the page besides the environment's. **`doors({ openHealth: true })`**: `/healthz` readable from any origin, for a module framed on an opaque one (atlas wrote the two headers by hand). **A reply header with an empty value** takes a default off the answer: `'cache-control': ''` sends none (paper sent `private` to say the same thing).
-- **`useKehikot` is gone**, and every name that said `roadmap`.
+- **`useKehikot` is gone.**
 - **The parts declaration is a refusal**: see [manifest.md](manifest.md).
 
 Not changed, and why: **`follow` still probes nothing by default.** Turning `probe` on would make

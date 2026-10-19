@@ -10,7 +10,7 @@ import { HostRefused, connect, makeMailbox, type Connection, type MessageSource 
  * These are the tests that would be skipped and shouldn't be. The happy path
  * across a frame is four lines of code and it works the first time; what breaks
  * in the field is the second sender, the answer to a question nobody asked, the
- * message that arrives before the greeting, and the roadmap that says nothing at
+ * message that arrives before the greeting, and the host that says nothing at
  * all — and every one of those is silent when it goes wrong, which is exactly
  * the class of failure a test can see and a person cannot.
  *
@@ -152,8 +152,8 @@ describe('the greeting', () => {
     const { source: source2, deliver: deliver2 } = fakeWindow()
     const real = speaker()
     attach({}, { source: source2 })
-    deliver2({ ...hello(real), origin: 'https://roadmap.example' })
-    expect(real.to).toEqual(['https://roadmap.example'])
+    deliver2({ ...hello(real), origin: 'https://other.example' })
+    expect(real.to).toEqual(['https://other.example'])
   })
 })
 
@@ -244,7 +244,7 @@ describe('the greeting that arrived before anybody was listening', () => {
 describe('binding to the window, not the origin', () => {
   test('a second window saying the same words is ignored', () => {
     /* The failure this prevents is not dramatic and that is the point: a page
-       framed by one roadmap, receiving context from another, would draw the
+       framed by one host, receiving context from another, would draw the
        wrong epic under the right title and say nothing about it. */
     const { source, deliver } = fakeWindow()
     const real = speaker()
@@ -270,7 +270,7 @@ describe('binding to the window, not the origin', () => {
     for (const data of [null, 'hello', { type: 'webpack/hot' }, { type: 'kehikot.hello' }, 7]) {
       deliver({ data, source: host })
     }
-    /* The fourth one starts `roadmap.` and is still not a greeting: no protocol,
+    /* The fourth one starts a foreign prefix and is still not a greeting: no protocol,
        no session, no context. A module that answered it would have bound itself
        to whatever posted it. */
     expect(host.said).toEqual([])
@@ -291,8 +291,8 @@ describe('the context is spread, never enumerated', () => {
     type: MESSAGE.CONTEXT,
     protocol: PROTOCOL,
     epic: 'a-epic',
-    project: 'roadmap',
-    projectPath: '/tmp/roadmap',
+    project: 'thesis',
+    projectPath: '/tmp/thesis',
     theme: 'light',
     selection: ['gh#41'],
     prompt: 'find the thing',
@@ -328,7 +328,7 @@ describe('the context is spread, never enumerated', () => {
     expect(context.prompt).toBe('find the thing')
     expect(context.pinned).toBe(true)
     expect(context.kehikko).toEqual({ id: 3, name: 'Delivery' })
-    expect(context.projectPath).toBe('/tmp/roadmap')
+    expect(context.projectPath).toBe('/tmp/thesis')
   })
 
   test('and the way the modules used to do it drops three of them', () => {
@@ -405,14 +405,14 @@ describe('a question and its answer', () => {
         id: asked.id,
         ok: false,
         reason: 'unknown-method',
-        error: 'this roadmap does not answer live.get',
+        error: 'this host does not answer live.get',
       },
       source: host,
     })
     await expect(answer).rejects.toBeInstanceOf(HostRefused)
     await answer.catch((error: HostRefused) => {
       expect(error.refusal.reason).toBe('unknown-method')
-      expect(error.refusal.error).toBe('this roadmap does not answer live.get')
+      expect(error.refusal.error).toBe('this host does not answer live.get')
     })
   })
 

@@ -4,12 +4,6 @@
  * (default `~/.local/share/kehikot/modules`) elsewhere.
  */
 export declare function registryDir(env?: Record<string, string | undefined>): string;
-/**
- * The file name a module's registration had before the app was renamed (`roadmap.<name>.json`), or
- * `null` for an id that never had one. READ, never written: a registry may still hold one, and what it
- * says (`keep`, above all) is this module's.
- */
-export declare function registrationBeforeRename(id: string): string | null;
 /** What one registration says. The host reads `url`, `dir`, and a `keep` this never writes. */
 export interface Registration {
     url: string;
@@ -32,6 +26,22 @@ export declare function registerAt({ id, origin, dir }: {
     origin: string;
     dir: string;
 }): Registered;
+/**
+ * Whether a copy of a module running from `dir` may write its registration, or whose it is.
+ *
+ * A registration names the ONE folder the app runs the module from: its installed copy. A copy of
+ * the same module started anywhere else — a worktree an agent is working in, a developer's clone —
+ * must not take that over: the app would start the module from a half-written change, or from a
+ * folder that is gone next week. So it may write only when nothing is registered yet, when what is
+ * registered is this same folder, or when the registered folder no longer exists. `bun run
+ * register` (calling `registerAt` itself) is the deliberate way to point the app somewhere else.
+ */
+export declare function takesOver(id: string, dir: string, where?: string): {
+    ok: true;
+} | {
+    ok: false;
+    held: Registration;
+};
 /** One registration file, or `null` for anything that is not one. Never throws. */
 export declare function readRegistration(file: string): Registration | null;
 /**

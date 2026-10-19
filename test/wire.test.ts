@@ -5,7 +5,6 @@ import {
   MESSAGE_PREFIX,
   LIMITS,
   MIN_HEIGHT,
-  canonicalModuleId,
   clampHeight,
   KEHIKKO_KEY,
   contextSchema,
@@ -34,7 +33,7 @@ describe('a response is one thing or the other', () => {
       id: 'q1',
       ok: false,
       reason: 'unknown-method',
-      error: 'this roadmap has no method "epics.gett"',
+      error: 'this host has no method "epics.gett"',
     })
     expect(no.ok).toBe(false)
     if (!no.ok) {
@@ -129,11 +128,11 @@ describe('context says what the host is in a position to know', () => {
   test('a project is named and a project is somewhere, and they are two fields', () => {
     const context = contextSchema.parse({
       epic: 'modes-are-modules',
-      project: 'roadmap',
-      projectPath: '/Users/somebody/Projects/roadmap',
+      project: 'thesis',
+      projectPath: '/Users/somebody/Projects/thesis',
     })
-    expect(context.project).toBe('roadmap')
-    expect(context.projectPath).toBe('/Users/somebody/Projects/roadmap')
+    expect(context.project).toBe('thesis')
+    expect(context.projectPath).toBe('/Users/somebody/Projects/thesis')
   })
 
   test('a host that only knows the name still parses, because the path is nullable', () => {
@@ -141,8 +140,8 @@ describe('context says what the host is in a position to know', () => {
        written before `projectPath` existed is still a valid context, and what
        comes out says the host has no folder to point at — which is the truth
        about what that message conveyed. */
-    const named = contextSchema.parse({ project: 'roadmap' })
-    expect(named.project).toBe('roadmap')
+    const named = contextSchema.parse({ project: 'thesis' })
+    expect(named.project).toBe('thesis')
     expect(named.projectPath).toBe(null)
   })
 
@@ -211,7 +210,7 @@ describe('who may say what', () => {
         type: MESSAGE.HELLO,
         protocol: 1,
         session: 'abc',
-        context: { epic: 'modes-are-modules', project: 'roadmap', theme: 'dark' },
+        context: { epic: 'modes-are-modules', project: 'thesis', theme: 'dark' },
       }).success,
     ).toBe(true)
     expect(hostMessageSchema.safeParse({ type: MESSAGE.CONTEXT, protocol: 1, epic: null }).success).toBe(true)
@@ -366,28 +365,21 @@ describe('a passage says where somebody is pointing, and how precisely', () => {
 })
 
 describe('one spelling', () => {
-  test('a message that says `roadmap.` is not a wire message, and no schema reads it', () => {
+  test('a message with a foreign prefix is not a wire message, and no schema reads it', () => {
     const hello = { type: 'kehikot.hello', protocol: 2, session: 's1', context: { epic: 'a-epic', project: null, theme: 'dark' } }
     expect(looksLikeWireMessage(hello)).toBe(true)
     expect(hostMessageSchema.safeParse(hello).success).toBe(true)
-    const before = { ...hello, type: 'roadmap.hello' }
+    const before = { ...hello, type: 'other.hello' }
     expect(looksLikeWireMessage(before)).toBe(false)
     expect(hostMessageSchema.safeParse(before).success).toBe(false)
     expect(MESSAGE_PREFIX).toBe('kehikot.')
   })
 
-  test('an id written to disk before the rename is still read as the module it is', () => {
-    expect(canonicalModuleId('roadmap.journeys')).toBe('kehikot.journeys')
-    expect(canonicalModuleId('kehikot.journeys')).toBe('kehikot.journeys')
-    expect(canonicalModuleId('com.example.thing')).toBe('com.example.thing')
-    expect(moduleFolder('roadmap.journeys')).toBe(moduleFolder('kehikot.journeys'))
-  })
-
-  test('a manifest that calls itself by the old word is not a manifest', () => {
+  test('a manifest that calls itself by a foreign kind is not a manifest', () => {
     const manifest = { kind: 'kehikot.module', protocol: 2, id: 'kehikot.example', name: 'Example', entry: '/app', modes: [{ id: 'main', label: 'Main' }], partless: 'Nothing in it belongs to a part.' }
     expect(manifestSchema.safeParse(manifest).success).toBe(true)
-    expect(manifestSchema.safeParse({ ...manifest, kind: 'roadmap.module' }).success).toBe(false)
+    expect(manifestSchema.safeParse({ ...manifest, kind: 'other.module' }).success).toBe(false)
     /* An id is carried as written: nothing is respelled on the way in. */
-    expect(manifestSchema.parse({ ...manifest, id: 'roadmap.example' }).id).toBe('roadmap.example')
+    expect(manifestSchema.parse({ ...manifest, id: 'other.example' }).id).toBe('other.example')
   })
 })

@@ -106,8 +106,8 @@ describe('the doors', () => {
     expect(now.status).toBe(200)
     expect(now.headers['content-type']).toBe('application/json; charset=utf-8')
     expect(json(now).kind).toBe('kehikot.module')
-    /* The path a host asked before the rename is nobody's now: it goes on to whatever is behind the doors. */
-    const before = await call('GET', '/.well-known/roadmap-module.json').done
+    /* The path a host asked from a foreign host is nobody's now: it goes on to whatever is behind the doors. */
+    const before = await call('GET', '/.well-known/other-module.json').done
     expect(before.nexted).toBe(true)
     expect(before.ended).toBe(false)
   })
@@ -298,7 +298,7 @@ describe('the doors as a fetch handler', () => {
     expect(found?.headers.get(BUILD_HEADER)).toBe(buildStamp(BUILD))
     expect(found?.headers.get('cache-control')).toBe('no-store')
     expect(((await found?.json()) as { build: unknown }).build).toEqual(BUILD)
-    expect(await at('/.well-known/roadmap-module.json')).toBe(null)
+    expect(await at('/.well-known/other-module.json')).toBe(null)
   })
 
   test('the page at /app, /app/ and /, with the same headers as the other form', async () => {

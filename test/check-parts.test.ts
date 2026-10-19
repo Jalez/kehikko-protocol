@@ -23,7 +23,7 @@ describe('which focus helpers a file imports', () => {
     expect(focusImports("import { fileInFocus } from './mine.ts'")).toEqual([])
     expect(focusImports("import { pickedParts, isFocused } from 'kehikot-module-protocol'")).toEqual([])
     expect(focusImports("import { useKehikot } from 'kehikot-module-protocol/client'")).toEqual([])
-    expect(focusImports("import { useFocus } from 'roadmap-module-protocol'")).toEqual([])
+    expect(focusImports("import { useFocus } from 'some-other-package'")).toEqual([])
   })
 })
 

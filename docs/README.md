@@ -10,7 +10,7 @@ Why the protocol is the way it is. The source keeps one to three lines beside ea
 | [The manifest](manifest.md) | What a module says about itself at the well-known path: every field of `manifestSchema`, what a module says it reacts to, its tags, and how a protocol range is read. |
 | [Names and ids](ids.md) | The patterns for a module id, a mode id and an epic slug, the one derivation of a slug from prose, and the lookup that does not fall through a prototype. |
 | [Limits](limits.md) | Why every string and every list is bounded, and the reasoning behind each number in `LIMITS`. |
-| [The protocol number, and what is left of the rename from "roadmap"](protocol-number.md) | Why `PROTOCOL` is 2 and what would raise it, and the three places a name from before the rename is still read from disk. |
+| [The protocol number](protocol-number.md) | Why `PROTOCOL` is 2 and what would raise it, and what would raise it. |
 | [Where a module keeps a project's data](project-data.md) | The `.kehikot/` folder inside a project, the folder each module gets in it, and the lines a project's `.gitignore` gains. |
 | [Parts of an epic: one list, one rule](parts.md) | What a part is and who keeps the list, the one rule for what a pick shows and the contract every module that follows parts keeps, a worked "one X per part" module, `parts.json`, project-relative documents, `parts.set`, what 1.2.0 deprecated, and the record an epic's steps are read from. |
 | [Trackers](tracker.md) | One reading of GitHub and GitLab shared by every module: the row a host hands back, what is missing and why, refreshing, and how a reference is spelled. |

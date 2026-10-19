@@ -1,5 +1,5 @@
 import { claim, sayClaim, type Claimed } from './ports.js'
-import { registerAt } from './registry.js'
+import { registerAt, takesOver } from './registry.js'
 
 /**
  * Options for `serves`, a module's whole port story as one line in its `vite.config.ts`:
@@ -98,7 +98,18 @@ export function serves({ id, prefer, dir, span, timeoutMs }: ServesOptions): Ser
         }
 
         const origin = `http://127.0.0.1:${bound.port}`
-        const written = registerAt({ id, origin, dir: dir ?? server.config.root })
+        const here = dir ?? server.config.root
+        /* Another folder is the one the app runs this module from: this copy answers, and is not
+           registered in its place (see `takesOver`). */
+        const may = takesOver(id, here)
+        if (!may.ok) {
+          console.log(
+            `${id} answers at ${origin} and was NOT registered: the app runs ${id} from ${may.held.dir}, and a copy `
+              + 'started from another folder does not take that over. `bun run register` here would.',
+          )
+          return
+        }
+        const written = registerAt({ id, origin, dir: here })
 
         /* Said every time, and short. After a drift it is the only place both numbers appear
            together. */

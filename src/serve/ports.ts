@@ -3,7 +3,7 @@ import { createServer } from 'node:net'
 import { join } from 'node:path'
 
 import { MANIFEST_KIND, WELL_KNOWN } from '../constants.js'
-import { neighbourPorts, portOf, readRegistration, registrationBeforeRename, registryDir } from './registry.js'
+import { neighbourPorts, portOf, readRegistration, registryDir } from './registry.js'
 
 /**
  * Which port this module binds, decided rather than assumed. A taken preferred port means moving
@@ -234,10 +234,7 @@ export async function claim({
    * Before drifting: is this module already answering where its registration last said it was?
    * The registration is a hint, never an authority — only an answer carrying THIS id stops the start.
    */
-  const before = registrationBeforeRename(id)
-  const mine = portOf(
-    (readRegistration(join(registry, `${id}.json`)) ?? (before ? readRegistration(join(registry, before)) : null))?.url ?? '',
-  )
+  const mine = portOf(readRegistration(join(registry, `${id}.json`))?.url ?? '')
   if (mine !== null && mine !== prefer && !(await isFree(mine))) {
     const there = await ask(mine, timeoutMs)
     if (there.at === 'module' && there.id === id) {

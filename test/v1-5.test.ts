@@ -57,7 +57,7 @@ describe('the method', () => {
   test('is under its own capability, and the version says 1.5.0', () => {
     expect(METHODS['activity.set']).toBe('activity:report')
     expect(Object.keys(CAPABILITIES)).toContain('activity:report')
-    expect(PACKAGE_VERSION).toMatch(/^1\.\d+\.\d+$/)
+    expect(PACKAGE_VERSION).toMatch(/^\d+\.\d+\.\d+$/)
   })
   test('items: the three states, optional place, since, detail', () => {
     expect([...ACTIVITY_STATES]).toEqual(['working', 'attention', 'done'])

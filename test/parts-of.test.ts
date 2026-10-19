@@ -31,8 +31,8 @@ import {
 /* The shape of the one real epic that has groups: headings and refs, no ids,
    and steps that name refs and say nothing about a part. */
 const asOnDisk = {
-  slug: 'the-roadmap-tracks-itself',
-  title: 'The roadmap can be trusted about its own state',
+  slug: 'the-thesis-tracks-itself',
+  title: 'The thesis can be trusted about its own state',
   steps: [
     { title: 'The one path that writes in public has a gate on it', body: '', refs: ['gh#1'], notes: [] },
     { title: 'The claim ledger is safe to be wrong about', body: '', refs: ['gh#3'], notes: [] },

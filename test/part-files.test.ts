@@ -31,8 +31,8 @@ import {
  * `paperFileOf`, turns the absolute path a module holds into that name.
  */
 
-const PROJECT = '/Users/someone/Projects/roadmap'
-const EPIC = 'the-roadmap-tracks-itself'
+const PROJECT = '/Users/someone/Projects/thesis'
+const EPIC = 'the-thesis-tracks-itself'
 const at = (file: string, epic = EPIC) => `${moduleDir(PROJECT, PAPER_MODULE)}/${epic}/${file}`
 
 const part = (id: string, files: string[], picked = false, refs: string[] = []): EpicPart =>
@@ -64,7 +64,7 @@ describe('the form a part’s file is kept in', () => {
   test('nothing absolute, nothing that climbs, no backslash, nothing empty, nothing unprintable', () => {
     const refused = [
       '/etc/passwd',
-      '/Users/someone/Projects/roadmap/.kehikot/paper/x/main.tex',
+      '/Users/someone/Projects/thesis/.kehikot/paper/x/main.tex',
       'C:/papers/main.tex',
       'C:main.tex',
       'c:\\papers\\main.tex',

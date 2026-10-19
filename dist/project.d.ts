@@ -22,8 +22,8 @@ export declare const DATA_FILE: RegExp;
  */
 export declare const MODULE_FOLDER: RegExp;
 /**
- * A module's folder name, from its id: `kehikot.checklist` and the pre-rename `roadmap.checklist`
- * both become `checklist`; an id with neither prefix is used whole. Throws, rather than falling
+ * A module's folder name, from its id: `kehikot.checklist` becomes `checklist`; an id without that
+ * prefix is used whole. Throws, rather than falling
  * back, when the id is not a `MODULE_ID` or the derived name is not a `MODULE_FOLDER`.
  */
 export declare function moduleFolder(moduleId: string): string;
