@@ -16,8 +16,8 @@ import {
 /** 2.2.0: the host's own folder in a project is `.kehikot/host/`; before, it was `.kehikot/kehikko/`. */
 
 describe('the version', () => {
-  test('is 2.2.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.2.0')
+  test('is 2.3.0, and PROTOCOL is still 2', () => {
+    expect(PACKAGE_VERSION).toBe('2.3.0')
     expect(PROTOCOL).toBe(2)
   })
 })

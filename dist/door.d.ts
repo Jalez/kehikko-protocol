@@ -32,6 +32,24 @@ export declare function doorContext(args: Record<string, unknown>, before?: Part
     deprecated: string[];
 };
 /**
+ * The sentences a door says about the `project` it was handed, in one wording for every module
+ * (2.3.0). `resolveDoorProject` in `/serve` says them; they are here, pure, so a door that asks its
+ * own way says the same. A door works on the path it was GIVEN BACK, never on the argument.
+ *
+ * - `moved(to)`: the folder was a project and the project is now elsewhere, and the door would not
+ *   follow it (the new path did not answer as the same project).
+ * - `notProject(path)`: the host does not hold the folder (or no host answered).
+ * - `unnamed`: the call named no project.
+ * - `followed(from, to)`: the line a door ADDS to an answer after it followed a move, so the agent
+ *   uses the new path from then on.
+ */
+export declare const DOOR_PROJECT_SAYS: {
+    readonly moved: (to: string) => string;
+    readonly notProject: (path: string) => string;
+    readonly unnamed: "Name the project: `project` is its absolute folder.";
+    readonly followed: (from: string, to: string) => string;
+};
+/**
  * What became of being asked to show something. `shown`: at least one open page is showing it.
  * `unseen`: no page is open to see it, or none is known to be showing it (a hidden window, a page
  * that did not say). `declined`: the open pages would not move — a talk is being given, a page holds

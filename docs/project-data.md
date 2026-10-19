@@ -214,6 +214,11 @@ project it has state for under the path, it moves that state to the id; after
 that the path is never looked at again for that project, and a rename costs
 nothing.
 
+The same goes for a module's SERVER (2.3.0): state it keeps between requests (a watcher, a cache, an
+open handle) is filed by the project's id, and the path is resolved again on each request —
+`resolveDoorProject` answers both, and follows a path the project used to have. See
+[asking.md](asking.md#a-project-that-moved-230).
+
 ## Notes by symbol
 
 ### `src/project.ts`

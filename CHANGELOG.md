@@ -7,6 +7,34 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.3.0 — 2026-10-19
+
+A project that moved is found from the path it had. A project is its id; after a person renames or
+moves its folder the host relinks it, but an agent still holds the old path, and a module door that
+checked only the disk (or asked the host for a yes or no) said "not a project" with nothing to go on.
+**Additive**; `PROTOCOL` is still 2. A 2.2 host's answer still reads, and a 2.2 module ignores the new
+fields.
+
+### Added
+
+- `isProjectResult` takes optional `id`, `movedTo`, `missing` and `why`. A malformed optional field
+  is dropped, not fatal.
+- `hostProject(folder, options?)` (`/serve`) → `{ project: true, path, id? } | { project: false,
+  movedTo?, id?, missing?, why? }`; `NO_HOST_ANSWERED` is the `why` when nobody answered.
+- `resolveDoorProject(args | folder, options?)` (`/serve`) → `{ ok: true, path, id?, movedFrom? } |
+  { ok: false, reason: 'unnamed' | 'not-project' | 'moved', why, movedTo? }`. It follows `movedTo`
+  once, and only to `project: true` with the same id.
+- `DOOR_PROJECT_SAYS` (front door, and re-exported from `/serve`): `moved(to)` "That folder was moved
+  to <to>; use that path.", `notProject(path)` "<path> is not a project open in Kehikot.",
+  `unnamed`, and `followed(from, to)`, the line a door adds after following a move.
+- Types `HostProject`, `DoorProject`, `HostHasProjectOptions` exported from `/serve`.
+
+### Changed
+
+- `hostHasProject` is a wrapper over `hostProject`: still a boolean, `false` for a former path.
+- docs/asking.md (a section on a project that moved: work on the returned path, say the move, key
+  server state by the id, page state by `projectKey`), docs/serving.md, docs/project-data.md.
+
 ## 2.2.0 — 2026-10-19
 
 The host's own folder in a project is `.kehikot/host/`, not `.kehikot/kehikko/`. A kehikko is one

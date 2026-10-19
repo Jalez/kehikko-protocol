@@ -51,6 +51,29 @@ export function doorContext(
 }
 
 /* ------------------------------------------------------------------------ *
+ * Which project is this? (2.3.0)
+ * ------------------------------------------------------------------------ */
+
+/**
+ * The sentences a door says about the `project` it was handed, in one wording for every module
+ * (2.3.0). `resolveDoorProject` in `/serve` says them; they are here, pure, so a door that asks its
+ * own way says the same. A door works on the path it was GIVEN BACK, never on the argument.
+ *
+ * - `moved(to)`: the folder was a project and the project is now elsewhere, and the door would not
+ *   follow it (the new path did not answer as the same project).
+ * - `notProject(path)`: the host does not hold the folder (or no host answered).
+ * - `unnamed`: the call named no project.
+ * - `followed(from, to)`: the line a door ADDS to an answer after it followed a move, so the agent
+ *   uses the new path from then on.
+ */
+export const DOOR_PROJECT_SAYS = {
+  moved: (to: string): string => `That folder was moved to ${to}; use that path.`,
+  notProject: (path: string): string => `${path} is not a project open in Kehikot.`,
+  unnamed: 'Name the project: `project` is its absolute folder.',
+  followed: (from: string, to: string): string => `The project at ${from} has moved to ${to}; this answer is about ${to}. Use that path from now on.`,
+} as const
+
+/* ------------------------------------------------------------------------ *
  * Was it shown?
  * ------------------------------------------------------------------------ */
 
