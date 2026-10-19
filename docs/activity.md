@@ -28,6 +28,7 @@ type ActivityItem = {
   priority?: 'urgent' | 'normal' | 'low'   // 1.7.0; absent is 'normal'
   refs?: string[]                  // 1.7.0; tracker refs (gh#12, !7), at most LIMITS.ACTIVITY_REFS (16)
   group?: string                   // 1.7.0; a fold key, 1..LIMITS.ACTIVITY_GROUP (64)
+  project?: string                 // 1.8.0; the absolute folder of the project it belongs to
 }
 ```
 
@@ -93,6 +94,22 @@ What follows is the spec for the host; the protocol cannot enforce it.
    pressable by an agent beyond what `press_item` already is.
 9. **Grant.** The call is answered only when `declares.uses` named `activity:report` (as every
    capability); `hello.answers` lists `activity.set` for such a module.
+
+## Across projects (1.8.0)
+
+A module's things may belong to projects other than the one open: an agent session runs in its own
+project's folder, and keeps running when the person switches project. The page that can report it is
+the one framed now. So an item may say which project it belongs to:
+
+- **`project`**: the absolute folder of the project. Absent: the project open now, as before.
+- **Only to a host that files by it.** A host that does answers `activity.set` with `projects: true`.
+  Until a module has heard that, it reports only the open project's things, untagged; a 1.7.0 host
+  strips `project` and would file every item under the open project, which is the misfiling this exists
+  to end.
+- **Complete across projects.** A list that carries `project` on any item is the module's whole list
+  for every project: an item absent from it is gone wherever it was. A host keeps that rule per module.
+- A host shows another project's items with that project's name, and pressing one opens that project
+  first.
 
 ## One system (1.7.0)
 

@@ -188,6 +188,9 @@ export interface Connection {
      * last taken is not sent again, the last list is re-sent after every greeting, and nothing is sent
      * to a host whose greeting said it does not answer `activity.set` (the module simply gets no dots).
      * A list that does not parse is dropped here, not sent. See docs/activity.md.
+     *
+     * 1.8.0: items may carry `project`. Until the host has answered `projects: true`, only the items of the
+     * project it has open (and those with no `project`) are sent, without the field; after, the whole list.
      */
     activity: (items: ActivityItem[]) => void;
     /** Whether anything has greeted us yet. */

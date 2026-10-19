@@ -7,6 +7,23 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 1.8.0 — 2026-10-19
+
+Activity across projects: a module whose things span projects (an agent session keeps running after
+the person switches project) can report them all from the page framed now, each filed under its own
+project. **Additive and optional**; `PROTOCOL` is still 2.
+
+### Added
+
+- `ActivityItem.project`: the absolute folder of the project an item belongs to, at most
+  `LIMITS.ACTIVITY_PROJECT` = 1024. Absent: the project open now.
+- `activitySetResult.projects`: `true` from a host that files each item under its `project` and holds
+  a tagged list as the module's complete list across projects.
+- The client helper sends a module's tagged list as it is only once the host has answered
+  `projects: true`. Until then — and always to a 1.7.0 host, which strips the field — it sends the
+  open project's items, untagged, and sends that project's share again when another one is opened. A
+  module that tags nothing is sent exactly what it said (`test/v1-8.test.ts`).
+
 ## 1.7.0 — 2026-10-16
 
 One system for what needs a person: `activity.set` also carries one-off notices, with a priority,

@@ -446,6 +446,13 @@ export const activitySetResult = z.object({
   outcome: z.enum(ACTIVITY_SET_OUTCOMES),
   taken: z.number().int().min(0).max(LIMITS.ACTIVITY_ITEMS).default(0),
   why: z.string().max(LIMITS.REASON).default(''),
+  /**
+   * 1.8.0. `true`: this host files each item under the project its `project` names, and holds a list that
+   * carries `project` as the module's complete list across every project (an item absent from it is gone
+   * wherever it was). A module may then report every project's things from one page. Absent: it does not,
+   * and every item is filed under the project open now.
+   */
+  projects: z.boolean().optional(),
 })
 export type ActivitySetResult = z.infer<typeof activitySetResult>
 
