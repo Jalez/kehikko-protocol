@@ -387,8 +387,7 @@ meaning, so a module and a host can move in either order.
   `canonicalExtension`. No schema respells an id or an extension name.
 - `useKehikot`, `Kehikot`, `UseKehikotOptions`, and `useRoadmap`, `Roadmap`, `UseRoadmapOptions`
   (`/client/react`). `useHost` is the hook.
-- `legacyRegistryDir`, and reading `~/.roadmap/modules`. `ROADMAP_MODULES_DIR` and
-  `ROADMAP_ORIGIN` are not read.
+- `legacyRegistryDir`.
 - The bin names `kehikko-create` and `kehikko-check-parts`; they are `kehikot-create` and
   `kehikot-check-parts`.
 
@@ -447,8 +446,7 @@ a 0.36.0 call does has changed.** Everything the next breaking release removes i
 | `Dialect`, `DIALECTS`, `toDialect`, `canonicalMessage`, `dialectOfType`, `dialectOfKind`, `nameIn`, `legacyName`, `legacyModuleId` | nothing: there is one spelling. Post a message as it is built |
 | `canonicalName`, `canonicalExtension` | `canonicalModuleId` for a module id read from disk; compare an extension name as written |
 | `connect()` answering in the dialect it was greeted in | nothing: it answers `kehikot.` |
-| `legacyRegistryDir` and reading `~/.roadmap/modules` (`/serve`) | nothing: a host copies that directory into `registryDir()` once |
-| the environment variables `ROADMAP_MODULES_DIR`, `ROADMAP_ORIGIN` | `KEHIKOT_MODULES_DIR`, `KEHIKOT_ORIGINS` |
+| `legacyRegistryDir` (`/serve`) | nothing |
 | the bins `kehikko-create`, `kehikko-check-parts` | `kehikot-create`, `kehikot-check-parts` (both names work in 0.37) |
 
 What is **not** deprecated, although it reads a pre-rename spelling: `canonicalModuleId` and
@@ -466,11 +464,10 @@ gains members.
 
 ### Said at runtime, once, in development only
 
-Three paths say so on `console.warn` the first time they are exercised — never per message, and
+Two paths say so on `console.warn` the first time they are exercised — never per message, and
 never when `NODE_ENV` is `production` or `test`, so no suite reads differently:
 
 - `useKehikot` (and `useRoadmap`) being called;
-- `ROADMAP_MODULES_DIR` or `ROADMAP_ORIGIN` being the variable that decided;
 - `connect()` being greeted with `roadmap.hello`.
 
 ### Added
@@ -482,8 +479,7 @@ never when `NODE_ENV` is `production` or `test`, so no suite reads differently:
 
 - No test can reach the real module registry. The preload (`test/setup.ts`) points the registry at
   a scratch directory for the whole suite, under every variable the code reads, and fails any test
-  that leaves it resolving anywhere else. Before this, each test set the variable itself — the
-  deprecated `ROADMAP_MODULES_DIR`, as it happens — which holds only while the code reads that name.
+  that leaves it resolving anywhere else. Before this, each test set the variable itself.
 
 ### Internal (carried from Unreleased; nothing a consumer can observe)
 

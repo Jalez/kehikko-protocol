@@ -19,8 +19,8 @@ export function registryDir(env: Record<string, string | undefined> = process.en
 
 /**
  * The file name a module's registration had before the app was renamed (`roadmap.<name>.json`), or
- * `null` for an id that never had one. READ, never written: a registry that was carried over from
- * `~/.roadmap/modules` may still hold one, and what it says (`keep`, above all) is this module's.
+ * `null` for an id that never had one. READ, never written: a registry may still hold one, and what it
+ * says (`keep`, above all) is this module's.
  */
 export function registrationBeforeRename(id: string): string | null {
   return id.startsWith('kehikot.') ? `${ID_PREFIX_BEFORE_RENAME}${id.slice('kehikot.'.length)}.json` : null

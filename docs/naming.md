@@ -34,7 +34,7 @@ host and every module have to spell the same way:
 2. **The host program, and by extension the repositories** — the thing that draws a kehikko.
    The host's repository and package are `kehikko`; its MCP server is `kehikko`; its binary is
    `kehikko-host`; its own folder inside a project is `.kehikot/kehikko/`; its own environment
-   variables are `KEHIKKO_ROADMAP_DIR`, `KEHIKKO_RESTART_FILE`, `KEHIKKO_PROPERTY`. Every
+   variables are `KEHIKKO_RESTART_FILE`, `KEHIKKO_PROPERTY`. Every
    repository is `kehikko-<something>`: `kehikko-protocol`, `kehikko-desktop`, `kehikko-paper`, …
 
 In two sentences: *the plural is the namespace two programs must agree on — the product, the
@@ -55,13 +55,10 @@ host that draws it together with the repositories named after that host.*
   between the two groups.
 - **`.kehikot/kehikko/`.** Both spellings in one path: the shared folder, then the host's own
   folder in it — consistent with the rule, and the place it is easiest to mistype.
-- **The legacy names are neither, and are gone from this package.** `roadmap.` on the wire,
-  `roadmap-module.json`, `roadmap.module`, `ROADMAP_ORIGIN`, `ROADMAP_MODULES_DIR` and `useRoadmap`
-  were the old product name; none is exported, read off the wire or written. Three readings of
-  what is already on a disk remain (`canonicalModuleId`, `moduleFolder`, a `roadmap.<name>.json`
-  registration) — see [protocol-number.md](protocol-number.md). What is left elsewhere is the
-  host's: `ROADMAP_FRAME_DB`, `~/.roadmap/`, `.kehikot/roadmap/{epics,state}/` and
-  `KEHIKKO_ROADMAP_DIR` (the singular and the legacy name together).
+- **The legacy names are neither, and are gone from this package.** The old product name is not
+  exported, read off the wire or written. Three readings of what is already on a disk remain
+  (`canonicalModuleId`, `moduleFolder`, a `roadmap.<name>.json` registration) — see
+  [protocol-number.md](protocol-number.md).
 - **A module's own hook file.** `template/src/wire/use-kehikot.ts`, and the same file in several
   modules, is the module's wrapper around `useHost` and exports a function called `useKehikot`. It
   is a file in a module, not part of this package's surface, and was left as it is.

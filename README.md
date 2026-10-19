@@ -124,8 +124,7 @@ This package was `roadmap-module-protocol` until 0.25.0, and every name it put o
 `roadmap.`. From 0.25.0 to 0.37.0 both spellings were read and the old one was still written to
 a party that needed it. **That is over: there is one spelling, `kehikot.`**, and nothing here
 exports, reads off the wire or writes the old one — no second dialect, no
-`/.well-known/roadmap-module.json`, no `kind: 'roadmap.module'`, no `ROADMAP_*` environment
-variable, no `useRoadmap`.
+`/.well-known/roadmap-module.json`, no `kind: 'roadmap.module'`, no `useRoadmap`.
 
 Three things on a person's disk are still read, never written: a module id stored as
 `roadmap.<name>` (`canonicalModuleId`), the folder that id names (`moduleFolder`), and a

@@ -368,11 +368,8 @@ platform keeps an app's own data — and `$XDG_DATA_HOME/kehikot/modules`
 (default `~/.local/share/kehikot/modules`) elsewhere. The same directory the
 host reads first; see `machineDirs.ts` in the host.
 
-It used to be `~/.roadmap/modules`, named after the app before it was called
-Kehikot. This package no longer reads that directory: a host copies it into
-the new one once, the first time the new one is made (`migrateMachineData`
-in the host), and reads the old one as a fallback itself. What this package
-still reads is a FILE NAME — see `registerAt.earlier`.
+What this package reads from an older registry is a FILE NAME — see
+`registerAt.earlier`.
 
 ##### `KEHIKOT_MODULES_DIR` is honoured, and that is not a convenience
 
@@ -380,8 +377,7 @@ It is how any of this can be tested. A test that wrote into a person's real
 registry would be a test that ADOPTS a module onto their canvas, and the
 only way to notice is a container appearing in an app the test never
 opened. The host reads the same variable, so a whole second registry is a
-directory and an environment variable away. `ROADMAP_MODULES_DIR`, its name
-before the rename, is not read.
+directory and an environment variable away.
 
 #### `registerAt`
 
@@ -445,8 +441,7 @@ Refused here rather than joined. A filename derived from an id is a PATH
 #### `registerAt.earlier`
 
 What this module said last time: under this id, or in the file it had
-     before the rename (`roadmap.x.json`) beside it — which is where a registry
-     carried over from `~/.roadmap/modules` still has it, with the `keep` a
+     before the rename (`roadmap.x.json`) beside it — with the `keep` a
      person set. Only read, never written: the older file is left exactly as
      it is. This, `claim` (which looks there for where the module last moved
      to) and `neighbourPorts` (which does not count it as a neighbour) are
@@ -670,7 +665,7 @@ Who may frame a module: the `frame-ancestors` a module's page should send.
 
 ##### Why a list
 
-A module used to read one origin, `ROADMAP_ORIGIN`, and fall back to the
+A module used to read one origin and fall back to the
 development page at `http://127.0.0.1:4181`. One host, one origin. But the
 same module is framed by more than one host on one machine: the development
 page on 4181, the desktop app's page on 4170, and the desktop app's own
@@ -688,7 +683,6 @@ its page from by default.
 `KEHIKOT_ORIGINS` (a list), then `KEHIKOT_ORIGIN` (one), then the defaults.
 A single origin is honoured as the whole answer rather than added to the
 defaults, because somebody who set it meant exactly that host.
-`ROADMAP_ORIGIN`, the name before the rename, is not read.
 
 ##### The same list, told to the page
 
