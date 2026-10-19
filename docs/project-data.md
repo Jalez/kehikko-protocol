@@ -13,9 +13,11 @@ Back to the [index](README.md).
 `moduleFile(context.projectPath, 'kehikot.notes', 'notes')` is
 `<projectPath>/.kehikot/notes/notes.json`, and that is the whole convention:
 one folder for the app, one folder per module inside it, and the module's own
-files in there.
+files in there — with ONE exception, `project.json` at the top, which is the
+host's (2.1.0; [below](#the-projects-id-projectjson-210)).
 
     <projectPath>/.kehikot/
+        project.json                 ← the host's: this project's id. Nobody else writes it.
         checklist/checklists.json
         checklist/papers.json
         notes/notes.json
@@ -81,6 +83,104 @@ comment explaining what the folder is and that deleting the rule is how you
 share it — because a rule somebody cannot explain is a rule they delete. It
 ignores the whole `.kehikot/`, not one module's folder, so adding a module
 never means editing somebody's ignore file again.
+
+### The project's id: `project.json` (2.1.0)
+
+A project used to be known only by its absolute path, so renaming or moving
+its folder made it a stranger: the host lost its canvases and epics' state, and
+every module that kept something about the project on the machine lost that
+too. Since 2.1.0 a project has a permanent id, kept inside the project itself:
+
+    <projectPath>/.kehikot/project.json      { "id": "3f2b8c1e-…", "createdAt": "2026-10-19T…" }
+
+- **`PROJECT_FILE`, `projectFile(projectPath)`** spell the file;
+  **`projectFileSchema`** is its contents (`id`: a `PROJECT_ID`; `createdAt`:
+  ISO 8601 or null) and **`readProjectFile`** reads one without throwing.
+- **The host writes it, once.** The first time a host meets a project with no
+  such file (or one that does not parse) it mints a lowercase random UUID and
+  writes the file; after that it never rewrites it. It keys the project by
+  that id, and the path becomes where the project is now, not what it is.
+- **Modules never write it.** They get the id from `context.projectId` (and
+  `projects.pick`'s `id`), and need not read the file at all.
+- **It is at the top of `.kehikot/`, not in `.kehikot/kehikko/`**, because it
+  is not the host's data in the sense a module folder is a module's data: it is
+  the identity of the whole folder, which every module's data in it belongs to.
+  No module may have a folder of that name: `moduleFolder` refuses an id that
+  would derive `project.json`.
+
+#### The storage rule, with its one exception
+
+A project's data lives only under `.kehikot/<module>/`, written by that module.
+**`.kehikot/project.json` is the single exception: one file at the top of
+`.kehikot/`, written only by the host.** Nothing else goes at the top of the
+folder, and a host's storage check that asserts "only module folders under
+`.kehikot/`" allows exactly this one file.
+
+#### It is never committed — even when `.kehikot/` is shared
+
+The id is only an identity if no two folders carry it. A `git clone`, a `cp -r`
+and a `git worktree add` all make a second folder; if the file came with them,
+the host would take the copy for the same project and the two would share one
+canvas, one set of machine state and one inbox. So the file is gitignored
+always, including in a project that has chosen to share the rest of `.kehikot/`:
+
+- `KEHIKOT_IGNORE` now ends with a second block, `PROJECT_FILE_IGNORE` — a
+  comment and `.kehikot/project.json` — after a blank line, so it is not part of
+  the folder's block that "Remove these lines" refers to.
+- `withoutKehikotIgnored` (sharing the folder) removes the folder's block and
+  keeps the file's rule, or adds it when the `.gitignore` was written before
+  2.1.0 and had only `.kehikot/`.
+- `withKehikotIgnored` appends only what is missing: everything into a file
+  with neither rule, only the folder's block where the file already has its
+  rule, only `PROJECT_FILE_IGNORE` under a commented-out `#.kehikot/` (a person
+  who chose to share the folder still does not share the id). A `.gitignore`
+  that already ignores the folder — every project from before 2.1.0 — comes back
+  unchanged, since that rule covers the file.
+- `ignoresProjectFile` is strict where `ignoresKehikot` is generous: a
+  commented-out rule does not count, and the last matching line wins, so a later
+  `!.kehikot/project.json` reads as "not ignored".
+- `withProjectFileIgnored` adds the file's block alone. A host runs it whenever
+  it writes `project.json` — unlike the folder's rule this one is nobody's
+  setting, so there is nothing to overrule.
+
+Ignoring covers git. A `cp -r` copies ignored files too, and a project
+committed before 2.1.0 with `.kehikot/` shared could have the file tracked
+already (ignoring does not untrack it). Both end the same way, and catching it
+is the host's job, because only the host knows every project: **when two
+existing folders it knows carry the same id, the one it met second gets a fresh
+id** (the host rewrites that copy's file — the only time the file is rewritten).
+A host that finds the file tracked by git should say so.
+
+### Machine-level state is keyed by the id; project-level state needs no key
+
+Two kinds of thing a module keeps for a project, and only one of them needs the id:
+
+- **Project-level state** — anything under `<projectPath>/.kehikot/<module>/` —
+  needs no key at all. It is inside the folder, so a rename or a move takes it
+  along. The path is the partition, as above, and that has not changed.
+- **Machine-level state** — anything kept outside the project, for instance a
+  module's own directory under the machine's Kehikot directory
+  (`~/Library/Application Support/Kehikot/` on macOS), a cache, a database, a
+  session log — has to be filed under SOMETHING that names the project. Until
+  2.1.0 that was the path or a hash of it, which a rename orphans. Key it by
+  `context.projectId`, and fall back to the path while that is `null` (a host
+  older than 2.1.0 sends no id):
+
+```ts
+import { projectKey } from 'kehikot-module-protocol'
+
+const key = projectKey(context)        // { by: 'id', key } | { by: 'path', key } | null
+if (key === null) return               // no project open: nowhere to file anything
+const dir = key.by === 'id'
+  ? join(machineDir, 'projects', key.key)              // a PROJECT_ID is a safe folder name as it is
+  : join(machineDir, 'projects', `path-${sha256(key.key)}`)
+```
+
+Spell the two kinds apart in the store (`path-…` above) rather than guessing
+later which one a name is. The first time a module is handed an id for a
+project it has state for under the path, it moves that state to the id; after
+that the path is never looked at again for that project, and a rename costs
+nothing.
 
 ## Notes by symbol
 
@@ -282,6 +382,11 @@ one module's: the modules are all the same program's working material, and a
 per-module rule would need a new line every time a module was added, which is
 a rule that goes quietly stale in somebody else's repository.
 
+Since 2.1.0 it is followed, after a blank line, by `PROJECT_FILE_IGNORE`: a
+second comment and `.kehikot/project.json`. Redundant while the folder is
+ignored, and the rule that is left when it is not. It is a block of its own so
+that "remove these lines" in the first comment does not reach it.
+
 #### `ignoresKehikot`
 
 Does this `.gitignore` already ignore the folder?
@@ -301,6 +406,29 @@ It is not a gitignore engine. A rule that ignores this folder by some route
 this does not recognise — a parent glob, an `exclude` file, `core.excludesFile`
 — reads as "not ignored" here, and the appended line is then redundant rather
 than wrong.
+
+#### `PROJECT_FILE`, `projectFile`, `projectFileSchema`, `readProjectFile`
+
+The one file at the top of `.kehikot/`, its path and its contents (2.1.0).
+See [the project's id](#the-projects-id-projectjson-210) above. `projectFile`
+answers `null` for no project, as `kehikotDir` does. `projectFileSchema`
+strips unknown keys and is not a passthrough: the file is written once and never
+rewritten, so there is no read-modify-write that could lose a newer host's field.
+`readProjectFile` never throws: a file that does not parse is no id, and the
+host mints one — a module never reads the file anyway.
+
+#### `projectKey`
+
+What a module files MACHINE-level state for a project under: the id when the
+host sent a good one, the trimmed path otherwise, `null` with no project. It
+returns which (`by`) rather than a bare string, because a store holding both
+must spell them apart and must know when to move path-keyed state to the id.
+
+#### `PROJECT_FILE_IGNORE`, `ignoresProjectFile`, `withProjectFileIgnored`
+
+The rule that keeps `project.json` out of git whatever was decided about the
+folder, how to tell whether a `.gitignore` has it, and how to add it. See
+[It is never committed](#it-is-never-committed--even-when-kehikot-is-shared).
 
 #### `withKehikotIgnored`
 
@@ -361,6 +489,16 @@ ignore off has no quarrel with it.
 
 Idempotent: a `.gitignore` with no such rule comes back unchanged, byte for
 byte, so a caller may run it without first asking whether it will do anything.
+
+##### What it keeps (2.1.0)
+
+When it removed anything, the result still ignores `.kehikot/project.json`: the
+rule `KEHIKOT_IGNORE` put there in its own block is not a rule ignoring the
+folder and is left, and a `.gitignore` from before 2.1.0, which had only
+`.kehikot/`, gains `PROJECT_FILE_IGNORE`. So the round trip is no longer "the
+file you started with": it is that file plus the id's rule. Sharing the folder
+was always a decision about a person's working material, and the id is not
+working material.
 
 #### Inside `withoutKehikotIgnored`
 

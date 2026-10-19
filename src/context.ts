@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { LIMITS } from './limits.js'
 import { trackerSignalSchema } from './tracker.js'
 import { contentSignalSchema } from './content.js'
-import { EPIC_SLUG, MODULE_ID } from './ids.js'
+import { EPIC_SLUG, MODULE_ID, PROJECT_ID } from './ids.js'
 import { partsSchema } from './parts.js'
 import { passageSchema } from './passage.js'
 import { filterChoiceSchema } from './filters.js'
@@ -86,6 +86,13 @@ export const contextSchema = z.object({
    * pretend to open it. A host should fill this and `project` in one place, from one project.
    */
   projectPath: z.string().min(1).max(LIMITS.PATH).nullable().default(null),
+  /**
+   * 2.1.0. Which project this is, for good: the id the host keeps in `<projectPath>/.kehikot/project.json`
+   * (see `PROJECT_ID`), the same after the folder is renamed or moved. Null from a host older than
+   * 2.1.0 or with no project. A module keys MACHINE-level state by it, falling back to `projectPath`
+   * (`projectKey`); state kept inside the project needs neither. Sent with `project` and `projectPath`.
+   */
+  projectId: z.string().regex(PROJECT_ID).nullable().default(null),
   theme: z.enum(['light', 'dark']).default('light'),
   /**
    * The refs the person has picked out; `[]` when nothing is selected. A module asks the host to set

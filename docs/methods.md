@@ -139,6 +139,13 @@ request it cannot act on.
 `projects.pick` is an outcome by the same test: `picked`, `cancelled` and
 `declined` send a module three different ways.
 
+A picked project is `{ path, name }`, and since 2.1.0 also `id`: the project's
+`PROJECT_ID`, the same value `context.projectId` carries for the open one.
+Optional — an older host leaves it out, and a module then keys what it
+remembers about the pick by `path`, as before. A module that stores a picked
+project to come back to later stores the id when it has one: the path is where
+the folder was when it was picked.
+
 **`epics.list`** is the case the rule does not cover, and its argument is
 different. Every other
 question takes an epic slug, and `epics.list` is the only way to get one. If its

@@ -46,7 +46,8 @@ So what matters about an id is how long it means the same thing.
 | a part id (`PART_ID`) | `context.parts[].id`, `parts.set`'s answer | for as long as the part is in the epic's list: through a rename and a reorder. The host makes it once, when the part is added (`partIdFor`), and never changes it |
 | a part's **name** | `context.parts[].heading` | **only until somebody rewords it.** Draw it; never file anything under it |
 | a ref (`gh#41`) | `context.selection`, `containers[].showing.refs` | as long as the tracker keeps the number |
-| `projectPath` | `context.projectPath` | on this machine, until the folder is moved |
+| `projectPath` | `context.projectPath` | on this machine, until the folder is moved or renamed |
+| a project's **id** (`PROJECT_ID`, 2.1.0) | `context.projectId`, `projects.pick`'s `id`, an activity item's `projectId` | for as long as `<project>/.kehikot/project.json` exists: through a rename and a move of the folder. `null` from an older host |
 | a kehikko's **`key`** (`KEHIKKO_KEY`) | `context.kehikko.key`, `event.kehikko.key` | for as long as the kehikko exists: through a rename, a reorder, the project being removed from the host and added again, and on another machine |
 | a kehikko's **`id`** | `context.kehikko.id`, `event.kehikko.id` | **only for the life of one host's database** |
 
@@ -86,6 +87,14 @@ that must keep something anyway falls back to `id` knowing what that costs. Tell
 which field they came from, never by how they look: a key may be all digits (`12345678` is a
 plausible eight hex characters), so a store that holds both spells them differently —
 `key:4072c9e5` and `id:3`, say — rather than guessing later.
+
+**A project's id is what to key machine-level state by (2.1.0).** A module that keeps something
+for a project OUTSIDE the project — under the machine's Kehikot directory, in a cache, in a
+database of its own — used to key it by the project's path, or a hash of it, and renaming the
+folder orphaned it. `context.projectId` is the host's permanent name for the project, kept in the
+project's own `.kehikot/project.json`; key by it, and fall back to the path while it is `null`
+(`projectKey` does both, and says which it used). See
+[project-data.md](project-data.md#the-projects-id-projectjson-210).
 
 ## Notes by symbol
 
@@ -157,6 +166,23 @@ file name or one part of a composed key without escaping.
 It is unique within one project's `kehikot.json` and nowhere wider. And it
 can be all digits, which is why nothing may tell a key from an `id` by its
 shape: see "Which ids are stable" above.
+
+#### `PROJECT_ID`
+
+A project's id (2.1.0): 8 to 64 characters of lowercase letters, digits and dashes, neither end a
+dash. Chosen over "a UUID" for two reasons:
+
+- **It is a safe path segment as it stands.** No dot, no slash, no leading dash, so a module may
+  name a folder or a file after it under its machine directory without escaping or hashing it —
+  the job it exists for. A UUID happens to have that property; the pattern says it outright.
+- **The package does not decide how a host mints it.** A host mints a lowercase random UUID
+  (`crypto.randomUUID()`, 36 characters), and that is the recommendation. Holding every reader to
+  the UUID grammar would refuse a whole context over a hand-repaired `project.json` for no gain:
+  nothing reads structure out of the id. The floor of 8 keeps hand-written ids from being words
+  two projects would both pick.
+
+Uppercase is refused rather than folded, so one project never has two spellings: a store keyed by
+it compares strings.
 
 #### `EPIC_SLUG`
 

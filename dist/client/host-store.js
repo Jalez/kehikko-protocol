@@ -49,6 +49,7 @@ export function hostFields(context, was, same = {}) {
     const now = {
         project: text(context?.project),
         projectPath: text(context?.projectPath),
+        projectId: text(context?.projectId),
         epic: text(context?.epic),
         passage: context?.passage ?? null,
         containers: context?.containers ?? NONE,

@@ -10,6 +10,11 @@ function projectOf(context) {
     const path = context?.projectPath;
     return typeof path === 'string' && path ? path : null;
 }
+/** The project id (2.1.0) a greeting or a context names, or null: an older host names none. */
+function projectIdOf(context) {
+    const id = context?.projectId;
+    return typeof id === 'string' && id ? id : null;
+}
 /**
  * The bridge: one conversation with one window, in the shape this package's schemas define.
  * A greeting is taken from an origin the page may be framed by (`mayGreet`); after it, identity is
@@ -117,6 +122,7 @@ export function connect(id, events = {}, options = {}) {
        and the project it has open — until it has said so, only that project's items are sent, untagged. */
     let byProject = false;
     let projectNow = null;
+    let projectIdNow = null;
     /** Correlation id -> the promise waiting on it. A `Map`, per the protocol's note on lookups. */
     const waiting = new Map();
     let counter = 0;
@@ -174,6 +180,7 @@ export function connect(id, events = {}, options = {}) {
             activityTaken = null;
             byProject = false;
             projectNow = projectOf(message.context);
+            projectIdNow = projectIdOf(message.context);
             sendActivity();
             events.onHello?.(message.context, message.state, { answers: message.answers ?? null, header: message.header ?? null });
             return;
@@ -187,9 +194,11 @@ export function connect(id, events = {}, options = {}) {
                protocol grows arrives without being listed here. */
             const { type: _envelope, protocol: _spoken, ...context } = message;
             const project = projectOf(context);
+            const projectId = projectIdOf(context);
             /* Another project open: a host that does not file by project is sent THAT project's things now. */
-            if (project !== projectNow) {
+            if (project !== projectNow || projectId !== projectIdNow) {
                 projectNow = project;
+                projectIdNow = projectId;
                 if (!byProject)
                     sendActivity();
             }
@@ -279,7 +288,7 @@ export function connect(id, events = {}, options = {}) {
             return;
         if (answered !== null && !answered.includes('activity.set'))
             return;
-        const items = byProject ? activityNow : forOpenProject(activityNow, projectNow);
+        const items = byProject ? activityNow : forOpenProject(activityNow, projectNow, projectIdNow);
         const key = JSON.stringify(items);
         if (key === activityTaken)
             return;
@@ -306,11 +315,21 @@ export function connect(id, events = {}, options = {}) {
                 activityTaken = null;
         });
     }
-    /** The items of the project open now, without `project`, for a host that does not file by it. */
-    function forOpenProject(items, open) {
+    /**
+     * The items of the project open now, without `project` or `projectId`, for a host that does not file
+     * by it. The id decides where the item and the host both name one (a renamed folder is still the
+     * project); otherwise the path does.
+     */
+    function forOpenProject(items, open, openId) {
         return items
-            .filter((item) => item.project === undefined || item.project === open)
-            .map(({ project: _project, ...item }) => item);
+            .filter((item) => {
+            if (item.project === undefined)
+                return true;
+            if (item.projectId !== undefined && openId !== null)
+                return item.projectId === openId;
+            return item.project === open;
+        })
+            .map(({ project: _project, projectId: _projectId, ...item }) => item);
     }
     const connection = {
         listen() {

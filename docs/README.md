@@ -11,7 +11,7 @@ Why the protocol is the way it is. The source keeps one to three lines beside ea
 | [Names and ids](ids.md) | The patterns for a module id, a mode id and an epic slug, the one derivation of a slug from prose, and the lookup that does not fall through a prototype. |
 | [Limits](limits.md) | Why every string and every list is bounded, and the reasoning behind each number in `LIMITS`. |
 | [The protocol number](protocol-number.md) | Why `PROTOCOL` is 2 and what would raise it, and what would raise it. |
-| [Where a module keeps a project's data](project-data.md) | The `.kehikot/` folder inside a project, the folder each module gets in it, and the lines a project's `.gitignore` gains. |
+| [Where a module keeps a project's data](project-data.md) | The `.kehikot/` folder inside a project, the folder each module gets in it, the project's own id in `.kehikot/project.json` (2.1.0) and how machine-level state is keyed by it, and the lines a project's `.gitignore` gains. |
 | [Parts of an epic: one list, one rule](parts.md) | What a part is and who keeps the list, the one rule for what a pick shows and the contract every module that follows parts keeps, a worked "one X per part" module, `parts.json`, project-relative documents, `parts.set`, what 1.2.0 deprecated, and the record an epic's steps are read from. |
 | [Trackers](tracker.md) | One reading of GitHub and GitLab shared by every module: the row a host hands back, what is missing and why, refreshing, and how a reference is spelled. |
 | [Content changes](content.md) | How a container is told that the material it shows has changed, and how a module reports a change of its own. |
