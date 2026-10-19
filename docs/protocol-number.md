@@ -180,13 +180,8 @@ Three things, all of them on somebody's DISK rather than on the wire, all read a
 |---|---|---|
 | a module id spelled `roadmap.<name>` | a project's `.kehikot/` files, a host's database, an argument somebody typed | `canonicalModuleId(id)` (`ids.ts`) — a host calls it on what it reads back; no schema here applies it |
 | the folder a module's data is in | `<project>/.kehikot/<name>/` | `moduleFolder('roadmap.<name>')` is `<name>`, the same folder as `kehikot.<name>` — the rename moved no data |
-| a registration named `roadmap.<name>.json` | the registry (`registryDir()`), carried over from `~/.roadmap/modules` by a host | `registerAt` (so `keep` survives), `claim` and `neighbourPorts` (`serve/registry.ts`) |
+| a registration named `roadmap.<name>.json` | the registry (`registryDir()`) | `registerAt` (so `keep` survives), `claim` and `neighbourPorts` (`serve/registry.ts`) |
 
-What is NOT read any more, and who reads it instead: `~/.roadmap/modules` and
-`~/.roadmap/frame.sqlite` (the host copies both into its machine directory once, and reads the
-old registry as a fallback itself); `<project>/.kehikot/roadmap/` (the host's own folder before it
-was `.kehikot/kehikko/`; the host moves it); `ROADMAP_MODULES_DIR` and `ROADMAP_ORIGIN` (set
-`KEHIKOT_MODULES_DIR` and `KEHIKOT_ORIGINS`).
 
 #### `canonicalModuleId`
 

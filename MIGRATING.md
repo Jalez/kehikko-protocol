@@ -26,9 +26,6 @@ it relates to parts** (section 2).
 | ids and extension names respelled by the schemas (`manifest.id`, `ready.id`, `event.from`, `event.extension`, `containers[].module`, `content[].source`, `events.emit`'s `extension`) | carried as written. A host that reads `roadmap.x` back from its own files calls `canonicalModuleId` itself |
 | `known('roadmap.notifications@1')`, `schemaFor(…)` | exact names only |
 | `connect()` answering `roadmap.ready` to `roadmap.hello` | it answers `kehikot.` and does not hear `roadmap.hello` at all |
-| `legacyRegistryDir()` (`/serve`) | nothing. This package does not read `~/.roadmap/modules`; a host copies it over once and reads it as its own fallback |
-| `ROADMAP_MODULES_DIR` | `KEHIKOT_MODULES_DIR`. **A test or script that sets only the old name now resolves the REAL registry** — see section 6 |
-| `ROADMAP_ORIGIN` | `KEHIKOT_ORIGINS` (a list) or `KEHIKOT_ORIGIN` (one) |
 | the bins `kehikko-create`, `kehikko-check-parts` | `kehikot-create`, `kehikot-check-parts` |
 
 Still read, on purpose, and never written — these are formats on a person's disk:
@@ -94,10 +91,10 @@ None of these is required; each names the code it replaces.
 ## 6. One environment variable names the registry — check what sets it
 
 `registryDir()` reads `KEHIKOT_MODULES_DIR` and nothing else. A test, a dev script or a shell
-profile that points the registry somewhere safe by setting **only** `ROADMAP_MODULES_DIR` no
+profile that points the registry somewhere safe by setting anything but `KEHIKOT_MODULES_DIR` no
 longer does: `registerAt` then writes into the real registry, which a running host sweeps.
 
-- Search for `ROADMAP_MODULES_DIR` and `ROADMAP_ORIGIN` before moving, and set the `KEHIKOT_` name.
+- Search for the registry and origin variables before moving, and set the `KEHIKOT_` names.
 - A test that restores the variable must restore what it was, never `delete` it: after a delete
   the rest of that process resolves the real directory.
 - This package's own suite sets it once, in its preload, and fails any test that leaves the

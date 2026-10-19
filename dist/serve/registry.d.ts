@@ -6,8 +6,8 @@
 export declare function registryDir(env?: Record<string, string | undefined>): string;
 /**
  * The file name a module's registration had before the app was renamed (`roadmap.<name>.json`), or
- * `null` for an id that never had one. READ, never written: a registry that was carried over from
- * `~/.roadmap/modules` may still hold one, and what it says (`keep`, above all) is this module's.
+ * `null` for an id that never had one. READ, never written: a registry may still hold one, and what it
+ * says (`keep`, above all) is this module's.
  */
 export declare function registrationBeforeRename(id: string): string | null;
 /** What one registration says. The host reads `url`, `dir`, and a `keep` this never writes. */

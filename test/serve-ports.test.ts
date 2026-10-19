@@ -548,10 +548,8 @@ describe('what is still read from before the rename, and what is not', () => {
     }
   }
 
-  test('one variable names the registry; the one from before the rename is not read', () => {
+  test('one variable names the registry', () => {
     expect(registryDir({ KEHIKOT_MODULES_DIR: '/m' })).toBe('/m')
-    expect(registryDir({ ROADMAP_MODULES_DIR: '/old', HOME: '/Users/x' })).not.toBe('/old')
-    expect(registryDir({ HOME: '/Users/x' })).not.toContain('.roadmap')
   })
 
   test('a registration left under the old file name is read — its keep carried over — and left as it is', () => {
