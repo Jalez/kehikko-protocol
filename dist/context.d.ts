@@ -821,12 +821,12 @@ export declare const contextSchema: z.ZodObject<{
         name: string;
         key?: string | undefined;
     } | null;
+    project: string | null;
     tracker: {
         at: string | null;
         refreshing: boolean;
     };
     projectPath: string | null;
-    project: string | null;
     theme: "light" | "dark";
     selection: string[];
     passage: {
@@ -892,12 +892,12 @@ export declare const contextSchema: z.ZodObject<{
         name: string;
         key?: string | undefined;
     } | null | undefined;
+    project?: string | null | undefined;
     tracker?: {
         at?: string | null | undefined;
         refreshing?: boolean | undefined;
     } | undefined;
     projectPath?: string | null | undefined;
-    project?: string | null | undefined;
     theme?: "light" | "dark" | undefined;
     selection?: string[] | undefined;
     passage?: {

@@ -859,6 +859,7 @@ export declare const methodParams: {
             priority: z.ZodOptional<z.ZodEnum<["urgent", "normal", "low"]>>;
             refs: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
             group: z.ZodOptional<z.ZodString>;
+            project: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
         }, "strip", z.ZodTypeAny, {
             id: string;
             state: "working" | "attention" | "done";
@@ -873,6 +874,7 @@ export declare const methodParams: {
             priority?: "urgent" | "normal" | "low" | undefined;
             refs?: string[] | undefined;
             group?: string | undefined;
+            project?: string | undefined;
         }, {
             id: string;
             state: "working" | "attention" | "done";
@@ -887,6 +889,7 @@ export declare const methodParams: {
             priority?: "urgent" | "normal" | "low" | undefined;
             refs?: string[] | undefined;
             group?: string | undefined;
+            project?: string | undefined;
         }>, "many">, {
             id: string;
             state: "working" | "attention" | "done";
@@ -901,6 +904,7 @@ export declare const methodParams: {
             priority?: "urgent" | "normal" | "low" | undefined;
             refs?: string[] | undefined;
             group?: string | undefined;
+            project?: string | undefined;
         }[], {
             id: string;
             state: "working" | "attention" | "done";
@@ -915,6 +919,7 @@ export declare const methodParams: {
             priority?: "urgent" | "normal" | "low" | undefined;
             refs?: string[] | undefined;
             group?: string | undefined;
+            project?: string | undefined;
         }[]>;
     }, "strip", z.ZodTypeAny, {
         items: {
@@ -931,6 +936,7 @@ export declare const methodParams: {
             priority?: "urgent" | "normal" | "low" | undefined;
             refs?: string[] | undefined;
             group?: string | undefined;
+            project?: string | undefined;
         }[];
     }, {
         items: {
@@ -947,6 +953,7 @@ export declare const methodParams: {
             priority?: "urgent" | "normal" | "low" | undefined;
             refs?: string[] | undefined;
             group?: string | undefined;
+            project?: string | undefined;
         }[];
     }>;
     readonly 'events.emit': z.ZodObject<{
@@ -1078,14 +1085,23 @@ export declare const activitySetResult: z.ZodObject<{
     outcome: z.ZodEnum<["taken", "declined"]>;
     taken: z.ZodDefault<z.ZodNumber>;
     why: z.ZodDefault<z.ZodString>;
+    /**
+     * 1.8.0. `true`: this host files each item under the project its `project` names, and holds a list that
+     * carries `project` as the module's complete list across every project (an item absent from it is gone
+     * wherever it was). A module may then report every project's things from one page. Absent: it does not,
+     * and every item is filed under the project open now.
+     */
+    projects: z.ZodOptional<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
     outcome: "declined" | "taken";
     why: string;
     taken: number;
+    projects?: boolean | undefined;
 }, {
     outcome: "declined" | "taken";
     why?: string | undefined;
     taken?: number | undefined;
+    projects?: boolean | undefined;
 }>;
 export type ActivitySetResult = z.infer<typeof activitySetResult>;
 /**
@@ -1192,19 +1208,19 @@ export declare const projectPickResult: z.ZodObject<{
     }>>>;
     why: z.ZodDefault<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    outcome: "declined" | "picked" | "cancelled";
-    why: string;
     project: {
         name: string;
         path: string;
     } | null;
+    outcome: "declined" | "picked" | "cancelled";
+    why: string;
 }, {
     outcome: "declined" | "picked" | "cancelled";
-    why?: string | undefined;
     project?: {
         path: string;
         name?: string | undefined;
     } | null | undefined;
+    why?: string | undefined;
 }>;
 export type ProjectPickResult = z.infer<typeof projectPickResult>;
 /**

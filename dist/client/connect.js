@@ -5,6 +5,11 @@ import { activityItemsSchema } from '../activity.js';
 import { ORIGINS_ELEMENT, originAmong } from '../page.js';
 import { headerItemsSchema, hostMessageSchema, looksLikeWireMessage, pressRefusal, } from '../wire.js';
 import { mailbox } from './mailbox.js';
+/** The project folder a greeting or a context names, or null. */
+function projectOf(context) {
+    const path = context?.projectPath;
+    return typeof path === 'string' && path ? path : null;
+}
 /**
  * The bridge: one conversation with one window, in the shape this package's schemas define.
  * A greeting is taken from an origin the page may be framed by (`mayGreet`); after it, identity is
@@ -108,6 +113,10 @@ export function connect(id, events = {}, options = {}) {
     let activityNow = null;
     let activityTaken = null;
     let answered = null;
+    /* 1.8.0. Whether this host said it files each item under its `project` (`activitySetResult.projects`),
+       and the project it has open — until it has said so, only that project's items are sent, untagged. */
+    let byProject = false;
+    let projectNow = null;
     /** Correlation id -> the promise waiting on it. A `Map`, per the protocol's note on lookups. */
     const waiting = new Map();
     let counter = 0;
@@ -163,6 +172,8 @@ export function connect(id, events = {}, options = {}) {
                 send({ type: MESSAGE.HEADER, items: heading });
             answered = message.answers ?? null;
             activityTaken = null;
+            byProject = false;
+            projectNow = projectOf(message.context);
             sendActivity();
             events.onHello?.(message.context, message.state, { answers: message.answers ?? null, header: message.header ?? null });
             return;
@@ -175,6 +186,13 @@ export function connect(id, events = {}, options = {}) {
             /* Handed on whole, with only the envelope (`type`, `protocol`) removed, so every field the
                protocol grows arrives without being listed here. */
             const { type: _envelope, protocol: _spoken, ...context } = message;
+            const project = projectOf(context);
+            /* Another project open: a host that does not file by project is sent THAT project's things now. */
+            if (project !== projectNow) {
+                projectNow = project;
+                if (!byProject)
+                    sendActivity();
+            }
             events.onContext?.(context);
             return;
         }
@@ -261,22 +279,38 @@ export function connect(id, events = {}, options = {}) {
             return;
         if (answered !== null && !answered.includes('activity.set'))
             return;
-        const key = JSON.stringify(activityNow);
+        const items = byProject ? activityNow : forOpenProject(activityNow, projectNow);
+        const key = JSON.stringify(items);
         if (key === activityTaken)
             return;
         activityTaken = key;
+        const spans = activityNow.some((item) => item.project !== undefined);
         connection
-            .request('activity.set', { items: activityNow })
+            .request('activity.set', { items })
             .then((answer) => {
-            const outcome = answer?.outcome;
-            if (outcome === 'declined' && activityTaken === key)
+            const said = answer;
+            if (said?.outcome === 'declined' && activityTaken === key)
                 activityTaken = null;
+            /* The host files by project: what it was sent was the open project's share, and the whole list goes now. */
+            if (said?.outcome === 'taken' && said.projects === true && !byProject) {
+                byProject = true;
+                if (spans) {
+                    activityTaken = null;
+                    sendActivity();
+                }
+            }
         })
             .catch(() => {
             /* Not taken: try again with the next list, even an identical one. */
             if (activityTaken === key)
                 activityTaken = null;
         });
+    }
+    /** The items of the project open now, without `project`, for a host that does not file by it. */
+    function forOpenProject(items, open) {
+        return items
+            .filter((item) => item.project === undefined || item.project === open)
+            .map(({ project: _project, ...item }) => item);
     }
     const connection = {
         listen() {

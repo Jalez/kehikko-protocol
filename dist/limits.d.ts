@@ -240,6 +240,8 @@ export declare const LIMITS: {
     readonly ACTIVITY_REFS: 16;
     /** An activity item's group key (1.7.0), in characters. */
     readonly ACTIVITY_GROUP: 64;
+    /** An activity item's project folder (1.8.0), in characters: an absolute path. */
+    readonly ACTIVITY_PROJECT: 1024;
     /** How many parts one place (`place.parts`, a `view.goto`'s `parts`) may name. */
     readonly PLACE_PARTS: 16;
     /** How long the host gets to say whether a folder is a project, in ms (`hostHasProject`). */

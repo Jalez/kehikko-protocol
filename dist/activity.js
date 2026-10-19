@@ -35,6 +35,13 @@ export const activityItemSchema = z.object({
     refs: z.array(ref).max(LIMITS.ACTIVITY_REFS).optional(),
     /** 1.7.0. A key a host may fold repeats under ("3 tests failed"); grouping is the host's display choice. */
     group: z.string().min(1).max(LIMITS.ACTIVITY_GROUP).optional(),
+    /**
+     * 1.8.0. The absolute folder of the project the item belongs to, for a module whose things span
+     * projects (an agent session runs in one, and is reported from a page framed in another). Absent:
+     * the project the host has open. Sent only to a host that said it files by it (`activitySetResult.projects`);
+     * a 1.7.0 host strips it and would file the item under the open project.
+     */
+    project: z.string().min(1).max(LIMITS.ACTIVITY_PROJECT).refine((path) => path.startsWith('/') || /^[A-Za-z]:[\\/]/.test(path), { message: 'an activity item’s project is an absolute folder' }).optional(),
 });
 /** The whole list, bounded, with no id twice. */
 export const activityItemsSchema = z

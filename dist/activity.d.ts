@@ -47,6 +47,13 @@ export declare const activityItemSchema: z.ZodObject<{
     refs: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
     /** 1.7.0. A key a host may fold repeats under ("3 tests failed"); grouping is the host's display choice. */
     group: z.ZodOptional<z.ZodString>;
+    /**
+     * 1.8.0. The absolute folder of the project the item belongs to, for a module whose things span
+     * projects (an agent session runs in one, and is reported from a page framed in another). Absent:
+     * the project the host has open. Sent only to a host that said it files by it (`activitySetResult.projects`);
+     * a 1.7.0 host strips it and would file the item under the open project.
+     */
+    project: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
 }, "strip", z.ZodTypeAny, {
     id: string;
     state: "working" | "attention" | "done";
@@ -61,6 +68,7 @@ export declare const activityItemSchema: z.ZodObject<{
     priority?: "urgent" | "normal" | "low" | undefined;
     refs?: string[] | undefined;
     group?: string | undefined;
+    project?: string | undefined;
 }, {
     id: string;
     state: "working" | "attention" | "done";
@@ -75,6 +83,7 @@ export declare const activityItemSchema: z.ZodObject<{
     priority?: "urgent" | "normal" | "low" | undefined;
     refs?: string[] | undefined;
     group?: string | undefined;
+    project?: string | undefined;
 }>;
 export type ActivityItem = z.infer<typeof activityItemSchema>;
 /** The whole list, bounded, with no id twice. */
@@ -108,6 +117,13 @@ export declare const activityItemsSchema: z.ZodEffects<z.ZodArray<z.ZodObject<{
     refs: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
     /** 1.7.0. A key a host may fold repeats under ("3 tests failed"); grouping is the host's display choice. */
     group: z.ZodOptional<z.ZodString>;
+    /**
+     * 1.8.0. The absolute folder of the project the item belongs to, for a module whose things span
+     * projects (an agent session runs in one, and is reported from a page framed in another). Absent:
+     * the project the host has open. Sent only to a host that said it files by it (`activitySetResult.projects`);
+     * a 1.7.0 host strips it and would file the item under the open project.
+     */
+    project: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
 }, "strip", z.ZodTypeAny, {
     id: string;
     state: "working" | "attention" | "done";
@@ -122,6 +138,7 @@ export declare const activityItemsSchema: z.ZodEffects<z.ZodArray<z.ZodObject<{
     priority?: "urgent" | "normal" | "low" | undefined;
     refs?: string[] | undefined;
     group?: string | undefined;
+    project?: string | undefined;
 }, {
     id: string;
     state: "working" | "attention" | "done";
@@ -136,6 +153,7 @@ export declare const activityItemsSchema: z.ZodEffects<z.ZodArray<z.ZodObject<{
     priority?: "urgent" | "normal" | "low" | undefined;
     refs?: string[] | undefined;
     group?: string | undefined;
+    project?: string | undefined;
 }>, "many">, {
     id: string;
     state: "working" | "attention" | "done";
@@ -150,6 +168,7 @@ export declare const activityItemsSchema: z.ZodEffects<z.ZodArray<z.ZodObject<{
     priority?: "urgent" | "normal" | "low" | undefined;
     refs?: string[] | undefined;
     group?: string | undefined;
+    project?: string | undefined;
 }[], {
     id: string;
     state: "working" | "attention" | "done";
@@ -164,6 +183,7 @@ export declare const activityItemsSchema: z.ZodEffects<z.ZodArray<z.ZodObject<{
     priority?: "urgent" | "normal" | "low" | undefined;
     refs?: string[] | undefined;
     group?: string | undefined;
+    project?: string | undefined;
 }[]>;
 /**
  * The mark of a container that holds these items: the worst state among them, `attention` over
