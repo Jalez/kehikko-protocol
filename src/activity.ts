@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { LIMITS } from './limits.js'
 import { placeSchema, ref } from './fragments.js'
+import { PROJECT_ID } from './ids.js'
 
 /**
  * What a module's things are doing right now (1.5.0): the list `activity.set` carries, and the one
@@ -48,6 +49,15 @@ export const activityItemSchema = z.object({
    * a 1.7.0 host strips it and would file the item under the open project.
    */
   project: z.string().min(1).max(LIMITS.ACTIVITY_PROJECT).refine((path) => path.startsWith('/') || /^[A-Za-z]:[\\/]/.test(path), { message: 'an activity item’s project is an absolute folder' }).optional(),
+  /**
+   * 2.1.0. The same project's `PROJECT_ID` (`context.projectId` there), only beside `project`. A host
+   * that knows the id files the item by it, ahead of the path; otherwise by `project`. A 2.0.0 host
+   * strips it and files by `project`, which is why the path is required with it.
+   */
+  projectId: z.string().regex(PROJECT_ID).optional(),
+}).refine((item) => item.projectId === undefined || item.project !== undefined, {
+  message: 'an activity item that names its project’s id names its folder too (`project`)',
+  path: ['project'],
 })
 export type ActivityItem = z.infer<typeof activityItemSchema>
 

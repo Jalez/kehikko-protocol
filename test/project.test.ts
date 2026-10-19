@@ -3,6 +3,7 @@ import {
   DATA_FILE,
   KEHIKOT_DIR,
   KEHIKOT_IGNORE,
+  PROJECT_FILE_IGNORE,
   MODULE_FOLDER,
   ignoresKehikot,
   kehikotDir,
@@ -166,7 +167,8 @@ describe('the line a project’s .gitignore gains', () => {
      under their `#` would be arguing with them in their own file. */
   test('treats a commented-out rule as a decision, not as an absence', () => {
     expect(ignoresKehikot('# .kehikot/\n')).toBe(true)
-    expect(withKehikotIgnored('# .kehikot/\n')).toBe('# .kehikot/\n')
+    /* 2.1.0: the folder stays shared, and only the project's id is kept out of git. */
+    expect(withKehikotIgnored('# .kehikot/\n')).toBe(`# .kehikot/\n\n${PROJECT_FILE_IGNORE}`)
   })
 
   test('is not fooled by a rule for something else that starts the same', () => {
@@ -189,15 +191,17 @@ describe('taking that line back out again', () => {
       expect(ignoresKehikot(back)).toBe(false)
       /* Not `toBe(before)`: an empty file gains a trailing newline on the way
          through and the two blank lines collapse. What must survive is every
-         line that says something. */
-      expect(back.split('\n').filter((l) => l.trim())).toEqual(before.split('\n').filter((l) => l.trim()))
+         line that says something — and, since 2.1.0, the rule that keeps the
+         project's id out of git, which is nobody's setting. */
+      const said = (text: string) => text.split('\n').filter((l) => l.trim())
+      expect(said(back)).toEqual([...said(before), ...said(PROJECT_FILE_IGNORE)])
     }
   })
 
   test('removes the rule however it was spelled, and the comment above it', () => {
     for (const rule of ['.kehikot', '.kehikot/', '/.kehikot/', '**/.kehikot/', 'anything/.kehikot']) {
       const out = withoutKehikotIgnored(`dist\n\n# what this is\n# and why\n${rule}\nbuild\n`)
-      expect(out).toBe('dist\nbuild\n')
+      expect(out).toBe(`dist\nbuild\n\n${PROJECT_FILE_IGNORE}`)
     }
   })
 
@@ -231,7 +235,7 @@ describe('taking that line back out again', () => {
     expect(out).not.toContain(`\n${KEHIKOT_DIR}/*`)
   })
 
-  test('a .gitignore that held nothing else is emptied rather than left blank', () => {
-    expect(withoutKehikotIgnored(KEHIKOT_IGNORE)).toBe('')
+  test('a .gitignore that held nothing else keeps only the project id’s rule, with no blank above it', () => {
+    expect(withoutKehikotIgnored(KEHIKOT_IGNORE)).toBe(PROJECT_FILE_IGNORE)
   })
 })

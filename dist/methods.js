@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { LIMITS } from './limits.js';
-import { EPIC_SLUG, MODULE_ID } from './ids.js';
+import { EPIC_SLUG, MODULE_ID, PROJECT_ID } from './ids.js';
 import { gotoRef, placeKehikko, placeParts, ref, stepNumber } from './fragments.js';
 import { activityItemsSchema } from './activity.js';
 /**
@@ -431,12 +431,14 @@ export const epicsListResult = z.object({ epics: z.array(epicSpine) }).passthrou
  */
 export const PICK_OUTCOMES = ['picked', 'cancelled', 'declined'];
 /**
- * One project, as a host hands it over: the same two fields `context` uses for the open project.
- * `path` is absolute and resolved; `name` is what the host calls it and is never a path.
+ * One project, as a host hands it over: the same fields `context` uses for the open project.
+ * `path` is absolute and resolved; `name` is what the host calls it and is never a path. `id` (2.1.0)
+ * is its `PROJECT_ID`, as `context.projectId`; absent from an older host, and then the path is the key.
  */
 export const pickedProject = z.object({
     path: z.string().min(1).max(LIMITS.PATH),
     name: z.string().max(LIMITS.PROJECT).default(''),
+    id: z.string().regex(PROJECT_ID).optional(),
 });
 export const projectPickResult = z.object({
     outcome: z.enum(PICK_OUTCOMES),

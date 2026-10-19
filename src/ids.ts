@@ -21,6 +21,15 @@ export const MODULE_ID = /^[a-z0-9][a-z0-9.-]{1,62}[a-z0-9]$/
  */
 export const KEHIKKO_KEY = /^[a-z0-9][a-z0-9-]{0,30}[a-z0-9]$/
 
+/**
+ * A project's id (2.1.0): the identity of one project that outlives its folder's path. 8 to 64
+ * characters of lowercase letters, digits and dashes, neither end a dash, so it is a safe file or
+ * folder name as it stands (no dot, no slash). A host mints a random lowercase UUID
+ * (`crypto.randomUUID()`, 36 characters); the pattern does not insist on one. Kept in
+ * `.kehikot/project.json` (`PROJECT_FILE`), written only by the host. Design notes: docs/project-data.md.
+ */
+export const PROJECT_ID = /^[a-z0-9][a-z0-9-]{6,62}[a-z0-9]$/
+
 /** A mode's id: one module's own name for one of its tabs. */
 export const MODE_ID = /^[a-z0-9][a-z0-9-]{0,30}$/
 

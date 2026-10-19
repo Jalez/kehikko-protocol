@@ -748,6 +748,7 @@ export declare const helloSchema: z.ZodObject<{
         epic: z.ZodDefault<z.ZodNullable<z.ZodString>>;
         project: z.ZodDefault<z.ZodNullable<z.ZodString>>;
         projectPath: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+        projectId: z.ZodDefault<z.ZodNullable<z.ZodString>>;
         theme: z.ZodDefault<z.ZodEnum<["light", "dark"]>>;
         selection: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
         passage: z.ZodDefault<z.ZodNullable<z.ZodEffects<z.ZodEffects<z.ZodObject<{
@@ -1055,16 +1056,16 @@ export declare const helloSchema: z.ZodObject<{
             value: "done" | "wont-do" | "duplicate" | "superseded";
             at: string | null;
             ref: string;
+            by: string | null;
             target: string | null;
             note: string;
-            by: string | null;
         }, {
             value: "done" | "wont-do" | "duplicate" | "superseded";
             ref: string;
             at?: string | null | undefined;
+            by?: string | null | undefined;
             target?: string | null | undefined;
             note?: string | undefined;
-            by?: string | null | undefined;
         }>, "many">>;
         tracker: z.ZodDefault<z.ZodObject<{
             at: z.ZodDefault<z.ZodNullable<z.ZodString>>;
@@ -1127,6 +1128,7 @@ export declare const helloSchema: z.ZodObject<{
             key?: string | undefined;
         } | null;
         project: string | null;
+        projectId: string | null;
         tracker: {
             at: string | null;
             refreshing: boolean;
@@ -1173,9 +1175,9 @@ export declare const helloSchema: z.ZodObject<{
             value: "done" | "wont-do" | "duplicate" | "superseded";
             at: string | null;
             ref: string;
+            by: string | null;
             target: string | null;
             note: string;
-            by: string | null;
         }[];
         content: {
             at: string;
@@ -1198,6 +1200,7 @@ export declare const helloSchema: z.ZodObject<{
             key?: string | undefined;
         } | null | undefined;
         project?: string | null | undefined;
+        projectId?: string | null | undefined;
         tracker?: {
             at?: string | null | undefined;
             refreshing?: boolean | undefined;
@@ -1244,9 +1247,9 @@ export declare const helloSchema: z.ZodObject<{
             value: "done" | "wont-do" | "duplicate" | "superseded";
             ref: string;
             at?: string | null | undefined;
+            by?: string | null | undefined;
             target?: string | null | undefined;
             note?: string | undefined;
-            by?: string | null | undefined;
         }[] | undefined;
         content?: {
             at: string;
@@ -1293,6 +1296,7 @@ export declare const helloSchema: z.ZodObject<{
             key?: string | undefined;
         } | null;
         project: string | null;
+        projectId: string | null;
         tracker: {
             at: string | null;
             refreshing: boolean;
@@ -1339,9 +1343,9 @@ export declare const helloSchema: z.ZodObject<{
             value: "done" | "wont-do" | "duplicate" | "superseded";
             at: string | null;
             ref: string;
+            by: string | null;
             target: string | null;
             note: string;
-            by: string | null;
         }[];
         content: {
             at: string;
@@ -1371,6 +1375,7 @@ export declare const helloSchema: z.ZodObject<{
             key?: string | undefined;
         } | null | undefined;
         project?: string | null | undefined;
+        projectId?: string | null | undefined;
         tracker?: {
             at?: string | null | undefined;
             refreshing?: boolean | undefined;
@@ -1417,9 +1422,9 @@ export declare const helloSchema: z.ZodObject<{
             value: "done" | "wont-do" | "duplicate" | "superseded";
             ref: string;
             at?: string | null | undefined;
+            by?: string | null | undefined;
             target?: string | null | undefined;
             note?: string | undefined;
-            by?: string | null | undefined;
         }[] | undefined;
         content?: {
             at: string;
@@ -1440,6 +1445,7 @@ export declare const contextMessageSchema: z.ZodObject<{
     epic: z.ZodDefault<z.ZodNullable<z.ZodString>>;
     project: z.ZodDefault<z.ZodNullable<z.ZodString>>;
     projectPath: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+    projectId: z.ZodDefault<z.ZodNullable<z.ZodString>>;
     theme: z.ZodDefault<z.ZodEnum<["light", "dark"]>>;
     selection: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
     passage: z.ZodDefault<z.ZodNullable<z.ZodEffects<z.ZodEffects<z.ZodObject<{
@@ -1747,16 +1753,16 @@ export declare const contextMessageSchema: z.ZodObject<{
         value: "done" | "wont-do" | "duplicate" | "superseded";
         at: string | null;
         ref: string;
+        by: string | null;
         target: string | null;
         note: string;
-        by: string | null;
     }, {
         value: "done" | "wont-do" | "duplicate" | "superseded";
         ref: string;
         at?: string | null | undefined;
+        by?: string | null | undefined;
         target?: string | null | undefined;
         note?: string | undefined;
-        by?: string | null | undefined;
     }>, "many">>;
     tracker: z.ZodDefault<z.ZodObject<{
         at: z.ZodDefault<z.ZodNullable<z.ZodString>>;
@@ -1823,6 +1829,7 @@ export declare const contextMessageSchema: z.ZodObject<{
         key?: string | undefined;
     } | null;
     project: string | null;
+    projectId: string | null;
     protocol: number;
     tracker: {
         at: string | null;
@@ -1870,9 +1877,9 @@ export declare const contextMessageSchema: z.ZodObject<{
         value: "done" | "wont-do" | "duplicate" | "superseded";
         at: string | null;
         ref: string;
+        by: string | null;
         target: string | null;
         note: string;
-        by: string | null;
     }[];
     content: {
         at: string;
@@ -1897,6 +1904,7 @@ export declare const contextMessageSchema: z.ZodObject<{
         key?: string | undefined;
     } | null | undefined;
     project?: string | null | undefined;
+    projectId?: string | null | undefined;
     tracker?: {
         at?: string | null | undefined;
         refreshing?: boolean | undefined;
@@ -1943,9 +1951,9 @@ export declare const contextMessageSchema: z.ZodObject<{
         value: "done" | "wont-do" | "duplicate" | "superseded";
         ref: string;
         at?: string | null | undefined;
+        by?: string | null | undefined;
         target?: string | null | undefined;
         note?: string | undefined;
-        by?: string | null | undefined;
     }[] | undefined;
     content?: {
         at: string;
@@ -2212,6 +2220,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         epic: z.ZodDefault<z.ZodNullable<z.ZodString>>;
         project: z.ZodDefault<z.ZodNullable<z.ZodString>>;
         projectPath: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+        projectId: z.ZodDefault<z.ZodNullable<z.ZodString>>;
         theme: z.ZodDefault<z.ZodEnum<["light", "dark"]>>;
         selection: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
         passage: z.ZodDefault<z.ZodNullable<z.ZodEffects<z.ZodEffects<z.ZodObject<{
@@ -2519,16 +2528,16 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             value: "done" | "wont-do" | "duplicate" | "superseded";
             at: string | null;
             ref: string;
+            by: string | null;
             target: string | null;
             note: string;
-            by: string | null;
         }, {
             value: "done" | "wont-do" | "duplicate" | "superseded";
             ref: string;
             at?: string | null | undefined;
+            by?: string | null | undefined;
             target?: string | null | undefined;
             note?: string | undefined;
-            by?: string | null | undefined;
         }>, "many">>;
         tracker: z.ZodDefault<z.ZodObject<{
             at: z.ZodDefault<z.ZodNullable<z.ZodString>>;
@@ -2591,6 +2600,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             key?: string | undefined;
         } | null;
         project: string | null;
+        projectId: string | null;
         tracker: {
             at: string | null;
             refreshing: boolean;
@@ -2637,9 +2647,9 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             value: "done" | "wont-do" | "duplicate" | "superseded";
             at: string | null;
             ref: string;
+            by: string | null;
             target: string | null;
             note: string;
-            by: string | null;
         }[];
         content: {
             at: string;
@@ -2662,6 +2672,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             key?: string | undefined;
         } | null | undefined;
         project?: string | null | undefined;
+        projectId?: string | null | undefined;
         tracker?: {
             at?: string | null | undefined;
             refreshing?: boolean | undefined;
@@ -2708,9 +2719,9 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             value: "done" | "wont-do" | "duplicate" | "superseded";
             ref: string;
             at?: string | null | undefined;
+            by?: string | null | undefined;
             target?: string | null | undefined;
             note?: string | undefined;
-            by?: string | null | undefined;
         }[] | undefined;
         content?: {
             at: string;
@@ -2757,6 +2768,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             key?: string | undefined;
         } | null;
         project: string | null;
+        projectId: string | null;
         tracker: {
             at: string | null;
             refreshing: boolean;
@@ -2803,9 +2815,9 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             value: "done" | "wont-do" | "duplicate" | "superseded";
             at: string | null;
             ref: string;
+            by: string | null;
             target: string | null;
             note: string;
-            by: string | null;
         }[];
         content: {
             at: string;
@@ -2835,6 +2847,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             key?: string | undefined;
         } | null | undefined;
         project?: string | null | undefined;
+        projectId?: string | null | undefined;
         tracker?: {
             at?: string | null | undefined;
             refreshing?: boolean | undefined;
@@ -2881,9 +2894,9 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             value: "done" | "wont-do" | "duplicate" | "superseded";
             ref: string;
             at?: string | null | undefined;
+            by?: string | null | undefined;
             target?: string | null | undefined;
             note?: string | undefined;
-            by?: string | null | undefined;
         }[] | undefined;
         content?: {
             at: string;
@@ -2898,6 +2911,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     epic: z.ZodDefault<z.ZodNullable<z.ZodString>>;
     project: z.ZodDefault<z.ZodNullable<z.ZodString>>;
     projectPath: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+    projectId: z.ZodDefault<z.ZodNullable<z.ZodString>>;
     theme: z.ZodDefault<z.ZodEnum<["light", "dark"]>>;
     selection: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
     passage: z.ZodDefault<z.ZodNullable<z.ZodEffects<z.ZodEffects<z.ZodObject<{
@@ -3205,16 +3219,16 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         value: "done" | "wont-do" | "duplicate" | "superseded";
         at: string | null;
         ref: string;
+        by: string | null;
         target: string | null;
         note: string;
-        by: string | null;
     }, {
         value: "done" | "wont-do" | "duplicate" | "superseded";
         ref: string;
         at?: string | null | undefined;
+        by?: string | null | undefined;
         target?: string | null | undefined;
         note?: string | undefined;
-        by?: string | null | undefined;
     }>, "many">>;
     tracker: z.ZodDefault<z.ZodObject<{
         at: z.ZodDefault<z.ZodNullable<z.ZodString>>;
@@ -3281,6 +3295,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         key?: string | undefined;
     } | null;
     project: string | null;
+    projectId: string | null;
     protocol: number;
     tracker: {
         at: string | null;
@@ -3328,9 +3343,9 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         value: "done" | "wont-do" | "duplicate" | "superseded";
         at: string | null;
         ref: string;
+        by: string | null;
         target: string | null;
         note: string;
-        by: string | null;
     }[];
     content: {
         at: string;
@@ -3355,6 +3370,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         key?: string | undefined;
     } | null | undefined;
     project?: string | null | undefined;
+    projectId?: string | null | undefined;
     tracker?: {
         at?: string | null | undefined;
         refreshing?: boolean | undefined;
@@ -3401,9 +3417,9 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         value: "done" | "wont-do" | "duplicate" | "superseded";
         ref: string;
         at?: string | null | undefined;
+        by?: string | null | undefined;
         target?: string | null | undefined;
         note?: string | undefined;
-        by?: string | null | undefined;
     }[] | undefined;
     content?: {
         at: string;

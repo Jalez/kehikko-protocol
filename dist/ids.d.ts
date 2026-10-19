@@ -16,6 +16,14 @@ export declare const MODULE_ID: RegExp;
  * can be all digits, so it is never told from a kehikko's `id` by its spelling.
  */
 export declare const KEHIKKO_KEY: RegExp;
+/**
+ * A project's id (2.1.0): the identity of one project that outlives its folder's path. 8 to 64
+ * characters of lowercase letters, digits and dashes, neither end a dash, so it is a safe file or
+ * folder name as it stands (no dot, no slash). A host mints a random lowercase UUID
+ * (`crypto.randomUUID()`, 36 characters); the pattern does not insist on one. Kept in
+ * `.kehikot/project.json` (`PROJECT_FILE`), written only by the host. Design notes: docs/project-data.md.
+ */
+export declare const PROJECT_ID: RegExp;
 /** A mode's id: one module's own name for one of its tabs. */
 export declare const MODE_ID: RegExp;
 /**

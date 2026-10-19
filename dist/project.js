@@ -1,16 +1,24 @@
 /**
  * Where a module's data for one project lives, `<projectPath>/.kehikot/<module>/<file>.json`, and
- * how a project's `.gitignore` says not to commit it. Strings and pure functions only: no I/O, and
- * paths are joined POSIX-style with `/`.
+ * how a project's `.gitignore` says not to commit it. Plus the one file at the top of `.kehikot/`
+ * (2.1.0): `project.json`, the project's permanent id, written only by the host. Strings, one
+ * schema and pure functions only: no I/O, and paths are joined POSIX-style with `/`.
  * Design notes: docs/project-data.md.
  */
+import { z } from 'zod';
 import { MESSAGE_PREFIX } from './constants.js';
-import { MODULE_ID } from './ids.js';
+import { MODULE_ID, PROJECT_ID } from './ids.js';
 /**
  * The folder in a project that holds the app's data, spelled once; this is the only place it is
  * spelled. `kehikot` (the app), not `kehikko` (one canvas inside it).
  */
 export const KEHIKOT_DIR = '.kehikot';
+/**
+ * The one file at the top of `.kehikot/` (2.1.0), beside the module folders rather than in one: the
+ * project's permanent id. Written ONLY by the host, once, and never rewritten; read by anyone.
+ * Every other file a project keeps is a module's, under `.kehikot/<module>/`.
+ */
+export const PROJECT_FILE = 'project.json';
 /**
  * What a module may call a file inside its own folder: lowercase, digits and dashes, no dot and no
  * slash, so no accepted spelling can leave the folder. A file name is a constant in the module that
@@ -30,7 +38,8 @@ function joined(left, right) {
 /**
  * A module's folder name, from its id: `kehikot.checklist` becomes `checklist`; an id without that
  * prefix is used whole. Throws, rather than falling
- * back, when the id is not a `MODULE_ID` or the derived name is not a `MODULE_FOLDER`.
+ * back, when the id is not a `MODULE_ID`, the derived name is not a `MODULE_FOLDER`, or (2.1.0) it
+ * is `PROJECT_FILE`, the host's file.
  */
 export function moduleFolder(moduleId) {
     if (typeof moduleId !== 'string' || !MODULE_ID.test(moduleId)) {
@@ -42,6 +51,11 @@ export function moduleFolder(moduleId) {
     if (!MODULE_FOLDER.test(name)) {
         throw new Error(`"${moduleId}" gives the folder name "${name}", which is not one this package will join onto somebody's `
             + 'project root.');
+    }
+    /* 2.1.0: the one name at the top of the folder that is not a module's. */
+    if (name === PROJECT_FILE) {
+        throw new Error(`"${moduleId}" gives the folder name "${name}", which is the host's own file at the top of ${KEHIKOT_DIR}/ `
+            + '(the project id), not a folder a module may have.');
     }
     return name;
 }
@@ -93,16 +107,60 @@ export function within(parent, child) {
     return child === root || child.startsWith(`${root}/`);
 }
 /**
- * What a project's `.gitignore` is given, once, when that folder is first made: a comment saying
- * what the folder is, and the rule `.kehikot/`, which ignores the whole folder anywhere in the tree.
+ * `<projectPath>/.kehikot/project.json`, or `null` when there is no project (as `kehikotDir`). Its
+ * contents are a `projectFileSchema`. A module reads the id from `context.projectId`, not from here.
  */
-export const KEHIKOT_IGNORE = `# Modules on a kehikot host keep this project's data here — checklists, notes,
+export function projectFile(projectPath) {
+    const dir = kehikotDir(projectPath);
+    return dir === null ? null : joined(dir, PROJECT_FILE);
+}
+/**
+ * What `project.json` holds. `id` is a `PROJECT_ID`, minted by the host the first time it meets the
+ * project (a lowercase random UUID). `createdAt` is when, ISO 8601, or null. Never committed: a
+ * clone, copy or git worktree carrying it would be the same project twice (`PROJECT_FILE_IGNORE`).
+ */
+export const projectFileSchema = z.object({
+    id: z.string().regex(PROJECT_ID),
+    createdAt: z.string().min(1).max(40).nullable().default(null),
+});
+/** Read a `project.json` off anything, or null. Never throws: a malformed file is no id, and the host mints one. */
+export function readProjectFile(value) {
+    const parsed = projectFileSchema.safeParse(value);
+    return parsed.success ? parsed.data : null;
+}
+export function projectKey(context) {
+    const id = context?.projectId;
+    if (typeof id === 'string' && PROJECT_ID.test(id))
+        return { by: 'id', key: id };
+    const path = context?.projectPath;
+    if (typeof path === 'string' && path.trim())
+        return { by: 'path', key: path.trim() };
+    return null;
+}
+/**
+ * The lines that keep `project.json` out of git, ALWAYS, even when the rest of `.kehikot/` is shared:
+ * a comment and `.kehikot/project.json`. Part of `KEHIKOT_IGNORE`; left behind by
+ * `withoutKehikotIgnored`; added on its own by `withProjectFileIgnored`.
+ */
+export const PROJECT_FILE_IGNORE = `# The project's own id, which Kehikot keeps in ${KEHIKOT_DIR}/${PROJECT_FILE}. It is never
+# committed, even when the rest of ${KEHIKOT_DIR}/ is shared: a clone, a copy or a git
+# worktree carrying it would be taken for this same project. Keep this line.
+${KEHIKOT_DIR}/${PROJECT_FILE}
+`;
+/** The folder's own block: the comment and the rule `.kehikot/`. */
+const FOLDER_IGNORE = `# Modules on a kehikot host keep this project's data here — checklists, notes,
 # journeys, questions — as plain JSON, one folder per module, so it sits beside
 # the work instead of inside somebody else's app. It is ignored because it is
 # one person's working material and not the project's. Remove these lines to
 # share it with everyone who clones this repository.
 ${KEHIKOT_DIR}/
 `;
+/**
+ * What a project's `.gitignore` is given, once, when that folder is first made: a comment saying
+ * what the folder is and the rule `.kehikot/`, which ignores the whole folder anywhere in the tree;
+ * then, after a blank line, `PROJECT_FILE_IGNORE` (2.1.0), which stays when the first block goes.
+ */
+export const KEHIKOT_IGNORE = `${FOLDER_IGNORE}\n${PROJECT_FILE_IGNORE}`;
 /**
  * Does this `.gitignore` already ignore the folder? Generous on purpose: `.kehikot`, `.kehikot/`,
  * `/.kehikot/`, `**\/.kehikot/` and a commented-out `#.kehikot` all count. Not a gitignore engine;
@@ -121,22 +179,58 @@ export function ignoresKehikot(gitignore) {
     });
 }
 /**
+ * Does this `.gitignore` keep `project.json` out of git (2.1.0)? Strict, unlike `ignoresKehikot`: a
+ * commented-out rule does NOT count, because the file must be ignored whatever anybody decided about
+ * the folder. An uncommented rule ignoring the folder (`.kehikot/`, `.kehikot/*`, …) or the file
+ * itself counts; the last such line wins, so a later `!` negation reads as not ignored. Not a
+ * gitignore engine: a false "no" costs one redundant line.
+ */
+export function ignoresProjectFile(gitignore) {
+    let ignored = false;
+    for (const line of gitignore.split(/\r?\n/)) {
+        const text = line.trim();
+        if (!text || text.startsWith('#'))
+            continue;
+        const negated = text.startsWith('!');
+        const rule = (negated ? text.slice(1) : text).replace(/\/\*$/, '').replace(/\/+$/, '');
+        const folder = rule === KEHIKOT_DIR || rule.endsWith(`/${KEHIKOT_DIR}`);
+        const file = `${KEHIKOT_DIR}/${PROJECT_FILE}`;
+        if (folder || rule === file || rule.endsWith(`/${file}`))
+            ignored = !negated;
+    }
+    return ignored;
+}
+/** Append a block: a blank line between it and what was there, none in an empty file. Never touches a byte. */
+function appended(gitignore, block) {
+    if (!gitignore.trim())
+        return block;
+    const ends = gitignore.endsWith('\n') ? gitignore : `${gitignore}\n`;
+    return `${ends}\n${block}`;
+}
+/**
+ * The text a `.gitignore` should have so that `project.json` is never committed (2.1.0); the same
+ * text back when it already is not (`ignoresProjectFile`). Append-only: `PROJECT_FILE_IGNORE`. A host
+ * runs it whenever it writes `project.json` — unlike the folder's rule, this one is nobody's choice.
+ */
+export function withProjectFileIgnored(gitignore) {
+    return ignoresProjectFile(gitignore) ? gitignore : appended(gitignore, PROJECT_FILE_IGNORE);
+}
+/**
  * The text a `.gitignore` should have after this convention is added to it; the same text back,
- * unchanged, when it already ignores the folder. Append-only: a blank line if needed, then
- * `KEHIKOT_IGNORE`. Run it once, when the folder is first created, not on every write.
+ * unchanged, when it already ignores the folder and `project.json`. Append-only: `KEHIKOT_IGNORE`,
+ * or only the part missing — the folder's block where the file already has its rule, or (2.1.0)
+ * `PROJECT_FILE_IGNORE` under a commented-out `#.kehikot/`. Run it once, when the folder is first created.
  */
 export function withKehikotIgnored(gitignore) {
     if (ignoresKehikot(gitignore))
-        return gitignore;
-    if (!gitignore.trim())
-        return KEHIKOT_IGNORE;
-    const ends = gitignore.endsWith('\n') ? gitignore : `${gitignore}\n`;
-    return `${ends}\n${KEHIKOT_IGNORE}`;
+        return withProjectFileIgnored(gitignore);
+    return appended(gitignore, ignoresProjectFile(gitignore) ? FOLDER_IGNORE : KEHIKOT_IGNORE);
 }
 /**
  * The text a `.gitignore` should have after this convention is taken out of it. Removes every
  * uncommented rule ignoring the folder, the comment lines directly above it and a stranded blank
- * line; leaves a commented-out `#.kehikot/` and a negation (`!.kehikot/…`) alone. Idempotent.
+ * line; leaves a commented-out `#.kehikot/` and a negation (`!.kehikot/…`) alone. Idempotent. When
+ * it removed anything, `project.json` stays ignored (2.1.0): its rule is kept, or added.
  */
 export function withoutKehikotIgnored(gitignore) {
     const lines = gitignore.split('\n');
@@ -179,7 +273,7 @@ export function withoutKehikotIgnored(gitignore) {
     /* A file that is now nothing but whitespace is empty, not a stack of blank
        lines: this function is the only thing that ever emptied it. */
     if (tidied.every((line) => line.trim() === ''))
-        return '';
+        return withProjectFileIgnored('');
     const out = tidied.join('\n');
-    return out.endsWith('\n') ? out : `${out}\n`;
+    return withProjectFileIgnored(out.endsWith('\n') ? out : `${out}\n`);
 }

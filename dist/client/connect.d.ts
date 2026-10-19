@@ -191,6 +191,8 @@ export interface Connection {
      *
      * 1.8.0: items may carry `project`. Until the host has answered `projects: true`, only the items of the
      * project it has open (and those with no `project`) are sent, without the field; after, the whole list.
+     * 2.1.0: an item may also carry `projectId`, beside `project`. Judging "the open project", the id
+     * decides where the item and the host both have one, else the path; both fields are dropped then.
      */
     activity: (items: ActivityItem[]) => void;
     /** Whether anything has greeted us yet. */

@@ -25,7 +25,7 @@ export {
 
 export { LIMITS } from './limits.js'
 
-export { MODULE_ID, MODE_ID, EPIC_SLUG, KEHIKKO_KEY, own, slugFrom } from './ids.js'
+export { MODULE_ID, MODE_ID, EPIC_SLUG, KEHIKKO_KEY, PROJECT_ID, own, slugFrom } from './ids.js'
 
 export {
   KEHIKOT_DIR,
@@ -40,6 +40,16 @@ export {
   ignoresKehikot,
   withKehikotIgnored,
   withoutKehikotIgnored,
+  PROJECT_FILE,
+  PROJECT_FILE_IGNORE,
+  projectFile,
+  projectFileSchema,
+  readProjectFile,
+  projectKey,
+  ignoresProjectFile,
+  withProjectFileIgnored,
+  type ProjectFile,
+  type ProjectKey,
 } from './project.js'
 
 export {

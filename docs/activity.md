@@ -111,6 +111,21 @@ the one framed now. So an item may say which project it belongs to:
 - A host shows another project's items with that project's name, and pressing one opens that project
   first.
 
+### And by id (2.1.0)
+
+An item that names its project may also name the project's id, `projectId`, beside `project` (never
+instead of it: an item with `projectId` and no `project` is refused). The precedence:
+
+1. A host that knows project ids files the item under the project with that id, wherever its
+   folder is now. The id outlives a rename; the path the module remembered may not.
+2. Otherwise — the id is absent, or names no project the host knows, or the host is older than
+   2.1.0 and stripped it — the host files it by `project`, as in 1.8.0.
+3. An item with neither is the open project's.
+
+The client helper uses the same order when it decides which items are "the open project's" for a
+host that does not file by project: the id where both the item and the host's context have one,
+else the path. Both fields are dropped from what it sends such a host.
+
 ## One system (1.7.0)
 
 `activity.set` is the ONE way a module tells the host about what needs a person's attention, what is

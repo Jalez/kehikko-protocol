@@ -4,7 +4,7 @@ import { HOLDINGS_FILE, HOLDINGS_VERSION, HOLDING_KINDS, holdingKinds, holdingsI
 import { EPIC_SLUG } from '../ids.js';
 import { LIMITS } from '../limits.js';
 import { PART_ID, documentOf } from '../parts.js';
-import { MODULE_FOLDER, kehikotDir, moduleDir, moduleFile, within } from '../project.js';
+import { MODULE_FOLDER, PROJECT_FILE, kehikotDir, moduleDir, moduleFile, within } from '../project.js';
 /**
  * The file `holdings.ts` describes, opened: a host reads every module's (`readHoldings`), a module
  * writes its own (`writeHoldings`). Both are synchronous, so nothing can run between a read and the
@@ -54,7 +54,7 @@ function eachHoldingsFile(projectPath, each) {
         return;
     let folders;
     try {
-        folders = readdirSync(dir).filter((name) => MODULE_FOLDER.test(name)).sort().slice(0, LIMITS.HOLDINGS_MODULES);
+        folders = readdirSync(dir).filter((name) => MODULE_FOLDER.test(name) && name !== PROJECT_FILE).sort().slice(0, LIMITS.HOLDINGS_MODULES);
     }
     catch {
         return;

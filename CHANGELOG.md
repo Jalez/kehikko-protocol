@@ -7,6 +7,45 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.1.0 — 2026-10-19
+
+A stable project identity. Projects were known by their absolute path, so renaming a project's
+folder made it a stranger to the host and orphaned every module's machine-level state for it. A
+project now has a permanent id, kept in `<project>/.kehikot/project.json` and written only by the
+host. **Additive and optional**; `PROTOCOL` is still 2. An older host sends no id, and a module
+falls back to the path.
+
+### Added
+
+- `PROJECT_ID`: 8–64 lowercase letters, digits and dashes, neither end a dash — a safe file name as
+  it stands. A host mints a lowercase random UUID.
+- `PROJECT_FILE` (`'project.json'`), `projectFile(projectPath)` → `<projectPath>/.kehikot/project.json`
+  or `null`, `projectFileSchema` (`{ id: PROJECT_ID, createdAt: string | null = null }`),
+  `readProjectFile` (never throws), `ProjectFile`.
+- `projectKey(context)` → `{ by: 'id', key } | { by: 'path', key } | null`: what a module keys
+  MACHINE-level state by. Project-level state needs no key.
+- `contextSchema.projectId`: `PROJECT_ID | null`, default `null`; `HostFields.projectId` in
+  `/client` (`useHost`, the host store).
+- `pickedProject.id` (`projects.pick`): optional `PROJECT_ID`.
+- `ActivityItem.projectId`: optional `PROJECT_ID`, only beside `project` (refused without it). A host
+  that knows the id files the item by it ahead of the path; the client helper judges "the open
+  project" by id where both sides have one.
+- `PROJECT_FILE_IGNORE`, `ignoresProjectFile`, `withProjectFileIgnored`: `project.json` is gitignored
+  always, even where `.kehikot/` is shared, since a clone, copy or worktree carrying it would be the
+  same project twice.
+
+### Changed
+
+- The storage rule has one exception: `.kehikot/project.json`, at the top of the folder, written only
+  by the host. Every other file a project keeps is a module's, under `.kehikot/<module>/`.
+- `KEHIKOT_IGNORE` ends with `PROJECT_FILE_IGNORE` after a blank line. `withKehikotIgnored` appends
+  only the missing block, and adds `PROJECT_FILE_IGNORE` under a commented-out `#.kehikot/`;
+  `withoutKehikotIgnored` keeps or adds the id's rule whenever it removed the folder's (so the round
+  trip gives back the starting file plus that rule). A `.gitignore` that already has `.kehikot/` is
+  left as it is by `withKehikotIgnored`.
+- `moduleFolder` refuses an id whose folder would be `project.json`.
+- `readHoldings` (`/serve`) skips `.kehikot/project.json` when it sweeps the module folders.
+
 ## 2.0.0 — 2026-10-19
 
 The breaking release that drops the names from before the app was called Kehikot, and stops

@@ -31,6 +31,12 @@ function projectOf(context: unknown): string | null {
   return typeof path === 'string' && path ? path : null
 }
 
+/** The project id (2.1.0) a greeting or a context names, or null: an older host names none. */
+function projectIdOf(context: unknown): string | null {
+  const id = (context as { projectId?: unknown } | null | undefined)?.projectId
+  return typeof id === 'string' && id ? id : null
+}
+
 /**
  * The bridge: one conversation with one window, in the shape this package's schemas define.
  * A greeting is taken from an origin the page may be framed by (`mayGreet`); after it, identity is
@@ -246,6 +252,8 @@ export interface Connection {
    *
    * 1.8.0: items may carry `project`. Until the host has answered `projects: true`, only the items of the
    * project it has open (and those with no `project`) are sent, without the field; after, the whole list.
+   * 2.1.0: an item may also carry `projectId`, beside `project`. Judging "the open project", the id
+   * decides where the item and the host both have one, else the path; both fields are dropped then.
    */
   activity: (items: ActivityItem[]) => void
   /** Whether anything has greeted us yet. */
@@ -288,6 +296,7 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
      and the project it has open — until it has said so, only that project's items are sent, untagged. */
   let byProject = false
   let projectNow: string | null = null
+  let projectIdNow: string | null = null
 
   /** Correlation id -> the promise waiting on it. A `Map`, per the protocol's note on lookups. */
   const waiting = new Map<
@@ -344,6 +353,7 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
       activityTaken = null
       byProject = false
       projectNow = projectOf(message.context)
+      projectIdNow = projectIdOf(message.context)
       sendActivity()
       events.onHello?.(message.context, message.state, { answers: message.answers ?? null, header: message.header ?? null })
       return
@@ -358,9 +368,11 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
          protocol grows arrives without being listed here. */
       const { type: _envelope, protocol: _spoken, ...context } = message
       const project = projectOf(context)
+      const projectId = projectIdOf(context)
       /* Another project open: a host that does not file by project is sent THAT project's things now. */
-      if (project !== projectNow) {
+      if (project !== projectNow || projectId !== projectIdNow) {
         projectNow = project
+        projectIdNow = projectId
         if (!byProject) sendActivity()
       }
       events.onContext?.(context)
@@ -445,7 +457,7 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
   function sendActivity(): void {
     if (activityNow === null || host === null) return
     if (answered !== null && !answered.includes('activity.set')) return
-    const items = byProject ? activityNow : forOpenProject(activityNow, projectNow)
+    const items = byProject ? activityNow : forOpenProject(activityNow, projectNow, projectIdNow)
     const key = JSON.stringify(items)
     if (key === activityTaken) return
     activityTaken = key
@@ -470,11 +482,19 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
       })
   }
 
-  /** The items of the project open now, without `project`, for a host that does not file by it. */
-  function forOpenProject(items: readonly ActivityItem[], open: string | null): ActivityItem[] {
+  /**
+   * The items of the project open now, without `project` or `projectId`, for a host that does not file
+   * by it. The id decides where the item and the host both name one (a renamed folder is still the
+   * project); otherwise the path does.
+   */
+  function forOpenProject(items: readonly ActivityItem[], open: string | null, openId: string | null): ActivityItem[] {
     return items
-      .filter((item) => item.project === undefined || item.project === open)
-      .map(({ project: _project, ...item }) => item)
+      .filter((item) => {
+        if (item.project === undefined) return true
+        if (item.projectId !== undefined && openId !== null) return item.projectId === openId
+        return item.project === open
+      })
+      .map(({ project: _project, projectId: _projectId, ...item }) => item)
   }
 
   const connection: Connection = {

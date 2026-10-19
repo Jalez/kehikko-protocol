@@ -837,7 +837,7 @@ export declare const methodParams: {
      * Duplicate ids are refused. See `activity.ts`.
      */
     readonly 'activity.set': z.ZodObject<{
-        items: z.ZodEffects<z.ZodArray<z.ZodObject<{
+        items: z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodObject<{
             id: z.ZodString;
             state: z.ZodEnum<["working", "attention", "done"]>;
             label: z.ZodString;
@@ -860,6 +860,7 @@ export declare const methodParams: {
             refs: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
             group: z.ZodOptional<z.ZodString>;
             project: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
+            projectId: z.ZodOptional<z.ZodString>;
         }, "strip", z.ZodTypeAny, {
             id: string;
             state: "working" | "attention" | "done";
@@ -875,6 +876,7 @@ export declare const methodParams: {
             refs?: string[] | undefined;
             group?: string | undefined;
             project?: string | undefined;
+            projectId?: string | undefined;
         }, {
             id: string;
             state: "working" | "attention" | "done";
@@ -890,6 +892,39 @@ export declare const methodParams: {
             refs?: string[] | undefined;
             group?: string | undefined;
             project?: string | undefined;
+            projectId?: string | undefined;
+        }>, {
+            id: string;
+            state: "working" | "attention" | "done";
+            label: string;
+            place?: {
+                epic?: string | undefined;
+                parts?: string[] | undefined;
+                kehikko?: string | undefined;
+            } | undefined;
+            since?: number | undefined;
+            detail?: string | undefined;
+            priority?: "urgent" | "normal" | "low" | undefined;
+            refs?: string[] | undefined;
+            group?: string | undefined;
+            project?: string | undefined;
+            projectId?: string | undefined;
+        }, {
+            id: string;
+            state: "working" | "attention" | "done";
+            label: string;
+            place?: {
+                epic?: string | undefined;
+                parts?: string[] | undefined;
+                kehikko?: string | undefined;
+            } | undefined;
+            since?: number | undefined;
+            detail?: string | undefined;
+            priority?: "urgent" | "normal" | "low" | undefined;
+            refs?: string[] | undefined;
+            group?: string | undefined;
+            project?: string | undefined;
+            projectId?: string | undefined;
         }>, "many">, {
             id: string;
             state: "working" | "attention" | "done";
@@ -905,6 +940,7 @@ export declare const methodParams: {
             refs?: string[] | undefined;
             group?: string | undefined;
             project?: string | undefined;
+            projectId?: string | undefined;
         }[], {
             id: string;
             state: "working" | "attention" | "done";
@@ -920,6 +956,7 @@ export declare const methodParams: {
             refs?: string[] | undefined;
             group?: string | undefined;
             project?: string | undefined;
+            projectId?: string | undefined;
         }[]>;
     }, "strip", z.ZodTypeAny, {
         items: {
@@ -937,6 +974,7 @@ export declare const methodParams: {
             refs?: string[] | undefined;
             group?: string | undefined;
             project?: string | undefined;
+            projectId?: string | undefined;
         }[];
     }, {
         items: {
@@ -954,6 +992,7 @@ export declare const methodParams: {
             refs?: string[] | undefined;
             group?: string | undefined;
             project?: string | undefined;
+            projectId?: string | undefined;
         }[];
     }>;
     readonly 'events.emit': z.ZodObject<{
@@ -1175,17 +1214,21 @@ export type EpicsListResult = z.infer<typeof epicsListResult>;
 export declare const PICK_OUTCOMES: readonly ["picked", "cancelled", "declined"];
 export type PickOutcome = (typeof PICK_OUTCOMES)[number];
 /**
- * One project, as a host hands it over: the same two fields `context` uses for the open project.
- * `path` is absolute and resolved; `name` is what the host calls it and is never a path.
+ * One project, as a host hands it over: the same fields `context` uses for the open project.
+ * `path` is absolute and resolved; `name` is what the host calls it and is never a path. `id` (2.1.0)
+ * is its `PROJECT_ID`, as `context.projectId`; absent from an older host, and then the path is the key.
  */
 export declare const pickedProject: z.ZodObject<{
     path: z.ZodString;
     name: z.ZodDefault<z.ZodString>;
+    id: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     name: string;
     path: string;
+    id?: string | undefined;
 }, {
     path: string;
+    id?: string | undefined;
     name?: string | undefined;
 }>;
 export type PickedProject = z.infer<typeof pickedProject>;
@@ -1199,11 +1242,14 @@ export declare const projectPickResult: z.ZodObject<{
     project: z.ZodDefault<z.ZodNullable<z.ZodObject<{
         path: z.ZodString;
         name: z.ZodDefault<z.ZodString>;
+        id: z.ZodOptional<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
         name: string;
         path: string;
+        id?: string | undefined;
     }, {
         path: string;
+        id?: string | undefined;
         name?: string | undefined;
     }>>>;
     why: z.ZodDefault<z.ZodString>;
@@ -1211,6 +1257,7 @@ export declare const projectPickResult: z.ZodObject<{
     project: {
         name: string;
         path: string;
+        id?: string | undefined;
     } | null;
     outcome: "declined" | "picked" | "cancelled";
     why: string;
@@ -1218,6 +1265,7 @@ export declare const projectPickResult: z.ZodObject<{
     outcome: "declined" | "picked" | "cancelled";
     project?: {
         path: string;
+        id?: string | undefined;
         name?: string | undefined;
     } | null | undefined;
     why?: string | undefined;

@@ -100,6 +100,15 @@ to another project and every module would go on reading the first one,
 correctly, from the root it was handed — nothing erroring, and every module
 describing a different project from the one the host had named.
 
+### A project is also someone: `projectId` (2.1.0)
+
+`context.projectId` is which project this is, for good: the id the host keeps in
+`<projectPath>/.kehikot/project.json`. A path says where a project is today and stops meaning it
+when the folder is renamed; the id does not. It travels with `project` and `projectPath`, from the
+same place, and is `null` from a host older than 2.1.0. A module keys what it keeps on the MACHINE
+for a project by it, and falls back to `projectPath` while it is null (`projectKey`); what it keeps
+inside the project needs neither. See [project-data.md](project-data.md#the-projects-id-projectjson-210).
+
 ### Why a reference closed
 
 A tracker's `closed` is done, won't do, duplicate and superseded at once.

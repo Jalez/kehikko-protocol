@@ -17,7 +17,7 @@ export type ActivityState = (typeof ACTIVITY_STATES)[number];
  */
 export declare const ACTIVITY_PRIORITIES: readonly ["urgent", "normal", "low"];
 export type ActivityPriority = (typeof ACTIVITY_PRIORITIES)[number];
-export declare const activityItemSchema: z.ZodObject<{
+export declare const activityItemSchema: z.ZodEffects<z.ZodObject<{
     /** Stable and unique within the module: the same thing keeps its id for as long as it exists. */
     id: z.ZodString;
     state: z.ZodEnum<["working", "attention", "done"]>;
@@ -54,6 +54,12 @@ export declare const activityItemSchema: z.ZodObject<{
      * a 1.7.0 host strips it and would file the item under the open project.
      */
     project: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
+    /**
+     * 2.1.0. The same project's `PROJECT_ID` (`context.projectId` there), only beside `project`. A host
+     * that knows the id files the item by it, ahead of the path; otherwise by `project`. A 2.0.0 host
+     * strips it and files by `project`, which is why the path is required with it.
+     */
+    projectId: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     id: string;
     state: "working" | "attention" | "done";
@@ -69,6 +75,7 @@ export declare const activityItemSchema: z.ZodObject<{
     refs?: string[] | undefined;
     group?: string | undefined;
     project?: string | undefined;
+    projectId?: string | undefined;
 }, {
     id: string;
     state: "working" | "attention" | "done";
@@ -84,10 +91,43 @@ export declare const activityItemSchema: z.ZodObject<{
     refs?: string[] | undefined;
     group?: string | undefined;
     project?: string | undefined;
+    projectId?: string | undefined;
+}>, {
+    id: string;
+    state: "working" | "attention" | "done";
+    label: string;
+    place?: {
+        epic?: string | undefined;
+        parts?: string[] | undefined;
+        kehikko?: string | undefined;
+    } | undefined;
+    since?: number | undefined;
+    detail?: string | undefined;
+    priority?: "urgent" | "normal" | "low" | undefined;
+    refs?: string[] | undefined;
+    group?: string | undefined;
+    project?: string | undefined;
+    projectId?: string | undefined;
+}, {
+    id: string;
+    state: "working" | "attention" | "done";
+    label: string;
+    place?: {
+        epic?: string | undefined;
+        parts?: string[] | undefined;
+        kehikko?: string | undefined;
+    } | undefined;
+    since?: number | undefined;
+    detail?: string | undefined;
+    priority?: "urgent" | "normal" | "low" | undefined;
+    refs?: string[] | undefined;
+    group?: string | undefined;
+    project?: string | undefined;
+    projectId?: string | undefined;
 }>;
 export type ActivityItem = z.infer<typeof activityItemSchema>;
 /** The whole list, bounded, with no id twice. */
-export declare const activityItemsSchema: z.ZodEffects<z.ZodArray<z.ZodObject<{
+export declare const activityItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodObject<{
     /** Stable and unique within the module: the same thing keeps its id for as long as it exists. */
     id: z.ZodString;
     state: z.ZodEnum<["working", "attention", "done"]>;
@@ -124,6 +164,12 @@ export declare const activityItemsSchema: z.ZodEffects<z.ZodArray<z.ZodObject<{
      * a 1.7.0 host strips it and would file the item under the open project.
      */
     project: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
+    /**
+     * 2.1.0. The same project's `PROJECT_ID` (`context.projectId` there), only beside `project`. A host
+     * that knows the id files the item by it, ahead of the path; otherwise by `project`. A 2.0.0 host
+     * strips it and files by `project`, which is why the path is required with it.
+     */
+    projectId: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     id: string;
     state: "working" | "attention" | "done";
@@ -139,6 +185,7 @@ export declare const activityItemsSchema: z.ZodEffects<z.ZodArray<z.ZodObject<{
     refs?: string[] | undefined;
     group?: string | undefined;
     project?: string | undefined;
+    projectId?: string | undefined;
 }, {
     id: string;
     state: "working" | "attention" | "done";
@@ -154,6 +201,39 @@ export declare const activityItemsSchema: z.ZodEffects<z.ZodArray<z.ZodObject<{
     refs?: string[] | undefined;
     group?: string | undefined;
     project?: string | undefined;
+    projectId?: string | undefined;
+}>, {
+    id: string;
+    state: "working" | "attention" | "done";
+    label: string;
+    place?: {
+        epic?: string | undefined;
+        parts?: string[] | undefined;
+        kehikko?: string | undefined;
+    } | undefined;
+    since?: number | undefined;
+    detail?: string | undefined;
+    priority?: "urgent" | "normal" | "low" | undefined;
+    refs?: string[] | undefined;
+    group?: string | undefined;
+    project?: string | undefined;
+    projectId?: string | undefined;
+}, {
+    id: string;
+    state: "working" | "attention" | "done";
+    label: string;
+    place?: {
+        epic?: string | undefined;
+        parts?: string[] | undefined;
+        kehikko?: string | undefined;
+    } | undefined;
+    since?: number | undefined;
+    detail?: string | undefined;
+    priority?: "urgent" | "normal" | "low" | undefined;
+    refs?: string[] | undefined;
+    group?: string | undefined;
+    project?: string | undefined;
+    projectId?: string | undefined;
 }>, "many">, {
     id: string;
     state: "working" | "attention" | "done";
@@ -169,6 +249,7 @@ export declare const activityItemsSchema: z.ZodEffects<z.ZodArray<z.ZodObject<{
     refs?: string[] | undefined;
     group?: string | undefined;
     project?: string | undefined;
+    projectId?: string | undefined;
 }[], {
     id: string;
     state: "working" | "attention" | "done";
@@ -184,6 +265,7 @@ export declare const activityItemsSchema: z.ZodEffects<z.ZodArray<z.ZodObject<{
     refs?: string[] | undefined;
     group?: string | undefined;
     project?: string | undefined;
+    projectId?: string | undefined;
 }[]>;
 /**
  * The mark of a container that holds these items: the worst state among them, `attention` over

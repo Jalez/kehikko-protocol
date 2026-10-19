@@ -81,6 +81,11 @@ export interface HostFields {
   project: string | null
   /** The absolute directory of the open project. `null` also for an empty string, or one that is only spaces. */
   projectPath: string | null
+  /**
+   * 2.1.0. The open project's permanent id (`context.projectId`): what to key machine-level state by,
+   * with `projectPath` as the fallback while it is `null` (an older host). See `projectKey`.
+   */
+  projectId: string | null
   epic: string | null
   passage: Passage | null
   containers: readonly CanvasContainer[]
@@ -180,6 +185,7 @@ export function hostFields(context: ModuleContext | null, was?: HostFields, same
   const now: HostFields = {
     project: text(context?.project),
     projectPath: text(context?.projectPath),
+    projectId: text(context?.projectId),
     epic: text(context?.epic),
     passage: context?.passage ?? null,
     containers: context?.containers ?? NONE,

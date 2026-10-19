@@ -21,16 +21,16 @@ export declare const dispositionSchema: z.ZodObject<{
     value: "done" | "wont-do" | "duplicate" | "superseded";
     at: string | null;
     ref: string;
+    by: string | null;
     target: string | null;
     note: string;
-    by: string | null;
 }, {
     value: "done" | "wont-do" | "duplicate" | "superseded";
     ref: string;
     at?: string | null | undefined;
+    by?: string | null | undefined;
     target?: string | null | undefined;
     note?: string | undefined;
-    by?: string | null | undefined;
 }>;
 export type Disposition = z.infer<typeof dispositionSchema>;
 /**
@@ -381,6 +381,13 @@ export declare const contextSchema: z.ZodObject<{
      * pretend to open it. A host should fill this and `project` in one place, from one project.
      */
     projectPath: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+    /**
+     * 2.1.0. Which project this is, for good: the id the host keeps in `<projectPath>/.kehikot/project.json`
+     * (see `PROJECT_ID`), the same after the folder is renamed or moved. Null from a host older than
+     * 2.1.0 or with no project. A module keys MACHINE-level state by it, falling back to `projectPath`
+     * (`projectKey`); state kept inside the project needs neither. Sent with `project` and `projectPath`.
+     */
+    projectId: z.ZodDefault<z.ZodNullable<z.ZodString>>;
     theme: z.ZodDefault<z.ZodEnum<["light", "dark"]>>;
     /**
      * The refs the person has picked out; `[]` when nothing is selected. A module asks the host to set
@@ -735,16 +742,16 @@ export declare const contextSchema: z.ZodObject<{
         value: "done" | "wont-do" | "duplicate" | "superseded";
         at: string | null;
         ref: string;
+        by: string | null;
         target: string | null;
         note: string;
-        by: string | null;
     }, {
         value: "done" | "wont-do" | "duplicate" | "superseded";
         ref: string;
         at?: string | null | undefined;
+        by?: string | null | undefined;
         target?: string | null | undefined;
         note?: string | undefined;
-        by?: string | null | undefined;
     }>, "many">>;
     /**
      * When the open project's shared tracker reading last changed, and whether a read is in flight: the
@@ -822,6 +829,7 @@ export declare const contextSchema: z.ZodObject<{
         key?: string | undefined;
     } | null;
     project: string | null;
+    projectId: string | null;
     tracker: {
         at: string | null;
         refreshing: boolean;
@@ -868,9 +876,9 @@ export declare const contextSchema: z.ZodObject<{
         value: "done" | "wont-do" | "duplicate" | "superseded";
         at: string | null;
         ref: string;
+        by: string | null;
         target: string | null;
         note: string;
-        by: string | null;
     }[];
     content: {
         at: string;
@@ -893,6 +901,7 @@ export declare const contextSchema: z.ZodObject<{
         key?: string | undefined;
     } | null | undefined;
     project?: string | null | undefined;
+    projectId?: string | null | undefined;
     tracker?: {
         at?: string | null | undefined;
         refreshing?: boolean | undefined;
@@ -939,9 +948,9 @@ export declare const contextSchema: z.ZodObject<{
         value: "done" | "wont-do" | "duplicate" | "superseded";
         ref: string;
         at?: string | null | undefined;
+        by?: string | null | undefined;
         target?: string | null | undefined;
         note?: string | undefined;
-        by?: string | null | undefined;
     }[] | undefined;
     content?: {
         at: string;
