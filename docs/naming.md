@@ -32,7 +32,7 @@ host and every module have to spell the same way:
    "on this kehikko".
 2. **The host program, and by extension the repositories** — the thing that draws a kehikko.
    The host's repository and package are `kehikko`; its MCP server is `kehikko`; its binary is
-   `kehikko-host`; its own folder inside a project is `.kehikot/kehikko/`; its own environment
+   `kehikko-host`; its own folder inside a project was `.kehikot/kehikko/` until 2.2.0 and is now `.kehikot/host/` (see below); its own environment
    variables are `KEHIKKO_RESTART_FILE`, `KEHIKKO_PROPERTY`. Every
    repository is `kehikko-<something>`: `kehikko-protocol`, `kehikko-desktop`, `kehikko-paper`, …
 
@@ -52,8 +52,12 @@ host that draws it together with the repositories named after that host.*
   `KEHIKOT_*`, but so are several only the host reads (`KEHIKOT_FRAME_DB`, `KEHIKOT_SEED_PROJECT`,
   `KEHIKOT_SCAN_PROJECTS`), beside host-only ones spelled `KEHIKKO_*`. There is no visible line
   between the two groups.
-- **`.kehikot/kehikko/`.** Both spellings in one path: the shared folder, then the host's own
-  folder in it — consistent with the rule, and the place it is easiest to mistype.
+- **`.kehikot/host/`, formerly `.kehikot/kehikko/`.** Until 2.2.0 the host's own folder in a
+  project was named after the host program, which put both spellings in one path — consistent with
+  the rule, but it read as if the folder belonged to one canvas when it holds the data of every
+  canvas in the project. Since 2.2.0 it is named for its role: `HOST_FOLDER` (`'host'`),
+  `hostDir`, `hostFile`. `LEGACY_HOST_FOLDER` (`'kehikko'`) names the old one, read as a fallback
+  and never written; a host moves it to the new name when it can.
 - **A module's own hook file.** `template/src/wire/use-kehikot.ts`, and the same file in several
   modules, is the module's wrapper around `useHost` and exports a function called `useKehikot`. It
   is a file in a module, not part of this package's surface, and was left as it is.

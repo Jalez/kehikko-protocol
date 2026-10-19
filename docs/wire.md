@@ -1000,7 +1000,7 @@ lasts.
 - `name` is a label a person can change, and two kehikot in one project may
   share one. Show it; do not compare it.
 - `key` (1.1.0) is the one the host keeps in the project's own
-  `.kehikot/kehikko/kehikot.json`. It survives a rename, a reorder, a re-add
+  `.kehikot/host/kehikot.json` (`.kehikot/kehikko/` before 2.2.0). It survives a rename, a reorder, a re-add
   and a clone, and is unique within the project. Store this. Its spelling is
   `KEHIKKO_KEY`.
 

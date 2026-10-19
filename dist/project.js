@@ -20,6 +20,21 @@ export const KEHIKOT_DIR = '.kehikot';
  */
 export const PROJECT_FILE = 'project.json';
 /**
+ * The host's own folder inside `.kehikot/` (2.2.0): `<projectPath>/.kehikot/host/`, where a host keeps
+ * what it writes for a project (its epics, their state, its record of the canvases, its tracker
+ * sources). Named for its role rather than for the host program, because a kehikko is one canvas
+ * and a folder named after one canvas, holding every canvas's data, read as a mistake. No module
+ * may have a folder of this name: `moduleFolder` refuses an id that would derive it.
+ */
+export const HOST_FOLDER = 'host';
+/**
+ * The host's folder before 2.2.0: `<projectPath>/.kehikot/kehikko/`. A read-only fallback, never
+ * written: a host moves it to `HOST_FOLDER` when it can, and reads it in place when it cannot (a
+ * read-only project), and a module that reads the host's files reads `HOST_FOLDER` first and this
+ * only when the file is not there. `moduleFolder` still derives it, for a host built before 2.2.0.
+ */
+export const LEGACY_HOST_FOLDER = 'kehikko';
+/**
  * What a module may call a file inside its own folder: lowercase, digits and dashes, no dot and no
  * slash, so no accepted spelling can leave the folder. A file name is a constant in the module that
  * owns it, never a string that arrived over the wire.
@@ -56,6 +71,11 @@ export function moduleFolder(moduleId) {
     if (name === PROJECT_FILE) {
         throw new Error(`"${moduleId}" gives the folder name "${name}", which is the host's own file at the top of ${KEHIKOT_DIR}/ `
             + '(the project id), not a folder a module may have.');
+    }
+    /* 2.2.0: the host's own folder is not a module's either. */
+    if (name === HOST_FOLDER) {
+        throw new Error(`"${moduleId}" gives the folder name "${name}", which is the host's own folder in ${KEHIKOT_DIR}/, `
+            + 'not a folder a module may have.');
     }
     return name;
 }
@@ -94,6 +114,43 @@ export function moduleFile(projectPath, moduleId, name) {
     }
     const dir = moduleDir(projectPath, moduleId);
     return dir === null ? null : joined(dir, `${name}.json`);
+}
+/**
+ * What one segment under the host's folder may be called (2.2.0): a file or folder name with no
+ * slash, not `.` or `..`, and nothing a shell or another platform would mangle.
+ */
+const HOST_SEGMENT = /^(?!\.\.?$)[A-Za-z0-9._-]{1,128}$/;
+/**
+ * The host's own folder for a project (2.2.0), `<projectPath>/.kehikot/host`, or `null` when there is
+ * no project (as `kehikotDir`). Where a host reads and writes what it keeps for a project; a module
+ * may read from it and never writes there. Before 2.2.0 it was `.kehikot/kehikko`
+ * (`LEGACY_HOST_FOLDER`), and `hostDir(p, { legacy: true })` names that one, for reading.
+ */
+export function hostDir(projectPath, options = {}) {
+    const dir = kehikotDir(projectPath);
+    return dir === null ? null : joined(dir, options.legacy ? LEGACY_HOST_FOLDER : HOST_FOLDER);
+}
+/**
+ * A path under the host's folder (2.2.0): `hostFile(p, 'epics', 'x.json')` is
+ * `<p>/.kehikot/host/epics/x.json`, or `null` when there is no project. Every segment is checked and
+ * the call throws on one that is empty, `.`, `..` or carries a slash, so no spelling leaves the
+ * folder. With no segments it is `hostDir(p)`. For the pre-2.2.0 spelling, `legacyHostFile`.
+ */
+export function hostFile(projectPath, ...segments) {
+    return underHost(hostDir(projectPath), segments);
+}
+/** `hostFile` under `.kehikot/kehikko/` (`LEGACY_HOST_FOLDER`), for reading what a host before 2.2.0 wrote. */
+export function legacyHostFile(projectPath, ...segments) {
+    return underHost(hostDir(projectPath, { legacy: true }), segments);
+}
+function underHost(dir, segments) {
+    for (const segment of segments) {
+        if (typeof segment !== 'string' || !HOST_SEGMENT.test(segment)) {
+            throw new Error(`"${String(segment)}" is not a name under the host's folder in ${KEHIKOT_DIR}/: one file or folder name, `
+                + 'with no slash, and not "." or "..".');
+        }
+    }
+    return dir === null ? null : segments.reduce(joined, dir);
 }
 /**
  * Is `child` at or beneath `parent`? String comparison only: it knows nothing about symlinks,

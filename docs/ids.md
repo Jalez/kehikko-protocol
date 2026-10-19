@@ -77,7 +77,7 @@ has whatever number that database had free. It is good for exactly one thing —
 `context.kehikko.id` with `event.kehikko.id` inside one running page, to tell near from far.
 
 **`kehikko.key` is what to store.** The host writes it into the project's own
-`.kehikot/kehikko/kehikot.json` beside the kehikko's name, and reads the file back by it, so it
+`.kehikot/host/kehikot.json` (`.kehikot/kehikko/` before 2.2.0) beside the kehikko's name, and reads the file back by it, so it
 is the same wherever and whenever that project is opened. It is unique **within a project** and
 not across projects: two projects may both have a kehikko keyed `writing`. Store it with the
 project — inside `<project>/.kehikot/<module>/`, or keyed by the project as well.

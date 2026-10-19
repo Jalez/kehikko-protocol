@@ -7,6 +7,33 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.2.0 — 2026-10-19
+
+The host's own folder in a project is `.kehikot/host/`, not `.kehikot/kehikko/`. A kehikko is one
+canvas, and a folder named after one canvas holding the data of every canvas in the project read as
+a mistake. **Additive**; `PROTOCOL` is still 2. A host built against 2.1.0 or older keeps writing
+`.kehikot/kehikko/` and runs unchanged.
+
+### Added
+
+- `HOST_FOLDER` (`'host'`) and `LEGACY_HOST_FOLDER` (`'kehikko'`, the pre-2.2 name: read as a
+  fallback, never written).
+- `hostDir(projectPath, { legacy? })` → `<projectPath>/.kehikot/host` (or `.kehikot/kehikko` with
+  `legacy`), `null` with no project.
+- `hostFile(projectPath, ...segments)` and `legacyHostFile(...)`: a path under either folder. Each
+  segment is checked (no slash, not `.` or `..`, at most 128 of `[A-Za-z0-9._-]`); a bad one throws.
+
+### Changed
+
+- `moduleFolder` refuses an id that would derive `host` (`kehikot.host`, `host`), as it refuses
+  `project.json`. It still derives `kehikko`, for older hosts.
+- docs/project-data.md (a section on the host's folder) and docs/naming.md.
+
+### For a module
+
+A module that reads one of the host's files directly reads `hostFile(p, ...)` first and falls back
+to `legacyHostFile(p, ...)` when that is not there.
+
 ## 2.1.0 — 2026-10-19
 
 A stable project identity. Projects were known by their absolute path, so renaming a project's
