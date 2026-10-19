@@ -263,13 +263,6 @@ Bounded in time and in bytes for the reason the host's `fetchManifest` gives:
 whoever is on that port is a stranger, and a reader with no deadline hangs on
 a program that accepts a connection and then says nothing.
 
-#### `identify.first`
-
-The current path first, then the one a module from before the rename
-     serves — but only after a plain "not here", so a module answering the
-     first path is asked once, and a program that answered anything but 404
-     there is judged on what it said.
-
 #### Inside `peek`
 
 A refused connection means nothing is listening — but `free()` has already
@@ -440,13 +433,8 @@ Refused here rather than joined. A filename derived from an id is a PATH
 
 #### `registerAt.earlier`
 
-What this module said last time: under this id, or in the file it had
-     before the rename (`roadmap.x.json`) beside it — with the `keep` a
-     person set. Only read, never written: the older file is left exactly as
-     it is. This, `claim` (which looks there for where the module last moved
-     to) and `neighbourPorts` (which does not count it as a neighbour) are
-     the whole of what this package still reads from before the rename on a
-     person's machine.
+What this module said last time, under this id: the registration with the `keep` a
+     person set.
 
 #### `registerAt.kept`
 

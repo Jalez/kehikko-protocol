@@ -103,7 +103,7 @@ The source says what each field is and what it is bounded by, in a line or three
 | [The manifest](docs/manifest.md) | What a module says about itself at the well-known path: every field of `manifestSchema`, what a module says it reacts to, its tags, and how a protocol range is read. |
 | [Names and ids](docs/ids.md) | The patterns for a module id, a mode id and an epic slug, the one derivation of a slug from prose, and the lookup that does not fall through a prototype. |
 | [Limits](docs/limits.md) | Why every string and every list is bounded, and the reasoning behind each number in `LIMITS`. |
-| [The protocol number, and what is left of the rename from "roadmap"](docs/protocol-number.md) | Why `PROTOCOL` is 2 and what would raise it, and the three places a name from before the rename is still read from disk. |
+| [The protocol number](docs/protocol-number.md) | Why `PROTOCOL` is 2 and what would raise it, and what would raise it. |
 | [Where a module keeps a project's data](docs/project-data.md) | The `.kehikot/` folder inside a project, the folder each module gets in it, and the lines a project's `.gitignore` gains. |
 | [Parts of an epic, focus, and the record of an epic's steps](docs/parts.md) | The parts an epic is divided into, what it means for some of them to be picked out, the one rule for whether a thing is in focus, the files a part owns, and the on-disk record of an epic's steps that parts are read from. |
 | [Trackers](docs/tracker.md) | One reading of GitHub and GitLab shared by every module: the row a host hands back, what is missing and why, refreshing, and how a reference is spelled. |
@@ -118,21 +118,12 @@ The source says what each field is and what it is bounded by, in a line or three
 | [The shared plumbing of a module](docs/module-plumbing.md) | What every module used to type out for itself, behind `/serve`, `/client` and `/client/react`: the page document and its first paint, the write ticket, the JSON body reader, the `doors()` plugin, `ask()`, `useHost`, the one not-ready screen `Cover`, and the build identity. |
 | [Packaging](PACKAGING.md) | How this package is consumed straight from git, and why `dist/` is committed. |
 
-## Once "roadmap", and what is left of it
+## One spelling
 
-This package was `roadmap-module-protocol` until 0.25.0, and every name it put on the wire said
-`roadmap.`. From 0.25.0 to 0.37.0 both spellings were read and the old one was still written to
-a party that needed it. **That is over: there is one spelling, `kehikot.`**, and nothing here
-exports, reads off the wire or writes the old one — no second dialect, no
-`/.well-known/roadmap-module.json`, no `kind: 'roadmap.module'`, no `useRoadmap`.
-
-Three things on a person's disk are still read, never written: a module id stored as
-`roadmap.<name>` (`canonicalModuleId`), the folder that id names (`moduleFolder`), and a
-registration file named `roadmap.<name>.json` beside the one `registerAt` writes. See
-[the protocol number](docs/protocol-number.md).
+Every name this package puts on the wire says `kehikot.`.
 
 Moving a module or a host onto this version from 0.36.0 or 0.37.0:
-[MIGRATING.md](MIGRATING.md) has the before and after for every removal, rename and changed
+[MIGRATING.md](MIGRATING.md) has the before and after for every removal and changed
 answer.
 
 ## Making a new module
@@ -166,6 +157,7 @@ The same list with what each version exported is in [CHANGELOG.md](CHANGELOG.md)
 
 | version | date | what it added |
 |---|---|---|
+| 2.0.0 | 2026-10-19 | Breaking, `PROTOCOL` still 2. Removes `canonicalModuleId`, `ID_PREFIX_BEFORE_RENAME`, `registrationBeforeRename`, the pre-rename id prefix in `moduleFolder` and the reading of pre-rename registration names; adds `takesOver`, and `serves()` no longer takes over a registration that names another existing folder. See [MIGRATING.md](MIGRATING.md). |
 | 1.8.0 | 2026-10-19 | Additive. An `ActivityItem` may carry `project` (an absolute folder) and a host that files by it answers `activity.set` with `projects: true`, so a module reports every project's things from one page; the client sends only the open project's share to a host that has not said so. See [activity](docs/activity.md#across-projects-180). |
 | 1.7.0 | 2026-10-16 | Additive. `activity.set` becomes the one way to report attention, progress and one-off notices: an `ActivityItem` may carry `priority` (`urgent`/`normal`/`low`), `refs` (at most `LIMITS.ACTIVITY_REFS` = 16) and `group` (at most `LIMITS.ACTIVITY_GROUP` = 64). `kehikot.notifications@1` is legacy for notices. A 1.6.0 host strips the new fields. See [activity](docs/activity.md). |
 | 1.6.0 | 2026-10-16 | Additive. A `run` header item may be `pinned: true`: the host draws it as an icon button in the container header (at most `LIMITS.PINNED_MAX` = 4), beside the menus; `HEADER_ICONS`, `pinnedRuns`. A 1.5.0 host strips it and keeps the item in the menu. See [the header](docs/header.md). |
@@ -175,8 +167,8 @@ The same list with what each version exported is in [CHANGELOG.md](CHANGELOG.md)
 | 1.2.0 | 2026-10-12 | Additive. Parts belong to the epic and name no module: `parts.json` per module (`readHoldings`, `writeHoldings` in `/serve`), project-relative `documents` on a part, the `{ whole: true }` anchor, `parts.set` and `partsSetResult`, `listedPartSchema`, `partIdFor`, `partsFor`, `emptySaid` and `narrow().empty`, `LIMITS.PARTS` 32 → 128. Deprecates `files`, `paperFileOf`, `PAPER_MODULE`, `focusSentence`, `FOCUS_WHERE`, `partsOf` and Journeys as where parts are. See [parts](docs/parts.md). |
 | 1.1.1 | 2026-10-12 | What a door requires of a request: it answers its own page and a program on this computer (`asker`, `admits`), a body has to be `application/json`, `serves()` sets `server.cors: false`, and a page answers a greeting only from an origin it may be framed by (`mayGreet`, the `origins` island). See [module plumbing](docs/module-plumbing.md). |
 | 1.1.0 | 2026-10-12 | Additive. The header: `kehikot.header`, `kehikot.press`, `kehikot.pressed`, `useHost().header()`, `onPress`. A module's door: the manifest's `mcp.subjects`, the show and done answers, `doorContext` (`project`, `epic`), `toolEffect`, `kehikot-check-door`, `readNeighbour` / `listTools` in `/serve`. `view.fold` and `containers[].folded`. See [asking](docs/asking.md) and [the header](docs/header.md). |
-| 1.0.0 | 2026-10-10 | The breaking release: removes everything 0.37.0 deprecated (the `roadmap` dialect, `LEGACY_*`, `useKehikot`/`useRoadmap`, the `ROADMAP_*` variables), makes the parts declaration a refusal, renames the bins to `kehikot-*`. See [MIGRATING.md](MIGRATING.md). |
-| 0.37.0 | 2026-10-10 | Deprecations only, nothing removed: everything named after "roadmap" (the second dialect, `LEGACY_*`, `legacyManifest`, `toDialect`, `useRoadmap`, `ROADMAP_*`), the old `useKehikot`, and the `kehikko-*` bin names (now also `kehikot-*`). See [CHANGELOG.md](CHANGELOG.md). |
+| 1.0.0 | 2026-10-10 | The breaking release: removes everything 0.37.0 deprecated (the second dialect, `LEGACY_*`, `useKehikot`), makes the parts declaration a refusal, renames the bins to `kehikot-*`. See [MIGRATING.md](MIGRATING.md). |
+| 0.37.0 | 2026-10-10 | Deprecations only, nothing removed: the second dialect (`LEGACY_*`, `legacyManifest`, `toDialect`), the old `useKehikot`, and the `kehikko-*` bin names (now also `kehikot-*`). See [CHANGELOG.md](CHANGELOG.md). |
 | 0.36.0 | 2026-10-09 | The plumbing's gaps, closed: `held` (unsaved work across a reload), `hostStore` (the host outside React), `doorsFetch` and `fillPage` (a `Bun.serve` module and its built page), `replied`, `probeServer`, `ask`'s `ticket`/`keepalive`/repeated `query`, `follow`'s `events`/`probe`, `coverFor`'s `host` and `server`. See [module plumbing](docs/module-plumbing.md). |
 | 0.35.0 | 2026-10-09 | The shared plumbing of a module: `pageDocument`, `mintTicket`/`refuseTicket`, `readJsonBody`, the `doors()` plugin, `ask`/`follow`, `useHost`, `Cover`/`coverFor`, and a build identity (`establishBuild`, `compareBuilds`, the manifest's and `ready`'s optional `build`, `PACKAGE_VERSION`). See [module plumbing](docs/module-plumbing.md). |
 | 0.34.1 | 2026-10-09 | `focusSentence(…, { total })` and `useFocus().narrow(…, { total: true })`: the sentence may say how many of how many. |
@@ -189,7 +181,7 @@ The same list with what each version exported is in [CHANGELOG.md](CHANGELOG.md)
 | 0.28.0 | 2026-10-07 | Tags: a manifest's `tags`, and the suggested vocabulary `TAGS`. See [the manifest](docs/manifest.md). |
 | 0.27.0 | 2026-10-06 | Content changes: `context.content`, the `content` reaction, `content.changed`, `contentStamp`. See [content](docs/content.md). |
 | 0.26.0 | 2026-10-05 | `dataVersion`: the format a module's project data is in, apart from `version`. |
-| 0.25.0 | 2026-10-05 | Renamed to `kehikot-module-protocol`; every name on the wire says `kehikot.` and both spellings are read. See the section above and [the protocol number](docs/protocol-number.md). |
+| 0.25.0 | 2026-10-05 | Every name on the wire says `kehikot.`. See the section above and [the protocol number](docs/protocol-number.md). |
 
 ## Development
 

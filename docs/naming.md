@@ -2,8 +2,7 @@
 
 > **Confirmed by the owner (2026-10-10).** `kehikot` is the shared namespace — the product, the
 > package, the wire, ids, the `.kehikot/` folder; `kehikko` is one canvas, and the host and the
-> repositories named after it; `roadmap` is the retired prototype's name, and since the breaking release
-> after 0.37 this package neither exports nor writes it. The exceptions below are
+> repositories named after it. The exceptions below are
 > listed rather than fixed, except where a line says otherwise.
 
 *Kehikko* is Finnish for a frame; *kehikot* is the plural.
@@ -55,10 +54,6 @@ host that draws it together with the repositories named after that host.*
   between the two groups.
 - **`.kehikot/kehikko/`.** Both spellings in one path: the shared folder, then the host's own
   folder in it — consistent with the rule, and the place it is easiest to mistype.
-- **The legacy names are neither, and are gone from this package.** The old product name is not
-  exported, read off the wire or written. Three readings of what is already on a disk remain
-  (`canonicalModuleId`, `moduleFolder`, a `roadmap.<name>.json` registration) — see
-  [protocol-number.md](protocol-number.md).
 - **A module's own hook file.** `template/src/wire/use-kehikot.ts`, and the same file in several
   modules, is the module's wrapper around `useHost` and exports a function called `useKehikot`. It
   is a file in a module, not part of this package's surface, and was left as it is.

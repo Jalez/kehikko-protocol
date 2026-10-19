@@ -1,11 +1,32 @@
 # Changelog
 
-One entry per version, newest first, from 0.25.0 — the rename — onward. Reconstructed from the
+One entry per version, newest first, from 0.25.0 onward. Reconstructed from the
 commit history; the date is the date of the commit that set the version. `PROTOCOL` is 2 in every
 version listed: each one added something a module may ignore.
 
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
+
+## 2.0.0 — 2026-10-19
+
+The breaking release that drops the names from before the app was called Kehikot, and stops
+`serves()` taking over another folder's registration. `PROTOCOL` is still 2: no wire message
+changed.
+
+### Breaking
+
+- Removed `canonicalModuleId` and `ID_PREFIX_BEFORE_RENAME`: ids are always `kehikot.<name>`.
+- `moduleFolder` no longer strips a pre-rename id prefix.
+- Removed `registrationBeforeRename`; `registerAt`, `claim` and `neighbourPorts` no longer read
+  registration files under pre-rename names.
+- `serves()` no longer takes over a registration that names another existing folder: a worktree or
+  clone answers, but is not registered. `bun run register` is the deliberate way to point the
+  registration there.
+
+### Added
+
+- `takesOver(id, dir, where?)` (`/serve`): `{ ok: true }`, or `{ ok: false, held }` when `id` is
+  registered to another folder that still exists.
 
 ## 1.8.0 — 2026-10-19
 
@@ -379,23 +400,14 @@ meaning, so a module and a host can move in either order.
 
 ### Removed
 
-- The pre-rename dialect, whole: `roadmap.*` message types are not read, `kind: 'roadmap.module'`
-  is not a manifest, `/.well-known/roadmap-module.json` is not answered or asked, and `connect()`
-  answers `kehikot.` only. `LEGACY_WELL_KNOWN`, `LEGACY_MANIFEST_KIND`, `LEGACY_MESSAGE_PREFIX`,
+- `connect()` answers `kehikot.` only. `LEGACY_WELL_KNOWN`, `LEGACY_MANIFEST_KIND`, `LEGACY_MESSAGE_PREFIX`,
   `MESSAGE_PREFIXES`, `legacyManifest`, `Dialect`, `DIALECTS`, `toDialect`, `canonicalMessage`,
   `dialectOfType`, `dialectOfKind`, `nameIn`, `legacyName`, `legacyModuleId`, `canonicalName`,
   `canonicalExtension`. No schema respells an id or an extension name.
-- `useKehikot`, `Kehikot`, `UseKehikotOptions`, and `useRoadmap`, `Roadmap`, `UseRoadmapOptions`
-  (`/client/react`). `useHost` is the hook.
+- `useKehikot`, `Kehikot`, `UseKehikotOptions` (`/client/react`). `useHost` is the hook.
 - `legacyRegistryDir`.
 - The bin names `kehikko-create` and `kehikko-check-parts`; they are `kehikot-create` and
   `kehikot-check-parts`.
-
-### Still read from before the rename — on disk, never written
-
-`canonicalModuleId('roadmap.x')` (kept, now in `ids.ts`), `moduleFolder('roadmap.x')`, and a
-`roadmap.<name>.json` registration beside the one `registerAt` writes. See
-[docs/protocol-number.md](docs/protocol-number.md).
 
 ### Changed
 
@@ -439,19 +451,9 @@ a 0.36.0 call does has changed.** Everything the next breaking release removes i
 | deprecated | use instead |
 |---|---|
 | `useKehikot`, `Kehikot`, `UseKehikotOptions` (`/client/react`) | `useHost`, `Host`, `UseHostOptions` — or `hostStore` outside React |
-| `useRoadmap`, `Roadmap`, `UseRoadmapOptions` (`/client/react`) | the same |
-| `LEGACY_WELL_KNOWN`, `legacyManifest`, and the manifest served at `/.well-known/roadmap-module.json` | `WELL_KNOWN`; a manifest is served there only |
-| `LEGACY_MANIFEST_KIND`, and `kind: 'roadmap.module'` read by `manifestSchema` and `readManifest` | `MANIFEST_KIND` |
-| `LEGACY_MESSAGE_PREFIX`, `MESSAGE_PREFIXES`, and `roadmap.*` message types read by every schema | `MESSAGE_PREFIX`, `MESSAGE.*` |
-| `Dialect`, `DIALECTS`, `toDialect`, `canonicalMessage`, `dialectOfType`, `dialectOfKind`, `nameIn`, `legacyName`, `legacyModuleId` | nothing: there is one spelling. Post a message as it is built |
-| `canonicalName`, `canonicalExtension` | `canonicalModuleId` for a module id read from disk; compare an extension name as written |
-| `connect()` answering in the dialect it was greeted in | nothing: it answers `kehikot.` |
+| `canonicalName`, `canonicalExtension` | compare an extension name as written |
 | `legacyRegistryDir` (`/serve`) | nothing |
 | the bins `kehikko-create`, `kehikko-check-parts` | `kehikot-create`, `kehikot-check-parts` (both names work in 0.37) |
-
-What is **not** deprecated, although it reads a pre-rename spelling: `canonicalModuleId` and
-`moduleFolder('roadmap.x')` (ids written to disk before the rename), and `registerAt` reading a
-`roadmap.<name>.json` registration beside the one it writes.
 
 Still a warning in 0.37, a refusal in the next breaking release: a manifest that neither says
 `reacts: ['parts']` nor gives `partless` a sentence (`partsDeclaration`).
@@ -464,11 +466,10 @@ gains members.
 
 ### Said at runtime, once, in development only
 
-Two paths say so on `console.warn` the first time they are exercised — never per message, and
+One path says so on `console.warn` the first time it is exercised — never per message, and
 never when `NODE_ENV` is `production` or `test`, so no suite reads differently:
 
-- `useKehikot` (and `useRoadmap`) being called;
-- `connect()` being greeted with `roadmap.hello`.
+- `useKehikot` being called.
 
 ### Added
 
@@ -616,13 +617,11 @@ absent meaning 1, bounded by `LIMITS.DATA_VERSION`.
 
 ## 0.25.0 — 2026-10-05
 
-Renamed from `roadmap-module-protocol` to `kehikot-module-protocol`. Every name on the wire says
-`kehikot.` — message types, `MANIFEST_KIND`, `WELL_KNOWN`, extension names, module ids — and every
-schema reads both spellings and hands back the new one. `toDialect`, `legacyManifest`,
-`LEGACY_WELL_KNOWN`; `connect()` answers in the dialect it was greeted in.
+Every name on the wire says `kehikot.` — message types, `MANIFEST_KIND`, `WELL_KNOWN`, extension
+names, module ids.
 
 ## Before 0.25.0
 
-Under the old name. 0.24.0 (2026-10-05) added the shared tracker reading; 0.23.0 (2026-10-05)
+0.24.0 (2026-10-05) added the shared tracker reading; 0.23.0 (2026-10-05)
 toggles filter groups, the shared ref facets and dispositions; 0.22.0 (2026-10-01) the module
 template and `create`. Earlier history is in `git log`.

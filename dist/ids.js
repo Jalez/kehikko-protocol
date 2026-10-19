@@ -11,21 +11,6 @@ import { LIMITS } from './limits.js';
  */
 export const MODULE_ID = /^[a-z0-9][a-z0-9.-]{1,62}[a-z0-9]$/;
 /**
- * The prefix a module id carried before the app was renamed (0.25.0). Not a name anything is
- * written under: it is here so an id that was written to DISK then can still be read.
- */
-export const ID_PREFIX_BEFORE_RENAME = 'roadmap.';
-const ID_PREFIX = 'kehikot.';
-/**
- * A module id as it is spelled now, whichever spelling it was stored in: `roadmap.journeys`, as a
- * project's `.kehikot/` files or a registration's file name may still say, is `kehikot.journeys`.
- * Anything else is returned unchanged. For ids read from DISK only — nothing on the wire says
- * `roadmap.` any more, and no schema here applies this.
- */
-export function canonicalModuleId(id) {
-    return id.startsWith(ID_PREFIX_BEFORE_RENAME) ? ID_PREFIX + id.slice(ID_PREFIX_BEFORE_RENAME.length) : id;
-}
-/**
  * A kehikko's key: the identity of one canvas that outlives the host's database. Two to 32
  * characters of lowercase letters, digits and dashes, neither end a dash; a host generates eight
  * hex characters and a person may write a word. Unique within a project, not across projects. It

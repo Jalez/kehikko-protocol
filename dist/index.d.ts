@@ -8,7 +8,7 @@
  */
 export { PROTOCOL, WELL_KNOWN, MANIFEST_KIND, MESSAGE, MESSAGE_PREFIX, HOST_MESSAGES, MODULE_MESSAGES, MIN_HEIGHT, MAX_HEIGHT, REFRESH_EVERY_MIN, REFRESH_EVERY_MAX, clampHeight, type MessageType, } from './constants.js';
 export { LIMITS } from './limits.js';
-export { MODULE_ID, MODE_ID, EPIC_SLUG, KEHIKKO_KEY, canonicalModuleId, own, slugFrom } from './ids.js';
+export { MODULE_ID, MODE_ID, EPIC_SLUG, KEHIKKO_KEY, own, slugFrom } from './ids.js';
 export { KEHIKOT_DIR, DATA_FILE, MODULE_FOLDER, KEHIKOT_IGNORE, moduleFolder, kehikotDir, moduleDir, moduleFile, within, ignoresKehikot, withKehikotIgnored, withoutKehikotIgnored, } from './project.js';
 export { DOOR_NAME, manifestSchema, speaks, partsDeclaration, MODULE_CONDITIONS, REACTS_TO, REACTION_NAMES, TAGS, TAG_NAMES, type Reaction, type Tag, type Manifest, type ManifestInput, type ModuleMode, type ModuleSubject, type ModuleCondition, } from './manifest.js';
 export { DOOR_ARGUMENTS, DOOR_ARGUMENTS_BEFORE, doorContext, SHOW_OUTCOMES, showAnswerSchema, SHOW_OUTPUT_SCHEMA, DONE_STATES, doneItemSchema, doneAnswerSchema, doneAnswer, DONE_OUTPUT_SCHEMA, doorToolSchema, toolEffect, TOOL_EFFECTS, type DoorArgument, type ShowOutcome, type ShowAnswer, type DoneState, type DoneItem, type DoneAnswer, type DoorTool, type ToolEffect, } from './door.js';

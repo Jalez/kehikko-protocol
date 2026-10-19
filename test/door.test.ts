@@ -279,7 +279,6 @@ describe('reading another module', () => {
   test('every registered module, in id order, leaving out the one asking', async () => {
     const where = registry({
       'kehikot.slides.json': { url: 'http://127.0.0.1:9510' },
-      'roadmap.slides.json': { url: 'http://127.0.0.1:9510' },
       'kehikot.learning.json': { url: 'http://127.0.0.1:9512' },
       'kehikot.screenplay.json': { url: 'http://127.0.0.1:9513' },
       'notes.txt': 'not a registration',

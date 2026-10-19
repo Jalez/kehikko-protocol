@@ -5,10 +5,10 @@ import { z } from 'zod'
 
 import { WELL_KNOWN } from '../constants.js'
 import { doorToolSchema, type DoorTool } from '../door.js'
-import { MODULE_ID, canonicalModuleId } from '../ids.js'
+import { MODULE_ID } from '../ids.js'
 import { LIMITS } from '../limits.js'
 import { manifestSchema, type Manifest } from '../manifest.js'
-import { readRegistration, registrationBeforeRename, registryDir } from './registry.js'
+import { readRegistration, registryDir } from './registry.js'
 
 /**
  * Another module, as this one can learn of it: where the registry says it answers, and what its
@@ -66,8 +66,7 @@ async function get(url: string, init: RequestInit, options: NeighbourOptions): P
 export async function readNeighbour(id: string, options: NeighbourOptions = {}): Promise<Neighbour> {
   if (!MODULE_ID.test(id)) return { found: false, id, why: 'unregistered', sentence: `"${id.slice(0, 80)}" is not a module id.` }
   const where = options.registry ?? registryDir()
-  const before = registrationBeforeRename(id)
-  const registration = readRegistration(join(where, `${id}.json`)) ?? (before ? readRegistration(join(where, before)) : null)
+  const registration = readRegistration(join(where, `${id}.json`))
   if (!registration) return { found: false, id, why: 'unregistered', sentence: `${id} is not registered on this computer.` }
 
   let origin: string
@@ -94,7 +93,7 @@ export async function readNeighbour(id: string, options: NeighbourOptions = {}):
     return { found: false, id, why: 'unreadable', sentence: `${origin} did not answer with a manifest.` }
   }
   if (!parsed.success) return { found: false, id, why: 'unreadable', sentence: `${origin} answered with a manifest this version of the protocol cannot read.` }
-  if (canonicalModuleId(parsed.data.id) !== canonicalModuleId(id)) {
+  if (parsed.data.id !== id) {
     return { found: false, id, why: 'unreadable', sentence: `${origin} is ${parsed.data.id}, not ${id}.` }
   }
   return { found: true, id, origin, manifest: parsed.data, door: doorOf(parsed.data, origin) }
@@ -123,8 +122,8 @@ export async function readNeighbours(options: NeighbourOptions & { except?: stri
   const ids = new Set<string>()
   for (const name of names) {
     if (!name.endsWith('.json')) continue
-    const id = canonicalModuleId(name.slice(0, -'.json'.length))
-    if (MODULE_ID.test(id) && id !== (options.except ? canonicalModuleId(options.except) : null)) ids.add(id)
+    const id = name.slice(0, -'.json'.length)
+    if (MODULE_ID.test(id) && id !== (options.except ?? null)) ids.add(id)
   }
   return Promise.all([...ids].sort().map((id) => readNeighbour(id, options)))
 }

@@ -6,7 +6,7 @@
  */
 
 import { MESSAGE_PREFIX } from './constants.js'
-import { ID_PREFIX_BEFORE_RENAME, MODULE_ID } from './ids.js'
+import { MODULE_ID } from './ids.js'
 
 /**
  * The folder in a project that holds the app's data, spelled once; this is the only place it is
@@ -34,8 +34,8 @@ function joined(left: string, right: string): string {
 }
 
 /**
- * A module's folder name, from its id: `kehikot.checklist` and the pre-rename `roadmap.checklist`
- * both become `checklist`; an id with neither prefix is used whole. Throws, rather than falling
+ * A module's folder name, from its id: `kehikot.checklist` becomes `checklist`; an id without that
+ * prefix is used whole. Throws, rather than falling
  * back, when the id is not a `MODULE_ID` or the derived name is not a `MODULE_FOLDER`.
  */
 export function moduleFolder(moduleId: string): string {
@@ -46,9 +46,7 @@ export function moduleFolder(moduleId: string): string {
         + 'from data — it is checked rather than trusted.',
     )
   }
-  /* The pre-rename prefix is taken off too: an id stored before 0.25.0 names the same folder. */
-  const prefix = [MESSAGE_PREFIX, ID_PREFIX_BEFORE_RENAME].find((p) => moduleId.startsWith(p))
-  const name = prefix ? moduleId.slice(prefix.length) : moduleId
+  const name = moduleId.startsWith(MESSAGE_PREFIX) ? moduleId.slice(MESSAGE_PREFIX.length) : moduleId
   if (!MODULE_FOLDER.test(name)) {
     throw new Error(
       `"${moduleId}" gives the folder name "${name}", which is not one this package will join onto somebody's `

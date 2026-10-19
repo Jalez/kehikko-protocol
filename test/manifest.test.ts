@@ -162,11 +162,11 @@ describe('the data version', () => {
 
 describe('ids', () => {
   test.each([
-    'Roadmap.Checklist',
-    'roadmap checklist',
-    'roadmap/checklist',
-    '-roadmap',
-    'roadmap-',
+    'Notes.Checklist',
+    'notes checklist',
+    'notes/checklist',
+    '-notes',
+    'notes-',
     'a',
     /* Two characters is not one either: the pattern is a first, a last, and at
        least one in between, so three is the floor. Worth a case rather than a

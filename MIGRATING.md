@@ -1,3 +1,16 @@
+# Migrating to 2.0.0
+
+`PROTOCOL` is still 2: no wire message changed. Module ids are always `kehikot.<name>`; nothing
+respells an id any more.
+
+- Replace every `canonicalModuleId(x)` with `x`, and drop `ID_PREFIX_BEFORE_RENAME` and
+  `registrationBeforeRename` where they were used.
+- `moduleFolder(id)` strips `kehikot.` only; an id with any other prefix is its own folder name.
+- Registration files are read under `kehikot.<name>.json` only.
+- `serves()` no longer overwrites a registration that names another folder which still exists. A
+  worktree or clone answers on its port but is not registered; run `bun run register` there when
+  that is what you want. `takesOver(id, dir)` (`/serve`) tells you which case you are in.
+
 # Migrating from 0.36 / 0.37 to 1.0.0
 
 Everything that was removed, renamed, or answers differently — before → after. 0.37.0 marked each
@@ -6,34 +19,25 @@ changed meaning, so a module and a host can move in either order, and a module o
 still framed by a host on this version (and the other way round) **provided its manifest says how
 it relates to parts** (section 2).
 
-## 1. Removed: everything named "roadmap", and the old hook
+## 1. Removed: the second dialect, and the old hook
 
 | before | after |
 |---|---|
 | `useKehikot(id, events, options)` (`/client/react`) | `useHost(id, events, options)` — `host.context` is still the whole context; `host.state` (a string) is `host.kept` through a codec (`options.kept`, JSON by default); `onClear` / `onRefresh` now arrive |
 | `Kehikot`, `UseKehikotOptions` | `Host`, `UseHostOptions` |
-| `useRoadmap`, `Roadmap`, `UseRoadmapOptions` | the same three |
-| `LEGACY_WELL_KNOWN` | `WELL_KNOWN`. `doors()` no longer answers `/.well-known/roadmap-module.json`; a host asks one path |
+| `LEGACY_WELL_KNOWN` | `WELL_KNOWN`. `doors()` answers one path, and a host asks one path |
 | `legacyManifest(manifest)` | nothing: serve the manifest as it is |
-| `LEGACY_MANIFEST_KIND`, `kind: 'roadmap.module'` | `MANIFEST_KIND`. `manifestSchema` and `readManifest` refuse the old word |
-| `LEGACY_MESSAGE_PREFIX`, `MESSAGE_PREFIXES` | `MESSAGE_PREFIX`. Code that needs the literal for its OWN stored data (a host's database migration) writes `'roadmap.'` itself |
+| `LEGACY_MANIFEST_KIND` | `MANIFEST_KIND`. `manifestSchema` and `readManifest` accept that kind only |
+| `LEGACY_MESSAGE_PREFIX`, `MESSAGE_PREFIXES` | `MESSAGE_PREFIX`. |
 | `Dialect`, `DIALECTS`, `dialectOfKind`, `dialectOfType` | nothing: there is one spelling. Delete the branch |
 | `toDialect(message, dialect)`, `canonicalMessage(message)` | post `message` as built; parse it as received |
 | `nameIn`, `legacyName`, `legacyModuleId` | nothing |
-| `canonicalName(name)` | `canonicalModuleId(id)` when it is a module id read from disk; otherwise nothing |
+| `canonicalName(name)` | nothing: compare a name as written |
 | `canonicalExtension(name) === FORMAT` | `name === FORMAT` |
-| `roadmap.*` message types, read by every schema | not read: `looksLikeWireMessage` drops them |
-| ids and extension names respelled by the schemas (`manifest.id`, `ready.id`, `event.from`, `event.extension`, `containers[].module`, `content[].source`, `events.emit`'s `extension`) | carried as written. A host that reads `roadmap.x` back from its own files calls `canonicalModuleId` itself |
-| `known('roadmap.notifications@1')`, `schemaFor(…)` | exact names only |
-| `connect()` answering `roadmap.ready` to `roadmap.hello` | it answers `kehikot.` and does not hear `roadmap.hello` at all |
+| ids and extension names respelled by the schemas (`manifest.id`, `ready.id`, `event.from`, `event.extension`, `containers[].module`, `content[].source`, `events.emit`'s `extension`) | carried as written. |
+| `known(name)`, `schemaFor(…)` | exact names only |
+| `connect()` answering in the dialect it was greeted in | it answers `kehikot.` only |
 | the bins `kehikko-create`, `kehikko-check-parts` | `kehikot-create`, `kehikot-check-parts` |
-
-Still read, on purpose, and never written — these are formats on a person's disk:
-
-- `canonicalModuleId('roadmap.x')` is `kehikot.x` (now exported from `ids.ts`; the import is unchanged).
-- `moduleFolder('roadmap.x')` is `x`, the same folder as `kehikot.x`.
-- `registerAt`, `claim` and `neighbourPorts` read a `roadmap.<name>.json` registration that sits
-  beside `kehikot.<name>.json` in the registry, so a `keep: true` somebody set is carried over.
 
 ## 2. The parts declaration is a refusal
 

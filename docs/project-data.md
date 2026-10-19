@@ -49,9 +49,8 @@ that are the whole of what the extra level buys:
   of what "transparent, and usable by others in the project" actually buys
   somebody. `rm -r .kehikot/notes` is a sentence.
 
-The folder's name is `moduleFolder(id)`: the module's id with `kehikot.` (or
-the pre-rename `roadmap.`) taken off — so `roadmap.notes` and `kehikot.notes`
-both keep their data in `.kehikot/notes` and the rename moves nothing — because a directory called `kehikot.checklist` in somebody's own
+The folder's name is `moduleFolder(id)`: the module's id with `kehikot.` taken off — so `kehikot.notes`
+keeps its data in `.kehikot/notes` — because a directory called `kehikot.checklist` in somebody's own
 repository carries a prefix that means nothing to the person reading it. That
 derivation is a PATH BUILT FROM DATA — the id came off a manifest on a port —
 so it is checked against a rule of its own and throws rather than falling back.
@@ -108,7 +107,7 @@ it.
 ##### What the convention is
 
 `<projectPath>/.kehikot/<module>/<file>.json`, where `<module>` is the
-module's own id with the `kehikot.` prefix (or the old `roadmap.` one) taken off.
+module's own id with the `kehikot.` prefix taken off.
 
     <projectPath>/.kehikot/
         checklist/checklists.json
@@ -203,13 +202,6 @@ program they belong to inside a folder already named after that program. An id
 with no such prefix is used whole — `something.else` stays `something.else` —
 because this package does not get to decide that somebody else's namespace is
 noise.
-
-##### Both spellings give the same folder, and that is the migration
-
-`roadmap.checklist` — the id from before the app was renamed — ALSO becomes
-`checklist`. The folder is named after the bare name, never after the
-prefix, so a module renamed from `roadmap.x` to `kehikot.x` reads the very
-folder it wrote yesterday. No data moves and none is orphaned.
 
 ##### Why it throws rather than falling back
 

@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "roadmap-module-protocol",
+      "name": "kehikot-module-protocol",
       "devDependencies": {
         "@happy-dom/global-registrator": "^20.12.0",
         "@types/bun": "latest",

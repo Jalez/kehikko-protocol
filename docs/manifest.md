@@ -332,8 +332,7 @@ The word that makes this a claim rather than a hopeful GET. Something else
 entirely may be listening on the port a host asked, and it must not be
 possible for that something to become a tab by accident.
 
-One spelling. `roadmap.module`, the word before the rename, was read until the
-breaking release after 0.37 and is not a manifest now.
+One spelling: `kehikot.module`.
 
 #### `manifestSchema.version`
 

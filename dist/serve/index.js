@@ -9,7 +9,7 @@ export { claim, free, identify, originFor, readManifest, sayClaim, search, verdi
 export { DEFAULT_FRAME_ORIGINS, frameAncestors, frameOrigins } from './origins.js';
 /* Whether a folder is a project the host holds: a module's server asks before it reads one. */
 export { hostHasProject, hostIsProjectUrls, IS_PROJECT_PATH, isProjectResult } from './host.js';
-export { neighbourPorts, portOf, readRegistration, registerAt, registryDir, } from './registry.js';
+export { neighbourPorts, portOf, readRegistration, registerAt, takesOver, registryDir, } from './registry.js';
 export { preferred, serves, } from './plugin.js';
 /* Another module, as this one can learn of it: its manifest and the tools at its door. */
 export { doorOf, listTools, readNeighbour, readNeighbours, NEIGHBOUR_TIMEOUT_MS, } from './neighbours.js';

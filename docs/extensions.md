@@ -131,8 +131,7 @@ unvalidated is one a future consumer has to distrust.
 
 A name this version of the protocol can check, which is the only kind worth accepting.
 
-Exact: the name as `EXTENSIONS` spells it. The pre-rename spelling
-(`roadmap.notifications@1`) is not known.
+Exact: the name as `EXTENSIONS` spells it.
 
 #### `schemaFor`
 

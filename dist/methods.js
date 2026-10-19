@@ -336,7 +336,6 @@ export const methodParams = {
      */
     'activity.set': z.object({ items: activityItemsSchema }),
     'events.emit': z.object({
-        /* Canonical once parsed, whichever spelling the module used. See `dialect.ts`. */
         extension: z.string().min(1).max(LIMITS.EXTENSION),
         /**
          * Unknown here, and checked against the named extension's own schema by whoever routes it; see

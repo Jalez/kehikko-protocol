@@ -244,10 +244,8 @@ from anything else that has a handle on it. The type check is what tells a
 
 A message type: the one literal, in the one spelling.
 
-Until the breaking release after 0.37 every schema read two spellings of its `type` — `kehikot.`
-and the pre-rename `roadmap.` — and handed back the first. There is one now. A message that
-says `roadmap.hello` is not a wire message: `looksLikeWireMessage` drops it and no schema reads
-it.
+One spelling of `type`: `kehikot.`. A message with any other prefix is not a wire message:
+`looksLikeWireMessage` drops it and no schema reads it.
 
 #### `helloSchema`
 

@@ -16,7 +16,7 @@ import { useHost } from 'kehikot-module-protocol/client/react'   // optional aga
 ```
 
 Twelve modules wrote the same `postMessage` handshake by hand — 7,519 lines of
-`mailbox.ts`, `host.ts` and `use-roadmap.ts` (now `use-kehikot.ts`) between them — and two bugs turned
+`mailbox.ts`, `host.ts` and `use-kehikot.ts` between them — and two bugs turned
 up in several of those copies INDEPENDENTLY, months apart:
 
 - **The replayed greeting nobody was there for.** The host greets on the frame's
@@ -874,6 +874,6 @@ the handlers. It is a thin binding over `hostStore` (`host-store.ts`), which kee
 orderings above — the connection stored before it listens, the handlers read when a message
 arrives, a stopped store's answer never overwriting the live one — outside React.
 
-The first hook, `useKehikot` (once `useRoadmap`), was deprecated in 0.37 and is gone: it
+The first hook, `useKehikot`, was deprecated in 0.37 and is gone: it
 returned the raw context and a `state` string, and never delivered `onClear` or `onRefresh`.
 [MIGRATING.md](../MIGRATING.md) has the before and after.

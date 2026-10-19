@@ -552,23 +552,8 @@ describe('what is still read from before the rename, and what is not', () => {
     expect(registryDir({ KEHIKOT_MODULES_DIR: '/m' })).toBe('/m')
   })
 
-  test('a registration left under the old file name is read — its keep carried over — and left as it is', () => {
-    withRegistry((where) => {
-      const old = join(where, 'roadmap.example.json')
-      const said = JSON.stringify({ url: 'http://127.0.0.1:7960', dir: '/Users/x/one', keep: true })
-      writeFileSync(old, said)
-      const written = registerAt({ id: ID_, origin: 'http://127.0.0.1:7961', dir: '/Users/x/one' })
-      expect(written.file).toBe(join(where, 'kehikot.example.json'))
-      expect(written.was).toEqual({ url: 'http://127.0.0.1:7960', dir: '/Users/x/one' })
-      expect((JSON.parse(readFileSync(written.file, 'utf8')) as { keep?: boolean }).keep).toBe(true)
-      expect(readFileSync(old, 'utf8')).toBe(said)
-      /* And its port is this module's own, not a neighbour's. */
-      expect(neighbourPorts(ID_, where)).toEqual(new Set())
-    })
-  })
-
-  test('a document that calls itself by the old word is a stranger', () => {
+  test('a document that calls itself by a foreign kind is a stranger', () => {
     expect(readManifest(JSON.stringify({ kind: 'kehikot.module', id: ID_ }))).toEqual({ at: 'module', id: ID_ })
-    expect(readManifest(JSON.stringify({ kind: 'roadmap.module', id: 'roadmap.example' })).at).toBe('stranger')
+    expect(readManifest(JSON.stringify({ kind: 'other.module', id: 'other.example' })).at).toBe('stranger')
   })
 })

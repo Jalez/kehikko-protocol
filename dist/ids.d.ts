@@ -10,18 +10,6 @@
  */
 export declare const MODULE_ID: RegExp;
 /**
- * The prefix a module id carried before the app was renamed (0.25.0). Not a name anything is
- * written under: it is here so an id that was written to DISK then can still be read.
- */
-export declare const ID_PREFIX_BEFORE_RENAME = "roadmap.";
-/**
- * A module id as it is spelled now, whichever spelling it was stored in: `roadmap.journeys`, as a
- * project's `.kehikot/` files or a registration's file name may still say, is `kehikot.journeys`.
- * Anything else is returned unchanged. For ids read from DISK only — nothing on the wire says
- * `roadmap.` any more, and no schema here applies this.
- */
-export declare function canonicalModuleId(id: string): string;
-/**
  * A kehikko's key: the identity of one canvas that outlives the host's database. Two to 32
  * characters of lowercase letters, digits and dashes, neither end a dash; a host generates eight
  * hex characters and a person may write a word. Unique within a project, not across projects. It
