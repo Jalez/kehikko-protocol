@@ -14,10 +14,12 @@ Back to the [index](README.md).
 `<projectPath>/.kehikot/notes/notes.json`, and that is the whole convention:
 one folder for the app, one folder per module inside it, and the module's own
 files in there — with ONE exception, `project.json` at the top, which is the
-host's (2.1.0; [below](#the-projects-id-projectjson-210)).
+host's (2.1.0; [below](#the-projects-id-projectjson-210)), and the host's own
+folder, `host/` (2.2.0; [below](#the-hosts-folder-host-220)).
 
     <projectPath>/.kehikot/
         project.json                 ← the host's: this project's id. Nobody else writes it.
+        host/                        ← the host's own folder (2.2.0; `.kehikot/kehikko/` before)
         checklist/checklists.json
         checklist/papers.json
         notes/notes.json
@@ -102,15 +104,45 @@ too. Since 2.1.0 a project has a permanent id, kept inside the project itself:
   that id, and the path becomes where the project is now, not what it is.
 - **Modules never write it.** They get the id from `context.projectId` (and
   `projects.pick`'s `id`), and need not read the file at all.
-- **It is at the top of `.kehikot/`, not in `.kehikot/kehikko/`**, because it
+- **It is at the top of `.kehikot/`, not in the host's folder (`.kehikot/host/`)**, because it
   is not the host's data in the sense a module folder is a module's data: it is
   the identity of the whole folder, which every module's data in it belongs to.
   No module may have a folder of that name: `moduleFolder` refuses an id that
   would derive `project.json`.
 
+### The host's folder: `host/` (2.2.0)
+
+The host keeps what it writes for a project — its epics and their state, its
+record of the project's canvases (`kehikot.json`), its tracker sources — in a
+folder of its own beside the modules':
+
+    <projectPath>/.kehikot/host/kehikot.json
+    <projectPath>/.kehikot/host/epics/<slug>.json
+    <projectPath>/.kehikot/host/trackers.json
+
+- **`HOST_FOLDER`** (`'host'`), **`hostDir(projectPath)`** and
+  **`hostFile(projectPath, ...segments)`** spell it. `hostFile` checks each
+  segment (no slash, not `.` or `..`) and throws on a bad one; both are `null`
+  with no project, as `kehikotDir`.
+- **Before 2.2.0 it was `.kehikot/kehikko/`** — the host's module id, through
+  `moduleFolder`. A kehikko is one canvas, and a folder named after one canvas
+  holding every canvas's data was a puzzle to anyone opening the project.
+  **`LEGACY_HOST_FOLDER`** (`'kehikko'`), `hostDir(p, { legacy: true })` and
+  `legacyHostFile` name the old one. It is **read-only**: a host renames it to
+  `host/` the first time it meets the project, and reads it in place only when it
+  cannot (a read-only project, or both folders already there).
+- **A module that reads the host's files** (an epic, the canvases record) reads
+  `hostFile(...)` first, and `legacyHostFile(...)` only when the first is not
+  there — so it works beside a host from before and after the move.
+- **No module may have a folder of that name**: `moduleFolder` refuses an id
+  that would derive `host`, as it refuses `project.json`. It still derives
+  `kehikko` from the host's id, so a host built before 2.2.0 runs unchanged
+  against this package.
+
 #### The storage rule, with its one exception
 
-A project's data lives only under `.kehikot/<module>/`, written by that module.
+A project's data lives only under `.kehikot/<module>/`, written by that module
+(and the host's under `.kehikot/host/`, written by the host).
 **`.kehikot/project.json` is the single exception: one file at the top of
 `.kehikot/`, written only by the host.** Nothing else goes at the top of the
 folder, and a host's storage check that asserts "only module folders under

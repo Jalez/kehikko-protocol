@@ -18,6 +18,21 @@ export declare const KEHIKOT_DIR = ".kehikot";
  */
 export declare const PROJECT_FILE = "project.json";
 /**
+ * The host's own folder inside `.kehikot/` (2.2.0): `<projectPath>/.kehikot/host/`, where a host keeps
+ * what it writes for a project (its epics, their state, its record of the canvases, its tracker
+ * sources). Named for its role rather than for the host program, because a kehikko is one canvas
+ * and a folder named after one canvas, holding every canvas's data, read as a mistake. No module
+ * may have a folder of this name: `moduleFolder` refuses an id that would derive it.
+ */
+export declare const HOST_FOLDER = "host";
+/**
+ * The host's folder before 2.2.0: `<projectPath>/.kehikot/kehikko/`. A read-only fallback, never
+ * written: a host moves it to `HOST_FOLDER` when it can, and reads it in place when it cannot (a
+ * read-only project), and a module that reads the host's files reads `HOST_FOLDER` first and this
+ * only when the file is not there. `moduleFolder` still derives it, for a host built before 2.2.0.
+ */
+export declare const LEGACY_HOST_FOLDER = "kehikko";
+/**
  * What a module may call a file inside its own folder: lowercase, digits and dashes, no dot and no
  * slash, so no accepted spelling can leave the folder. A file name is a constant in the module that
  * owns it, never a string that arrived over the wire.
@@ -53,6 +68,24 @@ export declare function moduleDir(projectPath: string | null | undefined, module
  * is not a legal id.
  */
 export declare function moduleFile(projectPath: string | null | undefined, moduleId: string, name: string): string | null;
+/**
+ * The host's own folder for a project (2.2.0), `<projectPath>/.kehikot/host`, or `null` when there is
+ * no project (as `kehikotDir`). Where a host reads and writes what it keeps for a project; a module
+ * may read from it and never writes there. Before 2.2.0 it was `.kehikot/kehikko`
+ * (`LEGACY_HOST_FOLDER`), and `hostDir(p, { legacy: true })` names that one, for reading.
+ */
+export declare function hostDir(projectPath: string | null | undefined, options?: {
+    legacy?: boolean;
+}): string | null;
+/**
+ * A path under the host's folder (2.2.0): `hostFile(p, 'epics', 'x.json')` is
+ * `<p>/.kehikot/host/epics/x.json`, or `null` when there is no project. Every segment is checked and
+ * the call throws on one that is empty, `.`, `..` or carries a slash, so no spelling leaves the
+ * folder. With no segments it is `hostDir(p)`. For the pre-2.2.0 spelling, `legacyHostFile`.
+ */
+export declare function hostFile(projectPath: string | null | undefined, ...segments: string[]): string | null;
+/** `hostFile` under `.kehikot/kehikko/` (`LEGACY_HOST_FOLDER`), for reading what a host before 2.2.0 wrote. */
+export declare function legacyHostFile(projectPath: string | null | undefined, ...segments: string[]): string | null;
 /**
  * Is `child` at or beneath `parent`? String comparison only: it knows nothing about symlinks,
  * uncollapsed `..` or whether either path exists. A caller confining a write must `realpath` both
