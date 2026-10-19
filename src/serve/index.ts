@@ -27,7 +27,20 @@ export {
 export { DEFAULT_FRAME_ORIGINS, frameAncestors, frameOrigins } from './origins.js'
 
 /* Whether a folder is a project the host holds: a module's server asks before it reads one. */
-export { hostHasProject, hostIsProjectUrls, IS_PROJECT_PATH, isProjectResult, type IsProjectResult } from './host.js'
+export {
+  hostHasProject,
+  hostIsProjectUrls,
+  hostProject,
+  resolveDoorProject,
+  IS_PROJECT_PATH,
+  isProjectResult,
+  NO_HOST_ANSWERED,
+  type DoorProject,
+  type HostHasProjectOptions,
+  type HostProject,
+  type IsProjectResult,
+} from './host.js'
+export { DOOR_PROJECT_SAYS } from '../door.js'
 
 export {
   neighbourPorts,

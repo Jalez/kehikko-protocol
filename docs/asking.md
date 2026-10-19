@@ -251,6 +251,43 @@ const { project, epic } = doorContext(args, { epic: ['slug'] })      // journeys
 
 `/api/…` routes between a module's own page and its own server are not doors and are not touched by any of this.
 
+## A project that moved (2.3.0)
+
+A project is its id, not its path: a person renames or moves the folder and the host relinks it. An
+agent that learnt the old path keeps sending it. So a door does not trust the `project` it is handed;
+it asks the host, from its server, with `resolveDoorProject` (`kehikot-module-protocol/serve`):
+
+```ts
+import { DOOR_PROJECT_SAYS, resolveDoorProject } from 'kehikot-module-protocol/serve'
+
+const at = await resolveDoorProject(args)       // or resolveDoorProject(folder)
+if (!at.ok) return { isError: true, content: [{ type: 'text', text: at.why }] }
+const answer = work(at.path)                    // the RETURNED path, never args.project
+if (at.movedFrom) answer.content.push({ type: 'text', text: DOOR_PROJECT_SAYS.followed(at.movedFrom, at.path) })
+```
+
+It asks `GET /host/is-project` for the folder. A project answers `{ ok: true, path, id? }`. A former
+path of a project answers `movedTo` and the project's `id`; the helper follows it ONCE — asks again on
+the new path, which must answer `project: true` with the same id — and answers `{ ok: true, path:
+<new>, id, movedFrom: <old> }`. Otherwise it refuses, in words every door shares (`DOOR_PROJECT_SAYS`):
+
+| `reason` | `why` |
+|---|---|
+| `moved` (could not follow) | `That folder was moved to <new>; use that path.` |
+| `not-project` (also: no host answered) | `<path> is not a project open in Kehikot.` |
+| `unnamed` | ``Name the project: `project` is its absolute folder.`` |
+
+- **Work on the returned path**, never the argument. After a followed move they differ.
+- **Say that you followed it**: add `DOOR_PROJECT_SAYS.followed(from, to)` to the answer, so the agent
+  uses the new path from then on.
+- **Key server state that outlives a request by the project's id** (`at.id`), and resolve the path
+  again on every request. A map from path to state goes stale the moment the folder moves.
+- **Page-side state** (held, session or local storage) is keyed by `projectKey(context)`, never by
+  `context.projectPath`: the host tells a page the new path in its context after a relink, and the
+  id does not change.
+
+`hostHasProject` is still there, a boolean (`project: true` only), for a gate that only needs yes or no.
+
 ## Learning another module's name and door
 
 `context.containers` stays small: a module id, whether it is picked out, whether it is folded, and what it says it is showing. Everything else about a neighbour is in that neighbour's manifest, and from 1.1.0 there is a reader for it beside `readRegistration`:

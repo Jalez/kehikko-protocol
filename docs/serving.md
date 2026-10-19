@@ -645,6 +645,32 @@ route answers a module's server and not a module's page, so call it from the ser
 Use it as the gate: `if (!(await hostHasProject(path))) return 403`. It tells whether the host holds the
 folder, not whether this module may read inside it; the module still keeps its reads inside the folder.
 
+#### `hostProject` and `resolveDoorProject` (2.3.0)
+
+Since 2.3.0 the host's answer may also carry `id` (the project's `PROJECT_ID`), `movedTo` (the folder is
+not a project but is a path a project had; the project is now at this absolute folder), `missing` (the
+host holds the project but its folder is not on disk) and `why` (a sentence). `isProjectResult` reads
+them; a malformed optional field is dropped rather than failing the answer, and a 2.2 host's answer
+still reads.
+
+`hostProject(folder)` returns what was said:
+
+```ts
+type HostProject =
+  | { project: true; path: string; id?: string }
+  | { project: false; movedTo?: string; id?: string; missing?: boolean; why?: string }
+```
+
+It asks the same origins in the same order; the first `project: true` ends it, and a `project: false`
+naming `movedTo` is kept over a bare one. With no host answering it is `{ project: false, why:
+NO_HOST_ANSWERED }`. `hostHasProject(folder)` is `(await hostProject(folder)).project`: a former path is
+`false`.
+
+`resolveDoorProject(args | folder)` is the door's helper: it reads `project` through `doorContext`,
+follows `movedTo` once to the same id, and answers `{ ok: true, path, id?, movedFrom? }` or `{ ok: false,
+reason, why, movedTo? }` with `DOOR_PROJECT_SAYS`'s sentences. What a door does with it is in
+[asking.md](asking.md#a-project-that-moved-230).
+
 ### `src/serve/origins.ts`
 
 #### About `src/serve/origins.ts`

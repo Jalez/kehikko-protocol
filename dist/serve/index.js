@@ -8,7 +8,8 @@
 export { claim, free, identify, originFor, readManifest, sayClaim, search, verdict, DRIFT_SPAN, IDENTIFY_TIMEOUT_MS, LOOPBACK, } from './ports.js';
 export { DEFAULT_FRAME_ORIGINS, frameAncestors, frameOrigins } from './origins.js';
 /* Whether a folder is a project the host holds: a module's server asks before it reads one. */
-export { hostHasProject, hostIsProjectUrls, IS_PROJECT_PATH, isProjectResult } from './host.js';
+export { hostHasProject, hostIsProjectUrls, hostProject, resolveDoorProject, IS_PROJECT_PATH, isProjectResult, NO_HOST_ANSWERED, } from './host.js';
+export { DOOR_PROJECT_SAYS } from '../door.js';
 export { neighbourPorts, portOf, readRegistration, registerAt, takesOver, registryDir, } from './registry.js';
 export { preferred, serves, } from './plugin.js';
 /* Another module, as this one can learn of it: its manifest and the tools at its door. */

@@ -80,6 +80,7 @@ export {
 export {
   DOOR_ARGUMENTS,
   DOOR_ARGUMENTS_BEFORE,
+  DOOR_PROJECT_SAYS,
   doorContext,
   SHOW_OUTCOMES,
   showAnswerSchema,
