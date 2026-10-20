@@ -32,6 +32,11 @@ export {
   hostIsProjectUrls,
   hostProject,
   resolveDoorProject,
+  hostPlace,
+  hostPlaceUrls,
+  placeTokenOf,
+  resolveDoorPlace,
+  PLACE_PATH,
   IS_PROJECT_PATH,
   isProjectResult,
   NO_HOST_ANSWERED,
@@ -40,7 +45,7 @@ export {
   type HostProject,
   type IsProjectResult,
 } from './host.js'
-export { DOOR_PROJECT_SAYS } from '../door.js'
+export { DOOR_PROJECT_SAYS, DOOR_PLACE_SAYS, PLACE_PARAM, placeDefaults, type DoorPlace } from '../door.js'
 
 export {
   neighbourPorts,
