@@ -1,6 +1,6 @@
 import { isAbsolute } from 'node:path';
 import { z } from 'zod';
-import { DOOR_PROJECT_SAYS, doorContext } from '../door.js';
+import { DOOR_PROJECT_SAYS, PLACE_PARAM, PLACE_TOKEN, doorContext, placeResult } from '../door.js';
 import { PROJECT_ID } from '../ids.js';
 import { LIMITS } from '../limits.js';
 import { frameOrigins } from './origins.js';
@@ -129,4 +129,77 @@ export async function resolveDoorProject(input, options = {}) {
     if (!then.project || then.id !== first.id)
         return refuse;
     return { ok: true, path: then.path, id: then.id, movedFrom: named };
+}
+/* ------------------------------------------------------------------------ *
+ * Whose place is this conversation? (2.4.0)
+ * ------------------------------------------------------------------------ */
+/**
+ * The host's route for a session's place: `GET /host/place?kehikot-place=<token>` answers
+ * `placeResult` (2.4.0). Programs on this machine; a module's SERVER asks it, never its page.
+ */
+export const PLACE_PATH = '/host/place';
+/**
+ * The place token a door request carries, or null: the `kehikot-place` query parameter
+ * (`PLACE_PARAM`), read from what a door has — the query (`DoorsOptions.answer` is handed it), a
+ * whole URL, or a request with a `url`. A value that is not spelled like a token is null.
+ */
+export function placeTokenOf(input) {
+    let query = null;
+    if (input instanceof URLSearchParams)
+        query = input;
+    else {
+        const raw = typeof input === 'string' ? input : input?.url;
+        if (typeof raw === 'string') {
+            try {
+                query = new URL(raw, 'http://127.0.0.1').searchParams;
+            }
+            catch {
+                query = null;
+            }
+        }
+    }
+    const token = query?.get(PLACE_PARAM) ?? null;
+    return token !== null && PLACE_TOKEN.test(token) ? token : null;
+}
+/** The URLs `hostPlace` asks, in order. Pure; exported for tests. */
+export function hostPlaceUrls(token, env = process.env) {
+    return hostOrigins(env).map((origin) => `${origin}${PLACE_PATH}?${PLACE_PARAM}=${encodeURIComponent(token)}`);
+}
+/**
+ * The place the host minted `token` for, or null — no such token, no host answering, or an answer of
+ * another shape (2.4.0). Asks each origin of `KEHIKOT_ORIGINS` until one knows the token. Never throws.
+ */
+export async function hostPlace(token, options = {}) {
+    if (typeof token !== 'string' || !PLACE_TOKEN.test(token))
+        return null;
+    const asked = options.fetch ?? fetch;
+    for (const url of hostPlaceUrls(token, options.env ?? process.env)) {
+        const control = new AbortController();
+        const timer = setTimeout(() => control.abort(), options.timeoutMs ?? LIMITS.HOST_ASK_MS);
+        try {
+            const response = await asked(url, { signal: control.signal });
+            if (!response.ok)
+                continue;
+            const read = placeResult.safeParse(await response.json());
+            if (read.success && read.data.place && read.data.place.token === token)
+                return read.data.place;
+        }
+        catch {
+            /* Not this origin. */
+        }
+        finally {
+            clearTimeout(timer);
+        }
+    }
+    return null;
+}
+/**
+ * The session's place for one door request (2.4.0): the token out of the request (`placeTokenOf`),
+ * then `hostPlace`. Null when the call carried no token or the host does not know it — and the door
+ * then answers exactly as it did before 2.4.0. Combine with `placeDefaults(args, place)` and say
+ * `DOOR_PLACE_SAYS.used(from, place)` when anything was taken from it.
+ */
+export async function resolveDoorPlace(input, options = {}) {
+    const token = placeTokenOf(input);
+    return token ? hostPlace(token, options) : null;
 }

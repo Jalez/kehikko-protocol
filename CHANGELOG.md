@@ -7,6 +7,27 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.5.0 — 2026-10-20
+
+Skills a module offers. A module can list Claude Code skills in its manifest and serve each one's
+SKILL.md; a host shows the text and the person installs it. **Additive**; `PROTOCOL` is still 2. A
+manifest without `declares.skills` parses as before.
+
+### Added
+
+- `declares.skills?: Array<{ name, summary, version }>` (`moduleSkillSchema`, `moduleSkillsSchema`,
+  `ModuleSkill`): at most `LIMITS.SKILLS` (16), names unique.
+- `SKILL_NAME` (kebab-case), `skillNameSchema`, `isSkillName`; `LIMITS.SKILL_NAME` (40),
+  `LIMITS.SKILL_VERSION` (64), `LIMITS.SKILL_TEXT` (65 536 bytes).
+- `SKILLS_PATH` (`/kehikot/skills/`) and `skillPath(name)` → `/kehikot/skills/<name>.md`.
+- `skillTextIssue(text, name)` and `skillTextBytes(text)`: a pure reading of a served SKILL.md.
+
+### Changed
+
+- `dist/` rebuilt: the v2.4.0 commit carried a `dist/` built before its own `door.ts` and
+  `serve/host.ts` changes, so the place exports were missing from the built package.
+- docs/manifest.md: "Skills a module offers (2.5.0)".
+
 ## 2.4.0 — 2026-10-20
 
 A conversation's place. A conversation started from a place in Kehikot (project, epic, picked parts,

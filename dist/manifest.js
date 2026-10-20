@@ -3,6 +3,7 @@ import { MANIFEST_KIND, PROTOCOL } from './constants.js';
 import { LIMITS } from './limits.js';
 import { MODE_ID, MODULE_ID } from './ids.js';
 import { buildSchema } from './build.js';
+import { moduleSkillsSchema } from './skills.js';
 /**
  * What a module says about itself when a host asks: the manifest schema, the words it suggests (`REACTS_TO`,
  * `TAGS`), and the pure readers `speaks` and `partsDeclaration`. Every string in the schema has a `max` from
@@ -248,6 +249,12 @@ const manifestFields = z.object({
          * `context.prompt` null.
          */
         prompt: z.boolean().default(false),
+        /**
+         * Claude Code skills this module offers a person (2.5.0): name, summary, version. Each one's
+         * text is served at `skillPath(name)`. An offer, not an install: the host shows the text and
+         * the person decides. Optional and never defaulted; absent means none.
+         */
+        skills: moduleSkillsSchema.optional(),
     })
         .default({ protocol: `>=${PROTOCOL}`, uses: [], storage: false, prompt: false }),
     /**

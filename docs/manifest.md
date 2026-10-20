@@ -141,6 +141,28 @@ What a host must still do for itself: resolve it against the origin the manifest
 came from, and refuse it if it leaves. A module may not use a host to point a
 poller at a third party.
 
+### Skills a module offers (2.5.0)
+
+`declares.skills` lists Claude Code skills a module offers a person: each one a
+`name` (kebab-case, `SKILL_NAME`, at most `LIMITS.SKILL_NAME` = 40 characters),
+a `summary` (at most 200) and a `version` (at most 64, compared for equality and
+never parsed); at most `LIMITS.SKILLS` = 16, no two with one name. Optional:
+a manifest without it offers none and parses as it did.
+
+The module serves each skill's text at `skillPath(name)`, which is
+`/kehikot/skills/<name>.md` on its own origin: one SKILL.md, front matter first
+(a line of `---`, the fields, a line of `---`), at most `LIMITS.SKILL_TEXT` =
+64 KB of UTF-8. `skillTextIssue(text, name)` says in one sentence what is wrong
+with a text as served, or `null`; a `name:` in the front matter, when present,
+must be the skill's own name.
+
+**It is an offer, not an install.** A skill is instructions that land in the
+person's Claude Code for every project, so a host shows the whole text (and,
+for an update, what changed) and installs only on the person's own press. A
+host fetches the text from the module's registered origin, never from what a
+request hands it, and no agent can install or remove one. Nothing in this
+package installs, fetches or decides anything about a skill.
+
 ## Notes by symbol
 
 ### `src/manifest.ts`
