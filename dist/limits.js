@@ -203,6 +203,10 @@ export const LIMITS = {
     TRACKER_BODY: 20_000,
     /** How many files of a change `detail` lists. */
     TRACKER_FILES: 300,
+    /** How many boards one project's sources have, and one row may sit on. (2.6.0) */
+    TRACKER_BOARDS: 16,
+    /** How many columns one board has. (2.6.0) */
+    TRACKER_COLUMNS: 64,
     /**
      * How many `(source, epic)` changes a context's `content` carries. See
      * `content.ts`. A host keeps the newest; one dropped costs a module a re-read

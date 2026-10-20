@@ -51,6 +51,28 @@ await request('tracker.refresh', { epic: 'modes-are-modules' }, { within: TRACKE
   `gl:group/project#12`; `spellTrackerRef` spells a ref the host found.
   A row's `ref` is the spelling it was asked for or named by.
 
+### Board columns (2.6.0)
+
+A row carries `column?: { name, board, boardUrl? }` — where the item stands on
+the project's own kanban board. On GitHub that is a Project (v2): `board` is the
+project's title and `name` its Status option (or, without a field named Status,
+the first single-select field the board groups by). On GitLab it is an issue
+board: `name` is the list whose label the issue carries, scoped labels
+included, and a closed issue is in the board's Closed list. An item on several
+boards also has `columns`, every one of them, `column` first.
+
+Absent is not "no column": the item may be on no board, the project may have
+none, or the host may be unable to read them (a GitHub token without
+`read:project`). A module shows a column when there is one and nothing when
+there is not.
+
+```ts
+const { boards } = await request('tracker.columns', {})
+// boards: [{ board: 'Roadmap', boardUrl, columns: ['Todo', 'In progress', 'Done'] }]
+```
+
+`tracker.columns` is under `trackers:read`: the same reading, another view of it.
+
 `live.get` stays, answered by a host as a view over the same reading, until
 the modules that ask it have moved.
 

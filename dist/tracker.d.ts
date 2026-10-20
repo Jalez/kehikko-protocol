@@ -123,6 +123,28 @@ export declare const trackerDetailSchema: z.ZodObject<{
     approvedBy?: string[] | undefined;
 }>;
 export type TrackerDetailFacts = z.infer<typeof trackerDetailSchema>;
+/**
+ * Where an item stands on one of the project's own boards: a GitHub Project (v2) and its Status
+ * option, or a GitLab issue board and the list whose label the item carries. `board` is the
+ * board's title, `name` the column. A closed item on a GitLab board is in its Closed list. (2.6.0)
+ */
+export declare const trackerColumnSchema: z.ZodObject<{
+    /** The column: a GitHub Project's Status option, or a GitLab board list's label (`Closed` for a closed item). */
+    name: z.ZodString;
+    /** The board's title: a GitHub Project v2 title, or a GitLab board name. */
+    board: z.ZodString;
+    /** Where the board is, when the tracker said. */
+    boardUrl: z.ZodOptional<z.ZodString>;
+}, "strip", z.ZodTypeAny, {
+    name: string;
+    board: string;
+    boardUrl?: string | undefined;
+}, {
+    name: string;
+    board: string;
+    boardUrl?: string | undefined;
+}>;
+export type TrackerColumn = z.infer<typeof trackerColumnSchema>;
 /** One ref, as the host last read it. Assignable to `Sighting` from `/facets`. */
 export declare const trackerRowSchema: z.ZodObject<{
     /**
@@ -178,6 +200,44 @@ export declare const trackerRowSchema: z.ZodObject<{
     pipeline: z.ZodOptional<z.ZodEnum<["success", "failed", "running", "pending", "canceled", "skipped", "manual"]>>;
     /** On a change: where its review stands. */
     review: z.ZodOptional<z.ZodEnum<["approved", "changes-requested", "required"]>>;
+    /**
+     * Where the item stands on the project's board (2.6.0). Absent when it is on no board, when the
+     * project has none, or when the host could not read boards (a GitHub token without `read:project`)
+     * — absent says nothing about which. On several boards: the first of `columns`.
+     */
+    column: z.ZodOptional<z.ZodObject<{
+        /** The column: a GitHub Project's Status option, or a GitLab board list's label (`Closed` for a closed item). */
+        name: z.ZodString;
+        /** The board's title: a GitHub Project v2 title, or a GitLab board name. */
+        board: z.ZodString;
+        /** Where the board is, when the tracker said. */
+        boardUrl: z.ZodOptional<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        name: string;
+        board: string;
+        boardUrl?: string | undefined;
+    }, {
+        name: string;
+        board: string;
+        boardUrl?: string | undefined;
+    }>>;
+    /** Every board the item is on, `column` first. Present only when it is on more than one. (2.6.0) */
+    columns: z.ZodOptional<z.ZodArray<z.ZodObject<{
+        /** The column: a GitHub Project's Status option, or a GitLab board list's label (`Closed` for a closed item). */
+        name: z.ZodString;
+        /** The board's title: a GitHub Project v2 title, or a GitLab board name. */
+        board: z.ZodString;
+        /** Where the board is, when the tracker said. */
+        boardUrl: z.ZodOptional<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        name: string;
+        board: string;
+        boardUrl?: string | undefined;
+    }, {
+        name: string;
+        board: string;
+        boardUrl?: string | undefined;
+    }>, "many">>;
     /** When the host read this row. A scoped refresh moves some rows and not others. */
     readAt: z.ZodString;
     detail: z.ZodOptional<z.ZodObject<{
@@ -271,6 +331,16 @@ export declare const trackerRowSchema: z.ZodObject<{
     mergedAt?: string | null | undefined;
     pipeline?: "success" | "failed" | "running" | "pending" | "canceled" | "skipped" | "manual" | undefined;
     review?: "approved" | "changes-requested" | "required" | undefined;
+    column?: {
+        name: string;
+        board: string;
+        boardUrl?: string | undefined;
+    } | undefined;
+    columns?: {
+        name: string;
+        board: string;
+        boardUrl?: string | undefined;
+    }[] | undefined;
 }, {
     number: number;
     state: "open" | "closed" | "merged";
@@ -311,6 +381,16 @@ export declare const trackerRowSchema: z.ZodObject<{
     }[] | undefined;
     pipeline?: "success" | "failed" | "running" | "pending" | "canceled" | "skipped" | "manual" | undefined;
     review?: "approved" | "changes-requested" | "required" | undefined;
+    column?: {
+        name: string;
+        board: string;
+        boardUrl?: string | undefined;
+    } | undefined;
+    columns?: {
+        name: string;
+        board: string;
+        boardUrl?: string | undefined;
+    }[] | undefined;
 }>;
 export type TrackerRow = z.infer<typeof trackerRowSchema>;
 /** One place the host reads (per source, not per tracker), and how that went last time. */
@@ -475,6 +555,44 @@ export declare const trackerReadingResult: z.ZodObject<{
         pipeline: z.ZodOptional<z.ZodEnum<["success", "failed", "running", "pending", "canceled", "skipped", "manual"]>>;
         /** On a change: where its review stands. */
         review: z.ZodOptional<z.ZodEnum<["approved", "changes-requested", "required"]>>;
+        /**
+         * Where the item stands on the project's board (2.6.0). Absent when it is on no board, when the
+         * project has none, or when the host could not read boards (a GitHub token without `read:project`)
+         * — absent says nothing about which. On several boards: the first of `columns`.
+         */
+        column: z.ZodOptional<z.ZodObject<{
+            /** The column: a GitHub Project's Status option, or a GitLab board list's label (`Closed` for a closed item). */
+            name: z.ZodString;
+            /** The board's title: a GitHub Project v2 title, or a GitLab board name. */
+            board: z.ZodString;
+            /** Where the board is, when the tracker said. */
+            boardUrl: z.ZodOptional<z.ZodString>;
+        }, "strip", z.ZodTypeAny, {
+            name: string;
+            board: string;
+            boardUrl?: string | undefined;
+        }, {
+            name: string;
+            board: string;
+            boardUrl?: string | undefined;
+        }>>;
+        /** Every board the item is on, `column` first. Present only when it is on more than one. (2.6.0) */
+        columns: z.ZodOptional<z.ZodArray<z.ZodObject<{
+            /** The column: a GitHub Project's Status option, or a GitLab board list's label (`Closed` for a closed item). */
+            name: z.ZodString;
+            /** The board's title: a GitHub Project v2 title, or a GitLab board name. */
+            board: z.ZodString;
+            /** Where the board is, when the tracker said. */
+            boardUrl: z.ZodOptional<z.ZodString>;
+        }, "strip", z.ZodTypeAny, {
+            name: string;
+            board: string;
+            boardUrl?: string | undefined;
+        }, {
+            name: string;
+            board: string;
+            boardUrl?: string | undefined;
+        }>, "many">>;
         /** When the host read this row. A scoped refresh moves some rows and not others. */
         readAt: z.ZodString;
         detail: z.ZodOptional<z.ZodObject<{
@@ -568,6 +686,16 @@ export declare const trackerReadingResult: z.ZodObject<{
         mergedAt?: string | null | undefined;
         pipeline?: "success" | "failed" | "running" | "pending" | "canceled" | "skipped" | "manual" | undefined;
         review?: "approved" | "changes-requested" | "required" | undefined;
+        column?: {
+            name: string;
+            board: string;
+            boardUrl?: string | undefined;
+        } | undefined;
+        columns?: {
+            name: string;
+            board: string;
+            boardUrl?: string | undefined;
+        }[] | undefined;
     }, {
         number: number;
         state: "open" | "closed" | "merged";
@@ -608,6 +736,16 @@ export declare const trackerReadingResult: z.ZodObject<{
         }[] | undefined;
         pipeline?: "success" | "failed" | "running" | "pending" | "canceled" | "skipped" | "manual" | undefined;
         review?: "approved" | "changes-requested" | "required" | undefined;
+        column?: {
+            name: string;
+            board: string;
+            boardUrl?: string | undefined;
+        } | undefined;
+        columns?: {
+            name: string;
+            board: string;
+            boardUrl?: string | undefined;
+        }[] | undefined;
     }>, "many">>;
     missing: z.ZodDefault<z.ZodArray<z.ZodObject<{
         ref: z.ZodString;
@@ -672,6 +810,16 @@ export declare const trackerReadingResult: z.ZodObject<{
         mergedAt?: string | null | undefined;
         pipeline?: "success" | "failed" | "running" | "pending" | "canceled" | "skipped" | "manual" | undefined;
         review?: "approved" | "changes-requested" | "required" | undefined;
+        column?: {
+            name: string;
+            board: string;
+            boardUrl?: string | undefined;
+        } | undefined;
+        columns?: {
+            name: string;
+            board: string;
+            boardUrl?: string | undefined;
+        }[] | undefined;
     }[];
     missing: {
         ref: string;
@@ -730,6 +878,16 @@ export declare const trackerReadingResult: z.ZodObject<{
         }[] | undefined;
         pipeline?: "success" | "failed" | "running" | "pending" | "canceled" | "skipped" | "manual" | undefined;
         review?: "approved" | "changes-requested" | "required" | undefined;
+        column?: {
+            name: string;
+            board: string;
+            boardUrl?: string | undefined;
+        } | undefined;
+        columns?: {
+            name: string;
+            board: string;
+            boardUrl?: string | undefined;
+        }[] | undefined;
     }[] | undefined;
     missing?: {
         ref: string;
@@ -759,6 +917,55 @@ export declare const trackerRefreshResult: z.ZodObject<{
     why?: string | undefined;
 }>;
 export type TrackerRefreshResult = z.infer<typeof trackerRefreshResult>;
+/** One board of the project, with its columns in board order. See `tracker.columns`. (2.6.0) */
+export declare const trackerBoardSchema: z.ZodObject<{
+    board: z.ZodString;
+    boardUrl: z.ZodOptional<z.ZodString>;
+    /** The columns, left to right as the board shows them. */
+    columns: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
+}, "strip", z.ZodTypeAny, {
+    board: string;
+    columns: string[];
+    boardUrl?: string | undefined;
+}, {
+    board: string;
+    boardUrl?: string | undefined;
+    columns?: string[] | undefined;
+}>;
+export type TrackerBoard = z.infer<typeof trackerBoardSchema>;
+/**
+ * What `tracker.columns` answers: the boards of the project's sources and their columns, from the
+ * host's reading. Empty when the project has no board or the host could not read them. (2.6.0)
+ */
+export declare const trackerColumnsResult: z.ZodObject<{
+    boards: z.ZodDefault<z.ZodArray<z.ZodObject<{
+        board: z.ZodString;
+        boardUrl: z.ZodOptional<z.ZodString>;
+        /** The columns, left to right as the board shows them. */
+        columns: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
+    }, "strip", z.ZodTypeAny, {
+        board: string;
+        columns: string[];
+        boardUrl?: string | undefined;
+    }, {
+        board: string;
+        boardUrl?: string | undefined;
+        columns?: string[] | undefined;
+    }>, "many">>;
+}, "strip", z.ZodTypeAny, {
+    boards: {
+        board: string;
+        columns: string[];
+        boardUrl?: string | undefined;
+    }[];
+}, {
+    boards?: {
+        board: string;
+        boardUrl?: string | undefined;
+        columns?: string[] | undefined;
+    }[] | undefined;
+}>;
+export type TrackerColumns = z.infer<typeof trackerColumnsResult>;
 /** How long to wait for a `tracker.refresh` to answer. A read of a few hundred refs over two trackers. */
 export declare const TRACKER_REFRESH_WITHIN_MS = 90000;
 /**
