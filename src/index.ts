@@ -282,6 +282,10 @@ export {
   trackerColumnSchema,
   trackerBoardSchema,
   trackerColumnsResult,
+  REVIEWER_STATES,
+  MY_ROLES,
+  trackerReviewerSchema,
+  trackerDiscussionsSchema,
   readTrackerRef,
   spellTrackerRef,
   type Tracker,
@@ -304,6 +308,10 @@ export {
   type TrackerColumn,
   type TrackerBoard,
   type TrackerColumns,
+  type ReviewerState,
+  type MyRole,
+  type TrackerReviewer,
+  type TrackerDiscussions,
 } from './tracker.js'
 
 export {

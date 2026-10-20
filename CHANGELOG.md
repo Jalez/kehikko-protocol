@@ -7,6 +7,23 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.7.0 — 2026-10-21
+
+People and roles. A tracker row names a change's reviewers, author and assignees by login, says the
+person's own roles on it, and carries its discussion counts and last push. **Additive**; `PROTOCOL` is
+still 2. A row without them parses as before.
+
+### Added
+
+- `trackerRowSchema.reviewers?: { login, name?, state }[]` (`trackerReviewerSchema`, `TrackerReviewer`),
+  `state` in `REVIEWER_STATES`: `requested`, `approved`, `changes`, `commented`.
+- `trackerRowSchema.authorLogin?: string | null` and `assigneeLogins?: string[]`.
+- `trackerRowSchema.myRoles?` from `MY_ROLES`: `reviewer-asked`, `reviewer-done`, `author`, `assignee`
+  (`MyRole`). Filled by the host; each role at most once.
+- `trackerRowSchema.discussions?: { resolved, unresolved }` (`trackerDiscussionsSchema`,
+  `TrackerDiscussions`) and `lastPushAt?` (ISO 8601).
+- `LIMITS.REVIEWERS` (32).
+
 ## 2.6.0 — 2026-10-21
 
 Board columns. A tracker row says where its item stands on the project's own kanban board — a GitHub
