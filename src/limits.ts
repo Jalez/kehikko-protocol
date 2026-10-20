@@ -265,4 +265,12 @@ export const LIMITS = {
   SUBJECT_ID: 128,
   /** How many things one "is this done?" answer may list. */
   DONE_ITEMS: 256,
+  /** How many Claude Code skills one manifest may offer (`declares.skills`, 2.5.0). */
+  SKILLS: 16,
+  /** A skill's name (2.5.0), in characters: kebab-case, and the folder it is installed in. */
+  SKILL_NAME: 40,
+  /** A skill's version (2.5.0), in characters. Compared for equality only, never parsed. */
+  SKILL_VERSION: 64,
+  /** A skill's text, its SKILL.md (2.5.0), in BYTES of UTF-8. */
+  SKILL_TEXT: 65_536,
 } as const

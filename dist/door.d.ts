@@ -50,6 +50,431 @@ export declare const DOOR_PROJECT_SAYS: {
     readonly followed: (from: string, to: string) => string;
 };
 /**
+ * The query parameter a session's place token travels in, on the URL of every Kehikot MCP door
+ * the session is configured with: `http://127.0.0.1:4590/mcp?kehikot-place=<token>` (2.4.0).
+ *
+ * A token is a POINTER, not a credential: it names one conversation's record (project, epic, parts, kehikko)
+ * the issuing module keeps, and grants nothing a call without it could not already do by naming the
+ * same place in its arguments. It is unguessable so that two sessions never share one by accident.
+ * A query parameter rather than a header because a door's `answer` is handed the query
+ * (`DoorsOptions.answer`) and every MCP client's config takes a URL.
+ */
+export declare const PLACE_PARAM = "kehikot-place";
+/** A place token's spelling: 22 to 64 URL-safe characters (the issuing module mints 32 random bytes, base64url). */
+export declare const PLACE_TOKEN: RegExp;
+/** Where a person is looking now, as the host sends it beside a place: the same three fields, or null when no page is open. */
+export declare const lookingSchema: z.ZodObject<{
+    projectId: z.ZodCatch<z.ZodNullable<z.ZodString>>;
+    project: z.ZodCatch<z.ZodNullable<z.ZodString>>;
+    epic: z.ZodNullable<z.ZodString>;
+    parts: z.ZodCatch<z.ZodArray<z.ZodString, "many">>;
+    kehikko: z.ZodCatch<z.ZodNullable<z.ZodObject<{
+        key: z.ZodString;
+        name: z.ZodCatch<z.ZodOptional<z.ZodString>>;
+    }, "strip", z.ZodTypeAny, {
+        key: string;
+        name?: string | undefined;
+    }, {
+        key: string;
+        name?: unknown;
+    }>>>;
+}, "strip", z.ZodTypeAny, {
+    epic: string | null;
+    parts: string[];
+    kehikko: {
+        key: string;
+        name?: string | undefined;
+    } | null;
+    project: string | null;
+    projectId: string | null;
+}, {
+    epic: string | null;
+    parts?: unknown;
+    kehikko?: unknown;
+    project?: unknown;
+    projectId?: unknown;
+}>;
+export type Looking = z.infer<typeof lookingSchema>;
+/**
+ * One session's place, as the host answers `GET /host/place?kehikot-place=<token>` (2.4.0).
+ * `project` is the folder the project is at NOW (a renamed folder is followed: the token keeps the
+ * project's id). `epic` is null for a place with no epic; `parts` empty is the whole epic.
+ * `looking` is what the person has on screen now, when a page of the host is open.
+ */
+export declare const doorPlaceSchema: z.ZodObject<{
+    token: z.ZodString;
+    /** The conversation the record is about (Claude Code's session id), when the record names one. */
+    conversation: z.ZodCatch<z.ZodOptional<z.ZodString>>;
+    projectId: z.ZodString;
+    project: z.ZodString;
+    projectName: z.ZodCatch<z.ZodOptional<z.ZodString>>;
+    epic: z.ZodNullable<z.ZodString>;
+    parts: z.ZodArray<z.ZodString, "many">;
+    kehikko: z.ZodNullable<z.ZodObject<{
+        key: z.ZodString;
+        name: z.ZodCatch<z.ZodOptional<z.ZodString>>;
+    }, "strip", z.ZodTypeAny, {
+        key: string;
+        name?: string | undefined;
+    }, {
+        key: string;
+        name?: unknown;
+    }>>;
+    looking: z.ZodCatch<z.ZodOptional<z.ZodNullable<z.ZodObject<{
+        projectId: z.ZodCatch<z.ZodNullable<z.ZodString>>;
+        project: z.ZodCatch<z.ZodNullable<z.ZodString>>;
+        epic: z.ZodNullable<z.ZodString>;
+        parts: z.ZodCatch<z.ZodArray<z.ZodString, "many">>;
+        kehikko: z.ZodCatch<z.ZodNullable<z.ZodObject<{
+            key: z.ZodString;
+            name: z.ZodCatch<z.ZodOptional<z.ZodString>>;
+        }, "strip", z.ZodTypeAny, {
+            key: string;
+            name?: string | undefined;
+        }, {
+            key: string;
+            name?: unknown;
+        }>>>;
+    }, "strip", z.ZodTypeAny, {
+        epic: string | null;
+        parts: string[];
+        kehikko: {
+            key: string;
+            name?: string | undefined;
+        } | null;
+        project: string | null;
+        projectId: string | null;
+    }, {
+        epic: string | null;
+        parts?: unknown;
+        kehikko?: unknown;
+        project?: unknown;
+        projectId?: unknown;
+    }>>>>;
+}, "strip", z.ZodTypeAny, {
+    epic: string | null;
+    parts: string[];
+    kehikko: {
+        key: string;
+        name?: string | undefined;
+    } | null;
+    project: string;
+    projectId: string;
+    token: string;
+    conversation?: string | undefined;
+    projectName?: string | undefined;
+    looking?: {
+        epic: string | null;
+        parts: string[];
+        kehikko: {
+            key: string;
+            name?: string | undefined;
+        } | null;
+        project: string | null;
+        projectId: string | null;
+    } | null | undefined;
+}, {
+    epic: string | null;
+    parts: string[];
+    kehikko: {
+        key: string;
+        name?: unknown;
+    } | null;
+    project: string;
+    projectId: string;
+    token: string;
+    conversation?: unknown;
+    projectName?: unknown;
+    looking?: unknown;
+}>;
+export type DoorPlace = z.infer<typeof doorPlaceSchema>;
+/** The host's answer at `/host/place`: the place, or `null` for a token it does not hold. */
+export declare const placeResult: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    place: z.ZodNullable<z.ZodObject<{
+        token: z.ZodString;
+        /** The conversation the record is about (Claude Code's session id), when the record names one. */
+        conversation: z.ZodCatch<z.ZodOptional<z.ZodString>>;
+        projectId: z.ZodString;
+        project: z.ZodString;
+        projectName: z.ZodCatch<z.ZodOptional<z.ZodString>>;
+        epic: z.ZodNullable<z.ZodString>;
+        parts: z.ZodArray<z.ZodString, "many">;
+        kehikko: z.ZodNullable<z.ZodObject<{
+            key: z.ZodString;
+            name: z.ZodCatch<z.ZodOptional<z.ZodString>>;
+        }, "strip", z.ZodTypeAny, {
+            key: string;
+            name?: string | undefined;
+        }, {
+            key: string;
+            name?: unknown;
+        }>>;
+        looking: z.ZodCatch<z.ZodOptional<z.ZodNullable<z.ZodObject<{
+            projectId: z.ZodCatch<z.ZodNullable<z.ZodString>>;
+            project: z.ZodCatch<z.ZodNullable<z.ZodString>>;
+            epic: z.ZodNullable<z.ZodString>;
+            parts: z.ZodCatch<z.ZodArray<z.ZodString, "many">>;
+            kehikko: z.ZodCatch<z.ZodNullable<z.ZodObject<{
+                key: z.ZodString;
+                name: z.ZodCatch<z.ZodOptional<z.ZodString>>;
+            }, "strip", z.ZodTypeAny, {
+                key: string;
+                name?: string | undefined;
+            }, {
+                key: string;
+                name?: unknown;
+            }>>>;
+        }, "strip", z.ZodTypeAny, {
+            epic: string | null;
+            parts: string[];
+            kehikko: {
+                key: string;
+                name?: string | undefined;
+            } | null;
+            project: string | null;
+            projectId: string | null;
+        }, {
+            epic: string | null;
+            parts?: unknown;
+            kehikko?: unknown;
+            project?: unknown;
+            projectId?: unknown;
+        }>>>>;
+    }, "strip", z.ZodTypeAny, {
+        epic: string | null;
+        parts: string[];
+        kehikko: {
+            key: string;
+            name?: string | undefined;
+        } | null;
+        project: string;
+        projectId: string;
+        token: string;
+        conversation?: string | undefined;
+        projectName?: string | undefined;
+        looking?: {
+            epic: string | null;
+            parts: string[];
+            kehikko: {
+                key: string;
+                name?: string | undefined;
+            } | null;
+            project: string | null;
+            projectId: string | null;
+        } | null | undefined;
+    }, {
+        epic: string | null;
+        parts: string[];
+        kehikko: {
+            key: string;
+            name?: unknown;
+        } | null;
+        project: string;
+        projectId: string;
+        token: string;
+        conversation?: unknown;
+        projectName?: unknown;
+        looking?: unknown;
+    }>>;
+    /** With no place for a token the host knows: why (its module has no record, or did not answer). */
+    why: z.ZodCatch<z.ZodOptional<z.ZodString>>;
+}, "strip", z.ZodTypeAny, {
+    place: {
+        epic: string | null;
+        parts: string[];
+        kehikko: {
+            key: string;
+            name?: string | undefined;
+        } | null;
+        project: string;
+        projectId: string;
+        token: string;
+        conversation?: string | undefined;
+        projectName?: string | undefined;
+        looking?: {
+            epic: string | null;
+            parts: string[];
+            kehikko: {
+                key: string;
+                name?: string | undefined;
+            } | null;
+            project: string | null;
+            projectId: string | null;
+        } | null | undefined;
+    } | null;
+    ok: true;
+    why?: string | undefined;
+}, {
+    place: {
+        epic: string | null;
+        parts: string[];
+        kehikko: {
+            key: string;
+            name?: unknown;
+        } | null;
+        project: string;
+        projectId: string;
+        token: string;
+        conversation?: unknown;
+        projectName?: unknown;
+        looking?: unknown;
+    } | null;
+    ok: true;
+    why?: unknown;
+}>;
+export type PlaceResult = z.infer<typeof placeResult>;
+/**
+ * A conversation's place is what a RECORD says (2.4.0), kept by the one that owns it: the module that
+ * started the conversation keeps its own records (Claude's: which conversation belongs to which
+ * place) and issues the token; the host keeps only which module issued a token, in which project.
+ *
+ * `POST /host/place` with this body: a module says it issued `token` for a conversation in `project`
+ * (`projectId` preferred), started on `kehikko` (its key, or null). Programs on this machine only.
+ */
+export declare const placeIssueSchema: z.ZodObject<{
+    module: z.ZodString;
+    token: z.ZodString;
+    project: z.ZodString;
+    projectId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    kehikko: z.ZodNullable<z.ZodString>;
+}, "strip", z.ZodTypeAny, {
+    kehikko: string | null;
+    project: string;
+    module: string;
+    token: string;
+    projectId?: string | null | undefined;
+}, {
+    kehikko: string | null;
+    project: string;
+    module: string;
+    token: string;
+    projectId?: string | null | undefined;
+}>;
+export type PlaceIssue = z.infer<typeof placeIssueSchema>;
+/**
+ * The host's answer to an issue: every Kehikot MCP door the session should be given, each with the
+ * token already on its URL — the host's own and those of the modules on that kehikko. `name` is the
+ * server name the person's agent config already uses for that door when it has one (a per-session
+ * config then replaces theirs by name), else the name the host would register it under.
+ */
+export declare const placeDoorsSchema: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    token: z.ZodString;
+    doors: z.ZodArray<z.ZodObject<{
+        module: z.ZodString;
+        name: z.ZodString;
+        url: z.ZodString;
+        transport: z.ZodCatch<z.ZodEnum<["http", "sse"]>>;
+    }, "strip", z.ZodTypeAny, {
+        name: string;
+        url: string;
+        module: string;
+        transport: "http" | "sse";
+    }, {
+        name: string;
+        url: string;
+        module: string;
+        transport?: unknown;
+    }>, "many">;
+}, "strip", z.ZodTypeAny, {
+    token: string;
+    ok: true;
+    doors: {
+        name: string;
+        url: string;
+        module: string;
+        transport: "http" | "sse";
+    }[];
+}, {
+    token: string;
+    ok: true;
+    doors: {
+        name: string;
+        url: string;
+        module: string;
+        transport?: unknown;
+    }[];
+}>;
+export type PlaceDoors = z.infer<typeof placeDoorsSchema>;
+/**
+ * Where a module that issues tokens answers for one, asked by the host:
+ * `GET <module origin>/api/kehikot/place?kehikot-place=<token>&project=<folder>` → `recordedPlaceResult`.
+ * The place as the module's record says it NOW — a conversation moved to another place, or carried on
+ * under a new id, is answered right — or `null` for a token it did not issue.
+ */
+export declare const RECORDED_PLACE_PATH = "/api/kehikot/place";
+export declare const recordedPlaceResult: z.ZodObject<{
+    ok: z.ZodLiteral<true>;
+    place: z.ZodNullable<z.ZodObject<{
+        conversation: z.ZodString;
+        epic: z.ZodNullable<z.ZodString>;
+        parts: z.ZodArray<z.ZodString, "many">;
+        kehikko: z.ZodNullable<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        epic: string | null;
+        parts: string[];
+        kehikko: string | null;
+        conversation: string;
+    }, {
+        epic: string | null;
+        parts: string[];
+        kehikko: string | null;
+        conversation: string;
+    }>>;
+}, "strip", z.ZodTypeAny, {
+    place: {
+        epic: string | null;
+        parts: string[];
+        kehikko: string | null;
+        conversation: string;
+    } | null;
+    ok: true;
+}, {
+    place: {
+        epic: string | null;
+        parts: string[];
+        kehikko: string | null;
+        conversation: string;
+    } | null;
+    ok: true;
+}>;
+export type RecordedPlaceResult = z.infer<typeof recordedPlaceResult>;
+/** Where a door took the project, epic and parts of a call from. */
+export type PlaceSource = 'arguments' | 'session' | 'none';
+/**
+ * THE RULE (2.4.0): what a call is about. An argument the agent passed wins; otherwise the
+ * session's place (when the call carried a token the host knows); otherwise nothing — and a door
+ * that refused a call without `project` before still refuses it. Pure. `from` is what the door
+ * SAYS in its answer (`DOOR_PLACE_SAYS.used`), every time it took anything from the session.
+ * An `epic` argument naming another epic than the session's is honoured (the agent asked for it);
+ * the parts then are the agent's, or none.
+ */
+export declare function placeDefaults(args: Record<string, unknown>, place: DoorPlace | null): {
+    project: string | null;
+    epic: string | null;
+    parts: string[];
+    from: PlaceSource;
+};
+/**
+ * The sentences a door says about a session's place, in one wording for every module (2.4.0).
+ *
+ * - `belongs(place)`: "This conversation belongs to <project>, epic E (parts …) on kehikko K."
+ * - `looking(place)`: whether the person is looking at the same thing, and what they are on if not;
+ *   `''` when the host sent no `looking`.
+ * - `used(from, place)`: the line a door adds when it took the project or epic from the session.
+ * - `unplaced`: what a door says when it was asked for the session's place and has none.
+ * - `fellBack`: what a door adds when it answered from the person's current view because there is no record.
+ */
+export declare const DOOR_PLACE_SAYS: {
+    readonly belongs: (place: DoorPlace) => string;
+    readonly looking: (place: DoorPlace) => string;
+    readonly used: (from: PlaceSource, place: DoorPlace | null) => string;
+    readonly unplaced: "This conversation isn’t recorded under any place. Name the project (and epic) in the call, or ask the person which epic it is for.";
+    /** The line a door adds whenever it answered from the person's current view for want of a record: never silently. */
+    readonly fellBack: "This conversation is not recorded under any place, so this answer is about what the person has open NOW — not this conversation’s place.";
+};
+/**
  * What became of being asked to show something. `shown`: at least one open page is showing it.
  * `unseen`: no page is open to see it, or none is known to be showing it (a hidden window, a page
  * that did not say). `declined`: the open pages would not move — a talk is being given, a page holds

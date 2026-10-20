@@ -7,8 +7,8 @@
  */
 export { claim, free, identify, originFor, readManifest, sayClaim, search, verdict, DRIFT_SPAN, IDENTIFY_TIMEOUT_MS, LOOPBACK, type Claimed, type ClaimOptions, type Occupant, type Verdict, } from './ports.js';
 export { DEFAULT_FRAME_ORIGINS, frameAncestors, frameOrigins } from './origins.js';
-export { hostHasProject, hostIsProjectUrls, hostProject, resolveDoorProject, IS_PROJECT_PATH, isProjectResult, NO_HOST_ANSWERED, type DoorProject, type HostHasProjectOptions, type HostProject, type IsProjectResult, } from './host.js';
-export { DOOR_PROJECT_SAYS } from '../door.js';
+export { hostHasProject, hostIsProjectUrls, hostProject, resolveDoorProject, hostPlace, hostPlaceUrls, placeTokenOf, resolveDoorPlace, PLACE_PATH, IS_PROJECT_PATH, isProjectResult, NO_HOST_ANSWERED, type DoorProject, type HostHasProjectOptions, type HostProject, type IsProjectResult, } from './host.js';
+export { DOOR_PROJECT_SAYS, DOOR_PLACE_SAYS, PLACE_PARAM, placeDefaults, type DoorPlace } from '../door.js';
 export { neighbourPorts, portOf, readRegistration, registerAt, takesOver, registryDir, type Registered, type Registration, } from './registry.js';
 export { preferred, serves, type DevServerLike, type HttpServerLike, type ServesOptions, type ServesPlugin, } from './plugin.js';
 export { doorOf, listTools, readNeighbour, readNeighbours, NEIGHBOUR_TIMEOUT_MS, type Neighbour, type NeighbourOptions, } from './neighbours.js';

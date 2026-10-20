@@ -271,8 +271,8 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         }[]>>;
     }, "strip", z.ZodTypeAny, {
         url: string;
-        about: string;
         transport: "http" | "sse" | "stdio";
+        about: string;
         subjects: {
             kind: string;
             about: string;
@@ -283,8 +283,8 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         as?: string | undefined;
     }, {
         url: string;
-        about?: string | undefined;
         transport?: "http" | "sse" | "stdio" | undefined;
+        about?: string | undefined;
         as?: string | undefined;
         subjects?: {
             kind: string;
@@ -367,16 +367,52 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
          * `context.prompt` null.
          */
         prompt: z.ZodDefault<z.ZodBoolean>;
+        /**
+         * Claude Code skills this module offers a person (2.5.0): name, summary, version. Each one's
+         * text is served at `skillPath(name)`. An offer, not an install: the host shows the text and
+         * the person decides. Optional and never defaulted; absent means none.
+         */
+        skills: z.ZodOptional<z.ZodEffects<z.ZodArray<z.ZodObject<{
+            name: z.ZodString;
+            summary: z.ZodString;
+            version: z.ZodString;
+        }, "strip", z.ZodTypeAny, {
+            name: string;
+            version: string;
+            summary: string;
+        }, {
+            name: string;
+            version: string;
+            summary: string;
+        }>, "many">, {
+            name: string;
+            version: string;
+            summary: string;
+        }[], {
+            name: string;
+            version: string;
+            summary: string;
+        }[]>>;
     }, "strip", z.ZodTypeAny, {
         protocol: string;
         prompt: boolean;
         uses: string[];
         storage: boolean;
+        skills?: {
+            name: string;
+            version: string;
+            summary: string;
+        }[] | undefined;
     }, {
         protocol?: string | undefined;
         prompt?: boolean | undefined;
         uses?: string[] | undefined;
         storage?: boolean | undefined;
+        skills?: {
+            name: string;
+            version: string;
+            summary: string;
+        }[] | undefined;
     }>>;
     /**
      * What the server answering is built from, and when it started. Optional, added by `doors()`;
@@ -424,6 +460,11 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         prompt: boolean;
         uses: string[];
         storage: boolean;
+        skills?: {
+            name: string;
+            version: string;
+            summary: string;
+        }[] | undefined;
     };
     build?: {
         version: string;
@@ -435,8 +476,8 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     health?: string | undefined;
     mcp?: {
         url: string;
-        about: string;
         transport: "http" | "sse" | "stdio";
+        about: string;
         subjects: {
             kind: string;
             about: string;
@@ -468,8 +509,8 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     health?: string | undefined;
     mcp?: {
         url: string;
-        about?: string | undefined;
         transport?: "http" | "sse" | "stdio" | undefined;
+        about?: string | undefined;
         as?: string | undefined;
         subjects?: {
             kind: string;
@@ -490,6 +531,11 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         prompt?: boolean | undefined;
         uses?: string[] | undefined;
         storage?: boolean | undefined;
+        skills?: {
+            name: string;
+            version: string;
+            summary: string;
+        }[] | undefined;
     } | undefined;
 }>, {
     id: string;
@@ -517,6 +563,11 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         prompt: boolean;
         uses: string[];
         storage: boolean;
+        skills?: {
+            name: string;
+            version: string;
+            summary: string;
+        }[] | undefined;
     };
     build?: {
         version: string;
@@ -528,8 +579,8 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     health?: string | undefined;
     mcp?: {
         url: string;
-        about: string;
         transport: "http" | "sse" | "stdio";
+        about: string;
         subjects: {
             kind: string;
             about: string;
@@ -561,8 +612,8 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     health?: string | undefined;
     mcp?: {
         url: string;
-        about?: string | undefined;
         transport?: "http" | "sse" | "stdio" | undefined;
+        about?: string | undefined;
         as?: string | undefined;
         subjects?: {
             kind: string;
@@ -583,6 +634,11 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         prompt?: boolean | undefined;
         uses?: string[] | undefined;
         storage?: boolean | undefined;
+        skills?: {
+            name: string;
+            version: string;
+            summary: string;
+        }[] | undefined;
     } | undefined;
 }>;
 export type Manifest = z.infer<typeof manifestSchema>;

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { type DoorPlace } from '../door.js';
 /**
  * Asking the host one question a module's SERVER has: is this folder a project a person added here?
  * A page tells its server a path, and the server has no other way to know the path is one the host
@@ -106,3 +107,32 @@ export type DoorProject = {
  * `hostProject`.
  */
 export declare function resolveDoorProject(input: Record<string, unknown> | string, options?: HostHasProjectOptions): Promise<DoorProject>;
+/**
+ * The host's route for a session's place: `GET /host/place?kehikot-place=<token>` answers
+ * `placeResult` (2.4.0). Programs on this machine; a module's SERVER asks it, never its page.
+ */
+export declare const PLACE_PATH = "/host/place";
+/**
+ * The place token a door request carries, or null: the `kehikot-place` query parameter
+ * (`PLACE_PARAM`), read from what a door has — the query (`DoorsOptions.answer` is handed it), a
+ * whole URL, or a request with a `url`. A value that is not spelled like a token is null.
+ */
+export declare function placeTokenOf(input: URLSearchParams | string | {
+    url?: string;
+} | null | undefined): string | null;
+/** The URLs `hostPlace` asks, in order. Pure; exported for tests. */
+export declare function hostPlaceUrls(token: string, env?: Record<string, string | undefined>): string[];
+/**
+ * The place the host minted `token` for, or null — no such token, no host answering, or an answer of
+ * another shape (2.4.0). Asks each origin of `KEHIKOT_ORIGINS` until one knows the token. Never throws.
+ */
+export declare function hostPlace(token: string, options?: HostHasProjectOptions): Promise<DoorPlace | null>;
+/**
+ * The session's place for one door request (2.4.0): the token out of the request (`placeTokenOf`),
+ * then `hostPlace`. Null when the call carried no token or the host does not know it — and the door
+ * then answers exactly as it did before 2.4.0. Combine with `placeDefaults(args, place)` and say
+ * `DOOR_PLACE_SAYS.used(from, place)` when anything was taken from it.
+ */
+export declare function resolveDoorPlace(input: URLSearchParams | string | {
+    url?: string;
+} | null | undefined, options?: HostHasProjectOptions): Promise<DoorPlace | null>;
