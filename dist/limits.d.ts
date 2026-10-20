@@ -202,6 +202,8 @@ export declare const LIMITS: {
     readonly TRACKER_BOARDS: 16;
     /** How many columns one board has. (2.6.0) */
     readonly TRACKER_COLUMNS: 64;
+    /** How many reviewers one change's row names, asked and done. (2.7.0) */
+    readonly REVIEWERS: 32;
     /**
      * How many `(source, epic)` changes a context's `content` carries. See
      * `content.ts`. A host keeps the newest; one dropped costs a module a re-read

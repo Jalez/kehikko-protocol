@@ -145,6 +145,47 @@ export declare const trackerColumnSchema: z.ZodObject<{
     boardUrl?: string | undefined;
 }>;
 export type TrackerColumn = z.infer<typeof trackerColumnSchema>;
+/**
+ * Where one reviewer of a change stands (2.7.0). `requested`: asked and not yet reviewed (a GitHub
+ * review request, a GitLab reviewer who has not approved). `approved`, `changes` (GitHub's
+ * `CHANGES_REQUESTED`) and `commented` are their latest review.
+ */
+export declare const REVIEWER_STATES: readonly ["requested", "approved", "changes", "commented"];
+export type ReviewerState = (typeof REVIEWER_STATES)[number];
+/**
+ * The person's roles on a row, worked out by the host from who the person is on that row's tracker
+ * (2.7.0). `reviewer-asked`: asked to review and not done; `reviewer-done`: has reviewed. Being
+ * mentioned in a comment is not a role.
+ */
+export declare const MY_ROLES: readonly ["reviewer-asked", "reviewer-done", "author", "assignee"];
+export type MyRole = (typeof MY_ROLES)[number];
+/** One reviewer of a change, by login. `name` is the display name when the tracker gave one. (2.7.0) */
+export declare const trackerReviewerSchema: z.ZodObject<{
+    login: z.ZodString;
+    name: z.ZodOptional<z.ZodString>;
+    state: z.ZodEnum<["requested", "approved", "changes", "commented"]>;
+}, "strip", z.ZodTypeAny, {
+    state: "approved" | "requested" | "changes" | "commented";
+    login: string;
+    name?: string | undefined;
+}, {
+    state: "approved" | "requested" | "changes" | "commented";
+    login: string;
+    name?: string | undefined;
+}>;
+export type TrackerReviewer = z.infer<typeof trackerReviewerSchema>;
+/** A change's review discussions: those that can be resolved, counted by whether they are. (2.7.0) */
+export declare const trackerDiscussionsSchema: z.ZodObject<{
+    resolved: z.ZodNumber;
+    unresolved: z.ZodNumber;
+}, "strip", z.ZodTypeAny, {
+    resolved: number;
+    unresolved: number;
+}, {
+    resolved: number;
+    unresolved: number;
+}>;
+export type TrackerDiscussions = z.infer<typeof trackerDiscussionsSchema>;
 /** One ref, as the host last read it. Assignable to `Sighting` from `/facets`. */
 export declare const trackerRowSchema: z.ZodObject<{
     /**
@@ -238,6 +279,45 @@ export declare const trackerRowSchema: z.ZodObject<{
         board: string;
         boardUrl?: string | undefined;
     }>, "many">>;
+    /**
+     * On a change: its reviewers by login, asked and done (2.7.0). Absent when the host did not read
+     * them; empty when nobody was asked and nobody reviewed.
+     */
+    reviewers: z.ZodOptional<z.ZodArray<z.ZodObject<{
+        login: z.ZodString;
+        name: z.ZodOptional<z.ZodString>;
+        state: z.ZodEnum<["requested", "approved", "changes", "commented"]>;
+    }, "strip", z.ZodTypeAny, {
+        state: "approved" | "requested" | "changes" | "commented";
+        login: string;
+        name?: string | undefined;
+    }, {
+        state: "approved" | "requested" | "changes" | "commented";
+        login: string;
+        name?: string | undefined;
+    }>, "many">>;
+    /** The author's login, beside `author` (which may be a display name). Null: the tracker named none. (2.7.0) */
+    authorLogin: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    /** The assignees' logins, beside `assignees`. (2.7.0) */
+    assigneeLogins: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+    /**
+     * The person's roles on this item, worked out by the host from who they are on this row's tracker
+     * (2.7.0). Absent when the host does not know who the person is there; empty when they have none.
+     */
+    myRoles: z.ZodOptional<z.ZodEffects<z.ZodArray<z.ZodEnum<["reviewer-asked", "reviewer-done", "author", "assignee"]>, "many">, ("reviewer-asked" | "reviewer-done" | "author" | "assignee")[], ("reviewer-asked" | "reviewer-done" | "author" | "assignee")[]>>;
+    /** On a change: its resolvable review discussions, resolved and not. (2.7.0) */
+    discussions: z.ZodOptional<z.ZodObject<{
+        resolved: z.ZodNumber;
+        unresolved: z.ZodNumber;
+    }, "strip", z.ZodTypeAny, {
+        resolved: number;
+        unresolved: number;
+    }, {
+        resolved: number;
+        unresolved: number;
+    }>>;
+    /** On a change: when its head was last pushed, or its last commit's time where the tracker gives no push. (2.7.0) */
+    lastPushAt: z.ZodOptional<z.ZodString>;
     /** When the host read this row. A scoped refresh moves some rows and not others. */
     readAt: z.ZodString;
     detail: z.ZodOptional<z.ZodObject<{
@@ -321,10 +401,10 @@ export declare const trackerRowSchema: z.ZodObject<{
         headSha?: string | null | undefined;
         approvedBy?: string[] | undefined;
     } | undefined;
+    author?: string | null | undefined;
     stateReason?: string | null | undefined;
     closedByMerge?: boolean | undefined;
     draft?: boolean | undefined;
-    author?: string | null | undefined;
     createdAt?: string | null | undefined;
     updatedAt?: string | null | undefined;
     closedAt?: string | null | undefined;
@@ -341,6 +421,19 @@ export declare const trackerRowSchema: z.ZodObject<{
         board: string;
         boardUrl?: string | undefined;
     }[] | undefined;
+    reviewers?: {
+        state: "approved" | "requested" | "changes" | "commented";
+        login: string;
+        name?: string | undefined;
+    }[] | undefined;
+    authorLogin?: string | null | undefined;
+    assigneeLogins?: string[] | undefined;
+    myRoles?: ("reviewer-asked" | "reviewer-done" | "author" | "assignee")[] | undefined;
+    discussions?: {
+        resolved: number;
+        unresolved: number;
+    } | undefined;
+    lastPushAt?: string | undefined;
 }, {
     number: number;
     state: "open" | "closed" | "merged";
@@ -365,12 +458,12 @@ export declare const trackerRowSchema: z.ZodObject<{
         headSha?: string | null | undefined;
         approvedBy?: string[] | undefined;
     } | undefined;
+    author?: string | null | undefined;
     stateReason?: string | null | undefined;
     closedByMerge?: boolean | undefined;
     draft?: boolean | undefined;
     labels?: string[] | undefined;
     assignees?: string[] | undefined;
-    author?: string | null | undefined;
     createdAt?: string | null | undefined;
     updatedAt?: string | null | undefined;
     closedAt?: string | null | undefined;
@@ -391,6 +484,19 @@ export declare const trackerRowSchema: z.ZodObject<{
         board: string;
         boardUrl?: string | undefined;
     }[] | undefined;
+    reviewers?: {
+        state: "approved" | "requested" | "changes" | "commented";
+        login: string;
+        name?: string | undefined;
+    }[] | undefined;
+    authorLogin?: string | null | undefined;
+    assigneeLogins?: string[] | undefined;
+    myRoles?: ("reviewer-asked" | "reviewer-done" | "author" | "assignee")[] | undefined;
+    discussions?: {
+        resolved: number;
+        unresolved: number;
+    } | undefined;
+    lastPushAt?: string | undefined;
 }>;
 export type TrackerRow = z.infer<typeof trackerRowSchema>;
 /** One place the host reads (per source, not per tracker), and how that went last time. */
@@ -593,6 +699,45 @@ export declare const trackerReadingResult: z.ZodObject<{
             board: string;
             boardUrl?: string | undefined;
         }>, "many">>;
+        /**
+         * On a change: its reviewers by login, asked and done (2.7.0). Absent when the host did not read
+         * them; empty when nobody was asked and nobody reviewed.
+         */
+        reviewers: z.ZodOptional<z.ZodArray<z.ZodObject<{
+            login: z.ZodString;
+            name: z.ZodOptional<z.ZodString>;
+            state: z.ZodEnum<["requested", "approved", "changes", "commented"]>;
+        }, "strip", z.ZodTypeAny, {
+            state: "approved" | "requested" | "changes" | "commented";
+            login: string;
+            name?: string | undefined;
+        }, {
+            state: "approved" | "requested" | "changes" | "commented";
+            login: string;
+            name?: string | undefined;
+        }>, "many">>;
+        /** The author's login, beside `author` (which may be a display name). Null: the tracker named none. (2.7.0) */
+        authorLogin: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+        /** The assignees' logins, beside `assignees`. (2.7.0) */
+        assigneeLogins: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        /**
+         * The person's roles on this item, worked out by the host from who they are on this row's tracker
+         * (2.7.0). Absent when the host does not know who the person is there; empty when they have none.
+         */
+        myRoles: z.ZodOptional<z.ZodEffects<z.ZodArray<z.ZodEnum<["reviewer-asked", "reviewer-done", "author", "assignee"]>, "many">, ("reviewer-asked" | "reviewer-done" | "author" | "assignee")[], ("reviewer-asked" | "reviewer-done" | "author" | "assignee")[]>>;
+        /** On a change: its resolvable review discussions, resolved and not. (2.7.0) */
+        discussions: z.ZodOptional<z.ZodObject<{
+            resolved: z.ZodNumber;
+            unresolved: z.ZodNumber;
+        }, "strip", z.ZodTypeAny, {
+            resolved: number;
+            unresolved: number;
+        }, {
+            resolved: number;
+            unresolved: number;
+        }>>;
+        /** On a change: when its head was last pushed, or its last commit's time where the tracker gives no push. (2.7.0) */
+        lastPushAt: z.ZodOptional<z.ZodString>;
         /** When the host read this row. A scoped refresh moves some rows and not others. */
         readAt: z.ZodString;
         detail: z.ZodOptional<z.ZodObject<{
@@ -676,10 +821,10 @@ export declare const trackerReadingResult: z.ZodObject<{
             headSha?: string | null | undefined;
             approvedBy?: string[] | undefined;
         } | undefined;
+        author?: string | null | undefined;
         stateReason?: string | null | undefined;
         closedByMerge?: boolean | undefined;
         draft?: boolean | undefined;
-        author?: string | null | undefined;
         createdAt?: string | null | undefined;
         updatedAt?: string | null | undefined;
         closedAt?: string | null | undefined;
@@ -696,6 +841,19 @@ export declare const trackerReadingResult: z.ZodObject<{
             board: string;
             boardUrl?: string | undefined;
         }[] | undefined;
+        reviewers?: {
+            state: "approved" | "requested" | "changes" | "commented";
+            login: string;
+            name?: string | undefined;
+        }[] | undefined;
+        authorLogin?: string | null | undefined;
+        assigneeLogins?: string[] | undefined;
+        myRoles?: ("reviewer-asked" | "reviewer-done" | "author" | "assignee")[] | undefined;
+        discussions?: {
+            resolved: number;
+            unresolved: number;
+        } | undefined;
+        lastPushAt?: string | undefined;
     }, {
         number: number;
         state: "open" | "closed" | "merged";
@@ -720,12 +878,12 @@ export declare const trackerReadingResult: z.ZodObject<{
             headSha?: string | null | undefined;
             approvedBy?: string[] | undefined;
         } | undefined;
+        author?: string | null | undefined;
         stateReason?: string | null | undefined;
         closedByMerge?: boolean | undefined;
         draft?: boolean | undefined;
         labels?: string[] | undefined;
         assignees?: string[] | undefined;
-        author?: string | null | undefined;
         createdAt?: string | null | undefined;
         updatedAt?: string | null | undefined;
         closedAt?: string | null | undefined;
@@ -746,6 +904,19 @@ export declare const trackerReadingResult: z.ZodObject<{
             board: string;
             boardUrl?: string | undefined;
         }[] | undefined;
+        reviewers?: {
+            state: "approved" | "requested" | "changes" | "commented";
+            login: string;
+            name?: string | undefined;
+        }[] | undefined;
+        authorLogin?: string | null | undefined;
+        assigneeLogins?: string[] | undefined;
+        myRoles?: ("reviewer-asked" | "reviewer-done" | "author" | "assignee")[] | undefined;
+        discussions?: {
+            resolved: number;
+            unresolved: number;
+        } | undefined;
+        lastPushAt?: string | undefined;
     }>, "many">>;
     missing: z.ZodDefault<z.ZodArray<z.ZodObject<{
         ref: z.ZodString;
@@ -800,10 +971,10 @@ export declare const trackerReadingResult: z.ZodObject<{
             headSha?: string | null | undefined;
             approvedBy?: string[] | undefined;
         } | undefined;
+        author?: string | null | undefined;
         stateReason?: string | null | undefined;
         closedByMerge?: boolean | undefined;
         draft?: boolean | undefined;
-        author?: string | null | undefined;
         createdAt?: string | null | undefined;
         updatedAt?: string | null | undefined;
         closedAt?: string | null | undefined;
@@ -820,6 +991,19 @@ export declare const trackerReadingResult: z.ZodObject<{
             board: string;
             boardUrl?: string | undefined;
         }[] | undefined;
+        reviewers?: {
+            state: "approved" | "requested" | "changes" | "commented";
+            login: string;
+            name?: string | undefined;
+        }[] | undefined;
+        authorLogin?: string | null | undefined;
+        assigneeLogins?: string[] | undefined;
+        myRoles?: ("reviewer-asked" | "reviewer-done" | "author" | "assignee")[] | undefined;
+        discussions?: {
+            resolved: number;
+            unresolved: number;
+        } | undefined;
+        lastPushAt?: string | undefined;
     }[];
     missing: {
         ref: string;
@@ -862,12 +1046,12 @@ export declare const trackerReadingResult: z.ZodObject<{
             headSha?: string | null | undefined;
             approvedBy?: string[] | undefined;
         } | undefined;
+        author?: string | null | undefined;
         stateReason?: string | null | undefined;
         closedByMerge?: boolean | undefined;
         draft?: boolean | undefined;
         labels?: string[] | undefined;
         assignees?: string[] | undefined;
-        author?: string | null | undefined;
         createdAt?: string | null | undefined;
         updatedAt?: string | null | undefined;
         closedAt?: string | null | undefined;
@@ -888,6 +1072,19 @@ export declare const trackerReadingResult: z.ZodObject<{
             board: string;
             boardUrl?: string | undefined;
         }[] | undefined;
+        reviewers?: {
+            state: "approved" | "requested" | "changes" | "commented";
+            login: string;
+            name?: string | undefined;
+        }[] | undefined;
+        authorLogin?: string | null | undefined;
+        assigneeLogins?: string[] | undefined;
+        myRoles?: ("reviewer-asked" | "reviewer-done" | "author" | "assignee")[] | undefined;
+        discussions?: {
+            resolved: number;
+            unresolved: number;
+        } | undefined;
+        lastPushAt?: string | undefined;
     }[] | undefined;
     missing?: {
         ref: string;

@@ -105,6 +105,37 @@ export const trackerColumnSchema = z.object({
 })
 export type TrackerColumn = z.infer<typeof trackerColumnSchema>
 
+/**
+ * Where one reviewer of a change stands (2.7.0). `requested`: asked and not yet reviewed (a GitHub
+ * review request, a GitLab reviewer who has not approved). `approved`, `changes` (GitHub's
+ * `CHANGES_REQUESTED`) and `commented` are their latest review.
+ */
+export const REVIEWER_STATES = ['requested', 'approved', 'changes', 'commented'] as const
+export type ReviewerState = (typeof REVIEWER_STATES)[number]
+
+/**
+ * The person's roles on a row, worked out by the host from who the person is on that row's tracker
+ * (2.7.0). `reviewer-asked`: asked to review and not done; `reviewer-done`: has reviewed. Being
+ * mentioned in a comment is not a role.
+ */
+export const MY_ROLES = ['reviewer-asked', 'reviewer-done', 'author', 'assignee'] as const
+export type MyRole = (typeof MY_ROLES)[number]
+
+/** One reviewer of a change, by login. `name` is the display name when the tracker gave one. (2.7.0) */
+export const trackerReviewerSchema = z.object({
+  login: person,
+  name: person.optional(),
+  state: z.enum(REVIEWER_STATES),
+})
+export type TrackerReviewer = z.infer<typeof trackerReviewerSchema>
+
+/** A change's review discussions: those that can be resolved, counted by whether they are. (2.7.0) */
+export const trackerDiscussionsSchema = z.object({
+  resolved: z.number().int().min(0),
+  unresolved: z.number().int().min(0),
+})
+export type TrackerDiscussions = z.infer<typeof trackerDiscussionsSchema>
+
 /** One ref, as the host last read it. Assignable to `Sighting` from `/facets`. */
 export const trackerRowSchema = z.object({
   /**
@@ -158,6 +189,28 @@ export const trackerRowSchema = z.object({
   column: trackerColumnSchema.optional(),
   /** Every board the item is on, `column` first. Present only when it is on more than one. (2.6.0) */
   columns: z.array(trackerColumnSchema).max(LIMITS.TRACKER_BOARDS).optional(),
+  /**
+   * On a change: its reviewers by login, asked and done (2.7.0). Absent when the host did not read
+   * them; empty when nobody was asked and nobody reviewed.
+   */
+  reviewers: z.array(trackerReviewerSchema).max(LIMITS.REVIEWERS).optional(),
+  /** The author's login, beside `author` (which may be a display name). Null: the tracker named none. (2.7.0) */
+  authorLogin: person.nullable().optional(),
+  /** The assignees' logins, beside `assignees`. (2.7.0) */
+  assigneeLogins: z.array(person).max(LIMITS.TRACKER_PEOPLE).optional(),
+  /**
+   * The person's roles on this item, worked out by the host from who they are on this row's tracker
+   * (2.7.0). Absent when the host does not know who the person is there; empty when they have none.
+   */
+  myRoles: z
+    .array(z.enum(MY_ROLES))
+    .max(MY_ROLES.length)
+    .refine((roles) => new Set(roles).size === roles.length, { message: 'A role is named once.' })
+    .optional(),
+  /** On a change: its resolvable review discussions, resolved and not. (2.7.0) */
+  discussions: trackerDiscussionsSchema.optional(),
+  /** On a change: when its head was last pushed, or its last commit's time where the tracker gives no push. (2.7.0) */
+  lastPushAt: instant.optional(),
   /** When the host read this row. A scoped refresh moves some rows and not others. */
   readAt: instant,
   detail: trackerDetailSchema.optional(),

@@ -73,6 +73,30 @@ const { boards } = await request('tracker.columns', {})
 
 `tracker.columns` is under `trackers:read`: the same reading, another view of it.
 
+### People and my roles (2.7.0)
+
+A change's row names its people by login, so a module can tell who is who
+without matching display names: `reviewers?: { login, name?, state }[]` with
+`state` one of `requested` (asked, not reviewed yet), `approved`, `changes`
+(changes requested) or `commented` — the reviewer's latest review —
+`authorLogin?` and `assigneeLogins?` beside the `author` and `assignees` that
+were already there.
+
+The host knows who the person is on each tracker host (`gh api user`,
+`glab api user`) and adds `myRoles?`: any of `reviewer-asked`,
+`reviewer-done`, `author`, `assignee`. Absent when the host does not know who
+the person is there; `[]` when they have no role. Being mentioned is not a role.
+
+A change also carries `discussions?: { resolved, unresolved }` — its
+resolvable review threads — and `lastPushAt?`, when its head was last pushed
+(or its last commit's time where the tracker gives no push time). Absent is not
+zero: the host may not have read them.
+
+```ts
+const { rows } = await request('tracker.get', { project: true })
+const mine = rows.filter((r) => r.myRoles?.includes('reviewer-asked'))
+```
+
 `live.get` stays, answered by a host as a view over the same reading, until
 the modules that ask it have moved.
 
