@@ -279,6 +279,9 @@ export {
   trackerReadingResult,
   trackerRefreshResult,
   trackerSignalSchema,
+  trackerColumnSchema,
+  trackerBoardSchema,
+  trackerColumnsResult,
   readTrackerRef,
   spellTrackerRef,
   type Tracker,
@@ -298,6 +301,9 @@ export {
   type TrackerRefreshResult,
   type TrackerSignal,
   type TrackerRefName,
+  type TrackerColumn,
+  type TrackerBoard,
+  type TrackerColumns,
 } from './tracker.js'
 
 export {

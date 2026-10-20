@@ -7,6 +7,22 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.6.0 — 2026-10-21
+
+Board columns. A tracker row says where its item stands on the project's own kanban board — a GitHub
+Project (v2) and its Status, or a GitLab issue board and its lists — and `tracker.columns` lists the
+boards. **Additive**; `PROTOCOL` is still 2. A row without a column parses as before.
+
+### Added
+
+- `trackerRowSchema.column?: { name, board, boardUrl? }` (`trackerColumnSchema`, `TrackerColumn`):
+  `board` is the board's title, `name` the column. `columns?` lists every board when the item is on
+  more than one, `column` first. Absent when the item is on no board or the host could not read boards.
+- `tracker.columns` (params `{}`), filed under `trackers:read`, answered with `trackerColumnsResult`:
+  `{ boards: Array<{ board, boardUrl?, columns: string[] }> }` (`trackerBoardSchema`, `TrackerBoard`,
+  `TrackerColumns`).
+- `LIMITS.TRACKER_BOARDS` (16) and `LIMITS.TRACKER_COLUMNS` (64).
+
 ## 2.5.0 — 2026-10-20
 
 Skills a module offers. A module can list Claude Code skills in its manifest and serve each one's

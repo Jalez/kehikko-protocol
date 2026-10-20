@@ -305,6 +305,7 @@ and a module that declares none gets none of the methods below.
 | `disposition.set` | `disposition:set` |
 | `tracker.get` | `trackers:read` |
 | `tracker.refresh` | `trackers:refresh` |
+| `tracker.columns` | `trackers:read` |
 | `content.changed` | `content:report` |
 | `parts.set` | `parts:set` |
 | `activity.set` | `activity:report` |
@@ -824,6 +825,13 @@ and answer when the read lands. Every module on the canvas is told through
 
 A host joins a refresh to one already running rather than starting a
 second; two presses are one read.
+
+#### `methodParams.tracker.columns`
+
+The boards of the open project's sources and their columns, from the host's
+reading, answered at once with `trackerColumnsResult`. No params: it is
+about the project, and where each item stands is on its row (`column`).
+Filed under `trackers:read` because it is part of the same reading. (2.6.0)
 
 #### `methodParams.content.changed`
 

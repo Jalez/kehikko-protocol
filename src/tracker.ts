@@ -90,6 +90,21 @@ export const trackerDetailSchema = z.object({
 })
 export type TrackerDetailFacts = z.infer<typeof trackerDetailSchema>
 
+/**
+ * Where an item stands on one of the project's own boards: a GitHub Project (v2) and its Status
+ * option, or a GitLab issue board and the list whose label the item carries. `board` is the
+ * board's title, `name` the column. A closed item on a GitLab board is in its Closed list. (2.6.0)
+ */
+export const trackerColumnSchema = z.object({
+  /** The column: a GitHub Project's Status option, or a GitLab board list's label (`Closed` for a closed item). */
+  name: z.string().min(1).max(LIMITS.TRACKER_LABEL),
+  /** The board's title: a GitHub Project v2 title, or a GitLab board name. */
+  board: z.string().min(1).max(LIMITS.TITLE),
+  /** Where the board is, when the tracker said. */
+  boardUrl: z.string().max(LIMITS.URL).optional(),
+})
+export type TrackerColumn = z.infer<typeof trackerColumnSchema>
+
 /** One ref, as the host last read it. Assignable to `Sighting` from `/facets`. */
 export const trackerRowSchema = z.object({
   /**
@@ -135,6 +150,14 @@ export const trackerRowSchema = z.object({
   pipeline: z.enum(PIPELINE_STATES).optional(),
   /** On a change: where its review stands. */
   review: z.enum(REVIEW_STATES).optional(),
+  /**
+   * Where the item stands on the project's board (2.6.0). Absent when it is on no board, when the
+   * project has none, or when the host could not read boards (a GitHub token without `read:project`)
+   * — absent says nothing about which. On several boards: the first of `columns`.
+   */
+  column: trackerColumnSchema.optional(),
+  /** Every board the item is on, `column` first. Present only when it is on more than one. (2.6.0) */
+  columns: z.array(trackerColumnSchema).max(LIMITS.TRACKER_BOARDS).optional(),
   /** When the host read this row. A scoped refresh moves some rows and not others. */
   readAt: instant,
   detail: trackerDetailSchema.optional(),
@@ -210,6 +233,24 @@ export const trackerRefreshResult = z.object({
   why: z.string().max(LIMITS.REASON).default(''),
 })
 export type TrackerRefreshResult = z.infer<typeof trackerRefreshResult>
+
+/** One board of the project, with its columns in board order. See `tracker.columns`. (2.6.0) */
+export const trackerBoardSchema = z.object({
+  board: z.string().min(1).max(LIMITS.TITLE),
+  boardUrl: z.string().max(LIMITS.URL).optional(),
+  /** The columns, left to right as the board shows them. */
+  columns: z.array(z.string().min(1).max(LIMITS.TRACKER_LABEL)).max(LIMITS.TRACKER_COLUMNS).default([]),
+})
+export type TrackerBoard = z.infer<typeof trackerBoardSchema>
+
+/**
+ * What `tracker.columns` answers: the boards of the project's sources and their columns, from the
+ * host's reading. Empty when the project has no board or the host could not read them. (2.6.0)
+ */
+export const trackerColumnsResult = z.object({
+  boards: z.array(trackerBoardSchema).max(LIMITS.TRACKER_BOARDS).default([]),
+})
+export type TrackerColumns = z.infer<typeof trackerColumnsResult>
 
 /** How long to wait for a `tracker.refresh` to answer. A read of a few hundred refs over two trackers. */
 export const TRACKER_REFRESH_WITHIN_MS = 90_000

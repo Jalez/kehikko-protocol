@@ -115,6 +115,8 @@ export declare const METHODS: {
     readonly 'disposition.set': "disposition:set";
     readonly 'tracker.get': "trackers:read";
     readonly 'tracker.refresh': "trackers:refresh";
+    /** The boards and their columns: part of the same reading, so under the same capability. (2.6.0) */
+    readonly 'tracker.columns': "trackers:read";
     readonly 'content.changed': "content:report";
     readonly 'parts.set': "parts:set";
     readonly 'activity.set': "activity:report";
@@ -668,6 +670,11 @@ export declare const methodParams: {
         refs?: string[] | undefined;
         project?: true | undefined;
     }>;
+    /**
+     * The boards of the open project's sources and their columns, from the host's reading; answered at
+     * once with `trackerColumnsResult`. Where each item stands is on its row (`column`). (2.6.0)
+     */
+    readonly 'tracker.columns': z.ZodObject<{}, "strip", z.ZodTypeAny, {}, {}>;
     /**
      * This module's own material changed, for this epic or, with no epic, for no one epic in particular. The host
      * tells every container in the project through `context.content`, the caller's included. Whose material and

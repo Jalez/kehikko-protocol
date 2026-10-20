@@ -8,7 +8,7 @@ import { activityItemsSchema } from './activity.js';
  * definition; `wire.ts` imports nothing from here.
  */
 import { DISPOSITIONS, filterChoiceSchema, passageSchema } from './wire.js';
-import { TRACKER_DETAILS, trackerReadingResult, trackerRefreshResult } from './tracker.js';
+import { TRACKER_DETAILS, trackerColumnsResult, trackerReadingResult, trackerRefreshResult } from './tracker.js';
 import { PART_ID, partListSchema } from './parts.js';
 /**
  * The questions a module can ask, by name and by shape: capabilities, methods, each method's
@@ -126,6 +126,8 @@ export const METHODS = {
     'disposition.set': 'disposition:set',
     'tracker.get': 'trackers:read',
     'tracker.refresh': 'trackers:refresh',
+    /** The boards and their columns: part of the same reading, so under the same capability. (2.6.0) */
+    'tracker.columns': 'trackers:read',
     'content.changed': 'content:report',
     'parts.set': 'parts:set',
     'activity.set': 'activity:report',
@@ -301,6 +303,11 @@ export const methodParams = {
      */
     'tracker.refresh': z.object(trackerScope).refine(oneScope, { message: ONE_SCOPE }),
     /**
+     * The boards of the open project's sources and their columns, from the host's reading; answered at
+     * once with `trackerColumnsResult`. Where each item stands is on its row (`column`). (2.6.0)
+     */
+    'tracker.columns': z.object({}),
+    /**
      * This module's own material changed, for this epic or, with no epic, for no one epic in particular. The host
      * tells every container in the project through `context.content`, the caller's included. Whose material and
      * `at` are the host's facts, not params. Report AFTER the write has landed.
@@ -467,6 +474,7 @@ export const methodResults = {
      */
     'tracker.get': trackerReadingResult,
     'tracker.refresh': trackerRefreshResult,
+    'tracker.columns': trackerColumnsResult,
     'parts.set': partsSetResult,
     'activity.set': activitySetResult,
 };
