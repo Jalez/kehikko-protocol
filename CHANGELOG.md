@@ -7,6 +7,32 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.4.0 — 2026-10-20
+
+A conversation's place. A conversation started from a place in Kehikot (project, epic, picked parts,
+kehikko) carries a token on the URL of every Kehikot door it is given, and a door answers from the record
+the token names instead of whatever the person switched the screen to since. **Additive**; `PROTOCOL` is
+still 2. A door that ignores the token answers as before.
+
+### Added
+
+- `PLACE_PARAM` (`'kehikot-place'`), the query parameter a token travels in; `PLACE_TOKEN`, its spelling.
+- `doorPlaceSchema` / `DoorPlace` (`token`, `conversation?`, `projectId`, `project`, `projectName?`,
+  `epic`, `parts`, `kehikko`, `looking?`), `lookingSchema`, and `placeResult` (with `why?`) — the host's
+  answer at `GET /host/place`.
+- `placeIssueSchema` and `placeDoorsSchema`: a module that starts conversations issues a token at
+  `POST /host/place` and gets every Kehikot door (name, url with the token on it) back.
+- `RECORDED_PLACE_PATH` (`/api/kehikot/place`) and `recordedPlaceResult`: where the host asks the issuing
+  module what its record says about a token now.
+- `placeDefaults(args, place)` → `{ project, epic, parts, from }`: arguments, then the record, then nothing.
+- `DOOR_PLACE_SAYS`: `belongs(place)`, `looking(place)`, `used(from, place)`, `unplaced`, `fellBack`.
+- `/serve`: `PLACE_PATH`, `placeTokenOf(query | url | request)`, `hostPlaceUrls`, `hostPlace(token)`,
+  `resolveDoorPlace(input)`. All fail closed to null.
+
+### Changed
+
+- docs/asking.md: a section on a conversation's place, with what Claude Code does and does not tell a door.
+
 ## 2.3.0 — 2026-10-19
 
 A project that moved is found from the path it had. A project is its id; after a person renames or

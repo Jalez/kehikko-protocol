@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { LIMITS } from './limits.js'
-import { own } from './ids.js'
+import { EPIC_SLUG, KEHIKKO_KEY, MODULE_ID, PROJECT_ID, own } from './ids.js'
 
 /**
  * What a module's MCP door agrees with every other module's: how its tools spell the two context
@@ -71,6 +71,179 @@ export const DOOR_PROJECT_SAYS = {
   notProject: (path: string): string => `${path} is not a project open in Kehikot.`,
   unnamed: 'Name the project: `project` is its absolute folder.',
   followed: (from: string, to: string): string => `The project at ${from} has moved to ${to}; this answer is about ${to}. Use that path from now on.`,
+} as const
+
+/* ------------------------------------------------------------------------ *
+ * Whose place is this conversation? (2.4.0)
+ * ------------------------------------------------------------------------ */
+
+/**
+ * The query parameter a session's place token travels in, on the URL of every Kehikot MCP door
+ * the session is configured with: `http://127.0.0.1:4590/mcp?kehikot-place=<token>` (2.4.0).
+ *
+ * A token is a POINTER, not a credential: it names one conversation's record (project, epic, parts, kehikko)
+ * the issuing module keeps, and grants nothing a call without it could not already do by naming the
+ * same place in its arguments. It is unguessable so that two sessions never share one by accident.
+ * A query parameter rather than a header because a door's `answer` is handed the query
+ * (`DoorsOptions.answer`) and every MCP client's config takes a URL.
+ */
+export const PLACE_PARAM = 'kehikot-place'
+
+/** A place token's spelling: 22 to 64 URL-safe characters (the issuing module mints 32 random bytes, base64url). */
+export const PLACE_TOKEN = /^[A-Za-z0-9_-]{22,64}$/
+
+const placeKehikko = z.object({ key: z.string().regex(KEHIKKO_KEY), name: z.string().max(LIMITS.SUMMARY).optional().catch(undefined) })
+
+/** Where a person is looking now, as the host sends it beside a place: the same three fields, or null when no page is open. */
+export const lookingSchema = z.object({
+  projectId: z.string().regex(PROJECT_ID).nullable().catch(null),
+  project: z.string().min(1).max(4096).nullable().catch(null),
+  epic: z.string().regex(EPIC_SLUG).nullable(),
+  parts: z.array(z.string().regex(EPIC_SLUG)).max(LIMITS.PARTS).catch([]),
+  kehikko: placeKehikko.nullable().catch(null),
+})
+export type Looking = z.infer<typeof lookingSchema>
+
+/**
+ * One session's place, as the host answers `GET /host/place?kehikot-place=<token>` (2.4.0).
+ * `project` is the folder the project is at NOW (a renamed folder is followed: the token keeps the
+ * project's id). `epic` is null for a place with no epic; `parts` empty is the whole epic.
+ * `looking` is what the person has on screen now, when a page of the host is open.
+ */
+export const doorPlaceSchema = z.object({
+  token: z.string().regex(PLACE_TOKEN),
+  /** The conversation the record is about (Claude Code's session id), when the record names one. */
+  conversation: z.string().min(1).max(128).optional().catch(undefined),
+  projectId: z.string().regex(PROJECT_ID),
+  project: z.string().min(1).max(4096),
+  projectName: z.string().max(LIMITS.SUMMARY).optional().catch(undefined),
+  epic: z.string().regex(EPIC_SLUG).nullable(),
+  parts: z.array(z.string().regex(EPIC_SLUG)).max(LIMITS.PARTS),
+  kehikko: placeKehikko.nullable(),
+  looking: lookingSchema.nullable().optional().catch(null),
+})
+export type DoorPlace = z.infer<typeof doorPlaceSchema>
+
+/** The host's answer at `/host/place`: the place, or `null` for a token it does not hold. */
+export const placeResult = z.object({
+  ok: z.literal(true),
+  place: doorPlaceSchema.nullable(),
+  /** With no place for a token the host knows: why (its module has no record, or did not answer). */
+  why: z.string().max(LIMITS.REASON).optional().catch(undefined),
+})
+export type PlaceResult = z.infer<typeof placeResult>
+
+/**
+ * A conversation's place is what a RECORD says (2.4.0), kept by the one that owns it: the module that
+ * started the conversation keeps its own records (Claude's: which conversation belongs to which
+ * place) and issues the token; the host keeps only which module issued a token, in which project.
+ *
+ * `POST /host/place` with this body: a module says it issued `token` for a conversation in `project`
+ * (`projectId` preferred), started on `kehikko` (its key, or null). Programs on this machine only.
+ */
+export const placeIssueSchema = z.object({
+  module: z.string().regex(MODULE_ID),
+  token: z.string().regex(PLACE_TOKEN),
+  project: z.string().min(1).max(4096),
+  projectId: z.string().regex(PROJECT_ID).nullable().optional(),
+  kehikko: z.string().regex(KEHIKKO_KEY).nullable(),
+})
+export type PlaceIssue = z.infer<typeof placeIssueSchema>
+
+/**
+ * The host's answer to an issue: every Kehikot MCP door the session should be given, each with the
+ * token already on its URL — the host's own and those of the modules on that kehikko. `name` is the
+ * server name the person's agent config already uses for that door when it has one (a per-session
+ * config then replaces theirs by name), else the name the host would register it under.
+ */
+export const placeDoorsSchema = z.object({
+  ok: z.literal(true),
+  token: z.string().regex(PLACE_TOKEN),
+  doors: z
+    .array(z.object({ module: z.string().min(1).max(128), name: z.string().min(1).max(128), url: z.string().url().max(2048), transport: z.enum(['http', 'sse']).catch('http') }))
+    .max(128),
+})
+export type PlaceDoors = z.infer<typeof placeDoorsSchema>
+
+/**
+ * Where a module that issues tokens answers for one, asked by the host:
+ * `GET <module origin>/api/kehikot/place?kehikot-place=<token>&project=<folder>` → `recordedPlaceResult`.
+ * The place as the module's record says it NOW — a conversation moved to another place, or carried on
+ * under a new id, is answered right — or `null` for a token it did not issue.
+ */
+export const RECORDED_PLACE_PATH = '/api/kehikot/place'
+export const recordedPlaceResult = z.object({
+  ok: z.literal(true),
+  place: z
+    .object({
+      conversation: z.string().min(1).max(128),
+      epic: z.string().regex(EPIC_SLUG).nullable(),
+      parts: z.array(z.string().regex(EPIC_SLUG)).max(LIMITS.PARTS),
+      kehikko: z.string().regex(KEHIKKO_KEY).nullable(),
+    })
+    .nullable(),
+})
+export type RecordedPlaceResult = z.infer<typeof recordedPlaceResult>
+
+/** Where a door took the project, epic and parts of a call from. */
+export type PlaceSource = 'arguments' | 'session' | 'none'
+
+/**
+ * THE RULE (2.4.0): what a call is about. An argument the agent passed wins; otherwise the
+ * session's place (when the call carried a token the host knows); otherwise nothing — and a door
+ * that refused a call without `project` before still refuses it. Pure. `from` is what the door
+ * SAYS in its answer (`DOOR_PLACE_SAYS.used`), every time it took anything from the session.
+ * An `epic` argument naming another epic than the session's is honoured (the agent asked for it);
+ * the parts then are the agent's, or none.
+ */
+export function placeDefaults(
+  args: Record<string, unknown>,
+  place: DoorPlace | null,
+): { project: string | null; epic: string | null; parts: string[]; from: PlaceSource } {
+  const named = doorContext(args)
+  const said = named.project !== null || named.epic !== null
+  /* No place, or the agent named another project: the arguments are the whole answer. */
+  if (!place || (named.project !== null && named.project !== place.project)) {
+    return { project: named.project, epic: named.epic, parts: [], from: said ? 'arguments' : 'none' }
+  }
+  const epic = named.epic ?? place.epic
+  const took = named.project === null || named.epic === null
+  return { project: place.project, epic, parts: epic === place.epic ? [...place.parts] : [], from: took ? 'session' : 'arguments' }
+}
+
+const namedPlace = (p: { epic: string | null; parts: readonly string[]; kehikko: { key: string; name?: string } | null }): string =>
+  `${p.epic ? `epic ${p.epic}` : 'no epic'}${p.parts.length ? ` (parts ${p.parts.join(', ')})` : ''}${p.kehikko ? ` on kehikko ${p.kehikko.name ? `"${p.kehikko.name}"` : p.kehikko.key}` : ''}`
+
+/**
+ * The sentences a door says about a session's place, in one wording for every module (2.4.0).
+ *
+ * - `belongs(place)`: "This conversation belongs to <project>, epic E (parts …) on kehikko K."
+ * - `looking(place)`: whether the person is looking at the same thing, and what they are on if not;
+ *   `''` when the host sent no `looking`.
+ * - `used(from, place)`: the line a door adds when it took the project or epic from the session.
+ * - `unplaced`: what a door says when it was asked for the session's place and has none.
+ * - `fellBack`: what a door adds when it answered from the person's current view because there is no record.
+ */
+export const DOOR_PLACE_SAYS = {
+  belongs: (place: DoorPlace): string =>
+    `This conversation belongs to ${place.projectName ?? place.project} (${place.project}), ${namedPlace(place)}.`,
+  looking: (place: DoorPlace): string => {
+    const now = place.looking
+    if (now === undefined) return ''
+    if (now === null) return 'No page of Kehikot is open, so the person is not looking at anything there now.'
+    const same = now.projectId === place.projectId && now.epic === place.epic && now.kehikko?.key === place.kehikko?.key
+    const sameParts = same && [...now.parts].sort().join('+') === [...place.parts].sort().join('+')
+    if (sameParts) return 'The person is looking at this place now.'
+    const where = `${now.projectId !== place.projectId && now.project ? `${now.project}, ` : ''}${namedPlace(now)}`
+    return `The person is looking at something else now (${where}); this conversation's place has not changed.`
+  },
+  used: (from: PlaceSource, place: DoorPlace | null): string =>
+    from === 'session' && place ? `Taken from this conversation's place: ${place.project}, ${namedPlace(place)}.` : '',
+  unplaced:
+    'This conversation isn’t recorded under any place. Name the project (and epic) in the call, or ask the person which epic it is for.',
+  /** The line a door adds whenever it answered from the person's current view for want of a record: never silently. */
+  fellBack:
+    'This conversation is not recorded under any place, so this answer is about what the person has open NOW — not this conversation’s place.',
 } as const
 
 /* ------------------------------------------------------------------------ *

@@ -288,6 +288,63 @@ the new path, which must answer `project: true` with the same id — and answers
 
 `hostHasProject` is still there, a boolean (`project: true` only), for a gate that only needs yes or no.
 
+## A conversation's place (2.4.0)
+
+A person runs several agent sessions at once, each about its own epic, and switches the epic on screen
+while they work. A door that read "the open epic" would answer every session about whatever the person
+looked at last. So a conversation's place is what a RECORD says about that conversation — never what is
+on screen, never a folder taken as a stand-in.
+
+**Records, each with one owner.** The module that starts a conversation keeps its records (Claude's:
+which conversation belongs to which place — project, epic, picked parts, kehikko) and issues the
+conversation a token. The host keeps only which module issued a token, in which project; it asks that
+module what its record says, every time (`RECORDED_PLACE_PATH`), so a conversation moved to another
+place, or carried on under a new id, is answered right.
+
+**How it travels.** The module that starts a session issues the token to the host — `POST /host/place`
+with `placeIssueSchema` — and the host answers `placeDoorsSchema`: every Kehikot door the session should
+have (the host's, and those of the modules on that kehikko) with `?kehikot-place=<token>` (`PLACE_PARAM`)
+on each URL, under the server name the person's agent config already uses for it. The session gets them
+in a per-session config, so every Kehikot door it calls sees the token on its own URL.
+
+**What a token is.** A pointer, not a credential: it names one conversation's record and grants nothing a
+call could not do by naming that place in its arguments. Unguessable (`PLACE_TOKEN`) so two conversations
+never share one by accident.
+
+**What a door does.**
+
+```ts
+import { DOOR_PLACE_SAYS, placeDefaults, resolveDoorPlace } from 'kehikot-module-protocol/serve'
+
+// in `answer(method, path, query, body)` for /mcp, on tools/call:
+const place = await resolveDoorPlace(query)          // null: no token, or no record behind it
+const at = placeDefaults(args, place)                // { project, epic, parts, from }
+if (!at.project) return refuse(DOOR_PROJECT_SAYS.unnamed)
+const said = DOOR_PLACE_SAYS.used(at.from, place)    // add this line to the answer when it is not ''
+```
+
+The rule, the same at every door:
+
+1. An argument the agent passed wins — `project`, `epic`.
+2. Otherwise the conversation's record: its project, its epic, and its parts when the epic is its own.
+3. Otherwise what the door did before 2.4.0. A door that refused a call without `project` still does; a
+   door that used the person's current view says so every time, in `DOOR_PLACE_SAYS.fellBack`.
+
+`DOOR_PLACE_SAYS.belongs(place)` is the one-line answer to "which epic is this conversation about?";
+`DOOR_PLACE_SAYS.looking(place)` says what the person has on screen now, when it differs.
+
+`GET /host/place?kehikot-place=<token>` answers `placeResult`: `{ ok: true, place: DoorPlace | null, why? }`,
+where `place.project` is the folder the project is at now, `place.conversation` the conversation the record
+is about, and `place.looking` what a page of the host has on screen (null with no page open).
+`hostPlace(token)` asks it; `placeTokenOf(query | url | request)` reads the token. Both fail closed to
+null and never throw. Server-side only.
+
+**A conversation nobody started from a place.** Measured on Claude Code 2.1.304: an MCP server is not told
+which conversation is calling — no header, no `initialize` field, and `${CLAUDE_CODE_SESSION_ID}` in an MCP
+config is not expanded to the session's own id. Claude Code's `SessionStart` hook IS told (`session_id`,
+`cwd`), so a module that keeps conversation records can hear of one the moment it starts and list it as
+not yet assigned. A door with no token answers as rule 3 says.
+
 ## Learning another module's name and door
 
 `context.containers` stays small: a module id, whether it is picked out, whether it is folded, and what it says it is showing. Everything else about a neighbour is in that neighbour's manifest, and from 1.1.0 there is a reader for it beside `readRegistration`:
