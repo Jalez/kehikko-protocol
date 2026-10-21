@@ -186,6 +186,64 @@ export declare const trackerDiscussionsSchema: z.ZodObject<{
     unresolved: number;
 }>;
 export type TrackerDiscussions = z.infer<typeof trackerDiscussionsSchema>;
+/**
+ * What the latest activity on an item was (2.8.0). `comment`: a comment or a review note; `review`: a
+ * review submitted or an approval; `commit`: a commit pushed to a change; `state`: opened, closed,
+ * reopened or merged.
+ */
+export declare const LAST_ACTIVITY_KINDS: readonly ["comment", "review", "commit", "state"];
+export type LastActivityKind = (typeof LAST_ACTIVITY_KINDS)[number];
+/**
+ * The latest thing somebody did on an item, among what the host read: its opening, comments, reviews,
+ * commits and state changes (2.8.0). Absent when the host did not read them or could not tell who
+ * did the latest one; the host never falls back to an earlier one.
+ */
+export declare const trackerActivitySchema: z.ZodObject<{
+    /** Who did it, by login on the row's tracker. */
+    login: z.ZodString;
+    at: z.ZodString;
+    kind: z.ZodEnum<["comment", "review", "commit", "state"]>;
+    /**
+     * Whether it was the person, worked out by the host the way it works out `myRoles`. Absent when the
+     * host does not know who the person is there: a module then cannot tell, and does not guess.
+     */
+    mine: z.ZodOptional<z.ZodBoolean>;
+}, "strip", z.ZodTypeAny, {
+    at: string;
+    login: string;
+    kind: "state" | "commit" | "comment" | "review";
+    mine?: boolean | undefined;
+}, {
+    at: string;
+    login: string;
+    kind: "state" | "commit" | "comment" | "review";
+    mine?: boolean | undefined;
+}>;
+export type TrackerActivity = z.infer<typeof trackerActivitySchema>;
+/**
+ * Where a change sits in a stack of changes (2.8.0): changes in one repository, each targeting the
+ * branch the one below it comes from. Worked out by the host across its reading, open changes only.
+ * `below`: the open change whose head branch is this one's base. `above`: the open changes whose base
+ * is this one's head branch, more than one where the stack forks. At least one of the two is there.
+ * The whole stack is found by following `below` down and `above` up through the reading's rows.
+ */
+export declare const trackerStackSchema: z.ZodEffects<z.ZodObject<{
+    below: z.ZodOptional<z.ZodString>;
+    above: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
+}, "strip", z.ZodTypeAny, {
+    above: string[];
+    below?: string | undefined;
+}, {
+    below?: string | undefined;
+    above?: string[] | undefined;
+}>, {
+    above: string[];
+    below?: string | undefined;
+}, {
+    below?: string | undefined;
+    above?: string[] | undefined;
+}>;
+export type TrackerStack = z.infer<typeof trackerStackSchema>;
 /** One ref, as the host last read it. Assignable to `Sighting` from `/facets`. */
 export declare const trackerRowSchema: z.ZodObject<{
     /**
@@ -318,6 +376,55 @@ export declare const trackerRowSchema: z.ZodObject<{
     }>>;
     /** On a change: when its head was last pushed, or its last commit's time where the tracker gives no push. (2.7.0) */
     lastPushAt: z.ZodOptional<z.ZodString>;
+    /** On a change: the branch it would merge into (GitHub's base, GitLab's target). (2.8.0) */
+    baseBranch: z.ZodOptional<z.ZodString>;
+    /**
+     * On a change: the branch it comes from (GitHub's head, GitLab's source), when it lives in the
+     * row's own repository. Absent for a change from a fork, whose branch no change here can target. (2.8.0)
+     */
+    headBranch: z.ZodOptional<z.ZodString>;
+    /**
+     * On an open change: where it sits in a stack of open changes (2.8.0). Absent when it is in none, or
+     * when the host did not read branches.
+     */
+    stack: z.ZodOptional<z.ZodEffects<z.ZodObject<{
+        below: z.ZodOptional<z.ZodString>;
+        above: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
+    }, "strip", z.ZodTypeAny, {
+        above: string[];
+        below?: string | undefined;
+    }, {
+        below?: string | undefined;
+        above?: string[] | undefined;
+    }>, {
+        above: string[];
+        below?: string | undefined;
+    }, {
+        below?: string | undefined;
+        above?: string[] | undefined;
+    }>>;
+    /** The latest activity on the item and who did it (2.8.0). Absent when not read or not attributable. */
+    lastActivity: z.ZodOptional<z.ZodObject<{
+        /** Who did it, by login on the row's tracker. */
+        login: z.ZodString;
+        at: z.ZodString;
+        kind: z.ZodEnum<["comment", "review", "commit", "state"]>;
+        /**
+         * Whether it was the person, worked out by the host the way it works out `myRoles`. Absent when the
+         * host does not know who the person is there: a module then cannot tell, and does not guess.
+         */
+        mine: z.ZodOptional<z.ZodBoolean>;
+    }, "strip", z.ZodTypeAny, {
+        at: string;
+        login: string;
+        kind: "state" | "commit" | "comment" | "review";
+        mine?: boolean | undefined;
+    }, {
+        at: string;
+        login: string;
+        kind: "state" | "commit" | "comment" | "review";
+        mine?: boolean | undefined;
+    }>>;
     /** When the host read this row. A scoped refresh moves some rows and not others. */
     readAt: z.ZodString;
     detail: z.ZodOptional<z.ZodObject<{
@@ -377,9 +484,9 @@ export declare const trackerRowSchema: z.ZodObject<{
     host: string;
     ref: string;
     readAt: string;
+    kind: "issue" | "change";
     tracker: "github" | "gitlab";
     repo: string;
-    kind: "issue" | "change";
     title: string;
     url: string;
     labels: string[];
@@ -402,6 +509,7 @@ export declare const trackerRowSchema: z.ZodObject<{
         approvedBy?: string[] | undefined;
     } | undefined;
     author?: string | null | undefined;
+    review?: "approved" | "changes-requested" | "required" | undefined;
     stateReason?: string | null | undefined;
     closedByMerge?: boolean | undefined;
     draft?: boolean | undefined;
@@ -410,7 +518,6 @@ export declare const trackerRowSchema: z.ZodObject<{
     closedAt?: string | null | undefined;
     mergedAt?: string | null | undefined;
     pipeline?: "success" | "failed" | "running" | "pending" | "canceled" | "skipped" | "manual" | undefined;
-    review?: "approved" | "changes-requested" | "required" | undefined;
     column?: {
         name: string;
         board: string;
@@ -434,15 +541,27 @@ export declare const trackerRowSchema: z.ZodObject<{
         unresolved: number;
     } | undefined;
     lastPushAt?: string | undefined;
+    baseBranch?: string | undefined;
+    headBranch?: string | undefined;
+    stack?: {
+        above: string[];
+        below?: string | undefined;
+    } | undefined;
+    lastActivity?: {
+        at: string;
+        login: string;
+        kind: "state" | "commit" | "comment" | "review";
+        mine?: boolean | undefined;
+    } | undefined;
 }, {
     number: number;
     state: "open" | "closed" | "merged";
     host: string;
     ref: string;
     readAt: string;
+    kind: "issue" | "change";
     tracker: "github" | "gitlab";
     repo: string;
-    kind: "issue" | "change";
     title: string;
     url: string;
     detail?: {
@@ -459,6 +578,7 @@ export declare const trackerRowSchema: z.ZodObject<{
         approvedBy?: string[] | undefined;
     } | undefined;
     author?: string | null | undefined;
+    review?: "approved" | "changes-requested" | "required" | undefined;
     stateReason?: string | null | undefined;
     closedByMerge?: boolean | undefined;
     draft?: boolean | undefined;
@@ -473,7 +593,6 @@ export declare const trackerRowSchema: z.ZodObject<{
         relation: "closes" | "closed-by";
     }[] | undefined;
     pipeline?: "success" | "failed" | "running" | "pending" | "canceled" | "skipped" | "manual" | undefined;
-    review?: "approved" | "changes-requested" | "required" | undefined;
     column?: {
         name: string;
         board: string;
@@ -497,6 +616,18 @@ export declare const trackerRowSchema: z.ZodObject<{
         unresolved: number;
     } | undefined;
     lastPushAt?: string | undefined;
+    baseBranch?: string | undefined;
+    headBranch?: string | undefined;
+    stack?: {
+        below?: string | undefined;
+        above?: string[] | undefined;
+    } | undefined;
+    lastActivity?: {
+        at: string;
+        login: string;
+        kind: "state" | "commit" | "comment" | "review";
+        mine?: boolean | undefined;
+    } | undefined;
 }>;
 export type TrackerRow = z.infer<typeof trackerRowSchema>;
 /** One place the host reads (per source, not per tracker), and how that went last time. */
@@ -738,6 +869,55 @@ export declare const trackerReadingResult: z.ZodObject<{
         }>>;
         /** On a change: when its head was last pushed, or its last commit's time where the tracker gives no push. (2.7.0) */
         lastPushAt: z.ZodOptional<z.ZodString>;
+        /** On a change: the branch it would merge into (GitHub's base, GitLab's target). (2.8.0) */
+        baseBranch: z.ZodOptional<z.ZodString>;
+        /**
+         * On a change: the branch it comes from (GitHub's head, GitLab's source), when it lives in the
+         * row's own repository. Absent for a change from a fork, whose branch no change here can target. (2.8.0)
+         */
+        headBranch: z.ZodOptional<z.ZodString>;
+        /**
+         * On an open change: where it sits in a stack of open changes (2.8.0). Absent when it is in none, or
+         * when the host did not read branches.
+         */
+        stack: z.ZodOptional<z.ZodEffects<z.ZodObject<{
+            below: z.ZodOptional<z.ZodString>;
+            above: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
+        }, "strip", z.ZodTypeAny, {
+            above: string[];
+            below?: string | undefined;
+        }, {
+            below?: string | undefined;
+            above?: string[] | undefined;
+        }>, {
+            above: string[];
+            below?: string | undefined;
+        }, {
+            below?: string | undefined;
+            above?: string[] | undefined;
+        }>>;
+        /** The latest activity on the item and who did it (2.8.0). Absent when not read or not attributable. */
+        lastActivity: z.ZodOptional<z.ZodObject<{
+            /** Who did it, by login on the row's tracker. */
+            login: z.ZodString;
+            at: z.ZodString;
+            kind: z.ZodEnum<["comment", "review", "commit", "state"]>;
+            /**
+             * Whether it was the person, worked out by the host the way it works out `myRoles`. Absent when the
+             * host does not know who the person is there: a module then cannot tell, and does not guess.
+             */
+            mine: z.ZodOptional<z.ZodBoolean>;
+        }, "strip", z.ZodTypeAny, {
+            at: string;
+            login: string;
+            kind: "state" | "commit" | "comment" | "review";
+            mine?: boolean | undefined;
+        }, {
+            at: string;
+            login: string;
+            kind: "state" | "commit" | "comment" | "review";
+            mine?: boolean | undefined;
+        }>>;
         /** When the host read this row. A scoped refresh moves some rows and not others. */
         readAt: z.ZodString;
         detail: z.ZodOptional<z.ZodObject<{
@@ -797,9 +977,9 @@ export declare const trackerReadingResult: z.ZodObject<{
         host: string;
         ref: string;
         readAt: string;
+        kind: "issue" | "change";
         tracker: "github" | "gitlab";
         repo: string;
-        kind: "issue" | "change";
         title: string;
         url: string;
         labels: string[];
@@ -822,6 +1002,7 @@ export declare const trackerReadingResult: z.ZodObject<{
             approvedBy?: string[] | undefined;
         } | undefined;
         author?: string | null | undefined;
+        review?: "approved" | "changes-requested" | "required" | undefined;
         stateReason?: string | null | undefined;
         closedByMerge?: boolean | undefined;
         draft?: boolean | undefined;
@@ -830,7 +1011,6 @@ export declare const trackerReadingResult: z.ZodObject<{
         closedAt?: string | null | undefined;
         mergedAt?: string | null | undefined;
         pipeline?: "success" | "failed" | "running" | "pending" | "canceled" | "skipped" | "manual" | undefined;
-        review?: "approved" | "changes-requested" | "required" | undefined;
         column?: {
             name: string;
             board: string;
@@ -854,15 +1034,27 @@ export declare const trackerReadingResult: z.ZodObject<{
             unresolved: number;
         } | undefined;
         lastPushAt?: string | undefined;
+        baseBranch?: string | undefined;
+        headBranch?: string | undefined;
+        stack?: {
+            above: string[];
+            below?: string | undefined;
+        } | undefined;
+        lastActivity?: {
+            at: string;
+            login: string;
+            kind: "state" | "commit" | "comment" | "review";
+            mine?: boolean | undefined;
+        } | undefined;
     }, {
         number: number;
         state: "open" | "closed" | "merged";
         host: string;
         ref: string;
         readAt: string;
+        kind: "issue" | "change";
         tracker: "github" | "gitlab";
         repo: string;
-        kind: "issue" | "change";
         title: string;
         url: string;
         detail?: {
@@ -879,6 +1071,7 @@ export declare const trackerReadingResult: z.ZodObject<{
             approvedBy?: string[] | undefined;
         } | undefined;
         author?: string | null | undefined;
+        review?: "approved" | "changes-requested" | "required" | undefined;
         stateReason?: string | null | undefined;
         closedByMerge?: boolean | undefined;
         draft?: boolean | undefined;
@@ -893,7 +1086,6 @@ export declare const trackerReadingResult: z.ZodObject<{
             relation: "closes" | "closed-by";
         }[] | undefined;
         pipeline?: "success" | "failed" | "running" | "pending" | "canceled" | "skipped" | "manual" | undefined;
-        review?: "approved" | "changes-requested" | "required" | undefined;
         column?: {
             name: string;
             board: string;
@@ -917,6 +1109,18 @@ export declare const trackerReadingResult: z.ZodObject<{
             unresolved: number;
         } | undefined;
         lastPushAt?: string | undefined;
+        baseBranch?: string | undefined;
+        headBranch?: string | undefined;
+        stack?: {
+            below?: string | undefined;
+            above?: string[] | undefined;
+        } | undefined;
+        lastActivity?: {
+            at: string;
+            login: string;
+            kind: "state" | "commit" | "comment" | "review";
+            mine?: boolean | undefined;
+        } | undefined;
     }>, "many">>;
     missing: z.ZodDefault<z.ZodArray<z.ZodObject<{
         ref: z.ZodString;
@@ -947,9 +1151,9 @@ export declare const trackerReadingResult: z.ZodObject<{
         host: string;
         ref: string;
         readAt: string;
+        kind: "issue" | "change";
         tracker: "github" | "gitlab";
         repo: string;
-        kind: "issue" | "change";
         title: string;
         url: string;
         labels: string[];
@@ -972,6 +1176,7 @@ export declare const trackerReadingResult: z.ZodObject<{
             approvedBy?: string[] | undefined;
         } | undefined;
         author?: string | null | undefined;
+        review?: "approved" | "changes-requested" | "required" | undefined;
         stateReason?: string | null | undefined;
         closedByMerge?: boolean | undefined;
         draft?: boolean | undefined;
@@ -980,7 +1185,6 @@ export declare const trackerReadingResult: z.ZodObject<{
         closedAt?: string | null | undefined;
         mergedAt?: string | null | undefined;
         pipeline?: "success" | "failed" | "running" | "pending" | "canceled" | "skipped" | "manual" | undefined;
-        review?: "approved" | "changes-requested" | "required" | undefined;
         column?: {
             name: string;
             board: string;
@@ -1004,6 +1208,18 @@ export declare const trackerReadingResult: z.ZodObject<{
             unresolved: number;
         } | undefined;
         lastPushAt?: string | undefined;
+        baseBranch?: string | undefined;
+        headBranch?: string | undefined;
+        stack?: {
+            above: string[];
+            below?: string | undefined;
+        } | undefined;
+        lastActivity?: {
+            at: string;
+            login: string;
+            kind: "state" | "commit" | "comment" | "review";
+            mine?: boolean | undefined;
+        } | undefined;
     }[];
     missing: {
         ref: string;
@@ -1028,9 +1244,9 @@ export declare const trackerReadingResult: z.ZodObject<{
         host: string;
         ref: string;
         readAt: string;
+        kind: "issue" | "change";
         tracker: "github" | "gitlab";
         repo: string;
-        kind: "issue" | "change";
         title: string;
         url: string;
         detail?: {
@@ -1047,6 +1263,7 @@ export declare const trackerReadingResult: z.ZodObject<{
             approvedBy?: string[] | undefined;
         } | undefined;
         author?: string | null | undefined;
+        review?: "approved" | "changes-requested" | "required" | undefined;
         stateReason?: string | null | undefined;
         closedByMerge?: boolean | undefined;
         draft?: boolean | undefined;
@@ -1061,7 +1278,6 @@ export declare const trackerReadingResult: z.ZodObject<{
             relation: "closes" | "closed-by";
         }[] | undefined;
         pipeline?: "success" | "failed" | "running" | "pending" | "canceled" | "skipped" | "manual" | undefined;
-        review?: "approved" | "changes-requested" | "required" | undefined;
         column?: {
             name: string;
             board: string;
@@ -1085,6 +1301,18 @@ export declare const trackerReadingResult: z.ZodObject<{
             unresolved: number;
         } | undefined;
         lastPushAt?: string | undefined;
+        baseBranch?: string | undefined;
+        headBranch?: string | undefined;
+        stack?: {
+            below?: string | undefined;
+            above?: string[] | undefined;
+        } | undefined;
+        lastActivity?: {
+            at: string;
+            login: string;
+            kind: "state" | "commit" | "comment" | "review";
+            mine?: boolean | undefined;
+        } | undefined;
     }[] | undefined;
     missing?: {
         ref: string;

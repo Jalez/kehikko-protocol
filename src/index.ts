@@ -286,6 +286,9 @@ export {
   MY_ROLES,
   trackerReviewerSchema,
   trackerDiscussionsSchema,
+  LAST_ACTIVITY_KINDS,
+  trackerActivitySchema,
+  trackerStackSchema,
   readTrackerRef,
   spellTrackerRef,
   type Tracker,
@@ -312,6 +315,9 @@ export {
   type MyRole,
   type TrackerReviewer,
   type TrackerDiscussions,
+  type LastActivityKind,
+  type TrackerActivity,
+  type TrackerStack,
 } from './tracker.js'
 
 export {

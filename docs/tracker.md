@@ -97,6 +97,34 @@ const { rows } = await request('tracker.get', { project: true })
 const mine = rows.filter((r) => r.myRoles?.includes('reviewer-asked'))
 ```
 
+### Stacks and last activity (2.8.0)
+
+A change's row says which branch it would merge into, `baseBranch?`, and
+which it comes from, `headBranch?` (absent for a change from a fork: no
+change in the repository can be based on a fork's branch).
+
+A stacked change is one whose base branch is another open change's head
+branch in the same repository. The host works that out across its whole
+reading, open changes only, and puts it on each row as `stack?`:
+`below?` is the ref of the change underneath, `above` the refs of the changes
+built on this one (more than one where the stack forks). A row in no stack
+has no `stack`. Follow `below` down and `above` up through the reading's rows
+for the whole stack; a ref the reading does not hold ends the walk.
+
+```ts
+const byRef = new Map(rows.map((r) => [r.ref, r]))
+const bottom = (r) => (r.stack?.below && byRef.get(r.stack.below) ? bottom(byRef.get(r.stack.below)) : r)
+```
+
+`lastActivity?: { login, at, kind, mine? }` is the latest thing somebody did
+on the item among what the host read: its opening and state changes
+(`state`), comments (`comment`), reviews and approvals (`review`) and, on a
+change, its commits (`commit`). `mine` says whether that was the person, the
+way `myRoles` does; it is absent when the host does not know who the person
+is, and a module that wants to say "somebody else had the last word" says
+nothing then. When the latest activity cannot be put to a login the field is
+absent; the host never falls back to an earlier one.
+
 `live.get` stays, answered by a host as a view over the same reading, until
 the modules that ask it have moved.
 

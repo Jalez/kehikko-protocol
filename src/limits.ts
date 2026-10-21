@@ -209,6 +209,8 @@ export const LIMITS = {
   TRACKER_COLUMNS: 64,
   /** How many reviewers one change's row names, asked and done. (2.7.0) */
   REVIEWERS: 32,
+  /** A git branch name a change targets or comes from. Git allows longer; no tracker shows one. (2.8.0) */
+  BRANCH: 255,
   /**
    * How many `(source, epic)` changes a context's `content` carries. See
    * `content.ts`. A host keeps the newest; one dropped costs a module a re-read

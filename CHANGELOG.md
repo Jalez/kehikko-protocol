@@ -7,6 +7,24 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.8.0 — 2026-10-21
+
+Stacks and last activity. A change's row names the branch it targets and the branch it comes from,
+and where it sits in a stack of open changes; any row says what the latest activity on it was, by
+whom, and whether that was the person. **Additive**; `PROTOCOL` is still 2. A row without them
+parses as before.
+
+### Added
+
+- `trackerRowSchema.baseBranch?` and `headBranch?` (a change's target and source branches;
+  `headBranch` absent for a change from a fork). `LIMITS.BRANCH` (255).
+- `trackerRowSchema.stack?: { below?: ref, above: ref[] }` (`trackerStackSchema`, `TrackerStack`):
+  the open change whose head branch is this one's base, and the open changes based on this one's
+  head. At least one is named. Worked out by the host across its reading.
+- `trackerRowSchema.lastActivity?: { login, at, kind, mine? }` (`trackerActivitySchema`,
+  `TrackerActivity`), `kind` in `LAST_ACTIVITY_KINDS`: `comment`, `review`, `commit`, `state`.
+  `mine` is the host's word on whether it was the person; absent when it does not know.
+
 ## 2.7.0 — 2026-10-21
 
 People and roles. A tracker row names a change's reviewers, author and assignees by login, says the
