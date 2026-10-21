@@ -244,6 +244,36 @@ export declare const trackerStackSchema: z.ZodEffects<z.ZodObject<{
     above?: string[] | undefined;
 }>;
 export type TrackerStack = z.infer<typeof trackerStackSchema>;
+/**
+ * Whether a string is an `https:` URL. An avatar is drawn by a module's page from wherever the
+ * tracker keeps it, so nothing but `https:` is carried: no `http:`, no `data:`, no `javascript:`. (2.10.0)
+ */
+export declare function isHttpsUrl(value: string): boolean;
+/** A person's picture: an absolute `https:` URL, at most `LIMITS.URL` long. (2.10.0) */
+export declare const avatarUrlSchema: z.ZodEffects<z.ZodString, string, string>;
+/**
+ * What the tracker says about one person a row names by login (2.10.0). `name`: their display name,
+ * when the tracker gave one. `avatarUrl`: their picture, absolute `https:`, as the tracker serves it
+ * (a host makes a relative one absolute against the tracker's host, and drops one it cannot). An
+ * entry says at least one of the two.
+ */
+export declare const trackerPersonSchema: z.ZodEffects<z.ZodObject<{
+    name: z.ZodOptional<z.ZodString>;
+    avatarUrl: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
+}, "strip", z.ZodTypeAny, {
+    name?: string | undefined;
+    avatarUrl?: string | undefined;
+}, {
+    name?: string | undefined;
+    avatarUrl?: string | undefined;
+}>, {
+    name?: string | undefined;
+    avatarUrl?: string | undefined;
+}, {
+    name?: string | undefined;
+    avatarUrl?: string | undefined;
+}>;
+export type TrackerPerson = z.infer<typeof trackerPersonSchema>;
 /** One ref, as the host last read it. Assignable to `Sighting` from `/facets`. */
 export declare const trackerRowSchema: z.ZodObject<{
     /**
@@ -425,6 +455,35 @@ export declare const trackerRowSchema: z.ZodObject<{
         kind: "state" | "commit" | "comment" | "review";
         mine?: boolean | undefined;
     }>>;
+    /**
+     * The people the row names by login — `reviewers[].login`, `assigneeLogins`, `authorLogin`,
+     * `lastActivity.login` — keyed by that login, with their display name and avatar where the
+     * tracker gave them (2.10.0). One map for the row rather than a field beside every login. Absent
+     * when the host did not read them; a login missing from it has nothing known. At most
+     * `LIMITS.ROW_PEOPLE` entries.
+     */
+    people: z.ZodOptional<z.ZodEffects<z.ZodRecord<z.ZodString, z.ZodEffects<z.ZodObject<{
+        name: z.ZodOptional<z.ZodString>;
+        avatarUrl: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
+    }, "strip", z.ZodTypeAny, {
+        name?: string | undefined;
+        avatarUrl?: string | undefined;
+    }, {
+        name?: string | undefined;
+        avatarUrl?: string | undefined;
+    }>, {
+        name?: string | undefined;
+        avatarUrl?: string | undefined;
+    }, {
+        name?: string | undefined;
+        avatarUrl?: string | undefined;
+    }>>, Record<string, {
+        name?: string | undefined;
+        avatarUrl?: string | undefined;
+    }>, Record<string, {
+        name?: string | undefined;
+        avatarUrl?: string | undefined;
+    }>>>;
     /** When the host read this row. A scoped refresh moves some rows and not others. */
     readAt: z.ZodString;
     detail: z.ZodOptional<z.ZodObject<{
@@ -553,6 +612,10 @@ export declare const trackerRowSchema: z.ZodObject<{
         kind: "state" | "commit" | "comment" | "review";
         mine?: boolean | undefined;
     } | undefined;
+    people?: Record<string, {
+        name?: string | undefined;
+        avatarUrl?: string | undefined;
+    }> | undefined;
 }, {
     number: number;
     state: "open" | "closed" | "merged";
@@ -628,6 +691,10 @@ export declare const trackerRowSchema: z.ZodObject<{
         kind: "state" | "commit" | "comment" | "review";
         mine?: boolean | undefined;
     } | undefined;
+    people?: Record<string, {
+        name?: string | undefined;
+        avatarUrl?: string | undefined;
+    }> | undefined;
 }>;
 export type TrackerRow = z.infer<typeof trackerRowSchema>;
 /** One place the host reads (per source, not per tracker), and how that went last time. */
@@ -918,6 +985,35 @@ export declare const trackerReadingResult: z.ZodObject<{
             kind: "state" | "commit" | "comment" | "review";
             mine?: boolean | undefined;
         }>>;
+        /**
+         * The people the row names by login — `reviewers[].login`, `assigneeLogins`, `authorLogin`,
+         * `lastActivity.login` — keyed by that login, with their display name and avatar where the
+         * tracker gave them (2.10.0). One map for the row rather than a field beside every login. Absent
+         * when the host did not read them; a login missing from it has nothing known. At most
+         * `LIMITS.ROW_PEOPLE` entries.
+         */
+        people: z.ZodOptional<z.ZodEffects<z.ZodRecord<z.ZodString, z.ZodEffects<z.ZodObject<{
+            name: z.ZodOptional<z.ZodString>;
+            avatarUrl: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
+        }, "strip", z.ZodTypeAny, {
+            name?: string | undefined;
+            avatarUrl?: string | undefined;
+        }, {
+            name?: string | undefined;
+            avatarUrl?: string | undefined;
+        }>, {
+            name?: string | undefined;
+            avatarUrl?: string | undefined;
+        }, {
+            name?: string | undefined;
+            avatarUrl?: string | undefined;
+        }>>, Record<string, {
+            name?: string | undefined;
+            avatarUrl?: string | undefined;
+        }>, Record<string, {
+            name?: string | undefined;
+            avatarUrl?: string | undefined;
+        }>>>;
         /** When the host read this row. A scoped refresh moves some rows and not others. */
         readAt: z.ZodString;
         detail: z.ZodOptional<z.ZodObject<{
@@ -1046,6 +1142,10 @@ export declare const trackerReadingResult: z.ZodObject<{
             kind: "state" | "commit" | "comment" | "review";
             mine?: boolean | undefined;
         } | undefined;
+        people?: Record<string, {
+            name?: string | undefined;
+            avatarUrl?: string | undefined;
+        }> | undefined;
     }, {
         number: number;
         state: "open" | "closed" | "merged";
@@ -1121,6 +1221,10 @@ export declare const trackerReadingResult: z.ZodObject<{
             kind: "state" | "commit" | "comment" | "review";
             mine?: boolean | undefined;
         } | undefined;
+        people?: Record<string, {
+            name?: string | undefined;
+            avatarUrl?: string | undefined;
+        }> | undefined;
     }>, "many">>;
     missing: z.ZodDefault<z.ZodArray<z.ZodObject<{
         ref: z.ZodString;
@@ -1220,6 +1324,10 @@ export declare const trackerReadingResult: z.ZodObject<{
             kind: "state" | "commit" | "comment" | "review";
             mine?: boolean | undefined;
         } | undefined;
+        people?: Record<string, {
+            name?: string | undefined;
+            avatarUrl?: string | undefined;
+        }> | undefined;
     }[];
     missing: {
         ref: string;
@@ -1313,6 +1421,10 @@ export declare const trackerReadingResult: z.ZodObject<{
             kind: "state" | "commit" | "comment" | "review";
             mine?: boolean | undefined;
         } | undefined;
+        people?: Record<string, {
+            name?: string | undefined;
+            avatarUrl?: string | undefined;
+        }> | undefined;
     }[] | undefined;
     missing?: {
         ref: string;

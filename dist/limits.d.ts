@@ -207,6 +207,11 @@ export declare const LIMITS: {
     /** A git branch name a change targets or comes from. Git allows longer; no tracker shows one. (2.8.0) */
     readonly BRANCH: 255;
     /**
+     * How many people one row's `people` map describes: its reviewers, assignees, author and the
+     * latest actor, with room to spare. (2.10.0)
+     */
+    readonly ROW_PEOPLE: 64;
+    /**
      * How many `(source, epic)` changes a context's `content` carries. See
      * `content.ts`. A host keeps the newest; one dropped costs a module a re-read
      * it did not need, never a change it did.
