@@ -125,6 +125,35 @@ is, and a module that wants to say "somebody else had the last word" says
 nothing then. When the latest activity cannot be put to a login the field is
 absent; the host never falls back to an earlier one.
 
+### People and their pictures (2.10.0)
+
+A row names people by login in four places: `reviewers[].login`,
+`assigneeLogins`, `authorLogin` and `lastActivity.login`. What the tracker says
+about each of them is in ONE map on the row, keyed by login, rather than a
+field beside every login:
+
+```ts
+people?: Record<login, { name?: string; avatarUrl?: string }>
+```
+
+`name` is the display name where the tracker gave one; `avatarUrl` is the
+person's picture, always an absolute `https:` URL (`avatarUrlSchema`,
+`isHttpsUrl`). The host makes a tracker's relative avatar path (a self-hosted
+GitLab's `/uploads/...`) absolute against the tracker's host, and leaves out one
+that is not `https:`. An entry says at least one of the two; a login with
+nothing known is not in the map; the map is absent when the host did not read
+people at all. At most `LIMITS.ROW_PEOPLE` entries.
+
+The protocol carries the URL; where a module may load a picture from is its own
+decision. A module that draws avatars should load them only from the hosts it
+expects for that tracker (its CSP `img-src` saying the same), with
+`referrerpolicy="no-referrer"`, and fall back to the person's initials when
+there is no URL or the picture does not load.
+
+```ts
+const face = (row, login) => row.people?.[login]?.avatarUrl
+```
+
 `live.get` stays, answered by a host as a view over the same reading, until
 the modules that ask it have moved.
 

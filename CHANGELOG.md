@@ -7,6 +7,22 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.10.0 — 2026-10-21
+
+Faces. A tracker row says who the people it names by login are: their display name and their
+picture. **Additive**; `PROTOCOL` is still 2. A row without them parses as before.
+
+### Added
+
+- `trackerRowSchema.people?: Record<login, { name?, avatarUrl? }>` (`trackerPersonSchema`,
+  `TrackerPerson`): one map per row, keyed by the logins in `reviewers`, `assigneeLogins`,
+  `authorLogin` and `lastActivity`, rather than a field beside each. An entry says at least one
+  of the two. At most `LIMITS.ROW_PEOPLE` (64) entries.
+- `avatarUrlSchema` and `isHttpsUrl`: an avatar is an absolute `https:` URL of at most
+  `LIMITS.URL`; `http:`, `data:`, `javascript:`, protocol-relative and relative URLs are refused.
+  A host makes a tracker's relative avatar path absolute against the tracker's host before it
+  sends it. Which hosts a module loads pictures from is the module's own policy.
+
 ## 2.9.0 — 2026-10-21
 
 All epics. A context can be about the whole project rather than one epic, and a module says whether

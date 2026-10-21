@@ -27,8 +27,8 @@ const row = {
 }
 
 describe('the version', () => {
-  test('is 2.9.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.9.0')
+  test('is 2.10.0, and PROTOCOL is still 2', () => {
+    expect(PACKAGE_VERSION).toBe('2.10.0')
     expect(PROTOCOL).toBe(2)
   })
   test('LIMITS.BRANCH is 255', () => expect(LIMITS.BRANCH).toBe(255))

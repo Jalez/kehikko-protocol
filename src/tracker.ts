@@ -181,6 +181,40 @@ export const trackerStackSchema = z
   })
 export type TrackerStack = z.infer<typeof trackerStackSchema>
 
+/**
+ * Whether a string is an `https:` URL. An avatar is drawn by a module's page from wherever the
+ * tracker keeps it, so nothing but `https:` is carried: no `http:`, no `data:`, no `javascript:`. (2.10.0)
+ */
+export function isHttpsUrl(value: string): boolean {
+  try {
+    return new URL(value).protocol === 'https:'
+  } catch {
+    return false
+  }
+}
+
+/** A person's picture: an absolute `https:` URL, at most `LIMITS.URL` long. (2.10.0) */
+export const avatarUrlSchema = z
+  .string()
+  .max(LIMITS.URL)
+  .refine(isHttpsUrl, { message: 'An avatar is an absolute https: URL.' })
+
+/**
+ * What the tracker says about one person a row names by login (2.10.0). `name`: their display name,
+ * when the tracker gave one. `avatarUrl`: their picture, absolute `https:`, as the tracker serves it
+ * (a host makes a relative one absolute against the tracker's host, and drops one it cannot). An
+ * entry says at least one of the two.
+ */
+export const trackerPersonSchema = z
+  .object({
+    name: person.optional(),
+    avatarUrl: avatarUrlSchema.optional(),
+  })
+  .refine((p) => p.name !== undefined || p.avatarUrl !== undefined, {
+    message: 'A person entry says a name or an avatar.',
+  })
+export type TrackerPerson = z.infer<typeof trackerPersonSchema>
+
 /** One ref, as the host last read it. Assignable to `Sighting` from `/facets`. */
 export const trackerRowSchema = z.object({
   /**
@@ -270,6 +304,19 @@ export const trackerRowSchema = z.object({
   stack: trackerStackSchema.optional(),
   /** The latest activity on the item and who did it (2.8.0). Absent when not read or not attributable. */
   lastActivity: trackerActivitySchema.optional(),
+  /**
+   * The people the row names by login — `reviewers[].login`, `assigneeLogins`, `authorLogin`,
+   * `lastActivity.login` — keyed by that login, with their display name and avatar where the
+   * tracker gave them (2.10.0). One map for the row rather than a field beside every login. Absent
+   * when the host did not read them; a login missing from it has nothing known. At most
+   * `LIMITS.ROW_PEOPLE` entries.
+   */
+  people: z
+    .record(person, trackerPersonSchema)
+    .refine((m) => Object.keys(m).length <= LIMITS.ROW_PEOPLE, {
+      message: `A row names at most ${LIMITS.ROW_PEOPLE} people.`,
+    })
+    .optional(),
   /** When the host read this row. A scoped refresh moves some rows and not others. */
   readAt: instant,
   detail: trackerDetailSchema.optional(),

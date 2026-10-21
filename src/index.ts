@@ -294,6 +294,9 @@ export {
   LAST_ACTIVITY_KINDS,
   trackerActivitySchema,
   trackerStackSchema,
+  trackerPersonSchema,
+  avatarUrlSchema,
+  isHttpsUrl,
   readTrackerRef,
   spellTrackerRef,
   type Tracker,
@@ -323,6 +326,7 @@ export {
   type LastActivityKind,
   type TrackerActivity,
   type TrackerStack,
+  type TrackerPerson,
 } from './tracker.js'
 
 export {
