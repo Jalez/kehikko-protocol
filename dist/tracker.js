@@ -106,6 +106,44 @@ export const trackerDiscussionsSchema = z.object({
     resolved: z.number().int().min(0),
     unresolved: z.number().int().min(0),
 });
+/**
+ * What the latest activity on an item was (2.8.0). `comment`: a comment or a review note; `review`: a
+ * review submitted or an approval; `commit`: a commit pushed to a change; `state`: opened, closed,
+ * reopened or merged.
+ */
+export const LAST_ACTIVITY_KINDS = ['comment', 'review', 'commit', 'state'];
+/**
+ * The latest thing somebody did on an item, among what the host read: its opening, comments, reviews,
+ * commits and state changes (2.8.0). Absent when the host did not read them or could not tell who
+ * did the latest one; the host never falls back to an earlier one.
+ */
+export const trackerActivitySchema = z.object({
+    /** Who did it, by login on the row's tracker. */
+    login: person,
+    at: instant,
+    kind: z.enum(LAST_ACTIVITY_KINDS),
+    /**
+     * Whether it was the person, worked out by the host the way it works out `myRoles`. Absent when the
+     * host does not know who the person is there: a module then cannot tell, and does not guess.
+     */
+    mine: z.boolean().optional(),
+});
+const branch = z.string().min(1).max(LIMITS.BRANCH);
+/**
+ * Where a change sits in a stack of changes (2.8.0): changes in one repository, each targeting the
+ * branch the one below it comes from. Worked out by the host across its reading, open changes only.
+ * `below`: the open change whose head branch is this one's base. `above`: the open changes whose base
+ * is this one's head branch, more than one where the stack forks. At least one of the two is there.
+ * The whole stack is found by following `below` down and `above` up through the reading's rows.
+ */
+export const trackerStackSchema = z
+    .object({
+    below: ref.optional(),
+    above: z.array(ref).max(LIMITS.TRACKER_LINKS).default([]),
+})
+    .refine((s) => s.below !== undefined || s.above.length > 0, {
+    message: 'A stack link names the change below or one above.',
+});
 /** One ref, as the host last read it. Assignable to `Sighting` from `/facets`. */
 export const trackerRowSchema = z.object({
     /**
@@ -181,6 +219,20 @@ export const trackerRowSchema = z.object({
     discussions: trackerDiscussionsSchema.optional(),
     /** On a change: when its head was last pushed, or its last commit's time where the tracker gives no push. (2.7.0) */
     lastPushAt: instant.optional(),
+    /** On a change: the branch it would merge into (GitHub's base, GitLab's target). (2.8.0) */
+    baseBranch: branch.optional(),
+    /**
+     * On a change: the branch it comes from (GitHub's head, GitLab's source), when it lives in the
+     * row's own repository. Absent for a change from a fork, whose branch no change here can target. (2.8.0)
+     */
+    headBranch: branch.optional(),
+    /**
+     * On an open change: where it sits in a stack of open changes (2.8.0). Absent when it is in none, or
+     * when the host did not read branches.
+     */
+    stack: trackerStackSchema.optional(),
+    /** The latest activity on the item and who did it (2.8.0). Absent when not read or not attributable. */
+    lastActivity: trackerActivitySchema.optional(),
     /** When the host read this row. A scoped refresh moves some rows and not others. */
     readAt: instant,
     detail: trackerDetailSchema.optional(),
