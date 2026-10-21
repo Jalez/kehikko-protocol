@@ -1,3 +1,4 @@
+import { scopeOf } from '../context.js';
 import { HostRefused, NOBODY_TO_ASK, connect, } from './connect.js';
 import { reloadWhenStale } from './ask.js';
 import { applyTheme, pageTheme, systemTheme } from './theme.js';
@@ -51,6 +52,7 @@ export function hostFields(context, was, same = {}) {
         projectPath: text(context?.projectPath),
         projectId: text(context?.projectId),
         epic: text(context?.epic),
+        scope: scopeOf(context),
         passage: context?.passage ?? null,
         containers: context?.containers ?? NONE,
         parts: context?.parts ?? NONE,

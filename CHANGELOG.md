@@ -7,6 +7,23 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.9.0 — 2026-10-21
+
+All epics. A context can be about the whole project rather than one epic, and a module says whether
+it can show one. **Additive**; `PROTOCOL` is still 2. A context or a manifest without them parses
+as before.
+
+### Added
+
+- `contextSchema.scope?: 'epic' | 'project'` (`CONTEXT_SCOPES`, `ContextScope`). Absent means
+  `epic` (a host older than 2.9.0). With `project` — the person chose "All epics" — `epic` is null
+  and `parts` is empty, which is not "no epic open". `scopeOf(context)` reads it with that default.
+- `manifestSchema.declares.scopes?: ('epic' | 'project')[]`: which scopes a module can show; absent
+  means `['epic']`. `scopesOf(manifest)` and `showsProject(manifest)`. A host covers a module that
+  does not list `project` with a sentence while "All epics" is chosen, and still sends it the context.
+- `HostFields.scope` in the client (`hostFields`, `hostStore`, `useHost`): `epic` when the host
+  does not say.
+
 ## 2.8.0 — 2026-10-21
 
 Stacks and last activity. A change's row names the branch it targets and the branch it comes from,

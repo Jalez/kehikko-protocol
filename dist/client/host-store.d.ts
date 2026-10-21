@@ -1,5 +1,6 @@
 import type { ActivityItem, CanvasContainer, EpicPart, FilterChoice, FilterGroup, HeaderItemInput, ModuleContext, Passage } from '../index.js';
 import type { PageTheme } from '../page.js';
+import { type ContextScope } from '../context.js';
 import { type AskOptions, type ConnectOptions, type Connection, type HostEvents } from './connect.js';
 /**
  * The host as one value outside React: everything `useHost` arranges — the grace before
@@ -59,6 +60,11 @@ export interface HostFields {
      */
     projectId: string | null;
     epic: string | null;
+    /**
+     * 2.9.0. Whether the host is showing one epic (`epic`) or the whole project (`project`, "All epics";
+     * `epic` is then `null` and `parts` empty). `epic` from a host that does not say. See `scopeOf`.
+     */
+    scope: ContextScope;
     passage: Passage | null;
     containers: readonly CanvasContainer[];
     /** The parts of the open epic, with which are picked out. Empty is the whole epic. */

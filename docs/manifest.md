@@ -163,6 +163,29 @@ host fetches the text from the module's registered origin, never from what a
 request hands it, and no agent can install or remove one. Nothing in this
 package installs, fetches or decides anything about a skill.
 
+### Which scopes a module can show (2.9.0)
+
+`declares.scopes` lists the scopes of `context.scope` a module can show:
+`epic`, one epic at a time, and `project`, every epic of the project at once
+(the host's "All epics"). Optional and never defaulted: absent means
+`['epic']`, which is every module written before 2.9.0. When present it is
+one or both words, each once.
+
+```ts
+declares: { uses: [...], scopes: ['epic', 'project'] }
+```
+
+`scopesOf(manifest)` reads it with that default; `showsProject(manifest)` is
+whether `project` is in it.
+
+A module that lists `project` shows, under `scope: 'project'`, what it holds
+for every epic of the project, each item labelled with its epic — and an item
+that belongs to no epic labelled as such rather than dropped. A module that
+does not list it is covered by the host with a sentence while "All epics" is
+chosen ("This module works on one epic at a time. Pick an epic to use it."),
+and is still sent the context. Like the rest of `declares` it is the module's
+own account: a host decides what to draw from it, and nothing is granted.
+
 ## Notes by symbol
 
 ### `src/manifest.ts`

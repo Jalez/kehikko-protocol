@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { type ContextScope } from './context.js';
 /**
  * What a module says about itself when a host asks: the manifest schema, the words it suggests (`REACTS_TO`,
  * `TAGS`), and the pure readers `speaks` and `partsDeclaration`. Every string in the schema has a `max` from
@@ -393,6 +394,13 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             version: string;
             summary: string;
         }[]>>;
+        /**
+         * Which scopes of `context.scope` this module can show (2.9.0): `epic` for one epic,
+         * `project` for every epic of the project at once, each item labelled with its epic. Optional
+         * and never defaulted; absent means `['epic']` (`scopesOf`). A host covers a module that does
+         * not list `project` while the person has "All epics" chosen, and still sends it the context.
+         */
+        scopes: z.ZodOptional<z.ZodEffects<z.ZodArray<z.ZodEnum<["epic", "project"]>, "many">, ("epic" | "project")[], ("epic" | "project")[]>>;
     }, "strip", z.ZodTypeAny, {
         protocol: string;
         prompt: boolean;
@@ -403,6 +411,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             version: string;
             summary: string;
         }[] | undefined;
+        scopes?: ("epic" | "project")[] | undefined;
     }, {
         protocol?: string | undefined;
         prompt?: boolean | undefined;
@@ -413,6 +422,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             version: string;
             summary: string;
         }[] | undefined;
+        scopes?: ("epic" | "project")[] | undefined;
     }>>;
     /**
      * What the server answering is built from, and when it started. Optional, added by `doors()`;
@@ -465,6 +475,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             version: string;
             summary: string;
         }[] | undefined;
+        scopes?: ("epic" | "project")[] | undefined;
     };
     build?: {
         version: string;
@@ -536,6 +547,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             version: string;
             summary: string;
         }[] | undefined;
+        scopes?: ("epic" | "project")[] | undefined;
     } | undefined;
 }>, {
     id: string;
@@ -568,6 +580,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             version: string;
             summary: string;
         }[] | undefined;
+        scopes?: ("epic" | "project")[] | undefined;
     };
     build?: {
         version: string;
@@ -639,6 +652,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             version: string;
             summary: string;
         }[] | undefined;
+        scopes?: ("epic" | "project")[] | undefined;
     } | undefined;
 }>;
 export type Manifest = z.infer<typeof manifestSchema>;
@@ -661,6 +675,21 @@ export declare function partsDeclaration(manifest: {
     reacts?: readonly string[];
     partless?: string;
 }): string[];
+/**
+ * 2.9.0. The scopes a module says it can show: `declares.scopes` as written, `['epic']` when it does
+ * not say. Takes a parsed manifest or the object about to be parsed.
+ */
+export declare function scopesOf(manifest: {
+    declares?: {
+        scopes?: readonly ContextScope[];
+    };
+} | null | undefined): readonly ContextScope[];
+/** 2.9.0. Whether a module can show a whole project at once (`scope: 'project'`): `project` in `scopesOf`. */
+export declare function showsProject(manifest: {
+    declares?: {
+        scopes?: readonly ContextScope[];
+    };
+} | null | undefined): boolean;
 /**
  * What a host has concluded about one module, in one word: it works (`ready`), it speaks a protocol
  * the host does not (`incompatible`), or nothing is answering (`silent`). A silent module keeps its

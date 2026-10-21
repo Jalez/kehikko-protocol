@@ -4,6 +4,7 @@ import { LIMITS } from './limits.js'
 import { MODE_ID, MODULE_ID } from './ids.js'
 import { buildSchema } from './build.js'
 import { moduleSkillsSchema } from './skills.js'
+import { CONTEXT_SCOPES, type ContextScope } from './context.js'
 
 /**
  * What a module says about itself when a host asks: the manifest schema, the words it suggests (`REACTS_TO`,
@@ -275,6 +276,15 @@ const manifestFields = z.object({
        * the person decides. Optional and never defaulted; absent means none.
        */
       skills: moduleSkillsSchema.optional(),
+      /**
+       * Which scopes of `context.scope` this module can show (2.9.0): `epic` for one epic,
+       * `project` for every epic of the project at once, each item labelled with its epic. Optional
+       * and never defaulted; absent means `['epic']` (`scopesOf`). A host covers a module that does
+       * not list `project` while the person has "All epics" chosen, and still sends it the context.
+       */
+      scopes: z.array(z.enum(CONTEXT_SCOPES)).min(1).max(CONTEXT_SCOPES.length)
+        .refine((scopes) => new Set(scopes).size === scopes.length, { message: 'a scope is listed once' })
+        .optional(),
     })
     .default({ protocol: `>=${PROTOCOL}`, uses: [], storage: false, prompt: false }),
   /**
@@ -353,6 +363,22 @@ export function partsDeclaration(manifest: { id?: string; reacts?: readonly stri
   }
   return []
 }
+
+/**
+ * 2.9.0. The scopes a module says it can show: `declares.scopes` as written, `['epic']` when it does
+ * not say. Takes a parsed manifest or the object about to be parsed.
+ */
+export function scopesOf(manifest: { declares?: { scopes?: readonly ContextScope[] } } | null | undefined): readonly ContextScope[] {
+  const said = manifest?.declares?.scopes
+  return said && said.length ? said : ONE_EPIC
+}
+
+/** 2.9.0. Whether a module can show a whole project at once (`scope: 'project'`): `project` in `scopesOf`. */
+export function showsProject(manifest: { declares?: { scopes?: readonly ContextScope[] } } | null | undefined): boolean {
+  return scopesOf(manifest).includes('project')
+}
+
+const ONE_EPIC: readonly ContextScope[] = Object.freeze(['epic'] as const)
 
 /**
  * What a host has concluded about one module, in one word: it works (`ready`), it speaks a protocol
