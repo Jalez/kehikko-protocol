@@ -367,12 +367,28 @@ export declare const containerSchema: z.ZodObject<{
 }>;
 export type CanvasContainer = z.infer<typeof containerSchema>;
 /**
+ * 2.9.0. How much of the project a context is about: `epic`, the one epic named in `epic` (or none
+ * open), or `project`, every epic of the project at once — the host's "All epics". Two words,
+ * closed: a module that meets another reads it as `epic`.
+ */
+export declare const CONTEXT_SCOPES: readonly ["epic", "project"];
+export type ContextScope = (typeof CONTEXT_SCOPES)[number];
+/**
  * What a module is told about where the reader is standing: the host's own knowledge of the open
  * epic and project. `epic` is null when none is open. Fields are null or empty rather than absent,
  * so a module can move into "none".
  */
 export declare const contextSchema: z.ZodObject<{
     epic: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+    /**
+     * 2.9.0. Whether this context is about one epic (`epic`) or the whole project (`project`, the
+     * person chose "All epics"). Absent means `epic`: a host older than 2.9.0 never says it, and
+     * `scopeOf` reads it that way. With `project`, `epic` is null and `parts` is empty — which is
+     * NOT "no epic open": a module that declares `scopes: ['epic', 'project']` shows every epic of
+     * the project, and one that does not is covered by the host with a sentence saying it works on
+     * one epic at a time. Optional, not defaulted, so a parsed older context stays as it was sent.
+     */
+    scope: z.ZodOptional<z.ZodEnum<["epic", "project"]>>;
     /** What the project is called: the name a module puts on screen, not a path. */
     project: z.ZodDefault<z.ZodNullable<z.ZodString>>;
     /**
@@ -885,6 +901,7 @@ export declare const contextSchema: z.ZodObject<{
         epic: string | null;
         source: string;
     }[];
+    scope?: "epic" | "project" | undefined;
 }, {
     epic?: string | null | undefined;
     parts?: {
@@ -907,6 +924,7 @@ export declare const contextSchema: z.ZodObject<{
         refreshing?: boolean | undefined;
     } | undefined;
     projectPath?: string | null | undefined;
+    scope?: "epic" | "project" | undefined;
     theme?: "light" | "dark" | undefined;
     selection?: string[] | undefined;
     passage?: {
@@ -959,3 +977,10 @@ export declare const contextSchema: z.ZodObject<{
     }[] | undefined;
 }>;
 export type ModuleContext = z.infer<typeof contextSchema>;
+/**
+ * 2.9.0. The scope a context is about, `epic` when it does not say (a host older than 2.9.0) or says
+ * a word this package does not know. Takes anything with a `scope`, so a page can pass what it holds.
+ */
+export declare function scopeOf(context: {
+    scope?: unknown;
+} | null | undefined): ContextScope;

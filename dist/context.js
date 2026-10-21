@@ -62,12 +62,27 @@ export const containerSchema = z.object({
     showing: showingSchema.default({}),
 });
 /**
+ * 2.9.0. How much of the project a context is about: `epic`, the one epic named in `epic` (or none
+ * open), or `project`, every epic of the project at once — the host's "All epics". Two words,
+ * closed: a module that meets another reads it as `epic`.
+ */
+export const CONTEXT_SCOPES = ['epic', 'project'];
+/**
  * What a module is told about where the reader is standing: the host's own knowledge of the open
  * epic and project. `epic` is null when none is open. Fields are null or empty rather than absent,
  * so a module can move into "none".
  */
 export const contextSchema = z.object({
     epic: z.string().regex(EPIC_SLUG).nullable().default(null),
+    /**
+     * 2.9.0. Whether this context is about one epic (`epic`) or the whole project (`project`, the
+     * person chose "All epics"). Absent means `epic`: a host older than 2.9.0 never says it, and
+     * `scopeOf` reads it that way. With `project`, `epic` is null and `parts` is empty — which is
+     * NOT "no epic open": a module that declares `scopes: ['epic', 'project']` shows every epic of
+     * the project, and one that does not is covered by the host with a sentence saying it works on
+     * one epic at a time. Optional, not defaulted, so a parsed older context stays as it was sent.
+     */
+    scope: z.enum(CONTEXT_SCOPES).optional(),
     /** What the project is called: the name a module puts on screen, not a path. */
     project: z.string().max(LIMITS.PROJECT).nullable().default(null),
     /**
@@ -148,3 +163,10 @@ export const contextSchema = z.object({
      */
     parts: partsSchema.default([]),
 });
+/**
+ * 2.9.0. The scope a context is about, `epic` when it does not say (a host older than 2.9.0) or says
+ * a word this package does not know. Takes anything with a `scope`, so a page can pass what it holds.
+ */
+export function scopeOf(context) {
+    return context?.scope === 'project' ? 'project' : 'epic';
+}

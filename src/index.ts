@@ -62,6 +62,8 @@ export {
   manifestSchema,
   speaks,
   partsDeclaration,
+  scopesOf,
+  showsProject,
   MODULE_CONDITIONS,
   REACTS_TO,
   REACTION_NAMES,
@@ -175,6 +177,9 @@ export {
 
 export {
   contextSchema,
+  CONTEXT_SCOPES,
+  scopeOf,
+  type ContextScope,
   passageSchema,
   sectionSchema,
   showingSchema,

@@ -770,6 +770,40 @@ about, forever, which is a page quietly describing the wrong work.
 `theme` rides along for the same reason the rest of it does: a module that
 had to ask would render once in the wrong colours first.
 
+#### `contextSchema.scope`
+
+How much of the project the context is about (2.9.0): `epic`, the one epic
+named in `epic` (or none open), or `project`, every epic of the project at
+once — what a person gets by choosing "All epics" in the host's epic picker.
+
+**Optional, and absent means `epic`.** A host older than 2.9.0 never says it,
+and every context such a host sends is about one epic, so absence cannot mean
+anything else. It is not defaulted, so a parsed context from an older host is
+what it sent; read it with `scopeOf(context)`, which answers `epic` for absent
+and for any word this package does not know. A page's standing
+(`hostFields`, `useHost`) carries it as `scope`, already read that way.
+
+**With `project`, `epic` is null and `parts` is empty.** Parts belong to an
+epic, so with no one epic there is nothing to pick, and a host hides its parts
+picker. `selection`, `passage`, `filters`, `containers` and the per-project
+fields are as they always are.
+
+**`project` is not "no epic open".** Both have `epic: null`, and that is the
+reason this field exists: "no epic" asks a module to show its empty state,
+"All epics" asks it to show everything the project holds, labelling each item
+with the epic it belongs to (and items that belong to none as such).
+A module that could not tell the two apart would have to guess, and both
+guesses are wrong half the time.
+
+**What a module that cannot show a whole project gets.** A module says which
+scopes it can show in `declares.scopes` (see docs/manifest.md); one that does
+not list `project` is still sent the context, `scope: 'project'` and all, and
+the HOST covers its container with one quiet sentence saying it works on one
+epic at a time. The module need do nothing: the host keeps its page mounted
+underneath, so its own state survives until an epic is picked again. A module
+that wants to may still use the field — drawing nothing new, say — but it must
+not mistake it for "no epic" and empty itself.
+
 #### `contextSchema.project`
 
 What the project is CALLED. Unchanged, and deliberately still a name.
