@@ -7,6 +7,19 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.12.0 — 2026-10-22
+
+Kehikko-bound skills. A skill a module offers may name the other modules it needs on the same
+kehikko. **Additive**; `PROTOCOL` is still 2. A skill without it parses as before.
+
+### Added
+
+- `moduleSkillSchema.needs?: string[]` (`skillNeedsSchema`): module ids that must be on the same
+  kehikko for the skill to make sense, each once, at most `LIMITS.SKILL_NEEDS` = 8; the declaring
+  module is implied. A skill with any is kehikko-bound: never installed user-wide, loaded only
+  into a conversation whose kehikko has every one.
+- `isKehikkoBound(skill)` and `missingNeeds(skill, present)`.
+
 ## 2.11.0 — 2026-10-22
 
 Work item types. A GitLab row says when an issue is a task, an incident or another work item

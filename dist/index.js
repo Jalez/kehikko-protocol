@@ -28,5 +28,5 @@ export { CITE_STATUSES, CITE_MARKER, parseSource, serialiseSource, uncitable, ma
 export { PAGE_BACKGROUND, ROOT_ELEMENT, THEME_KEY, THEME_PARAM, ORIGINS_ELEMENT, TICKET_ELEMENT, TICKET_HEADER, originAmong, TICKET_REFUSED, } from './page.js';
 /* What a module's server is built from, and how two builds compare. See `build.ts`. */
 export { BUILD_ELEMENT, BUILD_HEADER, PACKAGE_VERSION, buildIsStale, buildSchema, buildStamp, compareBuilds, describeBuild, readBuild, sameCode, sameProcess, } from './build.js';
-/* Claude Code skills a module offers, and where it serves them (2.5.0). See `skills.ts`. */
-export { SKILL_NAME, SKILLS_PATH, skillPath, isSkillName, skillNameSchema, moduleSkillSchema, moduleSkillsSchema, skillTextBytes, skillTextIssue, } from './skills.js';
+/* Claude Code skills a module offers, and where it serves them (2.5.0); what each needs beside its module (2.12.0). See `skills.ts`. */
+export { SKILL_NAME, SKILLS_PATH, skillPath, isSkillName, skillNameSchema, moduleSkillSchema, moduleSkillsSchema, skillNeedsSchema, isKehikkoBound, missingNeeds, skillTextBytes, skillTextIssue, } from './skills.js';

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { MODULE_ID } from './ids.js';
 import { LIMITS } from './limits.js';
 /**
  * Claude Code skills a module offers (2.5.0). A module lists them in `declares.skills` and serves
@@ -28,13 +29,41 @@ export const skillNameSchema = z
     .string()
     .max(LIMITS.SKILL_NAME)
     .regex(SKILL_NAME, 'a skill name is kebab-case: a lowercase letter, then lowercase letters, digits and single dashes');
+/**
+ * The modules a skill needs beside its own (2.12.0): module ids, each once, at most
+ * `LIMITS.SKILL_NEEDS`. The declaring module is implied and need not be listed.
+ */
+export const skillNeedsSchema = z
+    .array(z.string().regex(MODULE_ID, 'a module id'))
+    .max(LIMITS.SKILL_NEEDS)
+    .refine((ids) => new Set(ids).size === ids.length, { message: 'a skill needs each module once' });
 /** One skill a module offers: its name, a line about it for the person choosing, and its version. */
 export const moduleSkillSchema = z.object({
     name: skillNameSchema,
     summary: z.string().max(LIMITS.SUMMARY),
     /** The module's own version of this skill. Shown and compared for equality; never parsed. */
     version: z.string().min(1).max(LIMITS.SKILL_VERSION),
+    /**
+     * The other modules that must be on the same kehikko for this skill to make sense (2.12.0).
+     * A skill that lists any is "kehikko-bound": it belongs in a conversation on a kehikko that has
+     * the declaring module and every one of these, and never in the person's Claude Code for every
+     * project. Absent or empty: the skill works wherever the declaring module is installed.
+     */
+    needs: skillNeedsSchema.optional(),
 });
+/** Is this skill kehikko-bound (2.12.0): does it need any module beside its own? */
+export function isKehikkoBound(skill) {
+    return (skill.needs?.length ?? 0) > 0;
+}
+/**
+ * Which of the modules a skill needs are not among `present` (2.12.0), in the skill's order; empty
+ * when it can work there. `present` is the module ids on one kehikko. Compares ids as written: a
+ * host passes canonical ids on both sides. Decides nothing about the declaring module itself.
+ */
+export function missingNeeds(skill, present) {
+    const have = new Set(present);
+    return (skill.needs ?? []).filter((id) => !have.has(id));
+}
 /** The list in `declares.skills`: at most `LIMITS.SKILLS`, no two with one name. */
 export const moduleSkillsSchema = z
     .array(moduleSkillSchema)

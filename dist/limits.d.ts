@@ -273,4 +273,6 @@ export declare const LIMITS: {
     readonly SKILL_VERSION: 64;
     /** A skill's text, its SKILL.md (2.5.0), in BYTES of UTF-8. */
     readonly SKILL_TEXT: 65536;
+    /** How many other modules one skill may need on its kehikko (`needs`, 2.12.0). */
+    readonly SKILL_NEEDS: 8;
 };

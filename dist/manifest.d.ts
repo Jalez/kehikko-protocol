@@ -377,22 +377,27 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             name: z.ZodString;
             summary: z.ZodString;
             version: z.ZodString;
+            needs: z.ZodOptional<z.ZodEffects<z.ZodArray<z.ZodString, "many">, string[], string[]>>;
         }, "strip", z.ZodTypeAny, {
             name: string;
             version: string;
             summary: string;
+            needs?: string[] | undefined;
         }, {
             name: string;
             version: string;
             summary: string;
+            needs?: string[] | undefined;
         }>, "many">, {
             name: string;
             version: string;
             summary: string;
+            needs?: string[] | undefined;
         }[], {
             name: string;
             version: string;
             summary: string;
+            needs?: string[] | undefined;
         }[]>>;
         /**
          * Which scopes of `context.scope` this module can show (2.9.0): `epic` for one epic,
@@ -410,6 +415,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             name: string;
             version: string;
             summary: string;
+            needs?: string[] | undefined;
         }[] | undefined;
         scopes?: ("epic" | "project")[] | undefined;
     }, {
@@ -421,6 +427,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             name: string;
             version: string;
             summary: string;
+            needs?: string[] | undefined;
         }[] | undefined;
         scopes?: ("epic" | "project")[] | undefined;
     }>>;
@@ -474,6 +481,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             name: string;
             version: string;
             summary: string;
+            needs?: string[] | undefined;
         }[] | undefined;
         scopes?: ("epic" | "project")[] | undefined;
     };
@@ -546,6 +554,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             name: string;
             version: string;
             summary: string;
+            needs?: string[] | undefined;
         }[] | undefined;
         scopes?: ("epic" | "project")[] | undefined;
     } | undefined;
@@ -579,6 +588,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             name: string;
             version: string;
             summary: string;
+            needs?: string[] | undefined;
         }[] | undefined;
         scopes?: ("epic" | "project")[] | undefined;
     };
@@ -651,6 +661,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             name: string;
             version: string;
             summary: string;
+            needs?: string[] | undefined;
         }[] | undefined;
         scopes?: ("epic" | "project")[] | undefined;
     } | undefined;

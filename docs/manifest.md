@@ -163,6 +163,37 @@ host fetches the text from the module's registered origin, never from what a
 request hands it, and no agent can install or remove one. Nothing in this
 package installs, fetches or decides anything about a skill.
 
+#### Kehikko-bound skills (2.12.0)
+
+Some skills only make sense beside other modules: `/review-factory` reviews what
+Factory built with Review, and is nonsense on a kehikko without Review. Such a
+skill lists them in `needs`: module ids, each once, at most
+`LIMITS.SKILL_NEEDS` = 8. The declaring module is implied and need not be
+listed. A skill with a non-empty `needs` is **kehikko-bound**.
+
+```ts
+declares: {
+  skills: [
+    { name: 'factory', summary: '…', version: '1.0.0' },
+    { name: 'review-factory', summary: '…', version: '1.0.0', needs: ['kehikot.review'] },
+  ],
+}
+```
+
+A kehikko-bound skill is never installed user-wide (`~/.claude/skills/`, which
+lands in every conversation, on any kehikko or none). It reaches a conversation
+only through a per-conversation load — the Claude module's session plugin —
+and only when the conversation's kehikko has a container of the declaring
+module and of every id in `needs`. A host that finds one it installed
+user-wide removes it where the person has not edited it. The skill itself
+still checks at run time and names what is missing: a conversation can outlive
+its kehikko's arrangement.
+
+`isKehikkoBound(skill)` is whether `needs` lists anything;
+`missingNeeds(skill, present)` lists the ids in `needs` that are not among
+`present`, in the skill's order, comparing ids as written. Optional: a skill
+without `needs` works wherever its module is installed, as before.
+
 ### Which scopes a module can show (2.9.0)
 
 `declares.scopes` lists the scopes of `context.scope` a module can show:
