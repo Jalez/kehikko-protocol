@@ -25,3 +25,4 @@ export { CITE_STATUSES, CITE_MARKER, parseSource, serialiseSource, uncitable, ma
 export { PAGE_BACKGROUND, ROOT_ELEMENT, THEME_KEY, THEME_PARAM, ORIGINS_ELEMENT, TICKET_ELEMENT, TICKET_HEADER, originAmong, TICKET_REFUSED, type PageTheme, } from './page.js';
 export { BUILD_ELEMENT, BUILD_HEADER, PACKAGE_VERSION, buildIsStale, buildSchema, buildStamp, compareBuilds, describeBuild, readBuild, sameCode, sameProcess, type Build, type BuildComparison, } from './build.js';
 export { SKILL_NAME, SKILLS_PATH, skillPath, isSkillName, skillNameSchema, moduleSkillSchema, moduleSkillsSchema, skillNeedsSchema, isKehikkoBound, missingNeeds, skillTextBytes, skillTextIssue, type ModuleSkill, } from './skills.js';
+export { MODULE_ICONS, MODULE_ICON_SETS, LUCIDE_MODULE_ICONS, BRAND_MODULE_ICONS, isModuleIcon, moduleIconParts, type ModuleIcon, type ModuleIconSet, } from './icon.js';

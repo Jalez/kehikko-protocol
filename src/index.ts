@@ -509,3 +509,15 @@ export {
   skillTextIssue,
   type ModuleSkill,
 } from './skills.js'
+
+/* The icon a module is known by, as a key a host draws: `lucide:<name>` or `brand:<slug>` (2.14.0). See `icon.ts`. */
+export {
+  MODULE_ICONS,
+  MODULE_ICON_SETS,
+  LUCIDE_MODULE_ICONS,
+  BRAND_MODULE_ICONS,
+  isModuleIcon,
+  moduleIconParts,
+  type ModuleIcon,
+  type ModuleIconSet,
+} from './icon.js'
