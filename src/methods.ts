@@ -7,7 +7,7 @@ import { activityItemsSchema } from './activity.js'
  * `passageSchema` and `filterChoiceSchema` come from `wire.ts` so that both directions share one
  * definition; `wire.ts` imports nothing from here.
  */
-import { DISPOSITIONS, filterChoiceSchema, passageSchema } from './wire.js'
+import { DISPOSITIONS, LOCATION_INTENTS, codeLocationSchema, filterChoiceSchema, passageSchema } from './wire.js'
 import { TRACKER_DETAILS, trackerColumnsResult, trackerReadingResult, trackerRefreshResult } from './tracker.js'
 import { PART_ID, partListSchema } from './parts.js'
 
@@ -49,6 +49,13 @@ export const CAPABILITIES = {
    * front of every other pane.
    */
   'passage:set': 'Say where in a document the person is pointing, and quote it. Every module on the canvas is told.',
+  /**
+   * 2.13.0. Say where in a change's code the person is pointing — a file, a line or lines, a side of
+   * the diff — and whether they want to look there or comment there. A SHARED write like
+   * `passage:set`: it goes into `context.location` on this kehikko.
+   */
+  'location:set':
+    'Say where in a change’s code the person is pointing — a file and a line — or ask for a comment there. Every module on the canvas is told.',
   /**
    * Ask for its own container's filters to be moved. Reaches this container's own narrowing and
    * nothing else: not another container's, not the canvas.
@@ -126,6 +133,7 @@ export const METHODS = {
   'view.fold': 'view:fold',
   'selection.set': 'selection:set',
   'passage.set': 'passage:set',
+  'location.set': 'location:set',
   'filters.set': 'filters:set',
   'showing.set': 'showing:set',
   'projects.pick': 'projects:pick',
@@ -247,6 +255,18 @@ export const methodParams = {
    */
   'passage.set': z.object({
     passage: passageSchema.nullable(),
+  }),
+
+  /**
+   * 2.13.0. Say where in a change's code the person is pointing; answered with `locationSetResult`. The
+   * host relays it into `context.location` on this kehikko, stamped with who pointed and when.
+   * `location` is required and nullable: `null` is a real call that clears it. `intent` says why:
+   * `show` (absent means `show`) or `comment`. A host takes it only while `location.change` is in
+   * `context.selection`: a module pointing into a change nobody picked calls `selection.set` first.
+   */
+  'location.set': z.object({
+    location: codeLocationSchema.nullable(),
+    intent: z.enum(LOCATION_INTENTS).optional(),
   }),
 
   /**
@@ -463,6 +483,20 @@ export const activitySetResult = z.object({
 export type ActivitySetResult = z.infer<typeof activitySetResult>
 
 /**
+ * 2.13.0. What became of a `location.set`; all three are `ok: true`. `taken`: `context.location` is it now
+ * (or, for `null`, is cleared). `not-selected`: its change is not in `context.selection`, so the host did
+ * not keep it — pick the change with `selection.set` and point again. `declined`: the host will not, right now.
+ */
+export const LOCATION_SET_OUTCOMES = ['taken', 'not-selected', 'declined'] as const
+export type LocationSetOutcome = (typeof LOCATION_SET_OUTCOMES)[number]
+
+export const locationSetResult = z.object({
+  outcome: z.enum(LOCATION_SET_OUTCOMES),
+  why: z.string().max(LIMITS.REASON).default(''),
+})
+export type LocationSetResult = z.infer<typeof locationSetResult>
+
+/**
  * The least an `epics.list` can answer with. `slug` is required: it is the argument to every other
  * call. `title` and `project` are optional and bounded. Every other field passes through untouched.
  * There is no bound on how many epics come back.
@@ -531,6 +565,7 @@ export const methodResults: Partial<Record<Method, z.ZodTypeAny>> = {
   'tracker.columns': trackerColumnsResult,
   'parts.set': partsSetResult,
   'activity.set': activitySetResult,
+  'location.set': locationSetResult,
 }
 
 /** The schema for one method's answer, or nothing — which means unspecified. */

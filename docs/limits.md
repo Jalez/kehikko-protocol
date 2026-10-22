@@ -488,6 +488,13 @@ A module has a handful of kinds of thing, not dozens: eight. A tool name is
 bounded where MCP bounds it. A "done?" answer lists what was asked about, and
 256 is a long quiz; a caller with more asks twice. See [asking](asking.md).
 
+#### `LIMITS.CODE_LINE`
+
+*2.13.0.* Ten million: the highest line a code location (`location.ts`) may
+name, and its `endLine`. A value, not a length — a bound against a number
+that is not a line at all, not a guess at the longest file. A location's
+`path` is held to `PATH`, like every other path here.
+
 #### Inside `LIMITS`
 
 The shared tracker reading. See `tracker.ts`.

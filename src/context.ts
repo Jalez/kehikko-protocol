@@ -5,6 +5,7 @@ import { contentSignalSchema } from './content.js'
 import { EPIC_SLUG, MODULE_ID, PROJECT_ID } from './ids.js'
 import { partsSchema } from './parts.js'
 import { passageSchema } from './passage.js'
+import { sharedLocationSchema } from './location.js'
 import { filterChoiceSchema } from './filters.js'
 import { kehikkoSchema, ref } from './fragments.js'
 
@@ -121,6 +122,13 @@ export const contextSchema = z.object({
    * a host that has never heard of passages sends.
    */
   passage: passageSchema.nullable().default(null),
+  /**
+   * 2.13.0. Where in a change's code somebody is pointing, and why (`show`, or `comment` to start a
+   * review comment there); see `location.ts`. One per kehikko, set with `location.set` and relayed to
+   * every container. The host clears it when the selection no longer has its change
+   * (`locationStands`). Null when nobody is pointing, which is also what an older host sends.
+   */
+  location: sharedLocationSchema.nullable().default(null),
   /**
    * Whether this module has been pinned. `true` means it keeps what it was last told, and further
    * changes to this canvas do not reach it until this goes false. A context is still sent when the

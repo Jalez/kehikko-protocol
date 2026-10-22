@@ -7,6 +7,33 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.13.0 — 2026-10-22
+
+A place in a change's code, shared on a kehikko. Review points at the line a comment is about,
+Source opens the file there and Diff scrolls to the hunk; "Comment on this line" in Source or Diff
+points back with `intent: 'comment'`. **Additive**; `PROTOCOL` is still 2. A host or module that
+does not know it sends and reads `location: null`.
+
+### Added
+
+- `codeLocationSchema` / `CodeLocation`: `{ change: ref, path: string, line: number, endLine?: number,
+  side: 'new' | 'old', commit?: string }`. `path` is repository-relative (`repoPath`: forward
+  slashes, no leading slash, no `.`, `..` or empty segment, no backslash, at most `LIMITS.PATH`);
+  `line` and `endLine` count from 1 on `side`, `endLine >= line`, at most `LIMITS.CODE_LINE`
+  (10 000 000); `commit` is 7–64 lowercase hex (`COMMIT_SHA`). `CODE_SIDES`, `CodeSide`.
+- `contextSchema.location`: `sharedLocationSchema | null`, default `null` — the place plus
+  `intent: 'show' | 'comment'` (`LOCATION_INTENTS`; an unknown word reads `show`) and the host's own
+  `by?` (module id) and `at?` (ISO time, new on every call).
+- Method `location.set({ location: CodeLocation | null, intent?: 'show' | 'comment' })` under the new
+  capability `location:set`, answered with `locationSetResult`
+  (`{ outcome: 'taken' | 'not-selected' | 'declined', why }`, `LOCATION_SET_OUTCOMES`). A host keeps
+  one location per kehikko, takes one only while its change is in `context.selection`, and clears
+  it when the selection stops including it.
+- `REACTS_TO.location`.
+- `locationStands(location, selection)`, `samePlace(a, b)`, `locationLabel(location)`.
+- Client: `HostFields.location` (held steady while it says the same thing) and
+  `locate(location, intent?)` on the store and `useHost`, resolving with the host's answer or `null`.
+
 ## 2.12.0 — 2026-10-22
 
 Kehikko-bound skills. A skill a module offers may name the other modules it needs on the same

@@ -34,6 +34,12 @@ export declare const REACTS_TO: {
     readonly passage: "Does something when the reader points at a passage — a file, a place in it, and the words that were there.";
     readonly selection: "Does something when the references somebody picked out change.";
     /**
+     * 2.13.0. Somebody pointed at a place in a change's code (`context.location`). Paired with
+     * `location:set`. A module ticking this opens the file there, scrolls its diff there, or — for
+     * `intent: 'comment'` — starts a comment there.
+     */
+    readonly location: "Does something when somebody points at a place in a change's code — opens the file there, or starts a comment there.";
+    /**
      * What is arranged on the kehikko changed: which module each container holds, whether it is
      * picked out, and what it says it is showing. Paired with `showing:set`; also changed by a person
      * ticking a container's box, the host's own act.
@@ -107,8 +113,8 @@ declare const subjectSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
 }, {
     kind: string;
     done?: string | undefined;
-    about?: string | undefined;
     show?: string | undefined;
+    about?: string | undefined;
     release?: string | undefined;
 }>, {
     kind: string;
@@ -119,8 +125,8 @@ declare const subjectSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
 }, {
     kind: string;
     done?: string | undefined;
-    about?: string | undefined;
     show?: string | undefined;
+    about?: string | undefined;
     release?: string | undefined;
 }>, {
     kind: string;
@@ -131,8 +137,8 @@ declare const subjectSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
 }, {
     kind: string;
     done?: string | undefined;
-    about?: string | undefined;
     show?: string | undefined;
+    about?: string | undefined;
     release?: string | undefined;
 }>;
 export type ModuleSubject = z.infer<typeof subjectSchema>;
@@ -230,8 +236,8 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         }, {
             kind: string;
             done?: string | undefined;
-            about?: string | undefined;
             show?: string | undefined;
+            about?: string | undefined;
             release?: string | undefined;
         }>, {
             kind: string;
@@ -242,8 +248,8 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         }, {
             kind: string;
             done?: string | undefined;
-            about?: string | undefined;
             show?: string | undefined;
+            about?: string | undefined;
             release?: string | undefined;
         }>, {
             kind: string;
@@ -254,8 +260,8 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         }, {
             kind: string;
             done?: string | undefined;
-            about?: string | undefined;
             show?: string | undefined;
+            about?: string | undefined;
             release?: string | undefined;
         }>, "many">, {
             kind: string;
@@ -266,8 +272,8 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         }[], {
             kind: string;
             done?: string | undefined;
-            about?: string | undefined;
             show?: string | undefined;
+            about?: string | undefined;
             release?: string | undefined;
         }[]>>;
     }, "strip", z.ZodTypeAny, {
@@ -290,8 +296,8 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         subjects?: {
             kind: string;
             done?: string | undefined;
-            about?: string | undefined;
             show?: string | undefined;
+            about?: string | undefined;
             release?: string | undefined;
         }[] | undefined;
     }>>;
@@ -534,8 +540,8 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         subjects?: {
             kind: string;
             done?: string | undefined;
-            about?: string | undefined;
             show?: string | undefined;
+            about?: string | undefined;
             release?: string | undefined;
         }[] | undefined;
     } | undefined;
@@ -641,8 +647,8 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         subjects?: {
             kind: string;
             done?: string | undefined;
-            about?: string | undefined;
             show?: string | undefined;
+            about?: string | undefined;
             release?: string | undefined;
         }[] | undefined;
     } | undefined;

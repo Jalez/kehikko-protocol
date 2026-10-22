@@ -351,6 +351,16 @@ free: a module built against a host that broadcasts more than yours is not a
 malformed module. A host that does not know a word shows it or drops it, and
 either way frames the module.
 
+#### `REACTS_TO.location`
+
+*2.13.0.* Somebody pointed at a place in a change's code (`context.location`).
+Paired with `location:set`, the way `passage` is with `passage:set`. A module
+ticking this follows it: Source opens the file at the change's head on the
+line, Diff scrolls to the hunk, Review starts a comment when `intent` is
+`comment`. No other field says it: a passage is a place in a file on the
+machine, counted in bytes, and a code location is a place in a commit,
+counted in lines on one side of a diff.
+
 #### `REACTS_TO.containers`
 
 The third word, and the first whose other end is partly the host itself.
