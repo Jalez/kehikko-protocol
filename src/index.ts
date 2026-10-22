@@ -295,6 +295,7 @@ export {
   trackerActivitySchema,
   trackerStackSchema,
   trackerPersonSchema,
+  WORK_ITEM_TYPES,
   avatarUrlSchema,
   isHttpsUrl,
   readTrackerRef,
@@ -327,6 +328,7 @@ export {
   type TrackerActivity,
   type TrackerStack,
   type TrackerPerson,
+  type WorkItemType,
 } from './tracker.js'
 
 export {

@@ -49,6 +49,16 @@ export type ReviewState = (typeof REVIEW_STATES)[number]
 export const LINK_RELATIONS = ['closes', 'closed-by'] as const
 export type LinkRelation = (typeof LINK_RELATIONS)[number]
 
+/**
+ * What kind of GitLab work item an issue is, when it is not a plain issue (2.11.0): GitLab's
+ * `Issue.type` (GraphQL enum `IssueType`) in lower case, `ISSUE` left out. `task` is a task (a
+ * child of an issue), `incident` an incident, `test_case` a test case, `requirement` a requirement,
+ * `objective` and `key_result` the OKR types, `epic` a work-item epic, `ticket` a Service Desk
+ * ticket. GitHub has no such types.
+ */
+export const WORK_ITEM_TYPES = ['task', 'incident', 'test_case', 'requirement', 'objective', 'key_result', 'epic', 'ticket'] as const
+export type WorkItemType = (typeof WORK_ITEM_TYPES)[number]
+
 const instant = z.string().datetime({ offset: true })
 const word = z.string().max(LIMITS.TRACKER_WORD)
 const person = z.string().min(1).max(LIMITS.TRACKER_PERSON)
@@ -317,6 +327,13 @@ export const trackerRowSchema = z.object({
       message: `A row names at most ${LIMITS.ROW_PEOPLE} people.`,
     })
     .optional(),
+  /**
+   * On a GitLab issue that is a work item of another type: which (2.11.0). Absent on a plain issue,
+   * on a change, on every GitHub row, on a type outside `WORK_ITEM_TYPES` (a namespace's own
+   * configured type), and where the host could not read the type (an older GitLab). A module
+   * that tells tasks from issues reads `workItem === 'task'`.
+   */
+  workItem: z.enum(WORK_ITEM_TYPES).optional(),
   /** When the host read this row. A scoped refresh moves some rows and not others. */
   readAt: instant,
   detail: trackerDetailSchema.optional(),

@@ -154,6 +154,32 @@ there is no URL or the picture does not load.
 const face = (row, login) => row.people?.[login]?.avatarUrl
 ```
 
+### Work item types (2.11.0)
+
+A GitLab issue can be another kind of work item: a task (a child of an issue),
+an incident, a test case, a requirement, an OKR objective or key result, a
+work-item epic, or a Service Desk ticket. A row says which:
+
+```ts
+workItem?: 'task' | 'incident' | 'test_case' | 'requirement' | 'objective' | 'key_result' | 'epic' | 'ticket'
+```
+
+The words are GitLab's GraphQL `Issue.type` (enum `IssueType`), lower-cased,
+with `ISSUE` left out (`WORK_ITEM_TYPES`, `WorkItemType`). REST's `issue_type`
+spells the same words. `kind` stays `issue`: a task is still a piece of work,
+and every module that reads `kind` reads it as before.
+
+The field is absent on a plain issue, on a change, on every GitHub row (GitHub
+has no work item types), on a type a namespace configured for itself (GitLab
+18.8 and later), and where the host could not read the type: a GitLab too old
+for the field, which the host says in the source's sentence. So "absent" is not
+proof of a plain issue; a module that must know says so only when the field is
+there.
+
+```ts
+const isTask = (row) => row.workItem === 'task'
+```
+
 `live.get` stays, answered by a host as a view over the same reading, until
 the modules that ask it have moved.
 
