@@ -55,7 +55,7 @@ export const LUCIDE_MODULE_ICONS = [
     'mail',
     'map',
     'message-circle',
-    'message-square-check',
+    'message-square-code',
     'network',
     'notebook-pen',
     'package',

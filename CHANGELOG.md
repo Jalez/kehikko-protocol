@@ -7,6 +7,17 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.14.1 — 2026-10-22
+
+A fix to the module icons. `PROTOCOL` is still 2.
+
+### Fixed
+
+- `LUCIDE_MODULE_ICONS` named `message-square-check`, which is not a Lucide icon (lucide-react 0.544
+  has none by that name), so no host could draw `lucide:message-square-check`. It is
+  `message-square-code` now. No released module declared the old key; a host draws it, like any
+  string that is not a key, as its own neutral icon.
+
 ## 2.14.0 — 2026-10-22
 
 A module's icon. A module names the icon it is known by, and a host draws it beside the module's
