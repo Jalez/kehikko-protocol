@@ -36,7 +36,7 @@ Answer these before writing code. Each answer changes what gets built.
 | What does it show, and what does a person switch between? | The page, and the header: View switches and toggles, Go jumps, Run acts. |
 | Does what it holds belong to parts of the epic? | `reacts: ['parts']` and narrowing with `useFocus`, or a `partless` sentence saying why not. |
 | Does anything in it need the person, or run for a while? | What it reports to the Inbox with `activity.set`. |
-| Should a person be able to type a skill for it in Claude Code? | `declares.skills`. |
+| Should a person be able to type a skill for it in Claude Code? | `declares.skills`; a skill that cannot work without another module on the kehikko lists it in `needs`. |
 
 Write the answers down as a one-page design and agree on it before the first file.
 

@@ -24,4 +24,4 @@ export { notificationPayload, callPayload, EXTENSIONS, EXTENSION_NAMES, known, s
 export { CITE_STATUSES, CITE_MARKER, parseSource, serialiseSource, uncitable, markersIn, replaceMarkers, normaliseQuote, findQuote, resolveSource, linesOf, type CitedSource, type CiteStatus, type CitedRange, type CitationView, type MarkerScan, } from './citations.js';
 export { PAGE_BACKGROUND, ROOT_ELEMENT, THEME_KEY, THEME_PARAM, ORIGINS_ELEMENT, TICKET_ELEMENT, TICKET_HEADER, originAmong, TICKET_REFUSED, type PageTheme, } from './page.js';
 export { BUILD_ELEMENT, BUILD_HEADER, PACKAGE_VERSION, buildIsStale, buildSchema, buildStamp, compareBuilds, describeBuild, readBuild, sameCode, sameProcess, type Build, type BuildComparison, } from './build.js';
-export { SKILL_NAME, SKILLS_PATH, skillPath, isSkillName, skillNameSchema, moduleSkillSchema, moduleSkillsSchema, skillTextBytes, skillTextIssue, type ModuleSkill, } from './skills.js';
+export { SKILL_NAME, SKILLS_PATH, skillPath, isSkillName, skillNameSchema, moduleSkillSchema, moduleSkillsSchema, skillNeedsSchema, isKehikkoBound, missingNeeds, skillTextBytes, skillTextIssue, type ModuleSkill, } from './skills.js';

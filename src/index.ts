@@ -476,7 +476,7 @@ export {
   type BuildComparison,
 } from './build.js'
 
-/* Claude Code skills a module offers, and where it serves them (2.5.0). See `skills.ts`. */
+/* Claude Code skills a module offers, and where it serves them (2.5.0); what each needs beside its module (2.12.0). See `skills.ts`. */
 export {
   SKILL_NAME,
   SKILLS_PATH,
@@ -485,6 +485,9 @@ export {
   skillNameSchema,
   moduleSkillSchema,
   moduleSkillsSchema,
+  skillNeedsSchema,
+  isKehikkoBound,
+  missingNeeds,
   skillTextBytes,
   skillTextIssue,
   type ModuleSkill,
