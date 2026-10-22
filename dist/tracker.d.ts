@@ -39,6 +39,15 @@ export type ReviewState = (typeof REVIEW_STATES)[number];
  */
 export declare const LINK_RELATIONS: readonly ["closes", "closed-by"];
 export type LinkRelation = (typeof LINK_RELATIONS)[number];
+/**
+ * What kind of GitLab work item an issue is, when it is not a plain issue (2.11.0): GitLab's
+ * `Issue.type` (GraphQL enum `IssueType`) in lower case, `ISSUE` left out. `task` is a task (a
+ * child of an issue), `incident` an incident, `test_case` a test case, `requirement` a requirement,
+ * `objective` and `key_result` the OKR types, `epic` a work-item epic, `ticket` a Service Desk
+ * ticket. GitHub has no such types.
+ */
+export declare const WORK_ITEM_TYPES: readonly ["task", "incident", "test_case", "requirement", "objective", "key_result", "epic", "ticket"];
+export type WorkItemType = (typeof WORK_ITEM_TYPES)[number];
 export declare const trackerLinkSchema: z.ZodObject<{
     /** The other ref, spelled the way `spellTrackerRef` spells it. */
     ref: z.ZodString;
@@ -484,6 +493,13 @@ export declare const trackerRowSchema: z.ZodObject<{
         name?: string | undefined;
         avatarUrl?: string | undefined;
     }>>>;
+    /**
+     * On a GitLab issue that is a work item of another type: which (2.11.0). Absent on a plain issue,
+     * on a change, on every GitHub row, on a type outside `WORK_ITEM_TYPES` (a namespace's own
+     * configured type), and where the host could not read the type (an older GitLab). A module
+     * that tells tasks from issues reads `workItem === 'task'`.
+     */
+    workItem: z.ZodOptional<z.ZodEnum<["task", "incident", "test_case", "requirement", "objective", "key_result", "epic", "ticket"]>>;
     /** When the host read this row. A scoped refresh moves some rows and not others. */
     readAt: z.ZodString;
     detail: z.ZodOptional<z.ZodObject<{
@@ -616,6 +632,7 @@ export declare const trackerRowSchema: z.ZodObject<{
         name?: string | undefined;
         avatarUrl?: string | undefined;
     }> | undefined;
+    workItem?: "epic" | "task" | "incident" | "test_case" | "requirement" | "objective" | "key_result" | "ticket" | undefined;
 }, {
     number: number;
     state: "open" | "closed" | "merged";
@@ -695,6 +712,7 @@ export declare const trackerRowSchema: z.ZodObject<{
         name?: string | undefined;
         avatarUrl?: string | undefined;
     }> | undefined;
+    workItem?: "epic" | "task" | "incident" | "test_case" | "requirement" | "objective" | "key_result" | "ticket" | undefined;
 }>;
 export type TrackerRow = z.infer<typeof trackerRowSchema>;
 /** One place the host reads (per source, not per tracker), and how that went last time. */
@@ -1014,6 +1032,13 @@ export declare const trackerReadingResult: z.ZodObject<{
             name?: string | undefined;
             avatarUrl?: string | undefined;
         }>>>;
+        /**
+         * On a GitLab issue that is a work item of another type: which (2.11.0). Absent on a plain issue,
+         * on a change, on every GitHub row, on a type outside `WORK_ITEM_TYPES` (a namespace's own
+         * configured type), and where the host could not read the type (an older GitLab). A module
+         * that tells tasks from issues reads `workItem === 'task'`.
+         */
+        workItem: z.ZodOptional<z.ZodEnum<["task", "incident", "test_case", "requirement", "objective", "key_result", "epic", "ticket"]>>;
         /** When the host read this row. A scoped refresh moves some rows and not others. */
         readAt: z.ZodString;
         detail: z.ZodOptional<z.ZodObject<{
@@ -1146,6 +1171,7 @@ export declare const trackerReadingResult: z.ZodObject<{
             name?: string | undefined;
             avatarUrl?: string | undefined;
         }> | undefined;
+        workItem?: "epic" | "task" | "incident" | "test_case" | "requirement" | "objective" | "key_result" | "ticket" | undefined;
     }, {
         number: number;
         state: "open" | "closed" | "merged";
@@ -1225,6 +1251,7 @@ export declare const trackerReadingResult: z.ZodObject<{
             name?: string | undefined;
             avatarUrl?: string | undefined;
         }> | undefined;
+        workItem?: "epic" | "task" | "incident" | "test_case" | "requirement" | "objective" | "key_result" | "ticket" | undefined;
     }>, "many">>;
     missing: z.ZodDefault<z.ZodArray<z.ZodObject<{
         ref: z.ZodString;
@@ -1328,6 +1355,7 @@ export declare const trackerReadingResult: z.ZodObject<{
             name?: string | undefined;
             avatarUrl?: string | undefined;
         }> | undefined;
+        workItem?: "epic" | "task" | "incident" | "test_case" | "requirement" | "objective" | "key_result" | "ticket" | undefined;
     }[];
     missing: {
         ref: string;
@@ -1425,6 +1453,7 @@ export declare const trackerReadingResult: z.ZodObject<{
             name?: string | undefined;
             avatarUrl?: string | undefined;
         }> | undefined;
+        workItem?: "epic" | "task" | "incident" | "test_case" | "requirement" | "objective" | "key_result" | "ticket" | undefined;
     }[] | undefined;
     missing?: {
         ref: string;

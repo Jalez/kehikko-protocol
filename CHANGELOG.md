@@ -7,6 +7,19 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.11.0 — 2026-10-22
+
+Work item types. A GitLab row says when an issue is a task, an incident or another work item
+type. **Additive**; `PROTOCOL` is still 2. A row without it parses as before.
+
+### Added
+
+- `trackerRowSchema.workItem?: WorkItemType` (`WORK_ITEM_TYPES`: `task`, `incident`,
+  `test_case`, `requirement`, `objective`, `key_result`, `epic`, `ticket`): GitLab's
+  `Issue.type` (`IssueType`) lower-cased, `ISSUE` left out. `kind` stays `issue`. Absent on a
+  plain issue, a change, every GitHub row, a namespace's own configured type, and where the host
+  could not read the type (an older GitLab).
+
 ## 2.10.0 — 2026-10-21
 
 Faces. A tracker row says who the people it names by login are: their display name and their
