@@ -30,3 +30,5 @@ export { PAGE_BACKGROUND, ROOT_ELEMENT, THEME_KEY, THEME_PARAM, ORIGINS_ELEMENT,
 export { BUILD_ELEMENT, BUILD_HEADER, PACKAGE_VERSION, buildIsStale, buildSchema, buildStamp, compareBuilds, describeBuild, readBuild, sameCode, sameProcess, } from './build.js';
 /* Claude Code skills a module offers, and where it serves them (2.5.0); what each needs beside its module (2.12.0). See `skills.ts`. */
 export { SKILL_NAME, SKILLS_PATH, skillPath, isSkillName, skillNameSchema, moduleSkillSchema, moduleSkillsSchema, skillNeedsSchema, isKehikkoBound, missingNeeds, skillTextBytes, skillTextIssue, } from './skills.js';
+/* The icon a module is known by, as a key a host draws: `lucide:<name>` or `brand:<slug>` (2.14.0). See `icon.ts`. */
+export { MODULE_ICONS, MODULE_ICON_SETS, LUCIDE_MODULE_ICONS, BRAND_MODULE_ICONS, isModuleIcon, moduleIconParts, } from './icon.js';

@@ -111,6 +111,51 @@ host that compared `version` would refuse every harmless downgrade. Raise
 `dataVersion` in the one release that first writes data an earlier release
 cannot read, and at no other time.
 
+### A module's icon (2.14.0)
+
+`icon` is the icon a module is known by: a **key** of `MODULE_ICONS`, which a
+host draws from its own icon set beside the module's name wherever it lists the
+module — the modules menu, What's new, the module's settings. It is never a
+path, a URL or markup, and a host fetches nothing for it.
+
+```json
+{ "icon": "brand:latex" }
+```
+
+A key is a set, a colon and a name:
+
+- `lucide:<name>` — a [Lucide](https://lucide.dev) icon, by Lucide's own name
+  (`lucide:route`, `lucide:square-terminal`), as `HEADER_ICONS` uses them. The
+  set is `LUCIDE_MODULE_ICONS`.
+- `brand:<slug>` — the mark of a third-party tool the module fronts, by its
+  [Simple Icons](https://simpleicons.org) slug (`brand:latex` for a paper
+  written in LaTeX, `brand:claude` for a Claude Code session,
+  `brand:googlechrome` for a browser). The set is `BRAND_MODULE_ICONS`.
+
+Pick the brand of the tool when the module provides one specific third-party
+tool, and a Lucide icon otherwise. A brand mark **identifies the integrated
+tool and nothing else**: those marks are their owners' trademarks, a module
+showing one says it works with that tool, never that the tool's owner made,
+endorses or ships the module, and a module that does not front that tool does
+not use its mark. A host draws every icon in one colour — the text's — so a
+brand mark sits in the theme like any other icon and colour is never what tells
+two modules apart.
+
+Why a closed vocabulary, and why not `HEADER_ICONS`. A module's strings are
+text a stranger wrote, and an image URL is a fetch a stranger chose: the field
+held one before 2.14.0, and no host drew it. A key cannot point anywhere, and a
+fixed set is something every host can draw the same way. It is a contract, not
+a refusal: the schema still takes any short string, so no manifest is refused
+over its icon, and a host draws a string it does not know (an older URL, a name
+from a newer protocol) as its own neutral icon. `HEADER_ICONS` names acts — a
+check, a play, an undo — and this set names identities; keeping them apart
+keeps brand marks out of a module's buttons.
+
+A host may know the icon of a module it has not installed yet (the Kehikot
+host's list of official modules carries one per entry); what the running module
+declares wins over that. `isModuleIcon` says whether a string is a key, and
+`moduleIconParts` splits one into its set and name.
+
 ### `health`
 
 It is in the schema, bounded, and carried on the parsed manifest.

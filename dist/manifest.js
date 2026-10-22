@@ -165,6 +165,13 @@ const manifestFields = z.object({
     guidance: z.string().max(LIMITS.GUIDANCE).default(''),
     /** The page a host would frame. Relative to the module's own origin. */
     entry: url,
+    /**
+     * 2.14.0. The icon this module is known by: a KEY of `MODULE_ICONS` (`lucide:<name>`, or
+     * `brand:<slug>` for the mark of a third-party tool the module fronts), which a host draws from
+     * its own set beside the module's name. Never a path or URL: a host does not fetch it, and draws a
+     * string it does not know — including the image URL this field held before 2.14.0 — as its own
+     * neutral icon. Any short string still parses, so no manifest is refused for it. See `icon.ts`.
+     */
     icon: z.string().max(LIMITS.URL).optional(),
     /**
      * Cheap liveness, so that "not running" and "broken" can be different words. Carried on the

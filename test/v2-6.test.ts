@@ -32,8 +32,8 @@ const doing: TrackerColumn = { name: 'In progress', board: 'Roadmap', boardUrl: 
 const triage: TrackerColumn = { name: 'Triage', board: 'Bugs' }
 
 describe('the version', () => {
-  test('is 2.13.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.13.0')
+  test('is 2.14.0, and PROTOCOL is still 2', () => {
+    expect(PACKAGE_VERSION).toBe('2.14.0')
     expect(PROTOCOL).toBe(2)
   })
 })

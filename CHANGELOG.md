@@ -7,6 +7,28 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.14.0 — 2026-10-22
+
+A module's icon. A module names the icon it is known by, and a host draws it beside the module's
+name wherever it lists the module. **Additive**; `PROTOCOL` is still 2. A manifest without it
+parses as before, and so does one whose `icon` is anything else.
+
+### Added
+
+- `MODULE_ICONS` / `ModuleIcon`: the keys a manifest's `icon` may name — `lucide:<name>` for each of
+  `LUCIDE_MODULE_ICONS` (Lucide's own names) and `brand:<slug>` for each of `BRAND_MODULE_ICONS`
+  (`claude`, `git`, `github`, `gitlab`, `googlechrome`, `latex`, `markdown`; Simple Icons slugs), the
+  mark of a third-party tool the module fronts. `MODULE_ICON_SETS`, `ModuleIconSet`.
+- `isModuleIcon(value)` and `moduleIconParts(icon)`.
+- docs/manifest.md: "A module's icon", with the trademark note: a brand mark identifies the
+  integrated tool only.
+
+### Changed
+
+- The manifest's `icon` is a key, never a path or URL. The schema still takes any string up to
+  `LIMITS.URL`, so no manifest is refused; a host draws a string that is not a key — including the
+  image URL the field was read as before — as its own neutral icon.
+
 ## 2.13.0 — 2026-10-22
 
 A place in a change's code, shared on a kehikko. Review points at the line a comment is about,
