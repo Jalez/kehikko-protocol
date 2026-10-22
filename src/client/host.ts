@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import type { ActivityItem, FilterGroup, HeaderItemInput, Passage } from '../index.js'
+import type { ActivityItem, CodeLocation, FilterGroup, HeaderItemInput, LocationIntent, Passage } from '../index.js'
 import { HostRefused, NOBODY_TO_ASK, type AskOptions, type Connection, type HostEvents } from './connect.js'
 import {
   JSON_KEPT,
@@ -98,6 +98,10 @@ export function useHost<Kept = unknown>(
   }, [])
 
   const point = useCallback((passage: Passage | null) => held.current?.point(passage), [])
+  const locate = useCallback(
+    (location: CodeLocation | null, intent?: LocationIntent) => held.current?.locate(location, intent) ?? Promise.resolve(null),
+    [],
+  )
   const resize = useCallback((height: number) => held.current?.resize(height), [])
   const filters = useCallback((groups: FilterGroup[]) => held.current?.filters(groups), [])
   const clearable = useCallback((label: string | null) => held.current?.clearable(label), [])
@@ -111,7 +115,7 @@ export function useHost<Kept = unknown>(
   const read = useCallback(() => held.current?.get() ?? drawn.current, [])
 
   return useMemo(
-    () => ({ ...standing, remember, point, request, resize, filters, clearable, refreshable, header, activity, connection, read }),
-    [standing, remember, point, request, resize, filters, clearable, refreshable, header, activity, connection, read],
+    () => ({ ...standing, remember, point, locate, request, resize, filters, clearable, refreshable, header, activity, connection, read }),
+    [standing, remember, point, locate, request, resize, filters, clearable, refreshable, header, activity, connection, read],
   )
 }

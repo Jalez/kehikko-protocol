@@ -941,6 +941,55 @@ A module reading this against a host that has never heard of it finds
 `null`, which is the true answer there: that host has nobody pointing at
 anything.
 
+#### `contextSchema.location`
+
+*2.13.0.* Where in a change's code somebody is pointing on this kehikko, and
+why, or null. The shape is `sharedLocationSchema` in `src/location.ts`:
+
+```ts
+{
+  change: string        // the change's ref, as `selection` spells it: 'gl!123', 'gh#41'
+  path: string          // repository-relative, forward slashes, no '.', '..' or empty segment
+  line: number          // from 1, on `side`
+  endLine?: number      // inclusive, >= line; absent is the one line
+  side: 'new' | 'old'   // new = the change's head, old = its base
+  commit?: string       // the sha the lines were counted at, 7–64 lowercase hex
+  intent: 'show' | 'comment'  // why: look here, or start a review comment here; an unknown word reads 'show'
+  by?: string           // the module that pointed: the host's fact
+  at?: string           // when, ISO 8601: the host's fact, new on every location.set
+}
+```
+
+##### A place in a change, as context, for the reason a passage is
+
+The argument on `passage` holds with the nouns swapped. Review knows a
+comment is about `src/app.ts:42` of `!123`; Source and Diff should follow.
+A channel from Review to each of them would make Review know they exist,
+and a Source pane opened a minute later would miss it. One field per
+kehikko, set with `location.set`, relayed to every container.
+
+##### Why not a passage
+
+A passage's `path` is absolute on the host's machine and its range is
+bytes; it is a place in a file that exists. A line in a change is a place
+in a COMMIT — a file that may not be checked out anywhere, counted in
+lines, on one of two sides. Squeezing that into a passage would leave
+every consumer of passages guessing which kind it was handed.
+
+##### It lives while its change is selected
+
+The host clears it when `context.selection` no longer includes
+`location.change`, and refuses to take one whose change is not selected
+(`locationStands`). A location is not a selection: it does not pick the
+change, it points inside one somebody already picked.
+
+##### `intent` is in the state, and `at` makes it news
+
+"Comment here" is a request, and a request in a state field would be read
+again on every context. It is not, because `at` is new on each call: a
+consumer acts on a location whose `at` (or place, `samePlace`) it has not
+acted on, and leaves alone one it has. `by` lets a module ignore its own.
+
 #### `contextSchema.pinned`
 
 Whether this module has been pinned, and will stop being re-pointed.

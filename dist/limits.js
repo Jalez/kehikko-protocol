@@ -288,4 +288,9 @@ export const LIMITS = {
     SKILL_TEXT: 65_536,
     /** How many other modules one skill may need on its kehikko (`needs`, 2.12.0). */
     SKILL_NEEDS: 8,
+    /**
+     * The highest line number a code location may name (`codeLocationSchema`, 2.13.0). A value, not a
+     * length: a file longer than this is not one anybody reviews a line of.
+     */
+    CODE_LINE: 10_000_000,
 };

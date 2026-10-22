@@ -37,6 +37,12 @@ export declare const CAPABILITIES: {
      */
     readonly 'passage:set': "Say where in a document the person is pointing, and quote it. Every module on the canvas is told.";
     /**
+     * 2.13.0. Say where in a change's code the person is pointing — a file, a line or lines, a side of
+     * the diff — and whether they want to look there or comment there. A SHARED write like
+     * `passage:set`: it goes into `context.location` on this kehikko.
+     */
+    readonly 'location:set': "Say where in a change’s code the person is pointing — a file and a line — or ask for a comment there. Every module on the canvas is told.";
+    /**
      * Ask for its own container's filters to be moved. Reaches this container's own narrowing and
      * nothing else: not another container's, not the canvas.
      */
@@ -108,6 +114,7 @@ export declare const METHODS: {
     readonly 'view.fold': "view:fold";
     readonly 'selection.set': "selection:set";
     readonly 'passage.set': "passage:set";
+    readonly 'location.set': "location:set";
     readonly 'filters.set': "filters:set";
     readonly 'showing.set': "showing:set";
     readonly 'projects.pick': "projects:pick";
@@ -386,6 +393,72 @@ export declare const methodParams: {
                 to?: number | null | undefined;
             } | null | undefined;
         } | null;
+    }>;
+    /**
+     * 2.13.0. Say where in a change's code the person is pointing; answered with `locationSetResult`. The
+     * host relays it into `context.location` on this kehikko, stamped with who pointed and when.
+     * `location` is required and nullable: `null` is a real call that clears it. `intent` says why:
+     * `show` (absent means `show`) or `comment`. A host takes it only while `location.change` is in
+     * `context.selection`: a module pointing into a change nobody picked calls `selection.set` first.
+     */
+    readonly 'location.set': z.ZodObject<{
+        location: z.ZodNullable<z.ZodEffects<z.ZodObject<{
+            change: z.ZodString;
+            path: z.ZodEffects<z.ZodEffects<z.ZodString, string, string>, string, string>;
+            line: z.ZodNumber;
+            endLine: z.ZodOptional<z.ZodNumber>;
+            side: z.ZodEnum<["new", "old"]>;
+            commit: z.ZodOptional<z.ZodString>;
+        }, "strip", z.ZodTypeAny, {
+            path: string;
+            line: number;
+            change: string;
+            side: "new" | "old";
+            commit?: string | undefined;
+            endLine?: number | undefined;
+        }, {
+            path: string;
+            line: number;
+            change: string;
+            side: "new" | "old";
+            commit?: string | undefined;
+            endLine?: number | undefined;
+        }>, {
+            path: string;
+            line: number;
+            change: string;
+            side: "new" | "old";
+            commit?: string | undefined;
+            endLine?: number | undefined;
+        }, {
+            path: string;
+            line: number;
+            change: string;
+            side: "new" | "old";
+            commit?: string | undefined;
+            endLine?: number | undefined;
+        }>>;
+        intent: z.ZodOptional<z.ZodEnum<["show", "comment"]>>;
+    }, "strip", z.ZodTypeAny, {
+        location: {
+            path: string;
+            line: number;
+            change: string;
+            side: "new" | "old";
+            commit?: string | undefined;
+            endLine?: number | undefined;
+        } | null;
+        intent?: "comment" | "show" | undefined;
+    }, {
+        location: {
+            path: string;
+            line: number;
+            change: string;
+            side: "new" | "old";
+            commit?: string | undefined;
+            endLine?: number | undefined;
+        } | null;
+        intent?: "comment" | "show" | undefined;
     }>;
     /**
      * Ask the host to put this container's filters somewhere. A request: the host may refuse for any reason. A
@@ -1150,6 +1223,24 @@ export declare const activitySetResult: z.ZodObject<{
     projects?: boolean | undefined;
 }>;
 export type ActivitySetResult = z.infer<typeof activitySetResult>;
+/**
+ * 2.13.0. What became of a `location.set`; all three are `ok: true`. `taken`: `context.location` is it now
+ * (or, for `null`, is cleared). `not-selected`: its change is not in `context.selection`, so the host did
+ * not keep it — pick the change with `selection.set` and point again. `declined`: the host will not, right now.
+ */
+export declare const LOCATION_SET_OUTCOMES: readonly ["taken", "not-selected", "declined"];
+export type LocationSetOutcome = (typeof LOCATION_SET_OUTCOMES)[number];
+export declare const locationSetResult: z.ZodObject<{
+    outcome: z.ZodEnum<["taken", "not-selected", "declined"]>;
+    why: z.ZodDefault<z.ZodString>;
+}, "strip", z.ZodTypeAny, {
+    outcome: "declined" | "taken" | "not-selected";
+    why: string;
+}, {
+    outcome: "declined" | "taken" | "not-selected";
+    why?: string | undefined;
+}>;
+export type LocationSetResult = z.infer<typeof locationSetResult>;
 /**
  * The least an `epics.list` can answer with. `slug` is required: it is the argument to every other
  * call. `title` and `project` are optional and bounded. Every other field passes through untouched.

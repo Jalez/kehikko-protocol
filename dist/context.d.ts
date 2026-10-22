@@ -517,6 +517,63 @@ export declare const contextSchema: z.ZodObject<{
         } | null | undefined;
     }>>>;
     /**
+     * 2.13.0. Where in a change's code somebody is pointing, and why (`show`, or `comment` to start a
+     * review comment there); see `location.ts`. One per kehikko, set with `location.set` and relayed to
+     * every container. The host clears it when the selection no longer has its change
+     * (`locationStands`). Null when nobody is pointing, which is also what an older host sends.
+     */
+    location: z.ZodDefault<z.ZodNullable<z.ZodEffects<z.ZodObject<{
+        intent: z.ZodCatch<z.ZodEnum<["show", "comment"]>>;
+        by: z.ZodOptional<z.ZodString>;
+        at: z.ZodOptional<z.ZodString>;
+        change: z.ZodString;
+        path: z.ZodEffects<z.ZodEffects<z.ZodString, string, string>, string, string>;
+        line: z.ZodNumber;
+        endLine: z.ZodOptional<z.ZodNumber>;
+        side: z.ZodEnum<["new", "old"]>;
+        commit: z.ZodOptional<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        path: string;
+        line: number;
+        change: string;
+        side: "new" | "old";
+        intent: "comment" | "show";
+        at?: string | undefined;
+        commit?: string | undefined;
+        endLine?: number | undefined;
+        by?: string | undefined;
+    }, {
+        path: string;
+        line: number;
+        change: string;
+        side: "new" | "old";
+        at?: string | undefined;
+        commit?: string | undefined;
+        endLine?: number | undefined;
+        by?: string | undefined;
+        intent?: unknown;
+    }>, {
+        path: string;
+        line: number;
+        change: string;
+        side: "new" | "old";
+        intent: "comment" | "show";
+        at?: string | undefined;
+        commit?: string | undefined;
+        endLine?: number | undefined;
+        by?: string | undefined;
+    }, {
+        path: string;
+        line: number;
+        change: string;
+        side: "new" | "old";
+        at?: string | undefined;
+        commit?: string | undefined;
+        endLine?: number | undefined;
+        by?: string | undefined;
+        intent?: unknown;
+    }>>>;
+    /**
      * Whether this module has been pinned. `true` means it keeps what it was last told, and further
      * changes to this canvas do not reach it until this goes false. A context is still sent when the
      * pin changes, in both directions.
@@ -865,6 +922,17 @@ export declare const contextSchema: z.ZodObject<{
             title: string;
         } | null;
     } | null;
+    location: {
+        path: string;
+        line: number;
+        change: string;
+        side: "new" | "old";
+        intent: "comment" | "show";
+        at?: string | undefined;
+        commit?: string | undefined;
+        endLine?: number | undefined;
+        by?: string | undefined;
+    } | null;
     pinned: boolean;
     prompt: string | null;
     filters: Record<string, string | string[]>;
@@ -938,6 +1006,17 @@ export declare const contextSchema: z.ZodObject<{
             from?: number | null | undefined;
             to?: number | null | undefined;
         } | null | undefined;
+    } | null | undefined;
+    location?: {
+        path: string;
+        line: number;
+        change: string;
+        side: "new" | "old";
+        at?: string | undefined;
+        commit?: string | undefined;
+        endLine?: number | undefined;
+        by?: string | undefined;
+        intent?: unknown;
     } | null | undefined;
     pinned?: boolean | undefined;
     prompt?: string | null | undefined;

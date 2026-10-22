@@ -854,6 +854,57 @@ export declare const helloSchema: z.ZodObject<{
                 to?: number | null | undefined;
             } | null | undefined;
         }>>>;
+        location: z.ZodDefault<z.ZodNullable<z.ZodEffects<z.ZodObject<{
+            intent: z.ZodCatch<z.ZodEnum<["show", "comment"]>>;
+            by: z.ZodOptional<z.ZodString>;
+            at: z.ZodOptional<z.ZodString>;
+            change: z.ZodString;
+            path: z.ZodEffects<z.ZodEffects<z.ZodString, string, string>, string, string>;
+            line: z.ZodNumber;
+            endLine: z.ZodOptional<z.ZodNumber>;
+            side: z.ZodEnum<["new", "old"]>;
+            commit: z.ZodOptional<z.ZodString>;
+        }, "strip", z.ZodTypeAny, {
+            path: string;
+            line: number;
+            change: string;
+            side: "new" | "old";
+            intent: "comment" | "show";
+            at?: string | undefined;
+            commit?: string | undefined;
+            endLine?: number | undefined;
+            by?: string | undefined;
+        }, {
+            path: string;
+            line: number;
+            change: string;
+            side: "new" | "old";
+            at?: string | undefined;
+            commit?: string | undefined;
+            endLine?: number | undefined;
+            by?: string | undefined;
+            intent?: unknown;
+        }>, {
+            path: string;
+            line: number;
+            change: string;
+            side: "new" | "old";
+            intent: "comment" | "show";
+            at?: string | undefined;
+            commit?: string | undefined;
+            endLine?: number | undefined;
+            by?: string | undefined;
+        }, {
+            path: string;
+            line: number;
+            change: string;
+            side: "new" | "old";
+            at?: string | undefined;
+            commit?: string | undefined;
+            endLine?: number | undefined;
+            by?: string | undefined;
+            intent?: unknown;
+        }>>>;
         pinned: z.ZodDefault<z.ZodBoolean>;
         prompt: z.ZodDefault<z.ZodNullable<z.ZodString>>;
         kehikko: z.ZodDefault<z.ZodNullable<z.ZodObject<{
@@ -1149,6 +1200,17 @@ export declare const helloSchema: z.ZodObject<{
                 title: string;
             } | null;
         } | null;
+        location: {
+            path: string;
+            line: number;
+            change: string;
+            side: "new" | "old";
+            intent: "comment" | "show";
+            at?: string | undefined;
+            commit?: string | undefined;
+            endLine?: number | undefined;
+            by?: string | undefined;
+        } | null;
         pinned: boolean;
         prompt: string | null;
         filters: Record<string, string | string[]>;
@@ -1222,6 +1284,17 @@ export declare const helloSchema: z.ZodObject<{
                 from?: number | null | undefined;
                 to?: number | null | undefined;
             } | null | undefined;
+        } | null | undefined;
+        location?: {
+            path: string;
+            line: number;
+            change: string;
+            side: "new" | "old";
+            at?: string | undefined;
+            commit?: string | undefined;
+            endLine?: number | undefined;
+            by?: string | undefined;
+            intent?: unknown;
         } | null | undefined;
         pinned?: boolean | undefined;
         prompt?: string | null | undefined;
@@ -1319,6 +1392,17 @@ export declare const helloSchema: z.ZodObject<{
                 title: string;
             } | null;
         } | null;
+        location: {
+            path: string;
+            line: number;
+            change: string;
+            side: "new" | "old";
+            intent: "comment" | "show";
+            at?: string | undefined;
+            commit?: string | undefined;
+            endLine?: number | undefined;
+            by?: string | undefined;
+        } | null;
         pinned: boolean;
         prompt: string | null;
         filters: Record<string, string | string[]>;
@@ -1399,6 +1483,17 @@ export declare const helloSchema: z.ZodObject<{
                 from?: number | null | undefined;
                 to?: number | null | undefined;
             } | null | undefined;
+        } | null | undefined;
+        location?: {
+            path: string;
+            line: number;
+            change: string;
+            side: "new" | "old";
+            at?: string | undefined;
+            commit?: string | undefined;
+            endLine?: number | undefined;
+            by?: string | undefined;
+            intent?: unknown;
         } | null | undefined;
         pinned?: boolean | undefined;
         prompt?: string | null | undefined;
@@ -1555,6 +1650,57 @@ export declare const contextMessageSchema: z.ZodObject<{
             from?: number | null | undefined;
             to?: number | null | undefined;
         } | null | undefined;
+    }>>>;
+    location: z.ZodDefault<z.ZodNullable<z.ZodEffects<z.ZodObject<{
+        intent: z.ZodCatch<z.ZodEnum<["show", "comment"]>>;
+        by: z.ZodOptional<z.ZodString>;
+        at: z.ZodOptional<z.ZodString>;
+        change: z.ZodString;
+        path: z.ZodEffects<z.ZodEffects<z.ZodString, string, string>, string, string>;
+        line: z.ZodNumber;
+        endLine: z.ZodOptional<z.ZodNumber>;
+        side: z.ZodEnum<["new", "old"]>;
+        commit: z.ZodOptional<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        path: string;
+        line: number;
+        change: string;
+        side: "new" | "old";
+        intent: "comment" | "show";
+        at?: string | undefined;
+        commit?: string | undefined;
+        endLine?: number | undefined;
+        by?: string | undefined;
+    }, {
+        path: string;
+        line: number;
+        change: string;
+        side: "new" | "old";
+        at?: string | undefined;
+        commit?: string | undefined;
+        endLine?: number | undefined;
+        by?: string | undefined;
+        intent?: unknown;
+    }>, {
+        path: string;
+        line: number;
+        change: string;
+        side: "new" | "old";
+        intent: "comment" | "show";
+        at?: string | undefined;
+        commit?: string | undefined;
+        endLine?: number | undefined;
+        by?: string | undefined;
+    }, {
+        path: string;
+        line: number;
+        change: string;
+        side: "new" | "old";
+        at?: string | undefined;
+        commit?: string | undefined;
+        endLine?: number | undefined;
+        by?: string | undefined;
+        intent?: unknown;
     }>>>;
     pinned: z.ZodDefault<z.ZodBoolean>;
     prompt: z.ZodDefault<z.ZodNullable<z.ZodString>>;
@@ -1856,6 +2002,17 @@ export declare const contextMessageSchema: z.ZodObject<{
             title: string;
         } | null;
     } | null;
+    location: {
+        path: string;
+        line: number;
+        change: string;
+        side: "new" | "old";
+        intent: "comment" | "show";
+        at?: string | undefined;
+        commit?: string | undefined;
+        endLine?: number | undefined;
+        by?: string | undefined;
+    } | null;
     pinned: boolean;
     prompt: string | null;
     filters: Record<string, string | string[]>;
@@ -1931,6 +2088,17 @@ export declare const contextMessageSchema: z.ZodObject<{
             from?: number | null | undefined;
             to?: number | null | undefined;
         } | null | undefined;
+    } | null | undefined;
+    location?: {
+        path: string;
+        line: number;
+        change: string;
+        side: "new" | "old";
+        at?: string | undefined;
+        commit?: string | undefined;
+        endLine?: number | undefined;
+        by?: string | undefined;
+        intent?: unknown;
     } | null | undefined;
     pinned?: boolean | undefined;
     prompt?: string | null | undefined;
@@ -2334,6 +2502,57 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
                 to?: number | null | undefined;
             } | null | undefined;
         }>>>;
+        location: z.ZodDefault<z.ZodNullable<z.ZodEffects<z.ZodObject<{
+            intent: z.ZodCatch<z.ZodEnum<["show", "comment"]>>;
+            by: z.ZodOptional<z.ZodString>;
+            at: z.ZodOptional<z.ZodString>;
+            change: z.ZodString;
+            path: z.ZodEffects<z.ZodEffects<z.ZodString, string, string>, string, string>;
+            line: z.ZodNumber;
+            endLine: z.ZodOptional<z.ZodNumber>;
+            side: z.ZodEnum<["new", "old"]>;
+            commit: z.ZodOptional<z.ZodString>;
+        }, "strip", z.ZodTypeAny, {
+            path: string;
+            line: number;
+            change: string;
+            side: "new" | "old";
+            intent: "comment" | "show";
+            at?: string | undefined;
+            commit?: string | undefined;
+            endLine?: number | undefined;
+            by?: string | undefined;
+        }, {
+            path: string;
+            line: number;
+            change: string;
+            side: "new" | "old";
+            at?: string | undefined;
+            commit?: string | undefined;
+            endLine?: number | undefined;
+            by?: string | undefined;
+            intent?: unknown;
+        }>, {
+            path: string;
+            line: number;
+            change: string;
+            side: "new" | "old";
+            intent: "comment" | "show";
+            at?: string | undefined;
+            commit?: string | undefined;
+            endLine?: number | undefined;
+            by?: string | undefined;
+        }, {
+            path: string;
+            line: number;
+            change: string;
+            side: "new" | "old";
+            at?: string | undefined;
+            commit?: string | undefined;
+            endLine?: number | undefined;
+            by?: string | undefined;
+            intent?: unknown;
+        }>>>;
         pinned: z.ZodDefault<z.ZodBoolean>;
         prompt: z.ZodDefault<z.ZodNullable<z.ZodString>>;
         kehikko: z.ZodDefault<z.ZodNullable<z.ZodObject<{
@@ -2629,6 +2848,17 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
                 title: string;
             } | null;
         } | null;
+        location: {
+            path: string;
+            line: number;
+            change: string;
+            side: "new" | "old";
+            intent: "comment" | "show";
+            at?: string | undefined;
+            commit?: string | undefined;
+            endLine?: number | undefined;
+            by?: string | undefined;
+        } | null;
         pinned: boolean;
         prompt: string | null;
         filters: Record<string, string | string[]>;
@@ -2702,6 +2932,17 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
                 from?: number | null | undefined;
                 to?: number | null | undefined;
             } | null | undefined;
+        } | null | undefined;
+        location?: {
+            path: string;
+            line: number;
+            change: string;
+            side: "new" | "old";
+            at?: string | undefined;
+            commit?: string | undefined;
+            endLine?: number | undefined;
+            by?: string | undefined;
+            intent?: unknown;
         } | null | undefined;
         pinned?: boolean | undefined;
         prompt?: string | null | undefined;
@@ -2799,6 +3040,17 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
                 title: string;
             } | null;
         } | null;
+        location: {
+            path: string;
+            line: number;
+            change: string;
+            side: "new" | "old";
+            intent: "comment" | "show";
+            at?: string | undefined;
+            commit?: string | undefined;
+            endLine?: number | undefined;
+            by?: string | undefined;
+        } | null;
         pinned: boolean;
         prompt: string | null;
         filters: Record<string, string | string[]>;
@@ -2879,6 +3131,17 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
                 from?: number | null | undefined;
                 to?: number | null | undefined;
             } | null | undefined;
+        } | null | undefined;
+        location?: {
+            path: string;
+            line: number;
+            change: string;
+            side: "new" | "old";
+            at?: string | undefined;
+            commit?: string | undefined;
+            endLine?: number | undefined;
+            by?: string | undefined;
+            intent?: unknown;
         } | null | undefined;
         pinned?: boolean | undefined;
         prompt?: string | null | undefined;
@@ -3029,6 +3292,57 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             from?: number | null | undefined;
             to?: number | null | undefined;
         } | null | undefined;
+    }>>>;
+    location: z.ZodDefault<z.ZodNullable<z.ZodEffects<z.ZodObject<{
+        intent: z.ZodCatch<z.ZodEnum<["show", "comment"]>>;
+        by: z.ZodOptional<z.ZodString>;
+        at: z.ZodOptional<z.ZodString>;
+        change: z.ZodString;
+        path: z.ZodEffects<z.ZodEffects<z.ZodString, string, string>, string, string>;
+        line: z.ZodNumber;
+        endLine: z.ZodOptional<z.ZodNumber>;
+        side: z.ZodEnum<["new", "old"]>;
+        commit: z.ZodOptional<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        path: string;
+        line: number;
+        change: string;
+        side: "new" | "old";
+        intent: "comment" | "show";
+        at?: string | undefined;
+        commit?: string | undefined;
+        endLine?: number | undefined;
+        by?: string | undefined;
+    }, {
+        path: string;
+        line: number;
+        change: string;
+        side: "new" | "old";
+        at?: string | undefined;
+        commit?: string | undefined;
+        endLine?: number | undefined;
+        by?: string | undefined;
+        intent?: unknown;
+    }>, {
+        path: string;
+        line: number;
+        change: string;
+        side: "new" | "old";
+        intent: "comment" | "show";
+        at?: string | undefined;
+        commit?: string | undefined;
+        endLine?: number | undefined;
+        by?: string | undefined;
+    }, {
+        path: string;
+        line: number;
+        change: string;
+        side: "new" | "old";
+        at?: string | undefined;
+        commit?: string | undefined;
+        endLine?: number | undefined;
+        by?: string | undefined;
+        intent?: unknown;
     }>>>;
     pinned: z.ZodDefault<z.ZodBoolean>;
     prompt: z.ZodDefault<z.ZodNullable<z.ZodString>>;
@@ -3330,6 +3644,17 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             title: string;
         } | null;
     } | null;
+    location: {
+        path: string;
+        line: number;
+        change: string;
+        side: "new" | "old";
+        intent: "comment" | "show";
+        at?: string | undefined;
+        commit?: string | undefined;
+        endLine?: number | undefined;
+        by?: string | undefined;
+    } | null;
     pinned: boolean;
     prompt: string | null;
     filters: Record<string, string | string[]>;
@@ -3405,6 +3730,17 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             from?: number | null | undefined;
             to?: number | null | undefined;
         } | null | undefined;
+    } | null | undefined;
+    location?: {
+        path: string;
+        line: number;
+        change: string;
+        side: "new" | "old";
+        at?: string | undefined;
+        commit?: string | undefined;
+        endLine?: number | undefined;
+        by?: string | undefined;
+        intent?: unknown;
     } | null | undefined;
     pinned?: boolean | undefined;
     prompt?: string | null | undefined;

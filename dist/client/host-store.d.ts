@@ -1,4 +1,4 @@
-import type { ActivityItem, CanvasContainer, EpicPart, FilterChoice, FilterGroup, HeaderItemInput, ModuleContext, Passage } from '../index.js';
+import type { ActivityItem, CanvasContainer, CodeLocation, EpicPart, FilterChoice, FilterGroup, HeaderItemInput, LocationIntent, LocationSetResult, ModuleContext, Passage, SharedLocation } from '../index.js';
 import type { PageTheme } from '../page.js';
 import { type ContextScope } from '../context.js';
 import { type AskOptions, type ConnectOptions, type Connection, type HostEvents } from './connect.js';
@@ -43,7 +43,7 @@ export interface HostStoreOptions<Kept = unknown> extends ConnectOptions {
     same?: Steadiness;
 }
 /** The fields of a standing that keep their identity while they say the same thing. */
-export type SteadyField = 'passage' | 'containers' | 'parts' | 'selection' | 'chosen' | 'kehikko';
+export type SteadyField = 'passage' | 'location' | 'containers' | 'parts' | 'selection' | 'chosen' | 'kehikko';
 /** A page's own rule for "the same", per field: `(was, now) => true` keeps the object it was. */
 export type Steadiness = {
     [Field in SteadyField]?: (was: HostFields[Field], now: HostFields[Field]) => boolean;
@@ -66,6 +66,12 @@ export interface HostFields {
      */
     scope: ContextScope;
     passage: Passage | null;
+    /**
+     * 2.13.0. Where in a change's code somebody is pointing on this kehikko, and why
+     * (`context.location`), or `null`. The same object while it says the same thing: a repeated
+     * "comment here" is a new one, because `at` moved.
+     */
+    location: SharedLocation | null;
     containers: readonly CanvasContainer[];
     /** The parts of the open epic, with which are picked out. Empty is the whole epic. */
     parts: readonly EpicPart[];
@@ -111,6 +117,13 @@ export interface HostActions<Kept = unknown> {
      * none. Fire and forget, like `remember`.
      */
     point: (passage: Passage | null) => void;
+    /**
+     * 2.13.0. Say where in a change's code the person is pointing (`location.set`), and why (`show`
+     * when not said, or `comment`); `null` clears it. Resolves with the host's answer, or `null` when
+     * nothing is framing the page or the host did not answer in the shape `locationSetResult` says.
+     * Never rejects.
+     */
+    locate: (location: CodeLocation | null, intent?: LocationIntent) => Promise<LocationSetResult | null>;
     /** Ask the host something. Rejects with `HostRefused`, always; safe before the greeting. Stable. */
     request: (method: string, params?: Record<string, unknown>, options?: AskOptions) => Promise<unknown>;
     resize: (height: number) => void;

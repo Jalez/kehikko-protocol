@@ -1,4 +1,5 @@
 import { scopeOf } from '../context.js';
+import { locationSetResult } from '../methods.js';
 import { HostRefused, NOBODY_TO_ASK, connect, } from './connect.js';
 import { reloadWhenStale } from './ask.js';
 import { applyTheme, pageTheme, systemTheme } from './theme.js';
@@ -24,7 +25,7 @@ export const JSON_KEPT = {
     },
     write: (kept) => JSON.stringify(kept),
 };
-const STEADY = ['passage', 'containers', 'parts', 'selection', 'chosen', 'kehikko'];
+const STEADY = ['passage', 'location', 'containers', 'parts', 'selection', 'chosen', 'kehikko'];
 const NONE = [];
 const NO_CHOICE = {};
 const text = (value) => (typeof value === 'string' && value.trim() ? value : null);
@@ -54,6 +55,7 @@ export function hostFields(context, was, same = {}) {
         epic: text(context?.epic),
         scope: scopeOf(context),
         passage: context?.passage ?? null,
+        location: context?.location ?? null,
         containers: context?.containers ?? NONE,
         parts: context?.parts ?? NONE,
         selection: context?.selection ?? NONE,
@@ -184,6 +186,17 @@ export function hostStore(id, events = {}, options = {}) {
             if (!live || !live.greeted())
                 return;
             void live.request('passage.set', { passage }).catch(() => { });
+        },
+        locate(location, intent) {
+            if (!live || !live.greeted())
+                return Promise.resolve(null);
+            return live
+                .request('location.set', intent === undefined ? { location } : { location, intent })
+                .then((answer) => {
+                const read = locationSetResult.safeParse(answer);
+                return read.success ? read.data : null;
+            })
+                .catch(() => null);
         },
         request(method, params = {}, asking) {
             if (live)

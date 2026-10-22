@@ -298,6 +298,7 @@ and a module that declares none gets none of the methods below.
 | `view.fold` | `view:fold` |
 | `selection.set` | `selection:set` |
 | `passage.set` | `passage:set` |
+| `location.set` | `location:set` |
 | `filters.set` | `filters:set` |
 | `showing.set` | `showing:set` |
 | `projects.pick` | `projects:pick` |
@@ -351,6 +352,19 @@ and a paragraph of what was there. A module declaring this is asking to put
 all of that in front of every other pane on the canvas, and somebody
 deciding whether to run the program should read that in the sentence rather
 than discover it from a field name.
+
+#### `CAPABILITIES.location:set`
+
+*2.13.0.* Say where in a change's code the person is pointing, or ask for a
+comment there.
+
+A write, and a SHARED one, in the family of `passage:set`: what a module says
+goes into `context.location` on its kehikko, in front of every pane. It names
+a change, a file in its repository and a line, and — with `intent: 'comment'`
+— asks whoever writes reviews on the canvas to start a comment there. A
+module that declares it is asking to move its neighbours: Source opens the
+file, Diff scrolls its hunk, Review opens a comment box. The sentence a person
+reads before running the program says so.
 
 #### `CAPABILITIES.filters:set`
 
@@ -645,6 +659,58 @@ on them, and two copies of those rules is a wire where the host accepts
 what the context schema will later drop, or the reverse — a passage that
 validates on the way in and vanishes on the way out, with nothing anywhere
 saying so. One definition, in `wire.ts`, read by both.
+
+#### `methodParams.location.set`
+
+*2.13.0.* Say where in a change's code the person is pointing, and why.
+
+```ts
+await host.locate({ change: 'gl!123', path: 'src/app.ts', line: 42, side: 'new', commit: 'abc1234' })
+await host.locate({ change: 'gl!123', path: 'src/app.ts', line: 42, endLine: 48, side: 'new' }, 'comment')
+// on the wire: request('location.set', { location: {...} | null, intent?: 'show' | 'comment' })
+// answered with locationSetResult: { outcome: 'taken' | 'not-selected' | 'declined', why }
+```
+
+##### The same act `passage.set` performs, on a change instead of a file
+
+A passage is a place in a document on the host's machine. A code location is
+a place in a change: a merge request or pull request (`change`, the ref
+spelling `selection` carries), a file in its repository (`path`, relative to
+the root, as git spells it), a line or an inclusive range (`line`,
+`endLine`), which side of the diff they count on (`side`: `new` is the head,
+`old` the base) and, when the sender knows it, the commit they were counted
+at (`commit`). The file is not on the host's machine in any useful sense — it
+is in a commit — so this is not a passage with a ref beside it: a passage's
+`path` is absolute and its range is bytes, and a diff counts lines on two
+sides.
+
+##### `intent` rides on the call, and the context says it
+
+`show` (absent means `show`): look here. `comment`: start a review comment
+here. The intent is part of the context's `location`, not a separate event,
+for the reason a passage is context and not a message: one field per kehikko,
+the last one wins, and a module that opens late sees what the canvas is
+pointing at. The host stamps `by` (which module pointed) and `at` (when) on
+it, so pointing twice at the same line is still a change a consumer can see —
+"comment here" twice is two requests — and a module can leave its own
+location alone (`location.by === myId`).
+
+##### It lives only while its change is selected
+
+A host keeps one location per kehikko, and clears it when `context.selection`
+stops including `location.change` (`locationStands`). A location in a change
+nobody has picked out is a pointer into something no pane is showing. So a
+host also refuses to TAKE one whose change is not selected, with
+`not-selected`: a module pointing into a change nobody picked calls
+`selection.set` first and points again. `null` is a real call that clears it,
+for the reason `passage: null` is.
+
+##### `path` is checked for shape, not for existence
+
+`repoPath` refuses a leading slash, a backslash, an empty, `.` or `..`
+segment: what a consumer joins onto a checkout cannot climb out of it by its
+spelling. It cannot say whether the file exists at `commit`; a consumer that
+reads it still checks.
 
 #### `methodParams.filters.set`
 
