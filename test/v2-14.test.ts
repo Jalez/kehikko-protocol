@@ -26,8 +26,8 @@ const minimal = {
 }
 
 describe('the version', () => {
-  test('is 2.14.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.14.0')
+  test('is 2.14.1, and PROTOCOL is still 2', () => {
+    expect(PACKAGE_VERSION).toBe('2.14.1')
     expect(PROTOCOL).toBe(2)
   })
 })
@@ -46,6 +46,13 @@ describe('MODULE_ICONS', () => {
   test('is apart from HEADER_ICONS, and carries no sparkles: that is not any module', () => {
     for (const key of MODULE_ICONS) expect(HEADER_ICONS as readonly string[]).not.toContain(key)
     expect(MODULE_ICONS.some((key) => key.includes('sparkles'))).toBe(false)
+  })
+})
+
+describe('2.14.1', () => {
+  test('message-square-check, which Lucide does not have, is message-square-code', () => {
+    expect(isModuleIcon('lucide:message-square-check')).toBe(false)
+    expect(isModuleIcon('lucide:message-square-code')).toBe(true)
   })
 })
 
