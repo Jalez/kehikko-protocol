@@ -100,6 +100,7 @@ The source says what each field is and what it is bounded by, in a line or three
 
 | | |
 |---|---|
+| [Building a module](docs/building-a-module.md) | The guide for a new module: what to decide, the template repository, the rules, testing, running it in Kehikot, releasing. |
 | [The wire: context, passages and messages](docs/wire.md) | What a host and a module say to each other across the frame: the context a module is handed, the passage a reader is pointing at, and the messages themselves. |
 | [Filters, clearing and refreshing](docs/filters.md) | The three things a module offers and the host draws: filters to narrow by, a control that clears what is shown, and a control that reads the material again. Also the shared reference facets behind `/facets`. |
 | [Capabilities, methods and their answers](docs/methods.md) | The questions a module can ask the host, the capability each one needs, what a caller must construct, and which answers have a shape. |
@@ -130,6 +131,10 @@ Moving a module or a host onto this version from 0.36.0 or 0.37.0:
 answer.
 
 ## Making a new module
+
+Start with **[Building a module](docs/building-a-module.md)**: the whole path, from deciding what a module is to its first release, built on the template repository [`Jalez/kehikko-module-template`](https://github.com/Jalez/kehikko-module-template). In Claude Code, Kehikot's own `/kehikot-module` skill walks you through it.
+
+For a bare local module without the release setup:
 
 ```
 bun run create <name> [--dir <path>] [--register]

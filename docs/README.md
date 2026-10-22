@@ -2,8 +2,11 @@
 
 Why the protocol is the way it is. The source keeps one to three lines beside each field — the invariant, the unit, the constraint — and everything longer lives here, once: the reasoning, the incidents that produced a rule, the alternatives that were turned down.
 
+**New here? Start with [Building a module](building-a-module.md)**: the path from the first question to a first release, with the template repository and the rules every module keeps.
+
 | | |
 |---|---|
+| [Building a module](building-a-module.md) | The guide: deciding what a module is, starting from `Jalez/kehikko-module-template`, the rules it keeps, testing, running it in Kehikot, releasing, and proposing it for the official list. |
 | [The wire: context, passages and messages](wire.md) | What a host and a module say to each other across the frame: the context a module is handed, the passage a reader is pointing at, and the messages themselves. |
 | [Filters, clearing and refreshing](filters.md) | The three things a module offers and the host draws: filters to narrow by, a control that clears what is shown, and a control that reads the material again. Also the shared reference facets behind `/facets`. |
 | [Capabilities, methods and their answers](methods.md) | The questions a module can ask the host, the capability each one needs, what a caller must construct, and which answers have a shape. |
