@@ -58,12 +58,13 @@ async function stopped(ms: number, cap: number, signal: 'SIGTERM' | 'SIGINT') {
 }
 
 describe('run: a signal waits for an asynchronous onStop', () => {
-  test('the default cap is 5 s', () => {
-    expect(STOP_TIMEOUT_MS).toBe(5000)
+  test('the default cap is 2.5 s, inside a host\'s 3 s quit grace', () => {
+    expect(STOP_TIMEOUT_MS).toBe(2500)
+    expect(STOP_TIMEOUT_MS).toBeLessThan(3000)
   })
 
   test('SIGTERM: onStop finishes, once, before the process exits 0', async () => {
-    const said = await stopped(400, 5000, 'SIGTERM')
+    const said = await stopped(400, 2500, 'SIGTERM')
     expect(said.finished).toBe('finished after 400 ms, called 1 time(s)')
     expect(said.code).toBe(0)
     expect(said.took).toBeGreaterThanOrEqual(380)
@@ -71,7 +72,7 @@ describe('run: a signal waits for an asynchronous onStop', () => {
   })
 
   test('SIGINT too', async () => {
-    const said = await stopped(300, 5000, 'SIGINT')
+    const said = await stopped(300, 2500, 'SIGINT')
     expect(said.finished).toBe('finished after 300 ms, called 1 time(s)')
     expect(said.code).toBe(0)
   })

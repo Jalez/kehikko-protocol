@@ -48,9 +48,14 @@ await run({ id: ID, prefer: PREFERRED_PORT, dir: import.meta.dirname, manifest: 
 - `idleTimeout` 0 by default: an event stream or a long MCP call is not idle.
 - `onStop`, once, on SIGINT, SIGTERM or exit: end what the module started. It may return a promise
   (2.18.1): on a signal the server stops answering at once, and the process exits when `onStop` has
-  finished, or after `stopTimeoutMs` (default 5000) if it has not. A browser told to close writes
+  finished, or after `stopTimeoutMs` (default 2500) if it has not. A browser told to close writes
   its cookies; one killed by the exit does not. On a plain exit nothing can be awaited, so `onStop`
   is only begun.
+- **A stop has to be over within the host's grace.** A host sends SIGTERM to a module's process
+  group and SIGKILLs it 5 s later on a normal stop, and **3 s** later when the app quits. A module's
+  stop — `run`'s `onStop`, or what its Vite server does on SIGTERM — must finish inside 3 s, or it is
+  killed half-way whatever it was writing. Keep `stopTimeoutMs` under that; the default leaves half
+  a second of margin.
 
 ## A door of the module's own: `before` (2.18.0)
 

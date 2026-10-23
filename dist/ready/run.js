@@ -28,8 +28,12 @@ export function socketFence(headers, port) {
     }
     return { ok: true };
 }
-/** How long a signal waits for a module's `onStop` before the process exits anyway (2.18.1). */
-export const STOP_TIMEOUT_MS = 5000;
+/**
+ * How long a signal waits for a module's `onStop` before the process exits anyway (2.18.1). Under a
+ * host's grace: a host SIGKILLs a module's process group 5 s after SIGTERM on a normal stop, and 3 s
+ * after when the app quits, so a stop has to be over well inside 3 s.
+ */
+export const STOP_TIMEOUT_MS = 2500;
 const TEXT = { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store' };
 /** What a request sent under a name that is not this machine's is told, with status 403. */
 export const NOT_HERE = 'This address is not one this module answers at.';

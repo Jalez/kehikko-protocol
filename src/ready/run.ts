@@ -89,7 +89,11 @@ export interface RunOptions<T = unknown> extends Omit<DoorsOptions, 'page'> {
    * (`process.exit`, the event loop running dry) nothing can be awaited: it is called and not waited for.
    */
   onStop?: () => void | Promise<void>
-  /** How long a signal waits for `onStop` before the process exits anyway, in ms (2.18.1). Default 5000. */
+  /**
+   * How long a signal waits for `onStop` before the process exits anyway, in ms (2.18.1). Default
+   * `STOP_TIMEOUT_MS`, 2500. Keep it under the host's 3 s quit grace, after which the process group is
+   * killed whatever it is doing.
+   */
   stopTimeoutMs?: number
   /** Bun's idle timeout in seconds. Default 0, none: an event stream or a long MCP call is not idle. */
   idleTimeout?: number
@@ -148,8 +152,12 @@ export function socketFence(headers: { get(name: string): string | null }, port:
   return { ok: true }
 }
 
-/** How long a signal waits for a module's `onStop` before the process exits anyway (2.18.1). */
-export const STOP_TIMEOUT_MS = 5000
+/**
+ * How long a signal waits for a module's `onStop` before the process exits anyway (2.18.1). Under a
+ * host's grace: a host SIGKILLs a module's process group 5 s after SIGTERM on a normal stop, and 3 s
+ * after when the app quits, so a stop has to be over well inside 3 s.
+ */
+export const STOP_TIMEOUT_MS = 2500
 
 const TEXT = { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store' }
 

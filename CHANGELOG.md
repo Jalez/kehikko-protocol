@@ -14,7 +14,7 @@ label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING
 ### Fixed
 
 - `run`: on SIGINT or SIGTERM, a promise `onStop` returns is awaited, for at most `stopTimeoutMs`
-  (default `STOP_TIMEOUT_MS`, 5000), before the process exits 0. Until now the `process.exit` right
+  (default `STOP_TIMEOUT_MS`, 2500, inside the host's 3 s quit grace), before the process exits 0. Until now the `process.exit` right
   behind it cut it off, so a module whose stop is asynchronous (a browser told to close, which is
   when it writes its cookies) was killed half-way. The server stops answering as soon as stopping
   begins. On a plain exit `onStop` is begun and not waited for, as before.
