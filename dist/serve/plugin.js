@@ -14,20 +14,7 @@ export function serves({ id, prefer, dir, span, timeoutMs }) {
         name: 'kehikot-module-serves',
         apply: 'serve',
         async config(config) {
-            claimed = await claim({ id, prefer: preferred(prefer), span, timeoutMs });
-            if (claimed.status === 'already-running') {
-                /* Exit 0, not 1: nothing failed, the thing being asked for exists. And it EXITS rather
-                   than drifting — a second copy of one module is not a fallback. */
-                console.log(sayClaim(claimed));
-                process.exit(0);
-            }
-            if (claimed.status === 'nowhere') {
-                console.error(sayClaim(claimed));
-                process.exit(1);
-            }
-            /* Loud, on stdout, naming both numbers — the port that was wanted and the one taken. */
-            if (claimed.moved)
-                console.log(sayClaim(claimed));
+            claimed = await claimOrLeave({ id, prefer: preferred(prefer), span, timeoutMs });
             /* No cross-origin sharing unless the module wrote `server.cors` itself: a module's page asks
                its own origin, and Vite's own default answers other origins on this machine. */
             const said = config?.server?.cors !== undefined;
@@ -47,26 +34,46 @@ export function serves({ id, prefer, dir, span, timeoutMs }) {
                     console.error(`${id}: listening on ${String(bound)}, which is not an address a host can be told about`);
                     return;
                 }
-                const origin = `http://127.0.0.1:${bound.port}`;
-                const here = dir ?? server.config.root;
-                /* Another folder is the one the app runs this module from: this copy answers, and is not
-                   registered in its place (see `takesOver`). */
-                const may = takesOver(id, here);
-                if (!may.ok) {
-                    console.log(`${id} answers at ${origin} and was NOT registered: the app runs ${id} from ${may.held.dir}, and a copy `
-                        + 'started from another folder does not take that over. `bun run register` here would.');
-                    return;
-                }
-                const written = registerAt({ id, origin, dir: here });
-                /* Said every time, and short. After a drift it is the only place both numbers appear
-                   together. */
-                console.log(`${id} registered: ${written.file} -> ${origin}`);
-                if (written.was) {
-                    /* Whoever started last wins, and the losing entry is named rather than overwritten in
-                       silence. */
-                    console.log(`  (was ${written.was.url}${written.was.dir ? ` in ${written.was.dir}` : ''})`);
-                }
+                registerBound(id, `http://127.0.0.1:${bound.port}`, dir ?? server.config.root);
             });
         },
     };
+}
+/**
+ * The port, decided once for a dev server (`serves`) and a built one (`run` in `/run`) alike: the
+ * claim, and leaving when there is no port to take. Exit 0, not 1, when this module already answers:
+ * nothing failed, the thing being asked for exists, and a second copy of one module is not a
+ * fallback. Exit 1 when there is nowhere to go. A move is said on stdout, naming both numbers.
+ */
+export async function claimOrLeave(options) {
+    const claimed = await claim(options);
+    if (claimed.status === 'already-running') {
+        console.log(sayClaim(claimed));
+        process.exit(0);
+    }
+    if (claimed.status === 'nowhere') {
+        console.error(sayClaim(claimed));
+        process.exit(1);
+    }
+    if (claimed.moved)
+        console.log(sayClaim(claimed));
+    return claimed;
+}
+/**
+ * Write down the address a server ACTUALLY bound, once it is listening, for a dev server and a built
+ * one alike. Another folder that the app runs this module from is not taken over (see `takesOver`):
+ * this copy answers and says why it was not registered. Whoever started last wins, and the losing
+ * entry is named rather than overwritten in silence.
+ */
+export function registerBound(id, origin, here) {
+    const may = takesOver(id, here);
+    if (!may.ok) {
+        console.log(`${id} answers at ${origin} and was NOT registered: the app runs ${id} from ${may.held.dir}, and a copy `
+            + 'started from another folder does not take that over. `bun run register` here would.');
+        return;
+    }
+    const written = registerAt({ id, origin, dir: here });
+    console.log(`${id} registered: ${written.file} -> ${origin}`);
+    if (written.was)
+        console.log(`  (was ${written.was.url}${written.was.dir ? ` in ${written.was.dir}` : ''})`);
 }
