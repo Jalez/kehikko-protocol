@@ -59,7 +59,9 @@ export {
 } from './registry.js'
 
 export {
+  claimOrLeave,
   preferred,
+  registerBound,
   serves,
   type DevServerLike,
   type HttpServerLike,

@@ -7,6 +7,31 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.17.0 — 2026-10-23
+
+A module served ready-built. **Additive**; `PROTOCOL` is still 2. A module that does not use the new
+subpaths runs exactly as before.
+
+### Added
+
+- `kehikot-module-protocol/run` (Bun): `run(options)` serves a module's built `dist/` and the same
+  doors the dev server mounts (`doorsFetch`), on the port `serves()` would take (`PORT`, else
+  `prefer`, then `claim`), on `127.0.0.1` only, and registers the port it bound. `/assets/*`
+  immutable, other files `no-cache`, no directory listing, no dot files, nothing outside `dist/`;
+  `spa` for a page that routes by its address. `sockets` (`RunSockets`, `RunSocket`): WebSocket
+  doors on Bun's own WebSocket, behind `socketFence` (an `Origin` and a `Host` naming this server's
+  loopback address). `onStop`, `idleTimeout` (default 0). `fileIn`.
+- `kehikot-module-protocol/build`: `buildModule({ dir, page?, outDir?, vite? })` writes the page for
+  the build when the module has no `index.html`, runs the module's own `vite build`, and stamps
+  `dist/.kehikot-built` with the commit — only after a build that succeeded, from a checkout whose
+  tracked files match `HEAD`. `ModuleBuilt`, `ViteLike`.
+- Both: `STAMP_FILE`, `readStamp`, `readiness` (`Readiness`); `/build` also `writeStamp`,
+  `clearStamp`, `cleanTree`. `run` answers the page and `dist/` with a 503 saying why when the
+  stamp is not the commit the process started at: a stale build is never served.
+- `/serve`: `claimOrLeave` and `registerBound`, the port and registration steps `serves()` takes,
+  now shared with `run`. `serves()` behaves as before.
+- docs/ready-built.md.
+
 ## 2.16.0 — 2026-10-23
 
 A web address handed to the canvas (issue #51). A module that draws a link which is not a tracker

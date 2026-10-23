@@ -87,11 +87,12 @@ Concretely, the things this package deliberately does not do:
 | `mcp.subjects` in the manifest, `showAnswerSchema`, `doneAnswerSchema`, `doneAnswer`, `SHOW_OUTPUT_SCHEMA`, `DONE_OUTPUT_SCHEMA`, `doorContext`, `DOOR_ARGUMENTS`, `doorToolSchema`, `toolEffect` | A module's MCP door (1.1.0): which tool shows a kind of thing, lets go of it and answers "is it done?", the two answers a caller reads as a state, the one spelling of the context arguments, and what a tool says about only reading. |
 | `foldResult`, `FOLD_OUTCOMES`, and `folded` on a container | `view.fold` (1.1.0): a module asking the host to fold or unfold containers, and what became of it. |
 
-And behind two subpaths, which are not shapes and say so:
+And behind subpaths, which are not shapes and say so:
 
 | | |
 |---|---|
 | `kehikot-module-protocol/client` | `connect`, `mailbox`, `HostRefused` — the module half of the wire, for a page that would rather not write it again. Browser code, kept out of the front door so a Bun process can import shapes without it. **A convenience: a module may hand-roll its wire and be perfectly conforming.** |
+| `kehikot-module-protocol/run`, `kehikot-module-protocol/build` | A module served from its built page (2.17.0): `run`, one Bun server with the same doors as the dev server and a WebSocket hook, and `buildModule`, which builds and stamps `dist/` with the commit so a stale build is never served. See [ready-built](docs/ready-built.md). |
 | `kehikot-module-protocol/client/react` | `useHost`, `Cover` and `coverFor`, and `useFocus` (0.34.0), the parts focus as one value. Optional; `react` is an optional peer dependency and `client` does not import it. |
 
 ## Where the reasoning is
@@ -120,6 +121,7 @@ The source says what each field is and what it is bounded by, in a line or three
 | [The client library](docs/client.md) | The module half of the wire behind `/client` and `/client/react`: `connect`, the mailbox, and the hooks. A convenience, never a requirement. |
 | [Serving a module: ports, the registry, frame origins, and the template](docs/serving.md) | The node-only half behind `/serve` — which port a module binds, where it writes down that it exists, which origins may frame it — and the generator that makes a new module from `template/`. |
 | [The shared plumbing of a module](docs/module-plumbing.md) | What every module used to type out for itself, behind `/serve`, `/client` and `/client/react`: the page document and its first paint, the write ticket, the JSON body reader, the `doors()` plugin, `ask()`, `useHost`, the one not-ready screen `Cover`, and the build identity. |
+| [A module served ready-built](docs/ready-built.md) | `/run` and `/build` (2.17.0): the built page, the same doors as the dev server, sockets, and the stamp that keeps a stale build from being served. |
 | [Packaging](PACKAGING.md) | How this package is consumed straight from git, and why `dist/` is committed. |
 
 ## One spelling
@@ -165,6 +167,7 @@ The same list with what each version exported is in [CHANGELOG.md](CHANGELOG.md)
 
 | version | date | what it added |
 |---|---|---|
+| 2.17.0 | 2026-10-23 | Additive. A module served ready-built: `kehikot-module-protocol/run` (Bun) serves a module's built `dist/` and the same doors as the dev server, with a WebSocket hook (`sockets`, behind `socketFence`); `kehikot-module-protocol/build` builds the page and stamps `dist/.kehikot-built` with the commit. `run` refuses (503, saying why) a build whose stamp is not the commit it started at. `claimOrLeave` and `registerBound` in `/serve`. See [ready-built](docs/ready-built.md). |
 | 2.16.0 | 2026-10-23 | Additive. A web address handed to the canvas: `address.open({ url, title?, intent? })` under the new capability `address:open`, answered with `addressOpenResult` (`shown`, `offered`, `declined`); `webAddress` / `addressRefusal` (`https:`, or `http:` to this machine; no credentials; at most `LIMITS.URL`); `context.address` (`sharedAddressSchema`, stamped with the host's `by`, `agent` and `at`); `REACTS_TO.address`, the module that shows pages; `addressIsNews`, `addressLabel`; the client's `address` field and `openAddress`. See [methods](docs/methods.md#methodparamsaddressopen) and [wire](docs/wire.md#contextschemaaddress). |
 | 2.15.0 | 2026-10-23 | Additive. A module's settings: `declares.settings` lists fields (`key`, `label`, `description`, `type: 'boolean' \| 'string' \| 'number' \| 'choice' \| 'list'`, `choices?`, `default`, `scope: 'project' \| 'machine'`, `personOnly?`) a host draws as one form. Two door methods a host asks a module, filed under the door capability `settings` (`DOOR_CAPABILITIES`, `DOOR_METHODS`): `settings.get` → `{ values, file?, problem? }` and `settings.set` → `{ outcome: 'saved' \| 'refused', why, values? }`, at `SETTINGS_PATH`. A `personOnly` setting changes only for the module page's ticket or a pass the host vouches for (`SETTINGS_PASS_PATH`, `hostVouches`). `settingsDoor` in `/serve`. See [settings](docs/settings.md). |
 | 2.14.1 | 2026-10-22 | Fix. `LUCIDE_MODULE_ICONS` has `message-square-code` in place of `message-square-check`, which is not a Lucide icon. |

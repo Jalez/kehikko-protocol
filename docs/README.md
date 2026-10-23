@@ -27,6 +27,7 @@ Why the protocol is the way it is. The source keeps one to three lines beside ea
 | [The client library](client.md) | The module half of the wire behind `/client` and `/client/react`: `connect`, the mailbox, and the hooks. A convenience, never a requirement. |
 | [Serving a module: ports, the registry, frame origins, and the template](serving.md) | The node-only half behind `/serve` — which port a module binds, where it writes down that it exists, which origins may frame it — and the generator that makes a new module from `template/`. |
 | [The shared plumbing of a module](module-plumbing.md) | What every module used to type out for itself, behind `/serve`, `/client` and `/client/react`: the page document and its first paint, the write ticket, the JSON body reader, the `doors()` plugin, `ask()`, `useHost`, the one not-ready screen `Cover`, and the build identity. |
+| [A module served ready-built](ready-built.md) | `/run` and `/build` (2.17.0): one Bun server for a module's built page with the same doors as the dev server and a WebSocket hook, and the stamp that keeps a stale build from being served. |
 | [Packaging](../PACKAGING.md) | How this package is consumed straight from git, and why `dist/` is committed. |
 | [`kehikko` and `kehikot`](naming.md) | Which spelling goes where, as the code uses the two today. Inferred; to be confirmed. |
 
