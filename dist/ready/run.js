@@ -28,6 +28,8 @@ export function socketFence(headers, port) {
     }
     return { ok: true };
 }
+/** How long a signal waits for a module's `onStop` before the process exits anyway (2.18.1). */
+export const STOP_TIMEOUT_MS = 5000;
 const TEXT = { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store' };
 /** What a request sent under a name that is not this machine's is told, with status 403. */
 export const NOT_HERE = 'This address is not one this module answers at.';
@@ -234,24 +236,57 @@ export async function run(options) {
     const origin = `http://127.0.0.1:${port}`;
     registerBound(id, origin, dir);
     console.log(`${id} serves its built page on ${origin}/app${ready.ok ? ` (${ready.commit.slice(0, 7)})` : ' — refused, see above'}`);
-    let stopped = false;
+    /*
+     * Stopping happens once, whoever asks first. `onStop` may be asynchronous, and a signal waits for
+     * it, for at most `stopTimeoutMs`, before the process exits (2.18.1): until then a module's
+     * `onStop` was cut off by the `process.exit` right behind it.
+     */
+    let stopping = null;
+    let begun = false;
     const stop = () => {
-        if (stopped)
-            return;
-        stopped = true;
+        if (stopping)
+            return stopping;
+        /* Asked again from inside `onStop` (it exited, say): the first call is the one that stops. */
+        if (begun)
+            return Promise.resolve();
+        begun = true;
+        let ended;
         try {
-            options.onStop?.();
+            ended = options.onStop?.();
         }
-        finally {
-            server.stop(true);
+        catch (error) {
+            console.error(`${id}: onStop failed:`, error);
         }
+        /* No request is answered once stopping began: one could start again what `onStop` is ending. */
+        try {
+            void server.stop(true);
+        }
+        catch {
+            /* Already stopped. */
+        }
+        const cap = options.stopTimeoutMs ?? STOP_TIMEOUT_MS;
+        stopping = (async () => {
+            if (ended && typeof ended.then === 'function') {
+                let timer;
+                const late = new Promise((resolve) => {
+                    timer = setTimeout(() => resolve('late'), cap);
+                });
+                const said = await Promise.race([ended.then(() => 'done', (error) => error), late]);
+                clearTimeout(timer);
+                if (said === 'late')
+                    console.error(`${id}: onStop did not finish within ${cap} ms; stopping anyway.`);
+                else if (said !== 'done')
+                    console.error(`${id}: onStop failed:`, said);
+            }
+        })();
+        return stopping;
     };
     for (const signal of ['SIGINT', 'SIGTERM']) {
         process.once(signal, () => {
-            stop();
-            process.exit(0);
+            void stop().finally(() => process.exit(0));
         });
     }
-    process.once('exit', stop);
+    /* An exit nobody asked for by signal: nothing can be awaited here, so `onStop` is only begun. */
+    process.once('exit', () => void stop());
     return { port, origin, ready, stop };
 }

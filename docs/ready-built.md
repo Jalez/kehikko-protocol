@@ -1,4 +1,4 @@
-# A module served ready-built (2.17.0, 2.18.0)
+# A module served ready-built (2.17.0, 2.18.0, 2.18.1)
 
 `/run` and `/build`: a module's page compiled once, ahead of time, and served by one Bun process
 with the same doors the dev server mounts. Bun-only (`/run`) and Node-or-Bun (`/build`); neither
@@ -46,7 +46,11 @@ await run({ id: ID, prefer: PREFERRED_PORT, dir: import.meta.dirname, manifest: 
   (`server.allowedHosts`), so nothing a module answered in development is refused here. `hosts`
   adds names.
 - `idleTimeout` 0 by default: an event stream or a long MCP call is not idle.
-- `onStop`, once, on SIGINT, SIGTERM or exit: end what the module started.
+- `onStop`, once, on SIGINT, SIGTERM or exit: end what the module started. It may return a promise
+  (2.18.1): on a signal the server stops answering at once, and the process exits when `onStop` has
+  finished, or after `stopTimeoutMs` (default 5000) if it has not. A browser told to close writes
+  its cookies; one killed by the exit does not. On a plain exit nothing can be awaited, so `onStop`
+  is only begun.
 
 ## A door of the module's own: `before` (2.18.0)
 

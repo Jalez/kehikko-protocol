@@ -69,8 +69,15 @@ export interface RunOptions<T = unknown> extends Omit<DoorsOptions, 'page'> {
     /** How far the port may drift, and how long a squatter gets to say who it is (`claim`). */
     span?: number;
     timeoutMs?: number;
-    /** Called once when the process is asked to stop (SIGINT, SIGTERM) or exits: end what it started. */
-    onStop?: () => void;
+    /**
+     * Called once when the process is asked to stop (SIGINT, SIGTERM) or exits: end what it started.
+     * A promise it returns is awaited on a signal (2.18.1), for at most `stopTimeoutMs`, before the
+     * process exits: a browser told to close writes its cookies, one killed does not. On a plain exit
+     * (`process.exit`, the event loop running dry) nothing can be awaited: it is called and not waited for.
+     */
+    onStop?: () => void | Promise<void>;
+    /** How long a signal waits for `onStop` before the process exits anyway, in ms (2.18.1). Default 5000. */
+    stopTimeoutMs?: number;
     /** Bun's idle timeout in seconds. Default 0, none: an event stream or a long MCP call is not idle. */
     idleTimeout?: number;
     /**
@@ -108,7 +115,8 @@ export interface Running {
     origin: string;
     /** Whether the build was servable when the server started, and why not. */
     ready: Readiness;
-    stop(): void;
+    /** End what the module started (`onStop`, awaited for at most `stopTimeoutMs`) and stop serving. Once. */
+    stop(): Promise<void>;
 }
 /**
  * Is this WebSocket handshake from this module's own page? A browser always sends `Origin` on one
@@ -123,6 +131,8 @@ export declare function socketFence(headers: {
     ok: false;
     why: string;
 };
+/** How long a signal waits for a module's `onStop` before the process exits anyway (2.18.1). */
+export declare const STOP_TIMEOUT_MS = 5000;
 /** What a request sent under a name that is not this machine's is told, with status 403. */
 export declare const NOT_HERE = "This address is not one this module answers at.";
 /**

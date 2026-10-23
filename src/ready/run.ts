@@ -82,8 +82,15 @@ export interface RunOptions<T = unknown> extends Omit<DoorsOptions, 'page'> {
   /** How far the port may drift, and how long a squatter gets to say who it is (`claim`). */
   span?: number
   timeoutMs?: number
-  /** Called once when the process is asked to stop (SIGINT, SIGTERM) or exits: end what it started. */
-  onStop?: () => void
+  /**
+   * Called once when the process is asked to stop (SIGINT, SIGTERM) or exits: end what it started.
+   * A promise it returns is awaited on a signal (2.18.1), for at most `stopTimeoutMs`, before the
+   * process exits: a browser told to close writes its cookies, one killed does not. On a plain exit
+   * (`process.exit`, the event loop running dry) nothing can be awaited: it is called and not waited for.
+   */
+  onStop?: () => void | Promise<void>
+  /** How long a signal waits for `onStop` before the process exits anyway, in ms (2.18.1). Default 5000. */
+  stopTimeoutMs?: number
   /** Bun's idle timeout in seconds. Default 0, none: an event stream or a long MCP call is not idle. */
   idleTimeout?: number
   /**
@@ -120,7 +127,8 @@ export interface Running {
   origin: string
   /** Whether the build was servable when the server started, and why not. */
   ready: Readiness
-  stop(): void
+  /** End what the module started (`onStop`, awaited for at most `stopTimeoutMs`) and stop serving. Once. */
+  stop(): Promise<void>
 }
 
 /**
@@ -139,6 +147,9 @@ export function socketFence(headers: { get(name: string): string | null }, port:
   }
   return { ok: true }
 }
+
+/** How long a signal waits for a module's `onStop` before the process exits anyway (2.18.1). */
+export const STOP_TIMEOUT_MS = 5000
 
 const TEXT = { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store' }
 
@@ -355,23 +366,52 @@ export async function run<T = unknown>(options: RunOptions<T>): Promise<Running>
   registerBound(id, origin, dir)
   console.log(`${id} serves its built page on ${origin}/app${ready.ok ? ` (${ready.commit.slice(0, 7)})` : ' — refused, see above'}`)
 
-  let stopped = false
-  const stop = () => {
-    if (stopped) return
-    stopped = true
+  /*
+   * Stopping happens once, whoever asks first. `onStop` may be asynchronous, and a signal waits for
+   * it, for at most `stopTimeoutMs`, before the process exits (2.18.1): until then a module's
+   * `onStop` was cut off by the `process.exit` right behind it.
+   */
+  let stopping: Promise<void> | null = null
+  let begun = false
+  const stop = (): Promise<void> => {
+    if (stopping) return stopping
+    /* Asked again from inside `onStop` (it exited, say): the first call is the one that stops. */
+    if (begun) return Promise.resolve()
+    begun = true
+    let ended: unknown
     try {
-      options.onStop?.()
-    } finally {
-      server.stop(true)
+      ended = options.onStop?.()
+    } catch (error) {
+      console.error(`${id}: onStop failed:`, error)
     }
+    /* No request is answered once stopping began: one could start again what `onStop` is ending. */
+    try {
+      void server.stop(true)
+    } catch {
+      /* Already stopped. */
+    }
+    const cap = options.stopTimeoutMs ?? STOP_TIMEOUT_MS
+    stopping = (async () => {
+      if (ended && typeof (ended as Promise<void>).then === 'function') {
+        let timer: ReturnType<typeof setTimeout> | undefined
+        const late = new Promise<'late'>((resolve) => {
+          timer = setTimeout(() => resolve('late'), cap)
+        })
+        const said = await Promise.race([(ended as Promise<void>).then(() => 'done' as const, (error: unknown) => error), late])
+        clearTimeout(timer)
+        if (said === 'late') console.error(`${id}: onStop did not finish within ${cap} ms; stopping anyway.`)
+        else if (said !== 'done') console.error(`${id}: onStop failed:`, said)
+      }
+    })()
+    return stopping
   }
   for (const signal of ['SIGINT', 'SIGTERM'] as const) {
     process.once(signal, () => {
-      stop()
-      process.exit(0)
+      void stop().finally(() => process.exit(0))
     })
   }
-  process.once('exit', stop)
+  /* An exit nobody asked for by signal: nothing can be awaited here, so `onStop` is only begun. */
+  process.once('exit', () => void stop())
 
   return { port, origin, ready, stop }
 }
