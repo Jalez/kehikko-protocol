@@ -7,6 +7,31 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.18.0 — 2026-10-23
+
+A door of a module's own on both servers, and a built page on an opaque origin. **Additive**;
+`PROTOCOL` is still 2.
+
+### Added
+
+- `run({ before })`: a function from a `Request` and what the doors work out about it (`BeforeInfo`:
+  `asker`, `url`, `ticket`) to a `Response`, or `undefined` to go on. Asked before the doors, the
+  page and `dist/`; not for a socket handshake. A throw is a 500.
+- `/serve`: `beforeHandler(before)`, the same function as node middleware for Vite's
+  `configureServer` (the body is read only if the function reads it, so a request handed on reaches
+  the doors whole), and `beforeDoors(before, { name?, setup? })`, the Vite plugin around it.
+  `beforeInfo`, `requestOf`; types `Before`, `BeforeInfo`, `BeforePlugin`, `BeforeServerLike`. Also
+  re-exported from `/run`.
+- `run({ cors })`: for a `storage: false` module, whose page is on an opaque origin and loads its
+  module scripts with `Origin: null`. `true` answers `null` and the frame origins
+  (`KEHIKOT_ORIGINS`, `ancestors`); `{ origins }` adds more. The files of `dist/` and a preflight for
+  one only, echoing the origin, with `Vary: Origin`; the page and the doors keep their gate.
+  `corsOrigin`.
+- `run`: the `Host` fence. A request whose `Host` is not a loopback name (`127.0.0.1`, `[::1]`,
+  `localhost`, `*.localhost`) is a 403 before anything else, as Vite's `server.allowedHosts` refuses
+  it in development; `hosts` adds names. `hostFence`, `NOT_HERE`.
+- docs/ready-built.md: `before` and `cors`; docs/building-a-module.md: ready-built.
+
 ## 2.17.0 — 2026-10-23
 
 A module served ready-built. **Additive**; `PROTOCOL` is still 2. A module that does not use the new

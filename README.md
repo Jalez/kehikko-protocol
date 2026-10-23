@@ -92,7 +92,7 @@ And behind subpaths, which are not shapes and say so:
 | | |
 |---|---|
 | `kehikot-module-protocol/client` | `connect`, `mailbox`, `HostRefused` — the module half of the wire, for a page that would rather not write it again. Browser code, kept out of the front door so a Bun process can import shapes without it. **A convenience: a module may hand-roll its wire and be perfectly conforming.** |
-| `kehikot-module-protocol/run`, `kehikot-module-protocol/build` | A module served from its built page (2.17.0): `run`, one Bun server with the same doors as the dev server and a WebSocket hook, and `buildModule`, which builds and stamps `dist/` with the commit so a stale build is never served. See [ready-built](docs/ready-built.md). |
+| `kehikot-module-protocol/run`, `kehikot-module-protocol/build` | A module served from its built page (2.17.0): `run`, one Bun server with the same doors as the dev server, a WebSocket hook, a door of the module's own asked first (`before`, 2.18.0) and `cors` for a page on an opaque origin (2.18.0), and `buildModule`, which builds and stamps `dist/` with the commit so a stale build is never served. See [ready-built](docs/ready-built.md). |
 | `kehikot-module-protocol/client/react` | `useHost`, `Cover` and `coverFor`, and `useFocus` (0.34.0), the parts focus as one value. Optional; `react` is an optional peer dependency and `client` does not import it. |
 
 ## Where the reasoning is
@@ -121,7 +121,7 @@ The source says what each field is and what it is bounded by, in a line or three
 | [The client library](docs/client.md) | The module half of the wire behind `/client` and `/client/react`: `connect`, the mailbox, and the hooks. A convenience, never a requirement. |
 | [Serving a module: ports, the registry, frame origins, and the template](docs/serving.md) | The node-only half behind `/serve` — which port a module binds, where it writes down that it exists, which origins may frame it — and the generator that makes a new module from `template/`. |
 | [The shared plumbing of a module](docs/module-plumbing.md) | What every module used to type out for itself, behind `/serve`, `/client` and `/client/react`: the page document and its first paint, the write ticket, the JSON body reader, the `doors()` plugin, `ask()`, `useHost`, the one not-ready screen `Cover`, and the build identity. |
-| [A module served ready-built](docs/ready-built.md) | `/run` and `/build` (2.17.0): the built page, the same doors as the dev server, sockets, and the stamp that keeps a stale build from being served. |
+| [A module served ready-built](docs/ready-built.md) | `/run` and `/build` (2.17.0): the built page, the same doors as the dev server, sockets, `before` and `cors` (2.18.0), and the stamp that keeps a stale build from being served. |
 | [Packaging](PACKAGING.md) | How this package is consumed straight from git, and why `dist/` is committed. |
 
 ## One spelling
