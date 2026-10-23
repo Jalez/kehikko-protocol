@@ -236,6 +236,12 @@ describe('run', () => {
     expect(asset.headers.get('cache-control')).toContain('immutable')
     const icon = await get(`${server.origin}/favicon.svg`)
     expect(icon.headers.get('cache-control')).toBe('no-cache')
+    /* A page built with `base: './'` and opened at `/app/` asks for its assets under `/app/`. */
+    const relative = await get(`${server.origin}/app/assets/main-abc123.js`)
+    expect(relative.status).toBe(200)
+    expect(relative.headers.get('cache-control')).toContain('immutable')
+    expect((await get(`${server.origin}/app/${STAMP_FILE}`)).status).toBe(404)
+    expect((await get(`${server.origin}/app/..%2f..%2f.git/HEAD`)).status).toBe(404)
     expect((await get(`${server.origin}/${STAMP_FILE}`)).status).toBe(404)
     expect((await get(`${server.origin}/assets/`)).status).toBe(404)
     expect((await get(`${server.origin}/assets/..%2f..%2f.git/HEAD`)).status).toBe(404)

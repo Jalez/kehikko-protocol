@@ -206,12 +206,14 @@ export async function run<T = unknown>(options: RunOptions<T>): Promise<Running>
 
       if (method === 'GET' || method === 'HEAD') {
         const now = servable()
-        const file = fileIn(dist, path)
+        /* A page built with a relative base (`base: './'`) and opened at `/app/` asks for
+           `/app/assets/…`: the same file as `/assets/…`. */
+        const file = fileIn(dist, path) ?? (path.startsWith('/app/') ? fileIn(dist, path.slice('/app'.length)) : null)
         if (file) {
           if (!now.ok) return unservable(now.why)
           return new Response(bun.file(file), {
             headers: {
-              'cache-control': path.startsWith('/assets/') ? IMMUTABLE : 'no-cache',
+              'cache-control': path.startsWith('/assets/') || path.startsWith('/app/assets/') ? IMMUTABLE : 'no-cache',
               'x-content-type-options': 'nosniff',
             },
           })
