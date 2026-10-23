@@ -239,6 +239,10 @@ its kehikko's arrangement.
 `present`, in the skill's order, comparing ids as written. Optional: a skill
 without `needs` works wherever its module is installed, as before.
 
+### A module's settings (2.15.0)
+
+`declares.settings` lists the settings a person can see and change from the host: each field's key, label, sentence, type (`boolean`, `string`, `number`, `choice`, `list`), default, scope (`project` or `machine`) and whether only a person may change it. The host draws one form from it and asks the module to read and write the values at its door. Optional; a list that does not parse is dropped and the rest of the manifest is read. See [settings](settings.md).
+
 ### Which scopes a module can show (2.9.0)
 
 `declares.scopes` lists the scopes of `context.scope` a module can show:

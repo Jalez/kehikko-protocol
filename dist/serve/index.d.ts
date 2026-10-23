@@ -22,3 +22,5 @@ export { admits, asker, ELSEWHERE_REFUSAL, type Asker, type HeaderSource } from 
 export { doors, doorsFetch, doorsHandler, PAGE_PATHS, type Answer, type DoorFetch, type DoorHandler, type DoorRequest, type DoorResponse, type DoorsOptions, type DoorsPlugin, type DoorsServerLike, type Reply, type Stream, } from './doors.js';
 export { ORIGINS_ELEMENT, TICKET_HEADER, originAmong } from '../page.js';
 export { commitOf, establishBuild } from './build.js';
+export { hostVouches, hostVouchUrls, settingsDoor, type HostVouchesOptions, type SettingsDoorOptions, type SettingsRead, } from './settings.js';
+export { SETTINGS_PATH, SETTINGS_PASS_PATH } from '../settings.js';

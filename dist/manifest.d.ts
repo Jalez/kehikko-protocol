@@ -419,11 +419,121 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
          * not list `project` while the person has "All epics" chosen, and still sends it the context.
          */
         scopes: z.ZodOptional<z.ZodEffects<z.ZodArray<z.ZodEnum<["epic", "project"]>, "many">, ("epic" | "project")[], ("epic" | "project")[]>>;
+        /**
+         * The settings a person can see and change from the host (2.15.0): a short list of fields a host
+         * draws as one form, read and changed at the module's door (`settings.get`, `settings.set`). See
+         * `settings.ts`. Optional and never defaulted; absent means none. A list that does not parse is
+         * dropped, not fatal: the module then shows no settings in the host, and nothing else changes.
+         */
+        settings: z.ZodCatch<z.ZodOptional<z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodObject<{
+            key: z.ZodEffects<z.ZodString, string, string>;
+            label: z.ZodString;
+            description: z.ZodDefault<z.ZodString>;
+            type: z.ZodEnum<["boolean", "string", "number", "choice", "list"]>;
+            choices: z.ZodOptional<z.ZodArray<z.ZodObject<{
+                value: z.ZodString;
+                label: z.ZodString;
+            }, "strip", z.ZodTypeAny, {
+                value: string;
+                label: string;
+            }, {
+                value: string;
+                label: string;
+            }>, "many">>;
+            default: z.ZodUnknown;
+            scope: z.ZodDefault<z.ZodEnum<["project", "machine"]>>;
+            personOnly: z.ZodDefault<z.ZodBoolean>;
+        }, "strip", z.ZodTypeAny, {
+            key: string;
+            type: "string" | "number" | "boolean" | "choice" | "list";
+            label: string;
+            scope: "project" | "machine";
+            description: string;
+            personOnly: boolean;
+            default?: unknown;
+            choices?: {
+                value: string;
+                label: string;
+            }[] | undefined;
+        }, {
+            key: string;
+            type: "string" | "number" | "boolean" | "choice" | "list";
+            label: string;
+            default?: unknown;
+            scope?: "project" | "machine" | undefined;
+            description?: string | undefined;
+            choices?: {
+                value: string;
+                label: string;
+            }[] | undefined;
+            personOnly?: boolean | undefined;
+        }>, {
+            key: string;
+            type: "string" | "number" | "boolean" | "choice" | "list";
+            label: string;
+            scope: "project" | "machine";
+            description: string;
+            personOnly: boolean;
+            default?: unknown;
+            choices?: {
+                value: string;
+                label: string;
+            }[] | undefined;
+        }, {
+            key: string;
+            type: "string" | "number" | "boolean" | "choice" | "list";
+            label: string;
+            default?: unknown;
+            scope?: "project" | "machine" | undefined;
+            description?: string | undefined;
+            choices?: {
+                value: string;
+                label: string;
+            }[] | undefined;
+            personOnly?: boolean | undefined;
+        }>, "many">, {
+            key: string;
+            type: "string" | "number" | "boolean" | "choice" | "list";
+            label: string;
+            scope: "project" | "machine";
+            description: string;
+            personOnly: boolean;
+            default?: unknown;
+            choices?: {
+                value: string;
+                label: string;
+            }[] | undefined;
+        }[], {
+            key: string;
+            type: "string" | "number" | "boolean" | "choice" | "list";
+            label: string;
+            default?: unknown;
+            scope?: "project" | "machine" | undefined;
+            description?: string | undefined;
+            choices?: {
+                value: string;
+                label: string;
+            }[] | undefined;
+            personOnly?: boolean | undefined;
+        }[]>>>;
     }, "strip", z.ZodTypeAny, {
         protocol: string;
         prompt: boolean;
         uses: string[];
         storage: boolean;
+        settings?: {
+            key: string;
+            type: "string" | "number" | "boolean" | "choice" | "list";
+            label: string;
+            scope: "project" | "machine";
+            description: string;
+            personOnly: boolean;
+            default?: unknown;
+            choices?: {
+                value: string;
+                label: string;
+            }[] | undefined;
+        }[] | undefined;
         skills?: {
             name: string;
             version: string;
@@ -434,6 +544,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     }, {
         protocol?: string | undefined;
         prompt?: boolean | undefined;
+        settings?: unknown;
         uses?: string[] | undefined;
         storage?: boolean | undefined;
         skills?: {
@@ -490,6 +601,19 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         prompt: boolean;
         uses: string[];
         storage: boolean;
+        settings?: {
+            key: string;
+            type: "string" | "number" | "boolean" | "choice" | "list";
+            label: string;
+            scope: "project" | "machine";
+            description: string;
+            personOnly: boolean;
+            default?: unknown;
+            choices?: {
+                value: string;
+                label: string;
+            }[] | undefined;
+        }[] | undefined;
         skills?: {
             name: string;
             version: string;
@@ -561,6 +685,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     declares?: {
         protocol?: string | undefined;
         prompt?: boolean | undefined;
+        settings?: unknown;
         uses?: string[] | undefined;
         storage?: boolean | undefined;
         skills?: {
@@ -597,6 +722,19 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         prompt: boolean;
         uses: string[];
         storage: boolean;
+        settings?: {
+            key: string;
+            type: "string" | "number" | "boolean" | "choice" | "list";
+            label: string;
+            scope: "project" | "machine";
+            description: string;
+            personOnly: boolean;
+            default?: unknown;
+            choices?: {
+                value: string;
+                label: string;
+            }[] | undefined;
+        }[] | undefined;
         skills?: {
             name: string;
             version: string;
@@ -668,6 +806,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     declares?: {
         protocol?: string | undefined;
         prompt?: boolean | undefined;
+        settings?: unknown;
         uses?: string[] | undefined;
         storage?: boolean | undefined;
         skills?: {

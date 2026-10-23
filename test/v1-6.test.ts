@@ -28,7 +28,7 @@ afterAll(() => {
 const run = (id: string, more: Record<string, unknown> = {}) => ({ kind: 'run', id, label: id, ...more })
 
 describe('pinned runs', () => {
-  test('version', () => expect(PACKAGE_VERSION).toBe('2.14.1'))
+  test('version', () => expect(PACKAGE_VERSION).toBe('2.15.0'))
   test('optional, boolean, only drawn on runs', () => {
     const parsed = headerItemsSchema.parse([run('a'), run('b', { pinned: true, icon: 'check' })]) as any[]
     expect(parsed[0].pinned).toBeUndefined()

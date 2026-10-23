@@ -21,6 +21,7 @@ Why the protocol is the way it is. The source keeps one to three lines beside ea
 | [Citations](citations.md) | The one way a citation is written and the one rule for finding its words in a file again. |
 | [Asking a module to show something, and whether it is done](asking.md) | What a module's MCP door can be asked: the manifest's `mcp.subjects`, the show and done answers, read-only tools, the `project` and `epic` arguments, `check:door`, reading another module's manifest, and `view.fold`. |
 | [Activity](activity.md) | What a module's things are doing now — working, needing you, finished — said whole with `activity.set` so the host can mark epics, parts and kehikot, and what the host does with it. |
+| [A module's settings](settings.md) | The settings a module declares and a host draws as one form; `settings.get` and `settings.set` at the module's door; who may change a `personOnly` setting, and the host's pass. |
 | [The header](header.md) | The switches, toggles, jumps and runs a module declares and the host draws: `kehikot.header`, `press`, `pressed`, who may press, and what a receiver does with a message type it does not know. |
 | [Extension payloads](extensions.md) | The versioned formats modules send each other through a host: notifications and calls. |
 | [The client library](client.md) | The module half of the wire behind `/client` and `/client/react`: `connect`, the mailbox, and the hooks. A convenience, never a requirement. |

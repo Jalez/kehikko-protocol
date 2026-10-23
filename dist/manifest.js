@@ -5,6 +5,7 @@ import { MODE_ID, MODULE_ID } from './ids.js';
 import { buildSchema } from './build.js';
 import { moduleSkillsSchema } from './skills.js';
 import { CONTEXT_SCOPES } from './context.js';
+import { settingsDeclarationSchema } from './settings.js';
 /**
  * What a module says about itself when a host asks: the manifest schema, the words it suggests (`REACTS_TO`,
  * `TAGS`), and the pure readers `speaks` and `partsDeclaration`. Every string in the schema has a `max` from
@@ -278,6 +279,13 @@ const manifestFields = z.object({
         scopes: z.array(z.enum(CONTEXT_SCOPES)).min(1).max(CONTEXT_SCOPES.length)
             .refine((scopes) => new Set(scopes).size === scopes.length, { message: 'a scope is listed once' })
             .optional(),
+        /**
+         * The settings a person can see and change from the host (2.15.0): a short list of fields a host
+         * draws as one form, read and changed at the module's door (`settings.get`, `settings.set`). See
+         * `settings.ts`. Optional and never defaulted; absent means none. A list that does not parse is
+         * dropped, not fatal: the module then shows no settings in the host, and nothing else changes.
+         */
+        settings: settingsDeclarationSchema.optional().catch(undefined),
     })
         .default({ protocol: `>=${PROTOCOL}`, uses: [], storage: false, prompt: false }),
     /**
