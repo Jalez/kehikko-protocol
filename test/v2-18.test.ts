@@ -16,8 +16,8 @@ const get = Bun.fetch
 /** 2.18.0: a door of a module's own asked before the protocol's (`before`), and `run`'s `cors` and Host fence. */
 
 describe('the version', () => {
-  test('is 2.18.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.18.0')
+  test('is 2.18.1, and PROTOCOL is still 2', () => {
+    expect(PACKAGE_VERSION).toBe('2.18.1')
     expect(PROTOCOL).toBe(2)
   })
 })

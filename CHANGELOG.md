@@ -7,6 +7,23 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.18.1 — 2026-10-23
+
+`run` waits for an asynchronous `onStop`. **Additive**; `PROTOCOL` is still 2.
+
+### Fixed
+
+- `run`: on SIGINT or SIGTERM, a promise `onStop` returns is awaited, for at most `stopTimeoutMs`
+  (default `STOP_TIMEOUT_MS`, 2500, inside the host's 3 s quit grace), before the process exits 0. Until now the `process.exit` right
+  behind it cut it off, so a module whose stop is asynchronous (a browser told to close, which is
+  when it writes its cookies) was killed half-way. The server stops answering as soon as stopping
+  begins. On a plain exit `onStop` is begun and not waited for, as before.
+
+### Added
+
+- `RunOptions.stopTimeoutMs`, `STOP_TIMEOUT_MS`; `onStop` may return `Promise<void>`;
+  `Running.stop()` returns the promise of the stop.
+
 ## 2.18.0 — 2026-10-23
 
 A door of a module's own on both servers, and a built page on an opaque origin. **Additive**;
