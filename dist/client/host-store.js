@@ -1,5 +1,5 @@
 import { scopeOf } from '../context.js';
-import { locationSetResult } from '../methods.js';
+import { addressOpenResult, locationSetResult } from '../methods.js';
 import { HostRefused, NOBODY_TO_ASK, connect, } from './connect.js';
 import { reloadWhenStale } from './ask.js';
 import { applyTheme, pageTheme, systemTheme } from './theme.js';
@@ -25,7 +25,7 @@ export const JSON_KEPT = {
     },
     write: (kept) => JSON.stringify(kept),
 };
-const STEADY = ['passage', 'location', 'containers', 'parts', 'selection', 'chosen', 'kehikko'];
+const STEADY = ['passage', 'location', 'address', 'containers', 'parts', 'selection', 'chosen', 'kehikko'];
 const NONE = [];
 const NO_CHOICE = {};
 const text = (value) => (typeof value === 'string' && value.trim() ? value : null);
@@ -56,6 +56,7 @@ export function hostFields(context, was, same = {}) {
         scope: scopeOf(context),
         passage: context?.passage ?? null,
         location: context?.location ?? null,
+        address: context?.address ?? null,
         containers: context?.containers ?? NONE,
         parts: context?.parts ?? NONE,
         selection: context?.selection ?? NONE,
@@ -194,6 +195,25 @@ export function hostStore(id, events = {}, options = {}) {
                 .request('location.set', intent === undefined ? { location } : { location, intent })
                 .then((answer) => {
                 const read = locationSetResult.safeParse(answer);
+                return read.success ? read.data : null;
+            })
+                .catch(() => null);
+        },
+        openAddress(url, options = {}) {
+            if (!live || !live.greeted())
+                return Promise.resolve(null);
+            const answers = standing.answers;
+            if (answers !== null && !answers.includes('address.open'))
+                return Promise.resolve(null);
+            const params = { url };
+            if (options.title !== undefined)
+                params.title = options.title;
+            if (options.intent !== undefined)
+                params.intent = options.intent;
+            return live
+                .request('address.open', params)
+                .then((answer) => {
+                const read = addressOpenResult.safeParse(answer);
                 return read.success ? read.data : null;
             })
                 .catch(() => null);

@@ -67,6 +67,7 @@ export function useHost(id, events = {}, options = {}) {
     }, []);
     const point = useCallback((passage) => held.current?.point(passage), []);
     const locate = useCallback((location, intent) => held.current?.locate(location, intent) ?? Promise.resolve(null), []);
+    const openAddress = useCallback((url, options) => held.current?.openAddress(url, options) ?? Promise.resolve(null), []);
     const resize = useCallback((height) => held.current?.resize(height), []);
     const filters = useCallback((groups) => held.current?.filters(groups), []);
     const clearable = useCallback((label) => held.current?.clearable(label), []);
@@ -75,5 +76,5 @@ export function useHost(id, events = {}, options = {}) {
     const activity = useCallback((items) => held.current?.activity(items), []);
     const connection = useCallback(() => held.current?.connection() ?? null, []);
     const read = useCallback(() => held.current?.get() ?? drawn.current, []);
-    return useMemo(() => ({ ...standing, remember, point, locate, request, resize, filters, clearable, refreshable, header, activity, connection, read }), [standing, remember, point, locate, request, resize, filters, clearable, refreshable, header, activity, connection, read]);
+    return useMemo(() => ({ ...standing, remember, point, locate, openAddress, request, resize, filters, clearable, refreshable, header, activity, connection, read }), [standing, remember, point, locate, openAddress, request, resize, filters, clearable, refreshable, header, activity, connection, read]);
 }

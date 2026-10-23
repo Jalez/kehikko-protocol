@@ -410,6 +410,16 @@ line, Diff scrolls to the hunk, Review starts a comment when `intent` is
 machine, counted in bytes, and a code location is a place in a commit,
 counted in lines on one side of a diff.
 
+#### `REACTS_TO.address`
+
+*2.16.0.* Shows pages: opens a web address somebody handed to the canvas
+(`context.address`). Paired with `address:open`. The Browser ticks it.
+
+The one word a host reads for more than documentation. When a module asks
+`address.open`, the host answers `shown` if a container on the kehikko ticks
+`address`, and otherwise asks the person (`offered`). It still sends the
+address to every container, and still frames a module whatever it ticks.
+
 #### `REACTS_TO.containers`
 
 The third word, and the first whose other end is partly the host itself.

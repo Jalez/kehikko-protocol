@@ -299,6 +299,7 @@ and a module that declares none gets none of the methods below.
 | `selection.set` | `selection:set` |
 | `passage.set` | `passage:set` |
 | `location.set` | `location:set` |
+| `address.open` | `address:open` |
 | `filters.set` | `filters:set` |
 | `showing.set` | `showing:set` |
 | `projects.pick` | `projects:pick` |
@@ -365,6 +366,18 @@ a change, a file in its repository and a line, and — with `intent: 'comment'`
 module that declares it is asking to move its neighbours: Source opens the
 file, Diff scrolls its hunk, Review opens a comment box. The sentence a person
 reads before running the program says so.
+
+#### `CAPABILITIES.address:open`
+
+*2.16.0.* Hand a web address to the canvas, to be opened by whichever module
+shows pages.
+
+A write, and a SHARED one, like `location:set`: the address goes into
+`context.address` on the kehikko, in front of every pane, stamped with who
+asked. A module that declares it can make the Browser on the canvas move, and
+— when no module there shows pages — put a question in front of the person.
+It cannot open anything outside the canvas by itself: the host asks the
+person first. The sentence a person reads before running the program says so.
 
 #### `CAPABILITIES.filters:set`
 
@@ -712,7 +725,68 @@ segment: what a consumer joins onto a checkout cannot climb out of it by its
 spelling. It cannot say whether the file exists at `commit`; a consumer that
 reads it still checks.
 
-#### `methodParams.filters.set`
+#### `methodParams.address.open`
+
+*2.16.0.* Hand a web address to the canvas.
+
+```ts
+const answer = await host.openAddress('https://example.com/design', { title: 'Design' })
+// on the wire: request('address.open', { url, title?, intent?: 'show' })
+// answered with addressOpenResult: { outcome: 'shown' | 'offered' | 'declined', why }
+```
+
+##### Why a method, and not the selection
+
+The selection carries tracker refs, and a module that shows pages follows it:
+pick `#3805` and the Browser opens its page. Anything else — a design
+document, a deployed preview, a dashboard, a pipeline log — is not a ref, so
+it cannot be picked. Before this, a module drawing such a link had two wrong
+choices: a new tab of the system browser, outside the canvas, or the
+Browser's own MCP door by name, which ties one module to another's tools.
+
+##### The sender names an address and nothing else
+
+It does not name the Browser, or know whether one is on the canvas. Whatever
+module ticks `REACTS_TO.address` takes it, the way any module follows the
+selection. A tracker ref still goes through `selection.set`.
+
+##### The host stays in charge of what may be shown
+
+An address is untrusted text from a module's page. `url` is held to
+`addressRefusal`, and refused rather than repaired:
+
+- absolute `https://…`, or `http://` to `localhost`, `127.0.0.1` or `[::1]`
+  (`LOOPBACK_HOSTS`) for an app running on this machine — never
+  `javascript:`, `data:`, `file:`, `blob:` or any other scheme;
+- no user name or password: the address is told to every module on the
+  canvas, and a credential in it would be too;
+- no whitespace or control character, at most `LIMITS.URL` characters.
+
+A host may refuse more (`declined`), and the module that shows pages applies
+its own rules on top.
+
+##### It says whether anything took it
+
+`shown`: a module on this kehikko that shows pages has it, through
+`context.address`. `offered`: none does, and the host put the address in
+front of the person instead — to open it in their own browser, or to add a
+module that shows pages. A host never opens an address outside the canvas
+without a person's press. The sender does nothing more after either.
+`declined`: the host will not; the sender may fall back to what it did
+before, on the person's press. A host that does not answer `address.open`
+(`hello.answers` without it) is an older host: the sender keeps its old
+behaviour there.
+
+##### A request, carried the way `location` is
+
+Opening a page is something to do once, now. It travels in the context
+anyway, for the reason `location.intent` does: one field per kehikko, the
+last one wins, and a Browser placed a moment later — say, on the person's
+"Add Browser" — still finds it. What keeps it a request is `at`: the host
+stamps a new one on every hand-over, and a consumer opens an address whose
+`at` it has not acted on (`addressIsNews`) and leaves alone one it has.
+
+
 
 Ask the host to put this container's filters somewhere.
 

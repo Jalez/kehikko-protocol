@@ -7,7 +7,7 @@ import { activityItemsSchema } from './activity.js'
  * `passageSchema` and `filterChoiceSchema` come from `wire.ts` so that both directions share one
  * definition; `wire.ts` imports nothing from here.
  */
-import { DISPOSITIONS, LOCATION_INTENTS, codeLocationSchema, filterChoiceSchema, passageSchema } from './wire.js'
+import { ADDRESS_INTENTS, DISPOSITIONS, LOCATION_INTENTS, codeLocationSchema, filterChoiceSchema, passageSchema, webAddress } from './wire.js'
 import { TRACKER_DETAILS, trackerColumnsResult, trackerReadingResult, trackerRefreshResult } from './tracker.js'
 import { PART_ID, partListSchema } from './parts.js'
 
@@ -56,6 +56,13 @@ export const CAPABILITIES = {
    */
   'location:set':
     'Say where in a change’s code the person is pointing — a file and a line — or ask for a comment there. Every module on the canvas is told.',
+  /**
+   * 2.16.0. Hand a web address to the canvas, for whichever module shows pages to open. A SHARED write
+   * like `location:set`: it goes into `context.address` on this kehikko. Names an address and nothing
+   * else — not the Browser, not whether one is there. With no such module the host asks the person.
+   */
+  'address:open':
+    'Hand a web address (https:, or this machine) to the canvas to be opened by a module that shows pages. Every module on the canvas is told; with none, you are asked.',
   /**
    * Ask for its own container's filters to be moved. Reaches this container's own narrowing and
    * nothing else: not another container's, not the canvas.
@@ -134,6 +141,7 @@ export const METHODS = {
   'selection.set': 'selection:set',
   'passage.set': 'passage:set',
   'location.set': 'location:set',
+  'address.open': 'address:open',
   'filters.set': 'filters:set',
   'showing.set': 'showing:set',
   'projects.pick': 'projects:pick',
@@ -267,6 +275,20 @@ export const methodParams = {
   'location.set': z.object({
     location: codeLocationSchema.nullable(),
     intent: z.enum(LOCATION_INTENTS).optional(),
+  }),
+
+  /**
+   * 2.16.0. Hand a web address to the canvas; answered with `addressOpenResult`. `url` is held to
+   * `addressRefusal` (https:, or http: to this machine; no credentials; at most `LIMITS.URL`), and
+   * refused rather than repaired. `title` is what to call the page, when the sender knows. `intent`
+   * is `show` (absent means `show`). The host stamps who asked and when into `context.address`, where
+   * a module that shows pages (`REACTS_TO.address`) takes it. A tracker ref goes through
+   * `selection.set`, not here.
+   */
+  'address.open': z.object({
+    url: webAddress,
+    title: z.string().trim().min(1).max(LIMITS.TITLE).optional(),
+    intent: z.enum(ADDRESS_INTENTS).optional(),
   }),
 
   /**
@@ -497,6 +519,22 @@ export const locationSetResult = z.object({
 export type LocationSetResult = z.infer<typeof locationSetResult>
 
 /**
+ * 2.16.0. What became of an `address.open`; all three are `ok: true`. `shown`: a module on this kehikko
+ * that shows pages has it (`context.address` is it now). `offered`: none does, and the host put the
+ * address in front of the person instead — to open it in their own browser, or to add a module that
+ * shows pages — so the sender does nothing more. `declined`: the host will not, right now (`why`
+ * says so); the sender may fall back to what it did before, on a person's press.
+ */
+export const ADDRESS_OPEN_OUTCOMES = ['shown', 'offered', 'declined'] as const
+export type AddressOpenOutcome = (typeof ADDRESS_OPEN_OUTCOMES)[number]
+
+export const addressOpenResult = z.object({
+  outcome: z.enum(ADDRESS_OPEN_OUTCOMES),
+  why: z.string().max(LIMITS.REASON).default(''),
+})
+export type AddressOpenResult = z.infer<typeof addressOpenResult>
+
+/**
  * The least an `epics.list` can answer with. `slug` is required: it is the argument to every other
  * call. `title` and `project` are optional and bounded. Every other field passes through untouched.
  * There is no bound on how many epics come back.
@@ -566,6 +604,7 @@ export const methodResults: Partial<Record<Method, z.ZodTypeAny>> = {
   'parts.set': partsSetResult,
   'activity.set': activitySetResult,
   'location.set': locationSetResult,
+  'address.open': addressOpenResult,
 }
 
 /** The schema for one method's answer, or nothing — which means unspecified. */

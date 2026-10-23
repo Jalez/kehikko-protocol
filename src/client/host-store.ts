@@ -1,7 +1,7 @@
-import type { ActivityItem, CanvasContainer, CodeLocation, EpicPart, FilterChoice, FilterGroup, HeaderItemInput, LocationIntent, LocationSetResult, ModuleContext, Passage, SharedLocation } from '../index.js'
+import type { ActivityItem, AddressIntent, AddressOpenResult, CanvasContainer, CodeLocation, EpicPart, FilterChoice, FilterGroup, HeaderItemInput, LocationIntent, LocationSetResult, ModuleContext, Passage, SharedAddress, SharedLocation } from '../index.js'
 import type { PageTheme } from '../page.js'
 import { scopeOf, type ContextScope } from '../context.js'
-import { locationSetResult } from '../methods.js'
+import { addressOpenResult, locationSetResult } from '../methods.js'
 import {
   HostRefused,
   NOBODY_TO_ASK,
@@ -72,7 +72,7 @@ export interface HostStoreOptions<Kept = unknown> extends ConnectOptions {
 }
 
 /** The fields of a standing that keep their identity while they say the same thing. */
-export type SteadyField = 'passage' | 'location' | 'containers' | 'parts' | 'selection' | 'chosen' | 'kehikko'
+export type SteadyField = 'passage' | 'location' | 'address' | 'containers' | 'parts' | 'selection' | 'chosen' | 'kehikko'
 
 /** A page's own rule for "the same", per field: `(was, now) => true` keeps the object it was. */
 export type Steadiness = { [Field in SteadyField]?: (was: HostFields[Field], now: HostFields[Field]) => boolean }
@@ -101,6 +101,12 @@ export interface HostFields {
    * "comment here" is a new one, because `at` moved.
    */
   location: SharedLocation | null
+  /**
+   * 2.16.0. The last web address handed to this kehikko to be shown (`context.address`), or `null`.
+   * The same object while it says the same thing; handed over again, it is a new one, because `at`
+   * moved. A module that shows pages opens it when `addressIsNews`.
+   */
+  address: SharedAddress | null
   containers: readonly CanvasContainer[]
   /** The parts of the open epic, with which are picked out. Empty is the whole epic. */
   parts: readonly EpicPart[]
@@ -155,6 +161,13 @@ export interface HostActions<Kept = unknown> {
    * Never rejects.
    */
   locate: (location: CodeLocation | null, intent?: LocationIntent) => Promise<LocationSetResult | null>
+  /**
+   * 2.16.0. Hand a web address to the canvas (`address.open`), for whichever module shows pages.
+   * Resolves with the host's answer, or `null` when nothing is framing the page, the host does not
+   * answer `address.open` (`answers`), or it did not answer in the shape `addressOpenResult` says.
+   * Never rejects. A page that gets `null` or `declined` may do what it did before, on the press.
+   */
+  openAddress: (url: string, options?: { title?: string; intent?: AddressIntent }) => Promise<AddressOpenResult | null>
   /** Ask the host something. Rejects with `HostRefused`, always; safe before the greeting. Stable. */
   request: (method: string, params?: Record<string, unknown>, options?: AskOptions) => Promise<unknown>
   resize: (height: number) => void
@@ -180,7 +193,7 @@ export interface HostStore<Kept = unknown> extends HostActions<Kept> {
   connection: () => Connection | null
 }
 
-const STEADY: readonly SteadyField[] = ['passage', 'location', 'containers', 'parts', 'selection', 'chosen', 'kehikko']
+const STEADY: readonly SteadyField[] = ['passage', 'location', 'address', 'containers', 'parts', 'selection', 'chosen', 'kehikko']
 const NONE: readonly never[] = []
 const NO_CHOICE: FilterChoice = {}
 const text = (value: unknown): string | null => (typeof value === 'string' && value.trim() ? value : null)
@@ -210,6 +223,7 @@ export function hostFields(context: ModuleContext | null, was?: HostFields, same
     scope: scopeOf(context),
     passage: context?.passage ?? null,
     location: context?.location ?? null,
+    address: context?.address ?? null,
     containers: context?.containers ?? NONE,
     parts: context?.parts ?? NONE,
     selection: context?.selection ?? NONE,
@@ -348,6 +362,22 @@ export function hostStore<Kept = unknown>(
         .request('location.set', intent === undefined ? { location } : { location, intent })
         .then((answer) => {
           const read = locationSetResult.safeParse(answer)
+          return read.success ? read.data : null
+        })
+        .catch(() => null)
+    },
+
+    openAddress(url, options = {}) {
+      if (!live || !live.greeted()) return Promise.resolve(null)
+      const answers = standing.answers
+      if (answers !== null && !answers.includes('address.open')) return Promise.resolve(null)
+      const params: Record<string, unknown> = { url }
+      if (options.title !== undefined) params.title = options.title
+      if (options.intent !== undefined) params.intent = options.intent
+      return live
+        .request('address.open', params)
+        .then((answer) => {
+          const read = addressOpenResult.safeParse(answer)
           return read.success ? read.data : null
         })
         .catch(() => null)

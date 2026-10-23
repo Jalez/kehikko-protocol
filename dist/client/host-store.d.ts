@@ -1,4 +1,4 @@
-import type { ActivityItem, CanvasContainer, CodeLocation, EpicPart, FilterChoice, FilterGroup, HeaderItemInput, LocationIntent, LocationSetResult, ModuleContext, Passage, SharedLocation } from '../index.js';
+import type { ActivityItem, AddressIntent, AddressOpenResult, CanvasContainer, CodeLocation, EpicPart, FilterChoice, FilterGroup, HeaderItemInput, LocationIntent, LocationSetResult, ModuleContext, Passage, SharedAddress, SharedLocation } from '../index.js';
 import type { PageTheme } from '../page.js';
 import { type ContextScope } from '../context.js';
 import { type AskOptions, type ConnectOptions, type Connection, type HostEvents } from './connect.js';
@@ -43,7 +43,7 @@ export interface HostStoreOptions<Kept = unknown> extends ConnectOptions {
     same?: Steadiness;
 }
 /** The fields of a standing that keep their identity while they say the same thing. */
-export type SteadyField = 'passage' | 'location' | 'containers' | 'parts' | 'selection' | 'chosen' | 'kehikko';
+export type SteadyField = 'passage' | 'location' | 'address' | 'containers' | 'parts' | 'selection' | 'chosen' | 'kehikko';
 /** A page's own rule for "the same", per field: `(was, now) => true` keeps the object it was. */
 export type Steadiness = {
     [Field in SteadyField]?: (was: HostFields[Field], now: HostFields[Field]) => boolean;
@@ -72,6 +72,12 @@ export interface HostFields {
      * "comment here" is a new one, because `at` moved.
      */
     location: SharedLocation | null;
+    /**
+     * 2.16.0. The last web address handed to this kehikko to be shown (`context.address`), or `null`.
+     * The same object while it says the same thing; handed over again, it is a new one, because `at`
+     * moved. A module that shows pages opens it when `addressIsNews`.
+     */
+    address: SharedAddress | null;
     containers: readonly CanvasContainer[];
     /** The parts of the open epic, with which are picked out. Empty is the whole epic. */
     parts: readonly EpicPart[];
@@ -124,6 +130,16 @@ export interface HostActions<Kept = unknown> {
      * Never rejects.
      */
     locate: (location: CodeLocation | null, intent?: LocationIntent) => Promise<LocationSetResult | null>;
+    /**
+     * 2.16.0. Hand a web address to the canvas (`address.open`), for whichever module shows pages.
+     * Resolves with the host's answer, or `null` when nothing is framing the page, the host does not
+     * answer `address.open` (`answers`), or it did not answer in the shape `addressOpenResult` says.
+     * Never rejects. A page that gets `null` or `declined` may do what it did before, on the press.
+     */
+    openAddress: (url: string, options?: {
+        title?: string;
+        intent?: AddressIntent;
+    }) => Promise<AddressOpenResult | null>;
     /** Ask the host something. Rejects with `HostRefused`, always; safe before the greeting. Stable. */
     request: (method: string, params?: Record<string, unknown>, options?: AskOptions) => Promise<unknown>;
     resize: (height: number) => void;

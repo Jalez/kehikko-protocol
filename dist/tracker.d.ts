@@ -556,14 +556,14 @@ export declare const trackerRowSchema: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     number: number;
     state: "open" | "closed" | "merged";
+    url: string;
+    title: string;
     host: string;
     ref: string;
     readAt: string;
     kind: "issue" | "change";
     tracker: "github" | "gitlab";
     repo: string;
-    title: string;
-    url: string;
     labels: string[];
     assignees: string[];
     links: {
@@ -636,14 +636,14 @@ export declare const trackerRowSchema: z.ZodObject<{
 }, {
     number: number;
     state: "open" | "closed" | "merged";
+    url: string;
+    title: string;
     host: string;
     ref: string;
     readAt: string;
     kind: "issue" | "change";
     tracker: "github" | "gitlab";
     repo: string;
-    title: string;
-    url: string;
     detail?: {
         readAt: string;
         body?: string | undefined;
@@ -1095,14 +1095,14 @@ export declare const trackerReadingResult: z.ZodObject<{
     }, "strip", z.ZodTypeAny, {
         number: number;
         state: "open" | "closed" | "merged";
+        url: string;
+        title: string;
         host: string;
         ref: string;
         readAt: string;
         kind: "issue" | "change";
         tracker: "github" | "gitlab";
         repo: string;
-        title: string;
-        url: string;
         labels: string[];
         assignees: string[];
         links: {
@@ -1175,14 +1175,14 @@ export declare const trackerReadingResult: z.ZodObject<{
     }, {
         number: number;
         state: "open" | "closed" | "merged";
+        url: string;
+        title: string;
         host: string;
         ref: string;
         readAt: string;
         kind: "issue" | "change";
         tracker: "github" | "gitlab";
         repo: string;
-        title: string;
-        url: string;
         detail?: {
             readAt: string;
             body?: string | undefined;
@@ -1279,14 +1279,14 @@ export declare const trackerReadingResult: z.ZodObject<{
     rows: {
         number: number;
         state: "open" | "closed" | "merged";
+        url: string;
+        title: string;
         host: string;
         ref: string;
         readAt: string;
         kind: "issue" | "change";
         tracker: "github" | "gitlab";
         repo: string;
-        title: string;
-        url: string;
         labels: string[];
         assignees: string[];
         links: {
@@ -1377,14 +1377,14 @@ export declare const trackerReadingResult: z.ZodObject<{
     rows?: {
         number: number;
         state: "open" | "closed" | "merged";
+        url: string;
+        title: string;
         host: string;
         ref: string;
         readAt: string;
         kind: "issue" | "change";
         tracker: "github" | "gitlab";
         repo: string;
-        title: string;
-        url: string;
         detail?: {
             readAt: string;
             body?: string | undefined;

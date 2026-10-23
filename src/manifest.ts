@@ -35,7 +35,8 @@ const url = z.string().min(1).max(LIMITS.URL)
 
 /**
  * The context kinds a module can say it REACTS to, each with what it means. Documentation only: a host must not
- * gate, filter, withhold or route anything on it; every framed module gets the whole context. Free strings on
+ * gate, filter, withhold or route anything on it; every framed module gets the whole context. One exception,
+ * `address` (2.16.0): a host reads it to say whether anybody on the kehikko shows pages. Free strings on
  * the wire: a host shows or drops an unknown word and still frames the module.
  */
 export const REACTS_TO = {
@@ -48,6 +49,13 @@ export const REACTS_TO = {
    * `intent: 'comment'` — starts a comment there.
    */
   location: "Does something when somebody points at a place in a change's code — opens the file there, or starts a comment there.",
+  /**
+   * 2.16.0. A web address was handed to the canvas (`context.address`). Paired with `address:open`. A
+   * module ticking this SHOWS PAGES: it opens the address when its `at` is new. The one word a host
+   * reads for more than documentation: to answer `address.open` with `shown` (somebody on the kehikko
+   * ticks it) or `offered` (nobody does). It still sends the address to every container.
+   */
+  address: 'Shows pages: opens a web address somebody handed to the canvas.',
   /**
    * What is arranged on the kehikko changed: which module each container holds, whether it is
    * picked out, and what it says it is showing. Paired with `showing:set`; also changed by a person

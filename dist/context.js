@@ -6,6 +6,7 @@ import { EPIC_SLUG, MODULE_ID, PROJECT_ID } from './ids.js';
 import { partsSchema } from './parts.js';
 import { passageSchema } from './passage.js';
 import { sharedLocationSchema } from './location.js';
+import { sharedAddressSchema } from './address.js';
 import { filterChoiceSchema } from './filters.js';
 import { kehikkoSchema, ref } from './fragments.js';
 /* ------------------------------------------------------------------------ *
@@ -117,6 +118,13 @@ export const contextSchema = z.object({
      * (`locationStands`). Null when nobody is pointing, which is also what an older host sends.
      */
     location: sharedLocationSchema.nullable().default(null),
+    /**
+     * 2.16.0. The last web address handed to this kehikko to be shown, or null; see `address.ts`. Set
+     * with `address.open` (or by the host for a person or an agent) and relayed to every container,
+     * stamped with who asked and when. A module that shows pages (`REACTS_TO.address`) opens it when
+     * its `at` is new (`addressIsNews`); everybody else may ignore it. Null from an older host.
+     */
+    address: sharedAddressSchema.nullable().default(null),
     /**
      * Whether this module has been pinned. `true` means it keeps what it was last told, and further
      * changes to this canvas do not reach it until this goes false. A context is still sent when the
