@@ -1,4 +1,4 @@
-# A module served ready-built (2.17.0)
+# A module served ready-built (2.17.0, 2.18.0)
 
 `/run` and `/build`: a module's page compiled once, ahead of time, and served by one Bun process
 with the same doors the dev server mounts. Bun-only (`/run`) and Node-or-Bun (`/build`); neither
@@ -39,8 +39,75 @@ await run({ id: ID, prefer: PREFERRED_PORT, dir: import.meta.dirname, manifest: 
   refused }`), on Bun's own WebSocket. A handshake is upgraded only when its `Origin` and `Host`
   name this server's own loopback address (`socketFence`): no `Origin` is not a page, and a name
   that resolves to 127.0.0.1 is not here. A refusal is a bare 403; the reason goes to `refused`.
+- **The `Host` fence** (2.18.0): a request whose `Host` is not a loopback name — `127.0.0.1`,
+  `[::1]`, `localhost` or a name under it — is a 403 before anything else is asked (`hostFence`).
+  The doors' gate reads `Origin` against `Host`, so a page on a name somebody pointed at 127.0.0.1
+  (DNS rebinding) would otherwise be "its own page". Vite refuses the same requests
+  (`server.allowedHosts`), so nothing a module answered in development is refused here. `hosts`
+  adds names.
 - `idleTimeout` 0 by default: an event stream or a long MCP call is not idle.
 - `onStop`, once, on SIGINT, SIGTERM or exit: end what the module started.
+
+## A door of the module's own: `before` (2.18.0)
+
+Some doors cannot be an `answer`: one that reads a header the doors do not pass on (a key), or that
+must see a request before the doors' gate refuses it. On Vite such a door is middleware placed ahead
+of `doors()`; on `run` it is `before`. Both are the SAME function, written once, from a `Request` to a
+`Response`:
+
+```ts
+// factory.ts
+import type { Before } from 'kehikot-module-protocol/serve'
+
+export const factoryDoor: Before = async (request, { asker, url, ticket }) => {
+  if (url.pathname !== '/api/factory/send' || !request.headers.get(KEY_HEADER)) return undefined // not mine
+  if (asker !== 'program') return Response.json({ ok: false, error: '…' }, { status: 403 })
+  const body = await request.json()
+  …
+}
+
+// vite.config.ts — after serves(), before doors()
+plugins: [serves(…), beforeDoors(factoryDoor, { setup: ensureKey }), doors(…), react()]
+
+// serve.ts
+await run({ …, before: factoryDoor })
+```
+
+- **Asked first**: after the `Host` fence and a preflight `cors` answers, before the doors, the
+  page and the files of `dist/`. Not for a socket handshake on one of `sockets.paths`.
+- **`undefined` (or `null`) hands the request on, unread.** On Vite the request's body is a stream
+  that reads nothing until it is read, so the doors and Vite get it whole.
+- **`info`** is what the doors work out before they route: `asker` (`gate.ts`: `page`, `program`,
+  `person`, `navigation`, `elsewhere`), `url`, and the `ticket` it carried. It fences nothing itself:
+  what it answers, and to whom, is the module's — and it is handed `asker` so it decides the way the
+  doors do.
+- **A throw** is a 500 on `run` (the reason goes to the log), and `next(error)` on Vite.
+- **The adapters**: `beforeHandler(before)` is node middleware, `(request, response, next)`, for a
+  `configureServer` of the module's own; `beforeDoors(before, { name?, setup? })` is the Vite plugin
+  around it, with `setup` run once when the dev server is made. A body is streamed as it comes, so
+  a door that answers with an event stream works on both.
+
+## A page on an opaque origin: `cors` (2.18.0)
+
+A module whose manifest declares `storage: false` is framed WITHOUT `allow-same-origin`: its page is
+on an opaque origin. A module script is always fetched in CORS mode, and from an opaque origin it
+carries `Origin: null`; without a header saying it may, not one script of the page runs — the frame
+loads, the host greets it, and nothing answers. In development that header is Vite's `server.cors`.
+On `run` it is `cors`:
+
+```ts
+await run({ …, openHealth: true, cors: true })
+```
+
+- `true` answers `Origin: null` and the origins that may frame the page (`frameOrigins`: the
+  environment's `KEHIKOT_ORIGINS`, else `KEHIKOT_ORIGIN`, else the defaults, plus `ancestors`);
+  `{ origins }` adds more. Any other origin is not answered.
+- It opens **the files of `dist/` only**, and a preflight for one: the answer echoes the origin, and
+  every file says `Vary: Origin` while `cors` is on, so a copy cached for one origin is not used for
+  another.
+- **The page and the doors keep their gate.** A door still refuses a page on another origin with
+  403, `cors` or not; the one door an opaque page may read is the health check, opened by
+  `openHealth`, as before.
 
 ## The stamp, and why a stale build is never served
 

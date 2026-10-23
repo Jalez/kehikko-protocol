@@ -108,6 +108,17 @@ export {
   type Stream,
 } from './doors.js'
 export { ORIGINS_ELEMENT, TICKET_HEADER, originAmong } from '../page.js'
+/* A door of a module's own, asked before the protocol's, on Vite and on `run` alike (2.18.0). */
+export {
+  beforeDoors,
+  beforeHandler,
+  beforeInfo,
+  requestOf,
+  type Before,
+  type BeforeInfo,
+  type BeforePlugin,
+  type BeforeServerLike,
+} from './before.js'
 export { commitOf, establishBuild } from './build.js'
 
 /* A module's settings door, and asking the host whether a person's pass is real (2.15.0). */

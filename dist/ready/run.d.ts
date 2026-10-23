@@ -1,6 +1,8 @@
+import { type Before } from '../serve/before.js';
 import { type DoorsOptions } from '../serve/doors.js';
 import { type Readiness } from './stamp.js';
 export { STAMP_FILE, readStamp, readiness, type Readiness } from './stamp.js';
+export { beforeDoors, beforeHandler, beforeInfo, type Before, type BeforeInfo } from '../serve/before.js';
 /**
  * A module served from its BUILT page (2.17.0): one Bun server, the same doors the dev server
  * mounts (`doorsFetch`, the adapter `doors()` is the other form of), the files of `dist/`, and a
@@ -71,6 +73,35 @@ export interface RunOptions<T = unknown> extends Omit<DoorsOptions, 'page'> {
     onStop?: () => void;
     /** Bun's idle timeout in seconds. Default 0, none: an event stream or a long MCP call is not idle. */
     idleTimeout?: number;
+    /**
+     * A door of the module's own, asked before the protocol's doors and the files of `dist/` (2.18.0):
+     * a `Response` answers, `undefined` hands the request on. The same function a module mounts on
+     * Vite with `beforeDoors` (`kehikot-module-protocol/serve`), so the two servers cannot drift.
+     * Not asked for a socket handshake on one of `sockets.paths`, nor for a request whose `Host` is
+     * refused (`hostFence`).
+     */
+    before?: Before;
+    /**
+     * Let a page on another origin load the files of `dist/` (2.18.0). For a module framed WITHOUT
+     * `allow-same-origin` — its manifest declares `storage: false` — whose page is on an opaque
+     * origin: a module script is always fetched in CORS mode, and from an opaque origin it carries
+     * `Origin: null`, so without a header saying otherwise not one script of the page runs. What Vite's
+     * `server.cors` does in development.
+     *
+     * `true` answers `Origin: null` and the origins that may frame the page (`frameOrigins`: the
+     * environment's `KEHIKOT_ORIGINS`, and `ancestors`); `origins` adds more. The answer echoes the
+     * origin, with `Vary: Origin`, on the files of `dist/` and a preflight for one. The page and the
+     * doors are not opened by it: their gate still refuses another origin (`openHealth` is the
+     * health check's own opening).
+     */
+    cors?: boolean | {
+        origins?: readonly string[];
+    };
+    /**
+     * Names this server answers to besides the loopback ones (`hostFence`). Default none: as Vite's
+     * `server.allowedHosts`, a request whose `Host` is another name is a 403, whatever it asks.
+     */
+    hosts?: readonly string[];
 }
 export interface Running {
     port: number;
@@ -92,6 +123,23 @@ export declare function socketFence(headers: {
     ok: false;
     why: string;
 };
+/** What a request sent under a name that is not this machine's is told, with status 403. */
+export declare const NOT_HERE = "This address is not one this module answers at.";
+/**
+ * Whether a `Host` header names this machine — `127.0.0.1`, `[::1]`, `localhost` or a name under
+ * it, with or without a port — or one of `also` (2.18.0). Pure.
+ *
+ * The doors' gate reads `Origin` against `Host`, so it trusts `Host` to be this server. A page on a
+ * name somebody pointed at 127.0.0.1 (DNS rebinding) sends an `Origin` and a `Host` that agree, and
+ * would be "its own page". Vite refuses such a `Host` before its middleware runs
+ * (`server.allowedHosts`); `run` refuses it first, the same way, whatever the path.
+ */
+export declare function hostFence(host: string | null, also?: readonly string[]): boolean;
+/**
+ * The origin a cross-origin load of a file of `dist/` is answered for, or null (2.18.0): `null`, an
+ * opaque page's, and the frame origins, when `cors` is on. Pure.
+ */
+export declare function corsOrigin(origin: string | null, allowed: ReadonlySet<string> | null): string | null;
 /**
  * One file out of `dist`, or null. Never a directory (no listing), never a dot file (the stamp),
  * never a path that leaves `dist` once normalised.

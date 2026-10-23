@@ -1,6 +1,8 @@
 import { readFileSync, statSync } from 'node:fs'
 import { join, normalize, sep } from 'node:path'
 
+import { WELL_KNOWN } from '../index.js'
+import { beforeInfo, type Before } from '../serve/before.js'
 import { commitOf } from '../serve/build.js'
 import { PAGE_PATHS, doorsFetch, type DoorsOptions } from '../serve/doors.js'
 import { frameOrigins } from '../serve/origins.js'
@@ -9,6 +11,7 @@ import { claimOrLeave, preferred, registerBound } from '../serve/plugin.js'
 import { readStamp, readiness, type Readiness } from './stamp.js'
 
 export { STAMP_FILE, readStamp, readiness, type Readiness } from './stamp.js'
+export { beforeDoors, beforeHandler, beforeInfo, type Before, type BeforeInfo } from '../serve/before.js'
 
 /**
  * A module served from its BUILT page (2.17.0): one Bun server, the same doors the dev server
@@ -83,6 +86,33 @@ export interface RunOptions<T = unknown> extends Omit<DoorsOptions, 'page'> {
   onStop?: () => void
   /** Bun's idle timeout in seconds. Default 0, none: an event stream or a long MCP call is not idle. */
   idleTimeout?: number
+  /**
+   * A door of the module's own, asked before the protocol's doors and the files of `dist/` (2.18.0):
+   * a `Response` answers, `undefined` hands the request on. The same function a module mounts on
+   * Vite with `beforeDoors` (`kehikot-module-protocol/serve`), so the two servers cannot drift.
+   * Not asked for a socket handshake on one of `sockets.paths`, nor for a request whose `Host` is
+   * refused (`hostFence`).
+   */
+  before?: Before
+  /**
+   * Let a page on another origin load the files of `dist/` (2.18.0). For a module framed WITHOUT
+   * `allow-same-origin` — its manifest declares `storage: false` — whose page is on an opaque
+   * origin: a module script is always fetched in CORS mode, and from an opaque origin it carries
+   * `Origin: null`, so without a header saying otherwise not one script of the page runs. What Vite's
+   * `server.cors` does in development.
+   *
+   * `true` answers `Origin: null` and the origins that may frame the page (`frameOrigins`: the
+   * environment's `KEHIKOT_ORIGINS`, and `ancestors`); `origins` adds more. The answer echoes the
+   * origin, with `Vary: Origin`, on the files of `dist/` and a preflight for one. The page and the
+   * doors are not opened by it: their gate still refuses another origin (`openHealth` is the
+   * health check's own opening).
+   */
+  cors?: boolean | { origins?: readonly string[] }
+  /**
+   * Names this server answers to besides the loopback ones (`hostFence`). Default none: as Vite's
+   * `server.allowedHosts`, a request whose `Host` is another name is a 403, whatever it asks.
+   */
+  hosts?: readonly string[]
 }
 
 export interface Running {
@@ -111,6 +141,42 @@ export function socketFence(headers: { get(name: string): string | null }, port:
 }
 
 const TEXT = { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store' }
+
+/** What a request sent under a name that is not this machine's is told, with status 403. */
+export const NOT_HERE = 'This address is not one this module answers at.'
+
+/**
+ * Whether a `Host` header names this machine — `127.0.0.1`, `[::1]`, `localhost` or a name under
+ * it, with or without a port — or one of `also` (2.18.0). Pure.
+ *
+ * The doors' gate reads `Origin` against `Host`, so it trusts `Host` to be this server. A page on a
+ * name somebody pointed at 127.0.0.1 (DNS rebinding) sends an `Origin` and a `Host` that agree, and
+ * would be "its own page". Vite refuses such a `Host` before its middleware runs
+ * (`server.allowedHosts`); `run` refuses it first, the same way, whatever the path.
+ */
+export function hostFence(host: string | null, also: readonly string[] = []): boolean {
+  if (!host) return false
+  let name: string
+  try {
+    name = new URL(`http://${host}`).hostname.toLowerCase()
+  } catch {
+    return false
+  }
+  if (name === '127.0.0.1' || name === '[::1]' || name === 'localhost' || name.endsWith('.localhost')) return true
+  return also.some((one) => one.toLowerCase() === name)
+}
+
+/**
+ * The origin a cross-origin load of a file of `dist/` is answered for, or null (2.18.0): `null`, an
+ * opaque page's, and the frame origins, when `cors` is on. Pure.
+ */
+export function corsOrigin(origin: string | null, allowed: ReadonlySet<string> | null): string | null {
+  if (!origin || !allowed) return null
+  return allowed.has(origin) ? origin : null
+}
+
+/** The doors' own paths when a module names none (`ours` in doors.ts). */
+const oursByDefault = (path: string) => path === '/healthz' || path === '/mcp' || path.startsWith('/api/')
 
 /** Hashed by Vite: a file under `/assets/` never changes meaning, so a browser may keep it for good. */
 const IMMUTABLE = 'public, max-age=31536000, immutable'
@@ -156,7 +222,17 @@ export async function run<T = unknown>(options: RunOptions<T>): Promise<Running>
     if (readStamp(dist) === commit) return ready
     return readiness(dir, dist, commit)
   }
-  const unservable = (why: string) => new Response(`${why}\n`, { status: 503, headers: TEXT })
+  const unservable = (why: string, extra: Record<string, string> = {}) => new Response(`${why}\n`, { status: 503, headers: { ...TEXT, ...extra } })
+
+  /* Read per request, like `frame-ancestors`: who may frame the page is the environment's to say. */
+  const cors = options.cors
+  const corsAllowed = (): ReadonlySet<string> | null =>
+    cors ? new Set(['null', ...frameOrigins(process.env, options.ancestors), ...(typeof cors === 'object' ? (cors.origins ?? []) : [])]) : null
+  /* `Vary` on every file while `cors` is on, crossed or not: a copy cached for one origin is not another's. */
+  const corsHeaders = (origin: string | null): Record<string, string> =>
+    !cors ? {} : origin ? { 'access-control-allow-origin': origin, vary: 'Origin' } : { vary: 'Origin' }
+  const before = options.before
+  const hosts = options.hosts ?? []
 
   const pages = new Set([...PAGE_PATHS, ...(options.pages ?? [])])
   const through = doorsFetch({
@@ -184,6 +260,31 @@ export async function run<T = unknown>(options: RunOptions<T>): Promise<Running>
       const path = url.pathname
       const method = request.method.toUpperCase()
 
+      /* Asked under a name that is not this machine's: not answered, whatever the path. */
+      if (!hostFence(request.headers.get('host') ?? url.host, hosts)) {
+        return new Response(`${NOT_HERE}\n`, { status: 403, headers: TEXT })
+      }
+
+      /* Who may load a file of `dist/` from another origin, when the module said so. */
+      const crossed = corsOrigin(request.headers.get('origin'), corsAllowed())
+
+      /* A preflight for a file of `dist/`, from an origin `cors` answers. Every other OPTIONS goes on. */
+      if (crossed && method === 'OPTIONS' && request.headers.get('access-control-request-method')) {
+        const door = pages.has(path) || path === WELL_KNOWN || (options.ours ?? oursByDefault)(path)
+        if (!door && (fileIn(dist, path) ?? (path.startsWith('/app/') ? fileIn(dist, path.slice('/app'.length)) : null))) {
+          return new Response(null, {
+            status: 204,
+            headers: {
+              ...corsHeaders(crossed),
+              'access-control-allow-methods': 'GET, HEAD',
+              'access-control-allow-headers': request.headers.get('access-control-request-headers') ?? '',
+              'access-control-max-age': '600',
+              'cache-control': 'no-store',
+            },
+          })
+        }
+      }
+
       if (sockets && socketPaths.has(path) && request.headers.get('upgrade')?.toLowerCase() === 'websocket') {
         const gate = socketFence(request.headers, port)
         if (!gate.ok) {
@@ -193,6 +294,16 @@ export async function run<T = unknown>(options: RunOptions<T>): Promise<Running>
         const data = (sockets.data ? sockets.data(request) : undefined) as T
         if ((server as unknown as { upgrade(request: Request, options: { data: unknown }): boolean }).upgrade(request, { data })) return undefined
         return new Response('That was not a WebSocket handshake.\n', { status: 400, headers: TEXT })
+      }
+
+      if (before) {
+        try {
+          const mine = await before(request, beforeInfo(request))
+          if (mine) return mine
+        } catch (error) {
+          console.error(`${id}: a door of its own failed on ${method} ${path}:`, error)
+          return new Response('That door failed. The module says why in its log.\n', { status: 500, headers: TEXT })
+        }
       }
 
       const document = pages.has(path) && (method === 'GET' || method === 'HEAD')
@@ -210,11 +321,12 @@ export async function run<T = unknown>(options: RunOptions<T>): Promise<Running>
            `/app/assets/…`: the same file as `/assets/…`. */
         const file = fileIn(dist, path) ?? (path.startsWith('/app/') ? fileIn(dist, path.slice('/app'.length)) : null)
         if (file) {
-          if (!now.ok) return unservable(now.why)
+          if (!now.ok) return unservable(now.why, corsHeaders(crossed))
           return new Response(bun.file(file), {
             headers: {
               'cache-control': path.startsWith('/assets/') || path.startsWith('/app/assets/') ? IMMUTABLE : 'no-cache',
               'x-content-type-options': 'nosniff',
+              ...corsHeaders(crossed),
             },
           })
         }

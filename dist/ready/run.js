@@ -1,5 +1,7 @@
 import { readFileSync, statSync } from 'node:fs';
 import { join, normalize, sep } from 'node:path';
+import { WELL_KNOWN } from '../index.js';
+import { beforeInfo } from '../serve/before.js';
 import { commitOf } from '../serve/build.js';
 import { PAGE_PATHS, doorsFetch } from '../serve/doors.js';
 import { frameOrigins } from '../serve/origins.js';
@@ -7,6 +9,7 @@ import { fillPage } from '../serve/page.js';
 import { claimOrLeave, preferred, registerBound } from '../serve/plugin.js';
 import { readStamp, readiness } from './stamp.js';
 export { STAMP_FILE, readStamp, readiness } from './stamp.js';
+export { beforeDoors, beforeHandler, beforeInfo } from '../serve/before.js';
 /**
  * Is this WebSocket handshake from this module's own page? A browser always sends `Origin` on one
  * and a page cannot forge it, so none at all is not a page; `Host` is held to the same two names so
@@ -26,6 +29,42 @@ export function socketFence(headers, port) {
     return { ok: true };
 }
 const TEXT = { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store' };
+/** What a request sent under a name that is not this machine's is told, with status 403. */
+export const NOT_HERE = 'This address is not one this module answers at.';
+/**
+ * Whether a `Host` header names this machine — `127.0.0.1`, `[::1]`, `localhost` or a name under
+ * it, with or without a port — or one of `also` (2.18.0). Pure.
+ *
+ * The doors' gate reads `Origin` against `Host`, so it trusts `Host` to be this server. A page on a
+ * name somebody pointed at 127.0.0.1 (DNS rebinding) sends an `Origin` and a `Host` that agree, and
+ * would be "its own page". Vite refuses such a `Host` before its middleware runs
+ * (`server.allowedHosts`); `run` refuses it first, the same way, whatever the path.
+ */
+export function hostFence(host, also = []) {
+    if (!host)
+        return false;
+    let name;
+    try {
+        name = new URL(`http://${host}`).hostname.toLowerCase();
+    }
+    catch {
+        return false;
+    }
+    if (name === '127.0.0.1' || name === '[::1]' || name === 'localhost' || name.endsWith('.localhost'))
+        return true;
+    return also.some((one) => one.toLowerCase() === name);
+}
+/**
+ * The origin a cross-origin load of a file of `dist/` is answered for, or null (2.18.0): `null`, an
+ * opaque page's, and the frame origins, when `cors` is on. Pure.
+ */
+export function corsOrigin(origin, allowed) {
+    if (!origin || !allowed)
+        return null;
+    return allowed.has(origin) ? origin : null;
+}
+/** The doors' own paths when a module names none (`ours` in doors.ts). */
+const oursByDefault = (path) => path === '/healthz' || path === '/mcp' || path.startsWith('/api/');
 /** Hashed by Vite: a file under `/assets/` never changes meaning, so a browser may keep it for good. */
 const IMMUTABLE = 'public, max-age=31536000, immutable';
 /**
@@ -75,7 +114,14 @@ export async function run(options) {
             return ready;
         return readiness(dir, dist, commit);
     };
-    const unservable = (why) => new Response(`${why}\n`, { status: 503, headers: TEXT });
+    const unservable = (why, extra = {}) => new Response(`${why}\n`, { status: 503, headers: { ...TEXT, ...extra } });
+    /* Read per request, like `frame-ancestors`: who may frame the page is the environment's to say. */
+    const cors = options.cors;
+    const corsAllowed = () => cors ? new Set(['null', ...frameOrigins(process.env, options.ancestors), ...(typeof cors === 'object' ? (cors.origins ?? []) : [])]) : null;
+    /* `Vary` on every file while `cors` is on, crossed or not: a copy cached for one origin is not another's. */
+    const corsHeaders = (origin) => !cors ? {} : origin ? { 'access-control-allow-origin': origin, vary: 'Origin' } : { vary: 'Origin' };
+    const before = options.before;
+    const hosts = options.hosts ?? [];
     const pages = new Set([...PAGE_PATHS, ...(options.pages ?? [])]);
     const through = doorsFetch({
         ...options,
@@ -97,6 +143,28 @@ export async function run(options) {
             const url = new URL(request.url);
             const path = url.pathname;
             const method = request.method.toUpperCase();
+            /* Asked under a name that is not this machine's: not answered, whatever the path. */
+            if (!hostFence(request.headers.get('host') ?? url.host, hosts)) {
+                return new Response(`${NOT_HERE}\n`, { status: 403, headers: TEXT });
+            }
+            /* Who may load a file of `dist/` from another origin, when the module said so. */
+            const crossed = corsOrigin(request.headers.get('origin'), corsAllowed());
+            /* A preflight for a file of `dist/`, from an origin `cors` answers. Every other OPTIONS goes on. */
+            if (crossed && method === 'OPTIONS' && request.headers.get('access-control-request-method')) {
+                const door = pages.has(path) || path === WELL_KNOWN || (options.ours ?? oursByDefault)(path);
+                if (!door && (fileIn(dist, path) ?? (path.startsWith('/app/') ? fileIn(dist, path.slice('/app'.length)) : null))) {
+                    return new Response(null, {
+                        status: 204,
+                        headers: {
+                            ...corsHeaders(crossed),
+                            'access-control-allow-methods': 'GET, HEAD',
+                            'access-control-allow-headers': request.headers.get('access-control-request-headers') ?? '',
+                            'access-control-max-age': '600',
+                            'cache-control': 'no-store',
+                        },
+                    });
+                }
+            }
             if (sockets && socketPaths.has(path) && request.headers.get('upgrade')?.toLowerCase() === 'websocket') {
                 const gate = socketFence(request.headers, port);
                 if (!gate.ok) {
@@ -107,6 +175,17 @@ export async function run(options) {
                 if (server.upgrade(request, { data }))
                     return undefined;
                 return new Response('That was not a WebSocket handshake.\n', { status: 400, headers: TEXT });
+            }
+            if (before) {
+                try {
+                    const mine = await before(request, beforeInfo(request));
+                    if (mine)
+                        return mine;
+                }
+                catch (error) {
+                    console.error(`${id}: a door of its own failed on ${method} ${path}:`, error);
+                    return new Response('That door failed. The module says why in its log.\n', { status: 500, headers: TEXT });
+                }
             }
             const document = pages.has(path) && (method === 'GET' || method === 'HEAD');
             if (document) {
@@ -124,11 +203,12 @@ export async function run(options) {
                 const file = fileIn(dist, path) ?? (path.startsWith('/app/') ? fileIn(dist, path.slice('/app'.length)) : null);
                 if (file) {
                     if (!now.ok)
-                        return unservable(now.why);
+                        return unservable(now.why, corsHeaders(crossed));
                     return new Response(bun.file(file), {
                         headers: {
                             'cache-control': path.startsWith('/assets/') || path.startsWith('/app/assets/') ? IMMUTABLE : 'no-cache',
                             'x-content-type-options': 'nosniff',
+                            ...corsHeaders(crossed),
                         },
                     });
                 }

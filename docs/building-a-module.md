@@ -180,6 +180,16 @@ tools and its skills in Settings › Skills. From then on Kehikot runs that
 installed copy, never the checkout you work in: a change reaches the app when it
 is released (or merged, before the first release).
 
+**Ready-built.** An installed copy is served from its built page: `bun run build`
+stamps `dist/` with the commit (`buildModule`), and `run.sh` starts `serve.ts`
+(`run` from `kehikot-module-protocol/run`) when the stamp is `HEAD`, Vite
+otherwise. Everything the module says lives where both servers read it — the
+doors in `answer`, a door that must see a request first in one `before` function
+(`beforeDoors` on Vite, `run({ before })` built), and `cors: true` on `run` for a
+`storage: false` module, whose page is on an opaque origin. Check both:
+`bun run build && bun run start` must serve the page and every door the way
+`bun run dev` does. See [ready-built](ready-built.md).
+
 Starting `./run.sh` or `bun run dev` in a checkout registers that checkout when
 nothing is registered under the id yet, and then "Install from repository…"
 says the id is already registered. Use the stub while building.
