@@ -26,3 +26,6 @@ export { admits, asker, ELSEWHERE_REFUSAL } from './gate.js';
 export { doors, doorsFetch, doorsHandler, PAGE_PATHS, } from './doors.js';
 export { ORIGINS_ELEMENT, TICKET_HEADER, originAmong } from '../page.js';
 export { commitOf, establishBuild } from './build.js';
+/* A module's settings door, and asking the host whether a person's pass is real (2.15.0). */
+export { hostVouches, hostVouchUrls, settingsDoor, } from './settings.js';
+export { SETTINGS_PATH, SETTINGS_PASS_PATH } from '../settings.js';

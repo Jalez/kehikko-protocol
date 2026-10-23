@@ -7,6 +7,29 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.15.0 — 2026-10-23
+
+A module's settings, seen and changed from the host. **Additive**; `PROTOCOL` is still 2. A manifest
+without `declares.settings` parses as before, and a host that does not know it asks nothing.
+
+### Added
+
+- `declares.settings` (`settingsDeclarationSchema`, `settingFieldSchema`, `SettingField`): at most
+  `LIMITS.SETTINGS` fields `{ key, label, description, type, choices?, default, scope, personOnly }`.
+  `SETTING_TYPES` (`boolean`, `string`, `number`, `choice`, `list`), `SETTING_SCOPES` (`project`,
+  `machine`), `SETTING_KEY`. A list that does not parse is dropped, not fatal.
+- Door methods, what a host asks a module: `DOOR_CAPABILITIES` (`settings`), `DOOR_METHODS`
+  (`settings.get`, `settings.set`), `doorMethodParams`, `doorMethodResults`, `settingsGetResult`
+  (`values`, `file?`, `problem?`), `settingsSetResult` (`outcome: 'saved' | 'refused'`, `why`,
+  `values?`), `SETTINGS_PATH` (`/api/kehikot/settings`), `offersDoorCapability`.
+- The person's pass: `SETTINGS_PASS_PATH` (`/host/settings-pass`), `SETTINGS_PASS`,
+  `settingsPassResult`, `settingsPassAboutSchema`, `SETTINGS_ASKERS`.
+- The one rule: `settingValueIssue`, `settingsSetRefusal`, `settingsValues`, `SETTINGS_SAYS`.
+- `/serve`: `settingsDoor` (the door over a module's own store), `hostVouches`, `hostVouchUrls`.
+- `LIMITS.SETTINGS`, `SETTING_KEY`, `SETTING_LABEL`, `SETTING_DESCRIPTION`, `SETTING_CHOICES`,
+  `SETTING_CHOICE`, `SETTING_TEXT`, `SETTING_LIST`, `SETTINGS_PASS_MS`.
+- docs/settings.md.
+
 ## 2.14.1 — 2026-10-22
 
 A fix to the module icons. `PROTOCOL` is still 2.

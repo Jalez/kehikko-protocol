@@ -280,4 +280,22 @@ export declare const LIMITS: {
      * length: a file longer than this is not one anybody reviews a line of.
      */
     readonly CODE_LINE: 10000000;
+    /** How many settings one module may declare. */
+    readonly SETTINGS: 32;
+    /** A setting's key, in characters. */
+    readonly SETTING_KEY: 64;
+    /** A setting's label, and a choice's, in characters: what a control is called. */
+    readonly SETTING_LABEL: 80;
+    /** The sentence or two under a setting, in characters. */
+    readonly SETTING_DESCRIPTION: 400;
+    /** How many choices one `choice` setting may offer. */
+    readonly SETTING_CHOICES: 32;
+    /** A choice's value, in characters. */
+    readonly SETTING_CHOICE: 64;
+    /** A `string` setting's value, and each line of a `list`, in characters. */
+    readonly SETTING_TEXT: 2000;
+    /** How many lines a `list` setting may hold. */
+    readonly SETTING_LIST: 64;
+    /** How long a pass the host minted for a person's change is good for, in ms (`SETTINGS_PASS_PATH`). */
+    readonly SETTINGS_PASS_MS: 30000;
 };

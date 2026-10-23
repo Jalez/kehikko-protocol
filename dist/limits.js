@@ -293,4 +293,23 @@ export const LIMITS = {
      * length: a file longer than this is not one anybody reviews a line of.
      */
     CODE_LINE: 10_000_000,
+    /* A module's settings (`declares.settings`, 2.15.0). See `settings.ts`. */
+    /** How many settings one module may declare. */
+    SETTINGS: 32,
+    /** A setting's key, in characters. */
+    SETTING_KEY: 64,
+    /** A setting's label, and a choice's, in characters: what a control is called. */
+    SETTING_LABEL: 80,
+    /** The sentence or two under a setting, in characters. */
+    SETTING_DESCRIPTION: 400,
+    /** How many choices one `choice` setting may offer. */
+    SETTING_CHOICES: 32,
+    /** A choice's value, in characters. */
+    SETTING_CHOICE: 64,
+    /** A `string` setting's value, and each line of a `list`, in characters. */
+    SETTING_TEXT: 2000,
+    /** How many lines a `list` setting may hold. */
+    SETTING_LIST: 64,
+    /** How long a pass the host minted for a person's change is good for, in ms (`SETTINGS_PASS_PATH`). */
+    SETTINGS_PASS_MS: 30_000,
 };

@@ -31,8 +31,8 @@ const skill: ModuleSkill = { name: 'kehikot-place', summary: 'Answer from the pl
 const text = (name = skill.name, body = 'Do the thing.') => `---\nname: ${name}\ndescription: A skill.\n---\n\n${body}\n`
 
 describe('the version', () => {
-  test('is 2.14.1, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.14.1')
+  test('is 2.15.0, and PROTOCOL is still 2', () => {
+    expect(PACKAGE_VERSION).toBe('2.15.0')
     expect(PROTOCOL).toBe(2)
   })
 })

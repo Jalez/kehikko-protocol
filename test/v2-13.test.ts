@@ -27,8 +27,8 @@ import { hostFields, hostStore, makeMailbox } from '../src/client/index.js'
 const here: CodeLocation = { change: 'gl!123', path: 'src/app.ts', line: 42, side: 'new', commit: 'abc1234' }
 
 describe('the version', () => {
-  test('is 2.14.1, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.14.1')
+  test('is 2.15.0, and PROTOCOL is still 2', () => {
+    expect(PACKAGE_VERSION).toBe('2.15.0')
     expect(PROTOCOL).toBe(2)
   })
   test('LIMITS.CODE_LINE is ten million', () => expect(LIMITS.CODE_LINE).toBe(10_000_000))
