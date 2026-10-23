@@ -20,8 +20,8 @@ export declare const dispositionSchema: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     value: "done" | "wont-do" | "duplicate" | "superseded";
     at: string | null;
-    ref: string;
     by: string | null;
+    ref: string;
     target: string | null;
     note: string;
 }, {
@@ -53,25 +53,25 @@ export declare const showingSchema: z.ZodObject<{
             from: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
             to: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
         }, "strip", z.ZodTypeAny, {
+            title: string;
             from: number | null;
             to: number | null;
-            title: string;
         }, {
             title: string;
             from?: number | null | undefined;
             to?: number | null | undefined;
         }>, {
+            title: string;
             from: number | null;
             to: number | null;
-            title: string;
         }, {
             title: string;
             from?: number | null | undefined;
             to?: number | null | undefined;
         }>, {
+            title: string;
             from: number | null;
             to: number | null;
-            title: string;
         }, {
             title: string;
             from?: number | null | undefined;
@@ -84,9 +84,9 @@ export declare const showingSchema: z.ZodObject<{
         page: number | null;
         quoted: string;
         section: {
+            title: string;
             from: number | null;
             to: number | null;
-            title: string;
         } | null;
     }, {
         path: string;
@@ -106,9 +106,9 @@ export declare const showingSchema: z.ZodObject<{
         page: number | null;
         quoted: string;
         section: {
+            title: string;
             from: number | null;
             to: number | null;
-            title: string;
         } | null;
     }, {
         path: string;
@@ -128,9 +128,9 @@ export declare const showingSchema: z.ZodObject<{
         page: number | null;
         quoted: string;
         section: {
+            title: string;
             from: number | null;
             to: number | null;
-            title: string;
         } | null;
     }, {
         path: string;
@@ -153,9 +153,9 @@ export declare const showingSchema: z.ZodObject<{
         page: number | null;
         quoted: string;
         section: {
+            title: string;
             from: number | null;
             to: number | null;
-            title: string;
         } | null;
     }[];
 }, {
@@ -206,25 +206,25 @@ export declare const containerSchema: z.ZodObject<{
                 from: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
                 to: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
             }, "strip", z.ZodTypeAny, {
+                title: string;
                 from: number | null;
                 to: number | null;
-                title: string;
             }, {
                 title: string;
                 from?: number | null | undefined;
                 to?: number | null | undefined;
             }>, {
+                title: string;
                 from: number | null;
                 to: number | null;
-                title: string;
             }, {
                 title: string;
                 from?: number | null | undefined;
                 to?: number | null | undefined;
             }>, {
+                title: string;
                 from: number | null;
                 to: number | null;
-                title: string;
             }, {
                 title: string;
                 from?: number | null | undefined;
@@ -237,9 +237,9 @@ export declare const containerSchema: z.ZodObject<{
             page: number | null;
             quoted: string;
             section: {
+                title: string;
                 from: number | null;
                 to: number | null;
-                title: string;
             } | null;
         }, {
             path: string;
@@ -259,9 +259,9 @@ export declare const containerSchema: z.ZodObject<{
             page: number | null;
             quoted: string;
             section: {
+                title: string;
                 from: number | null;
                 to: number | null;
-                title: string;
             } | null;
         }, {
             path: string;
@@ -281,9 +281,9 @@ export declare const containerSchema: z.ZodObject<{
             page: number | null;
             quoted: string;
             section: {
+                title: string;
                 from: number | null;
                 to: number | null;
-                title: string;
             } | null;
         }, {
             path: string;
@@ -306,9 +306,9 @@ export declare const containerSchema: z.ZodObject<{
             page: number | null;
             quoted: string;
             section: {
+                title: string;
                 from: number | null;
                 to: number | null;
-                title: string;
             } | null;
         }[];
     }, {
@@ -338,9 +338,9 @@ export declare const containerSchema: z.ZodObject<{
             page: number | null;
             quoted: string;
             section: {
+                title: string;
                 from: number | null;
                 to: number | null;
-                title: string;
             } | null;
         }[];
     };
@@ -425,25 +425,25 @@ export declare const contextSchema: z.ZodObject<{
             from: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
             to: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
         }, "strip", z.ZodTypeAny, {
+            title: string;
             from: number | null;
             to: number | null;
-            title: string;
         }, {
             title: string;
             from?: number | null | undefined;
             to?: number | null | undefined;
         }>, {
+            title: string;
             from: number | null;
             to: number | null;
-            title: string;
         }, {
             title: string;
             from?: number | null | undefined;
             to?: number | null | undefined;
         }>, {
+            title: string;
             from: number | null;
             to: number | null;
-            title: string;
         }, {
             title: string;
             from?: number | null | undefined;
@@ -456,9 +456,9 @@ export declare const contextSchema: z.ZodObject<{
         page: number | null;
         quoted: string;
         section: {
+            title: string;
             from: number | null;
             to: number | null;
-            title: string;
         } | null;
     }, {
         path: string;
@@ -478,9 +478,9 @@ export declare const contextSchema: z.ZodObject<{
         page: number | null;
         quoted: string;
         section: {
+            title: string;
             from: number | null;
             to: number | null;
-            title: string;
         } | null;
     }, {
         path: string;
@@ -500,9 +500,9 @@ export declare const contextSchema: z.ZodObject<{
         page: number | null;
         quoted: string;
         section: {
+            title: string;
             from: number | null;
             to: number | null;
-            title: string;
         } | null;
     }, {
         path: string;
@@ -534,44 +534,72 @@ export declare const contextSchema: z.ZodObject<{
         commit: z.ZodOptional<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
         path: string;
+        intent: "show" | "comment";
         line: number;
         change: string;
         side: "new" | "old";
-        intent: "comment" | "show";
         at?: string | undefined;
+        by?: string | undefined;
         commit?: string | undefined;
         endLine?: number | undefined;
-        by?: string | undefined;
     }, {
         path: string;
         line: number;
         change: string;
         side: "new" | "old";
         at?: string | undefined;
+        intent?: unknown;
+        by?: string | undefined;
         commit?: string | undefined;
         endLine?: number | undefined;
-        by?: string | undefined;
-        intent?: unknown;
     }>, {
         path: string;
+        intent: "show" | "comment";
         line: number;
         change: string;
         side: "new" | "old";
-        intent: "comment" | "show";
         at?: string | undefined;
+        by?: string | undefined;
         commit?: string | undefined;
         endLine?: number | undefined;
-        by?: string | undefined;
     }, {
         path: string;
         line: number;
         change: string;
         side: "new" | "old";
         at?: string | undefined;
+        intent?: unknown;
+        by?: string | undefined;
         commit?: string | undefined;
         endLine?: number | undefined;
+    }>>>;
+    /**
+     * 2.16.0. The last web address handed to this kehikko to be shown, or null; see `address.ts`. Set
+     * with `address.open` (or by the host for a person or an agent) and relayed to every container,
+     * stamped with who asked and when. A module that shows pages (`REACTS_TO.address`) opens it when
+     * its `at` is new (`addressIsNews`); everybody else may ignore it. Null from an older host.
+     */
+    address: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+        url: z.ZodEffects<z.ZodString, string, string>;
+        title: z.ZodOptional<z.ZodString>;
+        intent: z.ZodCatch<z.ZodEnum<["show"]>>;
+        by: z.ZodOptional<z.ZodString>;
+        agent: z.ZodOptional<z.ZodLiteral<true>>;
+        at: z.ZodOptional<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        url: string;
+        intent: "show";
+        at?: string | undefined;
+        title?: string | undefined;
         by?: string | undefined;
+        agent?: true | undefined;
+    }, {
+        url: string;
+        at?: string | undefined;
+        title?: string | undefined;
         intent?: unknown;
+        by?: string | undefined;
+        agent?: true | undefined;
     }>>>;
     /**
      * Whether this module has been pinned. `true` means it keeps what it was last told, and further
@@ -640,25 +668,25 @@ export declare const contextSchema: z.ZodObject<{
                     from: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
                     to: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
                 }, "strip", z.ZodTypeAny, {
+                    title: string;
                     from: number | null;
                     to: number | null;
-                    title: string;
                 }, {
                     title: string;
                     from?: number | null | undefined;
                     to?: number | null | undefined;
                 }>, {
+                    title: string;
                     from: number | null;
                     to: number | null;
-                    title: string;
                 }, {
                     title: string;
                     from?: number | null | undefined;
                     to?: number | null | undefined;
                 }>, {
+                    title: string;
                     from: number | null;
                     to: number | null;
-                    title: string;
                 }, {
                     title: string;
                     from?: number | null | undefined;
@@ -671,9 +699,9 @@ export declare const contextSchema: z.ZodObject<{
                 page: number | null;
                 quoted: string;
                 section: {
+                    title: string;
                     from: number | null;
                     to: number | null;
-                    title: string;
                 } | null;
             }, {
                 path: string;
@@ -693,9 +721,9 @@ export declare const contextSchema: z.ZodObject<{
                 page: number | null;
                 quoted: string;
                 section: {
+                    title: string;
                     from: number | null;
                     to: number | null;
-                    title: string;
                 } | null;
             }, {
                 path: string;
@@ -715,9 +743,9 @@ export declare const contextSchema: z.ZodObject<{
                 page: number | null;
                 quoted: string;
                 section: {
+                    title: string;
                     from: number | null;
                     to: number | null;
-                    title: string;
                 } | null;
             }, {
                 path: string;
@@ -740,9 +768,9 @@ export declare const contextSchema: z.ZodObject<{
                 page: number | null;
                 quoted: string;
                 section: {
+                    title: string;
                     from: number | null;
                     to: number | null;
-                    title: string;
                 } | null;
             }[];
         }, {
@@ -772,9 +800,9 @@ export declare const contextSchema: z.ZodObject<{
                 page: number | null;
                 quoted: string;
                 section: {
+                    title: string;
                     from: number | null;
                     to: number | null;
-                    title: string;
                 } | null;
             }[];
         };
@@ -814,8 +842,8 @@ export declare const contextSchema: z.ZodObject<{
     }, "strip", z.ZodTypeAny, {
         value: "done" | "wont-do" | "duplicate" | "superseded";
         at: string | null;
-        ref: string;
         by: string | null;
+        ref: string;
         target: string | null;
         note: string;
     }, {
@@ -917,21 +945,29 @@ export declare const contextSchema: z.ZodObject<{
         page: number | null;
         quoted: string;
         section: {
+            title: string;
             from: number | null;
             to: number | null;
-            title: string;
         } | null;
     } | null;
     location: {
         path: string;
+        intent: "show" | "comment";
         line: number;
         change: string;
         side: "new" | "old";
-        intent: "comment" | "show";
         at?: string | undefined;
+        by?: string | undefined;
         commit?: string | undefined;
         endLine?: number | undefined;
+    } | null;
+    address: {
+        url: string;
+        intent: "show";
+        at?: string | undefined;
+        title?: string | undefined;
         by?: string | undefined;
+        agent?: true | undefined;
     } | null;
     pinned: boolean;
     prompt: string | null;
@@ -948,9 +984,9 @@ export declare const contextSchema: z.ZodObject<{
                 page: number | null;
                 quoted: string;
                 section: {
+                    title: string;
                     from: number | null;
                     to: number | null;
-                    title: string;
                 } | null;
             }[];
         };
@@ -959,8 +995,8 @@ export declare const contextSchema: z.ZodObject<{
     dispositions: {
         value: "done" | "wont-do" | "duplicate" | "superseded";
         at: string | null;
-        ref: string;
         by: string | null;
+        ref: string;
         target: string | null;
         note: string;
     }[];
@@ -1013,10 +1049,18 @@ export declare const contextSchema: z.ZodObject<{
         change: string;
         side: "new" | "old";
         at?: string | undefined;
+        intent?: unknown;
+        by?: string | undefined;
         commit?: string | undefined;
         endLine?: number | undefined;
-        by?: string | undefined;
+    } | null | undefined;
+    address?: {
+        url: string;
+        at?: string | undefined;
+        title?: string | undefined;
         intent?: unknown;
+        by?: string | undefined;
+        agent?: true | undefined;
     } | null | undefined;
     pinned?: boolean | undefined;
     prompt?: string | null | undefined;

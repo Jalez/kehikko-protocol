@@ -43,6 +43,12 @@ export declare const CAPABILITIES: {
      */
     readonly 'location:set': "Say where in a change’s code the person is pointing — a file and a line — or ask for a comment there. Every module on the canvas is told.";
     /**
+     * 2.16.0. Hand a web address to the canvas, for whichever module shows pages to open. A SHARED write
+     * like `location:set`: it goes into `context.address` on this kehikko. Names an address and nothing
+     * else — not the Browser, not whether one is there. With no such module the host asks the person.
+     */
+    readonly 'address:open': "Hand a web address (https:, or this machine) to the canvas to be opened by a module that shows pages. Every module on the canvas is told; with none, you are asked.";
+    /**
      * Ask for its own container's filters to be moved. Reaches this container's own narrowing and
      * nothing else: not another container's, not the canvas.
      */
@@ -115,6 +121,7 @@ export declare const METHODS: {
     readonly 'selection.set': "selection:set";
     readonly 'passage.set': "passage:set";
     readonly 'location.set': "location:set";
+    readonly 'address.open': "address:open";
     readonly 'filters.set': "filters:set";
     readonly 'showing.set': "showing:set";
     readonly 'projects.pick': "projects:pick";
@@ -276,25 +283,25 @@ export declare const methodParams: {
                 from: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
                 to: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
             }, "strip", z.ZodTypeAny, {
+                title: string;
                 from: number | null;
                 to: number | null;
-                title: string;
             }, {
                 title: string;
                 from?: number | null | undefined;
                 to?: number | null | undefined;
             }>, {
+                title: string;
                 from: number | null;
                 to: number | null;
-                title: string;
             }, {
                 title: string;
                 from?: number | null | undefined;
                 to?: number | null | undefined;
             }>, {
+                title: string;
                 from: number | null;
                 to: number | null;
-                title: string;
             }, {
                 title: string;
                 from?: number | null | undefined;
@@ -307,9 +314,9 @@ export declare const methodParams: {
             page: number | null;
             quoted: string;
             section: {
+                title: string;
                 from: number | null;
                 to: number | null;
-                title: string;
             } | null;
         }, {
             path: string;
@@ -329,9 +336,9 @@ export declare const methodParams: {
             page: number | null;
             quoted: string;
             section: {
+                title: string;
                 from: number | null;
                 to: number | null;
-                title: string;
             } | null;
         }, {
             path: string;
@@ -351,9 +358,9 @@ export declare const methodParams: {
             page: number | null;
             quoted: string;
             section: {
+                title: string;
                 from: number | null;
                 to: number | null;
-                title: string;
             } | null;
         }, {
             path: string;
@@ -375,9 +382,9 @@ export declare const methodParams: {
             page: number | null;
             quoted: string;
             section: {
+                title: string;
                 from: number | null;
                 to: number | null;
-                title: string;
             } | null;
         } | null;
     }, {
@@ -448,7 +455,7 @@ export declare const methodParams: {
             commit?: string | undefined;
             endLine?: number | undefined;
         } | null;
-        intent?: "comment" | "show" | undefined;
+        intent?: "show" | "comment" | undefined;
     }, {
         location: {
             path: string;
@@ -458,7 +465,28 @@ export declare const methodParams: {
             commit?: string | undefined;
             endLine?: number | undefined;
         } | null;
-        intent?: "comment" | "show" | undefined;
+        intent?: "show" | "comment" | undefined;
+    }>;
+    /**
+     * 2.16.0. Hand a web address to the canvas; answered with `addressOpenResult`. `url` is held to
+     * `addressRefusal` (https:, or http: to this machine; no credentials; at most `LIMITS.URL`), and
+     * refused rather than repaired. `title` is what to call the page, when the sender knows. `intent`
+     * is `show` (absent means `show`). The host stamps who asked and when into `context.address`, where
+     * a module that shows pages (`REACTS_TO.address`) takes it. A tracker ref goes through
+     * `selection.set`, not here.
+     */
+    readonly 'address.open': z.ZodObject<{
+        url: z.ZodEffects<z.ZodString, string, string>;
+        title: z.ZodOptional<z.ZodString>;
+        intent: z.ZodOptional<z.ZodEnum<["show"]>>;
+    }, "strip", z.ZodTypeAny, {
+        url: string;
+        title?: string | undefined;
+        intent?: "show" | undefined;
+    }, {
+        url: string;
+        title?: string | undefined;
+        intent?: "show" | undefined;
     }>;
     /**
      * Ask the host to put this container's filters somewhere. A request: the host may refuse for any reason. A
@@ -490,25 +518,25 @@ export declare const methodParams: {
                 from: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
                 to: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
             }, "strip", z.ZodTypeAny, {
+                title: string;
                 from: number | null;
                 to: number | null;
-                title: string;
             }, {
                 title: string;
                 from?: number | null | undefined;
                 to?: number | null | undefined;
             }>, {
+                title: string;
                 from: number | null;
                 to: number | null;
-                title: string;
             }, {
                 title: string;
                 from?: number | null | undefined;
                 to?: number | null | undefined;
             }>, {
+                title: string;
                 from: number | null;
                 to: number | null;
-                title: string;
             }, {
                 title: string;
                 from?: number | null | undefined;
@@ -521,9 +549,9 @@ export declare const methodParams: {
             page: number | null;
             quoted: string;
             section: {
+                title: string;
                 from: number | null;
                 to: number | null;
-                title: string;
             } | null;
         }, {
             path: string;
@@ -543,9 +571,9 @@ export declare const methodParams: {
             page: number | null;
             quoted: string;
             section: {
+                title: string;
                 from: number | null;
                 to: number | null;
-                title: string;
             } | null;
         }, {
             path: string;
@@ -565,9 +593,9 @@ export declare const methodParams: {
             page: number | null;
             quoted: string;
             section: {
+                title: string;
                 from: number | null;
                 to: number | null;
-                title: string;
             } | null;
         }, {
             path: string;
@@ -590,9 +618,9 @@ export declare const methodParams: {
             page: number | null;
             quoted: string;
             section: {
+                title: string;
                 from: number | null;
                 to: number | null;
-                title: string;
             } | null;
         }[];
     }, {
@@ -1241,6 +1269,26 @@ export declare const locationSetResult: z.ZodObject<{
     why?: string | undefined;
 }>;
 export type LocationSetResult = z.infer<typeof locationSetResult>;
+/**
+ * 2.16.0. What became of an `address.open`; all three are `ok: true`. `shown`: a module on this kehikko
+ * that shows pages has it (`context.address` is it now). `offered`: none does, and the host put the
+ * address in front of the person instead — to open it in their own browser, or to add a module that
+ * shows pages — so the sender does nothing more. `declined`: the host will not, right now (`why`
+ * says so); the sender may fall back to what it did before, on a person's press.
+ */
+export declare const ADDRESS_OPEN_OUTCOMES: readonly ["shown", "offered", "declined"];
+export type AddressOpenOutcome = (typeof ADDRESS_OPEN_OUTCOMES)[number];
+export declare const addressOpenResult: z.ZodObject<{
+    outcome: z.ZodEnum<["shown", "offered", "declined"]>;
+    why: z.ZodDefault<z.ZodString>;
+}, "strip", z.ZodTypeAny, {
+    outcome: "declined" | "shown" | "offered";
+    why: string;
+}, {
+    outcome: "declined" | "shown" | "offered";
+    why?: string | undefined;
+}>;
+export type AddressOpenResult = z.infer<typeof addressOpenResult>;
 /**
  * The least an `epics.list` can answer with. `slug` is required: it is the argument to every other
  * call. `title` and `project` are optional and bounded. Every other field passes through untouched.

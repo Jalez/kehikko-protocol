@@ -7,6 +7,32 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.16.0 — 2026-10-23
+
+A web address handed to the canvas (issue #51). A module that draws a link which is not a tracker
+ref — a design document, a preview, a dashboard, a pipeline log — asks the host to have it shown,
+and whichever module shows pages (the Browser) opens it. **Additive**; `PROTOCOL` is still 2. A host
+that does not know it does not answer `address.open` and sends `address: null`.
+
+### Added
+
+- Method `address.open({ url, title?, intent?: 'show' })` under the new capability `address:open`,
+  answered with `addressOpenResult` (`{ outcome: 'shown' | 'offered' | 'declined', why }`,
+  `ADDRESS_OPEN_OUTCOMES`). `shown`: a module that shows pages has it; `offered`: none does, and the
+  host asked the person instead; `declined`: the host will not.
+- `webAddress`, `addressRefusal`, `isWebAddress`, `LOOPBACK_HOSTS`: an address is absolute `https:`,
+  or `http:` to `localhost`, `127.0.0.1` or `[::1]`; never another scheme; no user name or password;
+  no whitespace or control character; at most `LIMITS.URL`. Refused, never repaired.
+- `contextSchema.address`: `sharedAddressSchema | null`, default `null` — `url`, `title?`,
+  `intent` (`ADDRESS_INTENTS`; an unknown word reads `show`), and the host's `by?`, `agent?` and
+  `at?` (new on every hand-over).
+- `REACTS_TO.address`: a module that shows pages. The one reaction a host reads, to answer
+  `shown` or `offered`.
+- `addressIsNews(address, actedOn)`, `addressLabel(address)`.
+- Client: `HostFields.address` (held steady while it says the same thing) and
+  `openAddress(url, { title?, intent? })` on the store and `useHost`, resolving with the host's
+  answer, or `null` when nothing frames the page or the host does not answer `address.open`.
+
 ## 2.15.0 — 2026-10-23
 
 A module's settings, seen and changed from the host. **Additive**; `PROTOCOL` is still 2. A manifest

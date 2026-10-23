@@ -990,7 +990,29 @@ again on every context. It is not, because `at` is new on each call: a
 consumer acts on a location whose `at` (or place, `samePlace`) it has not
 acted on, and leaves alone one it has. `by` lets a module ignore its own.
 
-#### `contextSchema.pinned`
+#### `contextSchema.address`
+
+*2.16.0.* The last web address handed to this kehikko to be shown, or null.
+The shape is `sharedAddressSchema` in `src/address.ts`:
+
+```ts
+{
+  url: string        // https:, or http: to this machine; no credentials; at most LIMITS.URL (addressRefusal)
+  title?: string     // what to call the page, when the sender knew
+  intent: 'show'     // open it; an unknown word reads 'show'
+  by?: string        // the module that asked: the host's fact
+  agent?: true       // an agent asked, through the host's own door, rather than a module
+  at?: string        // when, ISO 8601: the host's fact, new on every hand-over
+}
+```
+
+Set with `address.open` (see [methods](methods.md#methodparamsaddressopen)),
+or by the host itself for a person or an agent. Every container gets it; a
+module that shows pages (`REACTS_TO.address`) opens it when its `at` is new
+(`addressIsNews`), and every other module may ignore it. An older host sends
+null.
+
+
 
 Whether this module has been pinned, and will stop being re-pointed.
 

@@ -101,44 +101,44 @@ export declare const sharedLocationSchema: z.ZodEffects<z.ZodObject<{
     commit: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     path: string;
+    intent: "show" | "comment";
     line: number;
     change: string;
     side: "new" | "old";
-    intent: "comment" | "show";
     at?: string | undefined;
+    by?: string | undefined;
     commit?: string | undefined;
     endLine?: number | undefined;
-    by?: string | undefined;
 }, {
     path: string;
     line: number;
     change: string;
     side: "new" | "old";
     at?: string | undefined;
+    intent?: unknown;
+    by?: string | undefined;
     commit?: string | undefined;
     endLine?: number | undefined;
-    by?: string | undefined;
-    intent?: unknown;
 }>, {
     path: string;
+    intent: "show" | "comment";
     line: number;
     change: string;
     side: "new" | "old";
-    intent: "comment" | "show";
     at?: string | undefined;
+    by?: string | undefined;
     commit?: string | undefined;
     endLine?: number | undefined;
-    by?: string | undefined;
 }, {
     path: string;
     line: number;
     change: string;
     side: "new" | "old";
     at?: string | undefined;
+    intent?: unknown;
+    by?: string | undefined;
     commit?: string | undefined;
     endLine?: number | undefined;
-    by?: string | undefined;
-    intent?: unknown;
 }>;
 export type SharedLocation = z.infer<typeof sharedLocationSchema>;
 /**

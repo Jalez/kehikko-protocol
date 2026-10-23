@@ -8,25 +8,25 @@ export declare const sectionSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
     from: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
     to: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
 }, "strip", z.ZodTypeAny, {
+    title: string;
     from: number | null;
     to: number | null;
-    title: string;
 }, {
     title: string;
     from?: number | null | undefined;
     to?: number | null | undefined;
 }>, {
+    title: string;
     from: number | null;
     to: number | null;
-    title: string;
 }, {
     title: string;
     from?: number | null | undefined;
     to?: number | null | undefined;
 }>, {
+    title: string;
     from: number | null;
     to: number | null;
-    title: string;
 }, {
     title: string;
     from?: number | null | undefined;
@@ -65,25 +65,25 @@ export declare const passageSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
         from: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
         to: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
     }, "strip", z.ZodTypeAny, {
+        title: string;
         from: number | null;
         to: number | null;
-        title: string;
     }, {
         title: string;
         from?: number | null | undefined;
         to?: number | null | undefined;
     }>, {
+        title: string;
         from: number | null;
         to: number | null;
-        title: string;
     }, {
         title: string;
         from?: number | null | undefined;
         to?: number | null | undefined;
     }>, {
+        title: string;
         from: number | null;
         to: number | null;
-        title: string;
     }, {
         title: string;
         from?: number | null | undefined;
@@ -96,9 +96,9 @@ export declare const passageSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
     page: number | null;
     quoted: string;
     section: {
+        title: string;
         from: number | null;
         to: number | null;
-        title: string;
     } | null;
 }, {
     path: string;
@@ -118,9 +118,9 @@ export declare const passageSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
     page: number | null;
     quoted: string;
     section: {
+        title: string;
         from: number | null;
         to: number | null;
-        title: string;
     } | null;
 }, {
     path: string;
@@ -140,9 +140,9 @@ export declare const passageSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
     page: number | null;
     quoted: string;
     section: {
+        title: string;
         from: number | null;
         to: number | null;
-        title: string;
     } | null;
 }, {
     path: string;
