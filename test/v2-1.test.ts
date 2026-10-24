@@ -33,7 +33,7 @@ const OTHER = 'a1b2c3d4-0000-4000-8000-000000000000'
 
 describe('the version', () => {
   test('is 2.3.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.19.0')
+    expect(PACKAGE_VERSION).toBe('2.20.0')
     expect(PROTOCOL).toBe(2)
   })
 })

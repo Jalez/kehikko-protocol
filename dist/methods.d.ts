@@ -101,6 +101,17 @@ export declare const CAPABILITIES: {
      * `activity.ts`. 1.5.0.
      */
     readonly 'activity:report': "Say which of the things you run are working, need your attention or have finished, so the host can mark them.";
+    /**
+     * 2.20.0. Read the host's record of traffic: the calls Kehikot and every module made and received
+     * on this computer, and the connections open on their processes. Addresses and reasons, never what
+     * a call carried. See `traffic.read` and `traffic.ts`. For a module that shows traffic, and no other.
+     */
+    readonly 'traffic:read': "Read the record of the calls Kehikot and its modules make and receive on this computer — when, what kind, to where and why — never what they carried.";
+    /**
+     * 2.20.0. Add this module's own calls to the host's record, each with its reason. Writes into the
+     * host's memory only; read back by a module holding `traffic:read`. See `traffic.note`.
+     */
+    readonly 'traffic:report': "Note the calls this module makes, each with its reason, in Kehikot’s record of traffic on this computer.";
 };
 export type Capability = keyof typeof CAPABILITIES;
 export declare const CAPABILITY_NAMES: Capability[];
@@ -134,6 +145,10 @@ export declare const METHODS: {
     readonly 'content.changed': "content:report";
     readonly 'parts.set': "parts:set";
     readonly 'activity.set': "activity:report";
+    /** The record of traffic, from `since` (2.20.0). */
+    readonly 'traffic.read': "traffic:read";
+    /** A module's own calls, noted with their reasons (2.20.0). */
+    readonly 'traffic.note': "traffic:report";
 };
 export type Method = keyof typeof METHODS;
 export declare const METHOD_NAMES: Method[];
@@ -1140,6 +1155,95 @@ export declare const methodParams: {
     }, {
         extension: string;
         payload?: unknown;
+    }>;
+    /**
+     * 2.20.0. The rows of the host's record of traffic after `since` (a `seq`; 0 for all it keeps),
+     * oldest first, at most `limit`. `sample: true` also asks the host to look at its processes'
+     * connections, which it does only while such reads keep coming (`processes` in the answer).
+     */
+    readonly 'traffic.read': z.ZodObject<{
+        since: z.ZodDefault<z.ZodNumber>;
+        limit: z.ZodDefault<z.ZodNumber>;
+        sample: z.ZodDefault<z.ZodBoolean>;
+    }, "strip", z.ZodTypeAny, {
+        since: number;
+        limit: number;
+        sample: boolean;
+    }, {
+        since?: number | undefined;
+        limit?: number | undefined;
+        sample?: boolean | undefined;
+    }>;
+    /**
+     * 2.20.0. Calls this module made, each with its reason, added to the host's record as its own
+     * (`reported: 'module'`). Sanitize first (`trafficTarget`); the host sanitizes again.
+     */
+    readonly 'traffic.note': z.ZodObject<{
+        calls: z.ZodArray<z.ZodObject<{
+            at: z.ZodNumber;
+            ms: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+            reason: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+            kind: z.ZodString;
+            host: z.ZodString;
+            path: z.ZodString;
+            status: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+            ok: z.ZodDefault<z.ZodNullable<z.ZodBoolean>>;
+            bytesIn: z.ZodOptional<z.ZodNumber>;
+            bytesOut: z.ZodOptional<z.ZodNumber>;
+            cache: z.ZodOptional<z.ZodEnum<["hit", "not-modified", "refused"]>>;
+        }, "strip", z.ZodTypeAny, {
+            path: string;
+            at: number;
+            status: number | null;
+            host: string;
+            kind: string;
+            reason: string | null;
+            ok: boolean | null;
+            ms: number | null;
+            bytesIn?: number | undefined;
+            bytesOut?: number | undefined;
+            cache?: "refused" | "hit" | "not-modified" | undefined;
+        }, {
+            path: string;
+            at: number;
+            host: string;
+            kind: string;
+            status?: number | null | undefined;
+            reason?: string | null | undefined;
+            ok?: boolean | null | undefined;
+            ms?: number | null | undefined;
+            bytesIn?: number | undefined;
+            bytesOut?: number | undefined;
+            cache?: "refused" | "hit" | "not-modified" | undefined;
+        }>, "many">;
+    }, "strip", z.ZodTypeAny, {
+        calls: {
+            path: string;
+            at: number;
+            status: number | null;
+            host: string;
+            kind: string;
+            reason: string | null;
+            ok: boolean | null;
+            ms: number | null;
+            bytesIn?: number | undefined;
+            bytesOut?: number | undefined;
+            cache?: "refused" | "hit" | "not-modified" | undefined;
+        }[];
+    }, {
+        calls: {
+            path: string;
+            at: number;
+            host: string;
+            kind: string;
+            status?: number | null | undefined;
+            reason?: string | null | undefined;
+            ok?: boolean | null | undefined;
+            ms?: number | null | undefined;
+            bytesIn?: number | undefined;
+            bytesOut?: number | undefined;
+            cache?: "refused" | "hit" | "not-modified" | undefined;
+        }[];
     }>;
 };
 /** The params one method takes, as a caller must construct them. */

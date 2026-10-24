@@ -307,4 +307,20 @@ export declare const LIMITS: {
     readonly SERVER_PASS_MS: 10000;
     /** How long a module's server waits for the host to answer one question, in ms (`askHost`, 2.19.0). */
     readonly SERVER_ASK_MS: 5000;
+    /** How many rows of traffic a host keeps, and the most one `traffic.read` returns. */
+    readonly TRAFFIC_KEPT: 5000;
+    /** How many calls one `traffic.note` carries. A module notes more in another. */
+    readonly TRAFFIC_NOTE: 100;
+    /** A call's reason, in characters: a short plain phrase ("release list: Paper"). */
+    readonly TRAFFIC_REASON: 120;
+    /** A call's kind (`GET`, `git fetch`, `gh api`), and a process's name, in characters. */
+    readonly TRAFFIC_KIND: 40;
+    /** Where a call went: a host name and port, in characters. DNS allows 253. */
+    readonly TRAFFIC_HOST: 255;
+    /** A call's sanitized path and query keys, in characters. */
+    readonly TRAFFIC_PATH: 300;
+    /** Who made a call: `kehikko` or a module id, in characters. */
+    readonly TRAFFIC_BY: 64;
+    /** How many open connections one `traffic.read` describes. */
+    readonly TRAFFIC_CONNECTIONS: 500;
 };

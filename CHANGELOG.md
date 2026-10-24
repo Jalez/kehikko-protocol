@@ -7,6 +7,36 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.20.0 — 2026-10-24
+
+Traffic: the record of the calls Kehikot and its modules make and receive on this computer, with
+their reasons. **Additive**; `PROTOCOL` is still 2. A host that does not know the methods answers
+`unknown-method` to a page and refuses a server's question; a module that does not note its calls
+is unchanged.
+
+### Added
+
+- Capabilities `traffic:read` (read the record) and `traffic:report` (note this module's own calls);
+  methods `traffic.read` (`since`, `limit`, `sample`) and `traffic.note` (`calls`, at most
+  `LIMITS.TRAFFIC_NOTE`), with result schemas `trafficReadResult` and `trafficNoteResult`
+  (`TRAFFIC_NOTE_OUTCOMES`).
+- `traffic.ts`: `trafficNoteSchema`, `trafficCallSchema` (`seq`, `by`, `via`, `side`, `reported`),
+  `trafficBudgetSchema`, `trafficConnectionSchema`, `trafficProcessesSchema`; `TRAFFIC_SIDES`,
+  `TRAFFIC_VIA`, `TRAFFIC_REPORTERS`, `TRAFFIC_CACHE`, `TRAFFIC_HOST_BY`.
+- The sanitizer both sides use: `trafficTarget` (an address to `host` and `path`: no user, password,
+  query value or fragment), `trafficPath`, `looksSecret`, `TRAFFIC_REDACTED`; `trafficCommand` (which
+  `git`/`gh`/`glab` runs went over the network, and what of their arguments may be recorded).
+- `/serve`: `trafficNotes({ module })` — `fetch(reason, …)` noted, `note`, `command`, sent in batches
+  through `askHost('traffic.note')`; `TRAFFIC_FLUSH_MS`, `TRAFFIC_PENDING`; `trafficTarget`,
+  `trafficPath` and `trafficCommand` re-exported.
+- `SERVER_METHODS` gains `traffic.read` and `traffic.note`; `serverAskSchema.project` is optional for
+  a question about this computer (`SERVER_PROJECT_METHODS`, `needsProject`), and so is
+  `AskHostOptions.project`.
+- `LUCIDE_MODULE_ICONS`: `activity`.
+- `LIMITS.TRAFFIC_KEPT`, `TRAFFIC_NOTE`, `TRAFFIC_REASON`, `TRAFFIC_KIND`, `TRAFFIC_HOST`,
+  `TRAFFIC_PATH`, `TRAFFIC_BY`, `TRAFFIC_CONNECTIONS`.
+- docs/traffic.md.
+
 ## 2.19.0 — 2026-10-24
 
 A module's server reads the tracker; an epic's parts in one `tracker.get`; an issue's linked

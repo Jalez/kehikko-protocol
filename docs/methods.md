@@ -311,6 +311,8 @@ and a module that declares none gets none of the methods below.
 | `content.changed` | `content:report` |
 | `parts.set` | `parts:set` |
 | `activity.set` | `activity:report` |
+| `traffic.read` | `traffic:read` |
+| `traffic.note` | `traffic:report` |
 
 The host's table is the protocol's `METHODS`, read by its `capabilityOf`
 (`src/host/grants.ts`): there is no second list to keep in step. A host keeps a
@@ -324,6 +326,23 @@ part, and a module author reading `epics:read` reads a subject and a verb,
 which is all it ever really was. (The WORDS did change — `journeys:read` is
 `epics:read` now — but that is the epic rename, which had a reason, and not a
 tidy-up, which does not.)
+
+#### `CAPABILITIES.traffic:read` and `CAPABILITIES.traffic:report`
+
+2.20.0. `traffic:read` is the record of every call Kehikot and its modules made
+and received on this computer, and so a map of what the person does and when:
+which projects are refreshed, which repositories are read, which modules are
+open. A module that shows traffic asks for it, and no other module has a reason
+to. It reads addresses and reasons only — never a body, a header or a query
+value, which the recorder never keeps — but the addresses are still the
+person's, so the sentence says what is read.
+
+`traffic:report` is the other half: a module adding its own calls to that
+record, each with its reason. It writes nothing but rows in the host's memory,
+which only a holder of `traffic:read` reads back. It is a capability rather
+than free because a row a module files is filed under its name; a module that
+asks for it is saying it will tell the truth about its own calls. See
+[traffic](traffic.md).
 
 #### `CAPABILITIES.view:navigate`
 

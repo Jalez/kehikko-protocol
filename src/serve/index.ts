@@ -145,3 +145,14 @@ export {
   type ServerAnswers,
 } from './ask.js'
 export { SERVER_ASK_PATH, SERVER_PASS_PATH, SERVER_METHODS, type ServerMethod } from '../server-ask.js'
+
+/* A module's server noting its own calls, with their reasons, in the host's record of traffic (2.20.0). */
+export {
+  trafficNotes,
+  TRAFFIC_FLUSH_MS,
+  TRAFFIC_PENDING,
+  type TrafficNotes,
+  type TrafficNotesOptions,
+  type TrafficCallSaid,
+} from './traffic.js'
+export { trafficTarget, trafficPath, trafficCommand } from '../traffic.js'
