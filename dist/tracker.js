@@ -37,6 +37,26 @@ export const REVIEW_STATES = ['approved', 'changes-requested', 'required'];
  */
 export const LINK_RELATIONS = ['closes', 'closed-by'];
 /**
+ * How a change is tied to an issue it is part of without closing it (2.19.0), from the side of the row
+ * carrying it. `contributes-to`: this change says it is part of that issue's work ("Part of #12"), as the
+ * earlier changes of work delivered in several do while only the last one closes it. `contributed-by`: the
+ * reverse, on the issue. Like a link, only the change's own word: on GitHub, a cross-reference to the issue
+ * made from the pull request by its author. Carried in a row's `contributions`, beside `links` and not in
+ * it, so that a module built against an older copy of this package strips them instead of refusing the row.
+ */
+export const CONTRIBUTION_RELATIONS = ['contributes-to', 'contributed-by'];
+/** What the row at the other end of a relation carries: `closes` and `closed-by`, `contributes-to` and `contributed-by`. (2.19.0) */
+export const RELATION_MIRRORS = {
+    closes: 'closed-by',
+    'closed-by': 'closes',
+    'contributes-to': 'contributed-by',
+    'contributed-by': 'contributes-to',
+};
+/** A relation's mirror: `closes` for `closed-by`, `contributed-by` for `contributes-to`, and back. (2.19.0) */
+export function mirrorRelation(relation) {
+    return RELATION_MIRRORS[relation];
+}
+/**
  * What kind of GitLab work item an issue is, when it is not a plain issue (2.11.0): GitLab's
  * `Issue.type` (GraphQL enum `IssueType`) in lower case, `ISSUE` left out. `task` is a task (a
  * child of an issue), `incident` an incident, `test_case` a test case, `requirement` a requirement,
@@ -51,6 +71,12 @@ export const trackerLinkSchema = z.object({
     /** The other ref, spelled the way `spellTrackerRef` spells it. */
     ref,
     relation: z.enum(LINK_RELATIONS),
+});
+/** One change an issue is part-delivered by, or one issue a change is part of. (2.19.0) */
+export const trackerContributionSchema = z.object({
+    /** The other ref, spelled the way `spellTrackerRef` spells it. */
+    ref,
+    relation: z.enum(CONTRIBUTION_RELATIONS),
 });
 /** One file a change touched. Counts are absent where the tracker did not say. */
 export const trackerFileSchema = z.object({
@@ -224,6 +250,14 @@ export const trackerRowSchema = z.object({
     closedAt: instant.nullable().optional(),
     mergedAt: instant.nullable().optional(),
     links: z.array(trackerLinkSchema).max(LIMITS.TRACKER_LINKS).default([]),
+    /**
+     * The refs tied to this one without closing it (2.19.0): on an issue, `contributed-by` each change that
+     * says it is part of the issue's work; on a change, `contributes-to` each issue it says so of, mirrored
+     * by the host from the issues its reading holds. A ref already in `links` is not here. Absent when the
+     * host read none (an older host, or a tracker it does not read them from); empty when it read and there
+     * are none.
+     */
+    contributions: z.array(trackerContributionSchema).max(LIMITS.TRACKER_LINKS).optional(),
     /** On a change: its head pipeline. Absent on issues and where none ran or none was read. */
     pipeline: z.enum(PIPELINE_STATES).optional(),
     /** On a change: where its review stands. */

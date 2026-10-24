@@ -180,6 +180,45 @@ there.
 const isTask = (row) => row.workItem === 'task'
 ```
 
+### Changes that are part of an issue (2.19.0)
+
+Work too large for one change is delivered in several, and only the last one
+says it closes the issue; the earlier ones say "Part of #12". A row carries
+those beside its links:
+
+```ts
+contributions?: Array<{ ref: string; relation: 'contributes-to' | 'contributed-by' }>
+```
+
+On an issue, `contributed-by` names each change that says it is part of the
+issue's work without closing it. On a change, `contributes-to` names each issue
+it says so of. The two are a mirror pair, as `closes` and `closed-by` are
+(`CONTRIBUTION_RELATIONS`, `RELATION_MIRRORS`, `mirrorRelation`). A ref that
+closes the row is in `links` and never here too.
+
+Only the change's own word counts, as for a link. On GitHub it is a
+cross-reference on the issue's timeline whose source is a pull request and
+whose maker is that pull request's author, which is what writing "Part of #12"
+in the pull request leaves. A mention by somebody else, or from another issue,
+is not one. The host reads them from the issue's side, so a change's
+`contributes-to` is the mirror of the issues the host's reading holds.
+
+The field is absent where the host read none: an older host, or a tracker it
+does not read them from. Empty means the host read and found none. A module
+asking which changes deliver an issue reads both:
+
+```ts
+const delivering = (issue) => [
+  ...issue.links.filter((l) => l.relation === 'closed-by'),
+  ...(issue.contributions ?? []).filter((c) => c.relation === 'contributed-by'),
+].map((one) => one.ref)
+```
+
+They are a field of their own, and not two more `LINK_RELATIONS`, because a
+module built against an older copy of this package parses `links` with the
+two relations it knows and would refuse the whole row, and so the whole
+reading, over a third. An unknown field it strips.
+
 `live.get` stays, answered by a host as a view over the same reading, until
 the modules that ask it have moved.
 
@@ -257,6 +296,19 @@ Direction is the whole point. GitLab attaches a merge request to an issue for
 any cross-reference either way, so an issue that cites `!1772` as prior art
 would come back with it attached and read as work in flight. A link here is
 only the change's own claim.
+
+#### `CONTRIBUTION_RELATIONS`
+
+How a change is tied to an issue it is part of without closing it (2.19.0).
+
+`contributes-to` — on the change: it says it is part of that issue's work.
+`contributed-by` — the reverse, on the issue. Carried in `contributions`, not
+`links`; see "Changes that are part of an issue" above.
+
+#### `RELATION_MIRRORS`
+
+What the row at the other end of a relation carries (2.19.0): `closes` ↔
+`closed-by`, `contributes-to` ↔ `contributed-by`. `mirrorRelation(r)` reads it.
 
 #### `trackerRowSchema`
 

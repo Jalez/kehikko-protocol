@@ -7,6 +7,25 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.19.0 — 2026-10-24
+
+Changes that are part of an issue without closing it. **Additive**; `PROTOCOL` is still 2. A row
+without them parses as before, and a module built against 2.18.1 or earlier strips them.
+
+### Added
+
+- `trackerRowSchema.contributions?: TrackerContribution[]` (`trackerContributionSchema`: `ref`,
+  `relation`), at most `LIMITS.TRACKER_LINKS`. On an issue, `contributed-by` each change that says
+  it is part of the issue's work without closing it ("Part of #12"); on a change, `contributes-to`
+  each issue it says so of, mirrored by the host from the issues its reading holds. A ref in `links`
+  is not here too. Absent where the host read none; empty where it read and there are none. Only the
+  change's own word: on GitHub, a cross-reference made from the pull request by its author.
+- `CONTRIBUTION_RELATIONS` (`contributes-to`, `contributed-by`) and `ContributionRelation`. A field of
+  its own rather than two more `LINK_RELATIONS`, which an older module's strict enum would refuse
+  with the whole reading.
+- `RELATION_MIRRORS` and `mirrorRelation(relation)`: each relation's counterpart on the row at the
+  other end, `closes` ↔ `closed-by` and `contributes-to` ↔ `contributed-by`.
+
 ## 2.18.1 — 2026-10-23
 
 `run` waits for an asynchronous `onStop`. **Additive**; `PROTOCOL` is still 2.
