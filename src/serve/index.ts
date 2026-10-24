@@ -131,3 +131,17 @@ export {
   type SettingsRead,
 } from './settings.js'
 export { SETTINGS_PATH, SETTINGS_PASS_PATH } from '../settings.js'
+
+/* A module's server asking the host what its page would be told: the tracker reading, for its MCP door (2.19.0). */
+export {
+  askHost,
+  hostAskUrls,
+  mintServerPass,
+  serverPassReply,
+  spendServerPass,
+  NO_HOST_TO_ASK,
+  type AskedHost,
+  type AskHostOptions,
+  type ServerAnswers,
+} from './ask.js'
+export { SERVER_ASK_PATH, SERVER_PASS_PATH, SERVER_METHODS, type ServerMethod } from '../server-ask.js'

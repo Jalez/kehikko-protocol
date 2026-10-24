@@ -5,6 +5,8 @@ import { ELSEWHERE_REFUSAL, admits, asker } from './gate.js';
 import { frameAncestors, frameOrigins } from './origins.js';
 import { fillPage, pageDocument } from './page.js';
 import { ticketOf } from './ticket.js';
+import { serverPassReply } from './ask.js';
+import { SERVER_PASS_PATH } from '../server-ask.js';
 export const PAGE_PATHS = ['/app', '/app/', '/'];
 const oursByDefault = (path) => path === '/healthz' || path === '/mcp' || path.startsWith('/api/');
 /** What both forms of the doors work out once, from the options. */
@@ -35,7 +37,7 @@ function standing(options) {
          */
         refusal: (method, path, headers, host) => {
             const document = pages.has(path);
-            if (!document && path !== WELL_KNOWN && !ours(path))
+            if (!document && path !== WELL_KNOWN && path !== SERVER_PASS_PATH && !ours(path))
                 return null;
             if (open && path === '/healthz' && (method === 'GET' || method === 'HEAD'))
                 return null;
@@ -118,6 +120,10 @@ export function doorsHandler(options, transform) {
             return send(refused);
         if (path === WELL_KNOWN)
             return send({ status: 200, body: manifest });
+        /* The host asking whether this process minted a pass for a question its server asked (2.19.0). */
+        const passed = serverPassReply(method, path, url.searchParams);
+        if (passed)
+            return send(passed);
         if (pages.has(path)) {
             const built = document();
             void (transform ? transform(built, request.url ?? '/app', request.originalUrl) : Promise.resolve(built))
@@ -209,6 +215,10 @@ export function doorsFetch(options, transform) {
             return send(refused);
         if (path === WELL_KNOWN)
             return send({ status: 200, body: manifest });
+        /* The host asking whether this process minted a pass for a question its server asked (2.19.0). */
+        const passed = serverPassReply(method, path, url.searchParams);
+        if (passed)
+            return send(passed);
         if (pages.has(path)) {
             const built = document();
             return new Response(transform ? await transform(built, `${path}${url.search}`) : built, { status: 200, headers: pageHeaders() });

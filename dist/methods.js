@@ -327,12 +327,19 @@ export const methodParams = {
      * What the trackers last said, from the host's shared reading; answered at once with
      * `trackerReadingResult` (see `tracker.ts`), where a ref not read yet comes back in `missing`.
      * `detail: 'detail'` costs a call per ref at the tracker, so it is only accepted with `refs`.
+     * `parts: true` (2.19.0), with `epic`: the refs the epic's parts hold as well as the refs the epic
+     * names — the list `context.parts` carries — in one answer. A host before 2.19.0 strips it and
+     * answers the epic's own refs, so a module that needs the parts' refs from an older host still asks
+     * for the ones the answer did not cover.
      */
     'tracker.get': z
-        .object({ ...trackerScope, detail: z.enum(TRACKER_DETAILS).default('summary') })
+        .object({ ...trackerScope, detail: z.enum(TRACKER_DETAILS).default('summary'), parts: z.boolean().optional() })
         .refine(oneScope, { message: ONE_SCOPE })
         .refine((p) => p.detail === 'summary' || p.refs !== undefined, {
         message: 'detail is read a ref at a time, so ask for it by refs',
+    })
+        .refine((p) => p.parts !== true || p.epic !== undefined, {
+        message: "parts are an epic's, so ask for them with epic",
     }),
     /**
      * Read the trackers again, for these refs or this epic or the whole project, and answer when the read lands.

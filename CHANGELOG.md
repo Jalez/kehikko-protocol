@@ -7,6 +7,31 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.19.0 — 2026-10-24
+
+A module's server reads the tracker; an epic's parts in one `tracker.get`; an issue's linked
+branches. **Additive**; `PROTOCOL` is still 2. A host that does not know them refuses a server's
+question, strips `parts` and sends no `branches`.
+
+### Added
+
+- `askHost(method, params, { module, project, env?, timeoutMs?, fetch? })` in `/serve`: a module's
+  server asks the host one of `SERVER_METHODS` (`tracker.get`, `tracker.columns`) and gets what its
+  page would get, parsed with the method's result schema (`AskedHost`, `ServerAnswers`). Never throws;
+  `NO_HOST_TO_ASK` when no host answered. `hostAskUrls`.
+- The route: `SERVER_ASK_PATH` (`/host/server-ask`), `serverAskSchema` (`module`, `pass`, `project`,
+  `method`, `params`), `serverAskResult` (data, or `reason`, `error` and `refused?` from
+  `SERVER_ASK_REFUSALS`: `module`, `pass`, `grant`, `project`).
+- The pass: `SERVER_PASS`, `SERVER_PASS_PATH` (`/api/kehikot/server-pass`), `serverPassResult`;
+  `mintServerPass`, `spendServerPass`, `serverPassReply` in `/serve`. `doorsFetch` and
+  `doorsHandler` answer `SERVER_PASS_PATH` for every module, before `answer` and whatever `ours`
+  says, to a program on this machine only.
+- `tracker.get`: `parts?: boolean`, with `epic` only — the refs the epic's parts hold as well.
+- `trackerRowSchema.branches?` (`trackerBranchSchema`, `TrackerBranch`: `name`, `url?`), at most
+  `LIMITS.TRACKER_BRANCHES`.
+- `LIMITS.TRACKER_BRANCHES`, `SERVER_PASS_MS`, `SERVER_ASK_MS`.
+- docs/server-ask.md.
+
 ## 2.18.1 — 2026-10-23
 
 `run` waits for an asynchronous `onStop`. **Additive**; `PROTOCOL` is still 2.

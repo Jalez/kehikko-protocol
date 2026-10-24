@@ -283,6 +283,22 @@ export declare const trackerPersonSchema: z.ZodEffects<z.ZodObject<{
     avatarUrl?: string | undefined;
 }>;
 export type TrackerPerson = z.infer<typeof trackerPersonSchema>;
+/**
+ * A branch linked to an issue (2.19.0): GitHub's Development branches (`linkedBranches`), GitLab's
+ * related branches (named `<iid>-…`, as GitLab's "Create branch" names them). `url` is the branch on
+ * its tracker, `https:`, when the host could spell one.
+ */
+export declare const trackerBranchSchema: z.ZodObject<{
+    name: z.ZodString;
+    url: z.ZodOptional<z.ZodString>;
+}, "strip", z.ZodTypeAny, {
+    name: string;
+    url?: string | undefined;
+}, {
+    name: string;
+    url?: string | undefined;
+}>;
+export type TrackerBranch = z.infer<typeof trackerBranchSchema>;
 /** One ref, as the host last read it. Assignable to `Sighting` from `/facets`. */
 export declare const trackerRowSchema: z.ZodObject<{
     /**
@@ -500,6 +516,21 @@ export declare const trackerRowSchema: z.ZodObject<{
      * that tells tasks from issues reads `workItem === 'task'`.
      */
     workItem: z.ZodOptional<z.ZodEnum<["task", "incident", "test_case", "requirement", "objective", "key_result", "epic", "ticket"]>>;
+    /**
+     * On an issue: the branches linked to it (2.19.0) — GitHub's Development branches, GitLab's
+     * related branches. Absent when the host did not read them (an older host, a tracker that would
+     * not say); empty when it read them and there are none. At most `LIMITS.TRACKER_BRANCHES`.
+     */
+    branches: z.ZodOptional<z.ZodArray<z.ZodObject<{
+        name: z.ZodString;
+        url: z.ZodOptional<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        name: string;
+        url?: string | undefined;
+    }, {
+        name: string;
+        url?: string | undefined;
+    }>, "many">>;
     /** When the host read this row. A scoped refresh moves some rows and not others. */
     readAt: z.ZodString;
     detail: z.ZodOptional<z.ZodObject<{
@@ -633,6 +664,10 @@ export declare const trackerRowSchema: z.ZodObject<{
         avatarUrl?: string | undefined;
     }> | undefined;
     workItem?: "epic" | "task" | "incident" | "test_case" | "requirement" | "objective" | "key_result" | "ticket" | undefined;
+    branches?: {
+        name: string;
+        url?: string | undefined;
+    }[] | undefined;
 }, {
     number: number;
     state: "open" | "closed" | "merged";
@@ -713,6 +748,10 @@ export declare const trackerRowSchema: z.ZodObject<{
         avatarUrl?: string | undefined;
     }> | undefined;
     workItem?: "epic" | "task" | "incident" | "test_case" | "requirement" | "objective" | "key_result" | "ticket" | undefined;
+    branches?: {
+        name: string;
+        url?: string | undefined;
+    }[] | undefined;
 }>;
 export type TrackerRow = z.infer<typeof trackerRowSchema>;
 /** One place the host reads (per source, not per tracker), and how that went last time. */
@@ -1039,6 +1078,21 @@ export declare const trackerReadingResult: z.ZodObject<{
          * that tells tasks from issues reads `workItem === 'task'`.
          */
         workItem: z.ZodOptional<z.ZodEnum<["task", "incident", "test_case", "requirement", "objective", "key_result", "epic", "ticket"]>>;
+        /**
+         * On an issue: the branches linked to it (2.19.0) — GitHub's Development branches, GitLab's
+         * related branches. Absent when the host did not read them (an older host, a tracker that would
+         * not say); empty when it read them and there are none. At most `LIMITS.TRACKER_BRANCHES`.
+         */
+        branches: z.ZodOptional<z.ZodArray<z.ZodObject<{
+            name: z.ZodString;
+            url: z.ZodOptional<z.ZodString>;
+        }, "strip", z.ZodTypeAny, {
+            name: string;
+            url?: string | undefined;
+        }, {
+            name: string;
+            url?: string | undefined;
+        }>, "many">>;
         /** When the host read this row. A scoped refresh moves some rows and not others. */
         readAt: z.ZodString;
         detail: z.ZodOptional<z.ZodObject<{
@@ -1172,6 +1226,10 @@ export declare const trackerReadingResult: z.ZodObject<{
             avatarUrl?: string | undefined;
         }> | undefined;
         workItem?: "epic" | "task" | "incident" | "test_case" | "requirement" | "objective" | "key_result" | "ticket" | undefined;
+        branches?: {
+            name: string;
+            url?: string | undefined;
+        }[] | undefined;
     }, {
         number: number;
         state: "open" | "closed" | "merged";
@@ -1252,6 +1310,10 @@ export declare const trackerReadingResult: z.ZodObject<{
             avatarUrl?: string | undefined;
         }> | undefined;
         workItem?: "epic" | "task" | "incident" | "test_case" | "requirement" | "objective" | "key_result" | "ticket" | undefined;
+        branches?: {
+            name: string;
+            url?: string | undefined;
+        }[] | undefined;
     }>, "many">>;
     missing: z.ZodDefault<z.ZodArray<z.ZodObject<{
         ref: z.ZodString;
@@ -1356,6 +1418,10 @@ export declare const trackerReadingResult: z.ZodObject<{
             avatarUrl?: string | undefined;
         }> | undefined;
         workItem?: "epic" | "task" | "incident" | "test_case" | "requirement" | "objective" | "key_result" | "ticket" | undefined;
+        branches?: {
+            name: string;
+            url?: string | undefined;
+        }[] | undefined;
     }[];
     missing: {
         ref: string;
@@ -1454,6 +1520,10 @@ export declare const trackerReadingResult: z.ZodObject<{
             avatarUrl?: string | undefined;
         }> | undefined;
         workItem?: "epic" | "task" | "incident" | "test_case" | "requirement" | "objective" | "key_result" | "ticket" | undefined;
+        branches?: {
+            name: string;
+            url?: string | undefined;
+        }[] | undefined;
     }[] | undefined;
     missing?: {
         ref: string;

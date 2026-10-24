@@ -5,6 +5,8 @@ import { ELSEWHERE_REFUSAL, admits, asker, type HeaderSource } from './gate.js'
 import { frameAncestors, frameOrigins } from './origins.js'
 import { fillPage, pageDocument, type PageOptions } from './page.js'
 import { ticketOf } from './ticket.js'
+import { serverPassReply } from './ask.js'
+import { SERVER_PASS_PATH } from '../server-ask.js'
 
 /**
  * Every door a module answers on, served by the process that serves its page: a module is ONE
@@ -148,7 +150,7 @@ function standing(options: DoorsOptions) {
      */
     refusal: (method: string, path: string, headers: HeaderSource, host: string | null): Reply | null => {
       const document = pages.has(path)
-      if (!document && path !== WELL_KNOWN && !ours(path)) return null
+      if (!document && path !== WELL_KNOWN && path !== SERVER_PASS_PATH && !ours(path)) return null
       if (open && path === '/healthz' && (method === 'GET' || method === 'HEAD')) return null
       return admits(asker(headers, host), document) ? null : { status: 403, body: { ok: false, error: ELSEWHERE_REFUSAL } }
     },
@@ -232,6 +234,10 @@ export function doorsHandler(
     if (refused) return send(refused)
 
     if (path === WELL_KNOWN) return send({ status: 200, body: manifest })
+
+    /* The host asking whether this process minted a pass for a question its server asked (2.19.0). */
+    const passed = serverPassReply(method, path, url.searchParams)
+    if (passed) return send(passed)
 
     if (pages.has(path)) {
       const built = document()
@@ -330,6 +336,10 @@ export function doorsFetch(options: DoorsOptions, transform?: (html: string, url
     if (refused) return send(refused)
 
     if (path === WELL_KNOWN) return send({ status: 200, body: manifest })
+
+    /* The host asking whether this process minted a pass for a question its server asked (2.19.0). */
+    const passed = serverPassReply(method, path, url.searchParams)
+    if (passed) return send(passed)
 
     if (pages.has(path)) {
       const built = document()

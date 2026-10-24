@@ -206,6 +206,8 @@ export declare const LIMITS: {
     readonly REVIEWERS: 32;
     /** A git branch name a change targets or comes from. Git allows longer; no tracker shows one. (2.8.0) */
     readonly BRANCH: 255;
+    /** How many branches one issue's row lists as linked to it (`branches`, 2.19.0). */
+    readonly TRACKER_BRANCHES: 10;
     /**
      * How many people one row's `people` map describes: its reviewers, assignees, author and the
      * latest actor, with room to spare. (2.10.0)
@@ -298,4 +300,11 @@ export declare const LIMITS: {
     readonly SETTING_LIST: 64;
     /** How long a pass the host minted for a person's change is good for, in ms (`SETTINGS_PASS_PATH`). */
     readonly SETTINGS_PASS_MS: 30000;
+    /**
+     * How long a pass a module's server minted for one question to the host is good for, in ms
+     * (`SERVER_PASS_PATH`, 2.19.0). The host asks about it at once; this is room for a slow machine.
+     */
+    readonly SERVER_PASS_MS: 10000;
+    /** How long a module's server waits for the host to answer one question, in ms (`askHost`, 2.19.0). */
+    readonly SERVER_ASK_MS: 5000;
 };

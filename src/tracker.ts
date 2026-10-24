@@ -225,6 +225,17 @@ export const trackerPersonSchema = z
   })
 export type TrackerPerson = z.infer<typeof trackerPersonSchema>
 
+/**
+ * A branch linked to an issue (2.19.0): GitHub's Development branches (`linkedBranches`), GitLab's
+ * related branches (named `<iid>-…`, as GitLab's "Create branch" names them). `url` is the branch on
+ * its tracker, `https:`, when the host could spell one.
+ */
+export const trackerBranchSchema = z.object({
+  name: branch,
+  url: z.string().max(LIMITS.URL).optional(),
+})
+export type TrackerBranch = z.infer<typeof trackerBranchSchema>
+
 /** One ref, as the host last read it. Assignable to `Sighting` from `/facets`. */
 export const trackerRowSchema = z.object({
   /**
@@ -334,6 +345,12 @@ export const trackerRowSchema = z.object({
    * that tells tasks from issues reads `workItem === 'task'`.
    */
   workItem: z.enum(WORK_ITEM_TYPES).optional(),
+  /**
+   * On an issue: the branches linked to it (2.19.0) — GitHub's Development branches, GitLab's
+   * related branches. Absent when the host did not read them (an older host, a tracker that would
+   * not say); empty when it read them and there are none. At most `LIMITS.TRACKER_BRANCHES`.
+   */
+  branches: z.array(trackerBranchSchema).max(LIMITS.TRACKER_BRANCHES).optional(),
   /** When the host read this row. A scoped refresh moves some rows and not others. */
   readAt: instant,
   detail: trackerDetailSchema.optional(),

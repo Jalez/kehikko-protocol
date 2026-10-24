@@ -31,3 +31,6 @@ export { commitOf, establishBuild } from './build.js';
 /* A module's settings door, and asking the host whether a person's pass is real (2.15.0). */
 export { hostVouches, hostVouchUrls, settingsDoor, } from './settings.js';
 export { SETTINGS_PATH, SETTINGS_PASS_PATH } from '../settings.js';
+/* A module's server asking the host what its page would be told: the tracker reading, for its MCP door (2.19.0). */
+export { askHost, hostAskUrls, mintServerPass, serverPassReply, spendServerPass, NO_HOST_TO_ASK, } from './ask.js';
+export { SERVER_ASK_PATH, SERVER_PASS_PATH, SERVER_METHODS } from '../server-ask.js';
