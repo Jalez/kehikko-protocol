@@ -30,8 +30,17 @@ export const SERVER_PASS_PATH = '/api/kehikot/server-pass'
  * The methods a module's server may ask: reads of the host's material that need no frame. A method
  * that writes into a canvas, or waits on a person, is its page's to ask. Grows by an entry here.
  */
-export const SERVER_METHODS = ['tracker.get', 'tracker.columns'] as const
+export const SERVER_METHODS = ['tracker.get', 'tracker.columns', 'traffic.read', 'traffic.note'] as const
 export type ServerMethod = (typeof SERVER_METHODS)[number]
+
+/**
+ * The server methods that are about one project, and so name it. The traffic methods (2.20.0) are
+ * about this computer, and a question about them names no project.
+ */
+export const SERVER_PROJECT_METHODS: readonly ServerMethod[] = ['tracker.get', 'tracker.columns']
+
+/** Whether a question with this method has to name its project. */
+export const needsProject = (method: string): boolean => (SERVER_PROJECT_METHODS as readonly string[]).includes(method)
 
 /** A pass a module's server mints for one question: 32 to 64 URL-safe characters. */
 export const SERVER_PASS = /^[A-Za-z0-9_-]{32,64}$/
@@ -48,13 +57,19 @@ const projectFolder = z
  * project the host holds, or it is refused), and `method` and `params` the call as a page would make
  * it — held to `methodParams[method]`.
  */
-export const serverAskSchema = z.object({
-  module: z.string().regex(MODULE_ID),
-  pass: z.string().regex(SERVER_PASS),
-  project: projectFolder,
-  method: z.enum(SERVER_METHODS),
-  params: z.record(z.string(), z.unknown()).default({}),
-})
+export const serverAskSchema = z
+  .object({
+    module: z.string().regex(MODULE_ID),
+    pass: z.string().regex(SERVER_PASS),
+    /** Required for `SERVER_PROJECT_METHODS`; absent for a question about this computer (2.20.0). */
+    project: projectFolder.optional(),
+    method: z.enum(SERVER_METHODS),
+    params: z.record(z.string(), z.unknown()).default({}),
+  })
+  .refine((ask) => ask.project !== undefined || !needsProject(ask.method), {
+    message: 'this question is about a project, so it names the project',
+    path: ['project'],
+  })
 export type ServerAsk = z.infer<typeof serverAskSchema>
 
 /** What the module answers about a pass: whether it minted it (and has now spent it). */

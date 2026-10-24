@@ -27,3 +27,5 @@ export { hostVouches, hostVouchUrls, settingsDoor, type HostVouchesOptions, type
 export { SETTINGS_PATH, SETTINGS_PASS_PATH } from '../settings.js';
 export { askHost, hostAskUrls, mintServerPass, serverPassReply, spendServerPass, NO_HOST_TO_ASK, type AskedHost, type AskHostOptions, type ServerAnswers, } from './ask.js';
 export { SERVER_ASK_PATH, SERVER_PASS_PATH, SERVER_METHODS, type ServerMethod } from '../server-ask.js';
+export { trafficNotes, TRAFFIC_FLUSH_MS, TRAFFIC_PENDING, type TrafficNotes, type TrafficNotesOptions, type TrafficCallSaid, } from './traffic.js';
+export { trafficTarget, trafficPath, trafficCommand } from '../traffic.js';

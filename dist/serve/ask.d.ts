@@ -1,5 +1,6 @@
 import { type ServerAskRefusal, type ServerMethod } from '../server-ask.js';
 import type { TrackerColumns, TrackerReading } from '../tracker.js';
+import type { TrafficNoteResult, TrafficReadResult } from '../traffic.js';
 import type { Reply } from './doors.js';
 /** A new pass for one question, good once for `LIMITS.SERVER_PASS_MS`. `askHost` mints its own. */
 export declare function mintServerPass(now?: number): string;
@@ -16,6 +17,8 @@ export declare function hostAskUrls(env?: Record<string, string | undefined>): s
 export interface ServerAnswers {
     'tracker.get': TrackerReading;
     'tracker.columns': TrackerColumns;
+    'traffic.read': TrafficReadResult;
+    'traffic.note': TrafficNoteResult;
 }
 /**
  * What came of one question. `ok: true`: the host's answer, held to the method's result schema.
@@ -35,8 +38,11 @@ export type AskedHost<M extends ServerMethod> = {
 export interface AskHostOptions {
     /** This module's id: who asks. Its manifest is what the host holds the call to. */
     module: string;
-    /** The project the question is about: its absolute folder (`resolveDoorProject`, `resolveDoorPlace`). */
-    project: string;
+    /**
+     * The project the question is about: its absolute folder (`resolveDoorProject`, `resolveDoorPlace`).
+     * Left out for a question about this computer rather than a project (`traffic.*`, 2.20.0).
+     */
+    project?: string;
     env?: Record<string, string | undefined>;
     /** How long each host gets, in ms. Default `LIMITS.SERVER_ASK_MS`. */
     timeoutMs?: number;

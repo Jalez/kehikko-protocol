@@ -18,6 +18,8 @@ export type ModuleIconSet = (typeof MODULE_ICON_SETS)[number]
 
 /** The Lucide icons a module may count on a host drawing, by Lucide's name. */
 export const LUCIDE_MODULE_ICONS = [
+  /** 2.20.0. */
+  'activity',
   'bell',
   'blocks',
   'book-open',

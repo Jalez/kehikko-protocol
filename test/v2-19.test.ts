@@ -38,7 +38,7 @@ const ROW = {
 
 describe('the version', () => {
   test('is 2.19.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.19.0')
+    expect(PACKAGE_VERSION).toBe('2.20.0')
     expect(PROTOCOL).toBe(2)
   })
 })
@@ -94,7 +94,9 @@ describe('the shapes of a server question', () => {
   })
 
   test('only reads are a server’s to ask', () => {
-    expect([...SERVER_METHODS]).toEqual(['tracker.get', 'tracker.columns'])
+    /* 2.20.0 added the traffic methods, which are about this computer (see v2-20). */
+    expect([...SERVER_METHODS].slice(0, 2)).toEqual(['tracker.get', 'tracker.columns'])
+    expect(SERVER_METHODS).not.toContain('parts.set' as never)
   })
 
   test('an answer is data or a refusal with a reason', () => {

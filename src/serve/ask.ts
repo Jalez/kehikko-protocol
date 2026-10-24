@@ -11,6 +11,7 @@ import {
   type ServerMethod,
 } from '../server-ask.js'
 import type { TrackerColumns, TrackerReading } from '../tracker.js'
+import type { TrafficNoteResult, TrafficReadResult } from '../traffic.js'
 import type { Reply } from './doors.js'
 import { frameOrigins } from './origins.js'
 
@@ -76,6 +77,8 @@ export function hostAskUrls(env: Record<string, string | undefined> = process.en
 export interface ServerAnswers {
   'tracker.get': TrackerReading
   'tracker.columns': TrackerColumns
+  'traffic.read': TrafficReadResult
+  'traffic.note': TrafficNoteResult
 }
 
 /**
@@ -91,8 +94,11 @@ export type AskedHost<M extends ServerMethod> =
 export interface AskHostOptions {
   /** This module's id: who asks. Its manifest is what the host holds the call to. */
   module: string
-  /** The project the question is about: its absolute folder (`resolveDoorProject`, `resolveDoorPlace`). */
-  project: string
+  /**
+   * The project the question is about: its absolute folder (`resolveDoorProject`, `resolveDoorPlace`).
+   * Left out for a question about this computer rather than a project (`traffic.*`, 2.20.0).
+   */
+  project?: string
   env?: Record<string, string | undefined>
   /** How long each host gets, in ms. Default `LIMITS.SERVER_ASK_MS`. */
   timeoutMs?: number
@@ -124,7 +130,7 @@ export async function askHost<M extends ServerMethod>(method: M, params: Record<
       const response = await asked(url, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ module: options.module, pass, project: options.project, method, params }),
+        body: JSON.stringify({ module: options.module, pass, ...(options.project !== undefined ? { project: options.project } : {}), method, params }),
         signal: control.signal,
       })
       const read = serverAskResult.safeParse(await response.json())

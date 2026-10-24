@@ -16,6 +16,8 @@
 export const MODULE_ICON_SETS = ['lucide', 'brand'];
 /** The Lucide icons a module may count on a host drawing, by Lucide's name. */
 export const LUCIDE_MODULE_ICONS = [
+    /** 2.20.0. */
+    'activity',
     'bell',
     'blocks',
     'book-open',

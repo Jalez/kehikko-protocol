@@ -83,7 +83,7 @@ export async function askHost(method, params, options) {
             const response = await asked(url, {
                 method: 'POST',
                 headers: { 'content-type': 'application/json' },
-                body: JSON.stringify({ module: options.module, pass, project: options.project, method, params }),
+                body: JSON.stringify({ module: options.module, pass, ...(options.project !== undefined ? { project: options.project } : {}), method, params }),
                 signal: control.signal,
             });
             const read = serverAskResult.safeParse(await response.json());

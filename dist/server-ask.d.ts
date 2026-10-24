@@ -22,8 +22,15 @@ export declare const SERVER_PASS_PATH = "/api/kehikot/server-pass";
  * The methods a module's server may ask: reads of the host's material that need no frame. A method
  * that writes into a canvas, or waits on a person, is its page's to ask. Grows by an entry here.
  */
-export declare const SERVER_METHODS: readonly ["tracker.get", "tracker.columns"];
+export declare const SERVER_METHODS: readonly ["tracker.get", "tracker.columns", "traffic.read", "traffic.note"];
 export type ServerMethod = (typeof SERVER_METHODS)[number];
+/**
+ * The server methods that are about one project, and so name it. The traffic methods (2.20.0) are
+ * about this computer, and a question about them names no project.
+ */
+export declare const SERVER_PROJECT_METHODS: readonly ServerMethod[];
+/** Whether a question with this method has to name its project. */
+export declare const needsProject: (method: string) => boolean;
 /** A pass a module's server mints for one question: 32 to 64 URL-safe characters. */
 export declare const SERVER_PASS: RegExp;
 /**
@@ -31,24 +38,37 @@ export declare const SERVER_PASS: RegExp;
  * project the host holds, or it is refused), and `method` and `params` the call as a page would make
  * it — held to `methodParams[method]`.
  */
-export declare const serverAskSchema: z.ZodObject<{
+export declare const serverAskSchema: z.ZodEffects<z.ZodObject<{
     module: z.ZodString;
     pass: z.ZodString;
-    project: z.ZodEffects<z.ZodString, string, string>;
-    method: z.ZodEnum<["tracker.get", "tracker.columns"]>;
+    /** Required for `SERVER_PROJECT_METHODS`; absent for a question about this computer (2.20.0). */
+    project: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
+    method: z.ZodEnum<["tracker.get", "tracker.columns", "traffic.read", "traffic.note"]>;
     params: z.ZodDefault<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
 }, "strip", z.ZodTypeAny, {
     params: Record<string, unknown>;
-    project: string;
     module: string;
-    method: "tracker.get" | "tracker.columns";
+    method: "tracker.get" | "tracker.columns" | "traffic.read" | "traffic.note";
     pass: string;
+    project?: string | undefined;
 }, {
-    project: string;
     module: string;
-    method: "tracker.get" | "tracker.columns";
+    method: "tracker.get" | "tracker.columns" | "traffic.read" | "traffic.note";
     pass: string;
     params?: Record<string, unknown> | undefined;
+    project?: string | undefined;
+}>, {
+    params: Record<string, unknown>;
+    module: string;
+    method: "tracker.get" | "tracker.columns" | "traffic.read" | "traffic.note";
+    pass: string;
+    project?: string | undefined;
+}, {
+    module: string;
+    method: "tracker.get" | "tracker.columns" | "traffic.read" | "traffic.note";
+    pass: string;
+    params?: Record<string, unknown> | undefined;
+    project?: string | undefined;
 }>;
 export type ServerAsk = z.infer<typeof serverAskSchema>;
 /** What the module answers about a pass: whether it minted it (and has now spent it). */

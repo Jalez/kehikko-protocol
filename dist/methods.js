@@ -10,6 +10,7 @@ import { activityItemsSchema } from './activity.js';
 import { ADDRESS_INTENTS, DISPOSITIONS, LOCATION_INTENTS, codeLocationSchema, filterChoiceSchema, passageSchema, webAddress } from './wire.js';
 import { TRACKER_DETAILS, trackerColumnsResult, trackerReadingResult, trackerRefreshResult } from './tracker.js';
 import { PART_ID, partListSchema } from './parts.js';
+import { trafficNoteResult, trafficNoteSchema, trafficReadResult } from './traffic.js';
 /**
  * The questions a module can ask, by name and by shape: capabilities, methods, each method's
  * params, and a few result schemas. No answering is here: no dispatch table, no handlers. A
@@ -113,6 +114,17 @@ export const CAPABILITIES = {
      * `activity.ts`. 1.5.0.
      */
     'activity:report': 'Say which of the things you run are working, need your attention or have finished, so the host can mark them.',
+    /**
+     * 2.20.0. Read the host's record of traffic: the calls Kehikot and every module made and received
+     * on this computer, and the connections open on their processes. Addresses and reasons, never what
+     * a call carried. See `traffic.read` and `traffic.ts`. For a module that shows traffic, and no other.
+     */
+    'traffic:read': 'Read the record of the calls Kehikot and its modules make and receive on this computer — when, what kind, to where and why — never what they carried.',
+    /**
+     * 2.20.0. Add this module's own calls to the host's record, each with its reason. Writes into the
+     * host's memory only; read back by a module holding `traffic:read`. See `traffic.note`.
+     */
+    'traffic:report': 'Note the calls this module makes, each with its reason, in Kehikot’s record of traffic on this computer.',
 };
 export const CAPABILITY_NAMES = Object.keys(CAPABILITIES);
 /**
@@ -145,6 +157,10 @@ export const METHODS = {
     'content.changed': 'content:report',
     'parts.set': 'parts:set',
     'activity.set': 'activity:report',
+    /** The record of traffic, from `since` (2.20.0). */
+    'traffic.read': 'traffic:read',
+    /** A module's own calls, noted with their reasons (2.20.0). */
+    'traffic.note': 'traffic:report',
 };
 export const METHOD_NAMES = Object.keys(METHODS);
 /**
@@ -396,6 +412,21 @@ export const methodParams = {
          */
         payload: z.unknown(),
     }),
+    /**
+     * 2.20.0. The rows of the host's record of traffic after `since` (a `seq`; 0 for all it keeps),
+     * oldest first, at most `limit`. `sample: true` also asks the host to look at its processes'
+     * connections, which it does only while such reads keep coming (`processes` in the answer).
+     */
+    'traffic.read': z.object({
+        since: z.number().int().min(0).default(0),
+        limit: z.number().int().min(1).max(LIMITS.TRAFFIC_KEPT).default(1000),
+        sample: z.boolean().default(false),
+    }),
+    /**
+     * 2.20.0. Calls this module made, each with its reason, added to the host's record as its own
+     * (`reported: 'module'`). Sanitize first (`trafficTarget`); the host sanitizes again.
+     */
+    'traffic.note': z.object({ calls: z.array(trafficNoteSchema).min(1).max(LIMITS.TRAFFIC_NOTE) }),
 };
 /* ------------------------------------------------------------------------ *
  * The answers that are outcomes rather than material
@@ -546,6 +577,8 @@ export const methodResults = {
     'activity.set': activitySetResult,
     'location.set': locationSetResult,
     'address.open': addressOpenResult,
+    'traffic.read': trafficReadResult,
+    'traffic.note': trafficNoteResult,
 };
 /** The schema for one method's answer, or nothing — which means unspecified. */
 export function resultSchemaFor(method) {
