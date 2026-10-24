@@ -326,6 +326,7 @@ export {
   trackerActivitySchema,
   trackerStackSchema,
   trackerPersonSchema,
+  trackerBranchSchema,
   WORK_ITEM_TYPES,
   avatarUrlSchema,
   isHttpsUrl,
@@ -340,6 +341,7 @@ export {
   type TrackerFile,
   type TrackerDetailFacts,
   type TrackerRow,
+  type TrackerBranch,
   type TrackerSource,
   type MissingReason,
   type TrackerMissing,
@@ -535,6 +537,23 @@ export {
   type ModuleIcon,
   type ModuleIconSet,
 } from './icon.js'
+
+/* A module's server asking the host what its page would be told (2.19.0). See `server-ask.ts`; the asking is `askHost` in `/serve`. */
+export {
+  SERVER_ASK_PATH,
+  SERVER_PASS_PATH,
+  SERVER_METHODS,
+  SERVER_PASS,
+  SERVER_ASK_REFUSALS,
+  serverAskSchema,
+  serverAskResult,
+  serverPassResult,
+  type ServerMethod,
+  type ServerAsk,
+  type ServerAskResult,
+  type ServerAskRefusal,
+  type ServerPassResult,
+} from './server-ask.js'
 
 /* A module's settings, shown and changed in the host, read and written by the module at its door (2.15.0). See `settings.ts`. */
 export {

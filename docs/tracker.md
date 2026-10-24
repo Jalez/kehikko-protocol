@@ -183,6 +183,33 @@ const isTask = (row) => row.workItem === 'task'
 `live.get` stays, answered by a host as a view over the same reading, until
 the modules that ask it have moved.
 
+### Linked branches (2.19.0)
+
+An issue's row carries `branches?: { name, url? }[]`: the branches linked to it. On GitHub they are
+the issue's Development branches (GraphQL `linkedBranches`, the "Create a branch" link and any
+branch linked by hand); on GitLab, the issue's related branches — the branches named `<iid>-…`, as
+GitLab's "Create branch" names them, the rule its own related-branches list applies. `url` is the
+branch on its tracker when the host could spell one. Absent when the host did not read them (an
+older host, a tracker that would not say); `[]` when it read them and there are none. At most
+`LIMITS.TRACKER_BRANCHES`.
+
+A host reads them with the reads it already makes — the field in the issue query on GitHub, one
+listing of the repository's branches per source on a whole read on GitLab — never a request per
+issue. A module that takes a branch as "somebody started" reads `row.branches?.length`.
+
+### An epic with its parts (2.19.0)
+
+`tracker.get { epic, parts: true }` answers the refs the epic names and the refs its parts hold
+(`context.parts[].refs`, what modules filed under a part) in one answer. `parts` goes with `epic`
+only. A host before 2.19.0 strips it and answers the epic's own refs, so a module that needs the
+parts' refs from an older host still asks `{ refs }` for the ones the answer did not cover —
+which, from a newer host, are none.
+
+### Asked from a module's server (2.19.0)
+
+A module's server reads the same reading through `askHost` (`/serve`), held to the same
+`trackers:read`: see [server-ask](server-ask.md).
+
 ## Notes by symbol
 
 ### `src/tracker.ts`

@@ -708,39 +708,62 @@ export declare const methodParams: {
      * What the trackers last said, from the host's shared reading; answered at once with
      * `trackerReadingResult` (see `tracker.ts`), where a ref not read yet comes back in `missing`.
      * `detail: 'detail'` costs a call per ref at the tracker, so it is only accepted with `refs`.
+     * `parts: true` (2.19.0), with `epic`: the refs the epic's parts hold as well as the refs the epic
+     * names — the list `context.parts` carries — in one answer. A host before 2.19.0 strips it and
+     * answers the epic's own refs, so a module that needs the parts' refs from an older host still asks
+     * for the ones the answer did not cover.
      */
-    readonly 'tracker.get': z.ZodEffects<z.ZodEffects<z.ZodObject<{
+    readonly 'tracker.get': z.ZodEffects<z.ZodEffects<z.ZodEffects<z.ZodObject<{
         detail: z.ZodDefault<z.ZodEnum<["summary", "detail"]>>;
+        parts: z.ZodOptional<z.ZodBoolean>;
         refs: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         epic: z.ZodOptional<z.ZodString>;
         project: z.ZodOptional<z.ZodLiteral<true>>;
     }, "strip", z.ZodTypeAny, {
         detail: "detail" | "summary";
         epic?: string | undefined;
+        parts?: boolean | undefined;
         refs?: string[] | undefined;
         project?: true | undefined;
     }, {
         epic?: string | undefined;
+        parts?: boolean | undefined;
         detail?: "detail" | "summary" | undefined;
         refs?: string[] | undefined;
         project?: true | undefined;
     }>, {
         detail: "detail" | "summary";
         epic?: string | undefined;
+        parts?: boolean | undefined;
         refs?: string[] | undefined;
         project?: true | undefined;
     }, {
         epic?: string | undefined;
+        parts?: boolean | undefined;
         detail?: "detail" | "summary" | undefined;
         refs?: string[] | undefined;
         project?: true | undefined;
     }>, {
         detail: "detail" | "summary";
         epic?: string | undefined;
+        parts?: boolean | undefined;
         refs?: string[] | undefined;
         project?: true | undefined;
     }, {
         epic?: string | undefined;
+        parts?: boolean | undefined;
+        detail?: "detail" | "summary" | undefined;
+        refs?: string[] | undefined;
+        project?: true | undefined;
+    }>, {
+        detail: "detail" | "summary";
+        epic?: string | undefined;
+        parts?: boolean | undefined;
+        refs?: string[] | undefined;
+        project?: true | undefined;
+    }, {
+        epic?: string | undefined;
+        parts?: boolean | undefined;
         detail?: "detail" | "summary" | undefined;
         refs?: string[] | undefined;
         project?: true | undefined;

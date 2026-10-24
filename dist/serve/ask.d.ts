@@ -1,0 +1,58 @@
+import { type ServerAskRefusal, type ServerMethod } from '../server-ask.js';
+import type { TrackerColumns, TrackerReading } from '../tracker.js';
+import type { Reply } from './doors.js';
+/** A new pass for one question, good once for `LIMITS.SERVER_PASS_MS`. `askHost` mints its own. */
+export declare function mintServerPass(now?: number): string;
+/** Whether this process minted `pass` and it is still good; spent by asking, so a second ask says no. */
+export declare function spendServerPass(pass: string | null | undefined, now?: number): boolean;
+/**
+ * The doors' answer at `SERVER_PASS_PATH`, or null for any other path. Mounted by `doorsFetch` and
+ * `doorsHandler` for every module, before its own `answer`.
+ */
+export declare function serverPassReply(method: string, path: string, query: URLSearchParams): Reply | null;
+/** The URLs `askHost` posts to, in order. Pure; exported for tests. */
+export declare function hostAskUrls(env?: Record<string, string | undefined>): string[];
+/** What each method a server may ask is answered with. */
+export interface ServerAnswers {
+    'tracker.get': TrackerReading;
+    'tracker.columns': TrackerColumns;
+}
+/**
+ * What came of one question. `ok: true`: the host's answer, held to the method's result schema.
+ * `ok: false`: `why`, a sentence; `refused` when the host would not take it from this module or about
+ * this project (see `SERVER_ASK_REFUSALS`); `reason` when a host answered with a refusal; neither when
+ * no host answered at all.
+ */
+export type AskedHost<M extends ServerMethod> = {
+    ok: true;
+    data: ServerAnswers[M];
+} | {
+    ok: false;
+    why: string;
+    reason?: 'unknown-module' | 'unknown-method' | 'failed';
+    refused?: ServerAskRefusal;
+};
+export interface AskHostOptions {
+    /** This module's id: who asks. Its manifest is what the host holds the call to. */
+    module: string;
+    /** The project the question is about: its absolute folder (`resolveDoorProject`, `resolveDoorPlace`). */
+    project: string;
+    env?: Record<string, string | undefined>;
+    /** How long each host gets, in ms. Default `LIMITS.SERVER_ASK_MS`. */
+    timeoutMs?: number;
+    /** Injected by the tests. */
+    fetch?: typeof fetch;
+}
+/** What a module's server is told when no host on this machine answered. */
+export declare const NO_HOST_TO_ASK = "No Kehikot host answered, so there is nothing to read: Kehikot is not running, or not on the origins this module was given.";
+/**
+ * Ask the host one question from a module's server, and get what its page would get:
+ *
+ *     const read = await askHost('tracker.get', { epic, parts: true }, { module: ID, project })
+ *     if (read.ok) read.data.rows
+ *
+ * Asks each origin of `KEHIKOT_ORIGINS` in turn, with a pass minted for that ask, and takes the first
+ * that answers it; a host that does not hold the project or does not know the module is passed over
+ * for the next. Never throws.
+ */
+export declare function askHost<M extends ServerMethod>(method: M, params: Record<string, unknown>, options: AskHostOptions): Promise<AskedHost<M>>;

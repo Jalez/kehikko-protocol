@@ -25,3 +25,5 @@ export { beforeDoors, beforeHandler, beforeInfo, requestOf, type Before, type Be
 export { commitOf, establishBuild } from './build.js';
 export { hostVouches, hostVouchUrls, settingsDoor, type HostVouchesOptions, type SettingsDoorOptions, type SettingsRead, } from './settings.js';
 export { SETTINGS_PATH, SETTINGS_PASS_PATH } from '../settings.js';
+export { askHost, hostAskUrls, mintServerPass, serverPassReply, spendServerPass, NO_HOST_TO_ASK, type AskedHost, type AskHostOptions, type ServerAnswers, } from './ask.js';
+export { SERVER_ASK_PATH, SERVER_PASS_PATH, SERVER_METHODS, type ServerMethod } from '../server-ask.js';
