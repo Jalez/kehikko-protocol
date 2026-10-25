@@ -34,7 +34,7 @@ const ENV = { KEHIKOT_ORIGINS: 'http://127.0.0.1:8021' }
 
 describe('the version', () => {
   test('is 2.20.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.20.0')
+    expect(PACKAGE_VERSION).toBe('2.21.0')
     expect(PROTOCOL).toBe(2)
   })
 })
@@ -175,7 +175,9 @@ describe('a server question about this computer', () => {
   test('traffic names no project; a tracker question still has to', () => {
     expect(SERVER_METHODS).toContain('traffic.read')
     expect(SERVER_METHODS).toContain('traffic.note')
-    expect(SERVER_PROJECT_METHODS).toEqual(['tracker.get', 'tracker.columns'])
+    /* 2.21.0 added the epic's own material, every one of it a project's (see v2-21). */
+    expect(SERVER_PROJECT_METHODS.slice(0, 2)).toEqual(['tracker.get', 'tracker.columns'])
+    expect(SERVER_PROJECT_METHODS).not.toContain('traffic.read' as never)
     expect(serverAskSchema.safeParse({ module: 'kehikot.monitor', pass: PASS, method: 'traffic.read' }).success).toBe(true)
     expect(serverAskSchema.safeParse({ module: 'kehikot.kanban', pass: PASS, method: 'tracker.get', params: { epic: 'e' } }).success).toBe(false)
   })

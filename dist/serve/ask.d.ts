@@ -1,6 +1,8 @@
 import { type ServerAskRefusal, type ServerMethod } from '../server-ask.js';
 import type { TrackerColumns, TrackerReading } from '../tracker.js';
 import type { TrafficNoteResult, TrafficReadResult } from '../traffic.js';
+import type { DispositionsGetResult, EpicsListResult, PartsGetResult } from '../methods.js';
+import type { StepsListResult } from '../plan.js';
 import type { Reply } from './doors.js';
 /** A new pass for one question, good once for `LIMITS.SERVER_PASS_MS`. `askHost` mints its own. */
 export declare function mintServerPass(now?: number): string;
@@ -19,6 +21,16 @@ export interface ServerAnswers {
     'tracker.columns': TrackerColumns;
     'traffic.read': TrafficReadResult;
     'traffic.note': TrafficNoteResult;
+    /** 2.21.0. The project's epics. */
+    'epics.list': EpicsListResult;
+    /** 2.21.0. One epic, as the host keeps it: its own material, which the protocol gives no shape. */
+    'epic.get': Record<string, unknown>;
+    /** 2.21.0. Every provider's steps for the epic (`plansUnion`). */
+    'steps.list': StepsListResult;
+    /** 2.21.0. The epic's parts, with what the modules hold. */
+    'parts.get': PartsGetResult;
+    /** 2.21.0. The project's dispositions. */
+    'dispositions.get': DispositionsGetResult;
 }
 /**
  * What came of one question. `ok: true`: the host's answer, held to the method's result schema.

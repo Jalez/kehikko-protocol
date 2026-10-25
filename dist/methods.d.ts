@@ -14,7 +14,12 @@ import { z } from 'zod';
  */
 export declare const CAPABILITIES: {
     readonly 'epics:read': "Read which epics exist, and their titles, ledes and projects.";
-    readonly 'steps:read': "Read an epic's steps: their titles, bodies and the references they name.";
+    /**
+     * Read an epic's steps (`steps.list`). From 2.21.0 the answer is the union of every module that
+     * publishes a plan (`steps.json`), each step saying which module provides it, with the phases,
+     * order and gates the plans say.
+     */
+    readonly 'steps:read': "Read an epic's steps: their titles, bodies, order and phases, what holds them, and the references they name.";
     readonly 'live:read': "Read what the last refresh found in the trackers for an epic.";
     readonly 'stage:report': "Say where work is — working, in review, or blocked — into the host's database.";
     readonly 'events:emit': "Send an extension payload: a notification, a report of its own calls.";
@@ -112,6 +117,17 @@ export declare const CAPABILITIES: {
      * host's memory only; read back by a module holding `traffic:read`. See `traffic.note`.
      */
     readonly 'traffic:report': "Note the calls this module makes, each with its reason, in Kehikot’s record of traffic on this computer.";
+    /**
+     * 2.21.0. Read an epic's parts and what the modules hold for each (`parts.get`): the list every
+     * framed page is handed in `context.parts`, asked for by name — what a module's SERVER reads, having
+     * no frame to be handed it.
+     */
+    readonly 'parts:read': "Read an epic's parts and what the modules hold for each — the documents and references of every part.";
+    /**
+     * 2.21.0. Read why closed references closed (`dispositions.get`): the marks every framed page is
+     * handed in `context.dispositions`, asked for by name, as a module's server must.
+     */
+    readonly 'dispositions:read': "Read why closed references closed — done, won't do, duplicate or superseded — as every module is shown it.";
 };
 export type Capability = keyof typeof CAPABILITIES;
 export declare const CAPABILITY_NAMES: Capability[];
@@ -149,6 +165,10 @@ export declare const METHODS: {
     readonly 'traffic.read': "traffic:read";
     /** A module's own calls, noted with their reasons (2.20.0). */
     readonly 'traffic.note': "traffic:report";
+    /** An epic's parts with what the modules hold, as `context.parts` carries them (2.21.0). */
+    readonly 'parts.get': "parts:read";
+    /** The open project's dispositions, as `context.dispositions` carries them (2.21.0). */
+    readonly 'dispositions.get': "dispositions:read";
 };
 export type Method = keyof typeof METHODS;
 export declare const METHOD_NAMES: Method[];
@@ -1245,6 +1265,20 @@ export declare const methodParams: {
             cache?: "refused" | "hit" | "not-modified" | undefined;
         }[];
     }>;
+    /**
+     * 2.21.0. An epic's parts, each with what every module holds for it; answered with `partsGetResult`.
+     * The same list `context.parts` carries, with `picked` false throughout: picking is a person's,
+     * on one screen, and a server asking has none (a conversation's place says its picks).
+     */
+    readonly 'parts.get': z.ZodObject<{
+        epic: z.ZodString;
+    }, "strip", z.ZodTypeAny, {
+        epic: string;
+    }, {
+        epic: string;
+    }>;
+    /** 2.21.0. Every disposition in the project; answered with `dispositionsGetResult`, as `context.dispositions`. */
+    readonly 'dispositions.get': z.ZodObject<{}, "strip", z.ZodTypeAny, {}, {}>;
 };
 /** The params one method takes, as a caller must construct them. */
 export type MethodParams<M extends Method> = z.input<(typeof methodParams)[M]>;
@@ -1479,6 +1513,94 @@ export declare const epicsListResult: z.ZodObject<{
     }, z.ZodTypeAny, "passthrough">>, "many">;
 }, z.ZodTypeAny, "passthrough">>;
 export type EpicsListResult = z.infer<typeof epicsListResult>;
+/** 2.21.0. `parts.get`'s answer: the epic's parts in order, each with what the modules hold (`partsSchema`). */
+export declare const partsGetResult: z.ZodObject<{
+    parts: z.ZodArray<z.ZodObject<{
+        id: z.ZodString;
+        heading: z.ZodDefault<z.ZodString>;
+        refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
+        picked: z.ZodDefault<z.ZodBoolean>;
+        files: z.ZodOptional<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">>;
+        documents: z.ZodOptional<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">>;
+    }, "strip", z.ZodTypeAny, {
+        id: string;
+        refs: string[];
+        heading: string;
+        picked: boolean;
+        files?: string[] | undefined;
+        documents?: string[] | undefined;
+    }, {
+        id: string;
+        refs?: string[] | undefined;
+        files?: string[] | undefined;
+        heading?: string | undefined;
+        picked?: boolean | undefined;
+        documents?: string[] | undefined;
+    }>, "many">;
+}, "strip", z.ZodTypeAny, {
+    parts: {
+        id: string;
+        refs: string[];
+        heading: string;
+        picked: boolean;
+        files?: string[] | undefined;
+        documents?: string[] | undefined;
+    }[];
+}, {
+    parts: {
+        id: string;
+        refs?: string[] | undefined;
+        files?: string[] | undefined;
+        heading?: string | undefined;
+        picked?: boolean | undefined;
+        documents?: string[] | undefined;
+    }[];
+}>;
+export type PartsGetResult = z.infer<typeof partsGetResult>;
+/** 2.21.0. `dispositions.get`'s answer: the project's marks, as `context.dispositions` carries them. */
+export declare const dispositionsGetResult: z.ZodObject<{
+    dispositions: z.ZodArray<z.ZodObject<{
+        ref: z.ZodString;
+        value: z.ZodEnum<["done", "wont-do", "duplicate", "superseded"]>;
+        target: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+        note: z.ZodDefault<z.ZodString>;
+        by: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+        at: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+    }, "strip", z.ZodTypeAny, {
+        value: "done" | "wont-do" | "duplicate" | "superseded";
+        at: string | null;
+        by: string | null;
+        ref: string;
+        target: string | null;
+        note: string;
+    }, {
+        value: "done" | "wont-do" | "duplicate" | "superseded";
+        ref: string;
+        at?: string | null | undefined;
+        by?: string | null | undefined;
+        target?: string | null | undefined;
+        note?: string | undefined;
+    }>, "many">;
+}, "strip", z.ZodTypeAny, {
+    dispositions: {
+        value: "done" | "wont-do" | "duplicate" | "superseded";
+        at: string | null;
+        by: string | null;
+        ref: string;
+        target: string | null;
+        note: string;
+    }[];
+}, {
+    dispositions: {
+        value: "done" | "wont-do" | "duplicate" | "superseded";
+        ref: string;
+        at?: string | null | undefined;
+        by?: string | null | undefined;
+        target?: string | null | undefined;
+        note?: string | undefined;
+    }[];
+}>;
+export type DispositionsGetResult = z.infer<typeof dispositionsGetResult>;
 /**
  * What became of a `projects.pick`; all three are `ok: true`. `picked`: `project` says which. `cancelled`: the
  * picker was closed without choosing. `declined`: the host would not ask, also its answer when it has no

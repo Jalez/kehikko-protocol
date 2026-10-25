@@ -148,6 +148,8 @@ export {
   PICK_OUTCOMES,
   epicSpine,
   epicsListResult,
+  partsGetResult,
+  dispositionsGetResult,
   REPORTED_STAGES,
   type Capability,
   type Method,
@@ -169,6 +171,8 @@ export {
   type ProjectPickResult,
   type EpicSpine,
   type EpicsListResult,
+  type PartsGetResult,
+  type DispositionsGetResult,
   type ReportedStage,
 } from './methods.js'
 
@@ -436,10 +440,58 @@ export {
   type JourneyRecord,
   type JourneysDocument,
   type JourneySteps,
+  planOfJourney,
 } from './journey.js'
+
+/* An epic's plan — steps, phases, order and gates — as any module publishes it in `steps.json`, and the union a host answers `steps.list` with (2.21.0). See `plan.ts`; the file is opened behind `/serve`. */
+export {
+  PLAN_FILE,
+  PLAN_VERSION,
+  PLAN_ID,
+  PLAN_GATE_KINDS,
+  PLAN_GATE_KIND_NAMES,
+  planPhaseSchema,
+  planGateSchema,
+  planStepSchema,
+  planSchema,
+  planIn,
+  plansIn,
+  phaseOf,
+  providedStepSchema,
+  providedPhaseSchema,
+  stepsProviderSchema,
+  stepsListResult,
+  plansUnion,
+  type PlanGateKind,
+  type PlanPhase,
+  type PlanGate,
+  type PlanStep,
+  type PlanStepInput,
+  type Plan,
+  type PlanInput,
+  type ProvidedStep,
+  type ProvidedPhase,
+  type StepsProvider,
+  type StepsListResult,
+  type ProvidedPlan,
+} from './plan.js'
+
+/* What a module publishes for others to read, and whether it runs agent sessions that load skills (2.21.0). See `provides.ts`. */
+export {
+  PROVIDES,
+  PROVIDED_NAMES,
+  providesSchema,
+  agentSessionsSchema,
+  providesOf,
+  loadsSkills,
+  type Provided,
+  type AgentSessions,
+  type ProvidingManifest,
+} from './provides.js'
 
 export {
   CONTENT_HOST,
+  CONTENT_STEPS,
   contentChangeSchema,
   contentSignalSchema,
   contentStamp,
@@ -509,7 +561,7 @@ export {
   type BuildComparison,
 } from './build.js'
 
-/* Claude Code skills a module offers, and where it serves them (2.5.0); what each needs beside its module (2.12.0). See `skills.ts`. */
+/* Agent skills a module offers, and where it serves them (2.5.0); what each needs on the kehikko: modules by id (2.12.0) or what a module provides (2.21.0). See `skills.ts`. */
 export {
   SKILL_NAME,
   SKILLS_PATH,
@@ -519,8 +571,18 @@ export {
   moduleSkillSchema,
   moduleSkillsSchema,
   skillNeedsSchema,
+  skillNeedSchema,
+  NEED_KINDS,
+  needParts,
+  needKey,
+  meetsNeed,
+  needSaid,
+  neededIds,
   isKehikkoBound,
   missingNeeds,
+  type SkillNeed,
+  type CapabilityNeed,
+  type NeedKind,
   skillTextBytes,
   skillTextIssue,
   type ModuleSkill,

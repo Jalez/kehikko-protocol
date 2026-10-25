@@ -9,7 +9,9 @@ import { activityItemsSchema } from './activity.js';
  */
 import { ADDRESS_INTENTS, DISPOSITIONS, LOCATION_INTENTS, codeLocationSchema, filterChoiceSchema, passageSchema, webAddress } from './wire.js';
 import { TRACKER_DETAILS, trackerColumnsResult, trackerReadingResult, trackerRefreshResult } from './tracker.js';
-import { PART_ID, partListSchema } from './parts.js';
+import { PART_ID, partListSchema, partsSchema } from './parts.js';
+import { dispositionSchema } from './context.js';
+import { stepsListResult } from './plan.js';
 import { trafficNoteResult, trafficNoteSchema, trafficReadResult } from './traffic.js';
 /**
  * The questions a module can ask, by name and by shape: capabilities, methods, each method's
@@ -26,7 +28,12 @@ import { trafficNoteResult, trafficNoteSchema, trafficReadResult } from './traff
  */
 export const CAPABILITIES = {
     'epics:read': 'Read which epics exist, and their titles, ledes and projects.',
-    'steps:read': "Read an epic's steps: their titles, bodies and the references they name.",
+    /**
+     * Read an epic's steps (`steps.list`). From 2.21.0 the answer is the union of every module that
+     * publishes a plan (`steps.json`), each step saying which module provides it, with the phases,
+     * order and gates the plans say.
+     */
+    'steps:read': "Read an epic's steps: their titles, bodies, order and phases, what holds them, and the references they name.",
     'live:read': 'Read what the last refresh found in the trackers for an epic.',
     'stage:report': "Say where work is — working, in review, or blocked — into the host's database.",
     'events:emit': 'Send an extension payload: a notification, a report of its own calls.',
@@ -125,6 +132,17 @@ export const CAPABILITIES = {
      * host's memory only; read back by a module holding `traffic:read`. See `traffic.note`.
      */
     'traffic:report': 'Note the calls this module makes, each with its reason, in Kehikot’s record of traffic on this computer.',
+    /**
+     * 2.21.0. Read an epic's parts and what the modules hold for each (`parts.get`): the list every
+     * framed page is handed in `context.parts`, asked for by name — what a module's SERVER reads, having
+     * no frame to be handed it.
+     */
+    'parts:read': "Read an epic's parts and what the modules hold for each — the documents and references of every part.",
+    /**
+     * 2.21.0. Read why closed references closed (`dispositions.get`): the marks every framed page is
+     * handed in `context.dispositions`, asked for by name, as a module's server must.
+     */
+    'dispositions:read': "Read why closed references closed — done, won't do, duplicate or superseded — as every module is shown it.",
 };
 export const CAPABILITY_NAMES = Object.keys(CAPABILITIES);
 /**
@@ -161,6 +179,10 @@ export const METHODS = {
     'traffic.read': 'traffic:read',
     /** A module's own calls, noted with their reasons (2.20.0). */
     'traffic.note': 'traffic:report',
+    /** An epic's parts with what the modules hold, as `context.parts` carries them (2.21.0). */
+    'parts.get': 'parts:read',
+    /** The open project's dispositions, as `context.dispositions` carries them (2.21.0). */
+    'dispositions.get': 'dispositions:read',
 };
 export const METHOD_NAMES = Object.keys(METHODS);
 /**
@@ -427,6 +449,14 @@ export const methodParams = {
      * (`reported: 'module'`). Sanitize first (`trafficTarget`); the host sanitizes again.
      */
     'traffic.note': z.object({ calls: z.array(trafficNoteSchema).min(1).max(LIMITS.TRAFFIC_NOTE) }),
+    /**
+     * 2.21.0. An epic's parts, each with what every module holds for it; answered with `partsGetResult`.
+     * The same list `context.parts` carries, with `picked` false throughout: picking is a person's,
+     * on one screen, and a server asking has none (a conversation's place says its picks).
+     */
+    'parts.get': z.object({ epic }),
+    /** 2.21.0. Every disposition in the project; answered with `dispositionsGetResult`, as `context.dispositions`. */
+    'dispositions.get': z.object({}),
 };
 /* ------------------------------------------------------------------------ *
  * The answers that are outcomes rather than material
@@ -529,6 +559,10 @@ export const epicSpine = z
 })
     .passthrough();
 export const epicsListResult = z.object({ epics: z.array(epicSpine) }).passthrough();
+/** 2.21.0. `parts.get`'s answer: the epic's parts in order, each with what the modules hold (`partsSchema`). */
+export const partsGetResult = z.object({ parts: partsSchema });
+/** 2.21.0. `dispositions.get`'s answer: the project's marks, as `context.dispositions` carries them. */
+export const dispositionsGetResult = z.object({ dispositions: z.array(dispositionSchema).max(LIMITS.DISPOSITIONS) });
 /**
  * What became of a `projects.pick`; all three are `ok: true`. `picked`: `project` says which. `cancelled`: the
  * picker was closed without choosing. `declined`: the host would not ask, also its answer when it has no
@@ -579,6 +613,10 @@ export const methodResults = {
     'address.open': addressOpenResult,
     'traffic.read': trafficReadResult,
     'traffic.note': trafficNoteResult,
+    /** 2.21.0: the union of every module's plan (`plan.ts`). An older host's answer has no schema here. */
+    'steps.list': stepsListResult,
+    'parts.get': partsGetResult,
+    'dispositions.get': dispositionsGetResult,
 };
 /** The schema for one method's answer, or nothing — which means unspecified. */
 export function resultSchemaFor(method) {

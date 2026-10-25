@@ -14,6 +14,15 @@ import { EPIC_SLUG, MODULE_ID } from './ids.js'
  */
 export const CONTENT_HOST = 'host'
 
+/**
+ * The `source` when the changed material is an epic's steps, whoever provides them (2.21.0): a host
+ * announces it beside the module's own id whenever a module that provides steps (`declares.provides`)
+ * reports a change or rewrites its `steps.json`. A reader that shows the union `steps.list` answers
+ * follows this one source instead of naming every provider: `contentStamp(content, { sources:
+ * [CONTENT_STEPS], epic })`. Like `CONTENT_HOST`, a word and not a module id: module ids are reverse-DNS, with a dot.
+ */
+export const CONTENT_STEPS = 'steps'
+
 const instant = z.string().datetime({ offset: true })
 
 /**

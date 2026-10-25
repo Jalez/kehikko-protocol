@@ -13,6 +13,8 @@ export { neighbourPorts, portOf, readRegistration, registerAt, takesOver, regist
 export { claimOrLeave, preferred, registerBound, serves, type DevServerLike, type HttpServerLike, type ServesOptions, type ServesPlugin, } from './plugin.js';
 export { doorOf, listTools, readNeighbour, readNeighbours, NEIGHBOUR_TIMEOUT_MS, type Neighbour, type NeighbourOptions, } from './neighbours.js';
 export { readJourney, readJourneys } from './journeys.js';
+export { readPlans, readPlansFor, writePlan, type PublishedPlans, type PlanWritten } from './plans.js';
+export { PLAN_FILE, PLAN_VERSION, type Plan, type PlanInput } from '../plan.js';
 export { holdingsSpoken, readHoldings, writeHoldings, type HoldingsWritten } from './holdings.js';
 export { HOLDINGS_FILE, HOLDING_KINDS, type HoldingKind, type EpicHoldings, type PartHoldings, type ProjectHoldings } from '../holdings.js';
 export { fillPage, pageDocument, themeScript, FRAMED_DEFAULT_THEME, type PageOptions } from './page.js';

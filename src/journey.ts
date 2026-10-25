@@ -2,8 +2,15 @@ import { z } from 'zod'
 import { LIMITS } from './limits.js'
 import { EPIC_SLUG, slugFrom } from './ids.js'
 import { PART_ID, partFile } from './parts.js'
+import { PLAN_ID, PLAN_GATE_KIND_NAMES, planIn, type Plan, type PlanGateKind } from './plan.js'
+import { readTrackerRef } from './tracker.js'
 
 /**
+ * @deprecated 2.21.0, as where an epic's STEPS are. Steps are a holding any module publishes —
+ * `steps.json`, `planSchema` in `plan.ts` — and a host answers `steps.list` from the union of every
+ * publisher. Nothing new should read this file's shape; `planOfJourney` turns a record into a plan
+ * for the move. Kept, and unchanged, until 3.0.
+ *
  * An epic's steps and groups as a project keeps them, in the Journeys module's file a host reads.
  * Journeys owns the steps and the prose; a host owns the slug, the title, existence and, from 1.2.0,
  * the list of the epic's parts (`listedPartSchema` in `parts.ts`), which `groups` used to be read as.
@@ -15,7 +22,9 @@ import { PART_ID, partFile } from './parts.js'
  * The module that keeps the record, and the file it keeps it in:
  * `moduleFile(projectPath, JOURNEYS_MODULE, JOURNEYS_FILE)` is `<project>/.kehikot/journeys/journeys.json`.
  * @deprecated 1.2.0, as where an epic's PARTS are: a part names no module, and nothing about parts
- * should spell this id. Kept, and unchanged; a host that reads steps from the record still names it.
+ * should spell this id. 2.21.0, as where its STEPS are: a host reads every module's `steps.json`
+ * (`readPlans`) and this file only as a fallback for a Journeys that has not published one yet.
+ * Kept, and unchanged, until 3.0.
  */
 export const JOURNEYS_MODULE = 'kehikot.journeys'
 export const JOURNEYS_FILE = 'journeys'
@@ -72,7 +81,10 @@ export const stepsFromSchema = z
   .passthrough()
 export type StepsFrom = z.infer<typeof stepsFromSchema>
 
-/** The record for one epic. `slug` is the epic's slug: the same name as the host's `epic`. */
+/**
+ * The record for one epic. `slug` is the epic's slug: the same name as the host's `epic`.
+ * @deprecated 2.21.0: an epic's steps are a plan (`planSchema`), published by whichever module keeps them.
+ */
 export const journeyRecordSchema = z
   .object({
     slug: z.string().regex(EPIC_SLUG),
@@ -269,4 +281,117 @@ export function partsOf(record: unknown): JourneyPart[] {
   }
   for (const part of parts) part.refs = part.refs.slice(0, LIMITS.PART_REFS)
   return parts
+}
+
+/* ------------------------------------------------------------------------ *
+ * The move to plans (2.21.0)
+ * ------------------------------------------------------------------------ */
+
+const textOf = (value: unknown): string | undefined => (typeof value === 'string' && value.trim() ? value.trim() : undefined)
+const stringsOf = (value: unknown): string[] =>
+  Array.isArray(value) ? [...new Set(value.map(textOf).filter((one): one is string => one !== undefined))] : []
+
+/** A gate kind of the record's, as a plan says it: an issue or a ref another epic owns is a `ref`; an unknown kind is work. */
+function gateKindOf(kind: unknown): PlanGateKind {
+  if (kind === 'issue' || kind === 'ref-elsewhere') return 'ref'
+  return typeof kind === 'string' && (PLAN_GATE_KIND_NAMES as string[]).includes(kind) ? (kind as PlanGateKind) : 'work'
+}
+
+/** What a ref is to a step, from its `roles`: anything but `prior-art` and `related` delivers it. */
+function deliversStep(step: Record<string, unknown>, ref: string): boolean {
+  const roles = step.roles
+  if (!roles || typeof roles !== 'object' || Array.isArray(roles) || !Object.hasOwn(roles, ref)) return true
+  const role = (roles as Record<string, unknown>)[ref]
+  return role !== 'prior-art' && role !== 'related'
+}
+
+/**
+ * A Journeys record as a plan (2.21.0), for the move from this file to `steps.json`: what a host reads
+ * as the fallback for a Journeys that has not published yet, and what Journeys can publish with
+ * `writePlan`. Takes anything and never throws; null for a non-record and for one whose steps are kept
+ * elsewhere (`stepsFrom`), which is not "none".
+ *
+ * - A step's id is its part's (`stepPart`), else `step-<position>`, told apart with `-2`, `-3`.
+ * - `refs` are the refs that deliver it (its `roles` do not call them prior art or related), and
+ *   `related` the rest; `issue` is kept when it is a ref.
+ * - `under`, `after` and `phase` are kept where they name a step or phase of the record.
+ * - Its gates are the record's gates its `blockedBy` names, and those that hold a ref delivering it
+ *   (the record's own `blockedBy`, ref → gate ids). `issue` and `ref-elsewhere` gates are `ref` gates;
+ *   `state: 'done'` is `done`.
+ * - The record's `phases`, `goal` and `measure` come across as they are.
+ * @deprecated 2.21.0, with this file: for the migration only, and removed in 3.0.
+ */
+export function planOfJourney(record: unknown): Plan | null {
+  if (!record || typeof record !== 'object' || Array.isArray(record)) return null
+  const r = record as Record<string, unknown>
+  const steps = Array.isArray(r.steps) ? r.steps.filter((one): one is Record<string, unknown> => !!one && typeof one === 'object' && !Array.isArray(one)) : []
+  if (!steps.length && r.stepsFrom && typeof r.stepsFrom === 'object' && stepsFromSchema.safeParse(r.stepsFrom).success) return null
+
+  /* The record's gates, read loosely: one with no id or title is not a gate. */
+  const gates = new Map<string, Record<string, unknown>>()
+  for (const one of Array.isArray(r.gates) ? r.gates : []) {
+    if (!one || typeof one !== 'object') continue
+    const id = textOf((one as Record<string, unknown>).id)
+    if (id && PLAN_ID.test(id) && textOf((one as Record<string, unknown>).title) && !gates.has(id)) gates.set(id, one as Record<string, unknown>)
+  }
+  const heldRefs = r.blockedBy && typeof r.blockedBy === 'object' && !Array.isArray(r.blockedBy) ? (r.blockedBy as Record<string, unknown>) : {}
+
+  /* Ids first, so `under` and `after` can be read against them. */
+  const taken = new Set<string>()
+  const ids = steps.map((step, i) => {
+    const wanted = stepPart(step) ?? `step-${i + 1}`
+    let id = wanted
+    for (let n = 2; taken.has(id); n += 1) id = `${wanted.slice(0, 76)}-${n}`
+    taken.add(id)
+    return id
+  })
+  const byPart = new Map<string, string>()
+  steps.forEach((step, i) => {
+    const part = stepPart(step)
+    if (part && !byPart.has(part)) byPart.set(part, ids[i]!)
+  })
+  const idOf = (value: unknown): string | undefined => {
+    const said = textOf(value)
+    return said === undefined ? undefined : (byPart.get(said) ?? (taken.has(said) ? said : undefined))
+  }
+
+  const plan = planIn({
+    goal: textOf(r.goal),
+    measure: textOf(r.measure),
+    phases: Array.isArray(r.phases) ? r.phases : [],
+    steps: steps.map((step, i) => {
+      const all = stringsOf(step.refs)
+      const delivering = all.filter((one) => deliversStep(step, one))
+      const holding = [
+        ...stringsOf(step.blockedBy),
+        ...delivering.flatMap((one) => (Object.hasOwn(heldRefs, one) ? stringsOf(heldRefs[one]) : [])),
+      ].filter((id, at, list) => list.indexOf(id) === at && gates.has(id) && readTrackerRef(id) === null)
+      return {
+        id: ids[i],
+        title: textOf(step.title) ?? ids[i],
+        body: typeof step.body === 'string' ? step.body : '',
+        refs: delivering,
+        related: all.filter((one) => !delivering.includes(one)),
+        ...(textOf(step.issue) ? { issue: textOf(step.issue) } : {}),
+        ...(stepPart(step) ? { part: stepPart(step)! } : {}),
+        ...(idOf(step.under) ? { under: idOf(step.under) } : {}),
+        after: stringsOf(step.after).map(idOf).filter((one): one is string => one !== undefined),
+        ...(textOf(step.phase) ? { phase: textOf(step.phase) } : {}),
+        gates: holding.map((id) => {
+          const gate = gates.get(id)!
+          return {
+            id,
+            title: textOf(gate.title),
+            kind: gateKindOf(gate.kind),
+            ...(textOf(gate.ref) ? { ref: textOf(gate.ref) } : {}),
+            ...(textOf(gate.epic) ? { epic: textOf(gate.epic) } : {}),
+            ...(textOf(gate.owner) ? { owner: textOf(gate.owner) } : {}),
+            waitsOn: stringsOf(gate.waitsOn),
+            done: gate.state === 'done',
+          }
+        }),
+      }
+    }),
+  })
+  return plan
 }

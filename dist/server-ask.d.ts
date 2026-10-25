@@ -21,12 +21,14 @@ export declare const SERVER_PASS_PATH = "/api/kehikot/server-pass";
 /**
  * The methods a module's server may ask: reads of the host's material that need no frame. A method
  * that writes into a canvas, or waits on a person, is its page's to ask. Grows by an entry here.
+ * 2.21.0 adds the epic's own material — `epics.list`, `epic.get`, `steps.list`, `parts.get` and
+ * `dispositions.get` — so that no module's server reads the host's files or another module's.
  */
-export declare const SERVER_METHODS: readonly ["tracker.get", "tracker.columns", "traffic.read", "traffic.note"];
+export declare const SERVER_METHODS: readonly ["tracker.get", "tracker.columns", "traffic.read", "traffic.note", "epics.list", "epic.get", "steps.list", "parts.get", "dispositions.get"];
 export type ServerMethod = (typeof SERVER_METHODS)[number];
 /**
  * The server methods that are about one project, and so name it. The traffic methods (2.20.0) are
- * about this computer, and a question about them names no project.
+ * about this computer, and a question about them names no project. Every 2.21.0 method is a project's.
  */
 export declare const SERVER_PROJECT_METHODS: readonly ServerMethod[];
 /** Whether a question with this method has to name its project. */
@@ -43,29 +45,29 @@ export declare const serverAskSchema: z.ZodEffects<z.ZodObject<{
     pass: z.ZodString;
     /** Required for `SERVER_PROJECT_METHODS`; absent for a question about this computer (2.20.0). */
     project: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
-    method: z.ZodEnum<["tracker.get", "tracker.columns", "traffic.read", "traffic.note"]>;
+    method: z.ZodEnum<["tracker.get", "tracker.columns", "traffic.read", "traffic.note", "epics.list", "epic.get", "steps.list", "parts.get", "dispositions.get"]>;
     params: z.ZodDefault<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
 }, "strip", z.ZodTypeAny, {
     params: Record<string, unknown>;
     module: string;
-    method: "tracker.get" | "tracker.columns" | "traffic.read" | "traffic.note";
+    method: "epics.list" | "epic.get" | "steps.list" | "tracker.get" | "tracker.columns" | "traffic.read" | "traffic.note" | "parts.get" | "dispositions.get";
     pass: string;
     project?: string | undefined;
 }, {
     module: string;
-    method: "tracker.get" | "tracker.columns" | "traffic.read" | "traffic.note";
+    method: "epics.list" | "epic.get" | "steps.list" | "tracker.get" | "tracker.columns" | "traffic.read" | "traffic.note" | "parts.get" | "dispositions.get";
     pass: string;
     params?: Record<string, unknown> | undefined;
     project?: string | undefined;
 }>, {
     params: Record<string, unknown>;
     module: string;
-    method: "tracker.get" | "tracker.columns" | "traffic.read" | "traffic.note";
+    method: "epics.list" | "epic.get" | "steps.list" | "tracker.get" | "tracker.columns" | "traffic.read" | "traffic.note" | "parts.get" | "dispositions.get";
     pass: string;
     project?: string | undefined;
 }, {
     module: string;
-    method: "tracker.get" | "tracker.columns" | "traffic.read" | "traffic.note";
+    method: "epics.list" | "epic.get" | "steps.list" | "tracker.get" | "tracker.columns" | "traffic.read" | "traffic.note" | "parts.get" | "dispositions.get";
     pass: string;
     params?: Record<string, unknown> | undefined;
     project?: string | undefined;

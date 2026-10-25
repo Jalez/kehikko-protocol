@@ -7,6 +7,65 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.21.0 — 2026-10-26
+
+Steps any module can provide, skill needs by what a module provides, and a module's server asking
+for the epic. **Additive**; `PROTOCOL` is still 2. Nothing existing changes shape on the wire: an old
+module keeps working against a 2.21.0 host, and a 2.21.0 module against an older host, with one
+exception said below (`needs` objects).
+
+### Added
+
+- **An epic's plan as a holding** (`plan.ts`, docs/plans.md): `planSchema` — `goal?`, `measure?`,
+  `phases: { id, title }[]`, `steps: { id, title, body, refs, issue?, related, part?, under?, after,
+  phase?, gates: { id, title, kind: 'decision' | 'access' | 'work' | 'ref', ref?, epic?, owner?,
+  waitsOn, done }[] }[]` — published by any module in `.kehikot/<module>/steps.json`
+  (`PLAN_FILE`, `PLAN_VERSION`, `{ version, module, epics }`). `PLAN_ID`, `PLAN_GATE_KINDS`,
+  `planPhaseSchema`, `planGateSchema`, `planStepSchema`, `planIn` and `plansIn` (lenient readers),
+  `phaseOf` (a step's phase, inherited from above), `LIMITS.PLAN_*`.
+- `/serve`: `writePlan(projectPath, moduleId, epic, plan | null)` (atomic, inside the project, refuses
+  a plan that does not fit and reports dropped references) and `readPlans` / `readPlansFor` (every
+  module's `steps.json`, by folder).
+- **`steps.list` answers the union** of every provider: `stepsListResult` (`steps` and `phases`, each
+  with the `module` that provides it, and `providers: { module, goal?, measure?, fallback? }[]`) in
+  `methodResults`; `providedStepSchema`, `providedPhaseSchema`, `stepsProviderSchema`, and
+  `plansUnion`, the one union two hosts make alike. An epic whose steps are elsewhere is still
+  answered `{ stepsFrom }` with no `steps`.
+- `CONTENT_STEPS` (`'steps'`): the content source a host announces beside a steps provider's own id,
+  so a reader of `steps.list` follows "any steps provider" without naming one.
+- **`declares.provides`** (`PROVIDES`: `steps`, `documents`, `refs`; free words, at most
+  `LIMITS.PROVIDES`), `providesOf`; **`declares.agentSessions: { loadsSkills }`**, `loadsSkills`:
+  a module that runs agent sessions and loads kehikko-bound skills into them. Both dropped, not
+  fatal, when they do not parse.
+- **Skill needs by what a module provides**: a need is a module id or one of `{ provides }`,
+  `{ subject }` (`mcp.subjects` kind), `{ reacts }` or `{ uses }` (`NEED_KINDS`, `SkillNeed`,
+  `CapabilityNeed`, `skillNeedSchema`, `needParts`, `needKey`). `missingNeeds(skill, present)` takes
+  the manifests on the kehikko (or ids, as before) and returns the needs nothing meets;
+  `meetsNeed`, `needSaid` (a need in a person's words), `neededIds`.
+- **A module's server asks for the epic**: `SERVER_METHODS` (and `SERVER_PROJECT_METHODS`) gain
+  `epics.list`, `epic.get`, `steps.list`, `parts.get` and `dispositions.get`, each held to the same
+  capability as on the page. New methods `parts.get { epic }` → `partsGetResult` (`context.parts`'
+  shape, `picked` false) under the new capability `parts:read`, and `dispositions.get {}` →
+  `dispositionsGetResult` under `dispositions:read`. `askHost`'s `ServerAnswers` types them.
+- `planOfJourney(record)`: a Journeys record as a plan — what a host reads the Journeys fallback
+  with, and what Journeys can publish with. Deprecated with `journey.ts`.
+
+### Changed
+
+- `skillNeedsSchema` accepts the object forms beside ids; `ModuleSkill['needs']` is `SkillNeed[]`, and
+  `missingNeeds` returns `SkillNeed[]`. Code that treated a need as a string narrows it with
+  `typeof need === 'string'` or `neededIds`. **A host before 2.21.0 refuses a manifest whose
+  `needs` holds an object**: a module moving to the object forms gives its official-list entry
+  `protocol: "2.21.0"`.
+- The words: "Claude Code skills" are "agent skills" wherever the protocol describes them;
+  `CAPABILITIES['steps:read']` says what the union carries.
+
+### Deprecated
+
+- `journey.ts` (`JOURNEYS_MODULE`, `JOURNEYS_FILE`, `journeyRecordSchema` and the rest),
+  `readJourney` and `readJourneys`, as where an epic's STEPS are. A 2.21.0 host reads Journeys' file
+  only as the fallback provider while Journeys has no `steps.json`. Removed in 3.0.
+
 ## 2.20.0 — 2026-10-24
 
 Traffic: the record of the calls Kehikot and its modules make and receive on this computer, with

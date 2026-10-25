@@ -123,10 +123,27 @@ minutes would take five minutes to discover the host is gone. See
 ### Some answers have a shape, and the line is not where you would guess
 
 `methodParams` says what a caller constructs; what comes back is `unknown`,
-because no host promised otherwise. That still holds for `epic.get`,
-`steps.list` and `live.get`, and the reason is about **material**: two honest
-hosts hold different amounts of an epic, and a schema over that would be this
-package legislating what a host must keep.
+because no host promised otherwise. That still holds for `epic.get` and
+`live.get`, and the reason is about **material**: two honest hosts hold
+different amounts of an epic, and a schema over that would be this package
+legislating what a host must keep.
+
+**`steps.list`** stopped being material in 2.21.0. An epic's steps are no
+longer a host's holding, or one module's file a host happens to read: any
+module publishes them, in the shape `plan.ts` gives them (`steps.json`), and a
+host answers with the union of every publisher. Two hosts reading the same
+files make the same union (`plansUnion`), so the answer has a schema,
+`stepsListResult`: `steps` (each a plan step with the `module` that provides
+it), `phases` (likewise), and `providers`. All three are optional for one
+reason: an epic whose steps are kept somewhere no module publishes (an older
+record's `stepsFrom`) is answered with no `steps` at all, because an empty list
+would say there are none. See [plans](plans.md).
+
+**`parts.get`** and **`dispositions.get`** (2.21.0) are described for the
+reason `steps.list` is: they hand over, by name, what every framed page is
+already handed in `context.parts` and `context.dispositions`, whose shapes the
+context has always fixed. A module's server, which has no frame, asks for them
+(`SERVER_METHODS`); a page may too.
 
 Some answers are not material, and `methodResults` gives those a shape.
 
@@ -313,6 +330,8 @@ and a module that declares none gets none of the methods below.
 | `activity.set` | `activity:report` |
 | `traffic.read` | `traffic:read` |
 | `traffic.note` | `traffic:report` |
+| `parts.get` | `parts:read` |
+| `dispositions.get` | `dispositions:read` |
 
 The host's table is the protocol's `METHODS`, read by its `capabilityOf`
 (`src/host/grants.ts`): there is no second list to keep in step. A host keeps a
@@ -326,6 +345,25 @@ part, and a module author reading `epics:read` reads a subject and a verb,
 which is all it ever really was. (The WORDS did change — `journeys:read` is
 `epics:read` now — but that is the epic rename, which had a reason, and not a
 tidy-up, which does not.)
+
+#### `CAPABILITIES.parts:read` and `CAPABILITIES.dispositions:read`
+
+2.21.0. What every framed page is handed in the context — the epic's parts with
+what the modules hold for each, and why closed refs closed — asked for by name,
+which is what a module's SERVER needs: it has no frame, and before these it read
+the host's epic files and other modules' folders instead. They are capabilities
+of their own, rather than free, because a server's question is not tied to a
+screen: a module asking for them is saying it reads them with nobody looking.
+`parts.get { epic }` answers `partsGetResult` (`{ parts }`, `context.parts`'s
+shape, `picked` false throughout: picking is a person's, on one screen);
+`dispositions.get {}` answers `dispositionsGetResult` (`{ dispositions }`).
+
+#### `CAPABILITIES.steps:read`, from 2.21.0
+
+The capability is unchanged; its sentence now says what the answer carries:
+the union of every module's plan — titles, bodies, order (`under`, `after`),
+phases, gates and refs — each step saying which module provides it. See
+[plans](plans.md).
 
 #### `CAPABILITIES.traffic:read` and `CAPABILITIES.traffic:report`
 
