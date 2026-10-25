@@ -168,7 +168,8 @@ describe('which answers are described at all', () => {
   test('the outcomes are; the material is not, and missing means unspecified', () => {
     expect(resultSchemaFor('view.goto')).toBe(navigationResult)
     expect(resultSchemaFor('epics.list')).toBe(epicsListResult)
-    for (const name of ['epic.get', 'steps.list', 'live.get', 'stage.report', 'events.emit'] as const) {
+    /* `steps.list` has had one since 2.21.0: the union of every module's plan (see v2-21). */
+    for (const name of ['epic.get', 'live.get', 'stage.report', 'events.emit'] as const) {
       expect(resultSchemaFor(name)).toBeUndefined()
     }
   })

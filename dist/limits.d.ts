@@ -267,7 +267,7 @@ export declare const LIMITS: {
     readonly SUBJECT_ID: 128;
     /** How many things one "is this done?" answer may list. */
     readonly DONE_ITEMS: 256;
-    /** How many Claude Code skills one manifest may offer (`declares.skills`, 2.5.0). */
+    /** How many agent skills one manifest may offer (`declares.skills`, 2.5.0). */
     readonly SKILLS: 16;
     /** A skill's name (2.5.0), in characters: kebab-case, and the folder it is installed in. */
     readonly SKILL_NAME: 40;
@@ -275,7 +275,7 @@ export declare const LIMITS: {
     readonly SKILL_VERSION: 64;
     /** A skill's text, its SKILL.md (2.5.0), in BYTES of UTF-8. */
     readonly SKILL_TEXT: 65536;
-    /** How many other modules one skill may need on its kehikko (`needs`, 2.12.0). */
+    /** How many needs one skill may list (`needs`, 2.12.0): modules by id, or what a module provides (2.21.0). */
     readonly SKILL_NEEDS: 8;
     /**
      * The highest line number a code location may name (`codeLocationSchema`, 2.13.0). A value, not a
@@ -323,4 +323,22 @@ export declare const LIMITS: {
     readonly TRAFFIC_BY: 64;
     /** How many open connections one `traffic.read` describes. */
     readonly TRAFFIC_CONNECTIONS: 500;
+    /** How many steps one module's plan for one epic may hold. */
+    readonly PLAN_STEPS: 256;
+    /** How many phases one plan may hold. */
+    readonly PLAN_PHASES: 32;
+    /** How many gates may hold one step. */
+    readonly PLAN_GATES: 32;
+    /** How many refs one step may name, delivering or related, each list on its own. */
+    readonly PLAN_STEP_REFS: 64;
+    /** How many steps one step may wait for (`after`), and refs one gate may wait on (`waitsOn`). */
+    readonly PLAN_AFTER: 32;
+    /** A step's body, in characters: the prose under its title. */
+    readonly PLAN_BODY: 4000;
+    /** Who acts on a gate — a person or a role — in characters. */
+    readonly PLAN_OWNER: 80;
+    /** How many words one manifest may list in `declares.provides` (2.21.0). */
+    readonly PROVIDES: 8;
+    /** One word of `declares.provides`, and the value of a skill's `{ provides }` need, in characters. */
+    readonly PROVIDES_WORD: 32;
 };

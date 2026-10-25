@@ -351,7 +351,11 @@ All of it still works, unchanged. None of it is for new code.
 
 ## An epic's steps, and the record they are read from
 
-Unchanged by 1.2.0, and no longer about parts.
+Unchanged by 1.2.0, and no longer about parts. **Deprecated in 2.21.0**: an
+epic's steps are a plan any module publishes in its own `steps.json` and a host
+answers `steps.list` from the union of them all — see [plans](plans.md). What
+follows is the older record, which a 2.21.0 host still reads as the fallback for
+a Journeys that has not published, and which goes in 3.0.
 
 The Journeys module keeps `.kehikot/journeys/journeys.json`, `{ version, journeys: { <slug>: record } }`, and a host answers `epics.list`, `epic.get` and `steps.list` out of it, falling back to its own file when a project has no record under a slug. The format is `journey.ts`, here, so the writer and the reader import one shape.
 

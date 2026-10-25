@@ -188,7 +188,8 @@ poller at a third party.
 
 ### Skills a module offers (2.5.0)
 
-`declares.skills` lists Claude Code skills a module offers a person: each one a
+`declares.skills` lists agent skills a module offers a person — instructions an
+agent session loads, such as a Claude Code skill: each one a
 `name` (kebab-case, `SKILL_NAME`, at most `LIMITS.SKILL_NAME` = 40 characters),
 a `summary` (at most 200) and a `version` (at most 64, compared for equality and
 never parsed); at most `LIMITS.SKILLS` = 16, no two with one name. Optional:
@@ -202,7 +203,7 @@ with a text as served, or `null`; a `name:` in the front matter, when present,
 must be the skill's own name.
 
 **It is an offer, not an install.** A skill is instructions that land in the
-person's Claude Code for every project, so a host shows the whole text (and,
+person's agent for every project, so a host shows the whole text (and,
 for an update, what changed) and installs only on the person's own press. A
 host fetches the text from the module's registered origin, never from what a
 request hands it, and no agent can install or remove one. Nothing in this
@@ -212,32 +213,88 @@ package installs, fetches or decides anything about a skill.
 
 Some skills only make sense beside other modules: `/review-factory` reviews what
 Factory built with Review, and is nonsense on a kehikko without Review. Such a
-skill lists them in `needs`: module ids, each once, at most
-`LIMITS.SKILL_NEEDS` = 8. The declaring module is implied and need not be
-listed. A skill with a non-empty `needs` is **kehikko-bound**.
+skill lists what it needs in `needs`, each once, at most `LIMITS.SKILL_NEEDS` =
+8. The declaring module is implied and need not be listed. A skill with a
+non-empty `needs` is **kehikko-bound**.
+
+A need is a module id (2.12.0), or — from 2.21.0 — what some module on the
+kehikko provides, says or asks for, so that a skill needs a KIND of module and
+not one program by name (`NEED_KINDS`):
+
+| need | met by a module on the kehikko whose manifest… |
+|---|---|
+| `'kehikot.review'` | is that module (2.12.0) |
+| `{ provides: 'steps' }` | lists the word in `declares.provides` (`steps`, `documents`, `refs`, …) |
+| `{ subject: 'review-draft' }` | has a subject of that kind in `mcp.subjects` |
+| `{ reacts: 'address' }` | lists the word in `reacts` |
+| `{ uses: 'trackers:read' }` | lists the capability in `declares.uses` |
 
 ```ts
 declares: {
   skills: [
     { name: 'factory', summary: '…', version: '1.0.0' },
-    { name: 'review-factory', summary: '…', version: '1.0.0', needs: ['kehikot.review'] },
+    { name: 'review-factory', summary: '…', version: '1.0.0', needs: [{ subject: 'review-draft' }] },
+    { name: 'flow-roadmap', summary: '…', version: '1.0.0', needs: [{ provides: 'steps' }] },
   ],
 }
 ```
 
-A kehikko-bound skill is never installed user-wide (`~/.claude/skills/`, which
-lands in every conversation, on any kehikko or none). It reaches a conversation
-only through a per-conversation load — the Claude module's session plugin —
-and only when the conversation's kehikko has a container of the declaring
-module and of every id in `needs`. A host that finds one it installed
-user-wide removes it where the person has not edited it. The skill itself
-still checks at run time and names what is missing: a conversation can outlive
-its kehikko's arrangement.
+An object with a key this version does not know is carried and never met: the
+skill is not offered anywhere until a host knows what it means. **A host before
+2.21.0 refuses a manifest whose `needs` holds an object at all**, so a module
+that moves to the object forms needs hosts on 2.21.0: give its entry in the
+official list `protocol: "2.21.0"`.
 
-`isKehikkoBound(skill)` is whether `needs` lists anything;
-`missingNeeds(skill, present)` lists the ids in `needs` that are not among
-`present`, in the skill's order, comparing ids as written. Optional: a skill
-without `needs` works wherever its module is installed, as before.
+A kehikko-bound skill is never installed user-wide (`~/.claude/skills/` for
+Claude Code, which lands in every conversation, on any kehikko or none). It
+reaches a conversation only through a per-conversation load — a module that
+runs agent sessions and says so (`declares.agentSessions.loadsSkills`, below) —
+and only when the conversation's kehikko has a container of the declaring
+module and meets every need. A host that finds one it installed user-wide
+removes it where the person has not edited it. The skill itself still checks at
+run time and names what is missing: a conversation can outlive its kehikko's
+arrangement.
+
+`isKehikkoBound(skill)` is whether `needs` lists anything.
+`missingNeeds(skill, present)` lists the needs nothing in `present` meets, in
+the skill's order: `present` is the manifests on the kehikko (any object with
+`id`, `reacts`, `declares.uses`, `declares.provides` and `mcp.subjects`), or, as
+before, just the ids — which meet only id needs. `meetsNeed(need, manifest)` is
+one check; `needSaid(need, nameOf)` says a need in a person's words ("a module
+that keeps an epic's steps"); `neededIds(skill)` is the ids among the needs.
+Optional: a skill without `needs` works wherever its module is installed, as
+before.
+
+### What a module provides (2.21.0)
+
+`declares.provides` lists what a module PUBLISHES for other modules to read, as
+words of `PROVIDES`:
+
+- `steps` — its `steps.json`: an epic's steps, phases and gates ([plans](plans.md)).
+- `documents` — documents for an epic's parts in its `parts.json` ([parts](parts.md)).
+- `refs` — references for an epic's parts in its `parts.json`.
+
+Free words like `reacts`: a host carries one it does not know and matches it as
+written. It is what a skill's `{ provides }` need is met by, and how a host
+knows that a module's changes are changes to an epic's steps (`CONTENT_STEPS`).
+It grants nothing and is checked against nothing: a module that says it provides
+steps and publishes none provides none. Optional; one that does not parse is
+dropped, not fatal. `providesOf(manifest)` reads it, `[]` when absent.
+
+### Agent sessions (2.21.0)
+
+`declares.agentSessions` says a module runs agent sessions — conversations with
+a coding agent it starts for a place — and `loadsSkills: true` that it loads into
+each one the kehikko-bound skills that can work on that session's kehikko. A host
+routes kehikko-bound skills to whichever module declares it, never to a module
+by name; with none installed, it says so instead of naming one.
+
+```ts
+declares: { agentSessions: { loadsSkills: true } }
+```
+
+Optional; absent means the module runs none. One that does not parse is dropped,
+not fatal. `loadsSkills(manifest)` reads it.
 
 ### A module's settings (2.15.0)
 

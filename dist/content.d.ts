@@ -10,6 +10,14 @@ import { z } from 'zod';
  */
 export declare const CONTENT_HOST = "host";
 /**
+ * The `source` when the changed material is an epic's steps, whoever provides them (2.21.0): a host
+ * announces it beside the module's own id whenever a module that provides steps (`declares.provides`)
+ * reports a change or rewrites its `steps.json`. A reader that shows the union `steps.list` answers
+ * follows this one source instead of naming every provider: `contentStamp(content, { sources:
+ * [CONTENT_STEPS], epic })`. Like `CONTENT_HOST`, a word and not a module id: module ids are reverse-DNS, with a dot.
+ */
+export declare const CONTENT_STEPS = "steps";
+/**
  * One source's last change for one epic. `source` is `CONTENT_HOST` or the id of the module that
  * keeps the material. `epic` is null when the host cannot tell which epic; a reader takes null as
  * "any epic of this source".

@@ -1,5 +1,11 @@
 import { z } from 'zod';
+import { type Plan } from './plan.js';
 /**
+ * @deprecated 2.21.0, as where an epic's STEPS are. Steps are a holding any module publishes —
+ * `steps.json`, `planSchema` in `plan.ts` — and a host answers `steps.list` from the union of every
+ * publisher. Nothing new should read this file's shape; `planOfJourney` turns a record into a plan
+ * for the move. Kept, and unchanged, until 3.0.
+ *
  * An epic's steps and groups as a project keeps them, in the Journeys module's file a host reads.
  * Journeys owns the steps and the prose; a host owns the slug, the title, existence and, from 1.2.0,
  * the list of the epic's parts (`listedPartSchema` in `parts.ts`), which `groups` used to be read as.
@@ -10,7 +16,9 @@ import { z } from 'zod';
  * The module that keeps the record, and the file it keeps it in:
  * `moduleFile(projectPath, JOURNEYS_MODULE, JOURNEYS_FILE)` is `<project>/.kehikot/journeys/journeys.json`.
  * @deprecated 1.2.0, as where an epic's PARTS are: a part names no module, and nothing about parts
- * should spell this id. Kept, and unchanged; a host that reads steps from the record still names it.
+ * should spell this id. 2.21.0, as where its STEPS are: a host reads every module's `steps.json`
+ * (`readPlans`) and this file only as a fallback for a Journeys that has not published one yet.
+ * Kept, and unchanged, until 3.0.
  */
 export declare const JOURNEYS_MODULE = "kehikot.journeys";
 export declare const JOURNEYS_FILE = "journeys";
@@ -99,7 +107,10 @@ export declare const stepsFromSchema: z.ZodObject<{
     why: z.ZodDefault<z.ZodString>;
 }, z.ZodTypeAny, "passthrough">>;
 export type StepsFrom = z.infer<typeof stepsFromSchema>;
-/** The record for one epic. `slug` is the epic's slug: the same name as the host's `epic`. */
+/**
+ * The record for one epic. `slug` is the epic's slug: the same name as the host's `epic`.
+ * @deprecated 2.21.0: an epic's steps are a plan (`planSchema`), published by whichever module keeps them.
+ */
 export declare const journeyRecordSchema: z.ZodObject<{
     slug: z.ZodString;
     title: z.ZodString;
@@ -1175,3 +1186,20 @@ export declare function partIdsOf(groups: unknown): (string | null)[];
  * with `readHoldings`. Kept, and unchanged: it is how a host adopts the list of an epic that has none yet.
  */
 export declare function partsOf(record: unknown): JourneyPart[];
+/**
+ * A Journeys record as a plan (2.21.0), for the move from this file to `steps.json`: what a host reads
+ * as the fallback for a Journeys that has not published yet, and what Journeys can publish with
+ * `writePlan`. Takes anything and never throws; null for a non-record and for one whose steps are kept
+ * elsewhere (`stepsFrom`), which is not "none".
+ *
+ * - A step's id is its part's (`stepPart`), else `step-<position>`, told apart with `-2`, `-3`.
+ * - `refs` are the refs that deliver it (its `roles` do not call them prior art or related), and
+ *   `related` the rest; `issue` is kept when it is a ref.
+ * - `under`, `after` and `phase` are kept where they name a step or phase of the record.
+ * - Its gates are the record's gates its `blockedBy` names, and those that hold a ref delivering it
+ *   (the record's own `blockedBy`, ref → gate ids). `issue` and `ref-elsewhere` gates are `ref` gates;
+ *   `state: 'done'` is `done`.
+ * - The record's `phases`, `goal` and `measure` come across as they are.
+ * @deprecated 2.21.0, with this file: for the migration only, and removed in 3.0.
+ */
+export declare function planOfJourney(record: unknown): Plan | null;

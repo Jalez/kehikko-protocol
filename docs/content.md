@@ -23,7 +23,7 @@ are in `src/content.ts`.
 
 // a string that moves only when material this container shows changed
 const stamp = contentStamp(context.content, {
-  sources: [CONTENT_HOST, 'kehikot.journeys'],
+  sources: [CONTENT_HOST, CONTENT_STEPS],   // the host's epics, and any module's steps (2.21.0)
   epic: context.epic,
 })
 useEffect(() => { reread() }, [stamp])
@@ -36,8 +36,12 @@ await request('content.changed', { epic: 'modes-are-modules' })
   and for which epic; the module re-reads it through the door it already reads
   by — `steps.list`, `epic.get`, its own server.
 - **Sources**: `CONTENT_HOST` (`'host'`) is the epics the host keeps, which is
-  what `epics.list`, `epic.get` and `steps.list` answer from. Anything else is
-  the id of the module that keeps the material. `epic: null` means the host
+  what `epics.list` and `epic.get` answer from. `CONTENT_STEPS` (`'steps'`,
+  2.21.0) is an epic's steps, whoever provides them: a host announces it beside
+  the module's id whenever a module that provides steps (`declares.provides`)
+  reports a change or rewrites its `steps.json`, so a reader of `steps.list`
+  follows one source and names no provider. Anything else is the id of the
+  module that keeps the material. `epic: null` means the host
   could not tell which epic — an edited file holding several — and counts for
   any.
 - **A list, not the latest**: a host may fold two changes into one broadcast,
@@ -91,6 +95,17 @@ Whose material changed, when it is the host's own: the epics it keeps, which
 is what `epics.list`, `epic.get` and `steps.list` answer from. Every other
 source is a module id, and a module id always has a dot in it by convention,
 so the two do not meet.
+
+#### `CONTENT_STEPS`
+
+2.21.0. Before it, a module showing an epic's steps followed `'kehikot.journeys'`
+by name, because that was the one module whose file a host read steps from. Steps
+are now published by any module (`steps.json`, see [plans](plans.md)), and a
+reader cannot list every module that might provide them. So the host says it
+once: a change by any steps provider is also a change of `CONTENT_STEPS` for the
+same epic (or for none, when the host saw a file move and cannot tell which
+epic). An older host never sends it; a module that must also work there keeps
+the provider's id beside it in `sources` until it can drop it.
 
 #### `contentChangeSchema`
 

@@ -390,36 +390,56 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
          */
         prompt: z.ZodDefault<z.ZodBoolean>;
         /**
-         * Claude Code skills this module offers a person (2.5.0): name, summary, version. Each one's
-         * text is served at `skillPath(name)`. An offer, not an install: the host shows the text and
-         * the person decides. Optional and never defaulted; absent means none.
+         * Agent skills this module offers a person (2.5.0): name, summary, version, and what each
+         * needs on the kehikko. Each one's text is served at `skillPath(name)`. An offer, not an
+         * install: the host shows the text and the person decides. Optional and never defaulted;
+         * absent means none.
          */
         skills: z.ZodOptional<z.ZodEffects<z.ZodArray<z.ZodObject<{
             name: z.ZodString;
             summary: z.ZodString;
             version: z.ZodString;
-            needs: z.ZodOptional<z.ZodEffects<z.ZodArray<z.ZodString, "many">, string[], string[]>>;
+            needs: z.ZodOptional<z.ZodEffects<z.ZodArray<z.ZodType<import("./skills.js").SkillNeed, z.ZodTypeDef, import("./skills.js").SkillNeed>, "many">, import("./skills.js").SkillNeed[], import("./skills.js").SkillNeed[]>>;
         }, "strip", z.ZodTypeAny, {
             name: string;
             version: string;
             summary: string;
-            needs?: string[] | undefined;
+            needs?: import("./skills.js").SkillNeed[] | undefined;
         }, {
             name: string;
             version: string;
             summary: string;
-            needs?: string[] | undefined;
+            needs?: import("./skills.js").SkillNeed[] | undefined;
         }>, "many">, {
             name: string;
             version: string;
             summary: string;
-            needs?: string[] | undefined;
+            needs?: import("./skills.js").SkillNeed[] | undefined;
         }[], {
             name: string;
             version: string;
             summary: string;
-            needs?: string[] | undefined;
+            needs?: import("./skills.js").SkillNeed[] | undefined;
         }[]>>;
+        /**
+         * What this module publishes for others to read (2.21.0): words of `PROVIDES` — `steps` (its
+         * `steps.json`), `documents` and `refs` (its `parts.json`) — or a word a later version adds.
+         * What a skill's `{ provides }` need is met by, and how a reader finds "any steps provider"
+         * without an id. Optional and never defaulted; one that does not parse is dropped, not fatal.
+         */
+        provides: z.ZodCatch<z.ZodOptional<z.ZodEffects<z.ZodArray<z.ZodString, "many">, string[], string[]>>>;
+        /**
+         * That this module runs agent sessions (2.21.0), and whether it loads skills into them
+         * (`loadsSkills`): a host routes kehikko-bound skills to such a module, never to one by name.
+         * Optional; absent means it runs none. One that does not parse is dropped, not fatal.
+         */
+        agentSessions: z.ZodCatch<z.ZodOptional<z.ZodObject<{
+            loadsSkills: z.ZodDefault<z.ZodBoolean>;
+        }, "strip", z.ZodTypeAny, {
+            loadsSkills: boolean;
+        }, {
+            loadsSkills?: boolean | undefined;
+        }>>>;
         /**
          * Which scopes of `context.scope` this module can show (2.9.0): `epic` for one epic,
          * `project` for every epic of the project at once, each item labelled with its epic. Optional
@@ -542,25 +562,31 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                 label: string;
             }[] | undefined;
         }[] | undefined;
+        provides?: string[] | undefined;
         skills?: {
             name: string;
             version: string;
             summary: string;
-            needs?: string[] | undefined;
+            needs?: import("./skills.js").SkillNeed[] | undefined;
         }[] | undefined;
+        agentSessions?: {
+            loadsSkills: boolean;
+        } | undefined;
         scopes?: ("epic" | "project")[] | undefined;
     }, {
         protocol?: string | undefined;
         prompt?: boolean | undefined;
         settings?: unknown;
+        provides?: unknown;
         uses?: string[] | undefined;
         storage?: boolean | undefined;
         skills?: {
             name: string;
             version: string;
             summary: string;
-            needs?: string[] | undefined;
+            needs?: import("./skills.js").SkillNeed[] | undefined;
         }[] | undefined;
+        agentSessions?: unknown;
         scopes?: ("epic" | "project")[] | undefined;
     }>>;
     /**
@@ -590,20 +616,6 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     protocol: number;
     summary: string;
     kind: "kehikot.module";
-    dataVersion: number;
-    tags: string[];
-    guidance: string;
-    entry: string;
-    extensions: {
-        emits: string[];
-        consumes: string[];
-    };
-    reacts: string[];
-    modes: {
-        id: string;
-        label: string;
-        scope: "epic" | "global";
-    }[];
     declares: {
         protocol: string;
         prompt: boolean;
@@ -622,14 +634,32 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                 label: string;
             }[] | undefined;
         }[] | undefined;
+        provides?: string[] | undefined;
         skills?: {
             name: string;
             version: string;
             summary: string;
-            needs?: string[] | undefined;
+            needs?: import("./skills.js").SkillNeed[] | undefined;
         }[] | undefined;
+        agentSessions?: {
+            loadsSkills: boolean;
+        } | undefined;
         scopes?: ("epic" | "project")[] | undefined;
     };
+    reacts: string[];
+    dataVersion: number;
+    tags: string[];
+    guidance: string;
+    entry: string;
+    extensions: {
+        emits: string[];
+        consumes: string[];
+    };
+    modes: {
+        id: string;
+        label: string;
+        scope: "epic" | "global";
+    }[];
     build?: {
         version: string;
         commit: string | null;
@@ -637,7 +667,6 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         protocol: string;
     } | undefined;
     icon?: string | undefined;
-    health?: string | undefined;
     mcp?: {
         url: string;
         transport: "http" | "sse" | "stdio";
@@ -651,6 +680,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         }[];
         as?: string | undefined;
     } | undefined;
+    health?: string | undefined;
     partless?: string | undefined;
 }, {
     id: string;
@@ -667,10 +697,23 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     version?: string | undefined;
     summary?: string | undefined;
     icon?: string | undefined;
-    dataVersion?: number | undefined;
-    tags?: string[] | undefined;
-    guidance?: string | undefined;
-    health?: string | undefined;
+    declares?: {
+        protocol?: string | undefined;
+        prompt?: boolean | undefined;
+        settings?: unknown;
+        provides?: unknown;
+        uses?: string[] | undefined;
+        storage?: boolean | undefined;
+        skills?: {
+            name: string;
+            version: string;
+            summary: string;
+            needs?: import("./skills.js").SkillNeed[] | undefined;
+        }[] | undefined;
+        agentSessions?: unknown;
+        scopes?: ("epic" | "project")[] | undefined;
+    } | undefined;
+    reacts?: string[] | undefined;
     mcp?: {
         url: string;
         transport?: "http" | "sse" | "stdio" | undefined;
@@ -684,26 +727,15 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             release?: string | undefined;
         }[] | undefined;
     } | undefined;
+    dataVersion?: number | undefined;
+    tags?: string[] | undefined;
+    guidance?: string | undefined;
+    health?: string | undefined;
     extensions?: {
         emits?: string[] | undefined;
         consumes?: string[] | undefined;
     } | undefined;
-    reacts?: string[] | undefined;
     partless?: string | undefined;
-    declares?: {
-        protocol?: string | undefined;
-        prompt?: boolean | undefined;
-        settings?: unknown;
-        uses?: string[] | undefined;
-        storage?: boolean | undefined;
-        skills?: {
-            name: string;
-            version: string;
-            summary: string;
-            needs?: string[] | undefined;
-        }[] | undefined;
-        scopes?: ("epic" | "project")[] | undefined;
-    } | undefined;
 }>, {
     id: string;
     name: string;
@@ -711,20 +743,6 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     protocol: number;
     summary: string;
     kind: "kehikot.module";
-    dataVersion: number;
-    tags: string[];
-    guidance: string;
-    entry: string;
-    extensions: {
-        emits: string[];
-        consumes: string[];
-    };
-    reacts: string[];
-    modes: {
-        id: string;
-        label: string;
-        scope: "epic" | "global";
-    }[];
     declares: {
         protocol: string;
         prompt: boolean;
@@ -743,14 +761,32 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                 label: string;
             }[] | undefined;
         }[] | undefined;
+        provides?: string[] | undefined;
         skills?: {
             name: string;
             version: string;
             summary: string;
-            needs?: string[] | undefined;
+            needs?: import("./skills.js").SkillNeed[] | undefined;
         }[] | undefined;
+        agentSessions?: {
+            loadsSkills: boolean;
+        } | undefined;
         scopes?: ("epic" | "project")[] | undefined;
     };
+    reacts: string[];
+    dataVersion: number;
+    tags: string[];
+    guidance: string;
+    entry: string;
+    extensions: {
+        emits: string[];
+        consumes: string[];
+    };
+    modes: {
+        id: string;
+        label: string;
+        scope: "epic" | "global";
+    }[];
     build?: {
         version: string;
         commit: string | null;
@@ -758,7 +794,6 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         protocol: string;
     } | undefined;
     icon?: string | undefined;
-    health?: string | undefined;
     mcp?: {
         url: string;
         transport: "http" | "sse" | "stdio";
@@ -772,6 +807,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         }[];
         as?: string | undefined;
     } | undefined;
+    health?: string | undefined;
     partless?: string | undefined;
 }, {
     id: string;
@@ -788,10 +824,23 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     version?: string | undefined;
     summary?: string | undefined;
     icon?: string | undefined;
-    dataVersion?: number | undefined;
-    tags?: string[] | undefined;
-    guidance?: string | undefined;
-    health?: string | undefined;
+    declares?: {
+        protocol?: string | undefined;
+        prompt?: boolean | undefined;
+        settings?: unknown;
+        provides?: unknown;
+        uses?: string[] | undefined;
+        storage?: boolean | undefined;
+        skills?: {
+            name: string;
+            version: string;
+            summary: string;
+            needs?: import("./skills.js").SkillNeed[] | undefined;
+        }[] | undefined;
+        agentSessions?: unknown;
+        scopes?: ("epic" | "project")[] | undefined;
+    } | undefined;
+    reacts?: string[] | undefined;
     mcp?: {
         url: string;
         transport?: "http" | "sse" | "stdio" | undefined;
@@ -805,26 +854,15 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             release?: string | undefined;
         }[] | undefined;
     } | undefined;
+    dataVersion?: number | undefined;
+    tags?: string[] | undefined;
+    guidance?: string | undefined;
+    health?: string | undefined;
     extensions?: {
         emits?: string[] | undefined;
         consumes?: string[] | undefined;
     } | undefined;
-    reacts?: string[] | undefined;
     partless?: string | undefined;
-    declares?: {
-        protocol?: string | undefined;
-        prompt?: boolean | undefined;
-        settings?: unknown;
-        uses?: string[] | undefined;
-        storage?: boolean | undefined;
-        skills?: {
-            name: string;
-            version: string;
-            summary: string;
-            needs?: string[] | undefined;
-        }[] | undefined;
-        scopes?: ("epic" | "project")[] | undefined;
-    } | undefined;
 }>;
 export type Manifest = z.infer<typeof manifestSchema>;
 /** What a module author writes, before defaults are filled in. */

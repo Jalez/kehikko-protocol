@@ -280,7 +280,7 @@ export const LIMITS = {
   SUBJECT_ID: 128,
   /** How many things one "is this done?" answer may list. */
   DONE_ITEMS: 256,
-  /** How many Claude Code skills one manifest may offer (`declares.skills`, 2.5.0). */
+  /** How many agent skills one manifest may offer (`declares.skills`, 2.5.0). */
   SKILLS: 16,
   /** A skill's name (2.5.0), in characters: kebab-case, and the folder it is installed in. */
   SKILL_NAME: 40,
@@ -288,7 +288,7 @@ export const LIMITS = {
   SKILL_VERSION: 64,
   /** A skill's text, its SKILL.md (2.5.0), in BYTES of UTF-8. */
   SKILL_TEXT: 65_536,
-  /** How many other modules one skill may need on its kehikko (`needs`, 2.12.0). */
+  /** How many needs one skill may list (`needs`, 2.12.0): modules by id, or what a module provides (2.21.0). */
   SKILL_NEEDS: 8,
   /**
    * The highest line number a code location may name (`codeLocationSchema`, 2.13.0). A value, not a
@@ -338,4 +338,23 @@ export const LIMITS = {
   TRAFFIC_BY: 64,
   /** How many open connections one `traffic.read` describes. */
   TRAFFIC_CONNECTIONS: 500,
+  /* An epic's plan: its steps, phases and gates as a module publishes them (2.21.0). See `plan.ts`. */
+  /** How many steps one module's plan for one epic may hold. */
+  PLAN_STEPS: 256,
+  /** How many phases one plan may hold. */
+  PLAN_PHASES: 32,
+  /** How many gates may hold one step. */
+  PLAN_GATES: 32,
+  /** How many refs one step may name, delivering or related, each list on its own. */
+  PLAN_STEP_REFS: 64,
+  /** How many steps one step may wait for (`after`), and refs one gate may wait on (`waitsOn`). */
+  PLAN_AFTER: 32,
+  /** A step's body, in characters: the prose under its title. */
+  PLAN_BODY: 4000,
+  /** Who acts on a gate — a person or a role — in characters. */
+  PLAN_OWNER: 80,
+  /** How many words one manifest may list in `declares.provides` (2.21.0). */
+  PROVIDES: 8,
+  /** One word of `declares.provides`, and the value of a skill's `{ provides }` need, in characters. */
+  PROVIDES_WORD: 32,
 } as const

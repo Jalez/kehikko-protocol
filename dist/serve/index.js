@@ -15,6 +15,9 @@ export { claimOrLeave, preferred, registerBound, serves, } from './plugin.js';
 /* Another module, as this one can learn of it: its manifest and the tools at its door. */
 export { doorOf, listTools, readNeighbour, readNeighbours, NEIGHBOUR_TIMEOUT_MS, } from './neighbours.js';
 export { readJourney, readJourneys } from './journeys.js';
+/* An epic's plan as a module publishes it (2.21.0): `steps.json` in its own folder, and every module's read. */
+export { readPlans, readPlansFor, writePlan } from './plans.js';
+export { PLAN_FILE, PLAN_VERSION } from '../plan.js';
 /* What each module holds for an epic's parts: a host reads every module's, a module writes its own. */
 export { holdingsSpoken, readHoldings, writeHoldings } from './holdings.js';
 export { HOLDINGS_FILE, HOLDING_KINDS } from '../holdings.js';

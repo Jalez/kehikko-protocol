@@ -6,6 +6,7 @@ import { buildSchema } from './build.js';
 import { moduleSkillsSchema } from './skills.js';
 import { CONTEXT_SCOPES } from './context.js';
 import { settingsDeclarationSchema } from './settings.js';
+import { agentSessionsSchema, providesSchema } from './provides.js';
 /**
  * What a module says about itself when a host asks: the manifest schema, the words it suggests (`REACTS_TO`,
  * `TAGS`), and the pure readers `speaks` and `partsDeclaration`. Every string in the schema has a `max` from
@@ -273,11 +274,25 @@ const manifestFields = z.object({
          */
         prompt: z.boolean().default(false),
         /**
-         * Claude Code skills this module offers a person (2.5.0): name, summary, version. Each one's
-         * text is served at `skillPath(name)`. An offer, not an install: the host shows the text and
-         * the person decides. Optional and never defaulted; absent means none.
+         * Agent skills this module offers a person (2.5.0): name, summary, version, and what each
+         * needs on the kehikko. Each one's text is served at `skillPath(name)`. An offer, not an
+         * install: the host shows the text and the person decides. Optional and never defaulted;
+         * absent means none.
          */
         skills: moduleSkillsSchema.optional(),
+        /**
+         * What this module publishes for others to read (2.21.0): words of `PROVIDES` — `steps` (its
+         * `steps.json`), `documents` and `refs` (its `parts.json`) — or a word a later version adds.
+         * What a skill's `{ provides }` need is met by, and how a reader finds "any steps provider"
+         * without an id. Optional and never defaulted; one that does not parse is dropped, not fatal.
+         */
+        provides: providesSchema.optional().catch(undefined),
+        /**
+         * That this module runs agent sessions (2.21.0), and whether it loads skills into them
+         * (`loadsSkills`): a host routes kehikko-bound skills to such a module, never to one by name.
+         * Optional; absent means it runs none. One that does not parse is dropped, not fatal.
+         */
+        agentSessions: agentSessionsSchema.optional().catch(undefined),
         /**
          * Which scopes of `context.scope` this module can show (2.9.0): `epic` for one epic,
          * `project` for every epic of the project at once, each item labelled with its epic. Optional
