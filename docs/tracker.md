@@ -205,6 +205,37 @@ only. A host before 2.19.0 strips it and answers the epic's own refs, so a modul
 parts' refs from an older host still asks `{ refs }` for the ones the answer did not cover —
 which, from a newer host, are none.
 
+### Work that is part of an issue (2.26.0)
+
+A change can deliver an issue, or deliver part of it. "Closes #12" says the first: the change is a
+`closes` link, the issue carries it back as `closed-by`, and when it merges the issue is
+`closedByMerge`. "Part of #12" says the second, and before 2.26.0 a host had no other word than
+`closes` for it, so an issue with one of three changes merged read as done.
+
+Now a change that delivers part of an issue is in two fields of their own, never in `links`:
+
+- `contributes?: ref[]` on the change — the issues it says it is part of: words such as "Part of
+  #12" or "Implements #12" in its description, or, where a host reads it, the forge listing the
+  change as related to the issue (GitLab's related merge requests) without listing it as closing it
+  (GitLab's `closed_by`, GitHub's closing references). A mere mention is neither.
+- `contributedBy?: ref[]` on the issue — the reverse.
+
+What these never do: make the issue closed, or `closedByMerge`, or a `closed-by` link. An issue
+with only contributions is open until somebody closes it or a closing change merges. A change that
+both closes an issue and says it is part of it closes it: the ref is in `links` and not repeated in
+`contributes`. The forge's own closing list wins over the words: a change GitLab or GitHub says
+closes the issue is `closes` whatever its description says.
+
+Why two fields rather than two more `LINK_RELATIONS`: `relation` is an enum, a module built before
+2.26.0 parses `tracker.get` with that enum, and a word it does not know fails the link, the row and
+with it the whole answer. A field it does not know is stripped. So a newer host's rows read whole in
+an older module, which simply does not see the contributions — the same as before, minus the
+contributions it used to misread as closing. Both fields are dropped, not fatal, when they do not
+parse. `TRACKER_FIELD_SINCE` (`since.ts`) says which host version fills each row field.
+
+A module that shows the tie draws it from the change's side ("part of #12") and from the issue's
+("has contributions from !7"), and leaves both out of anything that counts done.
+
 ### Asked from a module's server (2.19.0)
 
 A module's server reads the same reading through `askHost` (`/serve`), held to the same
@@ -284,6 +315,11 @@ Direction is the whole point. GitLab attaches a merge request to an issue for
 any cross-reference either way, so an issue that cites `!1772` as prior art
 would come back with it attached and read as work in flight. A link here is
 only the change's own claim.
+
+A change that says it delivers only PART of an issue is not a link: it is in
+`contributes`, and the issue has it in `contributedBy` (2.26.0). See "Work that
+is part of an issue" above. The two words here stay the only two, so a module
+built against them reads every row a newer host sends.
 
 #### `trackerRowSchema`
 

@@ -99,18 +99,47 @@ export const DECLARATION_SINCE = {
     'agentSessions.installsSkills': '2.23.0',
 };
 export const DECLARATION_NAMES = Object.keys(DECLARATION_SINCE);
+/**
+ * The fields of a tracker row (`trackerRowSchema`) added after the tracker reading first had a shape,
+ * and the version that added each (2.26.0). Nothing a manifest names, so `needsOf` and `fitOf` do not
+ * read it: a module that reads one of these from an older host finds it absent and must not take the
+ * absence for a fact. What a module reads to know which host can fill a field, and what an official
+ * list's `protocol` is set from when a module only works with one. A field not here is older than the
+ * changelog's account of the row.
+ */
+export const TRACKER_FIELD_SINCE = {
+    column: '2.6.0',
+    columns: '2.6.0',
+    reviewers: '2.7.0',
+    authorLogin: '2.7.0',
+    assigneeLogins: '2.7.0',
+    myRoles: '2.7.0',
+    discussions: '2.7.0',
+    lastPushAt: '2.7.0',
+    baseBranch: '2.8.0',
+    headBranch: '2.8.0',
+    stack: '2.8.0',
+    lastActivity: '2.8.0',
+    people: '2.10.0',
+    workItem: '2.11.0',
+    branches: '2.19.0',
+    contributes: '2.26.0',
+    contributedBy: '2.26.0',
+};
 /** Every table, in one place. Plain objects: read them with `sinceOf`, never by indexing with a stranger's string. */
 export const SINCE = {
     methods: METHOD_SINCE,
     capabilities: CAPABILITY_SINCE,
     serverMethods: SERVER_METHOD_SINCE,
     declarations: DECLARATION_SINCE,
+    trackerFields: TRACKER_FIELD_SINCE,
 };
 const TABLE = {
     method: METHOD_SINCE,
     capability: CAPABILITY_SINCE,
     serverMethod: SERVER_METHOD_SINCE,
     declaration: DECLARATION_SINCE,
+    trackerField: TRACKER_FIELD_SINCE,
 };
 /**
  * The version a piece arrived in, or null when this package does not know it: a piece from a
@@ -171,6 +200,8 @@ export function pieceSaid(kind, piece) {
         return own(PIECE_SAID.declarations, piece) ?? piece;
     if (kind === 'capability')
         return own(PIECE_SAID.capabilities, piece) ?? piece;
+    if (kind === 'trackerField')
+        return piece;
     const capability = methodCapability(piece);
     return capability ? (own(PIECE_SAID.capabilities, capability) ?? piece) : piece;
 }
@@ -184,6 +215,7 @@ export const REMOVED = {
     capability: {},
     serverMethod: {},
     declaration: {},
+    trackerField: {},
 };
 /** The version that removed a piece, or null when nothing has. */
 export function removedIn(kind, piece) {

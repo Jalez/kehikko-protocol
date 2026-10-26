@@ -44,7 +44,10 @@ export type ReviewState = (typeof REVIEW_STATES)[number]
 /**
  * How two refs are tied together, from the side of the row carrying the link. `closes`: this change
  * says it delivers that issue. `closed-by`: the reverse, on the issue. A link is only the change's
- * own closing claim, never a mere cross-reference.
+ * own closing claim, never a mere cross-reference. A change that says it delivers PART of an issue
+ * ("Part of #12") is not a link: it is in `contributes` and `contributedBy` (2.26.0), which are
+ * separate fields so that a module built before them, whose schema knows only these two words, reads
+ * a row from a newer host whole.
  */
 export const LINK_RELATIONS = ['closes', 'closed-by'] as const
 export type LinkRelation = (typeof LINK_RELATIONS)[number]
@@ -263,7 +266,8 @@ export const trackerRowSchema = z.object({
   /**
    * On an issue: whether a change that says it closes this one has merged —
    * GitLab's sign that a closed issue was done. Absent when nothing read says
-   * either way.
+   * either way. A change that only contributes to the issue (`contributedBy`)
+   * never sets it.
    */
   closedByMerge: z.boolean().optional(),
   /** On a change: whether it is marked draft. */
@@ -277,6 +281,21 @@ export const trackerRowSchema = z.object({
   closedAt: instant.nullable().optional(),
   mergedAt: instant.nullable().optional(),
   links: z.array(trackerLinkSchema).max(LIMITS.TRACKER_LINKS).default([]),
+  /**
+   * On a change: the issues it says it delivers part of without closing them (2.26.0) — "Part of
+   * #12" or "Implements #12" in its description, or the forge listing it as related to the issue but
+   * not as closing it. A mere mention is neither. Never a `closes` link, and a ref in `links` is not repeated
+   * here. Absent from an older host and where nothing was read; dropped, not fatal, when it does
+   * not parse.
+   */
+  contributes: z.array(ref).max(LIMITS.TRACKER_LINKS).optional().catch(undefined),
+  /**
+   * On an issue: the changes that say they deliver part of it (2.26.0), the reverse of
+   * `contributes`. Their merging never makes the issue closed or `closedByMerge`: the issue is
+   * done when it is closed, or when a change in `links` as `closed-by` merges. Absent from an older
+   * host and where nothing was read; dropped, not fatal, when it does not parse.
+   */
+  contributedBy: z.array(ref).max(LIMITS.TRACKER_LINKS).optional().catch(undefined),
   /** On a change: its head pipeline. Absent on issues and where none ran or none was read. */
   pipeline: z.enum(PIPELINE_STATES).optional(),
   /** On a change: where its review stands. */

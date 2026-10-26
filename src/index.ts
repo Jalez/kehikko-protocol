@@ -728,6 +728,7 @@ export {
   SERVER_METHOD_SINCE,
   DECLARATION_SINCE,
   DECLARATION_NAMES,
+  TRACKER_FIELD_SINCE,
   PIECE_SAID,
   REMOVED,
   sinceOf,
@@ -739,6 +740,7 @@ export {
   versionSaid,
   type Declaration,
   type PieceKind,
+  type TrackerField,
 } from './since.js'
 export {
   needsOf,

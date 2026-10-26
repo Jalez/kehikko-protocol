@@ -7,6 +7,28 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.26.0 — 2026-10-26
+
+Work that is part of an issue. **Additive**; `PROTOCOL` is still 2. A change whose description says
+"Part of #12" used to come back as `closes` it, so merging one of three changes made the issue read
+as done. Now a change that delivers part of an issue is tied to it in fields of its own, and that
+tie never makes the issue closed. docs/tracker.md, "Work that is part of an issue".
+
+### Added
+
+- **`contributes?: ref[]`** on `trackerRowSchema`, on a change: the issues it says it is part of
+  without closing them ("Part of #12", "Implements #12", or the forge listing it as related but
+  not closing). A ref in `links` is not repeated here.
+- **`contributedBy?: ref[]`** on `trackerRowSchema`, on an issue: the reverse. Never sets
+  `closedByMerge`, never a `closed-by` link.
+- Both at most `LIMITS.TRACKER_LINKS`; absent from older hosts, stripped by older readers, and
+  dropped, not fatal, when they do not parse. Separate fields, not new `LINK_RELATIONS` words:
+  `relation` is an enum, and a word an older module's schema does not know would fail its whole
+  `tracker.get` answer.
+- **`TRACKER_FIELD_SINCE`** in `SINCE` (`trackerFields`, `TrackerField`, piece kind
+  `trackerField`): each tracker row field added since 2.6.0 and the version that added it.
+  `needsOf` and `fitOf` do not read it; no manifest names a row field.
+
 ## 2.25.0 — 2026-10-26
 
 Every request the host receives names who sent it. **Additive**; `PROTOCOL` is still 2. A row of

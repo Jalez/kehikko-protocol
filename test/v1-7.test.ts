@@ -29,7 +29,7 @@ const item = (id: string, more: Record<string, unknown> = {}) => ({ id, state: '
 
 describe('activity priority, refs, group', () => {
   test('version and limits', () => {
-    expect(PACKAGE_VERSION).toBe('2.25.0')
+    expect(PACKAGE_VERSION).toBe('2.26.0')
     expect(LIMITS.ACTIVITY_REFS).toBe(16)
     expect(LIMITS.ACTIVITY_GROUP).toBe(64)
     expect([...ACTIVITY_PRIORITIES]).toEqual(['urgent', 'normal', 'low'])

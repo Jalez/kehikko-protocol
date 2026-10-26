@@ -33,7 +33,7 @@ const triage: TrackerColumn = { name: 'Triage', board: 'Bugs' }
 
 describe('the version', () => {
   test('is 2.18.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.25.0')
+    expect(PACKAGE_VERSION).toBe('2.26.0')
     expect(PROTOCOL).toBe(2)
   })
 })
