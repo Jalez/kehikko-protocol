@@ -671,6 +671,28 @@ follows `movedTo` once to the same id, and answers `{ ok: true, path, id?, moved
 reason, why, movedTo? }` with `DOOR_PROJECT_SAYS`'s sentences. What a door does with it is in
 [asking.md](asking.md#a-project-that-moved-230).
 
+#### A yes kept (2.21.1)
+
+A door asks for every request it is handed, and a page that polls its server hands it one every few
+seconds — two polls every 4 s was thirty asks a minute of the host for one unchanged answer. So
+`hostProject` (and with it `hostHasProject` and `resolveDoorProject`) keeps a `project: true` for
+`keepMs` (default `LIMITS.HOST_PROJECT_KEEP_MS`, 60 000) and answers it again without asking. It still
+follows moves, because what it keeps is tied to the FOLDER the host vouched for, by device and inode:
+
+- **A move is noticed at once.** Renaming or moving a project takes its folder with it, so the path
+  then holds nothing, or a different folder: the kept answer does not apply, the host is asked, and it
+  says `movedTo`. No minute passes first.
+- **The same id named elsewhere drops it.** An answer that puts the project's id at another path, or
+  says that id moved, drops what was kept for it.
+- **A "no" is never kept**, nor a folder that is not on disk, nor anything when no host answered: a
+  project added a moment ago is a project at once, and failing closed stays failing closed.
+- **Asks that arrive together share one ask.**
+- What can be out of date is a "yes" for a project the person REMOVED from the host while its folder
+  stayed put, for at most `keepMs`. A module that hears of that its own way calls
+  `forgetHostProjects()`; `keepMs: 0` asks every time.
+
+Kept answers are per `fetch` and per origin list, so a test's fake host starts empty.
+
 ### `src/serve/origins.ts`
 
 #### About `src/serve/origins.ts`

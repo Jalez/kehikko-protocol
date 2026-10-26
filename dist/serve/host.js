@@ -1,3 +1,4 @@
+import { statSync } from 'node:fs';
 import { isAbsolute } from 'node:path';
 import { z } from 'zod';
 import { DOOR_PROJECT_SAYS, PLACE_PARAM, PLACE_TOKEN, doorContext, placeResult } from '../door.js';
@@ -9,7 +10,9 @@ import { frameOrigins } from './origins.js';
  * A page tells its server a path, and the server has no other way to know the path is one the host
  * handed out. Loopback only, one path in and one answer out, and failing closed: no answer is "no".
  * Since 2.3.0 the answer also says the project's id, and where a project that USED to be at the
- * folder is now (`movedTo`). Design notes: docs/serving.md.
+ * folder is now (`movedTo`). Since 2.21.1 a "yes" is kept for a while (`keepMs`) while the same folder
+ * is at the path, so a page that polls does not ask the host on every request. Design notes:
+ * docs/serving.md.
  */
 /** The host's route, `GET /host/is-project?path=<absolute folder>`, answered to programs on this machine. */
 export const IS_PROJECT_PATH = '/host/is-project';
@@ -55,19 +58,95 @@ export function hostIsProjectUrls(folder, env = process.env) {
 }
 /** `why` when no origin gave an answer of the right shape. */
 export const NO_HOST_ANSWERED = 'No Kehikot host answered.';
+/** Kept answers and answers on their way, per `fetch` (a test's fake host is its own), by the URLs asked. */
+let keptBy = new WeakMap();
+let askingBy = new WeakMap();
+function mapOf(by, asked) {
+    let map = by.get(asked);
+    if (!map)
+        by.set(asked, (map = new Map()));
+    return map;
+}
+/** The folder at `path` as the filesystem has it — device and inode — or null when no folder is there. */
+function folderAt(path) {
+    try {
+        const stat = statSync(path);
+        return stat.isDirectory() ? { dev: stat.dev, ino: stat.ino } : null;
+    }
+    catch {
+        return null;
+    }
+}
+/**
+ * Forgets every kept answer (2.21.1): the next `hostProject` of each folder asks the host. For a
+ * module that has heard, its own way, that a project was removed or moved.
+ */
+export function forgetHostProjects() {
+    keptBy = new WeakMap();
+    askingBy = new WeakMap();
+}
 /**
  * What the host says about `folder` (2.3.0). Asks each origin in `KEHIKOT_ORIGINS` (the same list
  * `frameOrigins` reads; non-loopback and `tauri:` entries are skipped) until one says `project:
  * true`. A `project: false` that names `movedTo` is kept over a bare one. Fails closed: a relative
  * path, no answer, a refusal, a slow host or a reply of another shape is `project: false`. Never throws.
+ *
+ * Since 2.21.1 a `project: true` is KEPT, for `keepMs` (`LIMITS.HOST_PROJECT_KEEP_MS`, 60 s), and
+ * given again without asking — but only while the very folder the host vouched for is still at the
+ * path (same device and inode). So a move is followed at once: the path is empty, or holds another
+ * folder, and the host is asked, which says `movedTo`. An answer that puts the same project id
+ * anywhere else, or says that id moved, drops what was kept for it. A "no" is never kept: a project
+ * added a moment ago is a project at once. Asks that arrive together while one is on its way share
+ * it. What is kept is a "yes" for a path the host might since have dropped (a project REMOVED,
+ * folder left as it was), for at most `keepMs`; `forgetHostProjects()` drops everything.
  */
 export async function hostProject(folder, options = {}) {
     if (typeof folder !== 'string' || !folder.trim() || !isAbsolute(folder.trim()))
         return { project: false, why: 'Not an absolute folder.' };
     const path = folder.trim();
     const asked = options.fetch ?? fetch;
+    const urls = hostIsProjectUrls(path, options.env ?? process.env);
+    const keepMs = options.keepMs ?? LIMITS.HOST_PROJECT_KEEP_MS;
+    if (keepMs <= 0 || urls.length === 0)
+        return askHost(path, urls, asked, options);
+    const now = options.now ?? Date.now;
+    const key = urls.join(' ');
+    const kept = mapOf(keptBy, asked);
+    const here = folderAt(path);
+    const had = kept.get(key);
+    if (had && here && had.dev === here.dev && had.ino === here.ino && now() - had.at < keepMs) {
+        return { project: true, path, ...(had.id ? { id: had.id } : {}) };
+    }
+    kept.delete(key);
+    const asking = mapOf(askingBy, asked);
+    const already = asking.get(key);
+    if (already)
+        return already;
+    const answer = askHost(path, urls, asked, options).then((said) => {
+        const id = said.id;
+        if (id)
+            for (const [other, one] of kept)
+                if (one.id === id && other !== key)
+                    kept.delete(other);
+        const after = folderAt(path);
+        if (said.project && here && after && here.dev === after.dev && here.ino === after.ino) {
+            kept.set(key, { ...(said.id ? { id: said.id } : {}), at: now(), dev: here.dev, ino: here.ino });
+        }
+        return said;
+    });
+    asking.set(key, answer);
+    try {
+        return await answer;
+    }
+    finally {
+        if (asking.get(key) === answer)
+            asking.delete(key);
+    }
+}
+/** One round of asking the host, origin by origin: what `hostProject` did before 2.21.1, unchanged. */
+async function askHost(path, urls, asked, options) {
     let no = null;
-    for (const url of hostIsProjectUrls(path, options.env ?? process.env)) {
+    for (const url of urls) {
         const control = new AbortController();
         const timer = setTimeout(() => control.abort(), options.timeoutMs ?? LIMITS.HOST_ASK_MS);
         try {

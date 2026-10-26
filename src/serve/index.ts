@@ -31,6 +31,7 @@ export {
   hostHasProject,
   hostIsProjectUrls,
   hostProject,
+  forgetHostProjects,
   resolveDoorProject,
   hostPlace,
   hostPlaceUrls,

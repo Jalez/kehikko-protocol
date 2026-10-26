@@ -274,6 +274,11 @@ export const LIMITS = {
   PLACE_PARTS: 16,
   /** How long the host gets to say whether a folder is a project, in ms (`hostHasProject`). */
   HOST_ASK_MS: 1500,
+  /**
+   * How long a module's server keeps the host's "yes, a project" for one folder, in ms (2.21.1,
+   * `hostProject`): while the same folder is at the path. A move is noticed at once regardless.
+   */
+  HOST_PROJECT_KEEP_MS: 60_000,
   /** The name of a tool at a module's MCP door. MCP's own bound. */
   TOOL: 64,
   /** The id of one thing a "is this done?" answer is about: a question, a checklist item. */

@@ -26,7 +26,7 @@ function host(table: Record<string, unknown>): typeof fetch {
 }
 
 describe('the version', () => {
-  test('is 2.8.0', () => expect(PACKAGE_VERSION).toBe('2.21.0'))
+  test('is 2.8.0', () => expect(PACKAGE_VERSION).toBe('2.21.1'))
 })
 
 describe('placeTokenOf', () => {

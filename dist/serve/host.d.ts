@@ -5,7 +5,9 @@ import { type DoorPlace } from '../door.js';
  * A page tells its server a path, and the server has no other way to know the path is one the host
  * handed out. Loopback only, one path in and one answer out, and failing closed: no answer is "no".
  * Since 2.3.0 the answer also says the project's id, and where a project that USED to be at the
- * folder is now (`movedTo`). Design notes: docs/serving.md.
+ * folder is now (`movedTo`). Since 2.21.1 a "yes" is kept for a while (`keepMs`) while the same folder
+ * is at the path, so a page that polls does not ask the host on every request. Design notes:
+ * docs/serving.md.
  */
 /** The host's route, `GET /host/is-project?path=<absolute folder>`, answered to programs on this machine. */
 export declare const IS_PROJECT_PATH = "/host/is-project";
@@ -49,8 +51,15 @@ export interface HostHasProjectOptions {
     env?: Record<string, string | undefined>;
     /** How long each origin gets, in ms. Default `LIMITS.HOST_ASK_MS`. */
     timeoutMs?: number;
+    /**
+     * How long a `project: true` is kept, in ms (2.21.1). Default `LIMITS.HOST_PROJECT_KEEP_MS`; 0 asks
+     * the host every time. Only `hostProject`, `hostHasProject` and `resolveDoorProject` read it.
+     */
+    keepMs?: number;
     /** Injected by the tests. */
     fetch?: typeof fetch;
+    /** The clock, in ms. Injected by the tests. */
+    now?: () => number;
 }
 /**
  * What the host said about one folder (2.3.0). `project: true`: the host holds it, at `path` (the
@@ -72,10 +81,24 @@ export type HostProject = {
 /** `why` when no origin gave an answer of the right shape. */
 export declare const NO_HOST_ANSWERED = "No Kehikot host answered.";
 /**
+ * Forgets every kept answer (2.21.1): the next `hostProject` of each folder asks the host. For a
+ * module that has heard, its own way, that a project was removed or moved.
+ */
+export declare function forgetHostProjects(): void;
+/**
  * What the host says about `folder` (2.3.0). Asks each origin in `KEHIKOT_ORIGINS` (the same list
  * `frameOrigins` reads; non-loopback and `tauri:` entries are skipped) until one says `project:
  * true`. A `project: false` that names `movedTo` is kept over a bare one. Fails closed: a relative
  * path, no answer, a refusal, a slow host or a reply of another shape is `project: false`. Never throws.
+ *
+ * Since 2.21.1 a `project: true` is KEPT, for `keepMs` (`LIMITS.HOST_PROJECT_KEEP_MS`, 60 s), and
+ * given again without asking — but only while the very folder the host vouched for is still at the
+ * path (same device and inode). So a move is followed at once: the path is empty, or holds another
+ * folder, and the host is asked, which says `movedTo`. An answer that puts the same project id
+ * anywhere else, or says that id moved, drops what was kept for it. A "no" is never kept: a project
+ * added a moment ago is a project at once. Asks that arrive together while one is on its way share
+ * it. What is kept is a "yes" for a path the host might since have dropped (a project REMOVED,
+ * folder left as it was), for at most `keepMs`; `forgetHostProjects()` drops everything.
  */
 export declare function hostProject(folder: string, options?: HostHasProjectOptions): Promise<HostProject>;
 /**

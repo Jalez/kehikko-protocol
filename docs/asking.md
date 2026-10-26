@@ -277,6 +277,10 @@ the new path, which must answer `project: true` with the same id — and answers
 | `not-project` (also: no host answered) | `<path> is not a project open in Kehikot.` |
 | `unnamed` | ``Name the project: `project` is its absolute folder.`` |
 
+- **Asking on every request is fine** (2.21.1): a "yes" is kept for `LIMITS.HOST_PROJECT_KEEP_MS`
+  (60 s) while the same folder is at the path, so a page polling its server every few seconds puts
+  the question to the host about once a minute, not every time. See
+  [serving.md](serving.md#a-yes-kept-2211).
 - **Work on the returned path**, never the argument. After a followed move they differ.
 - **Say that you followed it**: add `DOOR_PROJECT_SAYS.followed(from, to)` to the answer, so the agent
   uses the new path from then on.

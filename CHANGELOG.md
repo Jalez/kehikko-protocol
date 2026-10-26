@@ -7,6 +7,25 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.21.1 — 2026-10-26
+
+A module's server asks the host about a project far less often. **Additive**; `PROTOCOL` is still 2.
+
+### Fixed
+
+- `hostProject`, `hostHasProject`, `resolveDoorProject`: a `project: true` is kept for
+  `LIMITS.HOST_PROJECT_KEEP_MS` (60 s) and given again without asking, while the very folder the host
+  vouched for (device and inode) is still at the path. A page polling its server every 4 s with two
+  polls made its server ask `GET /host/is-project` thirty times a minute; now about once. A move is
+  still followed at once (the folder left the path, so the host is asked and says `movedTo`); an
+  answer naming the same id elsewhere drops what was kept; a "no", a folder not on disk and no answer
+  are never kept; asks that arrive together share one. docs/serving.md, "A yes kept".
+
+### Added
+
+- `forgetHostProjects()`; `HostHasProjectOptions.keepMs` (0 asks every time) and `now`;
+  `LIMITS.HOST_PROJECT_KEEP_MS`.
+
 ## 2.21.0 — 2026-10-26
 
 Steps any module can provide, skill needs by what a module provides, and a module's server asking
