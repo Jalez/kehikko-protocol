@@ -328,6 +328,8 @@ export declare const LIMITS: {
     readonly TRAFFIC_PATH: 300;
     /** Who made a call: `kehikko` or a module id, in characters. */
     readonly TRAFFIC_BY: 64;
+    /** Who sent a request the host received, named ("Claude session on Wide · methods"), in characters (2.25.0). */
+    readonly TRAFFIC_CALLER: 120;
     /** How many open connections one `traffic.read` describes. */
     readonly TRAFFIC_CONNECTIONS: 500;
     /** How many steps one module's plan for one epic may hold. */

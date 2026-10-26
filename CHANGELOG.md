@@ -7,6 +7,24 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.25.0 — 2026-10-26
+
+Every request the host receives names who sent it. **Additive**; `PROTOCOL` is still 2. A row of
+traffic with `by: ''` used to be all a reader could say about curl, an agent session at the host's
+MCP door, or a module's first calls before the process sampler had looked; now the host names it
+and says how it knew. docs/traffic.md, "Who asked".
+
+### Added
+
+- **`caller`** on `trafficCallSchema` (`trafficCallerSchema`, `TrafficCaller`): `kind`
+  (`TRAFFIC_CALLER_KINDS`: `host`, `module`, `session`, `program`, `remote`, `gone`), `name` (what a
+  person reads: "Claude session on Wide · methods", "curl, from your terminal (zsh)"), `how`
+  (`TRAFFIC_CALLER_HOW`: `route`, `origin`, `token`, `process`, `address`, `closed`), and optionally
+  `process` and `parent` (executable names, never a path or an argument), `place` and `pid`. Set by
+  the recorder on rows it received; a note cannot carry one. Optional: absent from older hosts,
+  stripped by older readers, and dropped, not fatal, when it does not parse.
+- **`LIMITS.TRAFFIC_CALLER`** (120): a caller's name and place, in characters.
+
 ## 2.24.0 — 2026-10-26
 
 Each forge's budgets, separately, on `traffic.read`. **Additive**; `PROTOCOL` is still 2. A host

@@ -343,6 +343,8 @@ export const LIMITS = {
   TRAFFIC_PATH: 300,
   /** Who made a call: `kehikko` or a module id, in characters. */
   TRAFFIC_BY: 64,
+  /** Who sent a request the host received, named ("Claude session on Wide · methods"), in characters (2.25.0). */
+  TRAFFIC_CALLER: 120,
   /** How many open connections one `traffic.read` describes. */
   TRAFFIC_CONNECTIONS: 500,
   /* An epic's plan: its steps, phases and gates as a module publishes them (2.21.0). See `plan.ts`. */

@@ -77,9 +77,62 @@ export declare const trafficNoteSchema: z.ZodObject<{
 export type TrafficNote = z.infer<typeof trafficNoteSchema>;
 export type TrafficNoteInput = z.input<typeof trafficNoteSchema>;
 /**
+ * What kind of caller sent a request the host received (2.25.0). `host`: Kehikot itself — its page or
+ * its desktop app. `module`: a module's server, page or a process it runs. `session`: an agent session
+ * an agent module started (a Claude Code or Codex conversation), filed under that module's `by`.
+ * `program`: any other program on this computer, named by its executable and its parent's. `remote`:
+ * another computer. `gone`: a program that closed before the host could look at it.
+ */
+export declare const TRAFFIC_CALLER_KINDS: readonly ["host", "module", "session", "program", "remote", "gone"];
+export type TrafficCallerKind = (typeof TRAFFIC_CALLER_KINDS)[number];
+/**
+ * How the host told who it was (2.25.0). `route`: the route that answered knows (a module's server
+ * asking with its pass). `origin`: the request carried a page's origin, the host's own or a module's.
+ * `token`: an MCP call carried a conversation's place token, whose issuer the host knows. `process`:
+ * the process holding the other end of the connection, and its parents. `address`: the other end was
+ * not this computer. `closed`: the connection's process was gone before the host could look.
+ */
+export declare const TRAFFIC_CALLER_HOW: readonly ["route", "origin", "token", "process", "address", "closed"];
+export type TrafficCallerHow = (typeof TRAFFIC_CALLER_HOW)[number];
+/**
+ * Who sent a request the host received, named (2.25.0), on rows with `side: 'in'`. `name` is what a
+ * person reads: "Paper", "Claude session on Wide · methods", "curl, from your terminal (zsh)",
+ * "Another computer (192.168.1.20)". `process` and `parent` are executable NAMES only — never a path,
+ * never an argument (a command line can hold a token). `place` is the kehikko and epic of a session,
+ * as its record says ("Wide · methods"). `pid` tells two callers of one name apart (two sessions);
+ * it means nothing after the process has gone.
+ */
+export declare const trafficCallerSchema: z.ZodObject<{
+    kind: z.ZodEnum<["host", "module", "session", "program", "remote", "gone"]>;
+    name: z.ZodString;
+    how: z.ZodEnum<["route", "origin", "token", "process", "address", "closed"]>;
+    process: z.ZodOptional<z.ZodString>;
+    parent: z.ZodOptional<z.ZodString>;
+    place: z.ZodOptional<z.ZodString>;
+    pid: z.ZodOptional<z.ZodNumber>;
+}, "strip", z.ZodTypeAny, {
+    name: string;
+    kind: "host" | "module" | "session" | "program" | "remote" | "gone";
+    how: "closed" | "address" | "token" | "origin" | "process" | "route";
+    place?: string | undefined;
+    process?: string | undefined;
+    parent?: string | undefined;
+    pid?: number | undefined;
+}, {
+    name: string;
+    kind: "host" | "module" | "session" | "program" | "remote" | "gone";
+    how: "closed" | "address" | "token" | "origin" | "process" | "route";
+    place?: string | undefined;
+    process?: string | undefined;
+    parent?: string | undefined;
+    pid?: number | undefined;
+}>;
+export type TrafficCaller = z.infer<typeof trafficCallerSchema>;
+/**
  * One row of the record. A note, stamped by the recorder with its place in the record (`seq`), who
- * (`by`: `TRAFFIC_HOST_BY`, a module id, or `''` when the host could not tell), which part of them
- * (`via`), which way (`side`) and who says so (`reported`).
+ * (`by`: `TRAFFIC_HOST_BY`, a module id, or `''` when the caller is neither), which part of them
+ * (`via`), which way (`side`) and who says so (`reported`). On a row the host received, `caller`
+ * names who asked even when `by` is `''` (2.25.0); a module cannot set it, the recorder does.
  */
 export declare const trafficCallSchema: z.ZodObject<{
     at: z.ZodNumber;
@@ -99,6 +152,32 @@ export declare const trafficCallSchema: z.ZodObject<{
     via: z.ZodEnum<["server", "page", "process"]>;
     side: z.ZodEnum<["out", "in", "seen"]>;
     reported: z.ZodEnum<["host", "module", "sampled"]>;
+    /** Absent from a host before 2.25.0 and from rows it did not receive; dropped, not fatal, when it does not parse. */
+    caller: z.ZodCatch<z.ZodOptional<z.ZodObject<{
+        kind: z.ZodEnum<["host", "module", "session", "program", "remote", "gone"]>;
+        name: z.ZodString;
+        how: z.ZodEnum<["route", "origin", "token", "process", "address", "closed"]>;
+        process: z.ZodOptional<z.ZodString>;
+        parent: z.ZodOptional<z.ZodString>;
+        place: z.ZodOptional<z.ZodString>;
+        pid: z.ZodOptional<z.ZodNumber>;
+    }, "strip", z.ZodTypeAny, {
+        name: string;
+        kind: "host" | "module" | "session" | "program" | "remote" | "gone";
+        how: "closed" | "address" | "token" | "origin" | "process" | "route";
+        place?: string | undefined;
+        process?: string | undefined;
+        parent?: string | undefined;
+        pid?: number | undefined;
+    }, {
+        name: string;
+        kind: "host" | "module" | "session" | "program" | "remote" | "gone";
+        how: "closed" | "address" | "token" | "origin" | "process" | "route";
+        place?: string | undefined;
+        process?: string | undefined;
+        parent?: string | undefined;
+        pid?: number | undefined;
+    }>>>;
 }, "strip", z.ZodTypeAny, {
     path: string;
     at: number;
@@ -116,6 +195,15 @@ export declare const trafficCallSchema: z.ZodObject<{
     bytesIn?: number | undefined;
     bytesOut?: number | undefined;
     cache?: "refused" | "hit" | "not-modified" | undefined;
+    caller?: {
+        name: string;
+        kind: "host" | "module" | "session" | "program" | "remote" | "gone";
+        how: "closed" | "address" | "token" | "origin" | "process" | "route";
+        place?: string | undefined;
+        process?: string | undefined;
+        parent?: string | undefined;
+        pid?: number | undefined;
+    } | undefined;
 }, {
     path: string;
     at: number;
@@ -133,6 +221,7 @@ export declare const trafficCallSchema: z.ZodObject<{
     bytesIn?: number | undefined;
     bytesOut?: number | undefined;
     cache?: "refused" | "hit" | "not-modified" | undefined;
+    caller?: unknown;
 }>;
 export type TrafficCall = z.infer<typeof trafficCallSchema>;
 /**
@@ -980,9 +1069,9 @@ export declare const trafficConnectionSchema: z.ZodObject<{
     since: number;
     by: string;
     process: string;
+    remote: string;
     pid: number;
     proto: "tcp" | "udp";
-    remote: string;
     port: number;
     local: boolean;
     bytesIn?: number | undefined;
@@ -991,9 +1080,9 @@ export declare const trafficConnectionSchema: z.ZodObject<{
     since: number;
     by: string;
     process: string;
+    remote: string;
     pid: number;
     proto: "tcp" | "udp";
-    remote: string;
     port: number;
     local: boolean;
     bytesIn?: number | undefined;
@@ -1027,9 +1116,9 @@ export declare const trafficProcessesSchema: z.ZodObject<{
         since: number;
         by: string;
         process: string;
+        remote: string;
         pid: number;
         proto: "tcp" | "udp";
-        remote: string;
         port: number;
         local: boolean;
         bytesIn?: number | undefined;
@@ -1038,9 +1127,9 @@ export declare const trafficProcessesSchema: z.ZodObject<{
         since: number;
         by: string;
         process: string;
+        remote: string;
         pid: number;
         proto: "tcp" | "udp";
-        remote: string;
         port: number;
         local: boolean;
         bytesIn?: number | undefined;
@@ -1055,9 +1144,9 @@ export declare const trafficProcessesSchema: z.ZodObject<{
         since: number;
         by: string;
         process: string;
+        remote: string;
         pid: number;
         proto: "tcp" | "udp";
-        remote: string;
         port: number;
         local: boolean;
         bytesIn?: number | undefined;
@@ -1072,9 +1161,9 @@ export declare const trafficProcessesSchema: z.ZodObject<{
         since: number;
         by: string;
         process: string;
+        remote: string;
         pid: number;
         proto: "tcp" | "udp";
-        remote: string;
         port: number;
         local: boolean;
         bytesIn?: number | undefined;
@@ -1108,6 +1197,32 @@ export declare const trafficReadResult: z.ZodObject<{
         via: z.ZodEnum<["server", "page", "process"]>;
         side: z.ZodEnum<["out", "in", "seen"]>;
         reported: z.ZodEnum<["host", "module", "sampled"]>;
+        /** Absent from a host before 2.25.0 and from rows it did not receive; dropped, not fatal, when it does not parse. */
+        caller: z.ZodCatch<z.ZodOptional<z.ZodObject<{
+            kind: z.ZodEnum<["host", "module", "session", "program", "remote", "gone"]>;
+            name: z.ZodString;
+            how: z.ZodEnum<["route", "origin", "token", "process", "address", "closed"]>;
+            process: z.ZodOptional<z.ZodString>;
+            parent: z.ZodOptional<z.ZodString>;
+            place: z.ZodOptional<z.ZodString>;
+            pid: z.ZodOptional<z.ZodNumber>;
+        }, "strip", z.ZodTypeAny, {
+            name: string;
+            kind: "host" | "module" | "session" | "program" | "remote" | "gone";
+            how: "closed" | "address" | "token" | "origin" | "process" | "route";
+            place?: string | undefined;
+            process?: string | undefined;
+            parent?: string | undefined;
+            pid?: number | undefined;
+        }, {
+            name: string;
+            kind: "host" | "module" | "session" | "program" | "remote" | "gone";
+            how: "closed" | "address" | "token" | "origin" | "process" | "route";
+            place?: string | undefined;
+            process?: string | undefined;
+            parent?: string | undefined;
+            pid?: number | undefined;
+        }>>>;
     }, "strip", z.ZodTypeAny, {
         path: string;
         at: number;
@@ -1125,6 +1240,15 @@ export declare const trafficReadResult: z.ZodObject<{
         bytesIn?: number | undefined;
         bytesOut?: number | undefined;
         cache?: "refused" | "hit" | "not-modified" | undefined;
+        caller?: {
+            name: string;
+            kind: "host" | "module" | "session" | "program" | "remote" | "gone";
+            how: "closed" | "address" | "token" | "origin" | "process" | "route";
+            place?: string | undefined;
+            process?: string | undefined;
+            parent?: string | undefined;
+            pid?: number | undefined;
+        } | undefined;
     }, {
         path: string;
         at: number;
@@ -1142,6 +1266,7 @@ export declare const trafficReadResult: z.ZodObject<{
         bytesIn?: number | undefined;
         bytesOut?: number | undefined;
         cache?: "refused" | "hit" | "not-modified" | undefined;
+        caller?: unknown;
     }>, "many">;
     newest: z.ZodNumber;
     oldest: z.ZodNumber;
@@ -1193,9 +1318,9 @@ export declare const trafficReadResult: z.ZodObject<{
             since: number;
             by: string;
             process: string;
+            remote: string;
             pid: number;
             proto: "tcp" | "udp";
-            remote: string;
             port: number;
             local: boolean;
             bytesIn?: number | undefined;
@@ -1204,9 +1329,9 @@ export declare const trafficReadResult: z.ZodObject<{
             since: number;
             by: string;
             process: string;
+            remote: string;
             pid: number;
             proto: "tcp" | "udp";
-            remote: string;
             port: number;
             local: boolean;
             bytesIn?: number | undefined;
@@ -1221,9 +1346,9 @@ export declare const trafficReadResult: z.ZodObject<{
             since: number;
             by: string;
             process: string;
+            remote: string;
             pid: number;
             proto: "tcp" | "udp";
-            remote: string;
             port: number;
             local: boolean;
             bytesIn?: number | undefined;
@@ -1238,9 +1363,9 @@ export declare const trafficReadResult: z.ZodObject<{
             since: number;
             by: string;
             process: string;
+            remote: string;
             pid: number;
             proto: "tcp" | "udp";
-            remote: string;
             port: number;
             local: boolean;
             bytesIn?: number | undefined;
@@ -1852,6 +1977,15 @@ export declare const trafficReadResult: z.ZodObject<{
         bytesIn?: number | undefined;
         bytesOut?: number | undefined;
         cache?: "refused" | "hit" | "not-modified" | undefined;
+        caller?: {
+            name: string;
+            kind: "host" | "module" | "session" | "program" | "remote" | "gone";
+            how: "closed" | "address" | "token" | "origin" | "process" | "route";
+            place?: string | undefined;
+            process?: string | undefined;
+            parent?: string | undefined;
+            pid?: number | undefined;
+        } | undefined;
     }[];
     newest: number;
     oldest: number;
@@ -1874,9 +2008,9 @@ export declare const trafficReadResult: z.ZodObject<{
             since: number;
             by: string;
             process: string;
+            remote: string;
             pid: number;
             proto: "tcp" | "udp";
-            remote: string;
             port: number;
             local: boolean;
             bytesIn?: number | undefined;
@@ -1974,6 +2108,7 @@ export declare const trafficReadResult: z.ZodObject<{
         bytesIn?: number | undefined;
         bytesOut?: number | undefined;
         cache?: "refused" | "hit" | "not-modified" | undefined;
+        caller?: unknown;
     }[];
     newest: number;
     oldest: number;
@@ -1996,9 +2131,9 @@ export declare const trafficReadResult: z.ZodObject<{
             since: number;
             by: string;
             process: string;
+            remote: string;
             pid: number;
             proto: "tcp" | "udp";
-            remote: string;
             port: number;
             local: boolean;
             bytesIn?: number | undefined;
