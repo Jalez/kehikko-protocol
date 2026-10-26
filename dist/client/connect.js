@@ -4,6 +4,7 @@ import { LIMITS } from '../limits.js';
 import { activityItemsSchema } from '../activity.js';
 import { ORIGINS_ELEMENT, originAmong } from '../page.js';
 import { headerItemsSchema, hostMessageSchema, looksLikeWireMessage, pressRefusal, } from '../wire.js';
+import { tooOldOf } from '../fit.js';
 import { mailbox } from './mailbox.js';
 /** The project folder a greeting or a context names, or null. */
 function projectOf(context) {
@@ -208,8 +209,17 @@ export function connect(id, events = {}, options = {}) {
         if (message.type === MESSAGE.RESPONSE) {
             if (message.ok)
                 settle(message.id, { ok: true, data: message.data });
-            else
-                settle(message.id, { ok: false, refusal: { reason: message.reason, error: message.error } });
+            else {
+                /* A method this package knows and the host does not: the host is older than it (2.22.0). */
+                const asked = waiting.get(message.id)?.method ?? '';
+                const tooOld = tooOldOf(asked, message);
+                settle(message.id, {
+                    ok: false,
+                    refusal: tooOld
+                        ? { reason: message.reason, error: message.error, declined: 'host-too-old', since: tooOld.since }
+                        : { reason: message.reason, error: message.error },
+                });
+            }
             return;
         }
         if (message.type === MESSAGE.EVENT) {
@@ -359,7 +369,7 @@ export function connect(id, events = {}, options = {}) {
                         },
                     });
                 }, deadline);
-                waiting.set(correlation, { resolve, reject, timer });
+                waiting.set(correlation, { method, resolve, reject, timer });
                 send({ type: MESSAGE.REQUEST, id: correlation, method, params });
             });
         },

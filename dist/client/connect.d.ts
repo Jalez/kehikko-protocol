@@ -35,6 +35,13 @@ export declare function mayGreet(greeting: {
 export type Refusal = {
     reason: ResponseFailureReason | 'silent';
     error: string;
+    /**
+     * 2.22.0. `host-too-old`: the host does not know the method and this package does, so the host is
+     * older than the method (`since`, from this package's `SINCE`). Read it with `hostTooOld`.
+     */
+    declined?: 'host-too-old';
+    /** 2.22.0. The version that has the method, beside `declined`; null when neither side can say. */
+    since?: string | null;
 };
 /** A refusal, as a thrown thing. Every rejection from `request` is one of these, always. */
 export declare class HostRefused extends Error {

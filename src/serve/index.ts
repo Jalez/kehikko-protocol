@@ -149,6 +149,8 @@ export {
   type ServerAnswers,
 } from './ask.js'
 export { SERVER_ASK_PATH, SERVER_PASS_PATH, SERVER_METHODS, type ServerMethod } from '../server-ask.js'
+/* A question the host is too old for (2.22.0): read it off an `AskedHost`, show the one line. */
+export { hostTooOld, FIT_SAYS, type HostTooOld } from '../fit.js'
 
 /* A module's server noting its own calls, with their reasons, in the host's record of traffic (2.20.0). */
 export {

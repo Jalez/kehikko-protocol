@@ -25,6 +25,11 @@ export declare const KEHIKKO_KEY: RegExp;
  */
 export declare const PROJECT_ID: RegExp;
 /** A mode's id: one module's own name for one of its tabs. */
+/**
+ * A protocol package version as this package spells its own (2.22.0): `major.minor.patch`, digits
+ * only, as `PACKAGE_VERSION`, `build.protocol` and every entry of `SINCE` are written.
+ */
+export declare const PROTOCOL_VERSION: RegExp;
 export declare const MODE_ID: RegExp;
 /**
  * An epic's slug: lowercase letters, digits and dashes, at most `LIMITS.EPIC_SLUG` characters. No

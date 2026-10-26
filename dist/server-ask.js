@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { MODULE_ID } from './ids.js';
 import { LIMITS } from './limits.js';
-import { responseFailureReasons } from './messages.js';
+import { declinedFields, responseFailureReasons } from './messages.js';
 /**
  * A module's SERVER asking the host a question (2.19.0): the same answers its page gets through the
  * frame, for the process with no frame — its MCP door, a job it runs. Shapes only; the asking is
@@ -100,5 +100,7 @@ export const serverAskResult = z.discriminatedUnion('ok', [
         reason: z.enum(responseFailureReasons),
         error: z.string().max(LIMITS.REASON),
         refused: z.enum(SERVER_ASK_REFUSALS).optional().catch(undefined),
+        /** 2.22.0. `host-too-old` for a method this host's server does not answer yet. See `declinedFields`. */
+        ...declinedFields,
     }),
 ]);

@@ -108,6 +108,8 @@ export declare const serverAskResult: z.ZodDiscriminatedUnion<"ok", [z.ZodObject
     ok: true;
     data?: unknown;
 }>, z.ZodObject<{
+    declined: z.ZodCatch<z.ZodOptional<z.ZodEnum<["host-too-old"]>>>;
+    since: z.ZodCatch<z.ZodOptional<z.ZodString>>;
     ok: z.ZodLiteral<false>;
     reason: z.ZodEnum<["unknown-module", "unknown-method", "failed"]>;
     error: z.ZodString;
@@ -116,11 +118,15 @@ export declare const serverAskResult: z.ZodDiscriminatedUnion<"ok", [z.ZodObject
     error: string;
     reason: "failed" | "unknown-module" | "unknown-method";
     ok: false;
+    since?: string | undefined;
+    declined?: "host-too-old" | undefined;
     refused?: "project" | "module" | "pass" | "grant" | undefined;
 }, {
     error: string;
     reason: "failed" | "unknown-module" | "unknown-method";
     ok: false;
+    since?: unknown;
+    declined?: unknown;
     refused?: unknown;
 }>]>;
 export type ServerAskResult = z.infer<typeof serverAskResult>;

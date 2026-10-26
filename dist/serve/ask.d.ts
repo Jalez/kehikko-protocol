@@ -46,6 +46,12 @@ export type AskedHost<M extends ServerMethod> = {
     why: string;
     reason?: 'unknown-module' | 'unknown-method' | 'failed';
     refused?: ServerAskRefusal;
+    /**
+     * 2.22.0. `host-too-old`: the host does not answer this method yet, and `since` is the version
+     * that does (`SERVER_METHOD_SINCE`). Read it with `hostTooOld`; show `FIT_SAYS.tooOld(since)`.
+     */
+    declined?: 'host-too-old';
+    since?: string | null;
 };
 export interface AskHostOptions {
     /** This module's id: who asks. Its manifest is what the host holds the call to. */

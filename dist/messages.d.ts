@@ -2237,6 +2237,23 @@ export declare const contextMessageSchema: z.ZodObject<{
 export declare const responseFailureReasons: readonly ["unknown-module", "unknown-method", "failed"];
 export type ResponseFailureReason = (typeof responseFailureReasons)[number];
 /**
+ * Why a host declined a call rather than failing it (2.22.0), said beside `reason` on a refusal as
+ * `declined`. One word: `host-too-old`, the method is newer than this host, which answers
+ * `reason: 'unknown-method'` with it. A reader before 2.22.0 strips the field and sees
+ * `unknown-method`, as before. Read it with `hostTooOld` (`fit.ts`).
+ */
+export declare const DECLINED_REASONS: readonly ["host-too-old"];
+export type DeclinedReason = (typeof DECLINED_REASONS)[number];
+/**
+ * The two fields a refusal may carry for a call the host is too old for (2.22.0): `declined`, and
+ * `since`, the version that has the method when the host can say (it usually cannot: the module's
+ * own `SINCE` knows). Optional, and dropped rather than fatal when out of shape.
+ */
+export declare const declinedFields: {
+    declined: z.ZodCatch<z.ZodOptional<z.ZodEnum<["host-too-old"]>>>;
+    since: z.ZodCatch<z.ZodOptional<z.ZodString>>;
+};
+/**
  * Host → module. The answer to exactly one request: data or a refusal, two shapes under one type.
  * A refusal always carries both `reason`, a word from `responseFailureReasons` for the program, and
  * `error`, a sentence for the person writing the module.
@@ -2262,6 +2279,8 @@ export declare const responseSchema: z.ZodDiscriminatedUnion<"ok", [z.ZodObject<
     ok: true;
     data?: unknown;
 }>, z.ZodObject<{
+    declined: z.ZodCatch<z.ZodOptional<z.ZodEnum<["host-too-old"]>>>;
+    since: z.ZodCatch<z.ZodOptional<z.ZodString>>;
     type: z.ZodLiteral<"kehikot.response">;
     id: z.ZodString;
     ok: z.ZodLiteral<false>;
@@ -2274,12 +2293,16 @@ export declare const responseSchema: z.ZodDiscriminatedUnion<"ok", [z.ZodObject<
     error: string;
     reason: "failed" | "unknown-module" | "unknown-method";
     ok: false;
+    since?: string | undefined;
+    declined?: "host-too-old" | undefined;
 }, {
     id: string;
     type: "kehikot.response";
     reason: "failed" | "unknown-module" | "unknown-method";
     ok: false;
+    since?: unknown;
     error?: string | undefined;
+    declined?: unknown;
 }>]>;
 /**
  * Host → module. Go to a reference. Names a `ref` or a 1-based `step`; an epic alone is refused,
@@ -3983,6 +4006,8 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     ok: true;
     data?: unknown;
 }>, z.ZodObject<{
+    declined: z.ZodCatch<z.ZodOptional<z.ZodEnum<["host-too-old"]>>>;
+    since: z.ZodCatch<z.ZodOptional<z.ZodString>>;
     type: z.ZodLiteral<"kehikot.response">;
     id: z.ZodString;
     ok: z.ZodLiteral<false>;
@@ -3995,12 +4020,16 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     error: string;
     reason: "failed" | "unknown-module" | "unknown-method";
     ok: false;
+    since?: string | undefined;
+    declined?: "host-too-old" | undefined;
 }, {
     id: string;
     type: "kehikot.response";
     reason: "failed" | "unknown-module" | "unknown-method";
     ok: false;
+    since?: unknown;
     error?: string | undefined;
+    declined?: unknown;
 }>]>, z.ZodEffects<z.ZodObject<{
     type: z.ZodLiteral<"kehikot.goto">;
     id: z.ZodString;

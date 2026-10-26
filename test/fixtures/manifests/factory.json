@@ -1,0 +1,111 @@
+{
+ "kind": "kehikot.module",
+ "protocol": 2,
+ "id": "kehikot.factory",
+ "name": "Factory",
+ "version": "0.6.0",
+ "dataVersion": 1,
+ "summary": "A software factory on your kehikko: builds judged by a panel of agents, and /review-factory for accurate, transparent reviews of pull and merge requests.",
+ "tags": [
+  "agents",
+  "review",
+  "code"
+ ],
+ "guidance": "Factory runs features through a pipeline of agents (spec, plan, build, review, counter-argument, judge) when the person types /factory in a Claude Code conversation. Its MCP door only reads: `jobs` lists a project's jobs and their stages, `job` reads one job's files (spec, plan, reviews, counter-arguments, judgements, decision). You cannot start, approve, merge or send back a job: those are the person's, typed or pressed. Never merge a factory/<job> branch yourself. It also runs /review-factory, a review panel for pull and merge requests (planner, two reviewers, an adversary, a judge) that drafts into Review: `reviews` lists a project's reviews, `review` reads one and its record (\"How this review was made\"). You cannot start, steer or send a review.",
+ "entry": "/app",
+ "icon": "lucide:factory",
+ "health": "/healthz",
+ "mcp": {
+  "url": "/mcp",
+  "transport": "http",
+  "about": "The jobs of the software factory in a project, and each job's files; the /review-factory reviews and their records. Read-only.",
+  "subjects": []
+ },
+ "extensions": {
+  "emits": [],
+  "consumes": []
+ },
+ "reacts": [
+  "parts"
+ ],
+ "modes": [
+  {
+   "id": "board",
+   "label": "Factory",
+   "scope": "epic"
+  }
+ ],
+ "declares": {
+  "protocol": ">=2 <3",
+  "uses": [
+   "activity:report",
+   "trackers:read",
+   "view:navigate",
+   "epics:read",
+   "steps:read",
+   "parts:read"
+  ],
+  "storage": true,
+  "prompt": false,
+  "scopes": [
+   "epic",
+   "project"
+  ],
+  "settings": [
+   {
+    "key": "judgeMerges",
+    "label": "Let the judge merge approved jobs by itself",
+    "description": "An approved job is merged into main without waiting for you. Off: approved jobs wait for you.",
+    "type": "boolean",
+    "default": false,
+    "scope": "project",
+    "personOnly": true
+   },
+   {
+    "key": "postTwoWay",
+    "label": "Post two-way reviews by myself",
+    "description": "A two-way change with no UI or UX is posted to the pull or merge request without you, through Review.",
+    "type": "boolean",
+    "default": false,
+    "scope": "project",
+    "personOnly": true
+   },
+   {
+    "key": "reReviewByItself",
+    "label": "Re-review by myself",
+    "description": "When a change is ready for another review, it runs in a background session without asking you.",
+    "type": "boolean",
+    "default": false,
+    "scope": "project",
+    "personOnly": true
+   },
+   {
+    "key": "runTests",
+    "label": "Reviewers may run this project's tests",
+    "description": "Only the project's own test command, in the review's checkout.",
+    "type": "boolean",
+    "default": false,
+    "scope": "project",
+    "personOnly": true
+   },
+   {
+    "key": "defaultRule",
+    "label": "Ready for another review",
+    "description": "The signal that an author is ready for another review, unless you set one for them.",
+    "type": "string",
+    "default": "when they re-request review, or 2 hours after the last push with new commits and every point answered",
+    "scope": "project",
+    "personOnly": true
+   },
+   {
+    "key": "doorRules",
+    "label": "Door rules",
+    "description": "One rule a line: \"path migrations/ → one-way\" or \"label two-way → two-way\". A one-way rule always wins.",
+    "type": "list",
+    "default": [],
+    "scope": "project",
+    "personOnly": true
+   }
+  ]
+ }
+}

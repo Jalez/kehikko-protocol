@@ -7,6 +7,51 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.22.0 — 2026-10-26
+
+Whether a module and a host fit, from the manifest every module already serves. **Additive**;
+`PROTOCOL` is still 2. A module needs no code for it. A reader from before 2.22.0 strips the new
+refusal fields and sees `unknown-method`, as before. docs/fit.md.
+
+### Added
+
+- **`SINCE`**: which version each piece arrived in. `METHOD_SINCE` (every method), `CAPABILITY_SINCE`
+  (every capability: the version of its oldest method), `SERVER_METHOD_SINCE` (when a module's
+  server could first ask each method in `SERVER_METHODS`), and `DECLARATION_SINCE` (`mcp.subjects`
+  1.1.0, `mcp.as` 1.3.0, `declares.skills` 2.5.0, `declares.scopes` 2.9.0, `skills.needs` 2.12.0,
+  `declares.settings` 2.15.0, `declares.provides`, `declares.agentSessions` and
+  `skills.needs.object` 2.21.0). Also `SINCE_FLOOR` (`0.25.0`), `DECLARATION_NAMES`, and
+  `sinceOf(kind, piece)`. `PIECE_SAID` and `pieceSaid` give each piece in a person's words.
+  `REMOVED` and `removedIn` are empty until 3.0.
+- **`needsOf(manifest, above?)`**: reads a parsed manifest or raw JSON and returns `version` (the
+  newest any piece needs), `pieces` (newer than `above`, then the unknown ones), `unknown`, and
+  `built` (`build.protocol`, a hint only).
+- **`fitOf(manifest, { version?, protocol? })`**: returns `fits`,
+  `host-too-old { since, missing }`, or `module-too-old { removed }`, plus `protocol` when the
+  protocol number decided. An unknown piece counts only if the module was built with a newer
+  package than the host, or does not say what it was built with.
+- **`fitSaid(fit, name)`** returns `{ title, line, action }`: "Monitor needs a newer Kehikot", "It
+  uses the call log, added in protocol 2.20.", "Update Kehikot"; or "<Module> needs an update" and
+  "Update <Module>". **`FIT_SAYS`** holds the same words, and `FIT_SAYS.tooOld(since)` is "This
+  needs Kehikot with protocol 2.21 or later."
+- **`declined: 'host-too-old'` and `since`** may appear on a refusal (`DECLINED_REASONS`,
+  `declinedFields`), on both `responseSchema` and `serverAskResult`. Out of shape, they are dropped.
+- **`hostTooOld(value)`** reads `{ outcome: 'declined', reason: 'host-too-old', since }` off a
+  `HostRefused`, a `Refusal`, an `AskedHost` or a relayed body. **`tooOldOf(method, refusal, kind?)`**
+  is the rule the client and `askHost` share. Both are also exported from `/client` and `/serve`.
+- `Refusal.declined?`, `Refusal.since?`; `AskedHost` failures also gain `declined?` and `since?`.
+- `PROTOCOL_VERSION` (the `major.minor.patch` pattern), `versionParts`, `compareVersions`,
+  `newerVersion`, `versionSaid`.
+
+### Changed
+
+- `connection.request` rejects with `host-too-old` (and `since` from `METHOD_SINCE`) when the host
+  answers `unknown-method` for a method this package knows. The `reason` is still `unknown-method`.
+- `askHost` says `host-too-old` when the host says `declined`, when it answers `unknown-method` for
+  a server method this package knows, and when a host from before 2.22.0 refuses the question as
+  malformed because its `SERVER_METHODS` lacks the method. Until now that last case read as "No
+  Kehikot host answered".
+
 ## 2.21.1 — 2026-10-26
 
 A module's server asks the host about a project far less often. **Additive**; `PROTOCOL` is still 2.

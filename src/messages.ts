@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { MESSAGE, MESSAGE_PREFIX, PROTOCOL, type MessageType } from './constants.js'
 import { LIMITS } from './limits.js'
-import { EPIC_SLUG, MODULE_ID } from './ids.js'
+import { EPIC_SLUG, MODULE_ID, PROTOCOL_VERSION } from './ids.js'
 import { buildSchema } from './build.js'
 import { contextSchema } from './context.js'
 import { filterGroupSchema } from './filters.js'
@@ -189,6 +189,25 @@ export const responseFailureReasons = ['unknown-module', 'unknown-method', 'fail
 export type ResponseFailureReason = (typeof responseFailureReasons)[number]
 
 /**
+ * Why a host declined a call rather than failing it (2.22.0), said beside `reason` on a refusal as
+ * `declined`. One word: `host-too-old`, the method is newer than this host, which answers
+ * `reason: 'unknown-method'` with it. A reader before 2.22.0 strips the field and sees
+ * `unknown-method`, as before. Read it with `hostTooOld` (`fit.ts`).
+ */
+export const DECLINED_REASONS = ['host-too-old'] as const
+export type DeclinedReason = (typeof DECLINED_REASONS)[number]
+
+/**
+ * The two fields a refusal may carry for a call the host is too old for (2.22.0): `declined`, and
+ * `since`, the version that has the method when the host can say (it usually cannot: the module's
+ * own `SINCE` knows). Optional, and dropped rather than fatal when out of shape.
+ */
+export const declinedFields = {
+  declined: z.enum(DECLINED_REASONS).optional().catch(undefined),
+  since: z.string().regex(PROTOCOL_VERSION).optional().catch(undefined),
+}
+
+/**
  * Host → module. The answer to exactly one request: data or a refusal, two shapes under one type.
  * A refusal always carries both `reason`, a word from `responseFailureReasons` for the program, and
  * `error`, a sentence for the person writing the module.
@@ -212,6 +231,8 @@ export const responseSchema = z.discriminatedUnion('ok', [
     reason: z.enum(responseFailureReasons),
     /** The sentence for the person. Bounded because a refusal quotes the module's own text back at it. */
     error: z.string().max(LIMITS.REASON).default(''),
+    /** 2.22.0. `host-too-old` (with `since` when the host knows it) for a method newer than this host. */
+    ...declinedFields,
   }),
 ])
 

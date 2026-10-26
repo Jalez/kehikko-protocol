@@ -1,6 +1,8 @@
 import { randomBytes } from 'node:crypto';
 import { LIMITS } from '../limits.js';
+import { FIT_SAYS, tooOldOf } from '../fit.js';
 import { methodResults } from '../methods.js';
+import { sinceOf } from '../since.js';
 import { SERVER_ASK_PATH, SERVER_PASS, SERVER_PASS_PATH, serverAskResult, } from '../server-ask.js';
 import { frameOrigins } from './origins.js';
 /**
@@ -86,10 +88,20 @@ export async function askHost(method, params, options) {
                 body: JSON.stringify({ module: options.module, pass, ...(options.project !== undefined ? { project: options.project } : {}), method, params }),
                 signal: control.signal,
             });
-            const read = serverAskResult.safeParse(await response.json());
-            if (!read.success)
+            const body = await response.json();
+            const read = serverAskResult.safeParse(body);
+            if (!read.success) {
+                /* A host before 2.22.0 refuses a question whose method it does not have as a question of the
+                   wrong shape (`{ ok: false, error }`, no reason). The question is this package's own, so
+                   the shape that is wrong is the host's: it is older than the method. */
+                if (olderHostRefused(body))
+                    return tooOld(method);
                 continue;
+            }
             if (!read.data.ok) {
+                const declined = tooOldOf(method, read.data, 'serverMethod');
+                if (declined)
+                    return tooOld(method, declined.since);
                 last = { ok: false, why: read.data.error, reason: read.data.reason, ...(read.data.refused ? { refused: read.data.refused } : {}) };
                 /* Another host on this machine may hold the project, or have the module registered. */
                 if (read.data.refused === 'project' || read.data.refused === 'module' || read.data.reason === 'unknown-module')
@@ -111,4 +123,21 @@ export async function askHost(method, params, options) {
         }
     }
     return last ?? { ok: false, why: NO_HOST_TO_ASK };
+}
+/** A refusal with no reason that names the method: a host before 2.22.0 taking the question for malformed. */
+function olderHostRefused(body) {
+    if (typeof body !== 'object' || body === null)
+        return false;
+    const { ok, error, reason } = body;
+    return ok === false && reason === undefined && typeof error === 'string' && /\bmethod\b/.test(error);
+}
+/** `host-too-old`, with the line a module may show as its `why`. */
+function tooOld(method, since = sinceOf('serverMethod', method)) {
+    return {
+        ok: false,
+        why: FIT_SAYS.tooOld(since),
+        reason: 'unknown-method',
+        declined: 'host-too-old',
+        since,
+    };
 }
