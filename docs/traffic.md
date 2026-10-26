@@ -65,6 +65,39 @@ would otherwise fill it with itself.
 connections is the expensive part, and a reader that does not show it (an agent's one look) does not
 make the host look.
 
+### Who asked (2.25.0)
+
+`by` files a row under the host, a module, or nobody (`''`). A request the host RECEIVES can come from
+anything on this computer — curl, an agent session at the host's MCP door, a module's server before
+anything has looked at its processes — so the host also names it, on the row, as `caller`:
+
+```ts
+caller: {
+  kind: 'session',                              // host | module | session | program | remote | gone
+  name: 'Claude session on Wide · methods',     // what a person reads
+  how: 'token',                                 // route | origin | token | process | address | closed
+  process: 'claude', parent: 'bun',             // executable names only
+  place: 'Wide · methods',                      // a session's kehikko and epic, as its record says
+  pid: 4242,                                    // tells two callers of one name apart
+}
+```
+
+- `host`: Kehikot itself — its page (by its origin) or its desktop app. `by` is `kehikko`.
+- `module`: a module's server, its page (by the module's origin) or a process under it. `by` is the
+  module.
+- `session`: an agent session an agent module started — by the place token on its MCP calls, or by
+  its process under the module's. `by` is the agent module, so a reader can group "Claude: 3 sessions".
+- `program`: anything else on this computer, by its executable's name and its parent's ("curl, from
+  your terminal (zsh)", "Claude Code, started outside Kehikot"). `by` is `''`.
+- `remote`: a peer that is not this computer ("Another computer (192.168.1.20)").
+- `gone`: the connection's process had closed before the host looked ("A program that closed before
+  it could be named").
+
+`process` and `parent` are executable NAMES. A command line is never recorded: it can hold a token.
+How a host finds the process is its own business; on macOS the connection's other end gives a pid
+(`netstat -anv`), and `ps` gives its parents. A row a host could not name keeps `by: ''` and no
+`caller`, as before 2.25.0.
+
 ## Symbols
 
 ### `traffic.ts`
@@ -78,12 +111,17 @@ answer was kept; it is in the record so a reader can see what a cache saved.
 
 #### `TRAFFIC_HOST_BY`
 
-`kehikko`, the host's name on the wire and its door. A row the host could not attribute has `by: ''`.
+`kehikko`, the host's name on the wire and its door. A row that is neither the host's nor a module's has `by: ''`, and on a row the host received, `caller` names it (2.25.0).
 
 #### `trafficNoteSchema`, `trafficCallSchema`
 
 A note is what a module says about one call; a call is a note the recorder stamped with `seq` (its
 place in the record, from 1 at the host's start), `by`, `via`, `side` and `reported`.
+
+#### `trafficCallerSchema`, `TRAFFIC_CALLER_KINDS`, `TRAFFIC_CALLER_HOW` (2.25.0)
+
+Who sent a request the host received, named, and how the host told. See "Who asked" above.
+`LIMITS.TRAFFIC_CALLER` bounds the name and the place.
 
 #### `trafficBudgetSchema`
 
