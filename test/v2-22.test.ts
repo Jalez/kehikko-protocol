@@ -48,7 +48,7 @@ const fixture = (name: string): Record<string, unknown> =>
 
 describe('the version', () => {
   test('is 2.22.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.22.0')
+    expect(PACKAGE_VERSION).toBe('2.23.0')
     expect(PROTOCOL).toBe(2)
   })
 })
@@ -78,6 +78,7 @@ const DECLARATION_MENTION: Record<string, string> = {
   'declares.provides': '`declares.provides`',
   'declares.agentSessions': '`declares.agentSessions',
   'skills.needs.object': '`needs` holds an object',
+  'agentSessions.installsSkills': '`agentSessions.installsSkills`',
 }
 
 describe('SINCE', () => {
@@ -241,10 +242,10 @@ describe('fitOf', () => {
   })
 
   test('a piece this package does not know counts when the module was built with a newer one', () => {
-    const newer = { ...base(), declares: { ...base().declares, uses: ['parts:write'] }, build: { version: '1', started: 'now', protocol: '2.23.0', commit: null } }
+    const newer = { ...base(), declares: { ...base().declares, uses: ['parts:write'] }, build: { version: '1', started: 'now', protocol: '2.99.0', commit: null } }
     const fit = fitOf(newer)
     expect(fit.fit).toBe('host-too-old')
-    if (fit.fit === 'host-too-old') expect(fit.since).toBe('2.23.0')
+    if (fit.fit === 'host-too-old') expect(fit.since).toBe('2.99.0')
     expect(fitSaid(fit, 'Terminal')?.line).toBe('It uses parts:write, which this Kehikot does not know.')
   })
 

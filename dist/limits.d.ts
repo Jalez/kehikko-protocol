@@ -282,6 +282,8 @@ export declare const LIMITS: {
     readonly SKILL_TEXT: 65536;
     /** How many needs one skill may list (`needs`, 2.12.0): modules by id, or what a module provides (2.21.0). */
     readonly SKILL_NEEDS: 8;
+    /** How many skills a host's `everywhere` list may hold (2.23.0): every registered module's, and its own. */
+    readonly EVERYWHERE_SKILLS: 512;
     /**
      * The highest line number a code location may name (`codeLocationSchema`, 2.13.0). A value, not a
      * length: a file longer than this is not one anybody reviews a line of.

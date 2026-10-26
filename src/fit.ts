@@ -67,6 +67,7 @@ function declarations(manifest: Loose): Declaration[] {
   if (listed(declares.settings).length) out.push('declares.settings')
   if (listed(declares.provides).length) out.push('declares.provides')
   if (asObject(declares.agentSessions)) out.push('declares.agentSessions')
+  if (asObject(declares.agentSessions)?.installsSkills === true) out.push('agentSessions.installsSkills')
   return out
 }
 

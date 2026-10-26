@@ -311,6 +311,15 @@ have (the host's, and those of the modules on that kehikko) with `?kehikot-place
 on each URL, under the server name the person's agent config already uses for it. The session gets them
 in a per-session config, so every Kehikot door it calls sees the token on its own URL.
 
+**The skills kept everywhere (2.23.0).** To a module that installs skills itself
+(`declares.agentSessions.installsSkills`), the answer also carries `everywhere`: the skills the host
+keeps installed in the person's agent for every conversation, as its settings say — its own and every
+module's that is not kehikko-bound, but never the skills of another module that runs agent sessions,
+which are written for that module's own agent. Each is `{ module, name, version, origin }`, its text at
+`origin` + `skillPath(name)`. The module keeps the same ones where ITS agent reads skills, so a person
+who chose to have Kehikot's skills in every conversation has them in that agent too. Absent (an older
+host): the module changes nothing it keeps for every conversation; empty: the host keeps none.
+
 **What a token is.** A pointer, not a credential: it names one conversation's record and grants nothing a
 call could not do by naming that place in its arguments. Unguessable (`PLACE_TOKEN`) so two conversations
 never share one by accident.
