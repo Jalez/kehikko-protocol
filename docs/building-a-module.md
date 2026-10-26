@@ -101,6 +101,25 @@ Every method the page calls is answered only when its capability is in
 relates to the parts of an epic — `reacts: ['parts']` or a `partless` sentence,
 never both; a manifest with neither is refused ([parts](parts.md)).
 
+### Kehikot says when it and the module do not fit
+
+There is nothing to write for this. The manifest the module already serves is enough: its
+`declares.uses`, its declarations and its protocol range. Kehikot compares them with its own
+protocol package (`fitOf`, [fit](fit.md)).
+
+- **The module needs a newer Kehikot.** The host shows "<Module> needs a newer Kehikot" in its
+  container, in place of the page, with one line naming what is missing (for example, "It uses the
+  call log, added in protocol 2.20.") and an **Update Kehikot** button.
+- **The module is too old for Kehikot.** The host shows "<Module> needs an update".
+
+The template's modules get this, and so does a module written by hand. Keep `declares.uses` true to
+what the module calls, and the notice will be right.
+
+If the module asks for a method the host does not have yet, the call comes back as
+`host-too-old` with the version that added the method. Read it with `hostTooOld(error)`; you may
+show `FIT_SAYS.tooOld(since)` ("This needs Kehikot with protocol 2.21 or later.") beside the
+control. Doing so is optional.
+
 ### The header is the host's to draw
 
 Declare items with `host.header(items)` and the host draws them in the

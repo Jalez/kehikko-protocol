@@ -549,6 +549,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         prompt: boolean;
         uses: string[];
         storage: boolean;
+        provides?: string[] | undefined;
         settings?: {
             key: string;
             type: "string" | "number" | "boolean" | "choice" | "list";
@@ -562,7 +563,6 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                 label: string;
             }[] | undefined;
         }[] | undefined;
-        provides?: string[] | undefined;
         skills?: {
             name: string;
             version: string;
@@ -576,9 +576,9 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     }, {
         protocol?: string | undefined;
         prompt?: boolean | undefined;
-        settings?: unknown;
         provides?: unknown;
         uses?: string[] | undefined;
+        settings?: unknown;
         storage?: boolean | undefined;
         skills?: {
             name: string;
@@ -621,6 +621,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         prompt: boolean;
         uses: string[];
         storage: boolean;
+        provides?: string[] | undefined;
         settings?: {
             key: string;
             type: "string" | "number" | "boolean" | "choice" | "list";
@@ -634,7 +635,6 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                 label: string;
             }[] | undefined;
         }[] | undefined;
-        provides?: string[] | undefined;
         skills?: {
             name: string;
             version: string;
@@ -700,9 +700,9 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     declares?: {
         protocol?: string | undefined;
         prompt?: boolean | undefined;
-        settings?: unknown;
         provides?: unknown;
         uses?: string[] | undefined;
+        settings?: unknown;
         storage?: boolean | undefined;
         skills?: {
             name: string;
@@ -748,6 +748,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         prompt: boolean;
         uses: string[];
         storage: boolean;
+        provides?: string[] | undefined;
         settings?: {
             key: string;
             type: "string" | "number" | "boolean" | "choice" | "list";
@@ -761,7 +762,6 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                 label: string;
             }[] | undefined;
         }[] | undefined;
-        provides?: string[] | undefined;
         skills?: {
             name: string;
             version: string;
@@ -827,9 +827,9 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     declares?: {
         protocol?: string | undefined;
         prompt?: boolean | undefined;
-        settings?: unknown;
         provides?: unknown;
         uses?: string[] | undefined;
+        settings?: unknown;
         storage?: boolean | undefined;
         skills?: {
             name: string;

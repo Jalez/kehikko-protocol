@@ -32,7 +32,7 @@ const text = (name = skill.name, body = 'Do the thing.') => `---\nname: ${name}\
 
 describe('the version', () => {
   test('is 2.18.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.21.1')
+    expect(PACKAGE_VERSION).toBe('2.22.0')
     expect(PROTOCOL).toBe(2)
   })
 })

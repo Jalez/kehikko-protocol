@@ -57,6 +57,8 @@ export { follow, type Attachment, type FollowOptions } from './stream.js'
 export { type Query, type QueryValue } from './query.js'
 export { applyTheme, pageTheme, systemTheme } from './theme.js'
 export { pageBuild } from './build.js'
+/* A call the host is too old for (2.22.0): read it off a `HostRefused`, show the one line. */
+export { hostTooOld, FIT_SAYS, type HostTooOld } from '../fit.js'
 
 /* What a page holds across a reload of itself: written as it changes, read back by the next load. */
 export { held, heldDraft, type Draft, type Held, type HeldAt, type HeldReader } from './held.js'

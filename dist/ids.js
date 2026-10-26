@@ -26,6 +26,11 @@ export const KEHIKKO_KEY = /^[a-z0-9][a-z0-9-]{0,30}[a-z0-9]$/;
  */
 export const PROJECT_ID = /^[a-z0-9][a-z0-9-]{6,62}[a-z0-9]$/;
 /** A mode's id: one module's own name for one of its tabs. */
+/**
+ * A protocol package version as this package spells its own (2.22.0): `major.minor.patch`, digits
+ * only, as `PACKAGE_VERSION`, `build.protocol` and every entry of `SINCE` are written.
+ */
+export const PROTOCOL_VERSION = /^\d{1,4}\.\d{1,5}\.\d{1,6}$/;
 export const MODE_ID = /^[a-z0-9][a-z0-9-]{0,30}$/;
 /**
  * An epic's slug: lowercase letters, digits and dashes, at most `LIMITS.EPIC_SLUG` characters. No

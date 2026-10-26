@@ -25,7 +25,7 @@ export {
 
 export { LIMITS } from './limits.js'
 
-export { MODULE_ID, MODE_ID, EPIC_SLUG, KEHIKKO_KEY, PROJECT_ID, own, slugFrom } from './ids.js'
+export { MODULE_ID, MODE_ID, EPIC_SLUG, KEHIKKO_KEY, PROJECT_ID, PROTOCOL_VERSION, own, slugFrom } from './ids.js'
 
 export {
   KEHIKOT_DIR,
@@ -223,6 +223,9 @@ export {
   contextMessageSchema,
   responseSchema,
   responseFailureReasons,
+  DECLINED_REASONS,
+  declinedFields,
+  type DeclinedReason,
   gotoSchema,
   eventSchema,
   readySchema,
@@ -698,3 +701,39 @@ export {
   type TrafficNoteResult,
   type TrafficCommand,
 } from './traffic.js'
+
+/* Which version each piece of the protocol arrived in, and whether a module and a host fit (2.22.0). See `since.ts`, `fit.ts`, docs/fit.md. */
+export {
+  SINCE,
+  SINCE_FLOOR,
+  METHOD_SINCE,
+  CAPABILITY_SINCE,
+  SERVER_METHOD_SINCE,
+  DECLARATION_SINCE,
+  DECLARATION_NAMES,
+  PIECE_SAID,
+  REMOVED,
+  sinceOf,
+  removedIn,
+  pieceSaid,
+  versionParts,
+  compareVersions,
+  newerVersion,
+  versionSaid,
+  type Declaration,
+  type PieceKind,
+} from './since.js'
+export {
+  needsOf,
+  fitOf,
+  fitSaid,
+  tooOldOf,
+  hostTooOld,
+  FIT_SAYS,
+  type NeededPiece,
+  type Needs,
+  type HostSide,
+  type RemovedPiece,
+  type Fit,
+  type HostTooOld,
+} from './fit.js'

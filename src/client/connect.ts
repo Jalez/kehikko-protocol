@@ -22,6 +22,7 @@ import {
   type ResponseFailureReason,
 } from '../wire.js'
 
+import { tooOldOf } from '../fit.js'
 import { mailbox, type MessageSource } from './mailbox.js'
 
 
@@ -86,7 +87,17 @@ export function mayGreet(
  * Why a question came back without an answer: the protocol's three reasons, plus `silent` for a
  * timeout or a host that is not there.
  */
-export type Refusal = { reason: ResponseFailureReason | 'silent'; error: string }
+export type Refusal = {
+  reason: ResponseFailureReason | 'silent'
+  error: string
+  /**
+   * 2.22.0. `host-too-old`: the host does not know the method and this package does, so the host is
+   * older than the method (`since`, from this package's `SINCE`). Read it with `hostTooOld`.
+   */
+  declined?: 'host-too-old'
+  /** 2.22.0. The version that has the method, beside `declined`; null when neither side can say. */
+  since?: string | null
+}
 
 /** A refusal, as a thrown thing. Every rejection from `request` is one of these, always. */
 export class HostRefused extends Error {
@@ -301,7 +312,7 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
   /** Correlation id -> the promise waiting on it. A `Map`, per the protocol's note on lookups. */
   const waiting = new Map<
     string,
-    { resolve: (v: unknown) => void; reject: (e: HostRefused) => void; timer: ReturnType<typeof setTimeout> }
+    { method: string; resolve: (v: unknown) => void; reject: (e: HostRefused) => void; timer: ReturnType<typeof setTimeout> }
   >()
 
   let counter = 0
@@ -381,7 +392,17 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
 
     if (message.type === MESSAGE.RESPONSE) {
       if (message.ok) settle(message.id, { ok: true, data: message.data })
-      else settle(message.id, { ok: false, refusal: { reason: message.reason, error: message.error } })
+      else {
+        /* A method this package knows and the host does not: the host is older than it (2.22.0). */
+        const asked = waiting.get(message.id)?.method ?? ''
+        const tooOld = tooOldOf(asked, message)
+        settle(message.id, {
+          ok: false,
+          refusal: tooOld
+            ? { reason: message.reason, error: message.error, declined: 'host-too-old', since: tooOld.since }
+            : { reason: message.reason, error: message.error },
+        })
+      }
       return
     }
 
@@ -528,7 +549,7 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
             },
           })
         }, deadline)
-        waiting.set(correlation, { resolve, reject, timer })
+        waiting.set(correlation, { method, resolve, reject, timer })
         send({ type: MESSAGE.REQUEST, id: correlation, method, params })
       })
     },

@@ -1,0 +1,35 @@
+{
+ "kind": "kehikot.module",
+ "protocol": 2,
+ "id": "kehikot.terminal",
+ "name": "Terminal",
+ "version": "1.2.0",
+ "dataVersion": 1,
+ "summary": "A real terminal on this machine. Your shell, in a container, with nothing else in it.",
+ "tags": [
+  "code"
+ ],
+ "guidance": "A person is sitting at a terminal on this canvas, watching a session run rather than reading a summary of it afterwards. So narrate as you go: say what you are about to do before you do it, and say what happened after, rather than working in silence and reporting at the end. They can see the same shell you are in, so do not describe output they are already looking at, and do not claim a command succeeded where they can watch it fail. Anything you run here runs on their machine as them, with no sandbox between: prefer the reversible order, and ask before the step that cannot be taken back.",
+ "entry": "/app",
+ "icon": "lucide:square-terminal",
+ "health": "/healthz",
+ "extensions": {
+  "emits": [],
+  "consumes": []
+ },
+ "reacts": [],
+ "partless": "A shell: nothing in it belongs to an epic.",
+ "modes": [
+  {
+   "id": "terminal",
+   "label": "Terminal",
+   "scope": "epic"
+  }
+ ],
+ "declares": {
+  "protocol": ">=2 <3",
+  "uses": [],
+  "storage": true,
+  "prompt": false
+ }
+}
