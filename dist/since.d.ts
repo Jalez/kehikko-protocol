@@ -98,6 +98,34 @@ export declare const DECLARATION_SINCE: {
 };
 export type Declaration = keyof typeof DECLARATION_SINCE;
 export declare const DECLARATION_NAMES: Declaration[];
+/**
+ * The fields of a tracker row (`trackerRowSchema`) added after the tracker reading first had a shape,
+ * and the version that added each (2.26.0). Nothing a manifest names, so `needsOf` and `fitOf` do not
+ * read it: a module that reads one of these from an older host finds it absent and must not take the
+ * absence for a fact. What a module reads to know which host can fill a field, and what an official
+ * list's `protocol` is set from when a module only works with one. A field not here is older than the
+ * changelog's account of the row.
+ */
+export declare const TRACKER_FIELD_SINCE: {
+    readonly column: "2.6.0";
+    readonly columns: "2.6.0";
+    readonly reviewers: "2.7.0";
+    readonly authorLogin: "2.7.0";
+    readonly assigneeLogins: "2.7.0";
+    readonly myRoles: "2.7.0";
+    readonly discussions: "2.7.0";
+    readonly lastPushAt: "2.7.0";
+    readonly baseBranch: "2.8.0";
+    readonly headBranch: "2.8.0";
+    readonly stack: "2.8.0";
+    readonly lastActivity: "2.8.0";
+    readonly people: "2.10.0";
+    readonly workItem: "2.11.0";
+    readonly branches: "2.19.0";
+    readonly contributes: "2.26.0";
+    readonly contributedBy: "2.26.0";
+};
+export type TrackerField = keyof typeof TRACKER_FIELD_SINCE;
 /** Every table, in one place. Plain objects: read them with `sinceOf`, never by indexing with a stranger's string. */
 export declare const SINCE: {
     readonly methods: {
@@ -179,9 +207,28 @@ export declare const SINCE: {
         readonly 'skills.needs.object': "2.21.0";
         readonly 'agentSessions.installsSkills': "2.23.0";
     };
+    readonly trackerFields: {
+        readonly column: "2.6.0";
+        readonly columns: "2.6.0";
+        readonly reviewers: "2.7.0";
+        readonly authorLogin: "2.7.0";
+        readonly assigneeLogins: "2.7.0";
+        readonly myRoles: "2.7.0";
+        readonly discussions: "2.7.0";
+        readonly lastPushAt: "2.7.0";
+        readonly baseBranch: "2.8.0";
+        readonly headBranch: "2.8.0";
+        readonly stack: "2.8.0";
+        readonly lastActivity: "2.8.0";
+        readonly people: "2.10.0";
+        readonly workItem: "2.11.0";
+        readonly branches: "2.19.0";
+        readonly contributes: "2.26.0";
+        readonly contributedBy: "2.26.0";
+    };
 };
 /** The kinds of piece the tables know. */
-export type PieceKind = 'method' | 'capability' | 'serverMethod' | 'declaration';
+export type PieceKind = 'method' | 'capability' | 'serverMethod' | 'declaration' | 'trackerField';
 /**
  * The version a piece arrived in, or null when this package does not know it: a piece from a
  * newer protocol, or a word nobody defined.

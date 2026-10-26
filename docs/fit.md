@@ -22,6 +22,10 @@ beside a call the host declined.
   `SERVER_METHODS`. This is never earlier than the page could ask it.
 - `DECLARATION_SINCE`: the manifest declarations a host has to know before it can do what the
   module asks. A declaration is named by where it sits in the manifest.
+- `TRACKER_FIELD_SINCE` (2.26.0): the fields of a tracker row added after the reading first had a
+  shape (`column` 2.6.0 … `contributes` and `contributedBy` 2.26.0). No manifest names a row field,
+  so `needsOf` and `fitOf` do not read this table; it says which host fills a field, so a module that
+  finds one absent knows whether the absence can mean anything.
 
 | declaration | since |
 |---|---|

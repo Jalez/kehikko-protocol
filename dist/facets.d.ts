@@ -30,7 +30,7 @@ export interface Sighting {
      * `NOT_PLANNED`, `DUPLICATE`, `REOPENED`. Absent where the tracker has none.
      */
     stateReason?: string | null;
-    /** True when a change this issue links to has merged — GitLab's sign that a closed issue was done. */
+    /** True when a change that says it closes this issue has merged — GitLab's sign that a closed issue was done. A change that is only part of it (`contributedBy`) never sets it. */
     closedByMerge?: boolean;
 }
 /** Where the disposition being shown came from. A person's mark always wins. */
