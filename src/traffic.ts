@@ -101,6 +101,72 @@ export const trafficBudgetSchema = z.object({
 })
 export type TrafficBudget = z.infer<typeof trafficBudgetSchema>
 
+const count = z.number().int().min(0)
+
+/**
+ * Kehikot's own share of one of an account's limits (2.24.0): at most `limit` of it in the account's
+ * window, of which it has spent `used`. A share the host keeps for itself, so the person's own use,
+ * their CI and their other apps keep the rest.
+ */
+export const trafficShareSchema = z.object({
+  limit: count,
+  used: count,
+})
+export type TrafficShare = z.infer<typeof trafficShareSchema>
+
+/**
+ * One of an account's limits as the forge last said it (2.24.0): GitHub's `core` (REST calls) or
+ * `graphql` (points), GitLab's API. `used` and `remaining` of `limit`, whoever spent them, until
+ * `resets` (ms since the epoch, null when unknown). `share`: Kehikot's own part of it, null when the
+ * host keeps none. `floor`: how much of `remaining` the host leaves alone — below it, it reads
+ * nothing, null when it keeps no floor.
+ */
+export const trafficAllowanceSchema = z.object({
+  limit: count,
+  used: count,
+  remaining: count,
+  resets: instant.nullable(),
+  share: trafficShareSchema.nullable().default(null),
+  floor: count.nullable().default(null),
+})
+export type TrafficAllowance = z.infer<typeof trafficAllowanceSchema>
+
+/**
+ * What a host knows of the account it calls a forge as (2.24.0): the person's own login, signed in
+ * through their `gh` or `glab`. `login`: the name, null when the host cannot say it without a call.
+ * `core`: the REST limit (GitLab's only one). `graphql`: GitHub's GraphQL points; null on GitLab or
+ * when not yet known. `paused`: the host is holding the calls it may hold, and `why` says so in a
+ * sentence, until `until` (null when it cannot say). `at`: when the numbers were last learned, null
+ * when never — a host reads them for free (`gh api rate_limit`) or from the answers it already gets.
+ */
+export const trafficAccountSchema = z.object({
+  login: z.string().max(LIMITS.TRAFFIC_BY).nullable().default(null),
+  core: trafficAllowanceSchema.nullable().default(null),
+  graphql: trafficAllowanceSchema.nullable().default(null),
+  paused: z.boolean().default(false),
+  why: z.string().max(LIMITS.REASON).default(''),
+  until: instant.nullable().default(null),
+  at: instant.nullable().default(null),
+})
+export type TrafficAccount = z.infer<typeof trafficAccountSchema>
+
+/**
+ * Each forge's budgets, separately (2.24.0). `github.account`: the person's signed-in account, null
+ * when `gh` is not signed in. `github.anonymous`: the host's own hourly budget for reading GitHub
+ * without an account — the same row as in `budgets`. `gitlab.account`: the person's `glab` account,
+ * when it is signed in and cheap to read. A forge the host says nothing about is absent.
+ */
+export const trafficLimitsSchema = z.object({
+  github: z
+    .object({
+      account: trafficAccountSchema.nullable().default(null),
+      anonymous: trafficBudgetSchema.nullable().default(null),
+    })
+    .optional(),
+  gitlab: z.object({ account: trafficAccountSchema.nullable().default(null) }).optional(),
+})
+export type TrafficLimits = z.infer<typeof trafficLimitsSchema>
+
 /**
  * One connection open on a process of `by` when the host last looked (`processes`). `remote` is the
  * other end's address (a name when the host looked it up cheaply), `bytesIn`/`bytesOut` what the
@@ -152,6 +218,12 @@ export const trafficReadResult = z.object({
   started: instant,
   budgets: z.array(trafficBudgetSchema).max(16).default([]),
   processes: trafficProcessesSchema.nullable().default(null),
+  /**
+   * Each forge's budgets, separately (2.24.0; `trafficLimitsSchema`). Absent from a host before
+   * 2.24.0, which says only `budgets`; a host that has it still fills `budgets`, so an older reader
+   * keeps working. One that does not parse is dropped, not fatal.
+   */
+  limits: trafficLimitsSchema.optional().catch(undefined),
 })
 export type TrafficReadResult = z.infer<typeof trafficReadResult>
 

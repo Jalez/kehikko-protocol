@@ -164,6 +164,801 @@ export declare const trafficBudgetSchema: z.ZodObject<{
 }>;
 export type TrafficBudget = z.infer<typeof trafficBudgetSchema>;
 /**
+ * Kehikot's own share of one of an account's limits (2.24.0): at most `limit` of it in the account's
+ * window, of which it has spent `used`. A share the host keeps for itself, so the person's own use,
+ * their CI and their other apps keep the rest.
+ */
+export declare const trafficShareSchema: z.ZodObject<{
+    limit: z.ZodNumber;
+    used: z.ZodNumber;
+}, "strip", z.ZodTypeAny, {
+    used: number;
+    limit: number;
+}, {
+    used: number;
+    limit: number;
+}>;
+export type TrafficShare = z.infer<typeof trafficShareSchema>;
+/**
+ * One of an account's limits as the forge last said it (2.24.0): GitHub's `core` (REST calls) or
+ * `graphql` (points), GitLab's API. `used` and `remaining` of `limit`, whoever spent them, until
+ * `resets` (ms since the epoch, null when unknown). `share`: Kehikot's own part of it, null when the
+ * host keeps none. `floor`: how much of `remaining` the host leaves alone — below it, it reads
+ * nothing, null when it keeps no floor.
+ */
+export declare const trafficAllowanceSchema: z.ZodObject<{
+    limit: z.ZodNumber;
+    used: z.ZodNumber;
+    remaining: z.ZodNumber;
+    resets: z.ZodNullable<z.ZodNumber>;
+    share: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+        limit: z.ZodNumber;
+        used: z.ZodNumber;
+    }, "strip", z.ZodTypeAny, {
+        used: number;
+        limit: number;
+    }, {
+        used: number;
+        limit: number;
+    }>>>;
+    floor: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+}, "strip", z.ZodTypeAny, {
+    used: number;
+    limit: number;
+    resets: number | null;
+    remaining: number;
+    share: {
+        used: number;
+        limit: number;
+    } | null;
+    floor: number | null;
+}, {
+    used: number;
+    limit: number;
+    resets: number | null;
+    remaining: number;
+    share?: {
+        used: number;
+        limit: number;
+    } | null | undefined;
+    floor?: number | null | undefined;
+}>;
+export type TrafficAllowance = z.infer<typeof trafficAllowanceSchema>;
+/**
+ * What a host knows of the account it calls a forge as (2.24.0): the person's own login, signed in
+ * through their `gh` or `glab`. `login`: the name, null when the host cannot say it without a call.
+ * `core`: the REST limit (GitLab's only one). `graphql`: GitHub's GraphQL points; null on GitLab or
+ * when not yet known. `paused`: the host is holding the calls it may hold, and `why` says so in a
+ * sentence, until `until` (null when it cannot say). `at`: when the numbers were last learned, null
+ * when never — a host reads them for free (`gh api rate_limit`) or from the answers it already gets.
+ */
+export declare const trafficAccountSchema: z.ZodObject<{
+    login: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+    core: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+        limit: z.ZodNumber;
+        used: z.ZodNumber;
+        remaining: z.ZodNumber;
+        resets: z.ZodNullable<z.ZodNumber>;
+        share: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+            limit: z.ZodNumber;
+            used: z.ZodNumber;
+        }, "strip", z.ZodTypeAny, {
+            used: number;
+            limit: number;
+        }, {
+            used: number;
+            limit: number;
+        }>>>;
+        floor: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+    }, "strip", z.ZodTypeAny, {
+        used: number;
+        limit: number;
+        resets: number | null;
+        remaining: number;
+        share: {
+            used: number;
+            limit: number;
+        } | null;
+        floor: number | null;
+    }, {
+        used: number;
+        limit: number;
+        resets: number | null;
+        remaining: number;
+        share?: {
+            used: number;
+            limit: number;
+        } | null | undefined;
+        floor?: number | null | undefined;
+    }>>>;
+    graphql: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+        limit: z.ZodNumber;
+        used: z.ZodNumber;
+        remaining: z.ZodNumber;
+        resets: z.ZodNullable<z.ZodNumber>;
+        share: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+            limit: z.ZodNumber;
+            used: z.ZodNumber;
+        }, "strip", z.ZodTypeAny, {
+            used: number;
+            limit: number;
+        }, {
+            used: number;
+            limit: number;
+        }>>>;
+        floor: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+    }, "strip", z.ZodTypeAny, {
+        used: number;
+        limit: number;
+        resets: number | null;
+        remaining: number;
+        share: {
+            used: number;
+            limit: number;
+        } | null;
+        floor: number | null;
+    }, {
+        used: number;
+        limit: number;
+        resets: number | null;
+        remaining: number;
+        share?: {
+            used: number;
+            limit: number;
+        } | null | undefined;
+        floor?: number | null | undefined;
+    }>>>;
+    paused: z.ZodDefault<z.ZodBoolean>;
+    why: z.ZodDefault<z.ZodString>;
+    until: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+    at: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+}, "strip", z.ZodTypeAny, {
+    at: number | null;
+    login: string | null;
+    why: string;
+    core: {
+        used: number;
+        limit: number;
+        resets: number | null;
+        remaining: number;
+        share: {
+            used: number;
+            limit: number;
+        } | null;
+        floor: number | null;
+    } | null;
+    graphql: {
+        used: number;
+        limit: number;
+        resets: number | null;
+        remaining: number;
+        share: {
+            used: number;
+            limit: number;
+        } | null;
+        floor: number | null;
+    } | null;
+    paused: boolean;
+    until: number | null;
+}, {
+    at?: number | null | undefined;
+    login?: string | null | undefined;
+    why?: string | undefined;
+    core?: {
+        used: number;
+        limit: number;
+        resets: number | null;
+        remaining: number;
+        share?: {
+            used: number;
+            limit: number;
+        } | null | undefined;
+        floor?: number | null | undefined;
+    } | null | undefined;
+    graphql?: {
+        used: number;
+        limit: number;
+        resets: number | null;
+        remaining: number;
+        share?: {
+            used: number;
+            limit: number;
+        } | null | undefined;
+        floor?: number | null | undefined;
+    } | null | undefined;
+    paused?: boolean | undefined;
+    until?: number | null | undefined;
+}>;
+export type TrafficAccount = z.infer<typeof trafficAccountSchema>;
+/**
+ * Each forge's budgets, separately (2.24.0). `github.account`: the person's signed-in account, null
+ * when `gh` is not signed in. `github.anonymous`: the host's own hourly budget for reading GitHub
+ * without an account — the same row as in `budgets`. `gitlab.account`: the person's `glab` account,
+ * when it is signed in and cheap to read. A forge the host says nothing about is absent.
+ */
+export declare const trafficLimitsSchema: z.ZodObject<{
+    github: z.ZodOptional<z.ZodObject<{
+        account: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+            login: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+            core: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+                limit: z.ZodNumber;
+                used: z.ZodNumber;
+                remaining: z.ZodNumber;
+                resets: z.ZodNullable<z.ZodNumber>;
+                share: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+                    limit: z.ZodNumber;
+                    used: z.ZodNumber;
+                }, "strip", z.ZodTypeAny, {
+                    used: number;
+                    limit: number;
+                }, {
+                    used: number;
+                    limit: number;
+                }>>>;
+                floor: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+            }, "strip", z.ZodTypeAny, {
+                used: number;
+                limit: number;
+                resets: number | null;
+                remaining: number;
+                share: {
+                    used: number;
+                    limit: number;
+                } | null;
+                floor: number | null;
+            }, {
+                used: number;
+                limit: number;
+                resets: number | null;
+                remaining: number;
+                share?: {
+                    used: number;
+                    limit: number;
+                } | null | undefined;
+                floor?: number | null | undefined;
+            }>>>;
+            graphql: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+                limit: z.ZodNumber;
+                used: z.ZodNumber;
+                remaining: z.ZodNumber;
+                resets: z.ZodNullable<z.ZodNumber>;
+                share: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+                    limit: z.ZodNumber;
+                    used: z.ZodNumber;
+                }, "strip", z.ZodTypeAny, {
+                    used: number;
+                    limit: number;
+                }, {
+                    used: number;
+                    limit: number;
+                }>>>;
+                floor: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+            }, "strip", z.ZodTypeAny, {
+                used: number;
+                limit: number;
+                resets: number | null;
+                remaining: number;
+                share: {
+                    used: number;
+                    limit: number;
+                } | null;
+                floor: number | null;
+            }, {
+                used: number;
+                limit: number;
+                resets: number | null;
+                remaining: number;
+                share?: {
+                    used: number;
+                    limit: number;
+                } | null | undefined;
+                floor?: number | null | undefined;
+            }>>>;
+            paused: z.ZodDefault<z.ZodBoolean>;
+            why: z.ZodDefault<z.ZodString>;
+            until: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+            at: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+        }, "strip", z.ZodTypeAny, {
+            at: number | null;
+            login: string | null;
+            why: string;
+            core: {
+                used: number;
+                limit: number;
+                resets: number | null;
+                remaining: number;
+                share: {
+                    used: number;
+                    limit: number;
+                } | null;
+                floor: number | null;
+            } | null;
+            graphql: {
+                used: number;
+                limit: number;
+                resets: number | null;
+                remaining: number;
+                share: {
+                    used: number;
+                    limit: number;
+                } | null;
+                floor: number | null;
+            } | null;
+            paused: boolean;
+            until: number | null;
+        }, {
+            at?: number | null | undefined;
+            login?: string | null | undefined;
+            why?: string | undefined;
+            core?: {
+                used: number;
+                limit: number;
+                resets: number | null;
+                remaining: number;
+                share?: {
+                    used: number;
+                    limit: number;
+                } | null | undefined;
+                floor?: number | null | undefined;
+            } | null | undefined;
+            graphql?: {
+                used: number;
+                limit: number;
+                resets: number | null;
+                remaining: number;
+                share?: {
+                    used: number;
+                    limit: number;
+                } | null | undefined;
+                floor?: number | null | undefined;
+            } | null | undefined;
+            paused?: boolean | undefined;
+            until?: number | null | undefined;
+        }>>>;
+        anonymous: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+            name: z.ZodString;
+            used: z.ZodNumber;
+            limit: z.ZodNumber;
+            left: z.ZodNumber;
+            resets: z.ZodNullable<z.ZodNumber>;
+            /** A sentence: whose allowance it is, or why it is not counted. */
+            note: z.ZodDefault<z.ZodString>;
+        }, "strip", z.ZodTypeAny, {
+            name: string;
+            note: string;
+            used: number;
+            limit: number;
+            left: number;
+            resets: number | null;
+        }, {
+            name: string;
+            used: number;
+            limit: number;
+            left: number;
+            resets: number | null;
+            note?: string | undefined;
+        }>>>;
+    }, "strip", z.ZodTypeAny, {
+        account: {
+            at: number | null;
+            login: string | null;
+            why: string;
+            core: {
+                used: number;
+                limit: number;
+                resets: number | null;
+                remaining: number;
+                share: {
+                    used: number;
+                    limit: number;
+                } | null;
+                floor: number | null;
+            } | null;
+            graphql: {
+                used: number;
+                limit: number;
+                resets: number | null;
+                remaining: number;
+                share: {
+                    used: number;
+                    limit: number;
+                } | null;
+                floor: number | null;
+            } | null;
+            paused: boolean;
+            until: number | null;
+        } | null;
+        anonymous: {
+            name: string;
+            note: string;
+            used: number;
+            limit: number;
+            left: number;
+            resets: number | null;
+        } | null;
+    }, {
+        account?: {
+            at?: number | null | undefined;
+            login?: string | null | undefined;
+            why?: string | undefined;
+            core?: {
+                used: number;
+                limit: number;
+                resets: number | null;
+                remaining: number;
+                share?: {
+                    used: number;
+                    limit: number;
+                } | null | undefined;
+                floor?: number | null | undefined;
+            } | null | undefined;
+            graphql?: {
+                used: number;
+                limit: number;
+                resets: number | null;
+                remaining: number;
+                share?: {
+                    used: number;
+                    limit: number;
+                } | null | undefined;
+                floor?: number | null | undefined;
+            } | null | undefined;
+            paused?: boolean | undefined;
+            until?: number | null | undefined;
+        } | null | undefined;
+        anonymous?: {
+            name: string;
+            used: number;
+            limit: number;
+            left: number;
+            resets: number | null;
+            note?: string | undefined;
+        } | null | undefined;
+    }>>;
+    gitlab: z.ZodOptional<z.ZodObject<{
+        account: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+            login: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+            core: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+                limit: z.ZodNumber;
+                used: z.ZodNumber;
+                remaining: z.ZodNumber;
+                resets: z.ZodNullable<z.ZodNumber>;
+                share: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+                    limit: z.ZodNumber;
+                    used: z.ZodNumber;
+                }, "strip", z.ZodTypeAny, {
+                    used: number;
+                    limit: number;
+                }, {
+                    used: number;
+                    limit: number;
+                }>>>;
+                floor: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+            }, "strip", z.ZodTypeAny, {
+                used: number;
+                limit: number;
+                resets: number | null;
+                remaining: number;
+                share: {
+                    used: number;
+                    limit: number;
+                } | null;
+                floor: number | null;
+            }, {
+                used: number;
+                limit: number;
+                resets: number | null;
+                remaining: number;
+                share?: {
+                    used: number;
+                    limit: number;
+                } | null | undefined;
+                floor?: number | null | undefined;
+            }>>>;
+            graphql: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+                limit: z.ZodNumber;
+                used: z.ZodNumber;
+                remaining: z.ZodNumber;
+                resets: z.ZodNullable<z.ZodNumber>;
+                share: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+                    limit: z.ZodNumber;
+                    used: z.ZodNumber;
+                }, "strip", z.ZodTypeAny, {
+                    used: number;
+                    limit: number;
+                }, {
+                    used: number;
+                    limit: number;
+                }>>>;
+                floor: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+            }, "strip", z.ZodTypeAny, {
+                used: number;
+                limit: number;
+                resets: number | null;
+                remaining: number;
+                share: {
+                    used: number;
+                    limit: number;
+                } | null;
+                floor: number | null;
+            }, {
+                used: number;
+                limit: number;
+                resets: number | null;
+                remaining: number;
+                share?: {
+                    used: number;
+                    limit: number;
+                } | null | undefined;
+                floor?: number | null | undefined;
+            }>>>;
+            paused: z.ZodDefault<z.ZodBoolean>;
+            why: z.ZodDefault<z.ZodString>;
+            until: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+            at: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+        }, "strip", z.ZodTypeAny, {
+            at: number | null;
+            login: string | null;
+            why: string;
+            core: {
+                used: number;
+                limit: number;
+                resets: number | null;
+                remaining: number;
+                share: {
+                    used: number;
+                    limit: number;
+                } | null;
+                floor: number | null;
+            } | null;
+            graphql: {
+                used: number;
+                limit: number;
+                resets: number | null;
+                remaining: number;
+                share: {
+                    used: number;
+                    limit: number;
+                } | null;
+                floor: number | null;
+            } | null;
+            paused: boolean;
+            until: number | null;
+        }, {
+            at?: number | null | undefined;
+            login?: string | null | undefined;
+            why?: string | undefined;
+            core?: {
+                used: number;
+                limit: number;
+                resets: number | null;
+                remaining: number;
+                share?: {
+                    used: number;
+                    limit: number;
+                } | null | undefined;
+                floor?: number | null | undefined;
+            } | null | undefined;
+            graphql?: {
+                used: number;
+                limit: number;
+                resets: number | null;
+                remaining: number;
+                share?: {
+                    used: number;
+                    limit: number;
+                } | null | undefined;
+                floor?: number | null | undefined;
+            } | null | undefined;
+            paused?: boolean | undefined;
+            until?: number | null | undefined;
+        }>>>;
+    }, "strip", z.ZodTypeAny, {
+        account: {
+            at: number | null;
+            login: string | null;
+            why: string;
+            core: {
+                used: number;
+                limit: number;
+                resets: number | null;
+                remaining: number;
+                share: {
+                    used: number;
+                    limit: number;
+                } | null;
+                floor: number | null;
+            } | null;
+            graphql: {
+                used: number;
+                limit: number;
+                resets: number | null;
+                remaining: number;
+                share: {
+                    used: number;
+                    limit: number;
+                } | null;
+                floor: number | null;
+            } | null;
+            paused: boolean;
+            until: number | null;
+        } | null;
+    }, {
+        account?: {
+            at?: number | null | undefined;
+            login?: string | null | undefined;
+            why?: string | undefined;
+            core?: {
+                used: number;
+                limit: number;
+                resets: number | null;
+                remaining: number;
+                share?: {
+                    used: number;
+                    limit: number;
+                } | null | undefined;
+                floor?: number | null | undefined;
+            } | null | undefined;
+            graphql?: {
+                used: number;
+                limit: number;
+                resets: number | null;
+                remaining: number;
+                share?: {
+                    used: number;
+                    limit: number;
+                } | null | undefined;
+                floor?: number | null | undefined;
+            } | null | undefined;
+            paused?: boolean | undefined;
+            until?: number | null | undefined;
+        } | null | undefined;
+    }>>;
+}, "strip", z.ZodTypeAny, {
+    github?: {
+        account: {
+            at: number | null;
+            login: string | null;
+            why: string;
+            core: {
+                used: number;
+                limit: number;
+                resets: number | null;
+                remaining: number;
+                share: {
+                    used: number;
+                    limit: number;
+                } | null;
+                floor: number | null;
+            } | null;
+            graphql: {
+                used: number;
+                limit: number;
+                resets: number | null;
+                remaining: number;
+                share: {
+                    used: number;
+                    limit: number;
+                } | null;
+                floor: number | null;
+            } | null;
+            paused: boolean;
+            until: number | null;
+        } | null;
+        anonymous: {
+            name: string;
+            note: string;
+            used: number;
+            limit: number;
+            left: number;
+            resets: number | null;
+        } | null;
+    } | undefined;
+    gitlab?: {
+        account: {
+            at: number | null;
+            login: string | null;
+            why: string;
+            core: {
+                used: number;
+                limit: number;
+                resets: number | null;
+                remaining: number;
+                share: {
+                    used: number;
+                    limit: number;
+                } | null;
+                floor: number | null;
+            } | null;
+            graphql: {
+                used: number;
+                limit: number;
+                resets: number | null;
+                remaining: number;
+                share: {
+                    used: number;
+                    limit: number;
+                } | null;
+                floor: number | null;
+            } | null;
+            paused: boolean;
+            until: number | null;
+        } | null;
+    } | undefined;
+}, {
+    github?: {
+        account?: {
+            at?: number | null | undefined;
+            login?: string | null | undefined;
+            why?: string | undefined;
+            core?: {
+                used: number;
+                limit: number;
+                resets: number | null;
+                remaining: number;
+                share?: {
+                    used: number;
+                    limit: number;
+                } | null | undefined;
+                floor?: number | null | undefined;
+            } | null | undefined;
+            graphql?: {
+                used: number;
+                limit: number;
+                resets: number | null;
+                remaining: number;
+                share?: {
+                    used: number;
+                    limit: number;
+                } | null | undefined;
+                floor?: number | null | undefined;
+            } | null | undefined;
+            paused?: boolean | undefined;
+            until?: number | null | undefined;
+        } | null | undefined;
+        anonymous?: {
+            name: string;
+            used: number;
+            limit: number;
+            left: number;
+            resets: number | null;
+            note?: string | undefined;
+        } | null | undefined;
+    } | undefined;
+    gitlab?: {
+        account?: {
+            at?: number | null | undefined;
+            login?: string | null | undefined;
+            why?: string | undefined;
+            core?: {
+                used: number;
+                limit: number;
+                resets: number | null;
+                remaining: number;
+                share?: {
+                    used: number;
+                    limit: number;
+                } | null | undefined;
+                floor?: number | null | undefined;
+            } | null | undefined;
+            graphql?: {
+                used: number;
+                limit: number;
+                resets: number | null;
+                remaining: number;
+                share?: {
+                    used: number;
+                    limit: number;
+                } | null | undefined;
+                floor?: number | null | undefined;
+            } | null | undefined;
+            paused?: boolean | undefined;
+            until?: number | null | undefined;
+        } | null | undefined;
+    } | undefined;
+}>;
+export type TrafficLimits = z.infer<typeof trafficLimitsSchema>;
+/**
  * One connection open on a process of `by` when the host last looked (`processes`). `remote` is the
  * other end's address (a name when the host looked it up cheaply), `bytesIn`/`bytesOut` what the
  * connection carried since it opened, absent when the host cannot see bytes.
@@ -452,6 +1247,592 @@ export declare const trafficReadResult: z.ZodObject<{
             bytesOut?: number | undefined;
         }[] | undefined;
     }>>>;
+    /**
+     * Each forge's budgets, separately (2.24.0; `trafficLimitsSchema`). Absent from a host before
+     * 2.24.0, which says only `budgets`; a host that has it still fills `budgets`, so an older reader
+     * keeps working. One that does not parse is dropped, not fatal.
+     */
+    limits: z.ZodCatch<z.ZodOptional<z.ZodObject<{
+        github: z.ZodOptional<z.ZodObject<{
+            account: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+                login: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+                core: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+                    limit: z.ZodNumber;
+                    used: z.ZodNumber;
+                    remaining: z.ZodNumber;
+                    resets: z.ZodNullable<z.ZodNumber>;
+                    share: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+                        limit: z.ZodNumber;
+                        used: z.ZodNumber;
+                    }, "strip", z.ZodTypeAny, {
+                        used: number;
+                        limit: number;
+                    }, {
+                        used: number;
+                        limit: number;
+                    }>>>;
+                    floor: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+                }, "strip", z.ZodTypeAny, {
+                    used: number;
+                    limit: number;
+                    resets: number | null;
+                    remaining: number;
+                    share: {
+                        used: number;
+                        limit: number;
+                    } | null;
+                    floor: number | null;
+                }, {
+                    used: number;
+                    limit: number;
+                    resets: number | null;
+                    remaining: number;
+                    share?: {
+                        used: number;
+                        limit: number;
+                    } | null | undefined;
+                    floor?: number | null | undefined;
+                }>>>;
+                graphql: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+                    limit: z.ZodNumber;
+                    used: z.ZodNumber;
+                    remaining: z.ZodNumber;
+                    resets: z.ZodNullable<z.ZodNumber>;
+                    share: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+                        limit: z.ZodNumber;
+                        used: z.ZodNumber;
+                    }, "strip", z.ZodTypeAny, {
+                        used: number;
+                        limit: number;
+                    }, {
+                        used: number;
+                        limit: number;
+                    }>>>;
+                    floor: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+                }, "strip", z.ZodTypeAny, {
+                    used: number;
+                    limit: number;
+                    resets: number | null;
+                    remaining: number;
+                    share: {
+                        used: number;
+                        limit: number;
+                    } | null;
+                    floor: number | null;
+                }, {
+                    used: number;
+                    limit: number;
+                    resets: number | null;
+                    remaining: number;
+                    share?: {
+                        used: number;
+                        limit: number;
+                    } | null | undefined;
+                    floor?: number | null | undefined;
+                }>>>;
+                paused: z.ZodDefault<z.ZodBoolean>;
+                why: z.ZodDefault<z.ZodString>;
+                until: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+                at: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+            }, "strip", z.ZodTypeAny, {
+                at: number | null;
+                login: string | null;
+                why: string;
+                core: {
+                    used: number;
+                    limit: number;
+                    resets: number | null;
+                    remaining: number;
+                    share: {
+                        used: number;
+                        limit: number;
+                    } | null;
+                    floor: number | null;
+                } | null;
+                graphql: {
+                    used: number;
+                    limit: number;
+                    resets: number | null;
+                    remaining: number;
+                    share: {
+                        used: number;
+                        limit: number;
+                    } | null;
+                    floor: number | null;
+                } | null;
+                paused: boolean;
+                until: number | null;
+            }, {
+                at?: number | null | undefined;
+                login?: string | null | undefined;
+                why?: string | undefined;
+                core?: {
+                    used: number;
+                    limit: number;
+                    resets: number | null;
+                    remaining: number;
+                    share?: {
+                        used: number;
+                        limit: number;
+                    } | null | undefined;
+                    floor?: number | null | undefined;
+                } | null | undefined;
+                graphql?: {
+                    used: number;
+                    limit: number;
+                    resets: number | null;
+                    remaining: number;
+                    share?: {
+                        used: number;
+                        limit: number;
+                    } | null | undefined;
+                    floor?: number | null | undefined;
+                } | null | undefined;
+                paused?: boolean | undefined;
+                until?: number | null | undefined;
+            }>>>;
+            anonymous: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+                name: z.ZodString;
+                used: z.ZodNumber;
+                limit: z.ZodNumber;
+                left: z.ZodNumber;
+                resets: z.ZodNullable<z.ZodNumber>;
+                /** A sentence: whose allowance it is, or why it is not counted. */
+                note: z.ZodDefault<z.ZodString>;
+            }, "strip", z.ZodTypeAny, {
+                name: string;
+                note: string;
+                used: number;
+                limit: number;
+                left: number;
+                resets: number | null;
+            }, {
+                name: string;
+                used: number;
+                limit: number;
+                left: number;
+                resets: number | null;
+                note?: string | undefined;
+            }>>>;
+        }, "strip", z.ZodTypeAny, {
+            account: {
+                at: number | null;
+                login: string | null;
+                why: string;
+                core: {
+                    used: number;
+                    limit: number;
+                    resets: number | null;
+                    remaining: number;
+                    share: {
+                        used: number;
+                        limit: number;
+                    } | null;
+                    floor: number | null;
+                } | null;
+                graphql: {
+                    used: number;
+                    limit: number;
+                    resets: number | null;
+                    remaining: number;
+                    share: {
+                        used: number;
+                        limit: number;
+                    } | null;
+                    floor: number | null;
+                } | null;
+                paused: boolean;
+                until: number | null;
+            } | null;
+            anonymous: {
+                name: string;
+                note: string;
+                used: number;
+                limit: number;
+                left: number;
+                resets: number | null;
+            } | null;
+        }, {
+            account?: {
+                at?: number | null | undefined;
+                login?: string | null | undefined;
+                why?: string | undefined;
+                core?: {
+                    used: number;
+                    limit: number;
+                    resets: number | null;
+                    remaining: number;
+                    share?: {
+                        used: number;
+                        limit: number;
+                    } | null | undefined;
+                    floor?: number | null | undefined;
+                } | null | undefined;
+                graphql?: {
+                    used: number;
+                    limit: number;
+                    resets: number | null;
+                    remaining: number;
+                    share?: {
+                        used: number;
+                        limit: number;
+                    } | null | undefined;
+                    floor?: number | null | undefined;
+                } | null | undefined;
+                paused?: boolean | undefined;
+                until?: number | null | undefined;
+            } | null | undefined;
+            anonymous?: {
+                name: string;
+                used: number;
+                limit: number;
+                left: number;
+                resets: number | null;
+                note?: string | undefined;
+            } | null | undefined;
+        }>>;
+        gitlab: z.ZodOptional<z.ZodObject<{
+            account: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+                login: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+                core: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+                    limit: z.ZodNumber;
+                    used: z.ZodNumber;
+                    remaining: z.ZodNumber;
+                    resets: z.ZodNullable<z.ZodNumber>;
+                    share: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+                        limit: z.ZodNumber;
+                        used: z.ZodNumber;
+                    }, "strip", z.ZodTypeAny, {
+                        used: number;
+                        limit: number;
+                    }, {
+                        used: number;
+                        limit: number;
+                    }>>>;
+                    floor: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+                }, "strip", z.ZodTypeAny, {
+                    used: number;
+                    limit: number;
+                    resets: number | null;
+                    remaining: number;
+                    share: {
+                        used: number;
+                        limit: number;
+                    } | null;
+                    floor: number | null;
+                }, {
+                    used: number;
+                    limit: number;
+                    resets: number | null;
+                    remaining: number;
+                    share?: {
+                        used: number;
+                        limit: number;
+                    } | null | undefined;
+                    floor?: number | null | undefined;
+                }>>>;
+                graphql: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+                    limit: z.ZodNumber;
+                    used: z.ZodNumber;
+                    remaining: z.ZodNumber;
+                    resets: z.ZodNullable<z.ZodNumber>;
+                    share: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+                        limit: z.ZodNumber;
+                        used: z.ZodNumber;
+                    }, "strip", z.ZodTypeAny, {
+                        used: number;
+                        limit: number;
+                    }, {
+                        used: number;
+                        limit: number;
+                    }>>>;
+                    floor: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+                }, "strip", z.ZodTypeAny, {
+                    used: number;
+                    limit: number;
+                    resets: number | null;
+                    remaining: number;
+                    share: {
+                        used: number;
+                        limit: number;
+                    } | null;
+                    floor: number | null;
+                }, {
+                    used: number;
+                    limit: number;
+                    resets: number | null;
+                    remaining: number;
+                    share?: {
+                        used: number;
+                        limit: number;
+                    } | null | undefined;
+                    floor?: number | null | undefined;
+                }>>>;
+                paused: z.ZodDefault<z.ZodBoolean>;
+                why: z.ZodDefault<z.ZodString>;
+                until: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+                at: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
+            }, "strip", z.ZodTypeAny, {
+                at: number | null;
+                login: string | null;
+                why: string;
+                core: {
+                    used: number;
+                    limit: number;
+                    resets: number | null;
+                    remaining: number;
+                    share: {
+                        used: number;
+                        limit: number;
+                    } | null;
+                    floor: number | null;
+                } | null;
+                graphql: {
+                    used: number;
+                    limit: number;
+                    resets: number | null;
+                    remaining: number;
+                    share: {
+                        used: number;
+                        limit: number;
+                    } | null;
+                    floor: number | null;
+                } | null;
+                paused: boolean;
+                until: number | null;
+            }, {
+                at?: number | null | undefined;
+                login?: string | null | undefined;
+                why?: string | undefined;
+                core?: {
+                    used: number;
+                    limit: number;
+                    resets: number | null;
+                    remaining: number;
+                    share?: {
+                        used: number;
+                        limit: number;
+                    } | null | undefined;
+                    floor?: number | null | undefined;
+                } | null | undefined;
+                graphql?: {
+                    used: number;
+                    limit: number;
+                    resets: number | null;
+                    remaining: number;
+                    share?: {
+                        used: number;
+                        limit: number;
+                    } | null | undefined;
+                    floor?: number | null | undefined;
+                } | null | undefined;
+                paused?: boolean | undefined;
+                until?: number | null | undefined;
+            }>>>;
+        }, "strip", z.ZodTypeAny, {
+            account: {
+                at: number | null;
+                login: string | null;
+                why: string;
+                core: {
+                    used: number;
+                    limit: number;
+                    resets: number | null;
+                    remaining: number;
+                    share: {
+                        used: number;
+                        limit: number;
+                    } | null;
+                    floor: number | null;
+                } | null;
+                graphql: {
+                    used: number;
+                    limit: number;
+                    resets: number | null;
+                    remaining: number;
+                    share: {
+                        used: number;
+                        limit: number;
+                    } | null;
+                    floor: number | null;
+                } | null;
+                paused: boolean;
+                until: number | null;
+            } | null;
+        }, {
+            account?: {
+                at?: number | null | undefined;
+                login?: string | null | undefined;
+                why?: string | undefined;
+                core?: {
+                    used: number;
+                    limit: number;
+                    resets: number | null;
+                    remaining: number;
+                    share?: {
+                        used: number;
+                        limit: number;
+                    } | null | undefined;
+                    floor?: number | null | undefined;
+                } | null | undefined;
+                graphql?: {
+                    used: number;
+                    limit: number;
+                    resets: number | null;
+                    remaining: number;
+                    share?: {
+                        used: number;
+                        limit: number;
+                    } | null | undefined;
+                    floor?: number | null | undefined;
+                } | null | undefined;
+                paused?: boolean | undefined;
+                until?: number | null | undefined;
+            } | null | undefined;
+        }>>;
+    }, "strip", z.ZodTypeAny, {
+        github?: {
+            account: {
+                at: number | null;
+                login: string | null;
+                why: string;
+                core: {
+                    used: number;
+                    limit: number;
+                    resets: number | null;
+                    remaining: number;
+                    share: {
+                        used: number;
+                        limit: number;
+                    } | null;
+                    floor: number | null;
+                } | null;
+                graphql: {
+                    used: number;
+                    limit: number;
+                    resets: number | null;
+                    remaining: number;
+                    share: {
+                        used: number;
+                        limit: number;
+                    } | null;
+                    floor: number | null;
+                } | null;
+                paused: boolean;
+                until: number | null;
+            } | null;
+            anonymous: {
+                name: string;
+                note: string;
+                used: number;
+                limit: number;
+                left: number;
+                resets: number | null;
+            } | null;
+        } | undefined;
+        gitlab?: {
+            account: {
+                at: number | null;
+                login: string | null;
+                why: string;
+                core: {
+                    used: number;
+                    limit: number;
+                    resets: number | null;
+                    remaining: number;
+                    share: {
+                        used: number;
+                        limit: number;
+                    } | null;
+                    floor: number | null;
+                } | null;
+                graphql: {
+                    used: number;
+                    limit: number;
+                    resets: number | null;
+                    remaining: number;
+                    share: {
+                        used: number;
+                        limit: number;
+                    } | null;
+                    floor: number | null;
+                } | null;
+                paused: boolean;
+                until: number | null;
+            } | null;
+        } | undefined;
+    }, {
+        github?: {
+            account?: {
+                at?: number | null | undefined;
+                login?: string | null | undefined;
+                why?: string | undefined;
+                core?: {
+                    used: number;
+                    limit: number;
+                    resets: number | null;
+                    remaining: number;
+                    share?: {
+                        used: number;
+                        limit: number;
+                    } | null | undefined;
+                    floor?: number | null | undefined;
+                } | null | undefined;
+                graphql?: {
+                    used: number;
+                    limit: number;
+                    resets: number | null;
+                    remaining: number;
+                    share?: {
+                        used: number;
+                        limit: number;
+                    } | null | undefined;
+                    floor?: number | null | undefined;
+                } | null | undefined;
+                paused?: boolean | undefined;
+                until?: number | null | undefined;
+            } | null | undefined;
+            anonymous?: {
+                name: string;
+                used: number;
+                limit: number;
+                left: number;
+                resets: number | null;
+                note?: string | undefined;
+            } | null | undefined;
+        } | undefined;
+        gitlab?: {
+            account?: {
+                at?: number | null | undefined;
+                login?: string | null | undefined;
+                why?: string | undefined;
+                core?: {
+                    used: number;
+                    limit: number;
+                    resets: number | null;
+                    remaining: number;
+                    share?: {
+                        used: number;
+                        limit: number;
+                    } | null | undefined;
+                    floor?: number | null | undefined;
+                } | null | undefined;
+                graphql?: {
+                    used: number;
+                    limit: number;
+                    resets: number | null;
+                    remaining: number;
+                    share?: {
+                        used: number;
+                        limit: number;
+                    } | null | undefined;
+                    floor?: number | null | undefined;
+                } | null | undefined;
+                paused?: boolean | undefined;
+                until?: number | null | undefined;
+            } | null | undefined;
+        } | undefined;
+    }>>>;
 }, "strip", z.ZodTypeAny, {
     started: number;
     calls: {
@@ -502,6 +1883,78 @@ export declare const trafficReadResult: z.ZodObject<{
             bytesOut?: number | undefined;
         }[];
     } | null;
+    limits?: {
+        github?: {
+            account: {
+                at: number | null;
+                login: string | null;
+                why: string;
+                core: {
+                    used: number;
+                    limit: number;
+                    resets: number | null;
+                    remaining: number;
+                    share: {
+                        used: number;
+                        limit: number;
+                    } | null;
+                    floor: number | null;
+                } | null;
+                graphql: {
+                    used: number;
+                    limit: number;
+                    resets: number | null;
+                    remaining: number;
+                    share: {
+                        used: number;
+                        limit: number;
+                    } | null;
+                    floor: number | null;
+                } | null;
+                paused: boolean;
+                until: number | null;
+            } | null;
+            anonymous: {
+                name: string;
+                note: string;
+                used: number;
+                limit: number;
+                left: number;
+                resets: number | null;
+            } | null;
+        } | undefined;
+        gitlab?: {
+            account: {
+                at: number | null;
+                login: string | null;
+                why: string;
+                core: {
+                    used: number;
+                    limit: number;
+                    resets: number | null;
+                    remaining: number;
+                    share: {
+                        used: number;
+                        limit: number;
+                    } | null;
+                    floor: number | null;
+                } | null;
+                graphql: {
+                    used: number;
+                    limit: number;
+                    resets: number | null;
+                    remaining: number;
+                    share: {
+                        used: number;
+                        limit: number;
+                    } | null;
+                    floor: number | null;
+                } | null;
+                paused: boolean;
+                until: number | null;
+            } | null;
+        } | undefined;
+    } | undefined;
 }, {
     started: number;
     calls: {
@@ -552,6 +2005,7 @@ export declare const trafficReadResult: z.ZodObject<{
             bytesOut?: number | undefined;
         }[] | undefined;
     } | null | undefined;
+    limits?: unknown;
 }>;
 export type TrafficReadResult = z.infer<typeof trafficReadResult>;
 /** `traffic.note`'s answer: `taken` with how many rows were written, or `declined` with a sentence. */

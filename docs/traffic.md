@@ -90,6 +90,38 @@ place in the record, from 1 at the host's start), `by`, `via`, `side` and `repor
 An allowance the host spends for the person: GitHub's API without a login, which the host's gateway
 keeps within a budget of its own. `left` of `limit` until `resets`.
 
+#### `trafficLimitsSchema`, `trafficAccountSchema`, `trafficAllowanceSchema`, `trafficShareSchema` (2.24.0)
+
+Each forge's budgets, separately, on `traffic.read`'s `limits`:
+
+```ts
+limits: {
+  github?: {
+    account: {                 // the person's signed-in gh; null when it is not signed in
+      login: 'Jalez',
+      core:    { limit: 5000, used: 188, remaining: 4812, resets, share: { limit: 1000, used: 312 }, floor: 500 },
+      graphql: { limit: 5000, used: 40,  remaining: 4960, resets, share: { limit: 1000, used: 25 },  floor: 500 },
+      paused: false, why: '', until: null,
+      at,                      // when the numbers were last learned
+    } | null,
+    anonymous: TrafficBudget | null,  // the 30-an-hour budget without an account, as in `budgets`
+  },
+  gitlab?: { account: TrafficAccount | null },  // core only; graphql null
+}
+```
+
+An account's limit is shared by everything the person runs as that account: their own `gh` and
+`git`, CI, other apps, agent sessions. `used` and `remaining` are the account's, whoever spent them;
+`share` is the part the host allows itself and what it has spent of it in the account's window, and
+`floor` the `remaining` below which it reads nothing. A host holds what it can while the share is
+used or the floor reached and says so in `paused` and `why`, a sentence a reader shows as written
+("Kehikot's share of your GitHub limit is used until 11:00"). Every call held is a row with
+`cache: 'refused'` and that reason.
+
+Older readers keep working: `budgets` is still filled, and a reader before 2.24.0 strips `limits`.
+A reader of 2.24.0 against an older host finds it absent. One that does not parse is dropped, not
+fatal: the rest of the answer stands.
+
 #### `trafficConnectionSchema`, `trafficProcessesSchema`
 
 What the host saw open on its processes when it last looked: the process, the other end, the bytes

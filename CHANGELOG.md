@@ -7,6 +7,22 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.24.0 — 2026-10-26
+
+Each forge's budgets, separately, on `traffic.read`. **Additive**; `PROTOCOL` is still 2. A host
+that reads GitHub as the person keeps a share of their account's limit for itself; a reader can now
+show the account's real limits, that share, and the anonymous budget apart. docs/traffic.md.
+
+### Added
+
+- **`limits`** on `trafficReadResult` (`trafficLimitsSchema`, `TrafficLimits`): `github.account`
+  and `gitlab.account` (`trafficAccountSchema`: `login`, `core`, `graphql`, `paused`, `why`, `until`,
+  `at`), each limit an `trafficAllowanceSchema` (`limit`, `used`, `remaining`, `resets`, `share`,
+  `floor`) with Kehikot's share as `trafficShareSchema` (`limit`, `used`); `github.anonymous`, the
+  budget without an account (`trafficBudgetSchema`, as in `budgets`). Optional: absent from older
+  hosts, stripped by older readers, and dropped, not fatal, when it does not parse. `budgets` is
+  unchanged and still filled.
+
 ## 2.23.0 — 2026-10-26
 
 Skills an agent module installs for its own agent. **Additive**; `PROTOCOL` is still 2. For an agent
