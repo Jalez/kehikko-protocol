@@ -435,10 +435,13 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
          */
         agentSessions: z.ZodCatch<z.ZodOptional<z.ZodObject<{
             loadsSkills: z.ZodDefault<z.ZodBoolean>;
+            installsSkills: z.ZodOptional<z.ZodBoolean>;
         }, "strip", z.ZodTypeAny, {
             loadsSkills: boolean;
+            installsSkills?: boolean | undefined;
         }, {
             loadsSkills?: boolean | undefined;
+            installsSkills?: boolean | undefined;
         }>>>;
         /**
          * Which scopes of `context.scope` this module can show (2.9.0): `epic` for one epic,
@@ -571,6 +574,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         }[] | undefined;
         agentSessions?: {
             loadsSkills: boolean;
+            installsSkills?: boolean | undefined;
         } | undefined;
         scopes?: ("epic" | "project")[] | undefined;
     }, {
@@ -643,6 +647,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         }[] | undefined;
         agentSessions?: {
             loadsSkills: boolean;
+            installsSkills?: boolean | undefined;
         } | undefined;
         scopes?: ("epic" | "project")[] | undefined;
     };
@@ -666,7 +671,6 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         started: string;
         protocol: string;
     } | undefined;
-    icon?: string | undefined;
     mcp?: {
         url: string;
         transport: "http" | "sse" | "stdio";
@@ -680,6 +684,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         }[];
         as?: string | undefined;
     } | undefined;
+    icon?: string | undefined;
     health?: string | undefined;
     partless?: string | undefined;
 }, {
@@ -696,7 +701,6 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     build?: unknown;
     version?: string | undefined;
     summary?: string | undefined;
-    icon?: string | undefined;
     declares?: {
         protocol?: string | undefined;
         prompt?: boolean | undefined;
@@ -727,6 +731,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             release?: string | undefined;
         }[] | undefined;
     } | undefined;
+    icon?: string | undefined;
     dataVersion?: number | undefined;
     tags?: string[] | undefined;
     guidance?: string | undefined;
@@ -770,6 +775,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         }[] | undefined;
         agentSessions?: {
             loadsSkills: boolean;
+            installsSkills?: boolean | undefined;
         } | undefined;
         scopes?: ("epic" | "project")[] | undefined;
     };
@@ -793,7 +799,6 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         started: string;
         protocol: string;
     } | undefined;
-    icon?: string | undefined;
     mcp?: {
         url: string;
         transport: "http" | "sse" | "stdio";
@@ -807,6 +812,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         }[];
         as?: string | undefined;
     } | undefined;
+    icon?: string | undefined;
     health?: string | undefined;
     partless?: string | undefined;
 }, {
@@ -823,7 +829,6 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     build?: unknown;
     version?: string | undefined;
     summary?: string | undefined;
-    icon?: string | undefined;
     declares?: {
         protocol?: string | undefined;
         prompt?: boolean | undefined;
@@ -854,6 +859,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             release?: string | undefined;
         }[] | undefined;
     } | undefined;
+    icon?: string | undefined;
     dataVersion?: number | undefined;
     tags?: string[] | undefined;
     guidance?: string | undefined;

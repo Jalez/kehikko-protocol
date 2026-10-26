@@ -7,6 +7,26 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.23.0 — 2026-10-26
+
+Skills an agent module installs for its own agent. **Additive**; `PROTOCOL` is still 2. For an agent
+with no per-conversation skills folder (Codex reads only user-wide and repository folders), the
+module that runs its sessions puts the skills where that agent reads them, and the host tells it which
+ones the person keeps in every conversation. docs/manifest.md, "Agent sessions"; docs/asking.md.
+
+### Added
+
+- **`declares.agentSessions.installsSkills`** (`agentSessions.installsSkills` in `DECLARATION_SINCE`),
+  read by `installsSkills(manifest)`: the module installs skills itself, where its agent reads them.
+  Its own declared skills are written for that agent, so a host never installs them into another
+  agent's folder (Claude Code's `~/.claude/skills`). A host before 2.23.0 strips the key and would
+  install them for Claude Code: `needsOf` says 2.23.0 for a manifest that sets it.
+- **`everywhere`** on `placeDoorsSchema`, the host's answer to `POST /host/place`, for a module that
+  installs skills: `everywhereSkillSchema` (`{ module, name, version, origin }`, `EverywhereSkill`),
+  the skills the host keeps installed in the person's agent for every conversation as its settings
+  say — its own and each module's that is not kehikko-bound, never another agent module's. At most
+  `LIMITS.EVERYWHERE_SKILLS`. Absent from older hosts; dropped, not fatal, when it does not parse.
+
 ## 2.22.0 — 2026-10-26
 
 Whether a module and a host fit, from the manifest every module already serves. **Additive**;

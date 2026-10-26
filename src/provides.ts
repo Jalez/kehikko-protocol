@@ -36,6 +36,15 @@ export const providesSchema = z
 export const agentSessionsSchema = z.object({
   /** It starts conversations with an agent, and loads into each the skills that can work on its kehikko. */
   loadsSkills: z.boolean().default(false),
+  /**
+   * It installs skills itself, where the agent it runs reads them (2.23.0): its own declared skills,
+   * which are written for that agent, the skills of the modules on a session's kehikko, and the ones
+   * the host keeps for every conversation (`everywhere` in the answer to `POST /host/place`). A host
+   * never installs this module's own declared skills into another agent's folder (Claude Code's
+   * `~/.claude/skills`, say), and lists them in a session's `everywhere` only for this module.
+   * Optional; absent or false means a host installs its declared skills as any module's.
+   */
+  installsSkills: z.boolean().optional(),
 })
 export type AgentSessions = z.infer<typeof agentSessionsSchema>
 
@@ -46,7 +55,7 @@ export interface ProvidingManifest {
   declares?: {
     uses?: readonly string[]
     provides?: readonly string[]
-    agentSessions?: { loadsSkills?: boolean } | null
+    agentSessions?: { loadsSkills?: boolean; installsSkills?: boolean } | null
   } | null
   mcp?: { subjects?: readonly { kind: string }[] } | null
 }
@@ -59,4 +68,13 @@ export function providesOf(manifest: Pick<ProvidingManifest, 'declares'> | null 
 /** Whether a module says it loads skills into the agent sessions it runs (`declares.agentSessions.loadsSkills`). */
 export function loadsSkills(manifest: Pick<ProvidingManifest, 'declares'> | null | undefined): boolean {
   return manifest?.declares?.agentSessions?.loadsSkills === true
+}
+
+/**
+ * Whether a module says it installs skills itself, where its agent reads them
+ * (`declares.agentSessions.installsSkills`, 2.23.0): its own declared skills are for that agent, and a
+ * host installs none of them into another agent's folder.
+ */
+export function installsSkills(manifest: Pick<ProvidingManifest, 'declares'> | null | undefined): boolean {
+  return manifest?.declares?.agentSessions?.installsSkills === true
 }

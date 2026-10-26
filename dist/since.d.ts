@@ -94,6 +94,7 @@ export declare const DECLARATION_SINCE: {
     readonly 'declares.provides': "2.21.0";
     readonly 'declares.agentSessions': "2.21.0";
     readonly 'skills.needs.object': "2.21.0";
+    readonly 'agentSessions.installsSkills': "2.23.0";
 };
 export type Declaration = keyof typeof DECLARATION_SINCE;
 export declare const DECLARATION_NAMES: Declaration[];
@@ -176,6 +177,7 @@ export declare const SINCE: {
         readonly 'declares.provides': "2.21.0";
         readonly 'declares.agentSessions': "2.21.0";
         readonly 'skills.needs.object': "2.21.0";
+        readonly 'agentSessions.installsSkills': "2.23.0";
     };
 };
 /** The kinds of piece the tables know. */
@@ -227,6 +229,7 @@ export declare const PIECE_SAID: {
         readonly 'declares.provides': "material it publishes for other modules";
         readonly 'declares.agentSessions': "agent sessions";
         readonly 'skills.needs.object': "skills that need what other modules provide";
+        readonly 'agentSessions.installsSkills': "skills it installs for its own agent";
     };
 };
 /** A piece in a person's words, or the piece as written when this package has no words for it. */

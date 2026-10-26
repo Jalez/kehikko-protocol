@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { LIMITS } from './limits.js'
 import { EPIC_SLUG, KEHIKKO_KEY, MODULE_ID, PROJECT_ID, own } from './ids.js'
+import { skillNameSchema } from './skills.js'
 
 /**
  * What a module's MCP door agrees with every other module's: how its tools spell the two context
@@ -156,12 +157,36 @@ export type PlaceIssue = z.infer<typeof placeIssueSchema>
  * server name the person's agent config already uses for that door when it has one (a per-session
  * config then replaces theirs by name), else the name the host would register it under.
  */
+/**
+ * One skill a host keeps installed for every conversation (2.23.0): which module offers it (the host's
+ * own id for the host's own skills), its name and version as that module declares it, and the origin
+ * its text is served at (`skillPath(name)` there). Never a kehikko-bound skill (one with `needs`),
+ * and never the skills of another module that runs agent sessions: those are written for that
+ * module's own agent.
+ */
+export const everywhereSkillSchema = z.object({
+  module: z.string().min(1).max(128),
+  name: skillNameSchema,
+  version: z.string().min(1).max(LIMITS.SKILL_VERSION),
+  origin: z.string().url().max(2048),
+})
+export type EverywhereSkill = z.infer<typeof everywhereSkillSchema>
+
 export const placeDoorsSchema = z.object({
   ok: z.literal(true),
   token: z.string().regex(PLACE_TOKEN),
   doors: z
     .array(z.object({ module: z.string().min(1).max(128), name: z.string().min(1).max(128), url: z.string().url().max(2048), transport: z.enum(['http', 'sse']).catch('http') }))
     .max(128),
+  /**
+   * The skills this host keeps installed in the person's agent for every conversation, as its
+   * settings say (2.23.0), for a module that installs skills itself (`installsSkills`) to keep the
+   * same ones where its own agent reads them. Absent from a host before 2.23.0, and for a module
+   * that does not install skills: then nothing is said about them, and a module changes nothing it
+   * keeps for every conversation. Present and empty: the host keeps none. One that does not parse
+   * is dropped, not fatal.
+   */
+  everywhere: z.array(everywhereSkillSchema).max(LIMITS.EVERYWHERE_SKILLS).optional().catch(undefined),
 })
 export type PlaceDoors = z.infer<typeof placeDoorsSchema>
 

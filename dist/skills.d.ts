@@ -6,7 +6,9 @@ import type { ProvidingManifest } from './provides.js';
  * origin, front matter first. The host shows the person that text and installs it only when they
  * press Install; nothing here installs, fetches or decides anything. Which agent reads them is the
  * host's and the person's business: a host installs one for a coding agent, and a module that runs
- * agent sessions (`declares.agentSessions.loadsSkills`, 2.21.0) loads the kehikko-bound ones.
+ * agent sessions (`declares.agentSessions.loadsSkills`, 2.21.0) loads the kehikko-bound ones. A
+ * module that installs skills for its own agent (`installsSkills`, 2.23.0) declares skills written for
+ * that agent, which a host never installs for another.
  * Design notes: docs/manifest.md, "declares.skills".
  */
 /**

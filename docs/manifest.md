@@ -296,6 +296,27 @@ declares: { agentSessions: { loadsSkills: true } }
 Optional; absent means the module runs none. One that does not parse is dropped,
 not fatal. `loadsSkills(manifest)` reads it.
 
+**`installsSkills: true` (2.23.0)** says the module installs skills itself, where
+the agent it runs reads them — for an agent with no per-conversation skills
+folder, such as Codex, that is the agent's user-wide folder. It installs its own
+declared skills, which are written for its agent; the skills of the modules on a
+session's kehikko; and the skills the host keeps for every conversation, which
+the host lists for it in its answer to `POST /host/place` (`everywhere`,
+[asking](asking.md)). A host never installs such a module's declared skills into
+another agent's folder (Claude Code's `~/.claude/skills`): it shows them, and
+says the module keeps them. The module holds to the same rules a host does:
+it writes and removes only folders it marked as its own, never a skill the person
+made or changed, and a kehikko-bound skill only while a conversation whose
+kehikko meets its needs holds it.
+
+```ts
+declares: { skills: [{ name: 'kehikot-here', summary: '…', version: '…' }], agentSessions: { loadsSkills: true, installsSkills: true } }
+```
+
+`installsSkills(manifest)` reads it. A host before 2.23.0 does not know it and
+would install the module's own skills for Claude Code, so it is in
+`DECLARATION_SINCE` (`agentSessions.installsSkills`).
+
 ### A module's settings (2.15.0)
 
 `declares.settings` lists the settings a person can see and change from the host: each field's key, label, sentence, type (`boolean`, `string`, `number`, `choice`, `list`), default, scope (`project` or `machine`) and whether only a person may change it. The host draws one form from it and asks the module to read and write the values at its door. Optional; a list that does not parse is dropped and the rest of the manifest is read. See [settings](settings.md).

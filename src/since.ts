@@ -103,6 +103,7 @@ export const DECLARATION_SINCE = {
   'declares.provides': '2.21.0',
   'declares.agentSessions': '2.21.0',
   'skills.needs.object': '2.21.0',
+  'agentSessions.installsSkills': '2.23.0',
 } as const
 export type Declaration = keyof typeof DECLARATION_SINCE
 export const DECLARATION_NAMES = Object.keys(DECLARATION_SINCE) as Declaration[]
@@ -176,6 +177,7 @@ export const PIECE_SAID = {
     'declares.provides': 'material it publishes for other modules',
     'declares.agentSessions': 'agent sessions',
     'skills.needs.object': 'skills that need what other modules provide',
+    'agentSessions.installsSkills': 'skills it installs for its own agent',
   } as const satisfies Record<Declaration, string>,
 } as const
 

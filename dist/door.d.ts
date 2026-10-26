@@ -358,6 +358,30 @@ export type PlaceIssue = z.infer<typeof placeIssueSchema>;
  * server name the person's agent config already uses for that door when it has one (a per-session
  * config then replaces theirs by name), else the name the host would register it under.
  */
+/**
+ * One skill a host keeps installed for every conversation (2.23.0): which module offers it (the host's
+ * own id for the host's own skills), its name and version as that module declares it, and the origin
+ * its text is served at (`skillPath(name)` there). Never a kehikko-bound skill (one with `needs`),
+ * and never the skills of another module that runs agent sessions: those are written for that
+ * module's own agent.
+ */
+export declare const everywhereSkillSchema: z.ZodObject<{
+    module: z.ZodString;
+    name: z.ZodString;
+    version: z.ZodString;
+    origin: z.ZodString;
+}, "strip", z.ZodTypeAny, {
+    name: string;
+    version: string;
+    module: string;
+    origin: string;
+}, {
+    name: string;
+    version: string;
+    module: string;
+    origin: string;
+}>;
+export type EverywhereSkill = z.infer<typeof everywhereSkillSchema>;
 export declare const placeDoorsSchema: z.ZodObject<{
     ok: z.ZodLiteral<true>;
     token: z.ZodString;
@@ -377,6 +401,30 @@ export declare const placeDoorsSchema: z.ZodObject<{
         module: string;
         transport?: unknown;
     }>, "many">;
+    /**
+     * The skills this host keeps installed in the person's agent for every conversation, as its
+     * settings say (2.23.0), for a module that installs skills itself (`installsSkills`) to keep the
+     * same ones where its own agent reads them. Absent from a host before 2.23.0, and for a module
+     * that does not install skills: then nothing is said about them, and a module changes nothing it
+     * keeps for every conversation. Present and empty: the host keeps none. One that does not parse
+     * is dropped, not fatal.
+     */
+    everywhere: z.ZodCatch<z.ZodOptional<z.ZodArray<z.ZodObject<{
+        module: z.ZodString;
+        name: z.ZodString;
+        version: z.ZodString;
+        origin: z.ZodString;
+    }, "strip", z.ZodTypeAny, {
+        name: string;
+        version: string;
+        module: string;
+        origin: string;
+    }, {
+        name: string;
+        version: string;
+        module: string;
+        origin: string;
+    }>, "many">>>;
 }, "strip", z.ZodTypeAny, {
     token: string;
     ok: true;
@@ -386,6 +434,12 @@ export declare const placeDoorsSchema: z.ZodObject<{
         module: string;
         transport: "http" | "sse";
     }[];
+    everywhere?: {
+        name: string;
+        version: string;
+        module: string;
+        origin: string;
+    }[] | undefined;
 }, {
     token: string;
     ok: true;
@@ -395,6 +449,7 @@ export declare const placeDoorsSchema: z.ZodObject<{
         module: string;
         transport?: unknown;
     }[];
+    everywhere?: unknown;
 }>;
 export type PlaceDoors = z.infer<typeof placeDoorsSchema>;
 /**

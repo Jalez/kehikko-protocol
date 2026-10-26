@@ -34,6 +34,7 @@ beside a call the host declined.
 | `declares.provides` | 2.21.0 |
 | `declares.agentSessions` | 2.21.0 |
 | `skills.needs.object` (`{ provides }` and the other object forms) | 2.21.0 |
+| `agentSessions.installsSkills` | 2.23.0 |
 
 A piece that was there at the first tag says `SINCE_FLOOR` (`0.25.0`). `test/v2-22.test.ts` holds
 the tables to `CHANGELOG.md`: the section for each version names the piece. It also holds them to
