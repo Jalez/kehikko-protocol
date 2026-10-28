@@ -202,6 +202,11 @@ export {
   activityItemSchema,
   activityItemsSchema,
   worstActivity,
+  EVENT_ID,
+  inboxEventSchema,
+  inboxEventsSchema,
+  declaredEvent,
+  type InboxEvent,
   type ActivityItem,
   type ActivityState,
 } from './activity.js'
@@ -785,6 +790,7 @@ export {
   DECLARATION_SINCE,
   DECLARATION_NAMES,
   TRACKER_FIELD_SINCE,
+  ACTIVITY_FIELD_SINCE,
   PIECE_SAID,
   REMOVED,
   sinceOf,
@@ -797,6 +803,7 @@ export {
   type Declaration,
   type PieceKind,
   type TrackerField,
+  type ActivityField,
 } from './since.js'
 export {
   needsOf,

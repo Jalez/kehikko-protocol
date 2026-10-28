@@ -17,6 +17,61 @@ export type ActivityState = (typeof ACTIVITY_STATES)[number];
  */
 export declare const ACTIVITY_PRIORITIES: readonly ["urgent", "normal", "low"];
 export type ActivityPriority = (typeof ACTIVITY_PRIORITIES)[number];
+/**
+ * The shape of an Inbox event's id (2.31.0): lowercase letters and digits in words joined by single
+ * dashes, starting with a letter. `research-complete`.
+ */
+export declare const EVENT_ID: RegExp;
+/**
+ * One Inbox event a module declares (2.31.0, `events`): a named case of one state that a
+ * person can tell apart and give its own sound. `says` is what the host calls it ("Research
+ * complete"), `state` the state an item carrying it is in. A module's own words, shown as text.
+ */
+export declare const inboxEventSchema: z.ZodObject<{
+    id: z.ZodString;
+    says: z.ZodString;
+    state: z.ZodEnum<["working", "attention", "done"]>;
+}, "strip", z.ZodTypeAny, {
+    id: string;
+    says: string;
+    state: "working" | "attention" | "done";
+}, {
+    id: string;
+    says: string;
+    state: "working" | "attention" | "done";
+}>;
+export type InboxEvent = z.infer<typeof inboxEventSchema>;
+/** A manifest's events: bounded, no id twice. */
+export declare const inboxEventsSchema: z.ZodEffects<z.ZodArray<z.ZodObject<{
+    id: z.ZodString;
+    says: z.ZodString;
+    state: z.ZodEnum<["working", "attention", "done"]>;
+}, "strip", z.ZodTypeAny, {
+    id: string;
+    says: string;
+    state: "working" | "attention" | "done";
+}, {
+    id: string;
+    says: string;
+    state: "working" | "attention" | "done";
+}>, "many">, {
+    id: string;
+    says: string;
+    state: "working" | "attention" | "done";
+}[], {
+    id: string;
+    says: string;
+    state: "working" | "attention" | "done";
+}[]>;
+/**
+ * The declared event an item is, or null: the item names an event (`event`), the module declares one
+ * by that id, and it is declared for the state the item is in. Anything else is ignored, and the item
+ * is an ordinary item of its state. The one rule a host applies to `event`.
+ */
+export declare function declaredEvent(declared: readonly InboxEvent[] | undefined, item: {
+    event?: string;
+    state: ActivityState;
+}): InboxEvent | null;
 export declare const activityItemSchema: z.ZodEffects<z.ZodObject<{
     /** Stable and unique within the module: the same thing keeps its id for as long as it exists. */
     id: z.ZodString;
@@ -60,6 +115,14 @@ export declare const activityItemSchema: z.ZodEffects<z.ZodObject<{
      * strips it and files by `project`, which is why the path is required with it.
      */
     projectId: z.ZodOptional<z.ZodString>;
+    /**
+     * 2.31.0. Which of the module's declared Inbox events this item is (`events`): a finished
+     * thing that is "Research complete", say. A host names the item by the event's `says` and may play
+     * a sound of its own for it; one the manifest does not declare, or declares for another state, is
+     * ignored and the item is an ordinary item of its state (`declaredEvent`). A host before 2.31.0
+     * strips it. An item is still one of the states: an event names a case, it is not a new state.
+     */
+    event: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     id: string;
     state: "working" | "attention" | "done";
@@ -76,6 +139,7 @@ export declare const activityItemSchema: z.ZodEffects<z.ZodObject<{
     group?: string | undefined;
     project?: string | undefined;
     projectId?: string | undefined;
+    event?: string | undefined;
 }, {
     id: string;
     state: "working" | "attention" | "done";
@@ -92,6 +156,7 @@ export declare const activityItemSchema: z.ZodEffects<z.ZodObject<{
     group?: string | undefined;
     project?: string | undefined;
     projectId?: string | undefined;
+    event?: string | undefined;
 }>, {
     id: string;
     state: "working" | "attention" | "done";
@@ -108,6 +173,7 @@ export declare const activityItemSchema: z.ZodEffects<z.ZodObject<{
     group?: string | undefined;
     project?: string | undefined;
     projectId?: string | undefined;
+    event?: string | undefined;
 }, {
     id: string;
     state: "working" | "attention" | "done";
@@ -124,6 +190,7 @@ export declare const activityItemSchema: z.ZodEffects<z.ZodObject<{
     group?: string | undefined;
     project?: string | undefined;
     projectId?: string | undefined;
+    event?: string | undefined;
 }>;
 export type ActivityItem = z.infer<typeof activityItemSchema>;
 /** The whole list, bounded, with no id twice. */
@@ -170,6 +237,14 @@ export declare const activityItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z
      * strips it and files by `project`, which is why the path is required with it.
      */
     projectId: z.ZodOptional<z.ZodString>;
+    /**
+     * 2.31.0. Which of the module's declared Inbox events this item is (`events`): a finished
+     * thing that is "Research complete", say. A host names the item by the event's `says` and may play
+     * a sound of its own for it; one the manifest does not declare, or declares for another state, is
+     * ignored and the item is an ordinary item of its state (`declaredEvent`). A host before 2.31.0
+     * strips it. An item is still one of the states: an event names a case, it is not a new state.
+     */
+    event: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     id: string;
     state: "working" | "attention" | "done";
@@ -186,6 +261,7 @@ export declare const activityItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z
     group?: string | undefined;
     project?: string | undefined;
     projectId?: string | undefined;
+    event?: string | undefined;
 }, {
     id: string;
     state: "working" | "attention" | "done";
@@ -202,6 +278,7 @@ export declare const activityItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z
     group?: string | undefined;
     project?: string | undefined;
     projectId?: string | undefined;
+    event?: string | undefined;
 }>, {
     id: string;
     state: "working" | "attention" | "done";
@@ -218,6 +295,7 @@ export declare const activityItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z
     group?: string | undefined;
     project?: string | undefined;
     projectId?: string | undefined;
+    event?: string | undefined;
 }, {
     id: string;
     state: "working" | "attention" | "done";
@@ -234,6 +312,7 @@ export declare const activityItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z
     group?: string | undefined;
     project?: string | undefined;
     projectId?: string | undefined;
+    event?: string | undefined;
 }>, "many">, {
     id: string;
     state: "working" | "attention" | "done";
@@ -250,6 +329,7 @@ export declare const activityItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z
     group?: string | undefined;
     project?: string | undefined;
     projectId?: string | undefined;
+    event?: string | undefined;
 }[], {
     id: string;
     state: "working" | "attention" | "done";
@@ -266,6 +346,7 @@ export declare const activityItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z
     group?: string | undefined;
     project?: string | undefined;
     projectId?: string | undefined;
+    event?: string | undefined;
 }[]>;
 /**
  * The mark of a container that holds these items: the worst state among them, `attention` over

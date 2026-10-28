@@ -29,6 +29,7 @@ type ActivityItem = {
   refs?: string[]                  // 1.7.0; tracker refs (gh#12, !7), at most LIMITS.ACTIVITY_REFS (16)
   group?: string                   // 1.7.0; a fold key, 1..LIMITS.ACTIVITY_GROUP (64)
   project?: string                 // 1.8.0; the absolute folder of the project it belongs to
+  event?: string                   // 2.31.0; one of the ids in the manifest's `events`
 }
 ```
 
@@ -159,6 +160,37 @@ inbox; there is no separate notifications module to feed.
 
 A 1.6.0 host strips all three and still takes the list (`test/v1-7.test.ts`, against the 1.6.0 tag).
 
+## Named events (2.31.0)
+
+An item stays one of the three states; an **event** names a case of one of them that a person can
+tell apart and give its own sound: "Research complete" is a `done`, not a new state. A module
+declares its events in the manifest and names one on an item:
+
+```ts
+events: [{ id: 'research-complete', says: 'Research complete', state: 'done' }]   // the manifest, top level
+// …
+{ id: sessionId, state: 'done', label: 'Protocol audit', event: 'research-complete' }
+```
+
+- **`events`** at the manifest's top level (`inboxEventsSchema`): at most `LIMITS.EVENTS` (16), each with an `id`
+  (`EVENT_ID`: lowercase words joined by single dashes, at most `LIMITS.EVENT_ID`, 40), `says` (what
+  a person is shown, at most `LIMITS.EVENT_SAYS`, 40) and the `state` its items are in. An id is
+  declared once. A list that does not parse is dropped, not fatal: the module runs without events.
+- **`event`** on an item: an id of the same shape. A host applies one rule, `declaredEvent(declared,
+  item)`: the event counts only when the manifest declares it AND declares it for the item's state.
+  Otherwise the host ignores the field and the item is an ordinary item of its state. A bad shape is
+  refused with the list, like any field.
+- **What a host does with one**: names the item by the event's `says` (beside or in place of the
+  state's word), lets a person give the event a sound of its own (falling back to the state's), and
+  reports the event to an agent that reads the Inbox. `says` is the module's text: drawn as text,
+  never as markup.
+- **An older host** strips `event`, and does not read `events`: the item is an ordinary
+  item of its state. Additive both ways, so neither field is in `DECLARATION_SINCE` (`fitOf` does
+  not hold a module that declares events to a newer host). `events` is at the top level, beside
+  `reacts` and `shows`, and NOT under `declares`: a host before 2.31.0 reads an unknown `declares`
+  key as a declaration from a newer protocol and would say it is too old to run the module. `ACTIVITY_FIELD_SINCE.event` says which
+  version a host has to be to act on it.
+
 ## What a host does with items
 
 The spec for a host's inbox; the protocol cannot enforce it.
@@ -196,6 +228,8 @@ The spec for a host's inbox; the protocol cannot enforce it.
   group: 'tests', refs: ['gh#12'] }`; drop it when the next run passes.
 - **A compile failed and nothing else will build**: the same with `priority: 'urgent'`.
 - **A long job finished**: `{ id: jobId, state: 'done', label: 'Export finished', priority: 'low' }`.
+- **A session finished a piece of research**: `{ id: sessionId, state: 'done', label: 'Protocol
+  audit', event: 'research-complete' }`, with `research-complete` in `events`.
 - **An unread review comment**: `{ id: 'review:' + commentId, state: 'attention', label: 'Comment
   on !7', refs: ['!7'] }`.
 - **A one-off notice**: report it once with a fresh id and drop it in the next list.

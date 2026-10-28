@@ -360,6 +360,35 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
      */
     shows: z.ZodCatch<z.ZodOptional<z.ZodEffects<z.ZodArray<z.ZodString, "many">, string[], string[]>>>;
     /**
+     * 2.31.0. The Inbox events this module may name on an activity item (`event`): each a named case of
+     * one state ("Research complete", a `done`) that a host shows by its `says` and lets a person give
+     * its own sound. What the module says about itself, like `reacts` and `shows`, and at the top level
+     * for the same reason: a host before 2.31.0 reads an unknown `declares` key as a declaration from a
+     * newer protocol (`fitOf`) and would not run the module, while it ignores this. Optional; a list
+     * that does not parse is dropped, not fatal.
+     */
+    events: z.ZodCatch<z.ZodOptional<z.ZodEffects<z.ZodArray<z.ZodObject<{
+        id: z.ZodString;
+        says: z.ZodString;
+        state: z.ZodEnum<["working", "attention", "done"]>;
+    }, "strip", z.ZodTypeAny, {
+        id: string;
+        says: string;
+        state: "working" | "attention" | "done";
+    }, {
+        id: string;
+        says: string;
+        state: "working" | "attention" | "done";
+    }>, "many">, {
+        id: string;
+        says: string;
+        state: "working" | "attention" | "done";
+    }[], {
+        id: string;
+        says: string;
+        state: "working" | "attention" | "done";
+    }[]>>>;
+    /**
      * The scopes this module can work at, as modes: one per scope, the default first (2.29.0; see
      * `modeSchema.scope`). Required, at least one, so a host older than 2.29.0 still parses it.
      */
@@ -731,6 +760,11 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     icon?: string | undefined;
     health?: string | undefined;
     partless?: string | undefined;
+    events?: {
+        id: string;
+        says: string;
+        state: "working" | "attention" | "done";
+    }[] | undefined;
 }, {
     id: string;
     name: string;
@@ -788,6 +822,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         consumes?: string[] | undefined;
     } | undefined;
     partless?: string | undefined;
+    events?: unknown;
 }>, {
     id: string;
     name: string;
@@ -865,6 +900,11 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     icon?: string | undefined;
     health?: string | undefined;
     partless?: string | undefined;
+    events?: {
+        id: string;
+        says: string;
+        state: "working" | "attention" | "done";
+    }[] | undefined;
 }, {
     id: string;
     name: string;
@@ -922,6 +962,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         consumes?: string[] | undefined;
     } | undefined;
     partless?: string | undefined;
+    events?: unknown;
 }>;
 export type Manifest = z.infer<typeof manifestSchema>;
 /** What a module author writes, before defaults are filled in. */

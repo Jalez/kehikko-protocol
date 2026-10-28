@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { MANIFEST_KIND, PROTOCOL } from './constants.js'
+import { inboxEventsSchema } from './activity.js'
 import { LIMITS } from './limits.js'
 import { MODE_ID, MODULE_ID } from './ids.js'
 import { buildSchema } from './build.js'
@@ -279,6 +280,15 @@ const manifestFields = z.object({
    * know the field still runs it and relays nothing. Optional; one that does not parse is dropped.
    */
   shows: showsSchema.optional().catch(undefined),
+  /**
+   * 2.31.0. The Inbox events this module may name on an activity item (`event`): each a named case of
+   * one state ("Research complete", a `done`) that a host shows by its `says` and lets a person give
+   * its own sound. What the module says about itself, like `reacts` and `shows`, and at the top level
+   * for the same reason: a host before 2.31.0 reads an unknown `declares` key as a declaration from a
+   * newer protocol (`fitOf`) and would not run the module, while it ignores this. Optional; a list
+   * that does not parse is dropped, not fatal.
+   */
+  events: inboxEventsSchema.optional().catch(undefined),
   /**
    * The scopes this module can work at, as modes: one per scope, the default first (2.29.0; see
    * `modeSchema.scope`). Required, at least one, so a host older than 2.29.0 still parses it.
