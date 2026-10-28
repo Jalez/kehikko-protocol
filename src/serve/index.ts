@@ -166,3 +166,6 @@ export {
   type TrafficCallSaid,
 } from './traffic.js'
 export { trafficTarget, trafficPath, trafficCommand } from '../traffic.js'
+
+/* The environment for what a module starts on the person's behalf, without the host's own Bun. */
+export { personEnv, HOST_PATH_ENV, type PersonEnvOptions } from './person.js'

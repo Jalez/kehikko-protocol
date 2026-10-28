@@ -34,3 +34,4 @@ export { SERVER_ASK_PATH, SERVER_PASS_PATH, SERVER_METHODS, type ServerMethod } 
 export { hostTooOld, FIT_SAYS, type HostTooOld } from '../fit.js';
 export { trafficNotes, TRAFFIC_FLUSH_MS, TRAFFIC_PENDING, type TrafficNotes, type TrafficNotesOptions, type TrafficCallSaid, } from './traffic.js';
 export { trafficTarget, trafficPath, trafficCommand } from '../traffic.js';
+export { personEnv, HOST_PATH_ENV, type PersonEnvOptions } from './person.js';

@@ -45,3 +45,5 @@ export { hostTooOld, FIT_SAYS } from '../fit.js';
 /* A module's server noting its own calls, with their reasons, in the host's record of traffic (2.20.0). */
 export { trafficNotes, TRAFFIC_FLUSH_MS, TRAFFIC_PENDING, } from './traffic.js';
 export { trafficTarget, trafficPath, trafficCommand } from '../traffic.js';
+/* The environment for what a module starts on the person's behalf, without the host's own Bun. */
+export { personEnv, HOST_PATH_ENV } from './person.js';

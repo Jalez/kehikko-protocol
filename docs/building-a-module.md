@@ -167,6 +167,13 @@ conversation's recorded place with `resolveDoorPlace` + `placeDefaults` when the
 agent named none, saying so in `DOOR_PLACE_SAYS` words ([asking](asking.md)).
 Every tool states `readOnlyHint`.
 
+### What it starts for the person runs as the person's
+
+A session, a shell or a command a module starts on the person's behalf gets
+`env: personEnv()` (`/serve`), never `process.env` as it is: the host put its
+own Bun first on the module's `PATH`, and a program the person runs must see
+their `bun` and `node`, not the host's ([serving](serving.md#what-a-module-starts-for-the-person-personenv-2300)).
+
 ### Scope is what the content belongs to
 
 A module lists in `modes` every scope it can work at — `machine`, `project`,

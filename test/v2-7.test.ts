@@ -33,7 +33,7 @@ const done: TrackerReviewer = { login: 'hubot', state: 'approved' }
 
 describe('the version', () => {
   test('is 2.18.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.29.0')
+    expect(PACKAGE_VERSION).toBe('2.30.0')
     expect(PROTOCOL).toBe(2)
   })
   test('LIMITS.REVIEWERS is 32', () => expect(LIMITS.REVIEWERS).toBe(32))
