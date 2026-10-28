@@ -7,6 +7,31 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.27.0 — 2026-10-28
+
+Run results for the work they are for. **Additive**; `PROTOCOL` is still 2, and a host needs nothing
+new: the file is a module's own, read by modules. A module that runs things — tests before a push, a
+fix's verification, a review round — says what came of each run and which change or issue it was
+for, and any other module can show it on that work without knowing who ran it. docs/runs.md.
+
+### Added
+
+- **`runs.json`** in a publisher's own folder (`RUNS_FILE`, `RUNS_VERSION` = 1):
+  `{ version, runs: RunResult[] }`.
+- **`runResultSchema`** (`RunResult`): `id`, `label`, `kind` (`RUN_RESULT_KINDS`: `push`, `verify`,
+  `review`, `other`; anything else reads as `other`), `refs` (tracker refs as the reading spells
+  them), `epic` (a slug or null), `state` (`RUN_RESULT_STATES`: `queued`, `running`, `passed`, `failed`,
+  `cancelled`), `queuedAt`, `startedAt`, `finishedAt` (ms since the epoch, null until then) and
+  `exit` (null until ended, and for a signal or a cancel). `runEnded(state)`.
+- **`runsIn(document)`**: a file's runs, junk costing only its entry, an id once, at most
+  `LIMITS.RUNS`. **`latestRuns(runs, ref)`**: the newest run of each label on one ref, in label
+  order — a newer run of a label replaces the older one's state, so a pass and then a failure reads
+  failed.
+- **`/serve`: `readRuns(projectPath)`** — every module folder's `runs.json`, each run with `from`
+  (`PublishedRun`), no module named; never throws, never writes. **`writeRuns(projectPath, moduleId,
+  runs)`** — one module's runs, whole, newest `LIMITS.RUNS` kept, atomic.
+- `LIMITS.RUNS` (200), `RUN_ID` (64), `RUN_LABEL` (120), `RUN_REFS` (16), `RUNS_BYTES` (1 MiB).
+
 ## 2.26.0 — 2026-10-26
 
 Work that is part of an issue. **Additive**; `PROTOCOL` is still 2. A change whose description says
@@ -1023,7 +1048,7 @@ Design, limits and the Paper example: [docs/header.md](docs/header.md).
 - **`kehikot.header`** (module → host: `items`, whole), **`kehikot.press`** (host → module) and
   **`kehikot.pressed`** (module → host): `headerSchema`, `headerItemSchema`, `headerItemsSchema`,
   `headerOptionSchema`, `pressSchema`, `pressedSchema`, `pressValueSchema`; `HEADER_KINDS`,
-  `HEADER_MENUS`, `HEADER_MENU_NAMES`, `RUN_STATES`; `pressRefusal(items, press)`.
+  `HEADER_MENUS`, `HEADER_MENU_NAMES`, `RUN_RESULT_STATES`; `pressRefusal(items, press)`.
 - The client: `Connection.header(items)`, replayed on every greeting; `HostEvents.onPress`,
   answered exactly once (`PRESS_BACKSTOP_MS`, `PressAnswer`); the same on `hostStore` and
   `useHost`.

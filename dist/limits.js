@@ -150,6 +150,16 @@ export const LIMITS = {
     HOLDINGS_BYTES: 4 * 1024 * 1024,
     /** How many module folders under `.kehikot/` a reader of holdings looks in. */
     HOLDINGS_MODULES: 128,
+    /** How many runs one `runs.json` is read for (2.27.0); a publisher keeps its newest. */
+    RUNS: 200,
+    /** A run's id within its publisher's file, in characters. */
+    RUN_ID: 64,
+    /** A run's label ("pre-push monorepo"), in characters. */
+    RUN_LABEL: 120,
+    /** How many refs one run may be for. */
+    RUN_REFS: 16,
+    /** As much of one module's `runs.json` as a reader will open, in bytes. A larger file is skipped whole. */
+    RUNS_BYTES: 1024 * 1024,
     /**
      * How many places in documents one container may say it is showing. Each entry is a whole
      * `passage`, with `quoted` bounded at `QUOTE`; a module saying what it shows should leave `quoted`

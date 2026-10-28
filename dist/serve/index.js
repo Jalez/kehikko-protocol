@@ -21,6 +21,9 @@ export { PLAN_FILE, PLAN_VERSION } from '../plan.js';
 /* What each module holds for an epic's parts: a host reads every module's, a module writes its own. */
 export { holdingsSpoken, readHoldings, writeHoldings } from './holdings.js';
 export { HOLDINGS_FILE, HOLDING_KINDS } from '../holdings.js';
+/* Run results any module publishes (2.27.0): read every publisher's, write one's own. */
+export { readRuns, writeRuns } from './runs.js';
+export { RUNS_FILE, RUNS_VERSION, RUN_RESULT_STATES, RUN_RESULT_KINDS, runEnded, runResultSchema, runsIn, latestRuns } from '../runs.js';
 /* The shared plumbing of a module's server: its page, its ticket, its doors. */
 export { fillPage, pageDocument, themeScript, FRAMED_DEFAULT_THEME } from './page.js';
 export { mintTicket, refuseTicket, sameTicket, ticketOf, TICKET_REFUSAL } from './ticket.js';
