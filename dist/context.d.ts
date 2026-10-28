@@ -381,14 +381,20 @@ export type ContextScope = (typeof CONTEXT_SCOPES)[number];
 export declare const contextSchema: z.ZodObject<{
     epic: z.ZodDefault<z.ZodNullable<z.ZodString>>;
     /**
-     * 2.9.0. Whether this context is about one epic (`epic`) or the whole project (`project`, the
-     * person chose "All epics"). Absent means `epic`: a host older than 2.9.0 never says it, and
-     * `scopeOf` reads it that way. With `project`, `epic` is null and `parts` is empty — which is
-     * NOT "no epic open": a module that declares `scopes: ['epic', 'project']` shows every epic of
-     * the project, and one that does not is covered by the host with a sentence saying it works on
-     * one epic at a time. Optional, not defaulted, so a parsed older context stays as it was sent.
+     * The scope the container works at (2.29.0): what its content belongs to, one of `MODULE_SCOPES`.
+     * A host tells each container its own: the scope the person picked for it among the ones its
+     * module lists in `modes`, or the module's default (the first mode's), and on "All epics" `project`
+     * for one at `epic` or `part` (`toldScope`). A host tells a module only a word it listed, `epic`
+     * or `project`, so a module built before 2.29.0 is never told a word it cannot parse.
+     *
+     * 2.9.0 gave it two words, `epic` and `project` ("All epics" in the host). Absent means `epic`: a
+     * host older than 2.9.0 never says it, and `readScope` (or the older `scopeOf`) reads it that way.
+     * On "All epics" `epic` is null and `parts` is empty — which is NOT "no epic open". When the person
+     * picked `project` for one container, `epic` is still the open epic, and a module at `project`
+     * shows the whole project regardless of it. Optional, not defaulted, so a parsed older context
+     * stays as it was sent; a word this package does not know reads as absent.
      */
-    scope: z.ZodOptional<z.ZodEnum<["epic", "project"]>>;
+    scope: z.ZodCatch<z.ZodOptional<z.ZodEnum<["machine", "project", "epic", "part", "kehikko"]>>>;
     /** What the project is called: the name a module puts on screen, not a path. */
     project: z.ZodDefault<z.ZodNullable<z.ZodString>>;
     /**
@@ -1035,7 +1041,7 @@ export declare const contextSchema: z.ZodObject<{
         epic: string | null;
         source: string;
     }[];
-    scope?: "epic" | "project" | undefined;
+    scope?: "epic" | "kehikko" | "project" | "part" | "machine" | undefined;
 }, {
     epic?: string | null | undefined;
     parts?: {
@@ -1064,7 +1070,7 @@ export declare const contextSchema: z.ZodObject<{
         refreshing?: boolean | undefined;
     } | undefined;
     projectPath?: string | null | undefined;
-    scope?: "epic" | "project" | undefined;
+    scope?: unknown;
     theme?: "light" | "dark" | undefined;
     selection?: string[] | undefined;
     passage?: {
@@ -1137,8 +1143,9 @@ export declare const contextSchema: z.ZodObject<{
 }>;
 export type ModuleContext = z.infer<typeof contextSchema>;
 /**
- * 2.9.0. The scope a context is about, `epic` when it does not say (a host older than 2.9.0) or says
- * a word this package does not know. Takes anything with a `scope`, so a page can pass what it holds.
+ * 2.9.0. Whether a context is about one epic or the whole project, `epic` when it does not say (a
+ * host older than 2.9.0) or says a word this package does not know. Since 2.29.0 `machine`, `part`
+ * and `kehikko` read as `epic` here too; read the container's scope itself with `readScope`. Takes anything with a `scope`, so a page can pass what it holds.
  */
 export declare function scopeOf(context: {
     scope?: unknown;

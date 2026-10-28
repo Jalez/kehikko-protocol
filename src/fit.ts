@@ -49,6 +49,7 @@ export interface Needs {
 const KNOWN_DECLARES = new Set(['protocol', 'uses', 'storage', 'prompt', 'skills', 'provides', 'agentSessions', 'scopes', 'settings', 'navigates'])
 
 type Loose = Record<string, unknown>
+const NEW_MODE_SCOPES = new Set(['machine', 'project', 'part', 'kehikko'])
 const asObject = (value: unknown): Loose | null => (typeof value === 'object' && value !== null && !Array.isArray(value) ? (value as Loose) : null)
 const listed = (value: unknown): unknown[] => (Array.isArray(value) ? value : [])
 
@@ -69,6 +70,8 @@ function declarations(manifest: Loose): Declaration[] {
   if (asObject(declares.agentSessions)) out.push('declares.agentSessions')
   if (asObject(declares.agentSessions)?.installsSkills === true) out.push('agentSessions.installsSkills')
   if (listed(declares.navigates).length) out.push('declares.navigates')
+  /* A mode scope a host before 2.29.0 refuses the whole manifest for: anything but `epic` and `global`. */
+  if (listed(manifest.modes).some((mode) => NEW_MODE_SCOPES.has(asObject(mode)?.scope as string))) out.push('modes.scope')
   return out
 }
 

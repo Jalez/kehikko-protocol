@@ -77,6 +77,23 @@ export {
   type ModuleSubject,
   type ModuleCondition,
 } from './manifest.js'
+/* A module's scope: what its content belongs to, the modes it can work at and the default (2.29.0). */
+export {
+  MODULE_SCOPES,
+  SCOPE_NAMES,
+  SCOPE_MEANS,
+  DEFAULT_SCOPE,
+  readScope,
+  scopeNeedsEpic,
+  supportedScopes,
+  defaultScope,
+  supportsScope,
+  activeScope,
+  scopeSaysOf,
+  toldScope,
+  type ModuleScope,
+  type SupportedScope,
+} from './scope.js'
 
 /* What a module's MCP door agrees with every other's. See `door.ts`. */
 export {

@@ -1,4 +1,5 @@
 import { scopeOf } from '../context.js';
+import { readScope } from '../scope.js';
 import { addressOpenResult, locationSetResult } from '../methods.js';
 import { HostRefused, NOBODY_TO_ASK, connect, } from './connect.js';
 import { reloadWhenStale } from './ask.js';
@@ -54,6 +55,7 @@ export function hostFields(context, was, same = {}) {
         projectId: text(context?.projectId),
         epic: text(context?.epic),
         scope: scopeOf(context),
+        workingScope: readScope(context?.scope),
         passage: context?.passage ?? null,
         location: context?.location ?? null,
         address: context?.address ?? null,
