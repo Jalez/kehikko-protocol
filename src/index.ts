@@ -411,6 +411,22 @@ export {
   type Narrowed,
 } from './parts.js'
 
+/* Run results any module publishes for the work they are for (2.27.0). The file is opened behind `/serve`. */
+export {
+  RUNS_FILE,
+  RUNS_VERSION,
+  RUN_RESULT_STATES,
+  RUN_RESULT_KINDS,
+  runEnded,
+  runResultSchema,
+  runsIn,
+  latestRuns,
+  type RunResult,
+  type RunResultState,
+  type RunResultKind,
+  type PublishedRun,
+} from './runs.js'
+
 /* What a module holds for an epic's parts, as it publishes it. The file is opened behind `/serve`. */
 export {
   HOLDINGS_FILE,

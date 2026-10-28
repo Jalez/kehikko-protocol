@@ -90,6 +90,10 @@ export { PLAN_FILE, PLAN_VERSION, type Plan, type PlanInput } from '../plan.js'
 export { holdingsSpoken, readHoldings, writeHoldings, type HoldingsWritten } from './holdings.js'
 export { HOLDINGS_FILE, HOLDING_KINDS, type HoldingKind, type EpicHoldings, type PartHoldings, type ProjectHoldings } from '../holdings.js'
 
+/* Run results any module publishes (2.27.0): read every publisher's, write one's own. */
+export { readRuns, writeRuns, type RunsWritten } from './runs.js'
+export { RUNS_FILE, RUNS_VERSION, RUN_RESULT_STATES, RUN_RESULT_KINDS, runEnded, runResultSchema, runsIn, latestRuns, type RunResult, type RunResultState, type RunResultKind, type PublishedRun } from '../runs.js'
+
 /* The shared plumbing of a module's server: its page, its ticket, its doors. */
 export { fillPage, pageDocument, themeScript, FRAMED_DEFAULT_THEME, type PageOptions } from './page.js'
 export { mintTicket, refuseTicket, sameTicket, ticketOf, TICKET_REFUSAL } from './ticket.js'
