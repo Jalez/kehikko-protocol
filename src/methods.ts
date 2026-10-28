@@ -12,6 +12,7 @@ import { TRACKER_DETAILS, trackerColumnsResult, trackerReadingResult, trackerRef
 import { PART_ID, partListSchema, partsSchema } from './parts.js'
 import { dispositionSchema } from './context.js'
 import { stepsListResult } from './plan.js'
+import { gotoProject, showAskSchema } from './show.js'
 import { trafficNoteResult, trafficNoteSchema, trafficReadResult } from './traffic.js'
 
 /**
@@ -263,12 +264,29 @@ export const methodParams = {
       parts: placeParts.optional(),
       /** 1.4.0. The kehikko to be on first: its `key`. With an epic, for the same reason. */
       kehikko: placeKehikko.optional(),
+      /**
+       * 2.28.0. The project to stand in first: its id (`context.projectId`) or, without one, its
+       * absolute folder (`context.projectPath`) — `projectKey`'s key. The host switches to it as the
+       * person's own switch does, then goes to the epic, kehikko and parts IN it; one it does not hold
+       * is `declined`. With an epic: a project alone names no place in it. Say `project` in
+       * `declares.navigates`; a host before 2.28.0 strips it and would go to that epic where it is.
+       */
+      project: gotoProject.optional(),
+      /**
+       * 2.28.0. One thing to be shown on the kehikko the move ends on (`showAskSchema`): relayed as
+       * `context.show` to the containers there whose manifests say they show `subject`, after a
+       * `moved`. Say `show` in `declares.navigates`.
+       */
+      show: showAskSchema.optional(),
     })
     .refine((g) => g.epic !== undefined || g.step !== undefined || g.ref !== undefined, {
       message: 'view.goto has to name an epic, a step or a ref; a call that names nothing asks for nothing',
     })
     .refine((g) => (g.parts === undefined && g.kehikko === undefined) || g.epic !== undefined, {
       message: 'view.goto: `parts` and `kehikko` go with the `epic` they are in',
+    })
+    .refine((g) => g.project === undefined || g.epic !== undefined, {
+      message: 'view.goto: `project` goes with the `epic` to go to in it',
     }),
   /**
    * Ask the host to fold containers to their headers, unfold them, or both; answered with

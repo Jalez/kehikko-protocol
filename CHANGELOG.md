@@ -7,6 +7,36 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.28.0 — 2026-10-28
+
+Going to a place in another project, and to one thing there. **Additive**; `PROTOCOL` is still 2. A
+module that remembers where something came from — a test run asked for from another project's
+conversation — can take the person there with one press: the host switches project as the person's
+own switch does, then goes to the epic, kehikko and parts, and the module that runs the conversation
+is asked to show it. Neither side names the other. docs/methods.md, docs/wire.md, docs/manifest.md.
+
+### Added
+
+- **`view.goto { project }`**: the project to stand in first, by its id (`context.projectId`) or,
+  without one, its absolute folder (`projectKey`'s key); `gotoProject`, `gotoProjectIsId`. Goes with
+  an `epic`: the schema refuses a project alone. A host switches as the person's own switch does,
+  then goes to the place in it; a project it does not hold is `declined`, with a sentence that lists
+  no project. Only on a person's press: a host never switches project for an agent.
+- **`view.goto { show }`**: one thing to be shown on the kehikko the move ends on, `{ subject, id }`
+  (`showAskSchema`; `SHOW_SUBJECTS`: `agent-session`, the id the module running the conversation keeps).
+- **`context.show`** (`sharedShowSchema`: the ask, `by`, `at`): relayed after a `moved`, only to the
+  containers on that kehikko whose manifests say they show the subject; `null` for everybody else and
+  from an older host. `showIsNews(show, actedOn)` (the rule `addressIsNews` keeps).
+- **`shows`** in a manifest (`showsSchema`, `showsOf`, `canShow`): the subjects a module can be asked
+  to show. What a module says about itself, like `reacts`: not in `DECLARATION_SINCE`, and an older
+  host still runs a module that says it (and relays nothing).
+- **`declares.navigates`** (`navigatesSchema`, `NAVIGATES`: `project`, `show`; `navigatesOf`): what a
+  module's `view.goto` carries that a host before 2.28.0 does not know. In `DECLARATION_SINCE`, so
+  `fitOf` holds such a module to a 2.28.0 host: an older one strips `project` and would go to the epic
+  of that name in the project it has open. A host answers `project` and `show` only for a module that
+  says them.
+- `LIMITS.NAVIGATES` (8), `SHOWS` (8), `SHOW_ID` (128).
+
 ## 2.27.0 — 2026-10-28
 
 Run results for the work they are for. **Additive**; `PROTOCOL` is still 2, and a host needs nothing

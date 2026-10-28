@@ -4,7 +4,7 @@ import { speaks } from './manifest.js';
 import { PROTOCOL_VERSION } from './ids.js';
 import { DECLARATION_SINCE, SINCE_FLOOR, compareVersions, pieceSaid, removedIn, sinceOf, versionParts, versionSaid, } from './since.js';
 /** The `declares` keys this package knows; another one is a declaration from a newer protocol. */
-const KNOWN_DECLARES = new Set(['protocol', 'uses', 'storage', 'prompt', 'skills', 'provides', 'agentSessions', 'scopes', 'settings']);
+const KNOWN_DECLARES = new Set(['protocol', 'uses', 'storage', 'prompt', 'skills', 'provides', 'agentSessions', 'scopes', 'settings', 'navigates']);
 const asObject = (value) => (typeof value === 'object' && value !== null && !Array.isArray(value) ? value : null);
 const listed = (value) => (Array.isArray(value) ? value : []);
 function declarations(manifest) {
@@ -33,6 +33,8 @@ function declarations(manifest) {
         out.push('declares.agentSessions');
     if (asObject(declares.agentSessions)?.installsSkills === true)
         out.push('agentSessions.installsSkills');
+    if (listed(declares.navigates).length)
+        out.push('declares.navigates');
     return out;
 }
 /** Every piece a manifest names that a host has to know, known or not, each once. */

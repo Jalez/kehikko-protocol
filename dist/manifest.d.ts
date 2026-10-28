@@ -343,6 +343,13 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
      * other, and `manifestSchema` refuses one that says neither or both (`partsDeclaration`).
      */
     partless: z.ZodOptional<z.ZodString>;
+    /**
+     * 2.28.0. The subjects this module can be asked to show (`SHOW_SUBJECTS`: `agent-session`), by a
+     * `view.goto { show }` another module makes: the host relays the ask as `context.show` to it and to
+     * nobody who does not say it. What the module says about itself, like `reacts`: a host that does not
+     * know the field still runs it and relays nothing. Optional; one that does not parse is dropped.
+     */
+    shows: z.ZodCatch<z.ZodOptional<z.ZodEffects<z.ZodArray<z.ZodString, "many">, string[], string[]>>>;
     modes: z.ZodArray<z.ZodObject<{
         id: z.ZodString;
         label: z.ZodString;
@@ -547,6 +554,15 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             }[] | undefined;
             personOnly?: boolean | undefined;
         }[]>>>;
+        /**
+         * What this module's `view.goto` carries that a host before 2.28.0 does not know (`NAVIGATES`):
+         * `project` (it switches project first) and `show` (it asks for one thing to be shown there).
+         * A host that knows them answers them only for a module that says so; `fitOf` holds a module
+         * that says so to a host that knows them, because an older one strips the field and would go
+         * to the epic of that name in the project it has open. Optional; one that does not parse is
+         * dropped, not fatal.
+         */
+        navigates: z.ZodCatch<z.ZodOptional<z.ZodEffects<z.ZodArray<z.ZodString, "many">, string[], string[]>>>;
     }, "strip", z.ZodTypeAny, {
         protocol: string;
         prompt: boolean;
@@ -577,6 +593,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             installsSkills?: boolean | undefined;
         } | undefined;
         scopes?: ("epic" | "project")[] | undefined;
+        navigates?: string[] | undefined;
     }, {
         protocol?: string | undefined;
         prompt?: boolean | undefined;
@@ -592,6 +609,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         }[] | undefined;
         agentSessions?: unknown;
         scopes?: ("epic" | "project")[] | undefined;
+        navigates?: unknown;
     }>>;
     /**
      * What the server answering is built from, and when it started. Optional, added by `doors()`;
@@ -650,6 +668,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             installsSkills?: boolean | undefined;
         } | undefined;
         scopes?: ("epic" | "project")[] | undefined;
+        navigates?: string[] | undefined;
     };
     reacts: string[];
     dataVersion: number;
@@ -671,6 +690,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         started: string;
         protocol: string;
     } | undefined;
+    shows?: string[] | undefined;
     mcp?: {
         url: string;
         transport: "http" | "sse" | "stdio";
@@ -701,6 +721,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     build?: unknown;
     version?: string | undefined;
     summary?: string | undefined;
+    shows?: unknown;
     declares?: {
         protocol?: string | undefined;
         prompt?: boolean | undefined;
@@ -716,6 +737,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         }[] | undefined;
         agentSessions?: unknown;
         scopes?: ("epic" | "project")[] | undefined;
+        navigates?: unknown;
     } | undefined;
     reacts?: string[] | undefined;
     mcp?: {
@@ -778,6 +800,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             installsSkills?: boolean | undefined;
         } | undefined;
         scopes?: ("epic" | "project")[] | undefined;
+        navigates?: string[] | undefined;
     };
     reacts: string[];
     dataVersion: number;
@@ -799,6 +822,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         started: string;
         protocol: string;
     } | undefined;
+    shows?: string[] | undefined;
     mcp?: {
         url: string;
         transport: "http" | "sse" | "stdio";
@@ -829,6 +853,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     build?: unknown;
     version?: string | undefined;
     summary?: string | undefined;
+    shows?: unknown;
     declares?: {
         protocol?: string | undefined;
         prompt?: boolean | undefined;
@@ -844,6 +869,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         }[] | undefined;
         agentSessions?: unknown;
         scopes?: ("epic" | "project")[] | undefined;
+        navigates?: unknown;
     } | undefined;
     reacts?: string[] | undefined;
     mcp?: {

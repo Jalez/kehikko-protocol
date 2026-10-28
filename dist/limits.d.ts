@@ -150,6 +150,12 @@ export declare const LIMITS: {
     readonly HOLDINGS_BYTES: number;
     /** How many module folders under `.kehikot/` a reader of holdings looks in. */
     readonly HOLDINGS_MODULES: 128;
+    /** How many words one `declares.navigates` may list (2.28.0). */
+    readonly NAVIGATES: 8;
+    /** How many subjects one manifest's `shows` may list (2.28.0). */
+    readonly SHOWS: 8;
+    /** The id of one thing a `view.goto` asks to have shown (2.28.0): an agent session's id. */
+    readonly SHOW_ID: 128;
     /** How many runs one `runs.json` is read for (2.27.0); a publisher keeps its newest. */
     readonly RUNS: 200;
     /** A run's id within its publisher's file, in characters. */
