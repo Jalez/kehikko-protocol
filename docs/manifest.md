@@ -340,6 +340,16 @@ what its `view.goto` carries that an older host does not know. That one IS in
 go to the epic of that name in the project it has open. `navigatesOf(manifest)`
 reads it.
 
+### Inbox events (2.31.0)
+
+`events: [{ id, says, state }]`, at the top level, names cases of an activity state that a person can tell
+apart and give a sound of their own: `{ id: 'research-complete', says: 'Research complete', state:
+'done' }`. An item names one with `event`. A host ignores an event the manifest does not declare, or
+declares for another state (`declaredEvent`). What the module says about itself, like `reacts`: an
+older host runs it and treats its items by their state, so it is not in `DECLARATION_SINCE`, and
+it is not under `declares`, whose unknown keys an older host's `fitOf` reads as too new to run. A list
+that does not parse is dropped. See [activity](activity.md#named-events-2310).
+
 ### A module's settings (2.15.0)
 
 `declares.settings` lists the settings a person can see and change from the host: each field's key, label, sentence, type (`boolean`, `string`, `number`, `choice`, `list`), default, scope (`project` or `machine`) and whether only a person may change it. The host draws one form from it and asks the module to read and write the values at its door. Optional; a list that does not parse is dropped and the rest of the manifest is read. See [settings](settings.md).

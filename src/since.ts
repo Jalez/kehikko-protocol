@@ -139,6 +139,24 @@ export const TRACKER_FIELD_SINCE = {
 } as const
 export type TrackerField = keyof typeof TRACKER_FIELD_SINCE
 
+/**
+ * The fields of an activity item (`activityItemSchema`) added after `activity.set` first had a shape
+ * (1.5.0), and the version that added each. Like `TRACKER_FIELD_SINCE`: nothing a manifest has to
+ * be held to, since a host that does not know a field strips it and files the item by what it does
+ * know. What a module reads to know whether a host will act on a field it sends. `event` (2.31.0)
+ * goes with `events`, which is not in `DECLARATION_SINCE` for the same reason: an older host
+ * treats the item by its state, and nothing is lost but the event's name and sound.
+ */
+export const ACTIVITY_FIELD_SINCE = {
+  priority: '1.7.0',
+  refs: '1.7.0',
+  group: '1.7.0',
+  project: '1.8.0',
+  projectId: '2.1.0',
+  event: '2.31.0',
+} as const
+export type ActivityField = keyof typeof ACTIVITY_FIELD_SINCE
+
 /** Every table, in one place. Plain objects: read them with `sinceOf`, never by indexing with a stranger's string. */
 export const SINCE = {
   methods: METHOD_SINCE,
@@ -146,10 +164,11 @@ export const SINCE = {
   serverMethods: SERVER_METHOD_SINCE,
   declarations: DECLARATION_SINCE,
   trackerFields: TRACKER_FIELD_SINCE,
+  activityFields: ACTIVITY_FIELD_SINCE,
 } as const
 
 /** The kinds of piece the tables know. */
-export type PieceKind = 'method' | 'capability' | 'serverMethod' | 'declaration' | 'trackerField'
+export type PieceKind = 'method' | 'capability' | 'serverMethod' | 'declaration' | 'trackerField' | 'activityField'
 
 const TABLE: Record<PieceKind, Record<string, string>> = {
   method: METHOD_SINCE,
@@ -157,6 +176,7 @@ const TABLE: Record<PieceKind, Record<string, string>> = {
   serverMethod: SERVER_METHOD_SINCE,
   declaration: DECLARATION_SINCE,
   trackerField: TRACKER_FIELD_SINCE,
+  activityField: ACTIVITY_FIELD_SINCE,
 }
 
 /**
@@ -220,7 +240,7 @@ export const PIECE_SAID = {
 export function pieceSaid(kind: PieceKind, piece: string): string {
   if (kind === 'declaration') return own(PIECE_SAID.declarations, piece) ?? piece
   if (kind === 'capability') return own(PIECE_SAID.capabilities, piece) ?? piece
-  if (kind === 'trackerField') return piece
+  if (kind === 'trackerField' || kind === 'activityField') return piece
   const capability = methodCapability(piece)
   return capability ? (own(PIECE_SAID.capabilities, capability) ?? piece) : piece
 }
@@ -236,6 +256,7 @@ export const REMOVED: { readonly [K in PieceKind]: Readonly<Record<string, strin
   serverMethod: {},
   declaration: {},
   trackerField: {},
+  activityField: {},
 }
 
 /** The version that removed a piece, or null when nothing has. */

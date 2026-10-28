@@ -7,6 +7,26 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.31.0 — 2026-10-28
+
+Named Inbox events. **Additive**; `PROTOCOL` is still 2. An activity item stays one of its three
+states; an event names a case of one ("Research complete", a `done`) that a host can show by name and
+give its own sound. An older host strips the item's `event` and does not read `events`.
+docs/activity.md#named-events-2310.
+
+### Added
+
+- **`events`** at the manifest's top level, beside `reacts` and `shows` (not under `declares`, whose
+  unknown keys a 2.30.0 `fitOf` reads as too new to run) (`inboxEventsSchema`, `inboxEventSchema`, `InboxEvent`):
+  `{ id, says, state }`, at most `LIMITS.EVENTS` (16), ids distinct. Dropped, not fatal, when it does
+  not parse.
+- **`event`** on an activity item (`activityItemSchema`): an `EVENT_ID` (`LIMITS.EVENT_ID`, 40).
+- **`declaredEvent(declared, item)`**: the declared event an item is, or null when the manifest does
+  not declare it or declares it for another state. The one rule a host applies.
+- **`ACTIVITY_FIELD_SINCE`** (`SINCE.activityFields`, `sinceOf('activityField', …)`): the version
+  that added each optional item field (`priority`, `refs`, `group`, `project`, `projectId`, `event`).
+  Not read by `fitOf`, like `TRACKER_FIELD_SINCE`; `events` is not in `DECLARATION_SINCE`.
+
 ## 2.30.0 — 2026-10-28
 
 What a module starts for the person runs with the person's `bun` and `node`. **Additive**;

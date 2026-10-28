@@ -1102,6 +1102,7 @@ export declare const methodParams: {
             group: z.ZodOptional<z.ZodString>;
             project: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
             projectId: z.ZodOptional<z.ZodString>;
+            event: z.ZodOptional<z.ZodString>;
         }, "strip", z.ZodTypeAny, {
             id: string;
             state: "working" | "attention" | "done";
@@ -1118,6 +1119,7 @@ export declare const methodParams: {
             group?: string | undefined;
             project?: string | undefined;
             projectId?: string | undefined;
+            event?: string | undefined;
         }, {
             id: string;
             state: "working" | "attention" | "done";
@@ -1134,6 +1136,7 @@ export declare const methodParams: {
             group?: string | undefined;
             project?: string | undefined;
             projectId?: string | undefined;
+            event?: string | undefined;
         }>, {
             id: string;
             state: "working" | "attention" | "done";
@@ -1150,6 +1153,7 @@ export declare const methodParams: {
             group?: string | undefined;
             project?: string | undefined;
             projectId?: string | undefined;
+            event?: string | undefined;
         }, {
             id: string;
             state: "working" | "attention" | "done";
@@ -1166,6 +1170,7 @@ export declare const methodParams: {
             group?: string | undefined;
             project?: string | undefined;
             projectId?: string | undefined;
+            event?: string | undefined;
         }>, "many">, {
             id: string;
             state: "working" | "attention" | "done";
@@ -1182,6 +1187,7 @@ export declare const methodParams: {
             group?: string | undefined;
             project?: string | undefined;
             projectId?: string | undefined;
+            event?: string | undefined;
         }[], {
             id: string;
             state: "working" | "attention" | "done";
@@ -1198,6 +1204,7 @@ export declare const methodParams: {
             group?: string | undefined;
             project?: string | undefined;
             projectId?: string | undefined;
+            event?: string | undefined;
         }[]>;
     }, "strip", z.ZodTypeAny, {
         items: {
@@ -1216,6 +1223,7 @@ export declare const methodParams: {
             group?: string | undefined;
             project?: string | undefined;
             projectId?: string | undefined;
+            event?: string | undefined;
         }[];
     }, {
         items: {
@@ -1234,6 +1242,7 @@ export declare const methodParams: {
             group?: string | undefined;
             project?: string | undefined;
             projectId?: string | undefined;
+            event?: string | undefined;
         }[];
     }>;
     readonly 'events.emit': z.ZodObject<{

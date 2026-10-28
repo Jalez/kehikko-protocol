@@ -273,6 +273,12 @@ export declare const LIMITS: {
     readonly ACTIVITY_GROUP: 64;
     /** An activity item's project folder (1.8.0), in characters: an absolute path. */
     readonly ACTIVITY_PROJECT: 1024;
+    /** An Inbox event's id (2.31.0): `research-complete`. On an item (`event`) and in `declares.events`. */
+    readonly EVENT_ID: 40;
+    /** What an Inbox event is called for a person (2.31.0): `Research complete`. */
+    readonly EVENT_SAYS: 40;
+    /** How many Inbox events one manifest may declare (2.31.0). */
+    readonly EVENTS: 16;
     /** How many parts one place (`place.parts`, a `view.goto`'s `parts`) may name. */
     readonly PLACE_PARTS: 16;
     /** How long the host gets to say whether a folder is a project, in ms (`hostHasProject`). */

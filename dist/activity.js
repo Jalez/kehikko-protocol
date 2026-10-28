@@ -18,6 +18,39 @@ export const ACTIVITY_STATES = ['working', 'attention', 'done'];
  * informational.
  */
 export const ACTIVITY_PRIORITIES = ['urgent', 'normal', 'low'];
+/**
+ * The shape of an Inbox event's id (2.31.0): lowercase letters and digits in words joined by single
+ * dashes, starting with a letter. `research-complete`.
+ */
+export const EVENT_ID = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
+/**
+ * One Inbox event a module declares (2.31.0, `events`): a named case of one state that a
+ * person can tell apart and give its own sound. `says` is what the host calls it ("Research
+ * complete"), `state` the state an item carrying it is in. A module's own words, shown as text.
+ */
+export const inboxEventSchema = z.object({
+    id: z.string().max(LIMITS.EVENT_ID).regex(EVENT_ID, 'an event id is lowercase letters, digits and single dashes'),
+    says: z.string().trim().min(1).max(LIMITS.EVENT_SAYS),
+    state: z.enum(ACTIVITY_STATES),
+});
+/** A manifest's events: bounded, no id twice. */
+export const inboxEventsSchema = z
+    .array(inboxEventSchema)
+    .max(LIMITS.EVENTS)
+    .refine((events) => new Set(events.map((one) => one.id)).size === events.length, {
+    message: 'an event is declared once',
+});
+/**
+ * The declared event an item is, or null: the item names an event (`event`), the module declares one
+ * by that id, and it is declared for the state the item is in. Anything else is ignored, and the item
+ * is an ordinary item of its state. The one rule a host applies to `event`.
+ */
+export function declaredEvent(declared, item) {
+    if (!item.event || !declared)
+        return null;
+    const found = declared.find((one) => one.id === item.event);
+    return found && found.state === item.state ? found : null;
+}
 export const activityItemSchema = z.object({
     /** Stable and unique within the module: the same thing keeps its id for as long as it exists. */
     id: z.string().min(1).max(LIMITS.ACTIVITY_ID),
@@ -49,6 +82,14 @@ export const activityItemSchema = z.object({
      * strips it and files by `project`, which is why the path is required with it.
      */
     projectId: z.string().regex(PROJECT_ID).optional(),
+    /**
+     * 2.31.0. Which of the module's declared Inbox events this item is (`events`): a finished
+     * thing that is "Research complete", say. A host names the item by the event's `says` and may play
+     * a sound of its own for it; one the manifest does not declare, or declares for another state, is
+     * ignored and the item is an ordinary item of its state (`declaredEvent`). A host before 2.31.0
+     * strips it. An item is still one of the states: an event names a case, it is not a new state.
+     */
+    event: z.string().max(LIMITS.EVENT_ID).regex(EVENT_ID, 'an event id is lowercase letters, digits and single dashes').optional(),
 }).refine((item) => item.projectId === undefined || item.project !== undefined, {
     message: 'an activity item that names its project’s id names its folder too (`project`)',
     path: ['project'],

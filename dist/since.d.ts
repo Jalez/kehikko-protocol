@@ -128,6 +128,23 @@ export declare const TRACKER_FIELD_SINCE: {
     readonly contributedBy: "2.26.0";
 };
 export type TrackerField = keyof typeof TRACKER_FIELD_SINCE;
+/**
+ * The fields of an activity item (`activityItemSchema`) added after `activity.set` first had a shape
+ * (1.5.0), and the version that added each. Like `TRACKER_FIELD_SINCE`: nothing a manifest has to
+ * be held to, since a host that does not know a field strips it and files the item by what it does
+ * know. What a module reads to know whether a host will act on a field it sends. `event` (2.31.0)
+ * goes with `events`, which is not in `DECLARATION_SINCE` for the same reason: an older host
+ * treats the item by its state, and nothing is lost but the event's name and sound.
+ */
+export declare const ACTIVITY_FIELD_SINCE: {
+    readonly priority: "1.7.0";
+    readonly refs: "1.7.0";
+    readonly group: "1.7.0";
+    readonly project: "1.8.0";
+    readonly projectId: "2.1.0";
+    readonly event: "2.31.0";
+};
+export type ActivityField = keyof typeof ACTIVITY_FIELD_SINCE;
 /** Every table, in one place. Plain objects: read them with `sinceOf`, never by indexing with a stranger's string. */
 export declare const SINCE: {
     readonly methods: {
@@ -230,9 +247,17 @@ export declare const SINCE: {
         readonly contributes: "2.26.0";
         readonly contributedBy: "2.26.0";
     };
+    readonly activityFields: {
+        readonly priority: "1.7.0";
+        readonly refs: "1.7.0";
+        readonly group: "1.7.0";
+        readonly project: "1.8.0";
+        readonly projectId: "2.1.0";
+        readonly event: "2.31.0";
+    };
 };
 /** The kinds of piece the tables know. */
-export type PieceKind = 'method' | 'capability' | 'serverMethod' | 'declaration' | 'trackerField';
+export type PieceKind = 'method' | 'capability' | 'serverMethod' | 'declaration' | 'trackerField' | 'activityField';
 /**
  * The version a piece arrived in, or null when this package does not know it: a piece from a
  * newer protocol, or a word nobody defined.
