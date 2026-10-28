@@ -5,6 +5,7 @@ import { PROTOCOL_VERSION } from './ids.js';
 import { DECLARATION_SINCE, SINCE_FLOOR, compareVersions, pieceSaid, removedIn, sinceOf, versionParts, versionSaid, } from './since.js';
 /** The `declares` keys this package knows; another one is a declaration from a newer protocol. */
 const KNOWN_DECLARES = new Set(['protocol', 'uses', 'storage', 'prompt', 'skills', 'provides', 'agentSessions', 'scopes', 'settings', 'navigates']);
+const NEW_MODE_SCOPES = new Set(['machine', 'project', 'part', 'kehikko']);
 const asObject = (value) => (typeof value === 'object' && value !== null && !Array.isArray(value) ? value : null);
 const listed = (value) => (Array.isArray(value) ? value : []);
 function declarations(manifest) {
@@ -35,6 +36,9 @@ function declarations(manifest) {
         out.push('agentSessions.installsSkills');
     if (listed(declares.navigates).length)
         out.push('declares.navigates');
+    /* A mode scope a host before 2.29.0 refuses the whole manifest for: anything but `epic` and `global`. */
+    if (listed(manifest.modes).some((mode) => NEW_MODE_SCOPES.has(asObject(mode)?.scope)))
+        out.push('modes.scope');
     return out;
 }
 /** Every piece a manifest names that a host has to know, known or not, each once. */

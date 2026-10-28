@@ -344,7 +344,64 @@ reads it.
 
 `declares.settings` lists the settings a person can see and change from the host: each field's key, label, sentence, type (`boolean`, `string`, `number`, `choice`, `list`), default, scope (`project` or `machine`) and whether only a person may change it. The host draws one form from it and asks the module to read and write the values at its door. Optional; a list that does not parse is dropped and the rest of the manifest is read. See [settings](settings.md).
 
-### Which scopes a module can show (2.9.0)
+### Scope (2.29.0)
+
+A module's scope is what its content belongs to. There are five, and a host
+shows each by its name:
+
+| `scope` | Shown as | What the content belongs to |
+|---|---|---|
+| `machine` | This computer | Every project on this computer (test runs, call monitor, notifications) |
+| `project` | Project | The whole project, whatever epic is open (files, source, history) |
+| `epic` | Epic | The open epic (journeys, a board of its work, its paper) |
+| `part` | Part | Each part of the open epic (notes per part, a checklist per change) |
+| `kehikko` | Kehikko | This arrangement of modules (a screenplay, the kehikko's own conversation) |
+
+A module lists one mode per scope it can work at, its DEFAULT FIRST, and each
+may say in one line what the module shows there:
+
+```ts
+modes: [
+  { id: 'board', label: 'Kanban', scope: 'epic', scopeSays: "the open epic's work, by column" },
+  { id: 'all', label: 'All epics', scope: 'project', scopeSays: "every epic's work, each card labelled" },
+],
+```
+
+Decide it from what the module actually reads and keeps: data under
+`.kehikot/<module>/` keyed by epic is `epic`, keyed by part is `part`, one
+file for the project is `project`; state in the machine directory, or a read
+across projects, is `machine`; something kept per kehikko is `kehikko`.
+
+**The person picks, among those only.** The host shows the scope on the
+module's header and in its settings window, where a module with more than one
+lists them with their `scopeSays` and the default marked; the pick is kept per
+container. A module with one is shown read-only ("This module only works for
+Project"). Kehikot cannot make a module change what its content belongs to,
+so never list a scope the module does not implement.
+
+**The module is told in `context.scope`** (see [the wire](wire.md#contextschemascope)):
+the container's scope, or `project` on "All epics" for a container at `epic`
+or `part`. A module with a scope switch of its own in its header (a "This
+epic / All epics" toggle) drops it: the host's control is that switch.
+
+**Nothing breaks.** Absent, the pre-2.29.0 `global` and a word a later
+version adds all read as `epic` (`readScope`); `modes` is still required so a
+host before 2.29.0 still parses the manifest. Such a host refuses a scope
+other than `epic` or `global`, so a module listing one needs a 2.29.0 host
+(`modes.scope` in `DECLARATION_SINCE`, which `needsOf` and `fitOf` read); a
+module that only adds `scopeSays` to an `epic` mode needs nothing.
+
+`supportedScopes(manifest)` lists them (default first, each once),
+`defaultScope`, `supportsScope`, `activeScope(manifest, picked)` (the pick when
+supported, else the default), `scopeSaysOf`, and `toldScope(active, allEpics)`
+what a host puts in `context.scope`.
+
+### Which scopes a module can show (2.9.0, deprecated in 2.29.0)
+
+Deprecated: list a mode with `scope: 'project'` instead. `project` here still
+counts as a supported scope after the modes', and `scopesOf` and
+`showsProject` read either; keep it beside the mode while a host before 2.29.0
+should leave the module uncovered on "All epics".
 
 `declares.scopes` lists the scopes of `context.scope` a module can show:
 `epic`, one epic at a time, and `project`, every epic of the project at once
@@ -407,17 +464,17 @@ material the module never touches.
 
 #### `modeSchema.scope`
 
-`epic` gives the mode a tab that FOLLOWS THE READER: it is told which epic
-is open and told again on every switch. `global` gives it one page for the
-whole canvas, told nothing and never re-pointed.
+What the module's content belongs to in this mode (2.29.0): `machine`,
+`project`, `epic`, `part` or `kehikko`. See [Scope](#scope-290).
 
-Defaulted rather than required, because following the reader is what nearly
-every module wants and a module that says nothing has not made a choice
-about it.
+Defaulted rather than required, because the open epic is what nearly every
+module is about and a module that says nothing has not made a choice. Until
+2.29.0 the words were `epic` ("follows the reader") and `global` ("one page,
+never re-pointed"); no host acted on the difference, every module was told the
+context alike, and `global` now reads as `epic`.
 
-The word was `journey` and is now `epic`, with no alias, because an epic is
-what a host can point a tab at. See `PROTOCOL` in `constants.ts` for why
-that rename is the thing that raised the number.
+The word was `journey` before `epic`, with no alias. See `PROTOCOL` in
+`constants.ts` for why that rename is the thing that raised the number.
 
 #### `url`
 

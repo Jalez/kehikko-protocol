@@ -48,7 +48,7 @@ const fixture = (name: string): Record<string, unknown> =>
 
 describe('the version', () => {
   test('is 2.22.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.28.0')
+    expect(PACKAGE_VERSION).toBe('2.29.0')
     expect(PROTOCOL).toBe(2)
   })
 })
@@ -80,6 +80,7 @@ const DECLARATION_MENTION: Record<string, string> = {
   'skills.needs.object': '`needs` holds an object',
   'agentSessions.installsSkills': '`agentSessions.installsSkills`',
   'declares.navigates': '`declares.navigates`',
+  'modes.scope': '`modes[].scope`',
 }
 
 describe('SINCE', () => {

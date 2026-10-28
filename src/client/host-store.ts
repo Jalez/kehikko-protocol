@@ -1,6 +1,7 @@
 import type { ActivityItem, AddressIntent, AddressOpenResult, CanvasContainer, CodeLocation, EpicPart, FilterChoice, FilterGroup, HeaderItemInput, LocationIntent, LocationSetResult, ModuleContext, Passage, SharedAddress, SharedLocation } from '../index.js'
 import type { PageTheme } from '../page.js'
 import { scopeOf, type ContextScope } from '../context.js'
+import { readScope, type ModuleScope } from '../scope.js'
 import { addressOpenResult, locationSetResult } from '../methods.js'
 import {
   HostRefused,
@@ -94,6 +95,12 @@ export interface HostFields {
    * `epic` is then `null` and `parts` empty). `epic` from a host that does not say. See `scopeOf`.
    */
   scope: ContextScope
+  /**
+   * 2.29.0. The scope this container works at (`context.scope`, read by `readScope`): `machine`,
+   * `project`, `epic`, `part` or `kehikko`. `epic` from a host that does not say. `scope` above is the
+   * same reading narrowed to the two words of 2.9.0.
+   */
+  workingScope: ModuleScope
   passage: Passage | null
   /**
    * 2.13.0. Where in a change's code somebody is pointing on this kehikko, and why
@@ -221,6 +228,7 @@ export function hostFields(context: ModuleContext | null, was?: HostFields, same
     projectId: text(context?.projectId),
     epic: text(context?.epic),
     scope: scopeOf(context),
+    workingScope: readScope(context?.scope),
     passage: context?.passage ?? null,
     location: context?.location ?? null,
     address: context?.address ?? null,

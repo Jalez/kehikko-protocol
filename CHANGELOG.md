@@ -7,6 +7,40 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.29.0 — 2026-10-28
+
+A module's scope: what its content belongs to. **Additive**; `PROTOCOL` is still 2. A module that
+lists only `epic` modes needs nothing new of a host; one that lists another scope needs a 2.29.0 host
+(`modes.scope` in `DECLARATION_SINCE`), because an older host's schema knew only `epic` and `global`.
+docs/manifest.md#scope-290.
+
+### Added
+
+- **`MODULE_SCOPES`** (`ModuleScope`): `machine`, `project`, `epic`, `part`, `kehikko`, with the
+  names a person is shown (`SCOPE_NAMES`: This computer, Project, Epic, Part, Kehikko) and what each
+  means (`SCOPE_MEANS`). `DEFAULT_SCOPE` is `epic`.
+- **`modes[].scope`** takes the five words. A module lists one mode per scope it can work at, its
+  default first; the person picks among them per container in the host. Absent, the old `global` and
+  a word a later version adds read as `epic` (`readScope`), so no manifest is refused for it.
+- **`modes[].scopeSays`**: what the module shows at that scope, in one line. Optional; a host before
+  2.29.0 drops it.
+- **`supportedScopes(manifest)`** (`SupportedScope`: `scope`, `says`, `mode`), **`defaultScope`**,
+  **`supportsScope`**, **`activeScope(manifest, picked)`** (the pick when supported, else the
+  default), **`scopeSaysOf`**, **`scopeNeedsEpic`** (`epic`, `part`) and **`toldScope(active,
+  allEpics)`**: on "All epics" a container at `epic` or `part` is told `project`.
+- **`context.scope`** carries the container's scope, any of the five; a host tells a module only a
+  word it listed, `epic` or `project`. When the person picked `project` for one container, `epic`
+  is still the open epic. A word this package does not know reads as absent.
+- **`workingScope`** on the client's standing (`hostFields`), beside the two-word `scope`.
+- **`modes.scope`** in `DECLARATION_SINCE` (`needsOf`, `fitOf`): a mode scope other than `epic` or
+  `global`.
+
+### Deprecated
+
+- **`declares.scopes`**: list a mode with `scope: 'project'` instead. Still read: `project` there
+  counts as a supported scope after the modes', and `scopesOf` and `showsProject` read either.
+  Keep it beside the mode while a host before 2.29.0 should leave the module uncovered on "All epics".
+
 ## 2.28.0 — 2026-10-28
 
 Going to a place in another project, and to one thing there. **Additive**; `PROTOCOL` is still 2. A
@@ -36,7 +70,6 @@ is asked to show it. Neither side names the other. docs/methods.md, docs/wire.md
   of that name in the project it has open. A host answers `project` and `show` only for a module that
   says them.
 - `LIMITS.NAVIGATES` (8), `SHOWS` (8), `SHOW_ID` (128).
-
 ## 2.27.0 — 2026-10-28
 
 Run results for the work they are for. **Additive**; `PROTOCOL` is still 2, and a host needs nothing

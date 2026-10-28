@@ -8,6 +8,7 @@ import { CONTEXT_SCOPES } from './context.js';
 import { settingsDeclarationSchema } from './settings.js';
 import { agentSessionsSchema, providesSchema } from './provides.js';
 import { navigatesSchema, showsSchema } from './show.js';
+import { modeScopeSchema, scopeSaysSchema, supportedScopes } from './scope.js';
 /**
  * What a module says about itself when a host asks: the manifest schema, the words it suggests (`REACTS_TO`,
  * `TAGS`), and the pure readers `speaks` and `partsDeclaration`. Every string in the schema has a `max` from
@@ -18,11 +19,18 @@ const modeSchema = z.object({
     id: z.string().regex(MODE_ID, 'lowercase, digits and dashes only'),
     label: z.string().min(1).max(LIMITS.LABEL),
     /**
-     * `epic`: the mode's tab follows the reader, told which epic is open and told again on every
-     * switch. `global`: one page for the whole canvas, told nothing and never re-pointed. The former
-     * word `journey` has no alias.
+     * 2.29.0. What the module's content belongs to while it works in this mode: one of
+     * `MODULE_SCOPES` (`machine`, `project`, `epic`, `part`, `kehikko`). A module lists one mode per
+     * scope it can work at, its default FIRST; the person picks among them per container and the host
+     * tells the one in use as `context.scope`. Absent, the pre-2.29.0 `global` and a word a later
+     * version adds all read as `epic` (`readScope`), so no manifest is refused for it. See `scope.ts`.
      */
-    scope: z.enum(['epic', 'global']).default('epic'),
+    scope: modeScopeSchema,
+    /**
+     * 2.29.0. What the module shows at this scope, in one line a host puts beside the scope's name
+     * ("every project's test runs, whatever is open here"). Optional; a host ignores it before 2.29.0.
+     */
+    scopeSays: scopeSaysSchema,
 });
 /**
  * A URL as a manifest may write one: a bounded string, not checked for being a URL and not
@@ -251,6 +259,10 @@ const manifestFields = z.object({
      * know the field still runs it and relays nothing. Optional; one that does not parse is dropped.
      */
     shows: showsSchema.optional().catch(undefined),
+    /**
+     * The scopes this module can work at, as modes: one per scope, the default first (2.29.0; see
+     * `modeSchema.scope`). Required, at least one, so a host older than 2.29.0 still parses it.
+     */
     modes: z.array(modeSchema).min(1).max(LIMITS.MODES),
     /**
      * What the module says about itself and its host: a statement of intent a person can read before
@@ -302,10 +314,11 @@ const manifestFields = z.object({
          */
         agentSessions: agentSessionsSchema.optional().catch(undefined),
         /**
-         * Which scopes of `context.scope` this module can show (2.9.0): `epic` for one epic,
-         * `project` for every epic of the project at once, each item labelled with its epic. Optional
-         * and never defaulted; absent means `['epic']` (`scopesOf`). A host covers a module that does
-         * not list `project` while the person has "All epics" chosen, and still sends it the context.
+         * DEPRECATED (2.29.0): list a mode with `scope: 'project'` instead. Which scopes of
+         * `context.scope` this module can show (2.9.0): `epic` for one epic, `project` for every epic of
+         * the project at once. Still read: `project` here counts as a supported scope after the modes'
+         * (`supportedScopes`). Keep it beside the mode while a host older than 2.29.0 should still
+         * leave the module uncovered on "All epics".
          */
         scopes: z.array(z.enum(CONTEXT_SCOPES)).min(1).max(CONTEXT_SCOPES.length)
             .refine((scopes) => new Set(scopes).size === scopes.length, { message: 'a scope is listed once' })
@@ -405,16 +418,23 @@ export function partsDeclaration(manifest) {
     return [];
 }
 /**
- * 2.9.0. The scopes a module says it can show: `declares.scopes` as written, `['epic']` when it does
- * not say. Takes a parsed manifest or the object about to be parsed.
+ * 2.9.0, DEPRECATED in 2.29.0 for `supportedScopes`. The scopes of the "All epics" choice a module
+ * can show: `declares.scopes` as written; otherwise `['epic']`, with `project` added when a mode
+ * says `scope: 'project'`. Takes a parsed manifest or the object about to be parsed.
  */
 export function scopesOf(manifest) {
     const said = manifest?.declares?.scopes;
-    return said && said.length ? said : ONE_EPIC;
+    if (said && said.length)
+        return said;
+    return supportedScopes(manifest).some((one) => one.scope === 'project') ? EPIC_AND_PROJECT : ONE_EPIC;
 }
-/** 2.9.0. Whether a module can show a whole project at once (`scope: 'project'`): `project` in `scopesOf`. */
+/**
+ * 2.9.0. Whether a module can show a whole project at once: `project` in its supported scopes, from
+ * a mode (2.29.0) or the deprecated `declares.scopes`.
+ */
 export function showsProject(manifest) {
-    return scopesOf(manifest).includes('project');
+    return supportedScopes(manifest).some((one) => one.scope === 'project');
 }
+const EPIC_AND_PROJECT = Object.freeze(['epic', 'project']);
 const ONE_EPIC = Object.freeze(['epic']);
 export const MODULE_CONDITIONS = ['ready', 'incompatible', 'silent'];

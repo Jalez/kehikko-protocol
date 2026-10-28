@@ -34,6 +34,7 @@ Answer these before writing code. Each answer changes what gets built.
 | What does it keep, and where? | The files under `<project>/.kehikot/<folder>/`, and their `dataVersion`. |
 | What should agents be able to do with it? | The MCP tools: which only read, which write, and which stay the person's alone. |
 | What does it show, and what does a person switch between? | The page, and the header: View switches and toggles, Go jumps, Run acts. |
+| What does its content belong to: this computer, the project, the open epic, each part, or this kehikko? Can it work at more than one? | `modes`: one per scope, the default first, each with a `scopeSays` line. See [Scope](manifest.md#scope-290). |
 | Does what it holds belong to parts of the epic? | `reacts: ['parts']` and narrowing with `useFocus`, or a `partless` sentence saying why not. |
 | Does anything in it need the person, or run for a while? | What it reports to the Inbox with `activity.set`. |
 | Should a person be able to type a skill for it in their agent (Claude Code, say)? | `declares.skills`; a skill that cannot work without another kind of module on the kehikko lists what it needs in `needs` — by what that module provides (`{ provides: 'steps' }`) rather than by its id where it can. |
@@ -165,6 +166,18 @@ with `resolveDoorProject` and works on the path that comes back, and takes the
 conversation's recorded place with `resolveDoorPlace` + `placeDefaults` when the
 agent named none, saying so in `DOOR_PLACE_SAYS` words ([asking](asking.md)).
 Every tool states `readOnlyHint`.
+
+### Scope is what the content belongs to
+
+A module lists in `modes` every scope it can work at — `machine`, `project`,
+`epic`, `part`, `kehikko` — its default first, each with a `scopeSays` line
+saying what it shows there. The host shows the scope on the module's header
+and lets the person pick among those listed, per container; the module reads
+the one in use from `context.scope` (`workingScope` on its standing) and shows
+its content at that scope. List only what it implements, and decide from what
+it actually keeps and reads, not from what it is about. A header switch of its
+own between "this epic" and "all epics" is the host's scope control now; drop
+it. See [Scope](manifest.md#scope-290).
 
 ### Plain language
 

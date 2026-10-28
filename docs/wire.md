@@ -349,8 +349,8 @@ inconsistency with `hello` and is kept because it is what both halves already
 speak — the same fields, one level up. `contextSchema` is the shared
 definition either way, so the two cannot drift apart in what they carry.
 
-Only epic-scoped modes are told. A `global` mode asked for one page over the
-whole canvas and gets one.
+Every container is told, whatever its scope (2.29.0; before it, a `global`
+mode was meant to be left alone, and no host did that).
 
 #### `responseFailureReasons`
 
@@ -775,6 +775,18 @@ had to ask would render once in the wrong colours first.
 How much of the project the context is about (2.9.0): `epic`, the one epic
 named in `epic` (or none open), or `project`, every epic of the project at
 once — what a person gets by choosing "All epics" in the host's epic picker.
+
+**Since 2.29.0 it is the container's scope**, any of `machine`, `project`,
+`epic`, `part` and `kehikko`: the one the person picked for the container among
+those its module lists in `modes`, or the module's default (its first mode). On
+"All epics" a container at `epic` or `part` is told `project` (`toldScope`);
+one at another scope is told its own, because it is not about the open epic and
+the host does not cover it. A host tells a module only a word it listed,
+`epic` or `project`, so a module built before 2.29.0, whose schema knows two
+words, is never told a third. When the person picked `project` for one
+container while an epic is open, `epic` is still that epic: a module at
+`project` shows the whole project regardless. Read it with `readScope`
+(`workingScope` on a page's standing); `scopeOf` still answers the two words.
 
 **Optional, and absent means `epic`.** A host older than 2.9.0 never says it,
 and every context such a host sends is about one epic, so absence cannot mean

@@ -34,7 +34,8 @@ export const MANIFEST: Manifest = manifestSchema.parse({
   guidance:
     'This canvas has __MODULE_NAME__ on it. Call `read_value` with the project path to see what it is holding.',
   entry: '/app',
-  modes: [{ id: '__MODULE_FOLDER__', label: '__MODULE_NAME__', scope: 'epic' }],
+  /* What its content belongs to (scope): one mode per scope it can work at, the default first. See docs/manifest.md#scope-290. */
+  modes: [{ id: '__MODULE_FOLDER__', label: '__MODULE_NAME__', scope: 'epic', scopeSays: 'what it shows for the open epic' }],
   mcp: {
     url: '/mcp',
     transport: 'http',

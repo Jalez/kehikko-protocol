@@ -746,7 +746,7 @@ export declare const helloSchema: z.ZodObject<{
     session: z.ZodString;
     context: z.ZodObject<{
         epic: z.ZodDefault<z.ZodNullable<z.ZodString>>;
-        scope: z.ZodOptional<z.ZodEnum<["epic", "project"]>>;
+        scope: z.ZodCatch<z.ZodOptional<z.ZodEnum<["machine", "project", "epic", "part", "kehikko"]>>>;
         project: z.ZodDefault<z.ZodNullable<z.ZodString>>;
         projectPath: z.ZodDefault<z.ZodNullable<z.ZodString>>;
         projectId: z.ZodDefault<z.ZodNullable<z.ZodString>>;
@@ -1300,7 +1300,7 @@ export declare const helloSchema: z.ZodObject<{
             epic: string | null;
             source: string;
         }[];
-        scope?: "epic" | "project" | undefined;
+        scope?: "epic" | "kehikko" | "project" | "part" | "machine" | undefined;
     }, {
         epic?: string | null | undefined;
         parts?: {
@@ -1329,7 +1329,7 @@ export declare const helloSchema: z.ZodObject<{
             refreshing?: boolean | undefined;
         } | undefined;
         projectPath?: string | null | undefined;
-        scope?: "epic" | "project" | undefined;
+        scope?: unknown;
         theme?: "light" | "dark" | undefined;
         selection?: string[] | undefined;
         passage?: {
@@ -1520,7 +1520,7 @@ export declare const helloSchema: z.ZodObject<{
             epic: string | null;
             source: string;
         }[];
-        scope?: "epic" | "project" | undefined;
+        scope?: "epic" | "kehikko" | "project" | "part" | "machine" | undefined;
     };
     answers?: string[] | undefined;
     header?: boolean | undefined;
@@ -1556,7 +1556,7 @@ export declare const helloSchema: z.ZodObject<{
             refreshing?: boolean | undefined;
         } | undefined;
         projectPath?: string | null | undefined;
-        scope?: "epic" | "project" | undefined;
+        scope?: unknown;
         theme?: "light" | "dark" | undefined;
         selection?: string[] | undefined;
         passage?: {
@@ -1638,7 +1638,7 @@ export declare const helloSchema: z.ZodObject<{
  */
 export declare const contextMessageSchema: z.ZodObject<{
     epic: z.ZodDefault<z.ZodNullable<z.ZodString>>;
-    scope: z.ZodOptional<z.ZodEnum<["epic", "project"]>>;
+    scope: z.ZodCatch<z.ZodOptional<z.ZodEnum<["machine", "project", "epic", "part", "kehikko"]>>>;
     project: z.ZodDefault<z.ZodNullable<z.ZodString>>;
     projectPath: z.ZodDefault<z.ZodNullable<z.ZodString>>;
     projectId: z.ZodDefault<z.ZodNullable<z.ZodString>>;
@@ -2197,7 +2197,7 @@ export declare const contextMessageSchema: z.ZodObject<{
         epic: string | null;
         source: string;
     }[];
-    scope?: "epic" | "project" | undefined;
+    scope?: "epic" | "kehikko" | "project" | "part" | "machine" | undefined;
 }, {
     type: "kehikot.context";
     protocol: number;
@@ -2228,7 +2228,7 @@ export declare const contextMessageSchema: z.ZodObject<{
         refreshing?: boolean | undefined;
     } | undefined;
     projectPath?: string | null | undefined;
-    scope?: "epic" | "project" | undefined;
+    scope?: unknown;
     theme?: "light" | "dark" | undefined;
     selection?: string[] | undefined;
     passage?: {
@@ -2579,7 +2579,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     session: z.ZodString;
     context: z.ZodObject<{
         epic: z.ZodDefault<z.ZodNullable<z.ZodString>>;
-        scope: z.ZodOptional<z.ZodEnum<["epic", "project"]>>;
+        scope: z.ZodCatch<z.ZodOptional<z.ZodEnum<["machine", "project", "epic", "part", "kehikko"]>>>;
         project: z.ZodDefault<z.ZodNullable<z.ZodString>>;
         projectPath: z.ZodDefault<z.ZodNullable<z.ZodString>>;
         projectId: z.ZodDefault<z.ZodNullable<z.ZodString>>;
@@ -3133,7 +3133,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             epic: string | null;
             source: string;
         }[];
-        scope?: "epic" | "project" | undefined;
+        scope?: "epic" | "kehikko" | "project" | "part" | "machine" | undefined;
     }, {
         epic?: string | null | undefined;
         parts?: {
@@ -3162,7 +3162,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             refreshing?: boolean | undefined;
         } | undefined;
         projectPath?: string | null | undefined;
-        scope?: "epic" | "project" | undefined;
+        scope?: unknown;
         theme?: "light" | "dark" | undefined;
         selection?: string[] | undefined;
         passage?: {
@@ -3353,7 +3353,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             epic: string | null;
             source: string;
         }[];
-        scope?: "epic" | "project" | undefined;
+        scope?: "epic" | "kehikko" | "project" | "part" | "machine" | undefined;
     };
     answers?: string[] | undefined;
     header?: boolean | undefined;
@@ -3389,7 +3389,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             refreshing?: boolean | undefined;
         } | undefined;
         projectPath?: string | null | undefined;
-        scope?: "epic" | "project" | undefined;
+        scope?: unknown;
         theme?: "light" | "dark" | undefined;
         selection?: string[] | undefined;
         passage?: {
@@ -3465,7 +3465,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     header?: boolean | undefined;
 }>, z.ZodObject<{
     epic: z.ZodDefault<z.ZodNullable<z.ZodString>>;
-    scope: z.ZodOptional<z.ZodEnum<["epic", "project"]>>;
+    scope: z.ZodCatch<z.ZodOptional<z.ZodEnum<["machine", "project", "epic", "part", "kehikko"]>>>;
     project: z.ZodDefault<z.ZodNullable<z.ZodString>>;
     projectPath: z.ZodDefault<z.ZodNullable<z.ZodString>>;
     projectId: z.ZodDefault<z.ZodNullable<z.ZodString>>;
@@ -4024,7 +4024,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         epic: string | null;
         source: string;
     }[];
-    scope?: "epic" | "project" | undefined;
+    scope?: "epic" | "kehikko" | "project" | "part" | "machine" | undefined;
 }, {
     type: "kehikot.context";
     protocol: number;
@@ -4055,7 +4055,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         refreshing?: boolean | undefined;
     } | undefined;
     projectPath?: string | null | undefined;
-    scope?: "epic" | "project" | undefined;
+    scope?: unknown;
     theme?: "light" | "dark" | undefined;
     selection?: string[] | undefined;
     passage?: {

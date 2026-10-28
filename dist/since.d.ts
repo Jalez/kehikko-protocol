@@ -96,6 +96,7 @@ export declare const DECLARATION_SINCE: {
     readonly 'skills.needs.object': "2.21.0";
     readonly 'agentSessions.installsSkills': "2.23.0";
     readonly 'declares.navigates': "2.28.0";
+    readonly 'modes.scope': "2.29.0";
 };
 export type Declaration = keyof typeof DECLARATION_SINCE;
 export declare const DECLARATION_NAMES: Declaration[];
@@ -208,6 +209,7 @@ export declare const SINCE: {
         readonly 'skills.needs.object': "2.21.0";
         readonly 'agentSessions.installsSkills': "2.23.0";
         readonly 'declares.navigates': "2.28.0";
+        readonly 'modes.scope': "2.29.0";
     };
     readonly trackerFields: {
         readonly column: "2.6.0";
@@ -280,6 +282,7 @@ export declare const PIECE_SAID: {
         readonly 'skills.needs.object': "skills that need what other modules provide";
         readonly 'agentSessions.installsSkills': "skills it installs for its own agent";
         readonly 'declares.navigates': "jumps to other projects and to what other modules show";
+        readonly 'modes.scope': "scopes";
     };
 };
 /** A piece in a person's words, or the piece as written when this package has no words for it. */
