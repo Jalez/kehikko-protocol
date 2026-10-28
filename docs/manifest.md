@@ -317,6 +317,29 @@ declares: { skills: [{ name: 'kehikot-here', summary: '…', version: '…' }], 
 would install the module's own skills for Claude Code, so it is in
 `DECLARATION_SINCE` (`agentSessions.installsSkills`).
 
+### What a module can be asked to show (2.28.0)
+
+`shows` lists the subjects another module may ask this one to show, by a
+`view.goto { show }` ([methods](methods.md#project-and-show-2280)): today
+`agent-session`, for a module that runs conversations with an agent. The host
+relays such an ask as `context.show` to the modules on the destination kehikko
+that say the subject, and to no other; it names none.
+
+```ts
+shows: ['agent-session']
+```
+
+What a module says about itself, like `reacts`: a host that does not know it
+still runs the module, and relays nothing. So it is not in `DECLARATION_SINCE`.
+`showsOf(manifest)` and `canShow(manifest, subject)` read it; one that does
+not parse is dropped, not fatal.
+
+The ASKING module says `declares.navigates: ['project', 'show']` (`NAVIGATES`):
+what its `view.goto` carries that an older host does not know. That one IS in
+`DECLARATION_SINCE` (2.28.0), because an older host strips `project` and would
+go to the epic of that name in the project it has open. `navigatesOf(manifest)`
+reads it.
+
 ### A module's settings (2.15.0)
 
 `declares.settings` lists the settings a person can see and change from the host: each field's key, label, sentence, type (`boolean`, `string`, `number`, `choice`, `list`), default, scope (`project` or `machine`) and whether only a person may change it. The host draws one form from it and asks the module to read and write the values at its door. Optional; a list that does not parse is dropped and the rest of the manifest is read. See [settings](settings.md).

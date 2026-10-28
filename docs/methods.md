@@ -667,6 +667,41 @@ The same three are what a notification line's `place` carries
 (`kehikot.notifications@1`), so a panel's press is `view.goto` with
 `place.epic ?? epic`, `place.parts` and `place.kehikko`, unchanged.
 
+##### `project` and `show` (2.28.0)
+
+A test run remembers the conversation that asked for it, and that conversation
+may belong to another project than the one open. Two optional fields take the
+person there.
+
+- `project`: the project to stand in first — its id (`context.projectId`) or,
+  for a host that sends none, its absolute folder (`context.projectPath`):
+  `projectKey`'s key, whichever the module kept. The host switches to it as
+  the person's own switch does (the same calm switch, the same kehikko it would
+  choose), then goes to the `epic`, `kehikko` and `parts` IN it, checked
+  against that project once it is read. A project it does not hold is
+  `declined`, and the sentence lists no project: a module is handed one
+  project, never the list. `project` goes **with an epic**, for the reason
+  `parts` and `kehikko` do.
+- `show`: `{ subject, id }` (`showAskSchema`), one thing to be shown on the
+  kehikko the move ends on — `agent-session` and the id the module running the
+  conversation keeps for it. After a `moved` the host relays it as
+  `context.show` ([wire](wire.md#contextschemashow)) to the containers on that
+  kehikko whose manifests say they show the subject (`shows`), and to nobody
+  else. It names no module. The one holding that session for that place shows
+  it; any other does nothing.
+
+**A jump into another project is a person's.** The host takes `project` only
+from a container on the kehikko on screen, while the page has the person's
+focus, and never from a module an agent's press (`press_item`) reached a moment
+before: a module calls it from its own click handler. No door tool switches
+project.
+
+**Say them in `declares.navigates`** (`['project', 'show']`). A host answers
+them only for a module that says so, and `fitOf` holds such a module to a host
+of 2.28.0 or later (`DECLARATION_SINCE`): an older host strips both fields and
+would go to the epic of that name in the project it has open, which is the
+wrong place, said as `moved`.
+
 #### `methodParams.view.goto.ref`
 
 Bounded at `GOTO_REF` rather than `REF`, and REFUSED rather than

@@ -411,6 +411,29 @@ export {
   type Narrowed,
 } from './parts.js'
 
+/* Going to another project, and asking for one thing to be shown there (2.28.0). */
+export {
+  NAVIGATES,
+  NAVIGATES_NAMES,
+  SHOW_SUBJECTS,
+  navigatesSchema,
+  showSubject,
+  showsSchema,
+  showAskSchema,
+  sharedShowSchema,
+  showIsNews,
+  showsOf,
+  canShow,
+  navigatesOf,
+  gotoProject,
+  gotoProjectIsId,
+  type Navigates,
+  type ShowSubject,
+  type ShowAsk,
+  type SharedShow,
+  type ShowingManifest,
+} from './show.js'
+
 /* Run results any module publishes for the work they are for (2.27.0). The file is opened behind `/serve`. */
 export {
   RUNS_FILE,

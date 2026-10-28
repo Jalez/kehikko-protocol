@@ -1012,6 +1012,28 @@ module that shows pages (`REACTS_TO.address`) opens it when its `at` is new
 (`addressIsNews`), and every other module may ignore it. An older host sends
 null.
 
+#### `contextSchema.show`
+
+*2.28.0.* One thing a module asked to have shown on this kehikko, or null. The
+shape is `sharedShowSchema` in `src/show.ts`:
+
+```ts
+{
+  subject: string    // a word of SHOW_SUBJECTS: 'agent-session'
+  id: string         // the id the module holding it keeps; at most LIMITS.SHOW_ID
+  by?: string        // the module that asked: the host's fact
+  at?: string        // when, ISO 8601: the host's fact, new on every ask
+}
+```
+
+Set by a `view.goto { show }` that `moved` (see
+[methods](methods.md#project-and-show-2280)). Unlike the address it is NOT
+sent to every container: only to those on the kehikko the move ended on whose
+manifests say `shows: [subject]`; every other one is told null. A module that
+holds that thing for the place it is on shows it when its `at` is new
+(`showIsNews`), and one that does not hold it does nothing — it cannot say no,
+and needs not: some other module may hold it. An older host sends null.
+
 
 
 Whether this module has been pinned, and will stop being re-pointed.

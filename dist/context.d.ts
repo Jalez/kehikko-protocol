@@ -602,6 +602,30 @@ export declare const contextSchema: z.ZodObject<{
         agent?: true | undefined;
     }>>>;
     /**
+     * 2.28.0. One thing a module asked to have shown on this kehikko (`view.goto { show }`), or null; see
+     * `show.ts`. The host sends it only to a container on the kehikko the move ended on whose manifest
+     * says it shows `subject` (`shows`), stamped with who asked and when; every other container is told
+     * null. A module that holds that thing for the place it is on shows it when its `at` is new
+     * (`showIsNews`); one that does not hold it does nothing. Null from an older host.
+     */
+    show: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+        subject: z.ZodString;
+        id: z.ZodString;
+    } & {
+        by: z.ZodOptional<z.ZodString>;
+        at: z.ZodOptional<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        id: string;
+        subject: string;
+        at?: string | undefined;
+        by?: string | undefined;
+    }, {
+        id: string;
+        subject: string;
+        at?: string | undefined;
+        by?: string | undefined;
+    }>>>;
+    /**
      * Whether this module has been pinned. `true` means it keeps what it was last told, and further
      * changes to this canvas do not reach it until this goes false. A context is still sent when the
      * pin changes, in both directions.
@@ -931,6 +955,12 @@ export declare const contextSchema: z.ZodObject<{
     } | null;
     project: string | null;
     projectId: string | null;
+    show: {
+        id: string;
+        subject: string;
+        at?: string | undefined;
+        by?: string | undefined;
+    } | null;
     tracker: {
         at: string | null;
         refreshing: boolean;
@@ -1023,6 +1053,12 @@ export declare const contextSchema: z.ZodObject<{
     } | null | undefined;
     project?: string | null | undefined;
     projectId?: string | null | undefined;
+    show?: {
+        id: string;
+        subject: string;
+        at?: string | undefined;
+        by?: string | undefined;
+    } | null | undefined;
     tracker?: {
         at?: string | null | undefined;
         refreshing?: boolean | undefined;

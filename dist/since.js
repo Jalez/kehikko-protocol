@@ -97,6 +97,7 @@ export const DECLARATION_SINCE = {
     'declares.agentSessions': '2.21.0',
     'skills.needs.object': '2.21.0',
     'agentSessions.installsSkills': '2.23.0',
+    'declares.navigates': '2.28.0',
 };
 export const DECLARATION_NAMES = Object.keys(DECLARATION_SINCE);
 /**
@@ -192,6 +193,7 @@ export const PIECE_SAID = {
         'declares.agentSessions': 'agent sessions',
         'skills.needs.object': 'skills that need what other modules provide',
         'agentSessions.installsSkills': 'skills it installs for its own agent',
+        'declares.navigates': 'jumps to other projects and to what other modules show',
     },
 };
 /** A piece in a person's words, or the piece as written when this package has no words for it. */

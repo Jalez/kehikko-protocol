@@ -7,6 +7,7 @@ import { moduleSkillsSchema } from './skills.js';
 import { CONTEXT_SCOPES } from './context.js';
 import { settingsDeclarationSchema } from './settings.js';
 import { agentSessionsSchema, providesSchema } from './provides.js';
+import { navigatesSchema, showsSchema } from './show.js';
 /**
  * What a module says about itself when a host asks: the manifest schema, the words it suggests (`REACTS_TO`,
  * `TAGS`), and the pure readers `speaks` and `partsDeclaration`. Every string in the schema has a `max` from
@@ -243,6 +244,13 @@ const manifestFields = z.object({
      * other, and `manifestSchema` refuses one that says neither or both (`partsDeclaration`).
      */
     partless: z.string().trim().min(1).max(LIMITS.SUMMARY).optional(),
+    /**
+     * 2.28.0. The subjects this module can be asked to show (`SHOW_SUBJECTS`: `agent-session`), by a
+     * `view.goto { show }` another module makes: the host relays the ask as `context.show` to it and to
+     * nobody who does not say it. What the module says about itself, like `reacts`: a host that does not
+     * know the field still runs it and relays nothing. Optional; one that does not parse is dropped.
+     */
+    shows: showsSchema.optional().catch(undefined),
     modes: z.array(modeSchema).min(1).max(LIMITS.MODES),
     /**
      * What the module says about itself and its host: a statement of intent a person can read before
@@ -309,6 +317,15 @@ const manifestFields = z.object({
          * dropped, not fatal: the module then shows no settings in the host, and nothing else changes.
          */
         settings: settingsDeclarationSchema.optional().catch(undefined),
+        /**
+         * What this module's `view.goto` carries that a host before 2.28.0 does not know (`NAVIGATES`):
+         * `project` (it switches project first) and `show` (it asks for one thing to be shown there).
+         * A host that knows them answers them only for a module that says so; `fitOf` holds a module
+         * that says so to a host that knows them, because an older one strips the field and would go
+         * to the epic of that name in the project it has open. Optional; one that does not parse is
+         * dropped, not fatal.
+         */
+        navigates: navigatesSchema.optional().catch(undefined),
     })
         .default({ protocol: `>=${PROTOCOL}`, uses: [], storage: false, prompt: false }),
     /**

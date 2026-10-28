@@ -927,6 +927,23 @@ export declare const helloSchema: z.ZodObject<{
             by?: string | undefined;
             agent?: true | undefined;
         }>>>;
+        show: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+            subject: z.ZodString;
+            id: z.ZodString;
+        } & {
+            by: z.ZodOptional<z.ZodString>;
+            at: z.ZodOptional<z.ZodString>;
+        }, "strip", z.ZodTypeAny, {
+            id: string;
+            subject: string;
+            at?: string | undefined;
+            by?: string | undefined;
+        }, {
+            id: string;
+            subject: string;
+            at?: string | undefined;
+            by?: string | undefined;
+        }>>>;
         pinned: z.ZodDefault<z.ZodBoolean>;
         prompt: z.ZodDefault<z.ZodNullable<z.ZodString>>;
         kehikko: z.ZodDefault<z.ZodNullable<z.ZodObject<{
@@ -1203,6 +1220,12 @@ export declare const helloSchema: z.ZodObject<{
         } | null;
         project: string | null;
         projectId: string | null;
+        show: {
+            id: string;
+            subject: string;
+            at?: string | undefined;
+            by?: string | undefined;
+        } | null;
         tracker: {
             at: string | null;
             refreshing: boolean;
@@ -1295,6 +1318,12 @@ export declare const helloSchema: z.ZodObject<{
         } | null | undefined;
         project?: string | null | undefined;
         projectId?: string | null | undefined;
+        show?: {
+            id: string;
+            subject: string;
+            at?: string | undefined;
+            by?: string | undefined;
+        } | null | undefined;
         tracker?: {
             at?: string | null | undefined;
             refreshing?: boolean | undefined;
@@ -1411,6 +1440,12 @@ export declare const helloSchema: z.ZodObject<{
         } | null;
         project: string | null;
         projectId: string | null;
+        show: {
+            id: string;
+            subject: string;
+            at?: string | undefined;
+            by?: string | undefined;
+        } | null;
         tracker: {
             at: string | null;
             refreshing: boolean;
@@ -1510,6 +1545,12 @@ export declare const helloSchema: z.ZodObject<{
         } | null | undefined;
         project?: string | null | undefined;
         projectId?: string | null | undefined;
+        show?: {
+            id: string;
+            subject: string;
+            at?: string | undefined;
+            by?: string | undefined;
+        } | null | undefined;
         tracker?: {
             at?: string | null | undefined;
             refreshing?: boolean | undefined;
@@ -1777,6 +1818,23 @@ export declare const contextMessageSchema: z.ZodObject<{
         intent?: unknown;
         by?: string | undefined;
         agent?: true | undefined;
+    }>>>;
+    show: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+        subject: z.ZodString;
+        id: z.ZodString;
+    } & {
+        by: z.ZodOptional<z.ZodString>;
+        at: z.ZodOptional<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        id: string;
+        subject: string;
+        at?: string | undefined;
+        by?: string | undefined;
+    }, {
+        id: string;
+        subject: string;
+        at?: string | undefined;
+        by?: string | undefined;
     }>>>;
     pinned: z.ZodDefault<z.ZodBoolean>;
     prompt: z.ZodDefault<z.ZodNullable<z.ZodString>>;
@@ -2058,6 +2116,12 @@ export declare const contextMessageSchema: z.ZodObject<{
     } | null;
     project: string | null;
     projectId: string | null;
+    show: {
+        id: string;
+        subject: string;
+        at?: string | undefined;
+        by?: string | undefined;
+    } | null;
     protocol: number;
     tracker: {
         at: string | null;
@@ -2153,6 +2217,12 @@ export declare const contextMessageSchema: z.ZodObject<{
     } | null | undefined;
     project?: string | null | undefined;
     projectId?: string | null | undefined;
+    show?: {
+        id: string;
+        subject: string;
+        at?: string | undefined;
+        by?: string | undefined;
+    } | null | undefined;
     tracker?: {
         at?: string | null | undefined;
         refreshing?: boolean | undefined;
@@ -2690,6 +2760,23 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             by?: string | undefined;
             agent?: true | undefined;
         }>>>;
+        show: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+            subject: z.ZodString;
+            id: z.ZodString;
+        } & {
+            by: z.ZodOptional<z.ZodString>;
+            at: z.ZodOptional<z.ZodString>;
+        }, "strip", z.ZodTypeAny, {
+            id: string;
+            subject: string;
+            at?: string | undefined;
+            by?: string | undefined;
+        }, {
+            id: string;
+            subject: string;
+            at?: string | undefined;
+            by?: string | undefined;
+        }>>>;
         pinned: z.ZodDefault<z.ZodBoolean>;
         prompt: z.ZodDefault<z.ZodNullable<z.ZodString>>;
         kehikko: z.ZodDefault<z.ZodNullable<z.ZodObject<{
@@ -2966,6 +3053,12 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         } | null;
         project: string | null;
         projectId: string | null;
+        show: {
+            id: string;
+            subject: string;
+            at?: string | undefined;
+            by?: string | undefined;
+        } | null;
         tracker: {
             at: string | null;
             refreshing: boolean;
@@ -3058,6 +3151,12 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         } | null | undefined;
         project?: string | null | undefined;
         projectId?: string | null | undefined;
+        show?: {
+            id: string;
+            subject: string;
+            at?: string | undefined;
+            by?: string | undefined;
+        } | null | undefined;
         tracker?: {
             at?: string | null | undefined;
             refreshing?: boolean | undefined;
@@ -3174,6 +3273,12 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         } | null;
         project: string | null;
         projectId: string | null;
+        show: {
+            id: string;
+            subject: string;
+            at?: string | undefined;
+            by?: string | undefined;
+        } | null;
         tracker: {
             at: string | null;
             refreshing: boolean;
@@ -3273,6 +3378,12 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         } | null | undefined;
         project?: string | null | undefined;
         projectId?: string | null | undefined;
+        show?: {
+            id: string;
+            subject: string;
+            at?: string | undefined;
+            by?: string | undefined;
+        } | null | undefined;
         tracker?: {
             at?: string | null | undefined;
             refreshing?: boolean | undefined;
@@ -3534,6 +3645,23 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         intent?: unknown;
         by?: string | undefined;
         agent?: true | undefined;
+    }>>>;
+    show: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+        subject: z.ZodString;
+        id: z.ZodString;
+    } & {
+        by: z.ZodOptional<z.ZodString>;
+        at: z.ZodOptional<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        id: string;
+        subject: string;
+        at?: string | undefined;
+        by?: string | undefined;
+    }, {
+        id: string;
+        subject: string;
+        at?: string | undefined;
+        by?: string | undefined;
     }>>>;
     pinned: z.ZodDefault<z.ZodBoolean>;
     prompt: z.ZodDefault<z.ZodNullable<z.ZodString>>;
@@ -3815,6 +3943,12 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     } | null;
     project: string | null;
     projectId: string | null;
+    show: {
+        id: string;
+        subject: string;
+        at?: string | undefined;
+        by?: string | undefined;
+    } | null;
     protocol: number;
     tracker: {
         at: string | null;
@@ -3910,6 +4044,12 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     } | null | undefined;
     project?: string | null | undefined;
     projectId?: string | null | undefined;
+    show?: {
+        id: string;
+        subject: string;
+        at?: string | undefined;
+        by?: string | undefined;
+    } | null | undefined;
     tracker?: {
         at?: string | null | undefined;
         refreshing?: boolean | undefined;

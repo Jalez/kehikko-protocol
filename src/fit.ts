@@ -46,7 +46,7 @@ export interface Needs {
 }
 
 /** The `declares` keys this package knows; another one is a declaration from a newer protocol. */
-const KNOWN_DECLARES = new Set(['protocol', 'uses', 'storage', 'prompt', 'skills', 'provides', 'agentSessions', 'scopes', 'settings'])
+const KNOWN_DECLARES = new Set(['protocol', 'uses', 'storage', 'prompt', 'skills', 'provides', 'agentSessions', 'scopes', 'settings', 'navigates'])
 
 type Loose = Record<string, unknown>
 const asObject = (value: unknown): Loose | null => (typeof value === 'object' && value !== null && !Array.isArray(value) ? (value as Loose) : null)
@@ -68,6 +68,7 @@ function declarations(manifest: Loose): Declaration[] {
   if (listed(declares.provides).length) out.push('declares.provides')
   if (asObject(declares.agentSessions)) out.push('declares.agentSessions')
   if (asObject(declares.agentSessions)?.installsSkills === true) out.push('agentSessions.installsSkills')
+  if (listed(declares.navigates).length) out.push('declares.navigates')
   return out
 }
 

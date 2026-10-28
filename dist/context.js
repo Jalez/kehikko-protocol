@@ -7,6 +7,7 @@ import { partsSchema } from './parts.js';
 import { passageSchema } from './passage.js';
 import { sharedLocationSchema } from './location.js';
 import { sharedAddressSchema } from './address.js';
+import { sharedShowSchema } from './show.js';
 import { filterChoiceSchema } from './filters.js';
 import { kehikkoSchema, ref } from './fragments.js';
 /* ------------------------------------------------------------------------ *
@@ -125,6 +126,14 @@ export const contextSchema = z.object({
      * its `at` is new (`addressIsNews`); everybody else may ignore it. Null from an older host.
      */
     address: sharedAddressSchema.nullable().default(null),
+    /**
+     * 2.28.0. One thing a module asked to have shown on this kehikko (`view.goto { show }`), or null; see
+     * `show.ts`. The host sends it only to a container on the kehikko the move ended on whose manifest
+     * says it shows `subject` (`shows`), stamped with who asked and when; every other container is told
+     * null. A module that holds that thing for the place it is on shows it when its `at` is new
+     * (`showIsNews`); one that does not hold it does nothing. Null from an older host.
+     */
+    show: sharedShowSchema.nullable().default(null),
     /**
      * Whether this module has been pinned. `true` means it keeps what it was last told, and further
      * changes to this canvas do not reach it until this goes false. A context is still sent when the

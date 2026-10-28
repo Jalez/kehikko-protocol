@@ -210,7 +210,7 @@ export declare const methodParams: {
      * `kehikot.goto` carries. Unlike `gotoSchema`, an epic alone is allowed; a call that names none
      * of epic, step or ref is refused.
      */
-    readonly 'view.goto': z.ZodEffects<z.ZodEffects<z.ZodObject<{
+    readonly 'view.goto': z.ZodEffects<z.ZodEffects<z.ZodEffects<z.ZodObject<{
         epic: z.ZodOptional<z.ZodString>;
         step: z.ZodOptional<z.ZodNumber>;
         /**
@@ -225,40 +225,115 @@ export declare const methodParams: {
         parts: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         /** 1.4.0. The kehikko to be on first: its `key`. With an epic, for the same reason. */
         kehikko: z.ZodOptional<z.ZodString>;
+        /**
+         * 2.28.0. The project to stand in first: its id (`context.projectId`) or, without one, its
+         * absolute folder (`context.projectPath`) — `projectKey`'s key. The host switches to it as the
+         * person's own switch does, then goes to the epic, kehikko and parts IN it; one it does not hold
+         * is `declined`. With an epic: a project alone names no place in it. Say `project` in
+         * `declares.navigates`; a host before 2.28.0 strips it and would go to that epic where it is.
+         */
+        project: z.ZodOptional<z.ZodString>;
+        /**
+         * 2.28.0. One thing to be shown on the kehikko the move ends on (`showAskSchema`): relayed as
+         * `context.show` to the containers there whose manifests say they show `subject`, after a
+         * `moved`. Say `show` in `declares.navigates`.
+         */
+        show: z.ZodOptional<z.ZodObject<{
+            subject: z.ZodString;
+            id: z.ZodString;
+        }, "strip", z.ZodTypeAny, {
+            id: string;
+            subject: string;
+        }, {
+            id: string;
+            subject: string;
+        }>>;
     }, "strip", z.ZodTypeAny, {
         epic?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
+        project?: string | undefined;
+        show?: {
+            id: string;
+            subject: string;
+        } | undefined;
         ref?: string | undefined;
         step?: number | undefined;
     }, {
         epic?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
+        project?: string | undefined;
+        show?: {
+            id: string;
+            subject: string;
+        } | undefined;
         ref?: string | undefined;
         step?: number | undefined;
     }>, {
         epic?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
+        project?: string | undefined;
+        show?: {
+            id: string;
+            subject: string;
+        } | undefined;
         ref?: string | undefined;
         step?: number | undefined;
     }, {
         epic?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
+        project?: string | undefined;
+        show?: {
+            id: string;
+            subject: string;
+        } | undefined;
         ref?: string | undefined;
         step?: number | undefined;
     }>, {
         epic?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
+        project?: string | undefined;
+        show?: {
+            id: string;
+            subject: string;
+        } | undefined;
         ref?: string | undefined;
         step?: number | undefined;
     }, {
         epic?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
+        project?: string | undefined;
+        show?: {
+            id: string;
+            subject: string;
+        } | undefined;
+        ref?: string | undefined;
+        step?: number | undefined;
+    }>, {
+        epic?: string | undefined;
+        parts?: string[] | undefined;
+        kehikko?: string | undefined;
+        project?: string | undefined;
+        show?: {
+            id: string;
+            subject: string;
+        } | undefined;
+        ref?: string | undefined;
+        step?: number | undefined;
+    }, {
+        epic?: string | undefined;
+        parts?: string[] | undefined;
+        kehikko?: string | undefined;
+        project?: string | undefined;
+        show?: {
+            id: string;
+            subject: string;
+        } | undefined;
         ref?: string | undefined;
         step?: number | undefined;
     }>;
