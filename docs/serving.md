@@ -112,6 +112,38 @@ write down about itself — and both of those were already the module's to decid
 Fourteen modules were deciding them fourteen times, in two files each, with the
 port literal duplicated between them.
 
+#### What a module starts for the person: `personEnv` (2.30.0)
+
+**Anything a module starts on the person's behalf uses `personEnv`.** A
+session, a shell, a command the person typed, a hook: start it with
+`env: personEnv()` (or `personEnv(base)` for an environment you built from
+`process.env`), never with `process.env` as it stands.
+
+The host starts an installed module with its own Bun first on the module's
+`PATH` — a folder holding a `bun` linked to the host binary, named in
+`KEHIKOT_HOST_PATH` (`HOST_PATH_ENV`) — and `BUN_BE_BUN=1`, which is what
+makes that compiled binary answer as Bun. `bun run` adds a `bun-node-*` folder
+of its own whose `bun` and `node` are the same binary. All of that is for the
+module's own process. A program the module starts inherits the folders, but not
+always the variable (Claude Code is a compiled Bun program and cannot keep
+it), and then `bun …` boots a second copy of the host instead of running the
+script it was given.
+
+`personEnv(env = process.env)` gives back the environment without it:
+
+- the folders `KEHIKOT_HOST_PATH` names come off `PATH`, one occurrence each
+  (the first), so the same folder further along, which is the person's, stays;
+- a folder whose `bun` or `node` resolves to this process's own runtime comes
+  off when that runtime is a compiled host rather than Bun or Node, and so does
+  a `bun-node-*` or `kehikot-bun-*` folder whose `bun` or `node` is this
+  runtime, whatever it is;
+- `BUN_BE_BUN` and `KEHIKOT_HOST_PATH` are dropped;
+- everything else is kept, so whatever the module adds on top (a
+  `TERM`, its own variables) it adds to what `personEnv` returns.
+
+A module's own builds and installs are not the person's and keep the
+environment they were given.
+
 ## Notes by symbol
 
 ### `src/serve/index.ts`
@@ -160,6 +192,9 @@ each.
 - `readJourneys` and `readJourney` open the file an epic's steps are kept
   in. Here because they read a disk, and for no other reason: the shape and
   the judgement are `journey.ts` behind the front door. See `journeys.ts`.
+
+- `personEnv` (2.30.0) is the environment for a program a module starts on
+  the person's behalf, without the host's own Bun. See above.
 
 - `writeHoldings` (1.2.0) is how a module publishes what it holds for an
   epic's parts, in `parts.json` in its own folder, and `readHoldings` is how

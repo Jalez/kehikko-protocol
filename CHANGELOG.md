@@ -7,6 +7,24 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.30.0 — 2026-10-28
+
+What a module starts for the person runs with the person's `bun` and `node`. **Additive**;
+`PROTOCOL` is still 2. A module on an older host gets the same result from the `PATH` checks alone;
+a host names what it prepends in `KEHIKOT_HOST_PATH` so the module need not guess.
+docs/serving.md#what-a-module-starts-for-the-person-personenv-2300.
+
+### Added
+
+- **`personEnv(env = process.env, { execPath })`** (`/serve`): the environment for a program a
+  module starts on the person's behalf. Takes off `PATH` the folders named in `KEHIKOT_HOST_PATH`
+  (the first occurrence of each), any `bun-node-*` or `kehikot-bun-*` folder whose `bun` or `node`
+  is the module's own runtime, and, when that runtime is a compiled host rather than Bun or Node,
+  any folder whose `bun` or `node` is it. Drops `BUN_BE_BUN` and `KEHIKOT_HOST_PATH`; keeps the
+  rest. **Anything a module starts on the person's behalf uses `personEnv`.**
+- **`HOST_PATH_ENV`** (`KEHIKOT_HOST_PATH`): the folders, joined by the path delimiter, a host put
+  first on a module's `PATH` for the module's own process.
+
 ## 2.29.0 — 2026-10-28
 
 A module's scope: what its content belongs to. **Additive**; `PROTOCOL` is still 2. A module that
