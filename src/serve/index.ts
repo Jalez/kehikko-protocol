@@ -167,5 +167,21 @@ export {
 } from './traffic.js'
 export { trafficTarget, trafficPath, trafficCommand } from '../traffic.js'
 
+/* A module telling its page something changed, over one held connection: a page never polls (2.32.0). */
+export {
+  attach,
+  eventFrame,
+  events,
+  publish,
+  streams,
+  watching,
+  EVENTS_BAD_TOPIC,
+  EVENTS_FULL,
+  MAX_EVENT_STREAMS,
+  MAX_TOPIC_LENGTH,
+  type EventRoute,
+  type Initial,
+} from './events.js'
+
 /* The environment for what a module starts on the person's behalf, without the host's own Bun. */
 export { personEnv, HOST_PATH_ENV, type PersonEnvOptions } from './person.js'

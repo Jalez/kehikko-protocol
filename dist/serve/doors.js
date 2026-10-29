@@ -7,6 +7,7 @@ import { fillPage, pageDocument } from './page.js';
 import { ticketOf } from './ticket.js';
 import { serverPassReply } from './ask.js';
 import { SERVER_PASS_PATH } from '../server-ask.js';
+import { eventFrame } from './events.js';
 export const PAGE_PATHS = ['/app', '/app/', '/'];
 const oursByDefault = (path) => path === '/healthz' || path === '/mcp' || path.startsWith('/api/');
 /** What both forms of the doors work out once, from the options. */
@@ -80,7 +81,7 @@ const STREAM_HEADERS = {
     connection: 'keep-alive',
     'x-accel-buffering': 'no',
 };
-const frame = (data, name) => `${name ? `event: ${name.replace(/[\r\n]/g, '')}\n` : ''}data: ${JSON.stringify(data)}\n\n`;
+const frame = eventFrame;
 /** What lets a page on another origin — an opaque one — read the health check, and the build on it. */
 const OPEN_HEALTH = { 'access-control-allow-origin': '*', 'access-control-expose-headers': BUILD_HEADER };
 /**

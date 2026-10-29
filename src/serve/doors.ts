@@ -7,6 +7,7 @@ import { fillPage, pageDocument, type PageOptions } from './page.js'
 import { ticketOf } from './ticket.js'
 import { serverPassReply } from './ask.js'
 import { SERVER_PASS_PATH } from '../server-ask.js'
+import { eventFrame } from './events.js'
 
 /**
  * Every door a module answers on, served by the process that serves its page: a module is ONE
@@ -189,8 +190,7 @@ const STREAM_HEADERS: Record<string, string> = {
   'x-accel-buffering': 'no',
 }
 
-const frame = (data: unknown, name?: string) =>
-  `${name ? `event: ${name.replace(/[\r\n]/g, '')}\n` : ''}data: ${JSON.stringify(data)}\n\n`
+const frame = eventFrame
 
 /** What lets a page on another origin — an opaque one — read the health check, and the build on it. */
 const OPEN_HEALTH: Record<string, string> = { 'access-control-allow-origin': '*', 'access-control-expose-headers': BUILD_HEADER }

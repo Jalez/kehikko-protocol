@@ -146,6 +146,14 @@ MCP door is reachable by any program on the computer, so it reads by default; a
 tool that writes says `readOnlyHint: false` and does only what the person would
 be glad an agent did.
 
+### A page never polls its module
+
+A page is told when something changed: the server puts topics on its stream
+door with `events` and `publish`es where its state changes (a write, a file
+watcher, a finished job), and the page `subscribe`s. No `setInterval` around a
+fetch of the module's own `/api`, no `refetchInterval`
+([events](events.md)).
+
 ### Agents never press what is the person's
 
 `agents: true` goes only on a harmless item: a view switch, a toggle, a jump.
