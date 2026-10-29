@@ -50,8 +50,8 @@ export declare const trafficNoteSchema: z.ZodObject<{
     bytesOut: z.ZodOptional<z.ZodNumber>;
     cache: z.ZodOptional<z.ZodEnum<["hit", "not-modified", "refused"]>>;
 }, "strip", z.ZodTypeAny, {
-    path: string;
     at: number;
+    path: string;
     status: number | null;
     host: string;
     kind: string;
@@ -62,8 +62,8 @@ export declare const trafficNoteSchema: z.ZodObject<{
     bytesOut?: number | undefined;
     cache?: "refused" | "hit" | "not-modified" | undefined;
 }, {
-    path: string;
     at: number;
+    path: string;
     host: string;
     kind: string;
     status?: number | null | undefined;
@@ -179,8 +179,8 @@ export declare const trafficCallSchema: z.ZodObject<{
         pid?: number | undefined;
     }>>>;
 }, "strip", z.ZodTypeAny, {
-    path: string;
     at: number;
+    path: string;
     status: number | null;
     by: string;
     host: string;
@@ -205,8 +205,8 @@ export declare const trafficCallSchema: z.ZodObject<{
         pid?: number | undefined;
     } | undefined;
 }, {
-    path: string;
     at: number;
+    path: string;
     by: string;
     host: string;
     kind: string;
@@ -1224,8 +1224,8 @@ export declare const trafficReadResult: z.ZodObject<{
             pid?: number | undefined;
         }>>>;
     }, "strip", z.ZodTypeAny, {
-        path: string;
         at: number;
+        path: string;
         status: number | null;
         by: string;
         host: string;
@@ -1250,8 +1250,8 @@ export declare const trafficReadResult: z.ZodObject<{
             pid?: number | undefined;
         } | undefined;
     }, {
-        path: string;
         at: number;
+        path: string;
         by: string;
         host: string;
         kind: string;
@@ -1961,8 +1961,8 @@ export declare const trafficReadResult: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     started: number;
     calls: {
-        path: string;
         at: number;
+        path: string;
         status: number | null;
         by: string;
         host: string;
@@ -2092,8 +2092,8 @@ export declare const trafficReadResult: z.ZodObject<{
 }, {
     started: number;
     calls: {
-        path: string;
         at: number;
+        path: string;
         by: string;
         host: string;
         kind: string;

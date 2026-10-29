@@ -69,12 +69,12 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     tool: z.ZodOptional<z.ZodString>;
     kind: z.ZodLiteral<"switch">;
 }, "strip", z.ZodTypeAny, {
-    id: string;
     value: string;
     options: {
         id: string;
         label: string;
     }[];
+    id: string;
     label: string;
     kind: "switch";
     agents: boolean;
@@ -83,12 +83,12 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     shortcut?: string | undefined;
     tool?: string | undefined;
 }, {
-    id: string;
     value: string;
     options: {
         id: string;
         label: string;
     }[];
+    id: string;
     label: string;
     kind: "switch";
     group?: string | undefined;
@@ -170,11 +170,11 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     tool: z.ZodOptional<z.ZodString>;
     kind: z.ZodLiteral<"go">;
 }, "strip", z.ZodTypeAny, {
-    id: string;
     options: {
         id: string;
         label: string;
     }[];
+    id: string;
     label: string;
     kind: "go";
     agents: boolean;
@@ -183,11 +183,11 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     shortcut?: string | undefined;
     tool?: string | undefined;
 }, {
-    id: string;
     options: {
         id: string;
         label: string;
     }[];
+    id: string;
     label: string;
     kind: "go";
     group?: string | undefined;
@@ -267,12 +267,12 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     confirm?: boolean | undefined;
     surface?: "fullscreen" | undefined;
 }>]>, {
-    id: string;
     value: string;
     options: {
         id: string;
         label: string;
     }[];
+    id: string;
     label: string;
     kind: "switch";
     agents: boolean;
@@ -291,11 +291,11 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     shortcut?: string | undefined;
     tool?: string | undefined;
 } | {
-    id: string;
     options: {
         id: string;
         label: string;
     }[];
+    id: string;
     label: string;
     kind: "go";
     agents: boolean;
@@ -319,12 +319,12 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     tool?: string | undefined;
     surface?: "fullscreen" | undefined;
 }, {
-    id: string;
     value: string;
     options: {
         id: string;
         label: string;
     }[];
+    id: string;
     label: string;
     kind: "switch";
     group?: string | undefined;
@@ -343,11 +343,11 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     agents?: boolean | undefined;
     tool?: string | undefined;
 } | {
-    id: string;
     options: {
         id: string;
         label: string;
     }[];
+    id: string;
     label: string;
     kind: "go";
     group?: string | undefined;
@@ -409,12 +409,12 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     tool: z.ZodOptional<z.ZodString>;
     kind: z.ZodLiteral<"switch">;
 }, "strip", z.ZodTypeAny, {
-    id: string;
     value: string;
     options: {
         id: string;
         label: string;
     }[];
+    id: string;
     label: string;
     kind: "switch";
     agents: boolean;
@@ -423,12 +423,12 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     shortcut?: string | undefined;
     tool?: string | undefined;
 }, {
-    id: string;
     value: string;
     options: {
         id: string;
         label: string;
     }[];
+    id: string;
     label: string;
     kind: "switch";
     group?: string | undefined;
@@ -510,11 +510,11 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     tool: z.ZodOptional<z.ZodString>;
     kind: z.ZodLiteral<"go">;
 }, "strip", z.ZodTypeAny, {
-    id: string;
     options: {
         id: string;
         label: string;
     }[];
+    id: string;
     label: string;
     kind: "go";
     agents: boolean;
@@ -523,11 +523,11 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     shortcut?: string | undefined;
     tool?: string | undefined;
 }, {
-    id: string;
     options: {
         id: string;
         label: string;
     }[];
+    id: string;
     label: string;
     kind: "go";
     group?: string | undefined;
@@ -607,12 +607,12 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     confirm?: boolean | undefined;
     surface?: "fullscreen" | undefined;
 }>]>, {
-    id: string;
     value: string;
     options: {
         id: string;
         label: string;
     }[];
+    id: string;
     label: string;
     kind: "switch";
     agents: boolean;
@@ -631,11 +631,11 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     shortcut?: string | undefined;
     tool?: string | undefined;
 } | {
-    id: string;
     options: {
         id: string;
         label: string;
     }[];
+    id: string;
     label: string;
     kind: "go";
     agents: boolean;
@@ -659,12 +659,12 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     tool?: string | undefined;
     surface?: "fullscreen" | undefined;
 }, {
-    id: string;
     value: string;
     options: {
         id: string;
         label: string;
     }[];
+    id: string;
     label: string;
     kind: "switch";
     group?: string | undefined;
@@ -683,11 +683,11 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     agents?: boolean | undefined;
     tool?: string | undefined;
 } | {
-    id: string;
     options: {
         id: string;
         label: string;
     }[];
+    id: string;
     label: string;
     kind: "go";
     group?: string | undefined;
@@ -711,12 +711,12 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     confirm?: boolean | undefined;
     surface?: "fullscreen" | undefined;
 }>, "many">, ({
-    id: string;
     value: string;
     options: {
         id: string;
         label: string;
     }[];
+    id: string;
     label: string;
     kind: "switch";
     agents: boolean;
@@ -735,11 +735,11 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     shortcut?: string | undefined;
     tool?: string | undefined;
 } | {
-    id: string;
     options: {
         id: string;
         label: string;
     }[];
+    id: string;
     label: string;
     kind: "go";
     agents: boolean;
@@ -763,12 +763,12 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     tool?: string | undefined;
     surface?: "fullscreen" | undefined;
 })[], ({
-    id: string;
     value: string;
     options: {
         id: string;
         label: string;
     }[];
+    id: string;
     label: string;
     kind: "switch";
     group?: string | undefined;
@@ -787,11 +787,11 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     agents?: boolean | undefined;
     tool?: string | undefined;
 } | {
-    id: string;
     options: {
         id: string;
         label: string;
     }[];
+    id: string;
     label: string;
     kind: "go";
     group?: string | undefined;
