@@ -217,6 +217,18 @@ describe('events: topics on the doors\' stream door, on both servers', () => {
     expect(watching()).toBe(0)
   })
 
+  test('`closed` is told once when the stream goes, after the topic forgot it: where a watcher is stopped', async () => {
+    const counts: number[] = []
+    const fetcher = doorsFetch({ ...options, stream: events(() => ({ topic: 'watched', closed: () => counts.push(watching('watched')) })) })
+    const abort = new AbortController()
+    const response = await fetcher(new Request('http://127.0.0.1/api/events', { signal: abort.signal }))
+    await readUntil(response!.body!, (t) => t.includes(': open'))
+    expect(watching('watched')).toBe(1)
+    abort.abort()
+    abort.abort()
+    expect(counts).toEqual([0])
+  })
+
   test('`streams` puts a module\'s own stream door beside its topics: the first that answers wins', async () => {
     const own: Stream = (method, path, _query, emit) => {
       if (path !== '/api/log') return null

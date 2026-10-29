@@ -56,6 +56,11 @@ export interface EventRoute {
      * a change. Leave it out to send nothing first.
      */
     initial?: Initial;
+    /**
+     * Called once when this stream closes, after the topic has forgotten it: `watching(topic)` is
+     * already the count without it. Where a module stops a file watcher nobody needs any more.
+     */
+    closed?: () => void;
 }
 /**
  * The doors' `stream` option, from a route: `(path, query, ticket) => { topic, initial } | null`,

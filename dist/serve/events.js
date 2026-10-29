@@ -165,7 +165,23 @@ export function events(route) {
         const held = attach(to.topic, emit, to.initial);
         if (!held)
             return { reply: { status: 503, body: { ok: false, error: EVENTS_FULL }, headers: { 'retry-after': '5' } } };
-        return held;
+        if (!to.closed)
+            return held;
+        let done = false;
+        return {
+            close: () => {
+                held.close();
+                if (done)
+                    return;
+                done = true;
+                try {
+                    to.closed?.();
+                }
+                catch {
+                    /* The module's own clean-up; the stream is closed either way. */
+                }
+            },
+        };
     };
 }
 /**

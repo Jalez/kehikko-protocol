@@ -17,7 +17,8 @@ A page never polls its module. **Additive**; `PROTOCOL` is still 2. Built on the
 - **`events(route)`** (`/serve`): a `Stream` for `doors({ stream })` and `run({ stream })`.
   `route(path, query, ticket)` returns `{ topic, initial? }` (`EventRoute`) or `null`; `GET` only.
   `initial` (a value, or a function that may be async) is sent first on every open, and what is
-  published meanwhile waits behind it. A bad topic is a 400 (`EVENTS_BAD_TOPIC`, `MAX_TOPIC_LENGTH`).
+  published meanwhile waits behind it. `closed` on the route is called once when that stream closes,
+  after the topic forgot it (where a file watcher is stopped). A bad topic is a 400 (`EVENTS_BAD_TOPIC`, `MAX_TOPIC_LENGTH`).
 - **`publish(topic, data, name?)`**: one event to every stream on the topic; returns how many it
   reached. **`watching(topic?)`**: how many streams are open on a topic, or on all.
 - **`MAX_EVENT_STREAMS`** (64) per process: past it a stream is a 503 with `retry-after: 5`

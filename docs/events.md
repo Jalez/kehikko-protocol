@@ -49,6 +49,8 @@ publish(`board:${project}`, readBoard(project))
 - **`initial`** is a value, or a function asked as the stream opens (it may be async; what is
   published meanwhile waits behind it, in order). It is sent first, every time a stream opens, so a
   page that reconnects — after a drop, or after being hidden — is never behind.
+- **`closed`** on the route is called once when that stream closes, after the topic forgot it, so
+  `watching(topic) === 0` there means the last page left: where a module stops its file watcher.
 - **`publish(topic, data, name?)`** sends `data` (JSON) to every stream on `topic` and returns how
   many it reached. Publish the new state when it is small; publish a hint (`{ changed: 'cards' }`)
   and let the page read the door it already reads when it is large.
