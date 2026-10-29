@@ -1,5 +1,10 @@
 # Every push to main and every pull request: build, prove the committed dist/
-# is what the source builds, typecheck, test.
+# is what the source builds, typecheck, test. Then, on a push to main only, tag
+# the release: when package.json's version is newer than every vX.Y.Z tag and
+# CHANGELOG.md has its "## X.Y.Z" entry, the annotated tag vX.Y.Z is created on
+# the pushed commit (Jalez/kehikko-desktop/.github/actions/tag-on-merge).
+# Consumers install a tag (`#vX.Y.Z`), so the tag is the release. Nobody tags by
+# hand.
 #
 # dist/ is committed because consumers install this package straight from git
 # and cannot build it themselves (PACKAGING.md). A dist/ that has drifted from
@@ -15,9 +20,11 @@ on:
 permissions:
   contents: read
 
+# A newer push cancels an older pull request run, never a run on main: that
+# one may be about to tag a release.
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   check:
@@ -44,3 +51,21 @@ jobs:
 
       - name: Test
         run: bun test
+
+  tag:
+    needs: check
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && !github.event.repository.fork
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: protocol-tag
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: Jalez/kehikko-desktop/.github/actions/tag-on-merge@main
+        with:
+          changelog: CHANGELOG.md

@@ -252,13 +252,20 @@ Kehikot installs and updates modules from their GitHub releases.
    two plain sentences.`, about what a person notices. No hashes, PR numbers,
    file names, protocol versions or hype; "bug fixes and improvements", TODO and
    placeholders are refused.
-3. Open a pull request with both, and merge it.
-4. Tag the merge commit with an annotated tag and push it:
-   `git tag -a v<version> -m v<version> <merge-commit> && git push origin v<version>`.
-5. The release workflow (`Jalez/kehikko-desktop/.github/workflows/module-release.yml`)
-   checks the tag against `package.json` and `main`, checks the notes, typechecks
-   and tests, then publishes "<Name> <version>". Nothing is published when a
-   check fails: fix it on `main` and tag again.
+3. Open a pull request with both, and merge it. That is the release: nobody
+   tags by hand.
+4. The release workflow (`Jalez/kehikko-desktop/.github/workflows/module-release.yml`,
+   called from the module's `.github/workflows/release.yml` on a push to `main`)
+   sees that `package.json`'s version is newer than the latest `vX.Y.Z` tag and
+   that its notes exist, creates the annotated tag `v<version>` on the merge
+   commit, checks the notes, typechecks and tests, then publishes
+   "<Name> <version>" in the same run. Nothing is published when a check fails:
+   fix it in another PR (a newer version) and merge that.
+
+The repository's tag protection has to let GitHub Actions create `v*` tags
+(a ruleset bypass for the GitHub Actions app); without one, keep tagging by
+hand: `git tag -a v<version> -m v<version> <merge-commit> && git push origin v<version>`
+also releases.
 
 A private repository of another owner cannot call that shared workflow; copy its
 steps into the module's own `release.yml` instead.
