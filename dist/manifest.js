@@ -8,6 +8,7 @@ import { moduleSkillsSchema } from './skills.js';
 import { CONTEXT_SCOPES } from './context.js';
 import { settingsDeclarationSchema } from './settings.js';
 import { agentSessionsSchema, providesSchema } from './provides.js';
+import { holdsSchema, opensSchema } from './abilities.js';
 import { navigatesSchema, showsSchema } from './show.js';
 import { modeScopeSchema, scopeSaysSchema, supportedScopes } from './scope.js';
 /**
@@ -269,6 +270,19 @@ const manifestFields = z.object({
      * that does not parse is dropped, not fatal.
      */
     events: inboxEventsSchema.optional().catch(undefined),
+    /**
+     * 2.33.0. What this module can open when the host points the canvas at it (`OPENS`: `file`). A host
+     * with a file to show a person offers to open it with a module that says `file`, and names none.
+     * What the module says about itself, at the top level like `shows` and for the same reason: a host
+     * before 2.33.0 ignores it and runs the module. Optional; one that does not parse is dropped.
+     */
+    opens: opensSchema.optional().catch(undefined),
+    /**
+     * 2.33.0. What this module holds that a restart of it ends (`HOLDS`: `live-sessions`). A host does
+     * not restart such a module on its own account, and says so when a person's press would. Top-level,
+     * optional, dropped when it does not parse, like `opens`.
+     */
+    holds: holdsSchema.optional().catch(undefined),
     /**
      * The scopes this module can work at, as modes: one per scope, the default first (2.29.0; see
      * `modeSchema.scope`). Required, at least one, so a host older than 2.29.0 still parses it.

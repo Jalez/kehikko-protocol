@@ -371,23 +371,41 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         id: z.ZodString;
         says: z.ZodString;
         state: z.ZodEnum<["working", "attention", "done"]>;
+        sound: z.ZodCatch<z.ZodOptional<z.ZodString>>;
     }, "strip", z.ZodTypeAny, {
         id: string;
         says: string;
         state: "working" | "attention" | "done";
+        sound?: string | undefined;
     }, {
         id: string;
         says: string;
         state: "working" | "attention" | "done";
+        sound?: unknown;
     }>, "many">, {
         id: string;
         says: string;
         state: "working" | "attention" | "done";
+        sound?: string | undefined;
     }[], {
         id: string;
         says: string;
         state: "working" | "attention" | "done";
+        sound?: unknown;
     }[]>>>;
+    /**
+     * 2.33.0. What this module can open when the host points the canvas at it (`OPENS`: `file`). A host
+     * with a file to show a person offers to open it with a module that says `file`, and names none.
+     * What the module says about itself, at the top level like `shows` and for the same reason: a host
+     * before 2.33.0 ignores it and runs the module. Optional; one that does not parse is dropped.
+     */
+    opens: z.ZodCatch<z.ZodOptional<z.ZodEffects<z.ZodArray<z.ZodString, "many">, string[], string[]>>>;
+    /**
+     * 2.33.0. What this module holds that a restart of it ends (`HOLDS`: `live-sessions`). A host does
+     * not restart such a module on its own account, and says so when a person's press would. Top-level,
+     * optional, dropped when it does not parse, like `opens`.
+     */
+    holds: z.ZodCatch<z.ZodOptional<z.ZodEffects<z.ZodArray<z.ZodString, "many">, string[], string[]>>>;
     /**
      * The scopes this module can work at, as modes: one per scope, the default first (2.29.0; see
      * `modeSchema.scope`). Required, at least one, so a host older than 2.29.0 still parses it.
@@ -534,8 +552,8 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             scope: z.ZodDefault<z.ZodEnum<["project", "machine"]>>;
             personOnly: z.ZodDefault<z.ZodBoolean>;
         }, "strip", z.ZodTypeAny, {
-            key: string;
             type: "string" | "number" | "boolean" | "choice" | "list";
+            key: string;
             label: string;
             scope: "project" | "machine";
             description: string;
@@ -546,8 +564,8 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                 label: string;
             }[] | undefined;
         }, {
-            key: string;
             type: "string" | "number" | "boolean" | "choice" | "list";
+            key: string;
             label: string;
             default?: unknown;
             scope?: "project" | "machine" | undefined;
@@ -558,8 +576,8 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             }[] | undefined;
             personOnly?: boolean | undefined;
         }>, {
-            key: string;
             type: "string" | "number" | "boolean" | "choice" | "list";
+            key: string;
             label: string;
             scope: "project" | "machine";
             description: string;
@@ -570,8 +588,8 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                 label: string;
             }[] | undefined;
         }, {
-            key: string;
             type: "string" | "number" | "boolean" | "choice" | "list";
+            key: string;
             label: string;
             default?: unknown;
             scope?: "project" | "machine" | undefined;
@@ -582,8 +600,8 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             }[] | undefined;
             personOnly?: boolean | undefined;
         }>, "many">, {
-            key: string;
             type: "string" | "number" | "boolean" | "choice" | "list";
+            key: string;
             label: string;
             scope: "project" | "machine";
             description: string;
@@ -594,8 +612,8 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                 label: string;
             }[] | undefined;
         }[], {
-            key: string;
             type: "string" | "number" | "boolean" | "choice" | "list";
+            key: string;
             label: string;
             default?: unknown;
             scope?: "project" | "machine" | undefined;
@@ -622,8 +640,8 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         storage: boolean;
         provides?: string[] | undefined;
         settings?: {
-            key: string;
             type: "string" | "number" | "boolean" | "choice" | "list";
+            key: string;
             label: string;
             scope: "project" | "machine";
             description: string;
@@ -697,8 +715,8 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         storage: boolean;
         provides?: string[] | undefined;
         settings?: {
-            key: string;
             type: "string" | "number" | "boolean" | "choice" | "list";
+            key: string;
             label: string;
             scope: "project" | "machine";
             description: string;
@@ -737,6 +755,8 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         scope: "epic" | "kehikko" | "project" | "part" | "machine";
         scopeSays?: string | undefined;
     }[];
+    opens?: string[] | undefined;
+    holds?: string[] | undefined;
     build?: {
         version: string;
         commit: string | null;
@@ -764,6 +784,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         id: string;
         says: string;
         state: "working" | "attention" | "done";
+        sound?: string | undefined;
     }[] | undefined;
 }, {
     id: string;
@@ -777,6 +798,8 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         scope?: unknown;
         scopeSays?: unknown;
     }[];
+    opens?: unknown;
+    holds?: unknown;
     build?: unknown;
     version?: string | undefined;
     summary?: string | undefined;
@@ -837,8 +860,8 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         storage: boolean;
         provides?: string[] | undefined;
         settings?: {
-            key: string;
             type: "string" | "number" | "boolean" | "choice" | "list";
+            key: string;
             label: string;
             scope: "project" | "machine";
             description: string;
@@ -877,6 +900,8 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         scope: "epic" | "kehikko" | "project" | "part" | "machine";
         scopeSays?: string | undefined;
     }[];
+    opens?: string[] | undefined;
+    holds?: string[] | undefined;
     build?: {
         version: string;
         commit: string | null;
@@ -904,6 +929,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         id: string;
         says: string;
         state: "working" | "attention" | "done";
+        sound?: string | undefined;
     }[] | undefined;
 }, {
     id: string;
@@ -917,6 +943,8 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         scope?: unknown;
         scopeSays?: unknown;
     }[];
+    opens?: unknown;
+    holds?: unknown;
     build?: unknown;
     version?: string | undefined;
     summary?: string | undefined;

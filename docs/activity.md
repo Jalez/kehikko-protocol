@@ -191,6 +191,25 @@ events: [{ id: 'research-complete', says: 'Research complete', state: 'done' }] 
   key as a declaration from a newer protocol and would say it is too old to run the module. `ACTIVITY_FIELD_SINCE.event` says which
   version a host has to be to act on it.
 
+### An event's own sound (2.33.0)
+
+An event may say which of the host's built-in sounds it plays before the person chooses one:
+
+```ts
+events: [{ id: 'research-complete', says: 'Research complete', state: 'done', sound: 'answer' }]
+```
+
+- **`sound`**: a key of `EVENT_SOUNDS` (`bell`, `marimba`, `pluck`, `twotone`, `rising`, `playful`,
+  `answer`), at most `LIMITS.SOUND_KEY` (24) lowercase letters and digits (`SOUND_KEY`). A free
+  string like `shows`: a key a later version adds parses. One that does not parse is dropped and the
+  event kept.
+- **What a host does with it**: plays that sound for the event until the person chooses another, and
+  says so in its picker. A key the host does not have plays the item's kind's sound
+  (`eventSoundOf(event, known)`). The person's choice always wins. A host keeps no table of event ids
+  of its own: the module picks.
+- **An older host** strips `sound` (`events` items are plain objects), and plays its own default.
+  Not in `DECLARATION_SINCE`.
+
 ## What a host does with items
 
 The spec for a host's inbox; the protocol cannot enforce it.

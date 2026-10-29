@@ -7,6 +7,26 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.33.0 — 2026-10-29
+
+What a host used to know about modules by id, said by the modules themselves. **Additive**; `PROTOCOL`
+is still 2. All three are top-level manifest fields (or on an `events` entry), not under `declares`,
+so a host before 2.33.0 ignores them and runs the module; none is in `DECLARATION_SINCE`.
+docs/manifest.md, docs/activity.md.
+
+### Added
+
+- **`opens`** (`opensSchema`, `OPENS`: `file`, `LIMITS.OPENS`): what a module can open when the host
+  points the canvas at it. A host with a file to show a person offers to open it with a module that
+  says `file`. `opensOf(manifest)`, `canOpen(manifest, what)`.
+- **`holds`** (`holdsSchema`, `HOLDS`: `live-sessions`, `LIMITS.HOLDS`): what a restart of the module
+  ends. A host does not restart such a module on its own account, and says so on a press that would.
+  `holdsOf(manifest)`, `holdsLiveSessions(manifest)`.
+- **`events[].sound`** (`EVENT_SOUNDS`, `SOUND_KEY`, `LIMITS.SOUND_KEY`, type `EventSound`): the
+  host's built-in sound an event plays until the person chooses one. A bad key is dropped, the event
+  kept. `eventSoundOf(event, known)`: the key when the host has it, else null (the kind's sound).
+- Exports: `type Opens`, `type Holds`, `type AbleManifest`.
+
 ## 2.32.0 — 2026-10-29
 
 A page never polls its module. **Additive**; `PROTOCOL` is still 2. Built on the doors' `stream` door

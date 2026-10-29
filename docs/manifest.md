@@ -350,6 +350,34 @@ older host runs it and treats its items by their state, so it is not in `DECLARA
 it is not under `declares`, whose unknown keys an older host's `fitOf` reads as too new to run. A list
 that does not parse is dropped. See [activity](activity.md#named-events-2310).
 
+Since 2.33.0 an event may also say `sound`, one of the host's built-in sounds (`EVENT_SOUNDS`), to
+play until the person chooses one. See [activity](activity.md#an-events-own-sound-2330).
+
+### What a module opens, and what a restart of it ends (2.33.0)
+
+Two words a module says about itself so a host can act without naming it, both at the top level
+beside `shows` and `events`:
+
+```ts
+opens: ['file']            // an Editor-like module
+holds: ['live-sessions']   // a terminal, an agent module
+```
+
+- **`opens`** (`OPENS`): what the module can open when the host points the canvas at it. `file` is a
+  file of the project, by its path, pointed at as a `context.passage` with a `path` by the host. A
+  host with a file to show a person (a module's settings file) offers to open it with a module that
+  says `file` — one on the kehikko, or one it places there for that press — and otherwise shows the
+  file itself. `opensOf(manifest)`, `canOpen(manifest, 'file')`.
+- **`holds`** (`HOLDS`): what a restart of the module ends. `live-sessions` is shells or agent
+  conversations running in the module's own process. A host never restarts such a module on its own
+  account (an automatic update waits for its sessions to end), and a press that restarts it says it
+  ends them. `holdsOf(manifest)`, `holdsLiveSessions(manifest)`.
+
+Free words like `shows` (at most `LIMITS.OPENS` and `LIMITS.HOLDS`, 8 each, each once): a host acts
+on the words it knows. A list that does not parse is dropped, not fatal. A host before 2.33.0
+ignores both and runs the module, so neither is in `DECLARATION_SINCE`; NOT under `declares`, whose
+unknown keys an older host's `fitOf` reads as too new.
+
 ### A module's settings (2.15.0)
 
 `declares.settings` lists the settings a person can see and change from the host: each field's key, label, sentence, type (`boolean`, `string`, `number`, `choice`, `list`), default, scope (`project` or `machine`) and whether only a person may change it. The host draws one form from it and asks the module to read and write the values at its door. Optional; a list that does not parse is dropped and the rest of the manifest is read. See [settings](settings.md).

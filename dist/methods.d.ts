@@ -1296,8 +1296,8 @@ export declare const methodParams: {
             bytesOut: z.ZodOptional<z.ZodNumber>;
             cache: z.ZodOptional<z.ZodEnum<["hit", "not-modified", "refused"]>>;
         }, "strip", z.ZodTypeAny, {
-            path: string;
             at: number;
+            path: string;
             status: number | null;
             host: string;
             kind: string;
@@ -1308,8 +1308,8 @@ export declare const methodParams: {
             bytesOut?: number | undefined;
             cache?: "refused" | "hit" | "not-modified" | undefined;
         }, {
-            path: string;
             at: number;
+            path: string;
             host: string;
             kind: string;
             status?: number | null | undefined;
@@ -1322,8 +1322,8 @@ export declare const methodParams: {
         }>, "many">;
     }, "strip", z.ZodTypeAny, {
         calls: {
-            path: string;
             at: number;
+            path: string;
             status: number | null;
             host: string;
             kind: string;
@@ -1336,8 +1336,8 @@ export declare const methodParams: {
         }[];
     }, {
         calls: {
-            path: string;
             at: number;
+            path: string;
             host: string;
             kind: string;
             status?: number | null | undefined;
@@ -1702,8 +1702,8 @@ export declare const pickedProject: z.ZodObject<{
     name: z.ZodDefault<z.ZodString>;
     id: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    name: string;
     path: string;
+    name: string;
     id?: string | undefined;
 }, {
     path: string;
@@ -1723,8 +1723,8 @@ export declare const projectPickResult: z.ZodObject<{
         name: z.ZodDefault<z.ZodString>;
         id: z.ZodOptional<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
-        name: string;
         path: string;
+        name: string;
         id?: string | undefined;
     }, {
         path: string;
@@ -1734,8 +1734,8 @@ export declare const projectPickResult: z.ZodObject<{
     why: z.ZodDefault<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     project: {
-        name: string;
         path: string;
+        name: string;
         id?: string | undefined;
     } | null;
     outcome: "declined" | "picked" | "cancelled";

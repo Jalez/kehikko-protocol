@@ -154,6 +154,10 @@ export declare const LIMITS: {
     readonly NAVIGATES: 8;
     /** How many subjects one manifest's `shows` may list (2.28.0). */
     readonly SHOWS: 8;
+    /** How many words one manifest's `opens` may list (2.33.0). */
+    readonly OPENS: 8;
+    /** How many words one manifest's `holds` may list (2.33.0). */
+    readonly HOLDS: 8;
     /** The id of one thing a `view.goto` asks to have shown (2.28.0): an agent session's id. */
     readonly SHOW_ID: 128;
     /** How many runs one `runs.json` is read for (2.27.0); a publisher keeps its newest. */
@@ -277,6 +281,8 @@ export declare const LIMITS: {
     readonly EVENT_ID: 40;
     /** What an Inbox event is called for a person (2.31.0): `Research complete`. */
     readonly EVENT_SAYS: 40;
+    /** A built-in sound's key on an Inbox event (2.33.0): `answer`. */
+    readonly SOUND_KEY: 24;
     /** How many Inbox events one manifest may declare (2.31.0). */
     readonly EVENTS: 16;
     /** How many parts one place (`place.parts`, a `view.goto`'s `parts`) may name. */

@@ -31,14 +31,39 @@ export type ActivityPriority = (typeof ACTIVITY_PRIORITIES)[number]
 export const EVENT_ID = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/
 
 /**
+ * The sounds a host has built in, by key (2.33.0): what an Inbox event may ask to play before the
+ * person chooses one (`sound` on an event). Each is a short tune a host plays the same way for any
+ * kind of item or event; the person can choose another, and a host plays the item's kind's sound for
+ * a key it does not have. Free strings on the wire, like `shows`: a key a later version adds parses.
+ */
+export const EVENT_SOUNDS = {
+  bell: 'Three rising notes, bright.',
+  marimba: 'Three notes, warm and wooden.',
+  pluck: 'Three falling notes, soft.',
+  twotone: 'Two notes, down a fourth.',
+  rising: 'Four notes up an octave, insistent.',
+  playful: 'Five quick notes, light.',
+  answer: 'A question, then its answer: up a fifth, a step back, then the octave.',
+} as const
+export type EventSound = keyof typeof EVENT_SOUNDS
+
+/** The shape of a sound's key (2.33.0): a lowercase letter, then lowercase letters and digits. */
+export const SOUND_KEY = /^[a-z][a-z0-9]*$/
+
+/**
  * One Inbox event a module declares (2.31.0, `events`): a named case of one state that a
  * person can tell apart and give its own sound. `says` is what the host calls it ("Research
  * complete"), `state` the state an item carrying it is in. A module's own words, shown as text.
+ *
+ * `sound` (2.33.0) is the host's built-in sound the event plays until the person chooses one
+ * (`EVENT_SOUNDS`: `answer`). Optional; absent, or a key the host does not have, plays the kind's.
+ * One that does not parse is dropped and the event kept. A host before 2.33.0 strips it.
  */
 export const inboxEventSchema = z.object({
   id: z.string().max(LIMITS.EVENT_ID).regex(EVENT_ID, 'an event id is lowercase letters, digits and single dashes'),
   says: z.string().trim().min(1).max(LIMITS.EVENT_SAYS),
   state: z.enum(ACTIVITY_STATES),
+  sound: z.string().max(LIMITS.SOUND_KEY).regex(SOUND_KEY).optional().catch(undefined),
 })
 export type InboxEvent = z.infer<typeof inboxEventSchema>
 
@@ -49,6 +74,15 @@ export const inboxEventsSchema = z
   .refine((events) => new Set(events.map((one) => one.id)).size === events.length, {
     message: 'an event is declared once',
   })
+
+/**
+ * The built-in sound a declared event asks to play before the person chooses one (2.33.0), or null:
+ * its `sound` when this host has a sound by that key (`known`), otherwise null — the kind's sound.
+ */
+export function eventSoundOf(event: Pick<InboxEvent, 'sound'> | null | undefined, known: (key: string) => boolean): string | null {
+  const key = event?.sound
+  return key && known(key) ? key : null
+}
 
 /**
  * The declared event an item is, or null: the item names an event (`event`), the module declares one
