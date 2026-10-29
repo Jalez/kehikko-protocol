@@ -206,6 +206,10 @@ export {
   inboxEventSchema,
   inboxEventsSchema,
   declaredEvent,
+  EVENT_SOUNDS,
+  SOUND_KEY,
+  eventSoundOf,
+  type EventSound,
   type InboxEvent,
   type ActivityItem,
   type ActivityState,
@@ -432,6 +436,21 @@ export {
   type Anchors,
   type Narrowed,
 } from './parts.js'
+
+/* What a module can open when pointed at, and what a restart of it ends (2.33.0). */
+export {
+  OPENS,
+  HOLDS,
+  opensSchema,
+  holdsSchema,
+  opensOf,
+  canOpen,
+  holdsOf,
+  holdsLiveSessions,
+  type Opens,
+  type Holds,
+  type AbleManifest,
+} from './abilities.js'
 
 /* Going to another project, and asking for one thing to be shown there (2.28.0). */
 export {
