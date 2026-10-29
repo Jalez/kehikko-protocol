@@ -54,6 +54,8 @@ export {
   type ServerStanding,
 } from './ask.js'
 export { follow, type Attachment, type FollowOptions } from './stream.js'
+/* The page half of `events`/`publish` (2.32.0): a page never polls its own module. */
+export { subscribe, type SubscribeOptions } from './subscribe.js'
 export { type Query, type QueryValue } from './query.js'
 export { applyTheme, pageTheme, systemTheme } from './theme.js'
 export { pageBuild } from './build.js'

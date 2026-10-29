@@ -7,6 +7,27 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.32.0 — 2026-10-29
+
+A page never polls its module. **Additive**; `PROTOCOL` is still 2. Built on the doors' `stream` door
+(its headers, opening comment, heartbeat, `setNoDelay`, close), which is unchanged. docs/events.md.
+
+### Added
+
+- **`events(route)`** (`/serve`): a `Stream` for `doors({ stream })` and `run({ stream })`.
+  `route(path, query, ticket)` returns `{ topic, initial? }` (`EventRoute`) or `null`; `GET` only.
+  `initial` (a value, or a function that may be async) is sent first on every open, and what is
+  published meanwhile waits behind it. A bad topic is a 400 (`EVENTS_BAD_TOPIC`, `MAX_TOPIC_LENGTH`).
+- **`publish(topic, data, name?)`**: one event to every stream on the topic; returns how many it
+  reached. **`watching(topic?)`**: how many streams are open on a topic, or on all.
+- **`MAX_EVENT_STREAMS`** (64) per process: past it a stream is a 503 with `retry-after: 5`
+  (`EVENTS_FULL`).
+- **`streams(...doors)`**: several stream doors as one, the first that answers wins.
+- **`attach(topic, deliver, initial?)`**: the hub itself, for a server that writes its own stream.
+- **`eventFrame(data, name?)`**: the one way an event is written; the doors use it.
+- **`subscribe(url, onEvent, options?)`** (`/client`): `follow` closed while `document.hidden` and
+  opened again when the page is shown (`whileHidden` keeps it open). Returns the unsubscribe.
+
 ## 2.31.0 — 2026-10-28
 
 Named Inbox events. **Additive**; `PROTOCOL` is still 2. An activity item stays one of its three

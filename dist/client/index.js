@@ -9,6 +9,8 @@ export { connect, mayGreet, pageOrigins, HostRefused, ANSWER_WITHIN_MS, PERSON_A
 /* A page asking its own server: the ticket, one fetch helper, one stream helper, the theme. */
 export { ask, answered, replied, probeServer, watchServer, ticket, AskFailed, onServerStanding, serverStanding, resetServerStanding, reloadStalePage, reloadWhenStale, STALE_RELOAD_MS, PAGE_STALE, PAGE_OLD, NOT_A_REPLY, CANCELLED, WATCH_SERVER_MS, KEEPALIVE_BYTES, SERVER_DOWN, } from './ask.js';
 export { follow } from './stream.js';
+/* The page half of `events`/`publish` (2.32.0): a page never polls its own module. */
+export { subscribe } from './subscribe.js';
 export {} from './query.js';
 export { applyTheme, pageTheme, systemTheme } from './theme.js';
 export { pageBuild } from './build.js';

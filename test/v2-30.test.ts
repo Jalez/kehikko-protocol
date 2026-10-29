@@ -39,7 +39,7 @@ const path = (...dirs: string[]) => dirs.join(delimiter)
 
 describe('the version', () => {
   test('is 2.30.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.31.0')
+    expect(PACKAGE_VERSION).toBe('2.32.0')
     expect(PROTOCOL).toBe(2)
   })
 })
