@@ -165,7 +165,7 @@ const SKIP = new Set(['node_modules', 'dist', 'build', 'coverage', 'test', 'test
 export function sourcesOf(dir: string): { path: string; text: string }[] {
   const out: { path: string; text: string }[] = []
   const walk = (at: string) => {
-    for (const entry of readdirSync(at, { withFileTypes: true })) {
+    for (const entry of readdirSync(at, { withFileTypes: true }).sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))) {
       if (entry.name.startsWith('.') || SKIP.has(entry.name)) continue
       const full = join(at, entry.name)
       if (entry.isDirectory()) walk(full)
