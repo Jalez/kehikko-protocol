@@ -189,6 +189,13 @@ export interface HostEvents {
    * nothing — or return the sentence saying why not. `connect` answers the host exactly once.
    */
   onPress?: (press: Pick<Press, 'item' | 'value'>) => PressAnswer | Promise<PressAnswer>
+  /**
+   * The person opened one of this module's Inbox items (2.35.0): pressed it in the Inbox, on a
+   * toast or with Next, and the host has gone to its place. `item` is the id the module reported.
+   * Show that thing and count it as seen; nothing is answered. What the host shows next is still
+   * the module's next `activity` list. See `openedSchema`.
+   */
+  onOpened?: (opened: { item: string }) => void
 }
 
 /**
@@ -418,6 +425,11 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
 
     if (message.type === MESSAGE.REFRESH) {
       events.onRefresh?.()
+      return
+    }
+
+    if (message.type === MESSAGE.OPENED) {
+      events.onOpened?.({ item: message.item })
       return
     }
 

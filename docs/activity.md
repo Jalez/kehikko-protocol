@@ -41,6 +41,11 @@ type ActivityItem = {
   kehikko `key`. An item with no place belongs to the project.
 - **`since`** lets the host decide "seen": an item that re-enters `done` later has a new `since`
   and is unseen again.
+- **The same item** is one `id` from one module. It is the SAME, unchanged item — never news again,
+  no toast, no sound, and seen stays seen — for as long as its `state` and `since` stay as they were.
+  So `since` is when the thing entered its state, kept as it was across every re-send, a restart of
+  the module, and a change of which of the module's own parts says it. A `since` that moves without
+  the thing having left its state tells the host it happened again.
 - The answer is `activitySetResult`: `{ outcome: 'taken' | 'declined', taken, why }`, `ok: true` both
   ways. `taken` is how many items the host holds. A refusal for the grant is the usual one.
 
@@ -86,7 +91,8 @@ What follows is the spec for the host; the protocol cannot enforce it.
    sign: each mark carries its state as a word for assistive technology and the tooltip.
 6. **Pressing.** Pressing an item (in the menu or on its mark) goes to its place with `view.goto`
    (`epic`, `parts`, `kehikko`); an item with no place shows its module's container. That also
-   counts as seen for a `done` item.
+   counts as seen for a `done` item. Once there, the host tells the item's module so
+   (`kehikot.opened`, 2.35.0; see below).
 7. **No standing rows.** Marks are small dots on what already exists (pickers, tabs, headers). The list
    itself lives in one host menu, worst first, then most recent `since`, each row: dot, label, module,
    place; `detail` is its tooltip.
@@ -95,6 +101,23 @@ What follows is the spec for the host; the protocol cannot enforce it.
    pressable by an agent beyond what `press_item` already is.
 9. **Grant.** The call is answered only when `declares.uses` named `activity:report` (as every
    capability); `hello.answers` lists `activity.set` for such a module.
+
+## The person opened an item (2.35.0)
+
+`attention` is never cleared by the host: the module says when it stops needing the person. But a
+module cannot tell "the person came here because of my item" from "the person came here", and the
+thing an item is about (one of several sessions at a place, say) may not be what the module shows on
+arrival. So when the person opens an item — presses it in the Inbox, on a toast, or with Next — the
+host, once it has gone to the item's place, sends the module's pages there:
+
+```ts
+{ type: 'kehikot.opened', protocol: 2, item: string }   // openedSchema; `item` is the item's `id`
+```
+
+Fire and forget; nothing answers it. The client hands it to `onOpened({ item })` (`connect`,
+`useHost`, `hostStore`). A module shows that thing and counts it as seen, then says so the usual way:
+its next list drops the item or moves it on. An id it no longer has is ignored. A host before 2.35.0
+sends nothing, and a module before it drops the message unread (`HOST_MESSAGES`).
 
 ## Across projects (1.8.0)
 

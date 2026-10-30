@@ -7,6 +7,21 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.35.0 — 2026-10-30
+
+The host tells a module which of its Inbox items the person opened. **Additive**; `PROTOCOL` is
+still 2. docs/activity.md, "The person opened an item".
+
+### Added
+
+- **`kehikot.opened`** (`MESSAGE.OPENED`, in `HOST_MESSAGES`; `openedSchema`, type `Opened`):
+  host → module, `{ protocol, item }`, sent once the host has gone to the place of an item the person
+  pressed in the Inbox, on a toast or with Next. `item` is the item's `id`. Not answered. A module
+  before 2.35.0 drops it unread.
+- **`onOpened({ item })`** on `connect`'s events, `useHost` and `hostStore`.
+- docs/activity.md says what "the same item" is: one `id` from one module, unchanged while its
+  `state` and `since` are, so a module keeps `since` across re-sends and its own restarts.
+
 ## 2.34.0 — 2026-10-30
 
 Where a change's pipeline is and when it last moved. **Additive**; `PROTOCOL` is still 2.

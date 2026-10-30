@@ -928,6 +928,44 @@ describe('the offer to read this page’s material again', () => {
   })
 })
 
+describe('an Inbox item the person opened (2.35.0)', () => {
+  test('reaches the page with the item id, and is not answered', () => {
+    const { source, deliver } = fakeWindow()
+    const host = speaker()
+    const heard: { item: string }[] = []
+    attach({ onOpened: (opened) => heard.push(opened) }, { source })
+    deliver(hello(host))
+    host.said.length = 0
+
+    deliver({ data: { type: MESSAGE.OPENED, protocol: PROTOCOL, item: 'session-1' }, origin: 'null', source: host })
+    expect(heard).toEqual([{ item: 'session-1' }])
+    expect(host.said).toEqual([])
+  })
+
+  test('from a window that never greeted us, or without an item, is ignored', () => {
+    const { source, deliver } = fakeWindow()
+    const host = speaker()
+    const stranger = speaker()
+    const heard: { item: string }[] = []
+    attach({ onOpened: (opened) => heard.push(opened) }, { source })
+    deliver(hello(host))
+
+    deliver({ data: { type: MESSAGE.OPENED, protocol: PROTOCOL, item: 'session-1' }, origin: 'null', source: stranger })
+    deliver({ data: { type: MESSAGE.OPENED, protocol: PROTOCOL, item: '' }, origin: 'null', source: host })
+    expect(heard).toEqual([])
+  })
+
+  test('at a page with no handler is silence, not an error', () => {
+    const { source, deliver } = fakeWindow()
+    const host = speaker()
+    attach({}, { source })
+    deliver(hello(host))
+    expect(() =>
+      deliver({ data: { type: MESSAGE.OPENED, protocol: PROTOCOL, item: 'x' }, origin: 'null', source: host }),
+    ).not.toThrow()
+  })
+})
+
 describe('a question that waits on a person', () => {
   /*
    * `projects.pick` is answered when somebody has read a list and decided, and

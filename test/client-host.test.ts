@@ -369,6 +369,14 @@ describe('useHost: asking and being asked', () => {
     expect(heard).toEqual(['clear', 'refresh'])
   })
 
+  test('onOpened reaches the page with the item it names', async () => {
+    const { box, post } = inbox(speaker(), hello(CONTEXT))
+    const heard: string[] = []
+    await render({ onOpened: (opened) => heard.push(opened.item) }, { source: box })
+    await act(async () => post({ type: MESSAGE.OPENED, protocol: PROTOCOL, item: 'abc' }))
+    expect(heard).toEqual(['abc'])
+  })
+
   test('point says which passage, and says nothing to nobody', async () => {
     const host = speaker()
     const page = await render({}, { source: inbox(host, hello(CONTEXT)).box })

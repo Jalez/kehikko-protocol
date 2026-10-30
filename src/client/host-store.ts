@@ -316,6 +316,9 @@ export function hostStore<Kept = unknown>(
           onRefresh: () => {
             if (!stopped) events.onRefresh?.()
           },
+          onOpened: (opened) => {
+            if (!stopped) events.onOpened?.(opened)
+          },
           /* Only when the page takes presses: without a listener the connection answers for it. */
           ...(events.onPress ? { onPress: (press) => (stopped ? false : events.onPress!(press)) } : {}),
         },

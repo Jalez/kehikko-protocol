@@ -86,6 +86,13 @@ export const MESSAGE = {
     PRESS: 'kehikot.press',
     /** Module → host. "I took that press", or "I did not, and here is why." One per `press`, by its `id`. */
     PRESSED: 'kehikot.pressed',
+    /**
+     * Host → module (2.35.0). "The person opened this Inbox item of yours": they pressed it in the
+     * Inbox, on a toast or with Next, and the host has gone to its place. Carries the item's `id` as
+     * the module reported it; no correlation id and no answer. The module may show that thing and
+     * count it as seen; whether the item stays is still the module's next list.
+     */
+    OPENED: 'kehikot.opened',
 };
 /** The prefix every message type carries, so a listener can drop the rest cheaply. There is one spelling. */
 export const MESSAGE_PREFIX = 'kehikot.';
@@ -106,6 +113,7 @@ export const HOST_MESSAGES = [
     MESSAGE.CLEAR,
     MESSAGE.REFRESH,
     MESSAGE.PRESS,
+    MESSAGE.OPENED,
 ];
 /** And what the module says. */
 export const MODULE_MESSAGES = [
