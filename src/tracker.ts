@@ -298,6 +298,18 @@ export const trackerRowSchema = z.object({
   contributedBy: z.array(ref).max(LIMITS.TRACKER_LINKS).optional().catch(undefined),
   /** On a change: its head pipeline. Absent on issues and where none ran or none was read. */
   pipeline: z.enum(PIPELINE_STATES).optional(),
+  /**
+   * On a change with a `pipeline`: where a person sees it on its tracker (2.34.0), `https:` — the
+   * pipeline's own page where the tracker has one, else the change's checks page. Absent when the
+   * host could not spell one; dropped, not fatal, when it does not parse.
+   */
+  pipelineUrl: z.string().max(LIMITS.URL).optional().catch(undefined),
+  /**
+   * On a change with a `pipeline`: when its state last moved (2.34.0) — when it finished, else when
+   * it started, else when it was made. Absent when the tracker did not say; dropped, not fatal,
+   * when it does not parse.
+   */
+  pipelineAt: instant.optional().catch(undefined),
   /** On a change: where its review stands. */
   review: z.enum(REVIEW_STATES).optional(),
   /**

@@ -136,6 +136,8 @@ export const TRACKER_FIELD_SINCE = {
   branches: '2.19.0',
   contributes: '2.26.0',
   contributedBy: '2.26.0',
+  pipelineUrl: '2.34.0',
+  pipelineAt: '2.34.0',
 } as const
 export type TrackerField = keyof typeof TRACKER_FIELD_SINCE
 
