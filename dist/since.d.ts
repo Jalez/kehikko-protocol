@@ -126,6 +126,8 @@ export declare const TRACKER_FIELD_SINCE: {
     readonly branches: "2.19.0";
     readonly contributes: "2.26.0";
     readonly contributedBy: "2.26.0";
+    readonly pipelineUrl: "2.34.0";
+    readonly pipelineAt: "2.34.0";
 };
 export type TrackerField = keyof typeof TRACKER_FIELD_SINCE;
 /**
@@ -246,6 +248,8 @@ export declare const SINCE: {
         readonly branches: "2.19.0";
         readonly contributes: "2.26.0";
         readonly contributedBy: "2.26.0";
+        readonly pipelineUrl: "2.34.0";
+        readonly pipelineAt: "2.34.0";
     };
     readonly activityFields: {
         readonly priority: "1.7.0";

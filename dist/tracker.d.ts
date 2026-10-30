@@ -371,6 +371,18 @@ export declare const trackerRowSchema: z.ZodObject<{
     contributedBy: z.ZodCatch<z.ZodOptional<z.ZodArray<z.ZodString, "many">>>;
     /** On a change: its head pipeline. Absent on issues and where none ran or none was read. */
     pipeline: z.ZodOptional<z.ZodEnum<["success", "failed", "running", "pending", "canceled", "skipped", "manual"]>>;
+    /**
+     * On a change with a `pipeline`: where a person sees it on its tracker (2.34.0), `https:` — the
+     * pipeline's own page where the tracker has one, else the change's checks page. Absent when the
+     * host could not spell one; dropped, not fatal, when it does not parse.
+     */
+    pipelineUrl: z.ZodCatch<z.ZodOptional<z.ZodString>>;
+    /**
+     * On a change with a `pipeline`: when its state last moved (2.34.0) — when it finished, else when
+     * it started, else when it was made. Absent when the tracker did not say; dropped, not fatal,
+     * when it does not parse.
+     */
+    pipelineAt: z.ZodCatch<z.ZodOptional<z.ZodString>>;
     /** On a change: where its review stands. */
     review: z.ZodOptional<z.ZodEnum<["approved", "changes-requested", "required"]>>;
     /**
@@ -645,6 +657,8 @@ export declare const trackerRowSchema: z.ZodObject<{
     contributes?: string[] | undefined;
     contributedBy?: string[] | undefined;
     pipeline?: "success" | "failed" | "running" | "pending" | "canceled" | "skipped" | "manual" | undefined;
+    pipelineUrl?: string | undefined;
+    pipelineAt?: string | undefined;
     column?: {
         name: string;
         board: string;
@@ -731,6 +745,8 @@ export declare const trackerRowSchema: z.ZodObject<{
     contributes?: unknown;
     contributedBy?: unknown;
     pipeline?: "success" | "failed" | "running" | "pending" | "canceled" | "skipped" | "manual" | undefined;
+    pipelineUrl?: unknown;
+    pipelineAt?: unknown;
     column?: {
         name: string;
         board: string;
@@ -953,6 +969,18 @@ export declare const trackerReadingResult: z.ZodObject<{
         contributedBy: z.ZodCatch<z.ZodOptional<z.ZodArray<z.ZodString, "many">>>;
         /** On a change: its head pipeline. Absent on issues and where none ran or none was read. */
         pipeline: z.ZodOptional<z.ZodEnum<["success", "failed", "running", "pending", "canceled", "skipped", "manual"]>>;
+        /**
+         * On a change with a `pipeline`: where a person sees it on its tracker (2.34.0), `https:` — the
+         * pipeline's own page where the tracker has one, else the change's checks page. Absent when the
+         * host could not spell one; dropped, not fatal, when it does not parse.
+         */
+        pipelineUrl: z.ZodCatch<z.ZodOptional<z.ZodString>>;
+        /**
+         * On a change with a `pipeline`: when its state last moved (2.34.0) — when it finished, else when
+         * it started, else when it was made. Absent when the tracker did not say; dropped, not fatal,
+         * when it does not parse.
+         */
+        pipelineAt: z.ZodCatch<z.ZodOptional<z.ZodString>>;
         /** On a change: where its review stands. */
         review: z.ZodOptional<z.ZodEnum<["approved", "changes-requested", "required"]>>;
         /**
@@ -1227,6 +1255,8 @@ export declare const trackerReadingResult: z.ZodObject<{
         contributes?: string[] | undefined;
         contributedBy?: string[] | undefined;
         pipeline?: "success" | "failed" | "running" | "pending" | "canceled" | "skipped" | "manual" | undefined;
+        pipelineUrl?: string | undefined;
+        pipelineAt?: string | undefined;
         column?: {
             name: string;
             board: string;
@@ -1313,6 +1343,8 @@ export declare const trackerReadingResult: z.ZodObject<{
         contributes?: unknown;
         contributedBy?: unknown;
         pipeline?: "success" | "failed" | "running" | "pending" | "canceled" | "skipped" | "manual" | undefined;
+        pipelineUrl?: unknown;
+        pipelineAt?: unknown;
         column?: {
             name: string;
             board: string;
@@ -1423,6 +1455,8 @@ export declare const trackerReadingResult: z.ZodObject<{
         contributes?: string[] | undefined;
         contributedBy?: string[] | undefined;
         pipeline?: "success" | "failed" | "running" | "pending" | "canceled" | "skipped" | "manual" | undefined;
+        pipelineUrl?: string | undefined;
+        pipelineAt?: string | undefined;
         column?: {
             name: string;
             board: string;
@@ -1527,6 +1561,8 @@ export declare const trackerReadingResult: z.ZodObject<{
         contributes?: unknown;
         contributedBy?: unknown;
         pipeline?: "success" | "failed" | "running" | "pending" | "canceled" | "skipped" | "manual" | undefined;
+        pipelineUrl?: unknown;
+        pipelineAt?: unknown;
         column?: {
             name: string;
             board: string;

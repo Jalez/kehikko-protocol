@@ -92,6 +92,13 @@ resolvable review threads — and `lastPushAt?`, when its head was last pushed
 (or its last commit's time where the tracker gives no push time). Absent is not
 zero: the host may not have read them.
 
+A change with a `pipeline` may also carry `pipelineUrl?` and `pipelineAt?`
+(2.34.0): where a person sees that pipeline (`https:`; the pipeline's page, or
+the change's checks page where the tracker has no single pipeline page) and
+when its state last moved (finished, else started, else made). Both come from
+the same reading as `pipeline`, with no call of their own; either may be absent
+when `pipeline` is there.
+
 ```ts
 const { rows } = await request('tracker.get', { project: true })
 const mine = rows.filter((r) => r.myRoles?.includes('reviewer-asked'))

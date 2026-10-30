@@ -7,6 +7,21 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.34.0 — 2026-10-30
+
+Where a change's pipeline is and when it last moved. **Additive**; `PROTOCOL` is still 2.
+docs/tracker.md, "People and my roles".
+
+### Added
+
+- **`pipelineUrl?: string`** on `trackerRowSchema`, on a change with a `pipeline`: where a person
+  sees it, `https:` — the pipeline's page, or the change's checks page where the tracker has no
+  single pipeline page. At most `LIMITS.URL`.
+- **`pipelineAt?: instant`** on `trackerRowSchema`: when the pipeline's state last moved —
+  finished, else started, else made.
+- Both from the same reading as `pipeline`, absent from older hosts, stripped by older readers, and
+  dropped, not fatal, when they do not parse. Both in `TRACKER_FIELD_SINCE` at 2.34.0.
+
 ## 2.33.0 — 2026-10-29
 
 What a host used to know about modules by id, said by the modules themselves. **Additive**; `PROTOCOL`

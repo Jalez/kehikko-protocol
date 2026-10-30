@@ -127,6 +127,8 @@ export const TRACKER_FIELD_SINCE = {
     branches: '2.19.0',
     contributes: '2.26.0',
     contributedBy: '2.26.0',
+    pipelineUrl: '2.34.0',
+    pipelineAt: '2.34.0',
 };
 /**
  * The fields of an activity item (`activityItemSchema`) added after `activity.set` first had a shape
