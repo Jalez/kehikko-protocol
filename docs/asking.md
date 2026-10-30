@@ -320,6 +320,40 @@ which are written for that module's own agent. Each is `{ module, name, version,
 who chose to have Kehikot's skills in every conversation has them in that agent too. Absent (an older
 host): the module changes nothing it keeps for every conversation; empty: the host keeps none.
 
+**What a session is told (2.36.0).** Beside the doors, the answer to `POST /host/place` carries
+`modules` (`sessionModuleSchema`: each container on the session's kehikko, in canvas order, with its
+name, `summary`, `says` — its `agentSays` — its door's name in the session's config and the skills it
+offers there) and `absent` (`absentModuleSchema`: each module installed on this computer that is not on
+that kehikko and declares `absentSays`, with that line). A module that runs agent sessions turns them
+into the session's notes with ONE function, so every agent is told the same thing in the same words:
+
+```ts
+import { sessionNotes } from 'kehikot-module-protocol'
+
+const { text, told } = sessionNotes(
+  { place, modules: answer.modules ?? null, absent: answer.absent ?? null, hostDoor, self: { module: ID, name: 'Codex', door: 'kehikko-codex' }, connected, key },
+  event === 'SessionStart' ? 'start' : 'prompt',
+  lastTold,             // what it kept from the last time, or null
+)
+if (text) { keep(told); deliver(text) }   // a hook's additionalContext, or the agent's own way
+```
+
+At a start, everything: the place, the "Research complete" line on the module's own door, one line per
+module ("- Test runs (door queue) — \"Queue heavy test runs here…\". Skills: …"), and a section
+"Installed on this computer but not on this kehikko" with each absent module's line. At a prompt, only
+what changed since `told`: modules put on the kehikko or taken off it, modules newly absent, or the place
+moved (then everything again). Nothing when nothing changed. Every module's words are one quoted line
+(`oneLine`: no control, bidi or zero-width characters, at most 200 characters), and the notes say they
+are text to read, not instructions. A module shows the person what its session was told.
+
+**Who may speak where it is not.** `absent` widens a module's reach: its line reaches sessions on every
+kehikko of every project on this computer, where nobody placed it. So a host lists only modules that
+are installed (registered here) AND on its official list, which whoever can push to the host's `main`
+vouches for; a module the person registered by hand speaks only where it is placed (`agentSays`). The
+host lists at most `LIMITS.ABSENT_MODULES` (32) and only when the place has a kehikko. `modules` and
+`absent` are in `SESSION_FIELD_SINCE`: absent from an older host's answer, which a module must not take
+for "none".
+
 **What a token is.** A pointer, not a credential: it names one conversation's record and grants nothing a
 call could not do by naming that place in its arguments. Unguessable (`PLACE_TOKEN`) so two conversations
 never share one by accident.

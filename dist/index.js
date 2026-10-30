@@ -22,6 +22,8 @@ export { TRACKERS, TRACKER_KINDS, TRACKER_STATES, TRACKER_DETAILS, PIPELINE_STAT
 export { PART_ID, partSchema, partsSchema, listedPartSchema, partListSchema, partIdFor, partsFor, PARTS_BEFORE_1_2, pickedParts, isFocused, refInFocus, partInFocus, focusCount, PAPER_MODULE, partFile, isPartFile, paperFileOf, partsOfFile, pickedFiles, fileInFocus, partDocument, isPartDocument, documentOf, pickedDocuments, anchorInFocus, narrowToFocus, emptySaid, focusSentence, FOCUS_WHERE, sameParts, } from './parts.js';
 /* What a module can open when pointed at, and what a restart of it ends (2.33.0). */
 export { OPENS, HOLDS, opensSchema, holdsSchema, opensOf, canOpen, holdsOf, holdsLiveSessions, } from './abilities.js';
+/* What an agent session is told about the modules around it, one wording for every agent module (2.36.0). */
+export { AGENT_SAYS_MAX, NOTES_MOST, agentSaysSchema, agentSaysOf, absentSaysOf, oneLine, sessionModuleSchema, absentModuleSchema, placeWords, moduleLine, absentLine, researchLine, startNotes, changeNotes, sessionNotes, } from './notes.js';
 /* Going to another project, and asking for one thing to be shown there (2.28.0). */
 export { NAVIGATES, NAVIGATES_NAMES, SHOW_SUBJECTS, navigatesSchema, showSubject, showsSchema, showAskSchema, sharedShowSchema, showIsNews, showsOf, canShow, navigatesOf, gotoProject, gotoProjectIsId, } from './show.js';
 /* Run results any module publishes for the work they are for (2.27.0). The file is opened behind `/serve`. */
@@ -51,5 +53,5 @@ export { SETTING_TYPES, SETTING_SCOPES, SETTING_KEY, SETTINGS_ASKERS, SETTINGS_P
 /* Traffic: the calls Kehikot and its modules make and receive on this computer, with their reasons (2.20.0). See `traffic.ts`; a module's server notes its own with `trafficNotes` in `/serve`. */
 export { TRAFFIC_SIDES, TRAFFIC_VIA, TRAFFIC_REPORTERS, TRAFFIC_CACHE, TRAFFIC_HOST_BY, TRAFFIC_REDACTED, TRAFFIC_NOTE_OUTCOMES, trafficNoteSchema, trafficCallSchema, trafficCallerSchema, TRAFFIC_CALLER_KINDS, TRAFFIC_CALLER_HOW, trafficBudgetSchema, trafficShareSchema, trafficAllowanceSchema, trafficAccountSchema, trafficLimitsSchema, trafficConnectionSchema, trafficProcessesSchema, trafficReadResult, trafficNoteResult, trafficTarget, trafficPath, trafficCommand, looksSecret, } from './traffic.js';
 /* Which version each piece of the protocol arrived in, and whether a module and a host fit (2.22.0). See `since.ts`, `fit.ts`, docs/fit.md. */
-export { SINCE, SINCE_FLOOR, METHOD_SINCE, CAPABILITY_SINCE, SERVER_METHOD_SINCE, DECLARATION_SINCE, DECLARATION_NAMES, TRACKER_FIELD_SINCE, ACTIVITY_FIELD_SINCE, PIECE_SAID, REMOVED, sinceOf, removedIn, pieceSaid, versionParts, compareVersions, newerVersion, versionSaid, } from './since.js';
+export { SINCE, SINCE_FLOOR, METHOD_SINCE, CAPABILITY_SINCE, SERVER_METHOD_SINCE, DECLARATION_SINCE, DECLARATION_NAMES, TRACKER_FIELD_SINCE, ACTIVITY_FIELD_SINCE, SESSION_FIELD_SINCE, PIECE_SAID, REMOVED, sinceOf, removedIn, pieceSaid, versionParts, compareVersions, newerVersion, versionSaid, } from './since.js';
 export { needsOf, fitOf, fitSaid, tooOldOf, hostTooOld, FIT_SAYS, } from './fit.js';

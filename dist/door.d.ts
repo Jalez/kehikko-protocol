@@ -425,6 +425,52 @@ export declare const placeDoorsSchema: z.ZodObject<{
         module: string;
         origin: string;
     }>, "many">>>;
+    /**
+     * The containers on the session's kehikko (2.36.0 gave it a shape; hosts sent it before), in the
+     * order the canvas is read, each with its door's name in the session's config, its one line, what
+     * it says to agents (`says`, its `agentSays`) and the skills it offers there. What the session is
+     * told (`sessionNotes`). Absent: the host did not say; empty: nothing else is on the kehikko.
+     */
+    modules: z.ZodCatch<z.ZodOptional<z.ZodArray<z.ZodObject<{
+        module: z.ZodString;
+        name: z.ZodString;
+        summary: z.ZodCatch<z.ZodString>;
+        says: z.ZodCatch<z.ZodOptional<z.ZodString>>;
+        door: z.ZodCatch<z.ZodNullable<z.ZodString>>;
+        skills: z.ZodCatch<z.ZodArray<z.ZodString, "many">>;
+    }, "strip", z.ZodTypeAny, {
+        name: string;
+        summary: string;
+        module: string;
+        door: string | null;
+        skills: string[];
+        says?: string | undefined;
+    }, {
+        name: string;
+        module: string;
+        says?: unknown;
+        summary?: unknown;
+        door?: unknown;
+        skills?: unknown;
+    }>, "many">>>;
+    /**
+     * The modules installed on this computer that are NOT on the session's kehikko and say something
+     * to sessions there (`absentSays`, 2.36.0), each with that line. Only modules on the host's
+     * official list. Absent: the host did not say (before 2.36.0, or the place has no kehikko).
+     */
+    absent: z.ZodCatch<z.ZodOptional<z.ZodArray<z.ZodObject<{
+        module: z.ZodString;
+        name: z.ZodString;
+        says: z.ZodString;
+    }, "strip", z.ZodTypeAny, {
+        name: string;
+        says: string;
+        module: string;
+    }, {
+        name: string;
+        says: string;
+        module: string;
+    }>, "many">>>;
 }, "strip", z.ZodTypeAny, {
     token: string;
     ok: true;
@@ -434,11 +480,24 @@ export declare const placeDoorsSchema: z.ZodObject<{
         module: string;
         transport: "http" | "sse";
     }[];
+    modules?: {
+        name: string;
+        summary: string;
+        module: string;
+        door: string | null;
+        skills: string[];
+        says?: string | undefined;
+    }[] | undefined;
     everywhere?: {
         name: string;
         version: string;
         module: string;
         origin: string;
+    }[] | undefined;
+    absent?: {
+        name: string;
+        says: string;
+        module: string;
     }[] | undefined;
 }, {
     token: string;
@@ -449,7 +508,9 @@ export declare const placeDoorsSchema: z.ZodObject<{
         module: string;
         transport?: unknown;
     }[];
+    modules?: unknown;
     everywhere?: unknown;
+    absent?: unknown;
 }>;
 export type PlaceDoors = z.infer<typeof placeDoorsSchema>;
 /**

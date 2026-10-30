@@ -378,6 +378,29 @@ on the words it knows. A list that does not parse is dropped, not fatal. A host 
 ignores both and runs the module, so neither is in `DECLARATION_SINCE`; NOT under `declares`, whose
 unknown keys an older host's `fitOf` reads as too new.
 
+### What a module says to agents, where it is and where it is not (2.36.0)
+
+Two lines a module writes for the agent sessions a person runs, both at the top level beside `shows`:
+
+```ts
+agentSays: "Queue heavy test runs here instead of running them in the shell, so sessions don't collide.",
+absentSays: "Don't start heavy test runs directly. If the person insists, suggest adding Test runs to this kehikko so runs don't collide.",
+```
+
+- **`agentSays`**: when to use the module, said beside its name and door to every session on a
+  kehikko it is on. A module without one is said with its `summary`.
+- **`absentSays`**: what a session should know on a kehikko the module is NOT on, while it is
+  installed on this computer. Write it for the case where the module would have mattered: what not
+  to do without it, and that the person can add it. A host says it only for a module on its official
+  list (docs/asking.md, "What a session is told").
+
+Both are text, at most 200 characters (`AGENT_SAYS_MAX`); one that is longer, empty or not a string is
+dropped, not fatal. Never markup or a link to follow: a host and an agent module say them as one quoted
+line (`oneLine`), marked as the module's own words to read, not instructions. `agentSaysOf(manifest)`
+and `absentSaysOf(manifest)` read them. A host before 2.36.0 ignores both and runs the module, so
+neither is in `DECLARATION_SINCE` (they are in `SESSION_FIELD_SINCE`); NOT under `declares`, whose
+unknown keys an older host's `fitOf` reads as too new.
+
 ### A module's settings (2.15.0)
 
 `declares.settings` lists the settings a person can see and change from the host: each field's key, label, sentence, type (`boolean`, `string`, `number`, `choice`, `list`), default, scope (`project` or `machine`) and whether only a person may change it. The host draws one form from it and asks the module to read and write the values at its door. Optional; a list that does not parse is dropped and the rest of the manifest is read. See [settings](settings.md).
