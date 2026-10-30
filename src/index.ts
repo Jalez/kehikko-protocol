@@ -471,6 +471,8 @@ export {
   startNotes,
   changeNotes,
   sessionNotes,
+  NOTES_VERSION,
+  UPDATED_HEAD,
   type SessionModule,
   type AbsentModule,
   type NotesPlace,

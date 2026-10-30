@@ -109,9 +109,20 @@ export interface NotesInput {
   key?: string | null
 }
 
+/**
+ * 2.37.0. The version of the notes' wording and content. Bump it WHENEVER the text a session is told
+ * changes in content or format (a new line, a new section, a reworded rule): a session told by an
+ * older version then gets the full new notes once, at its next prompt, instead of never (it would
+ * otherwise only hear about modules added or removed). 1 is the era before the version was kept: a
+ * `NotesTold` without `version` is read as 1.
+ */
+export const NOTES_VERSION = 2
+
 /** What a session was last told: its place by key, and which modules (null when they could not be read). */
 export interface NotesTold {
   key: string | null
+  /** The `NOTES_VERSION` it was told by (2.37.0); absent in a record kept before then, which means 1. */
+  version?: number
   modules: string[] | null
   absent?: string[] | null
   /** The names it was told them by, to say which left. */
@@ -120,6 +131,9 @@ export interface NotesTold {
 
 /** `start`: a session starts, resumes, is cleared or compacted. `prompt`: the person sent a prompt. */
 export type NotesEvent = 'start' | 'prompt'
+
+/** The line before the full notes a session gets again because the notes' wording changed since it was told. */
+export const UPDATED_HEAD = 'Kehikot: what this conversation is told was updated:'
 
 /** How many modules, and absent modules, are said at most; more are counted. */
 export const NOTES_MOST = { modules: 30, absent: 12 } as const
@@ -221,7 +235,8 @@ export function changeNotes(input: NotesInput, told: NotesTold): string | null {
 
 /**
  * THE RULE for one hook: everything at a start, or when the place moved, or when the modules could
- * not be read last time and can now; at a prompt, only what changed; otherwise nothing (`text`
+ * not be read last time and can now, or (2.37.0) once at a prompt when it was told by an older
+ * `NOTES_VERSION` (headed `UPDATED_HEAD`); at a prompt, otherwise only what changed; otherwise nothing (`text`
  * null). `told` is what to keep for next time, whenever `text` is not null.
  */
 export function sessionNotes(input: NotesInput, event: NotesEvent, told: NotesTold | null): { text: string | null; kind: 'start' | 'change' | null; told: NotesTold } {
@@ -234,12 +249,17 @@ export function sessionNotes(input: NotesInput, event: NotesEvent, told: NotesTo
   for (const one of modules ?? []) names[one.module] = oneLine(one.name, 80) || one.module
   const next: NotesTold = {
     key,
+    version: NOTES_VERSION,
     modules: modules === null ? (same ? (told?.modules ?? null) : null) : modules.map((one) => one.module),
     absent: absent === null ? (same ? (told?.absent ?? null) : null) : absent.map((one) => one.module),
     names,
   }
   if (event === 'start' || !told || !same || (told.modules === null && modules !== null)) {
     return { text: startNotes(input, event === 'prompt' && told !== null && !same), kind: 'start', told: next }
+  }
+  /* Told by an older wording (a record without `version` is 1): the full notes once, then only changes. */
+  if (told.version === undefined || (Number.isFinite(told.version) && told.version < NOTES_VERSION)) {
+    return { text: `${UPDATED_HEAD}\n${startNotes(input)}`, kind: 'start', told: next }
   }
   const text = changeNotes(input, told)
   return { text, kind: text === null ? null : 'change', told: next }

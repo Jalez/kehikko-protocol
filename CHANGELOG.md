@@ -7,6 +7,17 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.37.0 — 2026-10-31
+
+A session told by an older wording of the notes gets the full new notes once. Additive.
+
+- **`NOTES_VERSION`** (2 now; 1 is the era before it was kept): bumped whenever the content or format of
+  what a session is told changes. `sessionNotes` writes it into the `NotesTold` it returns (`version`,
+  optional: a record kept before 2.37.0 has none and reads as 1).
+- At a `'prompt'`, a session told by an older version (or none) gets the FULL start text once, headed
+  `UPDATED_HEAD` ("Kehikot: what this conversation is told was updated:"), and the new record; after
+  that only changes, as before. A start, and a moved place, say what they said before.
+
 ## 2.36.0 — 2026-10-31
 
 What agent sessions are told about the modules around them, and about the installed ones that are
