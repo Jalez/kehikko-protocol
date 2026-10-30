@@ -146,6 +146,21 @@ export const ACTIVITY_FIELD_SINCE = {
     projectId: '2.1.0',
     event: '2.31.0',
 };
+/**
+ * What a session that a module runs is told about the modules around it (2.36.0): the fields of the
+ * host's answer to `POST /host/place` (`placeDoorsSchema`) and the top-level manifest lines it is told
+ * from, with the version that added each. Like `TRACKER_FIELD_SINCE`, nothing `fitOf` holds a module
+ * to: a host before a field leaves it out of the answer, or ignores the manifest line and runs the
+ * module, and a module reading the answer finds it absent and must not take the absence for "none".
+ * (`modules` was in hosts' answers before; 2.36.0 is when the protocol gave it a shape.)
+ */
+export const SESSION_FIELD_SINCE = {
+    everywhere: '2.23.0',
+    modules: '2.36.0',
+    absent: '2.36.0',
+    agentSays: '2.36.0',
+    absentSays: '2.36.0',
+};
 /** Every table, in one place. Plain objects: read them with `sinceOf`, never by indexing with a stranger's string. */
 export const SINCE = {
     methods: METHOD_SINCE,
@@ -154,6 +169,7 @@ export const SINCE = {
     declarations: DECLARATION_SINCE,
     trackerFields: TRACKER_FIELD_SINCE,
     activityFields: ACTIVITY_FIELD_SINCE,
+    sessionFields: SESSION_FIELD_SINCE,
 };
 const TABLE = {
     method: METHOD_SINCE,
@@ -162,6 +178,7 @@ const TABLE = {
     declaration: DECLARATION_SINCE,
     trackerField: TRACKER_FIELD_SINCE,
     activityField: ACTIVITY_FIELD_SINCE,
+    sessionField: SESSION_FIELD_SINCE,
 };
 /**
  * The version a piece arrived in, or null when this package does not know it: a piece from a
@@ -224,7 +241,7 @@ export function pieceSaid(kind, piece) {
         return own(PIECE_SAID.declarations, piece) ?? piece;
     if (kind === 'capability')
         return own(PIECE_SAID.capabilities, piece) ?? piece;
-    if (kind === 'trackerField' || kind === 'activityField')
+    if (kind === 'trackerField' || kind === 'activityField' || kind === 'sessionField')
         return piece;
     const capability = methodCapability(piece);
     return capability ? (own(PIECE_SAID.capabilities, capability) ?? piece) : piece;
@@ -241,6 +258,7 @@ export const REMOVED = {
     declaration: {},
     trackerField: {},
     activityField: {},
+    sessionField: {},
 };
 /** The version that removed a piece, or null when nothing has. */
 export function removedIn(kind, piece) {

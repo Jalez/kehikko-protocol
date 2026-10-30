@@ -7,6 +7,32 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.36.0 — 2026-10-31
+
+What agent sessions are told about the modules around them, and about the installed ones that are
+not there. **Additive**; `PROTOCOL` is still 2. docs/asking.md, "What a session is told";
+docs/manifest.md, "What a module says to agents".
+
+### Added
+
+- **`agentSays`** and **`absentSays`**: top-level manifest lines (`agentSaysSchema`, text, at most
+  `AGENT_SAYS_MAX` = 200 characters, dropped when they do not parse). `agentSays` says when to use the
+  module, beside its name, to sessions on a kehikko it is on (falling back to `summary`;
+  `agentSaysOf`); `absentSays` is said to sessions on a kehikko it is not on while it is installed
+  (`absentSaysOf`). An older host ignores both.
+- **`modules`** and **`absent`** on `placeDoorsSchema`, the host's answer to `POST /host/place`:
+  `sessionModuleSchema` (`module`, `name`, `summary`, `says`, `door`, `skills`; hosts sent `modules`
+  before without a shape in the protocol) and `absentModuleSchema` (`module`, `name`, `says`). A host
+  lists in `absent` only installed modules on its official list. `LIMITS.SESSION_MODULES` (128),
+  `LIMITS.ABSENT_MODULES` (32).
+- **`sessionNotes(input, event, told)`**: THE text a session is told, the same for every module that
+  runs agent sessions — everything at a start (`startNotes`), what changed at a prompt
+  (`changeNotes`), or nothing — and what to keep for next time (`NotesTold`). With `placeWords`,
+  `moduleLine`, `absentLine`, `researchLine`, `oneLine`, `NOTES_MOST`, types `NotesInput`,
+  `NotesPlace`, `NotesSelf`, `NotesTold`, `NotesEvent`, `SessionModule`, `AbsentModule`.
+- **`SESSION_FIELD_SINCE`** (`SINCE.sessionFields`, `sinceOf('sessionField', …)`, type
+  `SessionField`): `everywhere` 2.23.0; `modules`, `absent`, `agentSays`, `absentSays` 2.36.0.
+
 ## 2.35.0 — 2026-10-30
 
 The host tells a module which of its Inbox items the person opened. **Additive**; `PROTOCOL` is

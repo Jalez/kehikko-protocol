@@ -454,6 +454,32 @@ export {
   type AbleManifest,
 } from './abilities.js'
 
+/* What an agent session is told about the modules around it, one wording for every agent module (2.36.0). */
+export {
+  AGENT_SAYS_MAX,
+  NOTES_MOST,
+  agentSaysSchema,
+  agentSaysOf,
+  absentSaysOf,
+  oneLine,
+  sessionModuleSchema,
+  absentModuleSchema,
+  placeWords,
+  moduleLine,
+  absentLine,
+  researchLine,
+  startNotes,
+  changeNotes,
+  sessionNotes,
+  type SessionModule,
+  type AbsentModule,
+  type NotesPlace,
+  type NotesSelf,
+  type NotesInput,
+  type NotesTold,
+  type NotesEvent,
+} from './notes.js'
+
 /* Going to another project, and asking for one thing to be shown there (2.28.0). */
 export {
   NAVIGATES,
@@ -812,6 +838,7 @@ export {
   DECLARATION_NAMES,
   TRACKER_FIELD_SINCE,
   ACTIVITY_FIELD_SINCE,
+  SESSION_FIELD_SINCE,
   PIECE_SAID,
   REMOVED,
   sinceOf,
@@ -825,6 +852,7 @@ export {
   type PieceKind,
   type TrackerField,
   type ActivityField,
+  type SessionField,
 } from './since.js'
 export {
   needsOf,

@@ -158,6 +158,10 @@ export const LIMITS = {
     OPENS: 8,
     /** How many words one manifest's `holds` may list (2.33.0). */
     HOLDS: 8,
+    /** How many containers the host lists to a session in its place answer (`modules`, 2.36.0). */
+    SESSION_MODULES: 128,
+    /** How many installed-but-absent modules the host lists to a session (`absent`, 2.36.0). */
+    ABSENT_MODULES: 32,
     /** The id of one thing a `view.goto` asks to have shown (2.28.0): an agent session's id. */
     SHOW_ID: 128,
     /** How many runs one `runs.json` is read for (2.27.0); a publisher keeps its newest. */

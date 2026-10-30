@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { LIMITS } from './limits.js';
+import { absentModuleSchema, sessionModuleSchema } from './notes.js';
 import { EPIC_SLUG, KEHIKKO_KEY, MODULE_ID, PROJECT_ID, own } from './ids.js';
 import { skillNameSchema } from './skills.js';
 /**
@@ -163,6 +164,19 @@ export const placeDoorsSchema = z.object({
      * is dropped, not fatal.
      */
     everywhere: z.array(everywhereSkillSchema).max(LIMITS.EVERYWHERE_SKILLS).optional().catch(undefined),
+    /**
+     * The containers on the session's kehikko (2.36.0 gave it a shape; hosts sent it before), in the
+     * order the canvas is read, each with its door's name in the session's config, its one line, what
+     * it says to agents (`says`, its `agentSays`) and the skills it offers there. What the session is
+     * told (`sessionNotes`). Absent: the host did not say; empty: nothing else is on the kehikko.
+     */
+    modules: z.array(sessionModuleSchema).max(LIMITS.SESSION_MODULES).optional().catch(undefined),
+    /**
+     * The modules installed on this computer that are NOT on the session's kehikko and say something
+     * to sessions there (`absentSays`, 2.36.0), each with that line. Only modules on the host's
+     * official list. Absent: the host did not say (before 2.36.0, or the place has no kehikko).
+     */
+    absent: z.array(absentModuleSchema).max(LIMITS.ABSENT_MODULES).optional().catch(undefined),
 });
 /**
  * Where a module that issues tokens answers for one, asked by the host:

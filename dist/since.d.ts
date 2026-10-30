@@ -147,6 +147,22 @@ export declare const ACTIVITY_FIELD_SINCE: {
     readonly event: "2.31.0";
 };
 export type ActivityField = keyof typeof ACTIVITY_FIELD_SINCE;
+/**
+ * What a session that a module runs is told about the modules around it (2.36.0): the fields of the
+ * host's answer to `POST /host/place` (`placeDoorsSchema`) and the top-level manifest lines it is told
+ * from, with the version that added each. Like `TRACKER_FIELD_SINCE`, nothing `fitOf` holds a module
+ * to: a host before a field leaves it out of the answer, or ignores the manifest line and runs the
+ * module, and a module reading the answer finds it absent and must not take the absence for "none".
+ * (`modules` was in hosts' answers before; 2.36.0 is when the protocol gave it a shape.)
+ */
+export declare const SESSION_FIELD_SINCE: {
+    readonly everywhere: "2.23.0";
+    readonly modules: "2.36.0";
+    readonly absent: "2.36.0";
+    readonly agentSays: "2.36.0";
+    readonly absentSays: "2.36.0";
+};
+export type SessionField = keyof typeof SESSION_FIELD_SINCE;
 /** Every table, in one place. Plain objects: read them with `sinceOf`, never by indexing with a stranger's string. */
 export declare const SINCE: {
     readonly methods: {
@@ -259,9 +275,16 @@ export declare const SINCE: {
         readonly projectId: "2.1.0";
         readonly event: "2.31.0";
     };
+    readonly sessionFields: {
+        readonly everywhere: "2.23.0";
+        readonly modules: "2.36.0";
+        readonly absent: "2.36.0";
+        readonly agentSays: "2.36.0";
+        readonly absentSays: "2.36.0";
+    };
 };
 /** The kinds of piece the tables know. */
-export type PieceKind = 'method' | 'capability' | 'serverMethod' | 'declaration' | 'trackerField' | 'activityField';
+export type PieceKind = 'method' | 'capability' | 'serverMethod' | 'declaration' | 'trackerField' | 'activityField' | 'sessionField';
 /**
  * The version a piece arrived in, or null when this package does not know it: a piece from a
  * newer protocol, or a word nobody defined.

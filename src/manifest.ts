@@ -9,6 +9,7 @@ import { CONTEXT_SCOPES, type ContextScope } from './context.js'
 import { settingsDeclarationSchema } from './settings.js'
 import { agentSessionsSchema, providesSchema } from './provides.js'
 import { holdsSchema, opensSchema } from './abilities.js'
+import { agentSaysSchema } from './notes.js'
 import { navigatesSchema, showsSchema } from './show.js'
 import { modeScopeSchema, scopeSaysSchema, supportedScopes } from './scope.js'
 
@@ -303,6 +304,22 @@ const manifestFields = z.object({
    * optional, dropped when it does not parse, like `opens`.
    */
   holds: holdsSchema.optional().catch(undefined),
+  /**
+   * 2.36.0. When an agent should use this module, in one line said beside its name to every agent
+   * session on a kehikko it is on ("Queue heavy test runs here instead of running them in the shell,
+   * so sessions don't collide."). Text, at most 200 characters; a host falls back to `summary`.
+   * Top-level like `shows`, so a host before 2.36.0 ignores it and runs the module; one that does not
+   * parse is dropped. See `sessionNotes`.
+   */
+  agentSays: agentSaysSchema.optional().catch(undefined),
+  /**
+   * 2.36.0. What an agent session should know on a kehikko this module is NOT on, while it is
+   * installed on this computer ("Don't start heavy test runs directly. If the person insists, suggest
+   * adding Test runs to this kehikko so runs don't collide."). Text, at most 200 characters. A host
+   * says it only for a module on its official list. Top-level, optional, dropped when it does not
+   * parse, like `agentSays`.
+   */
+  absentSays: agentSaysSchema.optional().catch(undefined),
   /**
    * The scopes this module can work at, as modes: one per scope, the default first (2.29.0; see
    * `modeSchema.scope`). Required, at least one, so a host older than 2.29.0 still parses it.
