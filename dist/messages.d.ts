@@ -2570,6 +2570,31 @@ export declare const wentSchema: z.ZodObject<{
     why?: string | undefined;
 }>;
 /**
+ * Host → module (2.35.0). The person opened one of this module's Inbox items — pressed it in the
+ * Inbox, on a toast, or with "Next that needs me" — and the host has gone to its place. `item` is the
+ * item's `id`, exactly as the module's last `activity.set` carried it. Fire and forget: no id, no
+ * answer. Sent to the module's pages on the kehikko the host arrived at, after it got there.
+ *
+ * What a module does with it is its own: show that thing (the session, the question) and count it
+ * as seen. It changes nothing on the host by itself: an `attention` item stays until the module's
+ * next list drops it or moves it on. An id the module no longer has is ignored. A host before
+ * 2.35.0 sends nothing; a module before it drops the message unread (`HOST_MESSAGES`).
+ */
+export declare const openedSchema: z.ZodObject<{
+    type: z.ZodLiteral<"kehikot.opened">;
+    protocol: z.ZodNumber;
+    item: z.ZodString;
+}, "strip", z.ZodTypeAny, {
+    type: "kehikot.opened";
+    protocol: number;
+    item: string;
+}, {
+    type: "kehikot.opened";
+    protocol: number;
+    item: string;
+}>;
+export type Opened = z.infer<typeof openedSchema>;
+/**
  * Every message a host sends. A plain union, not a `discriminatedUnion`, because `responseSchema`
  * is itself a union on a different key and cannot be an option of one.
  */
@@ -4291,6 +4316,18 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     protocol: number;
     item: string;
     value?: string | boolean | undefined;
+}>, z.ZodObject<{
+    type: z.ZodLiteral<"kehikot.opened">;
+    protocol: z.ZodNumber;
+    item: z.ZodString;
+}, "strip", z.ZodTypeAny, {
+    type: "kehikot.opened";
+    protocol: number;
+    item: string;
+}, {
+    type: "kehikot.opened";
+    protocol: number;
+    item: string;
 }>]>;
 export type HostMessage = z.infer<typeof hostMessageSchema>;
 export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{

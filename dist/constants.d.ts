@@ -86,6 +86,13 @@ export declare const MESSAGE: {
     readonly PRESS: "kehikot.press";
     /** Module → host. "I took that press", or "I did not, and here is why." One per `press`, by its `id`. */
     readonly PRESSED: "kehikot.pressed";
+    /**
+     * Host → module (2.35.0). "The person opened this Inbox item of yours": they pressed it in the
+     * Inbox, on a toast or with Next, and the host has gone to its place. Carries the item's `id` as
+     * the module reported it; no correlation id and no answer. The module may show that thing and
+     * count it as seen; whether the item stays is still the module's next list.
+     */
+    readonly OPENED: "kehikot.opened";
 };
 export type MessageType = (typeof MESSAGE)[keyof typeof MESSAGE];
 /** The prefix every message type carries, so a listener can drop the rest cheaply. There is one spelling. */
@@ -98,7 +105,7 @@ export declare const MESSAGE_PREFIX = "kehikot.";
  * dropped without a word; a type that is listed and does not parse is a fault worth reporting.
  * See docs/header.md, "A message type the other side does not know".
  */
-export declare const HOST_MESSAGES: readonly ["kehikot.hello", "kehikot.context", "kehikot.response", "kehikot.goto", "kehikot.event", "kehikot.clear", "kehikot.refresh", "kehikot.press"];
+export declare const HOST_MESSAGES: readonly ["kehikot.hello", "kehikot.context", "kehikot.response", "kehikot.goto", "kehikot.event", "kehikot.clear", "kehikot.refresh", "kehikot.press", "kehikot.opened"];
 /** And what the module says. */
 export declare const MODULE_MESSAGES: readonly ["kehikot.ready", "kehikot.request", "kehikot.resize", "kehikot.went", "kehikot.filters", "kehikot.clearable", "kehikot.refreshable", "kehikot.header", "kehikot.pressed"];
 /**

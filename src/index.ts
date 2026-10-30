@@ -279,6 +279,8 @@ export {
   headerOptionSchema,
   pressSchema,
   pressedSchema,
+  openedSchema,
+  type Opened,
   pressValueSchema,
   pressRefusal,
   HEADER_KINDS,
