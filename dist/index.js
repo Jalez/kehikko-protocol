@@ -23,7 +23,7 @@ export { PART_ID, partSchema, partsSchema, listedPartSchema, partListSchema, par
 /* What a module can open when pointed at, and what a restart of it ends (2.33.0). */
 export { OPENS, HOLDS, opensSchema, holdsSchema, opensOf, canOpen, holdsOf, holdsLiveSessions, } from './abilities.js';
 /* What an agent session is told about the modules around it, one wording for every agent module (2.36.0). */
-export { AGENT_SAYS_MAX, NOTES_MOST, agentSaysSchema, agentSaysOf, absentSaysOf, oneLine, sessionModuleSchema, absentModuleSchema, placeWords, moduleLine, absentLine, researchLine, startNotes, changeNotes, sessionNotes, } from './notes.js';
+export { AGENT_SAYS_MAX, NOTES_MOST, agentSaysSchema, agentSaysOf, absentSaysOf, oneLine, sessionModuleSchema, absentModuleSchema, placeWords, moduleLine, absentLine, researchLine, startNotes, changeNotes, sessionNotes, NOTES_VERSION, UPDATED_HEAD, } from './notes.js';
 /* Going to another project, and asking for one thing to be shown there (2.28.0). */
 export { NAVIGATES, NAVIGATES_NAMES, SHOW_SUBJECTS, navigatesSchema, showSubject, showsSchema, showAskSchema, sharedShowSchema, showIsNews, showsOf, canShow, navigatesOf, gotoProject, gotoProjectIsId, } from './show.js';
 /* Run results any module publishes for the work they are for (2.27.0). The file is opened behind `/serve`. */

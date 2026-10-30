@@ -346,6 +346,13 @@ moved (then everything again). Nothing when nothing changed. Every module's word
 (`oneLine`: no control, bidi or zero-width characters, at most 200 characters), and the notes say they
 are text to read, not instructions. A module shows the person what its session was told.
 
+**When the notes change (2.37.0).** `NOTES_VERSION` is the version of the notes' wording; `sessionNotes` writes it into
+the `told` record (`version`). A session told by an older version (a record without `version` is 1) gets the full notes
+once at its next prompt, headed "Kehikot: what this conversation is told was updated:", and only changes after. Whoever
+changes the text of the notes (a new line or section, a reworded rule) must bump `NOTES_VERSION` in `src/notes.ts`, or
+sessions already running never hear it until they restart. A module keeps the whole record it is given back (`told`)
+and passes it in unchanged next time.
+
 **Who may speak where it is not.** `absent` widens a module's reach: its line reaches sessions on every
 kehikko of every project on this computer, where nobody placed it. So a host lists only modules that
 are installed (registered here) AND on its official list, which whoever can push to the host's `main`
