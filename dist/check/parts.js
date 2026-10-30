@@ -124,7 +124,7 @@ const SKIP = new Set(['node_modules', 'dist', 'build', 'coverage', 'test', 'test
 export function sourcesOf(dir) {
     const out = [];
     const walk = (at) => {
-        for (const entry of readdirSync(at, { withFileTypes: true })) {
+        for (const entry of readdirSync(at, { withFileTypes: true }).sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))) {
             if (entry.name.startsWith('.') || SKIP.has(entry.name))
                 continue;
             const full = join(at, entry.name);
