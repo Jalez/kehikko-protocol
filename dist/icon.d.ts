@@ -22,7 +22,7 @@ export declare const LUCIDE_MODULE_ICONS: readonly ["activity", "bell", "blocks"
  * third-party tool a module fronts (LaTeX for a paper written in it, Claude for a Claude Code
  * session, Google Chrome for a browser). Drawn in one colour, the text's, like every other icon.
  */
-export declare const BRAND_MODULE_ICONS: readonly ["claude", "git", "github", "gitlab", "googlechrome", "latex", "markdown"];
+export declare const BRAND_MODULE_ICONS: readonly ["claude", "git", "github", "gitlab", "googlechrome", "googlegemini", "latex", "markdown", "mistralai", "openai", "opencode"];
 /** Every key a manifest's `icon` may name: `lucide:<name>` for each Lucide icon, then `brand:<slug>` for each mark. */
 export type ModuleIcon = `lucide:${(typeof LUCIDE_MODULE_ICONS)[number]}` | `brand:${(typeof BRAND_MODULE_ICONS)[number]}`;
 export declare const MODULE_ICONS: readonly ModuleIcon[];

@@ -7,6 +7,24 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.39.0 — 2026-10-31
+
+More brand marks for modules that front a coding agent. Additive.
+
+- **`BRAND_MODULE_ICONS`** gains `openai` (Codex), `googlegemini` (Antigravity), `opencode` and
+  `mistralai` (Vibe): Simple Icons slugs, so `brand:openai`, `brand:googlegemini`, `brand:opencode`
+  and `brand:mistralai` are keys of `MODULE_ICONS`. A host that does not know one yet draws the
+  module's initial, as for any unknown key.
+
+## 2.39.0 — 2026-10-31
+
+More brand marks for modules that front a coding agent. Additive.
+
+- **`BRAND_MODULE_ICONS`** gains `openai` (Codex), `googlegemini` (Antigravity), `opencode` and
+  `mistralai` (Vibe): Simple Icons slugs, so `brand:openai`, `brand:googlegemini`, `brand:opencode`
+  and `brand:mistralai` are keys of `MODULE_ICONS`. A host that does not know one yet draws the
+  module's initial, as for any unknown key.
+
 ## 2.38.0 — 2026-10-31
 
 The footer: a module declares its status row and the host draws it at the bottom of the container, as

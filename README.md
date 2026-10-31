@@ -169,6 +169,7 @@ The same list with what each version exported is in [CHANGELOG.md](CHANGELOG.md)
 
 | version | date | what it added |
 |---|---|---|
+| 2.39.0 | 2026-10-31 | Additive. `BRAND_MODULE_ICONS` gains `openai`, `googlegemini`, `opencode` and `mistralai` (Simple Icons slugs). |
 | 2.38.0 | 2026-10-31 | Additive. The footer: `kehikot.footer` (text, meters, and the header's switch, toggle, go and run, each with `align`, `optional`, `tooltip`), `place: 'footer'` on `kehikot.press`, `footerLayout` (one row at 380/280/200 px), `hello.footer` / `drawsFooter`, `WIRE_SINCE`. An older host drops the message; a module declares only when `drawsFooter` is true. See [the footer](docs/footer.md). |
 | 2.37.0 | 2026-10-31 | Additive. A session told by an older wording of the notes gets the full new notes once at its next prompt (`NOTES_VERSION`, `NotesTold.version`). |
 | 2.36.0 | 2026-10-31 | Additive. A module says when an agent should use it (`agentSays`) and what a session should know on a kehikko it is not on (`absentSays`), top-level text lines of at most 200 characters; the host's place answer gives them shapes (`modules`, `absent`; only official modules are absent-listed), and `sessionNotes` is the one text every agent module tells its sessions, at a start and at a prompt when something changed. `SESSION_FIELD_SINCE`. See [asking](docs/asking.md#a-conversations-place-240). |
