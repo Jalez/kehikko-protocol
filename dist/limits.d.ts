@@ -261,6 +261,10 @@ export declare const LIMITS: {
     readonly HEADER_GROUP: 24;
     /** What a run last came to, in a word or three: `1.2 s`, `failed`, `p. 3/12`. */
     readonly HEADER_RESULT: 32;
+    /** 2.40.0. The plain text a run asks the host to put on the clipboard (`copy.plain`): a few hundred references with their links. */
+    readonly RUN_COPY_PLAIN: 65536;
+    /** 2.40.0. The HTML beside it (`copy.html`), written to the clipboard as text/html and never drawn by the host. */
+    readonly RUN_COPY_HTML: 131072;
     /** How many footer items one module may declare at once, over every kind. */
     readonly FOOTER_ITEMS: 16;
     /** A footer status line or count: `12 references · 3 selected`. A host cuts it with an ellipsis, whole in its tooltip. */

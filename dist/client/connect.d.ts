@@ -87,6 +87,12 @@ export interface HostFacts {
      * host before 2.38.0, which does not. Only `true` means "declare it and draw none of your own".
      */
     footer: boolean | null;
+    /**
+     * 2.40.0. The acts this host carries out itself for a run in the person's click (`copy`, `open`), or
+     * `null` from a host before 2.40.0, which carries out none. Give a run `copy` or `open` only when it
+     * names the act; otherwise do the act in your own page.
+     */
+    carries: readonly string[] | null;
 }
 export interface HostEvents {
     /**
@@ -128,7 +134,7 @@ export interface HostEvents {
      * page's footer (declared with `footer`), absent for one of its header. Do it, declare the header again, and return
      * nothing — or return the sentence saying why not. `connect` answers the host exactly once.
      */
-    onPress?: (press: Pick<Press, 'item' | 'value' | 'place'>) => PressAnswer | Promise<PressAnswer>;
+    onPress?: (press: Pick<Press, 'item' | 'value' | 'place' | 'carried'>) => PressAnswer | Promise<PressAnswer>;
     /**
      * The person opened one of this module's Inbox items (2.35.0): pressed it in the Inbox, on a
      * toast or with Next, and the host has gone to its place. `item` is the id the module reported.

@@ -122,6 +122,8 @@ export interface HostStanding<Kept = unknown> extends HostFields {
      * See docs/footer.md.
      */
     drawsFooter: boolean | null;
+    /** 2.40.0. The acts the host carries out itself for a run (`copy`, `open`), or `null` when it did not say (none). */
+    hostCarries: readonly string[] | null;
 }
 /** What a page says to its host, the same from the hook and from the store. */
 export interface HostActions<Kept = unknown> {

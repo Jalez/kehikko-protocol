@@ -156,6 +156,12 @@ export interface HostFacts {
    * host before 2.38.0, which does not. Only `true` means "declare it and draw none of your own".
    */
   footer: boolean | null
+  /**
+   * 2.40.0. The acts this host carries out itself for a run in the person's click (`copy`, `open`), or
+   * `null` from a host before 2.40.0, which carries out none. Give a run `copy` or `open` only when it
+   * names the act; otherwise do the act in your own page.
+   */
+  carries: readonly string[] | null
 }
 
 export interface HostEvents {
@@ -198,7 +204,7 @@ export interface HostEvents {
    * page's footer (declared with `footer`), absent for one of its header. Do it, declare the header again, and return
    * nothing — or return the sentence saying why not. `connect` answers the host exactly once.
    */
-  onPress?: (press: Pick<Press, 'item' | 'value' | 'place'>) => PressAnswer | Promise<PressAnswer>
+  onPress?: (press: Pick<Press, 'item' | 'value' | 'place' | 'carried'>) => PressAnswer | Promise<PressAnswer>
   /**
    * The person opened one of this module's Inbox items (2.35.0): pressed it in the Inbox, on a
    * toast or with Next, and the host has gone to its place. `item` is the id the module reported.
@@ -395,7 +401,7 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
       projectNow = projectOf(message.context)
       projectIdNow = projectIdOf(message.context)
       sendActivity()
-      events.onHello?.(message.context, message.state, { answers: message.answers ?? null, header: message.header ?? null, footer: message.footer ?? null })
+      events.onHello?.(message.context, message.state, { answers: message.answers ?? null, header: message.header ?? null, footer: message.footer ?? null, carries: message.carries ?? null })
       return
     }
 
@@ -466,7 +472,7 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
       }
       const backstop = setTimeout(() => answer(false, 'This app did not say whether it took that press.'), pressBackstop)
       const footer = message.place === 'footer'
-      const press = { item: message.item, ...(message.value !== undefined ? { value: message.value } : {}), ...(footer ? { place: 'footer' as const } : {}) }
+      const press = { item: message.item, ...(message.value !== undefined ? { value: message.value } : {}), ...(footer ? { place: 'footer' as const } : {}), ...(message.carried ? { carried: message.carried } : {}) }
       /* Judged against what is declared NOW: the header (or footer) may have changed since it was drawn. */
       const refused = footer ? footerPressRefusal(footed, press) : pressRefusal(declared, press)
       if (refused !== null) answer(false, refused)

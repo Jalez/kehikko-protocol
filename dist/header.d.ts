@@ -31,6 +31,30 @@ export type RunSurface = (typeof RUN_SURFACES)[number];
  */
 export declare const HEADER_ICONS: readonly ["check", "x", "chevron-left", "chevron-right", "pencil", "play", "stop", "refresh", "undo", "external"];
 export type HeaderIcon = (typeof HEADER_ICONS)[number];
+/**
+ * 2.40.0. What a host can carry out ITSELF, inside the person's click on a run, because a press
+ * relayed to the module's page carries no user activation: `copy` (write the clipboard) and `open`
+ * (open a web page in the person's browser). The press is still sent to the module afterwards, with
+ * `carried` naming what the host did. See docs/header.md, "Acts the host carries out".
+ */
+export declare const RUN_CARRIES: readonly ["copy", "open"];
+export type RunCarry = (typeof RUN_CARRIES)[number];
+/** 2.40.0. A clipboard write: `plain` always, `html` beside it when the module has a richer form. Both are text to the host: written, never drawn. */
+export declare const runCopySchema: z.ZodObject<{
+    plain: z.ZodString;
+    html: z.ZodOptional<z.ZodString>;
+}, "strip", z.ZodTypeAny, {
+    plain: string;
+    html?: string | undefined;
+}, {
+    plain: string;
+    html?: string | undefined;
+}>;
+export type RunCopy = z.infer<typeof runCopySchema>;
+/** 2.40.0. Why an address is not one a host opens for a run, or null: `https:` only, a host name, no user name or password. */
+export declare function runOpenRefusal(value: unknown): string | null;
+/** 2.40.0. A web page a host opens in the person's browser for a run. */
+export declare const runOpenSchema: z.ZodEffects<z.ZodString, string, string>;
 /** A run is resting, in flight, or its last attempt failed. A host shows the last two on the menu's trigger. */
 export declare const RUN_STATES: readonly ["idle", "busy", "failed"];
 export type RunState = (typeof RUN_STATES)[number];
@@ -220,6 +244,22 @@ export declare const HEADER_ITEM_SHAPES: {
          * know the field strips it and keeps the item in the menu.
          */
         pinned: z.ZodOptional<z.ZodBoolean>;
+        /**
+         * 2.40.0. Text the HOST writes to the clipboard from the person's click, before it sends the
+         * press. A host before 2.40.0 strips it and only relays the press: look at `hello.carries`.
+         */
+        copy: z.ZodOptional<z.ZodObject<{
+            plain: z.ZodString;
+            html: z.ZodOptional<z.ZodString>;
+        }, "strip", z.ZodTypeAny, {
+            plain: string;
+            html?: string | undefined;
+        }, {
+            plain: string;
+            html?: string | undefined;
+        }>>;
+        /** 2.40.0. A page the HOST opens in the person's browser from their click, before it sends the press. https only. */
+        open: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
         id: z.ZodEffects<z.ZodString, string, string>;
         label: z.ZodString;
         /** An icon by name (`file-text`). A host draws the ones it has; an unknown name draws none. */
@@ -250,7 +290,12 @@ export declare const HEADER_ITEM_SHAPES: {
         disabled: string | null;
         confirm: boolean;
         group?: string | undefined;
+        open?: string | undefined;
         pinned?: boolean | undefined;
+        copy?: {
+            plain: string;
+            html?: string | undefined;
+        } | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         tool?: string | undefined;
@@ -261,7 +306,12 @@ export declare const HEADER_ITEM_SHAPES: {
         kind: "run";
         state?: "failed" | "idle" | "busy" | undefined;
         group?: string | undefined;
+        open?: string | undefined;
         pinned?: boolean | undefined;
+        copy?: {
+            plain: string;
+            html?: string | undefined;
+        } | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         agents?: boolean | undefined;
@@ -286,6 +336,9 @@ export declare function checkPressable(item: {
         id: string;
     }[];
     value?: string;
+    copy?: unknown;
+    open?: unknown;
+    surface?: unknown;
 }, ctx: z.RefinementCtx): void;
 /**
  * One item of a module's header. `switch`: one of several views, with the one it is on. `toggle`:
@@ -473,6 +526,22 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
      * know the field strips it and keeps the item in the menu.
      */
     pinned: z.ZodOptional<z.ZodBoolean>;
+    /**
+     * 2.40.0. Text the HOST writes to the clipboard from the person's click, before it sends the
+     * press. A host before 2.40.0 strips it and only relays the press: look at `hello.carries`.
+     */
+    copy: z.ZodOptional<z.ZodObject<{
+        plain: z.ZodString;
+        html: z.ZodOptional<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        plain: string;
+        html?: string | undefined;
+    }, {
+        plain: string;
+        html?: string | undefined;
+    }>>;
+    /** 2.40.0. A page the HOST opens in the person's browser from their click, before it sends the press. https only. */
+    open: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
     id: z.ZodEffects<z.ZodString, string, string>;
     label: z.ZodString;
     /** An icon by name (`file-text`). A host draws the ones it has; an unknown name draws none. */
@@ -503,7 +572,12 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     disabled: string | null;
     confirm: boolean;
     group?: string | undefined;
+    open?: string | undefined;
     pinned?: boolean | undefined;
+    copy?: {
+        plain: string;
+        html?: string | undefined;
+    } | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     tool?: string | undefined;
@@ -514,7 +588,12 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     kind: "run";
     state?: "failed" | "idle" | "busy" | undefined;
     group?: string | undefined;
+    open?: string | undefined;
     pinned?: boolean | undefined;
+    copy?: {
+        plain: string;
+        html?: string | undefined;
+    } | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     agents?: boolean | undefined;
@@ -570,7 +649,12 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     disabled: string | null;
     confirm: boolean;
     group?: string | undefined;
+    open?: string | undefined;
     pinned?: boolean | undefined;
+    copy?: {
+        plain: string;
+        html?: string | undefined;
+    } | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     tool?: string | undefined;
@@ -618,7 +702,12 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     kind: "run";
     state?: "failed" | "idle" | "busy" | undefined;
     group?: string | undefined;
+    open?: string | undefined;
     pinned?: boolean | undefined;
+    copy?: {
+        plain: string;
+        html?: string | undefined;
+    } | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     agents?: boolean | undefined;
@@ -813,6 +902,22 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
      * know the field strips it and keeps the item in the menu.
      */
     pinned: z.ZodOptional<z.ZodBoolean>;
+    /**
+     * 2.40.0. Text the HOST writes to the clipboard from the person's click, before it sends the
+     * press. A host before 2.40.0 strips it and only relays the press: look at `hello.carries`.
+     */
+    copy: z.ZodOptional<z.ZodObject<{
+        plain: z.ZodString;
+        html: z.ZodOptional<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        plain: string;
+        html?: string | undefined;
+    }, {
+        plain: string;
+        html?: string | undefined;
+    }>>;
+    /** 2.40.0. A page the HOST opens in the person's browser from their click, before it sends the press. https only. */
+    open: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
     id: z.ZodEffects<z.ZodString, string, string>;
     label: z.ZodString;
     /** An icon by name (`file-text`). A host draws the ones it has; an unknown name draws none. */
@@ -843,7 +948,12 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     disabled: string | null;
     confirm: boolean;
     group?: string | undefined;
+    open?: string | undefined;
     pinned?: boolean | undefined;
+    copy?: {
+        plain: string;
+        html?: string | undefined;
+    } | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     tool?: string | undefined;
@@ -854,7 +964,12 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     kind: "run";
     state?: "failed" | "idle" | "busy" | undefined;
     group?: string | undefined;
+    open?: string | undefined;
     pinned?: boolean | undefined;
+    copy?: {
+        plain: string;
+        html?: string | undefined;
+    } | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     agents?: boolean | undefined;
@@ -910,7 +1025,12 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     disabled: string | null;
     confirm: boolean;
     group?: string | undefined;
+    open?: string | undefined;
     pinned?: boolean | undefined;
+    copy?: {
+        plain: string;
+        html?: string | undefined;
+    } | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     tool?: string | undefined;
@@ -958,7 +1078,12 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     kind: "run";
     state?: "failed" | "idle" | "busy" | undefined;
     group?: string | undefined;
+    open?: string | undefined;
     pinned?: boolean | undefined;
+    copy?: {
+        plain: string;
+        html?: string | undefined;
+    } | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     agents?: boolean | undefined;
@@ -1014,7 +1139,12 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     disabled: string | null;
     confirm: boolean;
     group?: string | undefined;
+    open?: string | undefined;
     pinned?: boolean | undefined;
+    copy?: {
+        plain: string;
+        html?: string | undefined;
+    } | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     tool?: string | undefined;
@@ -1062,7 +1192,12 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     kind: "run";
     state?: "failed" | "idle" | "busy" | undefined;
     group?: string | undefined;
+    open?: string | undefined;
     pinned?: boolean | undefined;
+    copy?: {
+        plain: string;
+        html?: string | undefined;
+    } | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     agents?: boolean | undefined;

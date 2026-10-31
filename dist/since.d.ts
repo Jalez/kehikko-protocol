@@ -174,6 +174,10 @@ export declare const WIRE_SINCE: {
     readonly 'kehikot.footer': "2.38.0";
     readonly 'hello.footer': "2.38.0";
     readonly 'press.place': "2.38.0";
+    readonly 'run.copy': "2.40.0";
+    readonly 'run.open': "2.40.0";
+    readonly 'press.carried': "2.40.0";
+    readonly 'hello.carries': "2.40.0";
 };
 export type WirePiece = keyof typeof WIRE_SINCE;
 /** Every table, in one place. Plain objects: read them with `sinceOf`, never by indexing with a stranger's string. */
@@ -299,6 +303,10 @@ export declare const SINCE: {
         readonly 'kehikot.footer': "2.38.0";
         readonly 'hello.footer': "2.38.0";
         readonly 'press.place': "2.38.0";
+        readonly 'run.copy': "2.40.0";
+        readonly 'run.open': "2.40.0";
+        readonly 'press.carried': "2.40.0";
+        readonly 'hello.carries': "2.40.0";
     };
 };
 /** The kinds of piece the tables know. */

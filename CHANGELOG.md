@@ -7,6 +7,23 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.40.0 — 2026-10-31
+
+A run may hand the host a copy or an open, which the host carries out in the person's click. Additive.
+
+- **`copy: { plain, html? }`** and **`open`** on a `run` (header and footer; `runCopySchema`,
+  `runOpenSchema`, `RUN_CARRIES`): the host writes the clipboard (text/plain, and text/html when
+  given) or opens the page in the person's browser from its own click handler, because a press relayed
+  to the module carries no user activation. Capped (`RUN_COPY_PLAIN` 65 536, `RUN_COPY_HTML`
+  131 072); `open` is `https:` only (`runOpenRefusal`). One act per run, never with `agents: true`
+  or `surface`. The html is text to the host: written, never drawn.
+- **`carried`** on `kehikot.press`: `copy` or `open` when the host did the act before sending it.
+- **`hello.carries`**: the acts a host carries out; client `facts.carries`, `useHost().hostCarries`.
+  A module uses `copy`/`open` only when the act is listed, and keeps its in-page act otherwise.
+- `WIRE_SINCE`: `run.copy`, `run.open`, `press.carried`, `hello.carries`.
+
+See [the header](docs/header.md#acts-the-host-carries-out-2400).
+
 ## 2.39.0 — 2026-10-31
 
 More brand marks for modules that front a coding agent. Additive.

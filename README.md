@@ -169,6 +169,7 @@ The same list with what each version exported is in [CHANGELOG.md](CHANGELOG.md)
 
 | version | date | what it added |
 |---|---|---|
+| 2.40.0 | 2026-10-31 | Additive. A `run` may carry `copy: { plain, html? }` or `open` (https only), which the host carries out in the person's click before relaying the press with `carried`; `hello.carries` / `hostCarries` says which acts a host does. Capped; one act per run; never for agents. See [the header](docs/header.md#acts-the-host-carries-out-2400). |
 | 2.39.0 | 2026-10-31 | Additive. `BRAND_MODULE_ICONS` gains `openai`, `googlegemini`, `opencode` and `mistralai` (Simple Icons slugs). |
 | 2.38.0 | 2026-10-31 | Additive. The footer: `kehikot.footer` (text, meters, and the header's switch, toggle, go and run, each with `align`, `optional`, `tooltip`), `place: 'footer'` on `kehikot.press`, `footerLayout` (one row at 380/280/200 px), `hello.footer` / `drawsFooter`, `WIRE_SINCE`. An older host drops the message; a module declares only when `drawsFooter` is true. See [the footer](docs/footer.md). |
 | 2.37.0 | 2026-10-31 | Additive. A session told by an older wording of the notes gets the full new notes once at its next prompt (`NOTES_VERSION`, `NotesTold.version`). |

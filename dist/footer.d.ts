@@ -271,6 +271,17 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     confirm: z.ZodDefault<z.ZodBoolean>;
     surface: z.ZodOptional<z.ZodEnum<["fullscreen"]>>;
     pinned: z.ZodOptional<z.ZodBoolean>;
+    copy: z.ZodOptional<z.ZodObject<{
+        plain: z.ZodString;
+        html: z.ZodOptional<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        plain: string;
+        html?: string | undefined;
+    }, {
+        plain: string;
+        html?: string | undefined;
+    }>>;
+    open: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
     id: z.ZodEffects<z.ZodString, string, string>;
     label: z.ZodString;
     icon: z.ZodOptional<z.ZodString>;
@@ -301,6 +312,11 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     align: "start" | "center" | "end";
     optional: boolean;
     group?: string | undefined;
+    open?: string | undefined;
+    copy?: {
+        plain: string;
+        html?: string | undefined;
+    } | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     tool?: string | undefined;
@@ -311,6 +327,11 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     kind: "run";
     state?: "failed" | "idle" | "busy" | undefined;
     group?: string | undefined;
+    open?: string | undefined;
+    copy?: {
+        plain: string;
+        html?: string | undefined;
+    } | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     agents?: boolean | undefined;
@@ -397,6 +418,11 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     align: "start" | "center" | "end";
     optional: boolean;
     group?: string | undefined;
+    open?: string | undefined;
+    copy?: {
+        plain: string;
+        html?: string | undefined;
+    } | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     tool?: string | undefined;
@@ -471,6 +497,11 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     kind: "run";
     state?: "failed" | "idle" | "busy" | undefined;
     group?: string | undefined;
+    open?: string | undefined;
+    copy?: {
+        plain: string;
+        html?: string | undefined;
+    } | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     agents?: boolean | undefined;
@@ -738,6 +769,17 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     confirm: z.ZodDefault<z.ZodBoolean>;
     surface: z.ZodOptional<z.ZodEnum<["fullscreen"]>>;
     pinned: z.ZodOptional<z.ZodBoolean>;
+    copy: z.ZodOptional<z.ZodObject<{
+        plain: z.ZodString;
+        html: z.ZodOptional<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        plain: string;
+        html?: string | undefined;
+    }, {
+        plain: string;
+        html?: string | undefined;
+    }>>;
+    open: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
     id: z.ZodEffects<z.ZodString, string, string>;
     label: z.ZodString;
     icon: z.ZodOptional<z.ZodString>;
@@ -768,6 +810,11 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     align: "start" | "center" | "end";
     optional: boolean;
     group?: string | undefined;
+    open?: string | undefined;
+    copy?: {
+        plain: string;
+        html?: string | undefined;
+    } | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     tool?: string | undefined;
@@ -778,6 +825,11 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     kind: "run";
     state?: "failed" | "idle" | "busy" | undefined;
     group?: string | undefined;
+    open?: string | undefined;
+    copy?: {
+        plain: string;
+        html?: string | undefined;
+    } | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     agents?: boolean | undefined;
@@ -864,6 +916,11 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     align: "start" | "center" | "end";
     optional: boolean;
     group?: string | undefined;
+    open?: string | undefined;
+    copy?: {
+        plain: string;
+        html?: string | undefined;
+    } | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     tool?: string | undefined;
@@ -938,6 +995,11 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     kind: "run";
     state?: "failed" | "idle" | "busy" | undefined;
     group?: string | undefined;
+    open?: string | undefined;
+    copy?: {
+        plain: string;
+        html?: string | undefined;
+    } | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     agents?: boolean | undefined;
@@ -1024,6 +1086,11 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     align: "start" | "center" | "end";
     optional: boolean;
     group?: string | undefined;
+    open?: string | undefined;
+    copy?: {
+        plain: string;
+        html?: string | undefined;
+    } | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     tool?: string | undefined;
@@ -1098,6 +1165,11 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     kind: "run";
     state?: "failed" | "idle" | "busy" | undefined;
     group?: string | undefined;
+    open?: string | undefined;
+    copy?: {
+        plain: string;
+        html?: string | undefined;
+    } | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     agents?: boolean | undefined;

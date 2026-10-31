@@ -188,7 +188,7 @@ export function connect(id, events = {}, options = {}) {
             projectNow = projectOf(message.context);
             projectIdNow = projectIdOf(message.context);
             sendActivity();
-            events.onHello?.(message.context, message.state, { answers: message.answers ?? null, header: message.header ?? null, footer: message.footer ?? null });
+            events.onHello?.(message.context, message.state, { answers: message.answers ?? null, header: message.header ?? null, footer: message.footer ?? null, carries: message.carries ?? null });
             return;
         }
         /* Everything after the greeting has to come from the window that gave it.
@@ -255,7 +255,7 @@ export function connect(id, events = {}, options = {}) {
             };
             const backstop = setTimeout(() => answer(false, 'This app did not say whether it took that press.'), pressBackstop);
             const footer = message.place === 'footer';
-            const press = { item: message.item, ...(message.value !== undefined ? { value: message.value } : {}), ...(footer ? { place: 'footer' } : {}) };
+            const press = { item: message.item, ...(message.value !== undefined ? { value: message.value } : {}), ...(footer ? { place: 'footer' } : {}), ...(message.carried ? { carried: message.carried } : {}) };
             /* Judged against what is declared NOW: the header (or footer) may have changed since it was drawn. */
             const refused = footer ? footerPressRefusal(footed, press) : pressRefusal(declared, press);
             if (refused !== null)
