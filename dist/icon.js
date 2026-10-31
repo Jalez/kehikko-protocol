@@ -87,7 +87,20 @@ export const LUCIDE_MODULE_ICONS = [
  * third-party tool a module fronts (LaTeX for a paper written in it, Claude for a Claude Code
  * session, Google Chrome for a browser). Drawn in one colour, the text's, like every other icon.
  */
-export const BRAND_MODULE_ICONS = ['claude', 'git', 'github', 'gitlab', 'googlechrome', 'latex', 'markdown'];
+export const BRAND_MODULE_ICONS = [
+    'claude',
+    'git',
+    'github',
+    'gitlab',
+    'googlechrome',
+    /** 2.39.0. */
+    'googlegemini',
+    'latex',
+    'markdown',
+    'mistralai',
+    'openai',
+    'opencode',
+];
 export const MODULE_ICONS = [
     ...LUCIDE_MODULE_ICONS.map((name) => `lucide:${name}`),
     ...BRAND_MODULE_ICONS.map((name) => `brand:${name}`),

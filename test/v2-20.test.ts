@@ -34,7 +34,7 @@ const ENV = { KEHIKOT_ORIGINS: 'http://127.0.0.1:8021' }
 
 describe('the version', () => {
   test('is 2.20.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.38.0')
+    expect(PACKAGE_VERSION).toBe('2.39.0')
     expect(PROTOCOL).toBe(2)
   })
 })
