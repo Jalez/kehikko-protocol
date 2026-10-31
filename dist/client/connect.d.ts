@@ -1,5 +1,5 @@
 import { type ActivityItem } from '../activity.js';
-import { type FilterGroup, type Goto, type HeaderItemInput, type ModuleContext, type ModuleEvent, type Press, type ResponseFailureReason } from '../wire.js';
+import { type FilterGroup, type FooterItemInput, type Goto, type HeaderItemInput, type ModuleContext, type ModuleEvent, type Press, type ResponseFailureReason } from '../wire.js';
 import { type MessageSource } from './mailbox.js';
 /**
  * The bridge: one conversation with one window, in the shape this package's schemas define.
@@ -82,6 +82,11 @@ export interface HostFacts {
     answers: readonly string[] | null;
     /** Whether this host draws the module's header in its own menus, or `null`. */
     header: boolean | null;
+    /**
+     * 2.38.0. Whether this host draws the module's declared footer, or `null` when it did not say: a
+     * host before 2.38.0, which does not. Only `true` means "declare it and draw none of your own".
+     */
+    footer: boolean | null;
 }
 export interface HostEvents {
     /**
@@ -119,10 +124,11 @@ export interface HostEvents {
      * One of this page's header items was pressed, by a person in the host's menus or by an agent
      * through the host: `item` is its id, `value` the option chosen (switch, go) or the state wanted
      * (toggle). Only reaches a page that declared the item with `header`; a press the last header
-     * cannot take is refused before this is called. Do it, declare the header again, and return
+     * cannot take is refused before this is called. 2.38.0: `place` is `'footer'` for an item of the
+     * page's footer (declared with `footer`), absent for one of its header. Do it, declare the header again, and return
      * nothing — or return the sentence saying why not. `connect` answers the host exactly once.
      */
-    onPress?: (press: Pick<Press, 'item' | 'value'>) => PressAnswer | Promise<PressAnswer>;
+    onPress?: (press: Pick<Press, 'item' | 'value' | 'place'>) => PressAnswer | Promise<PressAnswer>;
     /**
      * The person opened one of this module's Inbox items (2.35.0): pressed it in the Inbox, on a
      * toast or with Next, and the host has gone to its place. `item` is the id the module reported.
@@ -198,6 +204,14 @@ export interface Connection {
      * `onPress`: the host draws what was last declared and holds no state of its own.
      */
     header: (items: HeaderItemInput[]) => void;
+    /**
+     * 2.38.0. Say what this page's footer shows and offers, so the host can draw it as one row at the
+     * bottom of the container: status text, meters, and the header's kinds of item. The whole list
+     * every time; `[]` withdraws it. Remembered and replayed on every greeting, like `header`. Presses
+     * reach `onPress` with `place: 'footer'`. Declare it only when the greeting said the host draws it
+     * (`HostFacts.footer === true`); otherwise draw the footer yourself. See docs/footer.md.
+     */
+    footer: (items: FooterItemInput[]) => void;
     /**
      * Say what this page's things are doing now (`activity.set`, 1.5.0): the COMPLETE list, replacing
      * what was said before; `[]` says nothing is going on. Fire and forget. A list identical to the one

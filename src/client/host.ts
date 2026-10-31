@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import type { ActivityItem, AddressIntent, CodeLocation, FilterGroup, HeaderItemInput, LocationIntent, Passage } from '../index.js'
+import type { ActivityItem, AddressIntent, CodeLocation, FilterGroup, FooterItemInput, HeaderItemInput, LocationIntent, Passage } from '../index.js'
 import { HostRefused, NOBODY_TO_ASK, type AskOptions, type Connection, type HostEvents } from './connect.js'
 import {
   JSON_KEPT,
@@ -115,12 +115,13 @@ export function useHost<Kept = unknown>(
     [],
   )
   const header = useCallback((items: HeaderItemInput[]) => held.current?.header(items), [])
+  const footer = useCallback((items: FooterItemInput[]) => held.current?.footer(items), [])
   const activity = useCallback((items: ActivityItem[]) => held.current?.activity(items), [])
   const connection = useCallback(() => held.current?.connection() ?? null, [])
   const read = useCallback(() => held.current?.get() ?? drawn.current, [])
 
   return useMemo(
-    () => ({ ...standing, remember, point, locate, openAddress, request, resize, filters, clearable, refreshable, header, activity, connection, read }),
-    [standing, remember, point, locate, openAddress, request, resize, filters, clearable, refreshable, header, activity, connection, read],
+    () => ({ ...standing, remember, point, locate, openAddress, request, resize, filters, clearable, refreshable, header, footer, activity, connection, read }),
+    [standing, remember, point, locate, openAddress, request, resize, filters, clearable, refreshable, header, footer, activity, connection, read],
   )
 }

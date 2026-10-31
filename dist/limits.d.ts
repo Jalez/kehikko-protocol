@@ -261,6 +261,14 @@ export declare const LIMITS: {
     readonly HEADER_GROUP: 24;
     /** What a run last came to, in a word or three: `1.2 s`, `failed`, `p. 3/12`. */
     readonly HEADER_RESULT: 32;
+    /** How many footer items one module may declare at once, over every kind. */
+    readonly FOOTER_ITEMS: 16;
+    /** A footer status line or count: `12 references · 3 selected`. A host cuts it with an ellipsis, whole in its tooltip. */
+    readonly FOOTER_TEXT: 120;
+    /** What a meter shows for its value instead of a percentage: `41k / 200k`. */
+    readonly FOOTER_METER_TEXT: 24;
+    /** A footer item's tooltip: a sentence that says more than the row has room for. */
+    readonly FOOTER_TOOLTIP: 240;
     /** How many kinds of subject one module may declare. */
     readonly SUBJECTS: 8;
     /** The name a module asks its MCP door to be registered under: `mcp.as`. */

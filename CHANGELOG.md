@@ -7,6 +7,32 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.38.0 — 2026-10-31
+
+The footer: a module declares its status row and the host draws it at the bottom of the container, as
+it draws the header. Additive.
+
+- **`kehikot.footer`** (`MESSAGE.FOOTER`, `footerSchema`, module → host): every footer item, whole,
+  every time; `[]` takes the footer away. Items (`footerItemSchema`, `FOOTER_KINDS`): `text` (a status
+  line or a count, with a `level`), `meter` (`label`, `value` 0 to 1, `level`, optional `text`), and the
+  header's `switch`, `toggle`, `go` and `run` with their fields and rules (`pinned` and `surface`
+  stripped). Every item has `align` (`start`, `center`, `end`; `FOOTER_ALIGNS`), `optional` and
+  `tooltip`. `FOOTER_LEVELS`: `normal`, `warn`, `critical`. Limits `FOOTER_ITEMS` (16), `FOOTER_TEXT`
+  (120), `FOOTER_METER_TEXT` (24), `FOOTER_TOOLTIP` (240).
+- **`kehikot.press` may say `place: 'footer'`** (`PRESS_PLACES`); absent is the header, as before.
+  `footerPressRefusal` judges a footer press; `pressableFooterItem`, `meterSaid`.
+- **Fit:** `footerLayout(items, width)` and `footerModeFor`, at the header's widths
+  (`FOOTER_ICONS_BELOW` 300, `FOOTER_MERGE_BELOW` 220): optional items go and runs become icons under
+  300, every pressable item is in one "⋯" under 220. Nothing pressable is lost.
+- **`hello.footer`**: whether the host draws a declared footer. Client: `Connection.footer`,
+  `HostFacts.footer`, `onPress` receives `place`, `hostStore`/`useHost` have `footer` and `drawsFooter`.
+  A module declares its footer only when `drawsFooter === true`, and draws its own otherwise.
+- **`WIRE_SINCE`** (`SINCE.wire`, `sinceOf('wire', …)`): `kehikot.footer`, `hello.footer`, `press.place`.
+- `HEADER_ITEM_SHAPES`, `checkPressable`, `headerIdSchema`, `headerLabelSchema`: the header's item
+  shapes and rules, exported so the footer takes the same ones.
+
+See [the footer](docs/footer.md).
+
 ## 2.37.0 — 2026-10-31
 
 A session told by an older wording of the notes gets the full new notes once. Additive.
