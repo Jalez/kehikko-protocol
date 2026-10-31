@@ -3,6 +3,7 @@ import type { TrackerColumns, TrackerReading } from '../tracker.js';
 import type { TrafficNoteResult, TrafficReadResult } from '../traffic.js';
 import type { DispositionsGetResult, EpicsListResult, PartsGetResult } from '../methods.js';
 import type { StepsListResult } from '../plan.js';
+import type { MessageReadResult, MessageSendResult } from '../agent-messages.js';
 import type { Reply } from './doors.js';
 /** A new pass for one question, good once for `LIMITS.SERVER_PASS_MS`. `askHost` mints its own. */
 export declare function mintServerPass(now?: number): string;
@@ -31,6 +32,10 @@ export interface ServerAnswers {
     'parts.get': PartsGetResult;
     /** 2.21.0. The project's dispositions. */
     'dispositions.get': DispositionsGetResult;
+    /** 2.41.0. What became of a message. */
+    'messages.send': MessageSendResult;
+    /** 2.41.0. The messages a session may read. */
+    'messages.read': MessageReadResult;
 }
 /**
  * What came of one question. `ok: true`: the host's answer, held to the method's result schema.

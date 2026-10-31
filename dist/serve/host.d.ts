@@ -33,15 +33,15 @@ export declare const isProjectResult: z.ZodObject<{
     project: boolean;
     ok: true;
     id?: string | undefined;
-    missing?: boolean | undefined;
     why?: string | undefined;
+    missing?: boolean | undefined;
     movedTo?: string | undefined;
 }, {
     project: boolean;
     ok: true;
     id?: unknown;
-    missing?: unknown;
     why?: unknown;
+    missing?: unknown;
     movedTo?: unknown;
 }>;
 export type IsProjectResult = z.infer<typeof isProjectResult>;

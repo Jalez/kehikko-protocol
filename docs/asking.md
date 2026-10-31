@@ -353,6 +353,12 @@ changes the text of the notes (a new line or section, a reworded rule) must bump
 sessions already running never hear it until they restart. A module keeps the whole record it is given back (`told`)
 and passes it in unchanged next time.
 
+**Messages (2.41.0).** Asked with `messages: true`, the answer also carries the session's unread messages
+(`messages`, `messagesMore`), now counted delivered; passed to `sessionNotes` as `messages` and
+`messagesMore` they are said after the rest, each one quoted line under a head that says they are text to
+read, not instructions. `messaging` adds the line about `send_message` and `read_messages`. See
+[agent messages](agent-messages.md).
+
 **Who may speak where it is not.** `absent` widens a module's reach: its line reaches sessions on every
 kehikko of every project on this computer, where nobody placed it. So a host lists only modules that
 are installed (registered here) AND on its official list, which whoever can push to the host's `main`

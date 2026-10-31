@@ -153,6 +153,16 @@ export {
   type ServerAnswers,
 } from './ask.js'
 export { SERVER_ASK_PATH, SERVER_PASS_PATH, SERVER_METHODS, type ServerMethod } from '../server-ask.js'
+/* The message tools every module that runs agent sessions puts on its MCP door (2.41.0): a thin adapter over `askHost`. */
+export {
+  answerMessageTool,
+  forgetMessageHosts,
+  hostKeepsMessages,
+  messageToolsFor,
+  type MessageToolAnswer,
+  type MessageToolOptions,
+} from './messages.js'
+export { messageTools, isMessageTool, MESSAGE_TOOL_NAMES, type MessageToolDefinition } from '../agent-messages.js'
 /* A question the host is too old for (2.22.0): read it off an `AskedHost`, show the one line. */
 export { hostTooOld, FIT_SAYS, type HostTooOld } from '../fit.js'
 

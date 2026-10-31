@@ -165,8 +165,8 @@ export declare const planStepSchema: z.ZodObject<{
     id: string;
     title: string;
     refs?: string[] | undefined;
-    issue?: string | undefined;
     body?: string | undefined;
+    issue?: string | undefined;
     part?: string | undefined;
     related?: string[] | undefined;
     under?: string | undefined;
@@ -281,8 +281,8 @@ export declare const planSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
         id: string;
         title: string;
         refs?: string[] | undefined;
-        issue?: string | undefined;
         body?: string | undefined;
+        issue?: string | undefined;
         part?: string | undefined;
         related?: string[] | undefined;
         under?: string | undefined;
@@ -333,8 +333,8 @@ export declare const planSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
         id: string;
         title: string;
         refs?: string[] | undefined;
-        issue?: string | undefined;
         body?: string | undefined;
+        issue?: string | undefined;
         part?: string | undefined;
         related?: string[] | undefined;
         under?: string | undefined;
@@ -391,8 +391,8 @@ export declare const planSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
         id: string;
         title: string;
         refs?: string[] | undefined;
-        issue?: string | undefined;
         body?: string | undefined;
+        issue?: string | undefined;
         part?: string | undefined;
         related?: string[] | undefined;
         under?: string | undefined;
@@ -449,8 +449,8 @@ export declare const planSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
         id: string;
         title: string;
         refs?: string[] | undefined;
-        issue?: string | undefined;
         body?: string | undefined;
+        issue?: string | undefined;
         part?: string | undefined;
         related?: string[] | undefined;
         under?: string | undefined;
@@ -554,8 +554,8 @@ export declare const providedStepSchema: z.ZodObject<{
     id: string;
     refs: string[];
     title: string;
-    body: string;
     module: string;
+    body: string;
     related: string[];
     after: string[];
     gates: {
@@ -577,8 +577,8 @@ export declare const providedStepSchema: z.ZodObject<{
     title: string;
     module: string;
     refs?: string[] | undefined;
-    issue?: string | undefined;
     body?: string | undefined;
+    issue?: string | undefined;
     part?: string | undefined;
     related?: string[] | undefined;
     under?: string | undefined;
@@ -701,8 +701,8 @@ export declare const stepsListResult: z.ZodObject<{
         id: string;
         refs: string[];
         title: string;
-        body: string;
         module: string;
+        body: string;
         related: string[];
         after: string[];
         gates: {
@@ -724,8 +724,8 @@ export declare const stepsListResult: z.ZodObject<{
         title: string;
         module: string;
         refs?: string[] | undefined;
-        issue?: string | undefined;
         body?: string | undefined;
+        issue?: string | undefined;
         part?: string | undefined;
         related?: string[] | undefined;
         under?: string | undefined;
@@ -832,8 +832,8 @@ export declare const stepsListResult: z.ZodObject<{
         id: string;
         refs: string[];
         title: string;
-        body: string;
         module: string;
+        body: string;
         related: string[];
         after: string[];
         gates: {
@@ -855,8 +855,8 @@ export declare const stepsListResult: z.ZodObject<{
         title: string;
         module: string;
         refs?: string[] | undefined;
-        issue?: string | undefined;
         body?: string | undefined;
+        issue?: string | undefined;
         part?: string | undefined;
         related?: string[] | undefined;
         under?: string | undefined;
@@ -963,8 +963,8 @@ export declare const stepsListResult: z.ZodObject<{
         id: string;
         refs: string[];
         title: string;
-        body: string;
         module: string;
+        body: string;
         related: string[];
         after: string[];
         gates: {
@@ -986,8 +986,8 @@ export declare const stepsListResult: z.ZodObject<{
         title: string;
         module: string;
         refs?: string[] | undefined;
-        issue?: string | undefined;
         body?: string | undefined;
+        issue?: string | undefined;
         part?: string | undefined;
         related?: string[] | undefined;
         under?: string | undefined;

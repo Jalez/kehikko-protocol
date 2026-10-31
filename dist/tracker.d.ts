@@ -646,7 +646,7 @@ export declare const trackerRowSchema: z.ZodObject<{
         approvedBy?: string[] | undefined;
     } | undefined;
     author?: string | null | undefined;
-    review?: "approved" | "changes-requested" | "required" | undefined;
+    review?: "required" | "approved" | "changes-requested" | undefined;
     stateReason?: string | null | undefined;
     closedByMerge?: boolean | undefined;
     draft?: boolean | undefined;
@@ -728,7 +728,7 @@ export declare const trackerRowSchema: z.ZodObject<{
         approvedBy?: string[] | undefined;
     } | undefined;
     author?: string | null | undefined;
-    review?: "approved" | "changes-requested" | "required" | undefined;
+    review?: "required" | "approved" | "changes-requested" | undefined;
     stateReason?: string | null | undefined;
     closedByMerge?: boolean | undefined;
     draft?: boolean | undefined;
@@ -1244,7 +1244,7 @@ export declare const trackerReadingResult: z.ZodObject<{
             approvedBy?: string[] | undefined;
         } | undefined;
         author?: string | null | undefined;
-        review?: "approved" | "changes-requested" | "required" | undefined;
+        review?: "required" | "approved" | "changes-requested" | undefined;
         stateReason?: string | null | undefined;
         closedByMerge?: boolean | undefined;
         draft?: boolean | undefined;
@@ -1326,7 +1326,7 @@ export declare const trackerReadingResult: z.ZodObject<{
             approvedBy?: string[] | undefined;
         } | undefined;
         author?: string | null | undefined;
-        review?: "approved" | "changes-requested" | "required" | undefined;
+        review?: "required" | "approved" | "changes-requested" | undefined;
         stateReason?: string | null | undefined;
         closedByMerge?: boolean | undefined;
         draft?: boolean | undefined;
@@ -1444,7 +1444,7 @@ export declare const trackerReadingResult: z.ZodObject<{
             approvedBy?: string[] | undefined;
         } | undefined;
         author?: string | null | undefined;
-        review?: "approved" | "changes-requested" | "required" | undefined;
+        review?: "required" | "approved" | "changes-requested" | undefined;
         stateReason?: string | null | undefined;
         closedByMerge?: boolean | undefined;
         draft?: boolean | undefined;
@@ -1544,7 +1544,7 @@ export declare const trackerReadingResult: z.ZodObject<{
             approvedBy?: string[] | undefined;
         } | undefined;
         author?: string | null | undefined;
-        review?: "approved" | "changes-requested" | "required" | undefined;
+        review?: "required" | "approved" | "changes-requested" | undefined;
         stateReason?: string | null | undefined;
         closedByMerge?: boolean | undefined;
         draft?: boolean | undefined;
@@ -1628,10 +1628,10 @@ export declare const trackerRefreshResult: z.ZodObject<{
     why: z.ZodDefault<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     at: string | null;
-    outcome: "failed" | "read" | "declined";
+    outcome: "declined" | "failed" | "read";
     why: string;
 }, {
-    outcome: "failed" | "read" | "declined";
+    outcome: "declined" | "failed" | "read";
     at?: string | null | undefined;
     why?: string | undefined;
 }>;

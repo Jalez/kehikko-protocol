@@ -42,12 +42,17 @@ export const SERVER_METHODS = [
   'steps.list',
   'parts.get',
   'dispositions.get',
+  /* 2.41.0: messages between agent sessions. The project is the one the session's token names, so they name none. */
+  'messages.send',
+  'messages.read',
 ] as const
 export type ServerMethod = (typeof SERVER_METHODS)[number]
 
 /**
  * The server methods that are about one project, and so name it. The traffic methods (2.20.0) are
  * about this computer, and a question about them names no project. Every 2.21.0 method is a project's.
+ * The message methods (2.41.0) are a project's too, but the project is the one the session's token
+ * names: the host takes it from there, and a question names none.
  */
 export const SERVER_PROJECT_METHODS: readonly ServerMethod[] = [
   'tracker.get',

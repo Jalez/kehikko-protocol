@@ -38,6 +38,8 @@ export const METHOD_SINCE = {
     'traffic.note': '2.20.0',
     'parts.get': '2.21.0',
     'dispositions.get': '2.21.0',
+    'messages.send': '2.41.0',
+    'messages.read': '2.41.0',
 };
 /** Each capability, and the version that added it: the oldest of its methods. */
 export const CAPABILITY_SINCE = {
@@ -66,6 +68,7 @@ export const CAPABILITY_SINCE = {
     'traffic:report': '2.20.0',
     'parts:read': '2.21.0',
     'dispositions:read': '2.21.0',
+    'agents:message': '2.41.0',
 };
 /** Each method a module's server may ask (`SERVER_METHODS`), and the version a server could first ask it in. */
 export const SERVER_METHOD_SINCE = {
@@ -78,6 +81,8 @@ export const SERVER_METHOD_SINCE = {
     'steps.list': '2.21.0',
     'parts.get': '2.21.0',
     'dispositions.get': '2.21.0',
+    'messages.send': '2.41.0',
+    'messages.read': '2.41.0',
 };
 /**
  * The manifest declarations a host has to know to do what the module asks, and the version that
@@ -160,6 +165,9 @@ export const SESSION_FIELD_SINCE = {
     absent: '2.36.0',
     agentSays: '2.36.0',
     absentSays: '2.36.0',
+    /** Unread messages for the session, and how many more wait (2.41.0), when the module asked with `messages: true`. */
+    messages: '2.41.0',
+    messagesMore: '2.41.0',
 };
 /**
  * Wire messages and message fields added after 2.37.0, and the version that added each (2.38.0): what a
@@ -237,6 +245,7 @@ export const PIECE_SAID = {
         'traffic:report': 'its own entries in the call log',
         'parts:read': "an epic's parts from the host",
         'dispositions:read': 'marks for why references closed, from the host',
+        'agents:message': 'messages between agent sessions',
     },
     declarations: {
         'mcp.subjects': 'door subjects',

@@ -517,6 +517,42 @@ export {
   type NotesEvent,
 } from './notes.js'
 
+/* Messages between agent sessions, kept by the host (2.41.0). See `agent-messages.ts`. */
+export {
+  MESSAGE_THREAD,
+  MESSAGE_SEND_OUTCOMES,
+  MESSAGE_TOOL_NAMES,
+  MESSAGES_HEAD,
+  NOTES_MESSAGES_MOST,
+  agentSessionRefSchema,
+  messagePlaceSchema,
+  messageToSchema,
+  messageFromPlaceSchema,
+  agentMessageSchema,
+  messageSendParams,
+  messageReadParams,
+  messageSendResult,
+  messageReadResult,
+  quotedBody,
+  messageToWords,
+  messageLine,
+  messagesNotes,
+  messagingLine,
+  isMessageTool,
+  messageTools,
+  readMessagesText,
+  sentText,
+  type AgentSessionRef,
+  type MessagePlace,
+  type MessageTo,
+  type AgentMessage,
+  type MessageSendOutcome,
+  type MessageSendResult,
+  type MessageReadResult,
+  type MessageToolName,
+  type MessageToolDefinition,
+} from './agent-messages.js'
+
 /* Going to another project, and asking for one thing to be shown there (2.28.0). */
 export {
   NAVIGATES,

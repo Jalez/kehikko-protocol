@@ -332,6 +332,8 @@ and a module that declares none gets none of the methods below.
 | `traffic.note` | `traffic:report` |
 | `parts.get` | `parts:read` |
 | `dispositions.get` | `dispositions:read` |
+| `messages.send` | `agents:message` |
+| `messages.read` | `agents:message` |
 
 The host's table is the protocol's `METHODS`, read by its `capabilityOf`
 (`src/host/grants.ts`): there is no second list to keep in step. A host keeps a
@@ -357,6 +359,17 @@ screen: a module asking for them is saying it reads them with nobody looking.
 `parts.get { epic }` answers `partsGetResult` (`{ parts }`, `context.parts`'s
 shape, `picked` false throughout: picking is a person's, on one screen);
 `dispositions.get {}` answers `dispositionsGetResult` (`{ dispositions }`).
+
+#### `CAPABILITIES.agents:message`
+
+2.41.0. Messages between the agent sessions a module runs, kept by the host per
+project. `messages.send { token, body, to?, thread? }` answers
+`messageSendResult` (`sent` with the id, or `declined` with why);
+`messages.read { token, unread?, since?, thread?, limit? }` answers
+`messageReadResult` (`{ messages, unread, you }`). Both are asked from a
+module's SERVER for the session whose place token is on the door's URL; the
+host stamps the sender and takes the project from the token. A page has no
+session, and a host declines them there. See [agent messages](agent-messages.md).
 
 #### `CAPABILITIES.steps:read`, from 2.21.0
 

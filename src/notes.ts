@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { LIMITS } from './limits.js'
+import { messagesNotes, messagingLine, type AgentMessage } from './agent-messages.js'
 
 /**
  * 2.36.0. What an agent session is told about the modules around it, in ONE wording for every module
@@ -107,6 +108,19 @@ export interface NotesInput {
   connected?: readonly string[] | null
   /** The place's key as the module keeps it, to notice a move; derived from `place` when absent. */
   key?: string | null
+  /**
+   * 2.41.0. The session's unread messages, as the host handed them (`messages` in its answer to
+   * `POST /host/place` asked with `messages: true`), oldest first. Said whenever there are any, at a
+   * start or a prompt, under `MESSAGES_HEAD`. Null or absent: none, or a host that keeps none.
+   */
+  messages?: readonly AgentMessage[] | null
+  /** 2.41.0. How many more unread wait beyond `messages` (`messagesMore`). */
+  messagesMore?: number | null
+  /**
+   * 2.41.0. Present when the host keeps messages (its answer carried `messages`) and the module offers
+   * the tools (`messageTools`): the start says so, with the session's own address when known.
+   */
+  messaging?: { session: string | null } | null
 }
 
 /**
@@ -114,9 +128,10 @@ export interface NotesInput {
  * changes in content or format (a new line, a new section, a reworded rule): a session told by an
  * older version then gets the full new notes once, at its next prompt, instead of never (it would
  * otherwise only hear about modules added or removed). 1 is the era before the version was kept: a
- * `NotesTold` without `version` is read as 1.
+ * `NotesTold` without `version` is read as 1. 3 (2.41.0): the line about messaging other agent sessions,
+ * and the messages section.
  */
-export const NOTES_VERSION = 2
+export const NOTES_VERSION = 3
 
 /** What a session was last told: its place by key, and which modules (null when they could not be read). */
 export interface NotesTold {
@@ -202,6 +217,7 @@ export function startNotes(input: NotesInput, moved = false): string {
     `Kehikot: this conversation ${moved ? 'has been moved, and now belongs' : 'belongs'} to ${placeWords(place)}. That is its place whatever the person has on screen; the ${host} MCP server answers about it (my_place, read_canvas).`,
     researchLine(input.self),
   ]
+  if (input.messaging) lines.push(messagingLine(input.self, input.messaging.session))
   if (!place.kehikko) return lines.join('\n')
   const modules = others(input.modules, input.self)
   if (modules === null) lines.push('The modules on this kehikko could not be read just now (Kehikot did not say); read_canvas lists them.')
@@ -237,9 +253,17 @@ export function changeNotes(input: NotesInput, told: NotesTold): string | null {
  * THE RULE for one hook: everything at a start, or when the place moved, or when the modules could
  * not be read last time and can now, or (2.37.0) once at a prompt when it was told by an older
  * `NOTES_VERSION` (headed `UPDATED_HEAD`); at a prompt, otherwise only what changed; otherwise nothing (`text`
- * null). `told` is what to keep for next time, whenever `text` is not null.
+ * null). (2.41.0) The session's unread messages follow whatever else is said, and are said on their
+ * own (`kind: 'change'`) when nothing else is. `told` is what to keep for next time, whenever `text` is not null.
  */
 export function sessionNotes(input: NotesInput, event: NotesEvent, told: NotesTold | null): { text: string | null; kind: 'start' | 'change' | null; told: NotesTold } {
+  const said = notesWithoutMessages(input, event, told)
+  const messages = messagesNotes(input.messages, Math.max(0, Number(input.messagesMore) || 0))
+  if (!messages) return said
+  return { text: said.text ? `${said.text}\n${messages}` : messages, kind: said.kind ?? 'change', told: said.told }
+}
+
+function notesWithoutMessages(input: NotesInput, event: NotesEvent, told: NotesTold | null): { text: string | null; kind: 'start' | 'change' | null; told: NotesTold } {
   const key = input.key !== undefined ? input.key : keyOf(input.place)
   const onKehikko = Boolean(input.place?.kehikko)
   const modules = onKehikko ? others(input.modules, input.self) : []

@@ -112,16 +112,16 @@ export declare const trafficCallerSchema: z.ZodObject<{
     pid: z.ZodOptional<z.ZodNumber>;
 }, "strip", z.ZodTypeAny, {
     name: string;
-    kind: "host" | "module" | "session" | "program" | "remote" | "gone";
-    how: "closed" | "address" | "token" | "origin" | "process" | "route";
+    kind: "module" | "session" | "host" | "program" | "remote" | "gone";
+    how: "token" | "closed" | "address" | "origin" | "process" | "route";
     place?: string | undefined;
     process?: string | undefined;
     parent?: string | undefined;
     pid?: number | undefined;
 }, {
     name: string;
-    kind: "host" | "module" | "session" | "program" | "remote" | "gone";
-    how: "closed" | "address" | "token" | "origin" | "process" | "route";
+    kind: "module" | "session" | "host" | "program" | "remote" | "gone";
+    how: "token" | "closed" | "address" | "origin" | "process" | "route";
     place?: string | undefined;
     process?: string | undefined;
     parent?: string | undefined;
@@ -163,16 +163,16 @@ export declare const trafficCallSchema: z.ZodObject<{
         pid: z.ZodOptional<z.ZodNumber>;
     }, "strip", z.ZodTypeAny, {
         name: string;
-        kind: "host" | "module" | "session" | "program" | "remote" | "gone";
-        how: "closed" | "address" | "token" | "origin" | "process" | "route";
+        kind: "module" | "session" | "host" | "program" | "remote" | "gone";
+        how: "token" | "closed" | "address" | "origin" | "process" | "route";
         place?: string | undefined;
         process?: string | undefined;
         parent?: string | undefined;
         pid?: number | undefined;
     }, {
         name: string;
-        kind: "host" | "module" | "session" | "program" | "remote" | "gone";
-        how: "closed" | "address" | "token" | "origin" | "process" | "route";
+        kind: "module" | "session" | "host" | "program" | "remote" | "gone";
+        how: "token" | "closed" | "address" | "origin" | "process" | "route";
         place?: string | undefined;
         process?: string | undefined;
         parent?: string | undefined;
@@ -191,14 +191,14 @@ export declare const trafficCallSchema: z.ZodObject<{
     ms: number | null;
     seq: number;
     via: "page" | "server" | "process";
-    reported: "host" | "module" | "sampled";
+    reported: "module" | "host" | "sampled";
     bytesIn?: number | undefined;
     bytesOut?: number | undefined;
     cache?: "refused" | "hit" | "not-modified" | undefined;
     caller?: {
         name: string;
-        kind: "host" | "module" | "session" | "program" | "remote" | "gone";
-        how: "closed" | "address" | "token" | "origin" | "process" | "route";
+        kind: "module" | "session" | "host" | "program" | "remote" | "gone";
+        how: "token" | "closed" | "address" | "origin" | "process" | "route";
         place?: string | undefined;
         process?: string | undefined;
         parent?: string | undefined;
@@ -213,7 +213,7 @@ export declare const trafficCallSchema: z.ZodObject<{
     side: "out" | "in" | "seen";
     seq: number;
     via: "page" | "server" | "process";
-    reported: "host" | "module" | "sampled";
+    reported: "module" | "host" | "sampled";
     status?: number | null | undefined;
     reason?: string | null | undefined;
     ok?: boolean | null | undefined;
@@ -238,15 +238,15 @@ export declare const trafficBudgetSchema: z.ZodObject<{
     note: z.ZodDefault<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     name: string;
+    limit: number;
     note: string;
     used: number;
-    limit: number;
     left: number;
     resets: number | null;
 }, {
     name: string;
-    used: number;
     limit: number;
+    used: number;
     left: number;
     resets: number | null;
     note?: string | undefined;
@@ -261,11 +261,11 @@ export declare const trafficShareSchema: z.ZodObject<{
     limit: z.ZodNumber;
     used: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
-    used: number;
     limit: number;
+    used: number;
 }, {
-    used: number;
     limit: number;
+    used: number;
 }>;
 export type TrafficShare = z.infer<typeof trafficShareSchema>;
 /**
@@ -284,31 +284,31 @@ export declare const trafficAllowanceSchema: z.ZodObject<{
         limit: z.ZodNumber;
         used: z.ZodNumber;
     }, "strip", z.ZodTypeAny, {
-        used: number;
         limit: number;
+        used: number;
     }, {
-        used: number;
         limit: number;
+        used: number;
     }>>>;
     floor: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
 }, "strip", z.ZodTypeAny, {
-    used: number;
     limit: number;
+    used: number;
     resets: number | null;
     remaining: number;
     share: {
-        used: number;
         limit: number;
+        used: number;
     } | null;
     floor: number | null;
 }, {
-    used: number;
     limit: number;
+    used: number;
     resets: number | null;
     remaining: number;
     share?: {
-        used: number;
         limit: number;
+        used: number;
     } | null | undefined;
     floor?: number | null | undefined;
 }>;
@@ -332,31 +332,31 @@ export declare const trafficAccountSchema: z.ZodObject<{
             limit: z.ZodNumber;
             used: z.ZodNumber;
         }, "strip", z.ZodTypeAny, {
-            used: number;
             limit: number;
+            used: number;
         }, {
-            used: number;
             limit: number;
+            used: number;
         }>>>;
         floor: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
     }, "strip", z.ZodTypeAny, {
-        used: number;
         limit: number;
+        used: number;
         resets: number | null;
         remaining: number;
         share: {
-            used: number;
             limit: number;
+            used: number;
         } | null;
         floor: number | null;
     }, {
-        used: number;
         limit: number;
+        used: number;
         resets: number | null;
         remaining: number;
         share?: {
-            used: number;
             limit: number;
+            used: number;
         } | null | undefined;
         floor?: number | null | undefined;
     }>>>;
@@ -369,31 +369,31 @@ export declare const trafficAccountSchema: z.ZodObject<{
             limit: z.ZodNumber;
             used: z.ZodNumber;
         }, "strip", z.ZodTypeAny, {
-            used: number;
             limit: number;
+            used: number;
         }, {
-            used: number;
             limit: number;
+            used: number;
         }>>>;
         floor: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
     }, "strip", z.ZodTypeAny, {
-        used: number;
         limit: number;
+        used: number;
         resets: number | null;
         remaining: number;
         share: {
-            used: number;
             limit: number;
+            used: number;
         } | null;
         floor: number | null;
     }, {
-        used: number;
         limit: number;
+        used: number;
         resets: number | null;
         remaining: number;
         share?: {
-            used: number;
             limit: number;
+            used: number;
         } | null | undefined;
         floor?: number | null | undefined;
     }>>>;
@@ -403,27 +403,27 @@ export declare const trafficAccountSchema: z.ZodObject<{
     at: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
 }, "strip", z.ZodTypeAny, {
     at: number | null;
-    login: string | null;
     why: string;
+    login: string | null;
     core: {
-        used: number;
         limit: number;
+        used: number;
         resets: number | null;
         remaining: number;
         share: {
-            used: number;
             limit: number;
+            used: number;
         } | null;
         floor: number | null;
     } | null;
     graphql: {
-        used: number;
         limit: number;
+        used: number;
         resets: number | null;
         remaining: number;
         share: {
-            used: number;
             limit: number;
+            used: number;
         } | null;
         floor: number | null;
     } | null;
@@ -431,27 +431,27 @@ export declare const trafficAccountSchema: z.ZodObject<{
     until: number | null;
 }, {
     at?: number | null | undefined;
-    login?: string | null | undefined;
     why?: string | undefined;
+    login?: string | null | undefined;
     core?: {
-        used: number;
         limit: number;
+        used: number;
         resets: number | null;
         remaining: number;
         share?: {
-            used: number;
             limit: number;
+            used: number;
         } | null | undefined;
         floor?: number | null | undefined;
     } | null | undefined;
     graphql?: {
-        used: number;
         limit: number;
+        used: number;
         resets: number | null;
         remaining: number;
         share?: {
-            used: number;
             limit: number;
+            used: number;
         } | null | undefined;
         floor?: number | null | undefined;
     } | null | undefined;
@@ -478,31 +478,31 @@ export declare const trafficLimitsSchema: z.ZodObject<{
                     limit: z.ZodNumber;
                     used: z.ZodNumber;
                 }, "strip", z.ZodTypeAny, {
-                    used: number;
                     limit: number;
+                    used: number;
                 }, {
-                    used: number;
                     limit: number;
+                    used: number;
                 }>>>;
                 floor: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
             }, "strip", z.ZodTypeAny, {
-                used: number;
                 limit: number;
+                used: number;
                 resets: number | null;
                 remaining: number;
                 share: {
-                    used: number;
                     limit: number;
+                    used: number;
                 } | null;
                 floor: number | null;
             }, {
-                used: number;
                 limit: number;
+                used: number;
                 resets: number | null;
                 remaining: number;
                 share?: {
-                    used: number;
                     limit: number;
+                    used: number;
                 } | null | undefined;
                 floor?: number | null | undefined;
             }>>>;
@@ -515,31 +515,31 @@ export declare const trafficLimitsSchema: z.ZodObject<{
                     limit: z.ZodNumber;
                     used: z.ZodNumber;
                 }, "strip", z.ZodTypeAny, {
-                    used: number;
                     limit: number;
+                    used: number;
                 }, {
-                    used: number;
                     limit: number;
+                    used: number;
                 }>>>;
                 floor: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
             }, "strip", z.ZodTypeAny, {
-                used: number;
                 limit: number;
+                used: number;
                 resets: number | null;
                 remaining: number;
                 share: {
-                    used: number;
                     limit: number;
+                    used: number;
                 } | null;
                 floor: number | null;
             }, {
-                used: number;
                 limit: number;
+                used: number;
                 resets: number | null;
                 remaining: number;
                 share?: {
-                    used: number;
                     limit: number;
+                    used: number;
                 } | null | undefined;
                 floor?: number | null | undefined;
             }>>>;
@@ -549,27 +549,27 @@ export declare const trafficLimitsSchema: z.ZodObject<{
             at: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
         }, "strip", z.ZodTypeAny, {
             at: number | null;
-            login: string | null;
             why: string;
+            login: string | null;
             core: {
-                used: number;
                 limit: number;
+                used: number;
                 resets: number | null;
                 remaining: number;
                 share: {
-                    used: number;
                     limit: number;
+                    used: number;
                 } | null;
                 floor: number | null;
             } | null;
             graphql: {
-                used: number;
                 limit: number;
+                used: number;
                 resets: number | null;
                 remaining: number;
                 share: {
-                    used: number;
                     limit: number;
+                    used: number;
                 } | null;
                 floor: number | null;
             } | null;
@@ -577,27 +577,27 @@ export declare const trafficLimitsSchema: z.ZodObject<{
             until: number | null;
         }, {
             at?: number | null | undefined;
-            login?: string | null | undefined;
             why?: string | undefined;
+            login?: string | null | undefined;
             core?: {
-                used: number;
                 limit: number;
+                used: number;
                 resets: number | null;
                 remaining: number;
                 share?: {
-                    used: number;
                     limit: number;
+                    used: number;
                 } | null | undefined;
                 floor?: number | null | undefined;
             } | null | undefined;
             graphql?: {
-                used: number;
                 limit: number;
+                used: number;
                 resets: number | null;
                 remaining: number;
                 share?: {
-                    used: number;
                     limit: number;
+                    used: number;
                 } | null | undefined;
                 floor?: number | null | undefined;
             } | null | undefined;
@@ -614,15 +614,15 @@ export declare const trafficLimitsSchema: z.ZodObject<{
             note: z.ZodDefault<z.ZodString>;
         }, "strip", z.ZodTypeAny, {
             name: string;
+            limit: number;
             note: string;
             used: number;
-            limit: number;
             left: number;
             resets: number | null;
         }, {
             name: string;
-            used: number;
             limit: number;
+            used: number;
             left: number;
             resets: number | null;
             note?: string | undefined;
@@ -630,27 +630,27 @@ export declare const trafficLimitsSchema: z.ZodObject<{
     }, "strip", z.ZodTypeAny, {
         account: {
             at: number | null;
-            login: string | null;
             why: string;
+            login: string | null;
             core: {
-                used: number;
                 limit: number;
+                used: number;
                 resets: number | null;
                 remaining: number;
                 share: {
-                    used: number;
                     limit: number;
+                    used: number;
                 } | null;
                 floor: number | null;
             } | null;
             graphql: {
-                used: number;
                 limit: number;
+                used: number;
                 resets: number | null;
                 remaining: number;
                 share: {
-                    used: number;
                     limit: number;
+                    used: number;
                 } | null;
                 floor: number | null;
             } | null;
@@ -659,36 +659,36 @@ export declare const trafficLimitsSchema: z.ZodObject<{
         } | null;
         anonymous: {
             name: string;
+            limit: number;
             note: string;
             used: number;
-            limit: number;
             left: number;
             resets: number | null;
         } | null;
     }, {
         account?: {
             at?: number | null | undefined;
-            login?: string | null | undefined;
             why?: string | undefined;
+            login?: string | null | undefined;
             core?: {
-                used: number;
                 limit: number;
+                used: number;
                 resets: number | null;
                 remaining: number;
                 share?: {
-                    used: number;
                     limit: number;
+                    used: number;
                 } | null | undefined;
                 floor?: number | null | undefined;
             } | null | undefined;
             graphql?: {
-                used: number;
                 limit: number;
+                used: number;
                 resets: number | null;
                 remaining: number;
                 share?: {
-                    used: number;
                     limit: number;
+                    used: number;
                 } | null | undefined;
                 floor?: number | null | undefined;
             } | null | undefined;
@@ -697,8 +697,8 @@ export declare const trafficLimitsSchema: z.ZodObject<{
         } | null | undefined;
         anonymous?: {
             name: string;
-            used: number;
             limit: number;
+            used: number;
             left: number;
             resets: number | null;
             note?: string | undefined;
@@ -716,31 +716,31 @@ export declare const trafficLimitsSchema: z.ZodObject<{
                     limit: z.ZodNumber;
                     used: z.ZodNumber;
                 }, "strip", z.ZodTypeAny, {
-                    used: number;
                     limit: number;
+                    used: number;
                 }, {
-                    used: number;
                     limit: number;
+                    used: number;
                 }>>>;
                 floor: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
             }, "strip", z.ZodTypeAny, {
-                used: number;
                 limit: number;
+                used: number;
                 resets: number | null;
                 remaining: number;
                 share: {
-                    used: number;
                     limit: number;
+                    used: number;
                 } | null;
                 floor: number | null;
             }, {
-                used: number;
                 limit: number;
+                used: number;
                 resets: number | null;
                 remaining: number;
                 share?: {
-                    used: number;
                     limit: number;
+                    used: number;
                 } | null | undefined;
                 floor?: number | null | undefined;
             }>>>;
@@ -753,31 +753,31 @@ export declare const trafficLimitsSchema: z.ZodObject<{
                     limit: z.ZodNumber;
                     used: z.ZodNumber;
                 }, "strip", z.ZodTypeAny, {
-                    used: number;
                     limit: number;
+                    used: number;
                 }, {
-                    used: number;
                     limit: number;
+                    used: number;
                 }>>>;
                 floor: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
             }, "strip", z.ZodTypeAny, {
-                used: number;
                 limit: number;
+                used: number;
                 resets: number | null;
                 remaining: number;
                 share: {
-                    used: number;
                     limit: number;
+                    used: number;
                 } | null;
                 floor: number | null;
             }, {
-                used: number;
                 limit: number;
+                used: number;
                 resets: number | null;
                 remaining: number;
                 share?: {
-                    used: number;
                     limit: number;
+                    used: number;
                 } | null | undefined;
                 floor?: number | null | undefined;
             }>>>;
@@ -787,27 +787,27 @@ export declare const trafficLimitsSchema: z.ZodObject<{
             at: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
         }, "strip", z.ZodTypeAny, {
             at: number | null;
-            login: string | null;
             why: string;
+            login: string | null;
             core: {
-                used: number;
                 limit: number;
+                used: number;
                 resets: number | null;
                 remaining: number;
                 share: {
-                    used: number;
                     limit: number;
+                    used: number;
                 } | null;
                 floor: number | null;
             } | null;
             graphql: {
-                used: number;
                 limit: number;
+                used: number;
                 resets: number | null;
                 remaining: number;
                 share: {
-                    used: number;
                     limit: number;
+                    used: number;
                 } | null;
                 floor: number | null;
             } | null;
@@ -815,27 +815,27 @@ export declare const trafficLimitsSchema: z.ZodObject<{
             until: number | null;
         }, {
             at?: number | null | undefined;
-            login?: string | null | undefined;
             why?: string | undefined;
+            login?: string | null | undefined;
             core?: {
-                used: number;
                 limit: number;
+                used: number;
                 resets: number | null;
                 remaining: number;
                 share?: {
-                    used: number;
                     limit: number;
+                    used: number;
                 } | null | undefined;
                 floor?: number | null | undefined;
             } | null | undefined;
             graphql?: {
-                used: number;
                 limit: number;
+                used: number;
                 resets: number | null;
                 remaining: number;
                 share?: {
-                    used: number;
                     limit: number;
+                    used: number;
                 } | null | undefined;
                 floor?: number | null | undefined;
             } | null | undefined;
@@ -845,27 +845,27 @@ export declare const trafficLimitsSchema: z.ZodObject<{
     }, "strip", z.ZodTypeAny, {
         account: {
             at: number | null;
-            login: string | null;
             why: string;
+            login: string | null;
             core: {
-                used: number;
                 limit: number;
+                used: number;
                 resets: number | null;
                 remaining: number;
                 share: {
-                    used: number;
                     limit: number;
+                    used: number;
                 } | null;
                 floor: number | null;
             } | null;
             graphql: {
-                used: number;
                 limit: number;
+                used: number;
                 resets: number | null;
                 remaining: number;
                 share: {
-                    used: number;
                     limit: number;
+                    used: number;
                 } | null;
                 floor: number | null;
             } | null;
@@ -875,27 +875,27 @@ export declare const trafficLimitsSchema: z.ZodObject<{
     }, {
         account?: {
             at?: number | null | undefined;
-            login?: string | null | undefined;
             why?: string | undefined;
+            login?: string | null | undefined;
             core?: {
-                used: number;
                 limit: number;
+                used: number;
                 resets: number | null;
                 remaining: number;
                 share?: {
-                    used: number;
                     limit: number;
+                    used: number;
                 } | null | undefined;
                 floor?: number | null | undefined;
             } | null | undefined;
             graphql?: {
-                used: number;
                 limit: number;
+                used: number;
                 resets: number | null;
                 remaining: number;
                 share?: {
-                    used: number;
                     limit: number;
+                    used: number;
                 } | null | undefined;
                 floor?: number | null | undefined;
             } | null | undefined;
@@ -907,27 +907,27 @@ export declare const trafficLimitsSchema: z.ZodObject<{
     github?: {
         account: {
             at: number | null;
-            login: string | null;
             why: string;
+            login: string | null;
             core: {
-                used: number;
                 limit: number;
+                used: number;
                 resets: number | null;
                 remaining: number;
                 share: {
-                    used: number;
                     limit: number;
+                    used: number;
                 } | null;
                 floor: number | null;
             } | null;
             graphql: {
-                used: number;
                 limit: number;
+                used: number;
                 resets: number | null;
                 remaining: number;
                 share: {
-                    used: number;
                     limit: number;
+                    used: number;
                 } | null;
                 floor: number | null;
             } | null;
@@ -936,9 +936,9 @@ export declare const trafficLimitsSchema: z.ZodObject<{
         } | null;
         anonymous: {
             name: string;
+            limit: number;
             note: string;
             used: number;
-            limit: number;
             left: number;
             resets: number | null;
         } | null;
@@ -946,27 +946,27 @@ export declare const trafficLimitsSchema: z.ZodObject<{
     gitlab?: {
         account: {
             at: number | null;
-            login: string | null;
             why: string;
+            login: string | null;
             core: {
-                used: number;
                 limit: number;
+                used: number;
                 resets: number | null;
                 remaining: number;
                 share: {
-                    used: number;
                     limit: number;
+                    used: number;
                 } | null;
                 floor: number | null;
             } | null;
             graphql: {
-                used: number;
                 limit: number;
+                used: number;
                 resets: number | null;
                 remaining: number;
                 share: {
-                    used: number;
                     limit: number;
+                    used: number;
                 } | null;
                 floor: number | null;
             } | null;
@@ -978,27 +978,27 @@ export declare const trafficLimitsSchema: z.ZodObject<{
     github?: {
         account?: {
             at?: number | null | undefined;
-            login?: string | null | undefined;
             why?: string | undefined;
+            login?: string | null | undefined;
             core?: {
-                used: number;
                 limit: number;
+                used: number;
                 resets: number | null;
                 remaining: number;
                 share?: {
-                    used: number;
                     limit: number;
+                    used: number;
                 } | null | undefined;
                 floor?: number | null | undefined;
             } | null | undefined;
             graphql?: {
-                used: number;
                 limit: number;
+                used: number;
                 resets: number | null;
                 remaining: number;
                 share?: {
-                    used: number;
                     limit: number;
+                    used: number;
                 } | null | undefined;
                 floor?: number | null | undefined;
             } | null | undefined;
@@ -1007,8 +1007,8 @@ export declare const trafficLimitsSchema: z.ZodObject<{
         } | null | undefined;
         anonymous?: {
             name: string;
-            used: number;
             limit: number;
+            used: number;
             left: number;
             resets: number | null;
             note?: string | undefined;
@@ -1017,27 +1017,27 @@ export declare const trafficLimitsSchema: z.ZodObject<{
     gitlab?: {
         account?: {
             at?: number | null | undefined;
-            login?: string | null | undefined;
             why?: string | undefined;
+            login?: string | null | undefined;
             core?: {
-                used: number;
                 limit: number;
+                used: number;
                 resets: number | null;
                 remaining: number;
                 share?: {
-                    used: number;
                     limit: number;
+                    used: number;
                 } | null | undefined;
                 floor?: number | null | undefined;
             } | null | undefined;
             graphql?: {
-                used: number;
                 limit: number;
+                used: number;
                 resets: number | null;
                 remaining: number;
                 share?: {
-                    used: number;
                     limit: number;
+                    used: number;
                 } | null | undefined;
                 floor?: number | null | undefined;
             } | null | undefined;
@@ -1208,16 +1208,16 @@ export declare const trafficReadResult: z.ZodObject<{
             pid: z.ZodOptional<z.ZodNumber>;
         }, "strip", z.ZodTypeAny, {
             name: string;
-            kind: "host" | "module" | "session" | "program" | "remote" | "gone";
-            how: "closed" | "address" | "token" | "origin" | "process" | "route";
+            kind: "module" | "session" | "host" | "program" | "remote" | "gone";
+            how: "token" | "closed" | "address" | "origin" | "process" | "route";
             place?: string | undefined;
             process?: string | undefined;
             parent?: string | undefined;
             pid?: number | undefined;
         }, {
             name: string;
-            kind: "host" | "module" | "session" | "program" | "remote" | "gone";
-            how: "closed" | "address" | "token" | "origin" | "process" | "route";
+            kind: "module" | "session" | "host" | "program" | "remote" | "gone";
+            how: "token" | "closed" | "address" | "origin" | "process" | "route";
             place?: string | undefined;
             process?: string | undefined;
             parent?: string | undefined;
@@ -1236,14 +1236,14 @@ export declare const trafficReadResult: z.ZodObject<{
         ms: number | null;
         seq: number;
         via: "page" | "server" | "process";
-        reported: "host" | "module" | "sampled";
+        reported: "module" | "host" | "sampled";
         bytesIn?: number | undefined;
         bytesOut?: number | undefined;
         cache?: "refused" | "hit" | "not-modified" | undefined;
         caller?: {
             name: string;
-            kind: "host" | "module" | "session" | "program" | "remote" | "gone";
-            how: "closed" | "address" | "token" | "origin" | "process" | "route";
+            kind: "module" | "session" | "host" | "program" | "remote" | "gone";
+            how: "token" | "closed" | "address" | "origin" | "process" | "route";
             place?: string | undefined;
             process?: string | undefined;
             parent?: string | undefined;
@@ -1258,7 +1258,7 @@ export declare const trafficReadResult: z.ZodObject<{
         side: "out" | "in" | "seen";
         seq: number;
         via: "page" | "server" | "process";
-        reported: "host" | "module" | "sampled";
+        reported: "module" | "host" | "sampled";
         status?: number | null | undefined;
         reason?: string | null | undefined;
         ok?: boolean | null | undefined;
@@ -1283,15 +1283,15 @@ export declare const trafficReadResult: z.ZodObject<{
         note: z.ZodDefault<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
         name: string;
+        limit: number;
         note: string;
         used: number;
-        limit: number;
         left: number;
         resets: number | null;
     }, {
         name: string;
-        used: number;
         limit: number;
+        used: number;
         left: number;
         resets: number | null;
         note?: string | undefined;
@@ -1390,31 +1390,31 @@ export declare const trafficReadResult: z.ZodObject<{
                         limit: z.ZodNumber;
                         used: z.ZodNumber;
                     }, "strip", z.ZodTypeAny, {
-                        used: number;
                         limit: number;
+                        used: number;
                     }, {
-                        used: number;
                         limit: number;
+                        used: number;
                     }>>>;
                     floor: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
                 }, "strip", z.ZodTypeAny, {
-                    used: number;
                     limit: number;
+                    used: number;
                     resets: number | null;
                     remaining: number;
                     share: {
-                        used: number;
                         limit: number;
+                        used: number;
                     } | null;
                     floor: number | null;
                 }, {
-                    used: number;
                     limit: number;
+                    used: number;
                     resets: number | null;
                     remaining: number;
                     share?: {
-                        used: number;
                         limit: number;
+                        used: number;
                     } | null | undefined;
                     floor?: number | null | undefined;
                 }>>>;
@@ -1427,31 +1427,31 @@ export declare const trafficReadResult: z.ZodObject<{
                         limit: z.ZodNumber;
                         used: z.ZodNumber;
                     }, "strip", z.ZodTypeAny, {
-                        used: number;
                         limit: number;
+                        used: number;
                     }, {
-                        used: number;
                         limit: number;
+                        used: number;
                     }>>>;
                     floor: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
                 }, "strip", z.ZodTypeAny, {
-                    used: number;
                     limit: number;
+                    used: number;
                     resets: number | null;
                     remaining: number;
                     share: {
-                        used: number;
                         limit: number;
+                        used: number;
                     } | null;
                     floor: number | null;
                 }, {
-                    used: number;
                     limit: number;
+                    used: number;
                     resets: number | null;
                     remaining: number;
                     share?: {
-                        used: number;
                         limit: number;
+                        used: number;
                     } | null | undefined;
                     floor?: number | null | undefined;
                 }>>>;
@@ -1461,27 +1461,27 @@ export declare const trafficReadResult: z.ZodObject<{
                 at: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
             }, "strip", z.ZodTypeAny, {
                 at: number | null;
-                login: string | null;
                 why: string;
+                login: string | null;
                 core: {
-                    used: number;
                     limit: number;
+                    used: number;
                     resets: number | null;
                     remaining: number;
                     share: {
-                        used: number;
                         limit: number;
+                        used: number;
                     } | null;
                     floor: number | null;
                 } | null;
                 graphql: {
-                    used: number;
                     limit: number;
+                    used: number;
                     resets: number | null;
                     remaining: number;
                     share: {
-                        used: number;
                         limit: number;
+                        used: number;
                     } | null;
                     floor: number | null;
                 } | null;
@@ -1489,27 +1489,27 @@ export declare const trafficReadResult: z.ZodObject<{
                 until: number | null;
             }, {
                 at?: number | null | undefined;
-                login?: string | null | undefined;
                 why?: string | undefined;
+                login?: string | null | undefined;
                 core?: {
-                    used: number;
                     limit: number;
+                    used: number;
                     resets: number | null;
                     remaining: number;
                     share?: {
-                        used: number;
                         limit: number;
+                        used: number;
                     } | null | undefined;
                     floor?: number | null | undefined;
                 } | null | undefined;
                 graphql?: {
-                    used: number;
                     limit: number;
+                    used: number;
                     resets: number | null;
                     remaining: number;
                     share?: {
-                        used: number;
                         limit: number;
+                        used: number;
                     } | null | undefined;
                     floor?: number | null | undefined;
                 } | null | undefined;
@@ -1526,15 +1526,15 @@ export declare const trafficReadResult: z.ZodObject<{
                 note: z.ZodDefault<z.ZodString>;
             }, "strip", z.ZodTypeAny, {
                 name: string;
+                limit: number;
                 note: string;
                 used: number;
-                limit: number;
                 left: number;
                 resets: number | null;
             }, {
                 name: string;
-                used: number;
                 limit: number;
+                used: number;
                 left: number;
                 resets: number | null;
                 note?: string | undefined;
@@ -1542,27 +1542,27 @@ export declare const trafficReadResult: z.ZodObject<{
         }, "strip", z.ZodTypeAny, {
             account: {
                 at: number | null;
-                login: string | null;
                 why: string;
+                login: string | null;
                 core: {
-                    used: number;
                     limit: number;
+                    used: number;
                     resets: number | null;
                     remaining: number;
                     share: {
-                        used: number;
                         limit: number;
+                        used: number;
                     } | null;
                     floor: number | null;
                 } | null;
                 graphql: {
-                    used: number;
                     limit: number;
+                    used: number;
                     resets: number | null;
                     remaining: number;
                     share: {
-                        used: number;
                         limit: number;
+                        used: number;
                     } | null;
                     floor: number | null;
                 } | null;
@@ -1571,36 +1571,36 @@ export declare const trafficReadResult: z.ZodObject<{
             } | null;
             anonymous: {
                 name: string;
+                limit: number;
                 note: string;
                 used: number;
-                limit: number;
                 left: number;
                 resets: number | null;
             } | null;
         }, {
             account?: {
                 at?: number | null | undefined;
-                login?: string | null | undefined;
                 why?: string | undefined;
+                login?: string | null | undefined;
                 core?: {
-                    used: number;
                     limit: number;
+                    used: number;
                     resets: number | null;
                     remaining: number;
                     share?: {
-                        used: number;
                         limit: number;
+                        used: number;
                     } | null | undefined;
                     floor?: number | null | undefined;
                 } | null | undefined;
                 graphql?: {
-                    used: number;
                     limit: number;
+                    used: number;
                     resets: number | null;
                     remaining: number;
                     share?: {
-                        used: number;
                         limit: number;
+                        used: number;
                     } | null | undefined;
                     floor?: number | null | undefined;
                 } | null | undefined;
@@ -1609,8 +1609,8 @@ export declare const trafficReadResult: z.ZodObject<{
             } | null | undefined;
             anonymous?: {
                 name: string;
-                used: number;
                 limit: number;
+                used: number;
                 left: number;
                 resets: number | null;
                 note?: string | undefined;
@@ -1628,31 +1628,31 @@ export declare const trafficReadResult: z.ZodObject<{
                         limit: z.ZodNumber;
                         used: z.ZodNumber;
                     }, "strip", z.ZodTypeAny, {
-                        used: number;
                         limit: number;
+                        used: number;
                     }, {
-                        used: number;
                         limit: number;
+                        used: number;
                     }>>>;
                     floor: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
                 }, "strip", z.ZodTypeAny, {
-                    used: number;
                     limit: number;
+                    used: number;
                     resets: number | null;
                     remaining: number;
                     share: {
-                        used: number;
                         limit: number;
+                        used: number;
                     } | null;
                     floor: number | null;
                 }, {
-                    used: number;
                     limit: number;
+                    used: number;
                     resets: number | null;
                     remaining: number;
                     share?: {
-                        used: number;
                         limit: number;
+                        used: number;
                     } | null | undefined;
                     floor?: number | null | undefined;
                 }>>>;
@@ -1665,31 +1665,31 @@ export declare const trafficReadResult: z.ZodObject<{
                         limit: z.ZodNumber;
                         used: z.ZodNumber;
                     }, "strip", z.ZodTypeAny, {
-                        used: number;
                         limit: number;
+                        used: number;
                     }, {
-                        used: number;
                         limit: number;
+                        used: number;
                     }>>>;
                     floor: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
                 }, "strip", z.ZodTypeAny, {
-                    used: number;
                     limit: number;
+                    used: number;
                     resets: number | null;
                     remaining: number;
                     share: {
-                        used: number;
                         limit: number;
+                        used: number;
                     } | null;
                     floor: number | null;
                 }, {
-                    used: number;
                     limit: number;
+                    used: number;
                     resets: number | null;
                     remaining: number;
                     share?: {
-                        used: number;
                         limit: number;
+                        used: number;
                     } | null | undefined;
                     floor?: number | null | undefined;
                 }>>>;
@@ -1699,27 +1699,27 @@ export declare const trafficReadResult: z.ZodObject<{
                 at: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
             }, "strip", z.ZodTypeAny, {
                 at: number | null;
-                login: string | null;
                 why: string;
+                login: string | null;
                 core: {
-                    used: number;
                     limit: number;
+                    used: number;
                     resets: number | null;
                     remaining: number;
                     share: {
-                        used: number;
                         limit: number;
+                        used: number;
                     } | null;
                     floor: number | null;
                 } | null;
                 graphql: {
-                    used: number;
                     limit: number;
+                    used: number;
                     resets: number | null;
                     remaining: number;
                     share: {
-                        used: number;
                         limit: number;
+                        used: number;
                     } | null;
                     floor: number | null;
                 } | null;
@@ -1727,27 +1727,27 @@ export declare const trafficReadResult: z.ZodObject<{
                 until: number | null;
             }, {
                 at?: number | null | undefined;
-                login?: string | null | undefined;
                 why?: string | undefined;
+                login?: string | null | undefined;
                 core?: {
-                    used: number;
                     limit: number;
+                    used: number;
                     resets: number | null;
                     remaining: number;
                     share?: {
-                        used: number;
                         limit: number;
+                        used: number;
                     } | null | undefined;
                     floor?: number | null | undefined;
                 } | null | undefined;
                 graphql?: {
-                    used: number;
                     limit: number;
+                    used: number;
                     resets: number | null;
                     remaining: number;
                     share?: {
-                        used: number;
                         limit: number;
+                        used: number;
                     } | null | undefined;
                     floor?: number | null | undefined;
                 } | null | undefined;
@@ -1757,27 +1757,27 @@ export declare const trafficReadResult: z.ZodObject<{
         }, "strip", z.ZodTypeAny, {
             account: {
                 at: number | null;
-                login: string | null;
                 why: string;
+                login: string | null;
                 core: {
-                    used: number;
                     limit: number;
+                    used: number;
                     resets: number | null;
                     remaining: number;
                     share: {
-                        used: number;
                         limit: number;
+                        used: number;
                     } | null;
                     floor: number | null;
                 } | null;
                 graphql: {
-                    used: number;
                     limit: number;
+                    used: number;
                     resets: number | null;
                     remaining: number;
                     share: {
-                        used: number;
                         limit: number;
+                        used: number;
                     } | null;
                     floor: number | null;
                 } | null;
@@ -1787,27 +1787,27 @@ export declare const trafficReadResult: z.ZodObject<{
         }, {
             account?: {
                 at?: number | null | undefined;
-                login?: string | null | undefined;
                 why?: string | undefined;
+                login?: string | null | undefined;
                 core?: {
-                    used: number;
                     limit: number;
+                    used: number;
                     resets: number | null;
                     remaining: number;
                     share?: {
-                        used: number;
                         limit: number;
+                        used: number;
                     } | null | undefined;
                     floor?: number | null | undefined;
                 } | null | undefined;
                 graphql?: {
-                    used: number;
                     limit: number;
+                    used: number;
                     resets: number | null;
                     remaining: number;
                     share?: {
-                        used: number;
                         limit: number;
+                        used: number;
                     } | null | undefined;
                     floor?: number | null | undefined;
                 } | null | undefined;
@@ -1819,27 +1819,27 @@ export declare const trafficReadResult: z.ZodObject<{
         github?: {
             account: {
                 at: number | null;
-                login: string | null;
                 why: string;
+                login: string | null;
                 core: {
-                    used: number;
                     limit: number;
+                    used: number;
                     resets: number | null;
                     remaining: number;
                     share: {
-                        used: number;
                         limit: number;
+                        used: number;
                     } | null;
                     floor: number | null;
                 } | null;
                 graphql: {
-                    used: number;
                     limit: number;
+                    used: number;
                     resets: number | null;
                     remaining: number;
                     share: {
-                        used: number;
                         limit: number;
+                        used: number;
                     } | null;
                     floor: number | null;
                 } | null;
@@ -1848,9 +1848,9 @@ export declare const trafficReadResult: z.ZodObject<{
             } | null;
             anonymous: {
                 name: string;
+                limit: number;
                 note: string;
                 used: number;
-                limit: number;
                 left: number;
                 resets: number | null;
             } | null;
@@ -1858,27 +1858,27 @@ export declare const trafficReadResult: z.ZodObject<{
         gitlab?: {
             account: {
                 at: number | null;
-                login: string | null;
                 why: string;
+                login: string | null;
                 core: {
-                    used: number;
                     limit: number;
+                    used: number;
                     resets: number | null;
                     remaining: number;
                     share: {
-                        used: number;
                         limit: number;
+                        used: number;
                     } | null;
                     floor: number | null;
                 } | null;
                 graphql: {
-                    used: number;
                     limit: number;
+                    used: number;
                     resets: number | null;
                     remaining: number;
                     share: {
-                        used: number;
                         limit: number;
+                        used: number;
                     } | null;
                     floor: number | null;
                 } | null;
@@ -1890,27 +1890,27 @@ export declare const trafficReadResult: z.ZodObject<{
         github?: {
             account?: {
                 at?: number | null | undefined;
-                login?: string | null | undefined;
                 why?: string | undefined;
+                login?: string | null | undefined;
                 core?: {
-                    used: number;
                     limit: number;
+                    used: number;
                     resets: number | null;
                     remaining: number;
                     share?: {
-                        used: number;
                         limit: number;
+                        used: number;
                     } | null | undefined;
                     floor?: number | null | undefined;
                 } | null | undefined;
                 graphql?: {
-                    used: number;
                     limit: number;
+                    used: number;
                     resets: number | null;
                     remaining: number;
                     share?: {
-                        used: number;
                         limit: number;
+                        used: number;
                     } | null | undefined;
                     floor?: number | null | undefined;
                 } | null | undefined;
@@ -1919,8 +1919,8 @@ export declare const trafficReadResult: z.ZodObject<{
             } | null | undefined;
             anonymous?: {
                 name: string;
-                used: number;
                 limit: number;
+                used: number;
                 left: number;
                 resets: number | null;
                 note?: string | undefined;
@@ -1929,27 +1929,27 @@ export declare const trafficReadResult: z.ZodObject<{
         gitlab?: {
             account?: {
                 at?: number | null | undefined;
-                login?: string | null | undefined;
                 why?: string | undefined;
+                login?: string | null | undefined;
                 core?: {
-                    used: number;
                     limit: number;
+                    used: number;
                     resets: number | null;
                     remaining: number;
                     share?: {
-                        used: number;
                         limit: number;
+                        used: number;
                     } | null | undefined;
                     floor?: number | null | undefined;
                 } | null | undefined;
                 graphql?: {
-                    used: number;
                     limit: number;
+                    used: number;
                     resets: number | null;
                     remaining: number;
                     share?: {
-                        used: number;
                         limit: number;
+                        used: number;
                     } | null | undefined;
                     floor?: number | null | undefined;
                 } | null | undefined;
@@ -1973,14 +1973,14 @@ export declare const trafficReadResult: z.ZodObject<{
         ms: number | null;
         seq: number;
         via: "page" | "server" | "process";
-        reported: "host" | "module" | "sampled";
+        reported: "module" | "host" | "sampled";
         bytesIn?: number | undefined;
         bytesOut?: number | undefined;
         cache?: "refused" | "hit" | "not-modified" | undefined;
         caller?: {
             name: string;
-            kind: "host" | "module" | "session" | "program" | "remote" | "gone";
-            how: "closed" | "address" | "token" | "origin" | "process" | "route";
+            kind: "module" | "session" | "host" | "program" | "remote" | "gone";
+            how: "token" | "closed" | "address" | "origin" | "process" | "route";
             place?: string | undefined;
             process?: string | undefined;
             parent?: string | undefined;
@@ -1993,9 +1993,9 @@ export declare const trafficReadResult: z.ZodObject<{
     kept: number;
     budgets: {
         name: string;
+        limit: number;
         note: string;
         used: number;
-        limit: number;
         left: number;
         resets: number | null;
     }[];
@@ -2021,27 +2021,27 @@ export declare const trafficReadResult: z.ZodObject<{
         github?: {
             account: {
                 at: number | null;
-                login: string | null;
                 why: string;
+                login: string | null;
                 core: {
-                    used: number;
                     limit: number;
+                    used: number;
                     resets: number | null;
                     remaining: number;
                     share: {
-                        used: number;
                         limit: number;
+                        used: number;
                     } | null;
                     floor: number | null;
                 } | null;
                 graphql: {
-                    used: number;
                     limit: number;
+                    used: number;
                     resets: number | null;
                     remaining: number;
                     share: {
-                        used: number;
                         limit: number;
+                        used: number;
                     } | null;
                     floor: number | null;
                 } | null;
@@ -2050,9 +2050,9 @@ export declare const trafficReadResult: z.ZodObject<{
             } | null;
             anonymous: {
                 name: string;
+                limit: number;
                 note: string;
                 used: number;
-                limit: number;
                 left: number;
                 resets: number | null;
             } | null;
@@ -2060,27 +2060,27 @@ export declare const trafficReadResult: z.ZodObject<{
         gitlab?: {
             account: {
                 at: number | null;
-                login: string | null;
                 why: string;
+                login: string | null;
                 core: {
-                    used: number;
                     limit: number;
+                    used: number;
                     resets: number | null;
                     remaining: number;
                     share: {
-                        used: number;
                         limit: number;
+                        used: number;
                     } | null;
                     floor: number | null;
                 } | null;
                 graphql: {
-                    used: number;
                     limit: number;
+                    used: number;
                     resets: number | null;
                     remaining: number;
                     share: {
-                        used: number;
                         limit: number;
+                        used: number;
                     } | null;
                     floor: number | null;
                 } | null;
@@ -2100,7 +2100,7 @@ export declare const trafficReadResult: z.ZodObject<{
         side: "out" | "in" | "seen";
         seq: number;
         via: "page" | "server" | "process";
-        reported: "host" | "module" | "sampled";
+        reported: "module" | "host" | "sampled";
         status?: number | null | undefined;
         reason?: string | null | undefined;
         ok?: boolean | null | undefined;
@@ -2116,8 +2116,8 @@ export declare const trafficReadResult: z.ZodObject<{
     gap?: boolean | undefined;
     budgets?: {
         name: string;
-        used: number;
         limit: number;
+        used: number;
         left: number;
         resets: number | null;
         note?: string | undefined;
