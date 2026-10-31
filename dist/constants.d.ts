@@ -99,6 +99,13 @@ export declare const MESSAGE: {
      * count it as seen; whether the item stays is still the module's next list.
      */
     readonly OPENED: "kehikot.opened";
+    /**
+     * Host → module (2.42.0). "My rows now cover this much of your frame": CSS pixels at its top and
+     * at its bottom, sent to a module whose manifest says `reveal: 'over'` whenever that changes (a
+     * hover revealed or hid the header and footer), and again after a greeting while anything is
+     * covered. No answer. The frame itself is not resized; see `reveal.ts`.
+     */
+    readonly COVERED: "kehikot.covered";
 };
 export type MessageType = (typeof MESSAGE)[keyof typeof MESSAGE];
 /** The prefix every message type carries, so a listener can drop the rest cheaply. There is one spelling. */
@@ -111,7 +118,7 @@ export declare const MESSAGE_PREFIX = "kehikot.";
  * dropped without a word; a type that is listed and does not parse is a fault worth reporting.
  * See docs/header.md, "A message type the other side does not know".
  */
-export declare const HOST_MESSAGES: readonly ["kehikot.hello", "kehikot.context", "kehikot.response", "kehikot.goto", "kehikot.event", "kehikot.clear", "kehikot.refresh", "kehikot.press", "kehikot.opened"];
+export declare const HOST_MESSAGES: readonly ["kehikot.hello", "kehikot.context", "kehikot.response", "kehikot.goto", "kehikot.event", "kehikot.clear", "kehikot.refresh", "kehikot.press", "kehikot.opened", "kehikot.covered"];
 /** And what the module says. */
 export declare const MODULE_MESSAGES: readonly ["kehikot.ready", "kehikot.request", "kehikot.resize", "kehikot.went", "kehikot.filters", "kehikot.clearable", "kehikot.refreshable", "kehikot.header", "kehikot.pressed", "kehikot.footer"];
 /**

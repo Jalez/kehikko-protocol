@@ -280,6 +280,8 @@ export {
   pressSchema,
   pressedSchema,
   openedSchema,
+  coveredSchema,
+  type CoveredMessage,
   footerSchema,
   footerItemSchema,
   footerItemsSchema,
@@ -488,6 +490,18 @@ export {
   type Holds,
   type AbleManifest,
 } from './abilities.js'
+
+/* How the host's revealed header and footer meet a module's page: push, or over and `kehikot.covered` (2.42.0). */
+export {
+  REVEAL_MODES,
+  revealModeSchema,
+  revealModeOf,
+  coveredFields,
+  NOT_COVERED,
+  keepInView,
+  type RevealMode,
+  type Covered,
+} from './reveal.js'
 
 /* What an agent session is told about the modules around it, one wording for every agent module (2.36.0). */
 export {

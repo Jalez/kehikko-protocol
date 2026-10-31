@@ -58,6 +58,8 @@ export { follow, type Attachment, type FollowOptions } from './stream.js'
 export { subscribe, type SubscribeOptions } from './subscribe.js'
 export { type Query, type QueryValue } from './query.js'
 export { applyTheme, pageTheme, systemTheme } from './theme.js'
+/* What the host's revealed rows cover of a page that says `reveal: 'over'`, and how to keep the last line out from under them (2.42.0). */
+export { keepInView, NOT_COVERED, type Covered } from '../reveal.js'
 export { pageBuild } from './build.js'
 /* A call the host is too old for (2.22.0): read it off a `HostRefused`, show the one line. */
 export { hostTooOld, FIT_SAYS, type HostTooOld } from '../fit.js'

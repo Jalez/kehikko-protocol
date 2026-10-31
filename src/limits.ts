@@ -158,6 +158,8 @@ export const LIMITS = {
   OPENS: 8,
   /** How many words one manifest's `holds` may list (2.33.0). */
   HOLDS: 8,
+  /** The most CSS pixels a host may say its rows cover at the top or at the bottom of a frame, in `kehikot.covered` (2.42.0). */
+  COVERED_PX: 512,
   /** How many containers the host lists to a session in its place answer (`modules`, 2.36.0). */
   SESSION_MODULES: 128,
   /** How many installed-but-absent modules the host lists to a session (`absent`, 2.36.0). */

@@ -9,6 +9,7 @@ import { CONTEXT_SCOPES } from './context.js';
 import { settingsDeclarationSchema } from './settings.js';
 import { agentSessionsSchema, providesSchema } from './provides.js';
 import { holdsSchema, opensSchema } from './abilities.js';
+import { revealModeSchema } from './reveal.js';
 import { agentSaysSchema } from './notes.js';
 import { navigatesSchema, showsSchema } from './show.js';
 import { modeScopeSchema, scopeSaysSchema, supportedScopes } from './scope.js';
@@ -284,6 +285,14 @@ const manifestFields = z.object({
      * optional, dropped when it does not parse, like `opens`.
      */
     holds: holdsSchema.optional().catch(undefined),
+    /**
+     * 2.42.0. How the host's revealed header and footer meet this module's page (`REVEAL_MODES`):
+     * `push` (the default) shrinks the frame to make room; `over` keeps the frame's size and draws the
+     * rows over its top and bottom, saying how much they cover in `kehikot.covered`. For a page a resize
+     * costs dearly — a terminal, whose pty redraws on every size. Top-level, optional, dropped when it
+     * does not parse, like `opens`; a host before 2.42.0 ignores it. See `reveal.ts`.
+     */
+    reveal: revealModeSchema.optional().catch(undefined),
     /**
      * 2.36.0. When an agent should use this module, in one line said beside its name to every agent
      * session on a kehikko it is on ("Queue heavy test runs here instead of running them in the shell,

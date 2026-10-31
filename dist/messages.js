@@ -8,6 +8,7 @@ import { filterGroupSchema } from './filters.js';
 import { footerItemsSchema } from './footer.js';
 import { RUN_CARRIES, headerItemsSchema, pressValueSchema } from './header.js';
 import { gotoRef, kehikkoSchema, stepNumber } from './fragments.js';
+import { coveredFields } from './reveal.js';
 /**
  * Everything the two sides say to each other: the schema of every `postMessage` between a host and
  * a framed, cross-origin module. Parse both directions: a module validates what the host sends too.
@@ -347,6 +348,19 @@ export const openedSchema = z.object({
     item: z.string().min(1).max(LIMITS.ACTIVITY_ID),
 });
 /**
+ * Host → module (2.42.0). How much of this module's frame the host's own rows cover now: `top` and
+ * `bottom` in CSS pixels. Sent only to a module whose manifest says `reveal: 'over'`, whenever it
+ * changes, and after a greeting while anything is covered; `{ top: 0, bottom: 0 }` says the rows
+ * are gone. The frame keeps its size throughout, so a module never refits for it: it moves what
+ * must stay readable out from under the rows (`keepInView`). Fire and forget. A host before 2.42.0
+ * sends nothing; a module before it drops the message unread (`HOST_MESSAGES`).
+ */
+export const coveredSchema = z.object({
+    type: messageType(MESSAGE.COVERED),
+    protocol: z.number().int().min(1),
+    ...coveredFields,
+});
+/**
  * Every message a host sends. A plain union, not a `discriminatedUnion`, because `responseSchema`
  * is itself a union on a different key and cannot be an option of one.
  */
@@ -360,6 +374,7 @@ export const hostMessageSchema = z.union([
     refreshSchema,
     pressSchema,
     openedSchema,
+    coveredSchema,
 ]);
 export const moduleMessageSchema = z.union([
     readySchema,

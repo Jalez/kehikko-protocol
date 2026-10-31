@@ -11,6 +11,7 @@ export { follow, type Attachment, type FollowOptions } from './stream.js';
 export { subscribe, type SubscribeOptions } from './subscribe.js';
 export { type Query, type QueryValue } from './query.js';
 export { applyTheme, pageTheme, systemTheme } from './theme.js';
+export { keepInView, NOT_COVERED, type Covered } from '../reveal.js';
 export { pageBuild } from './build.js';
 export { hostTooOld, FIT_SAYS, type HostTooOld } from '../fit.js';
 export { held, heldDraft, type Draft, type Held, type HeldAt, type HeldReader } from './held.js';

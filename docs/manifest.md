@@ -378,6 +378,40 @@ on the words it knows. A list that does not parse is dropped, not fatal. A host 
 ignores both and runs the module, so neither is in `DECLARATION_SINCE`; NOT under `declares`, whose
 unknown keys an older host's `fitOf` reads as too new.
 
+### How the host's rows meet the page (2.42.0)
+
+A host may hide every container's header and footer and reveal them while the pointer is over the
+container. By default they PUSH: they come back into the column and the module's frame shrinks to
+make room, so nothing is covered. For most pages that is right.
+
+For a terminal it is the worst thing a hover can do. The frame shrinks, the emulator fits to fewer
+rows, the pty is told (SIGWINCH) and the program redraws for the smaller screen; the pointer leaves
+and all of it runs again the other way — two full redraws and two scroll jumps per hover, where the
+person is reading. Waiting for the size to settle only moves the jump later: the pointer rests over
+a terminal for as long as somebody works in it.
+
+So a module may say how the rows meet its page:
+
+```json
+{ "reveal": "over" }
+```
+
+- **`push`** (the default, and what saying nothing means): the frame shrinks while the rows show.
+- **`over`**: the frame keeps its size whatever is revealed, and the rows are drawn over its top and
+  bottom. The host says how much they cover in **`kehikot.covered`** `{ top, bottom }` (CSS pixels,
+  host → module, no answer), whenever that changes and again after a greeting while anything is
+  covered; `{ top: 0, bottom: 0 }` says they are gone. `connect` hands it to `onCovered`, and
+  `hostStore`/`useHost` keep it as `covered`.
+
+A module that says `over` keeps what matters out from under the rows WITHOUT resizing: a terminal
+moves its content with a transform so its last line (the last row with text, or the cursor's,
+whichever is lower) sits above the footer — `keepInView(covered, frameHeight, lastLineBottom)` says
+by how much (negative is up). Never refit for it: that is the redraw the field exists to avoid.
+
+Top-level like `opens`, so a host before 2.42.0 ignores it, sends no `kehikot.covered` and pushes as
+it always did; the module behaves exactly as before. An unknown word is dropped, not fatal.
+`REVEAL_MODES`, `revealModeOf`, `coveredSchema`, `NOT_COVERED`, `keepInView` (`src/reveal.ts`).
+
 ### What a module says to agents, where it is and where it is not (2.36.0)
 
 Two lines a module writes for the agent sessions a person runs, both at the top level beside `shows`:
