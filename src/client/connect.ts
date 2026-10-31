@@ -8,11 +8,15 @@ import { LIMITS } from '../limits.js'
 import { activityItemsSchema, type ActivityItem } from '../activity.js'
 import { ORIGINS_ELEMENT, originAmong } from '../page.js'
 import {
+  footerItemsSchema,
+  footerPressRefusal,
   headerItemsSchema,
   hostMessageSchema,
   looksLikeWireMessage,
   pressRefusal,
   type FilterGroup,
+  type FooterItem,
+  type FooterItemInput,
   type Goto,
   type HeaderItem,
   type HeaderItemInput,
@@ -147,6 +151,11 @@ export interface HostFacts {
   answers: readonly string[] | null
   /** Whether this host draws the module's header in its own menus, or `null`. */
   header: boolean | null
+  /**
+   * 2.38.0. Whether this host draws the module's declared footer, or `null` when it did not say: a
+   * host before 2.38.0, which does not. Only `true` means "declare it and draw none of your own".
+   */
+  footer: boolean | null
 }
 
 export interface HostEvents {
@@ -185,10 +194,11 @@ export interface HostEvents {
    * One of this page's header items was pressed, by a person in the host's menus or by an agent
    * through the host: `item` is its id, `value` the option chosen (switch, go) or the state wanted
    * (toggle). Only reaches a page that declared the item with `header`; a press the last header
-   * cannot take is refused before this is called. Do it, declare the header again, and return
+   * cannot take is refused before this is called. 2.38.0: `place` is `'footer'` for an item of the
+   * page's footer (declared with `footer`), absent for one of its header. Do it, declare the header again, and return
    * nothing — or return the sentence saying why not. `connect` answers the host exactly once.
    */
-  onPress?: (press: Pick<Press, 'item' | 'value'>) => PressAnswer | Promise<PressAnswer>
+  onPress?: (press: Pick<Press, 'item' | 'value' | 'place'>) => PressAnswer | Promise<PressAnswer>
   /**
    * The person opened one of this module's Inbox items (2.35.0): pressed it in the Inbox, on a
    * toast or with Next, and the host has gone to its place. `item` is the id the module reported.
@@ -262,6 +272,14 @@ export interface Connection {
    */
   header: (items: HeaderItemInput[]) => void
   /**
+   * 2.38.0. Say what this page's footer shows and offers, so the host can draw it as one row at the
+   * bottom of the container: status text, meters, and the header's kinds of item. The whole list
+   * every time; `[]` withdraws it. Remembered and replayed on every greeting, like `header`. Presses
+   * reach `onPress` with `place: 'footer'`. Declare it only when the greeting said the host draws it
+   * (`HostFacts.footer === true`); otherwise draw the footer yourself. See docs/footer.md.
+   */
+  footer: (items: FooterItemInput[]) => void
+  /**
    * Say what this page's things are doing now (`activity.set`, 1.5.0): the COMPLETE list, replacing
    * what was said before; `[]` says nothing is going on. Fire and forget. A list identical to the one
    * last taken is not sent again, the last list is re-sent after every greeting, and nothing is sent
@@ -305,6 +323,9 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
   /* The last header, replayed likewise, as it was written; and as parsed, to judge a press by. */
   let heading: HeaderItemInput[] | null = null
   let declared: HeaderItem[] = []
+  /* The last footer (2.38.0), replayed and judged likewise. */
+  let footing: FooterItemInput[] | null = null
+  let footed: FooterItem[] = []
   /* The last activity list, as written, and the text of the one the host last took (`null`: none yet on
      this greeting, so the next is sent). `answered` is the greeting's `answers`, `null` when it did not say. */
   let activityNow: ActivityItem[] | null = null
@@ -367,13 +388,14 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
       if (clearing !== null) send({ type: MESSAGE.CLEARABLE, label: clearing.label })
       if (refreshing !== null) send({ type: MESSAGE.REFRESHABLE, ...refreshing })
       if (heading !== null) send({ type: MESSAGE.HEADER, items: heading })
+      if (footing !== null) send({ type: MESSAGE.FOOTER, items: footing })
       answered = message.answers ?? null
       activityTaken = null
       byProject = false
       projectNow = projectOf(message.context)
       projectIdNow = projectIdOf(message.context)
       sendActivity()
-      events.onHello?.(message.context, message.state, { answers: message.answers ?? null, header: message.header ?? null })
+      events.onHello?.(message.context, message.state, { answers: message.answers ?? null, header: message.header ?? null, footer: message.footer ?? null })
       return
     }
 
@@ -443,9 +465,10 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
         send({ type: MESSAGE.PRESSED, id: message.id, ok, why: why.slice(0, LIMITS.REASON) })
       }
       const backstop = setTimeout(() => answer(false, 'This app did not say whether it took that press.'), pressBackstop)
-      const press = { item: message.item, ...(message.value !== undefined ? { value: message.value } : {}) }
-      /* Judged against what is declared NOW: the header may have changed since the menu was drawn. */
-      const refused = pressRefusal(declared, press)
+      const footer = message.place === 'footer'
+      const press = { item: message.item, ...(message.value !== undefined ? { value: message.value } : {}), ...(footer ? { place: 'footer' as const } : {}) }
+      /* Judged against what is declared NOW: the header (or footer) may have changed since it was drawn. */
+      const refused = footer ? footerPressRefusal(footed, press) : pressRefusal(declared, press)
       if (refused !== null) answer(false, refused)
       else if (!events.onPress) answer(false, 'This app declared that item and does not take presses.')
       else {
@@ -603,6 +626,14 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
       const parsed = headerItemsSchema.safeParse(items)
       declared = parsed.success ? parsed.data : []
       send({ type: MESSAGE.HEADER, items })
+    },
+
+    footer(items) {
+      /* As `header`: kept before it is sent, and a list that does not parse is still sent for the host to report. */
+      footing = items
+      const parsed = footerItemsSchema.safeParse(items)
+      footed = parsed.success ? parsed.data : []
+      send({ type: MESSAGE.FOOTER, items })
     },
 
     activity(items) {

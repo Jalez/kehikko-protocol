@@ -1,4 +1,4 @@
-import type { ActivityItem, AddressIntent, AddressOpenResult, CanvasContainer, CodeLocation, EpicPart, FilterChoice, FilterGroup, HeaderItemInput, LocationIntent, LocationSetResult, ModuleContext, Passage, SharedAddress, SharedLocation } from '../index.js';
+import type { ActivityItem, AddressIntent, AddressOpenResult, CanvasContainer, CodeLocation, EpicPart, FilterChoice, FilterGroup, FooterItemInput, HeaderItemInput, LocationIntent, LocationSetResult, ModuleContext, Passage, SharedAddress, SharedLocation } from '../index.js';
 import type { PageTheme } from '../page.js';
 import { type ContextScope } from '../context.js';
 import { type ModuleScope } from '../scope.js';
@@ -116,6 +116,12 @@ export interface HostStanding<Kept = unknown> extends HostFields {
     answers: readonly string[] | null;
     /** Whether the host draws this module's header (1.4.0), or `null` when it did not say. See docs/header.md. */
     drawsHeader: boolean | null;
+    /**
+     * 2.38.0. Whether the host draws this module's declared footer, or `null` when it did not say (a host
+     * before 2.38.0, which does not). Declare a footer and draw none of your own only when this is `true`.
+     * See docs/footer.md.
+     */
+    drawsFooter: boolean | null;
 }
 /** What a page says to its host, the same from the hook and from the store. */
 export interface HostActions<Kept = unknown> {
@@ -159,6 +165,8 @@ export interface HostActions<Kept = unknown> {
     }) => void;
     /** Declare this page's header items, whole (`kehikot.header`); `[]` withdraws them. See `Connection.header`. */
     header: (items: HeaderItemInput[]) => void;
+    /** Declare this page's footer items, whole (`kehikot.footer`, 2.38.0); `[]` withdraws them. See `Connection.footer`. */
+    footer: (items: FooterItemInput[]) => void;
     /** Say what this page's things are doing, whole (`activity.set`, 1.5.0); `[]` for nothing. See `Connection.activity`. */
     activity: (items: ActivityItem[]) => void;
 }

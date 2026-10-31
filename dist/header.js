@@ -9,12 +9,15 @@ import { LIMITS } from './limits.js';
 /* A press and a choice travel by id, and a host may key a record by one. See `RESERVED_IDS` in `filters.ts`. */
 const RESERVED_IDS = new Set(['__proto__', 'constructor', 'prototype']);
 /** The id of a header item, or of one option of a switch or a go item. */
-const headerId = z
+export const headerIdSchema = z
     .string()
     .min(1)
     .max(LIMITS.HEADER_ID)
     .refine((id) => !RESERVED_IDS.has(id), { message: '__proto__, constructor and prototype are not usable as header ids' });
-const headerLabel = z.string().min(1).max(LIMITS.HEADER_LABEL);
+const headerId = headerIdSchema;
+/** The words on an item or an option. Shared with the footer (2.38.0). */
+export const headerLabelSchema = z.string().min(1).max(LIMITS.HEADER_LABEL);
+const headerLabel = headerLabelSchema;
 /** One thing a switch can be on, or a go item can jump to: an id and the words for it. */
 export const headerOptionSchema = z.object({ id: headerId, label: headerLabel });
 const options = z.array(headerOptionSchema).min(1).max(LIMITS.HEADER_OPTIONS);
@@ -66,62 +69,62 @@ export const HEADER_ICONS = [
 ];
 /** A run is resting, in flight, or its last attempt failed. A host shows the last two on the menu's trigger. */
 export const RUN_STATES = ['idle', 'busy', 'failed'];
+/* The four kinds as plain objects, so the footer (2.38.0, `footer.ts`) can take the same fields. */
+const switchItem = z.object({
+    kind: z.literal('switch'),
+    ...common,
+    options,
+    /** Which option the module is on now. One of `options`. */
+    value: headerId,
+});
+const toggleItem = z.object({
+    kind: z.literal('toggle'),
+    ...common,
+    checked: z.boolean(),
+});
+const goItem = z.object({
+    kind: z.literal('go'),
+    ...common,
+    options,
+});
+const runItem = z.object({
+    kind: z.literal('run'),
+    ...common,
+    state: z.enum(RUN_STATES).default('idle'),
+    /** What the last run came to, in a word or three, or null. Shown beside the label. */
+    result: z.string().min(1).max(LIMITS.HEADER_RESULT).nullable().default(null),
+    /** Why it cannot be run right now, as a sentence, or null when it can. A host draws it flat and says why. */
+    disabled: z.string().min(1).max(LIMITS.REASON).nullable().default(null),
+    /** Whether a press arms it and a second press runs it. The arm is the host's; the module adds none. */
+    confirm: z.boolean().default(false),
+    /**
+     * 1.4.0. Where the press lands. A relayed press carries no user activation, so a module cannot
+     * ask for full screen from `onPress`; the host can, from the person's click. Absent: the press
+     * is only relayed. A host that does not know the field strips it and relays the press.
+     */
+    surface: z.enum(RUN_SURFACES).optional(),
+    /**
+     * 1.6.0. Draw this run as an icon button in the container header, left of the menus, as well
+     * as in the Run menu. Only drawing changes: an agent presses by id as before. At most
+     * `LIMITS.PINNED_MAX` are drawn (declaration order, see `pinnedRuns`). A host that does not
+     * know the field strips it and keeps the item in the menu.
+     */
+    pinned: z.boolean().optional(),
+});
+/** The four kinds' shapes, before the rules that span fields. Shared with the footer (2.38.0). */
+export const HEADER_ITEM_SHAPES = { switch: switchItem, toggle: toggleItem, go: goItem, run: runItem };
 /**
- * One item of a module's header. `switch`: one of several views, with the one it is on. `toggle`:
- * on or off. `go`: a jump to one of several places, with nothing held afterwards. `run`: an act,
- * with whether it is in flight and what it last came to.
+ * The rules that span an item's fields, for a header item and for a footer item of the same kinds
+ * (2.38.0): option ids unique, a switch's value one of its options, `agents` not beside `tool`, and
+ * not on a run that is confirmed.
  */
-export const headerItemSchema = z
-    .discriminatedUnion('kind', [
-    z.object({
-        kind: z.literal('switch'),
-        ...common,
-        options,
-        /** Which option the module is on now. One of `options`. */
-        value: headerId,
-    }),
-    z.object({
-        kind: z.literal('toggle'),
-        ...common,
-        checked: z.boolean(),
-    }),
-    z.object({
-        kind: z.literal('go'),
-        ...common,
-        options,
-    }),
-    z.object({
-        kind: z.literal('run'),
-        ...common,
-        state: z.enum(RUN_STATES).default('idle'),
-        /** What the last run came to, in a word or three, or null. Shown beside the label. */
-        result: z.string().min(1).max(LIMITS.HEADER_RESULT).nullable().default(null),
-        /** Why it cannot be run right now, as a sentence, or null when it can. A host draws it flat and says why. */
-        disabled: z.string().min(1).max(LIMITS.REASON).nullable().default(null),
-        /** Whether a press arms it and a second press runs it. The arm is the host's; the module adds none. */
-        confirm: z.boolean().default(false),
-        /**
-         * 1.4.0. Where the press lands. A relayed press carries no user activation, so a module cannot
-         * ask for full screen from `onPress`; the host can, from the person's click. Absent: the press
-         * is only relayed. A host that does not know the field strips it and relays the press.
-         */
-        surface: z.enum(RUN_SURFACES).optional(),
-        /**
-         * 1.6.0. Draw this run as an icon button in the container header, left of the menus, as well
-         * as in the Run menu. Only drawing changes: an agent presses by id as before. At most
-         * `LIMITS.PINNED_MAX` are drawn (declaration order, see `pinnedRuns`). A host that does not
-         * know the field strips it and keeps the item in the menu.
-         */
-        pinned: z.boolean().optional(),
-    }),
-])
-    .superRefine((item, ctx) => {
-    if (item.kind === 'switch' || item.kind === 'go') {
+export function checkPressable(item, ctx) {
+    if ((item.kind === 'switch' || item.kind === 'go') && item.options) {
         if (new Set(item.options.map((option) => option.id)).size !== item.options.length) {
             ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'two options of one item cannot share an id' });
         }
     }
-    if (item.kind === 'switch' && !item.options.some((option) => option.id === item.value)) {
+    if (item.kind === 'switch' && item.options && !item.options.some((option) => option.id === item.value)) {
         ctx.addIssue({ code: z.ZodIssueCode.custom, message: "a switch's value has to be one of its own options" });
     }
     if (item.agents && item.tool !== undefined) {
@@ -133,7 +136,15 @@ export const headerItemSchema = z
     if (item.kind === 'run' && item.agents && item.confirm) {
         ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'a run that has to be confirmed is not pressed by agents' });
     }
-});
+}
+/**
+ * One item of a module's header. `switch`: one of several views, with the one it is on. `toggle`:
+ * on or off. `go`: a jump to one of several places, with nothing held afterwards. `run`: an act,
+ * with whether it is in flight and what it last came to.
+ */
+export const headerItemSchema = z
+    .discriminatedUnion('kind', [switchItem, toggleItem, goItem, runItem])
+    .superRefine(checkPressable);
 /** A module's whole header: every item, in the order the module wants them within each menu. Ids are unique. */
 export const headerItemsSchema = z
     .array(headerItemSchema)

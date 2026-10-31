@@ -689,6 +689,763 @@ export declare const headerSchema: z.ZodObject<{
 }>;
 export type Header = z.infer<typeof headerSchema>;
 /**
+ * Module → host (2.38.0). Every footer item this module has, whole, every time, like the header: it
+ * replaces, never merges, and an empty `items` takes the footer away. A host draws it as one row at
+ * the bottom of the container. See `footer.ts` and docs/footer.md.
+ */
+export declare const footerSchema: z.ZodObject<{
+    type: z.ZodLiteral<"kehikot.footer">;
+    items: z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodDiscriminatedUnion<"kind", [z.ZodObject<{
+        align: z.ZodDefault<z.ZodEnum<["start", "center", "end"]>>;
+        optional: z.ZodDefault<z.ZodBoolean>;
+        tooltip: z.ZodOptional<z.ZodString>;
+        kind: z.ZodLiteral<"text">;
+        id: z.ZodEffects<z.ZodString, string, string>;
+        text: z.ZodString;
+        level: z.ZodDefault<z.ZodEnum<["normal", "warn", "critical"]>>;
+    }, "strip", z.ZodTypeAny, {
+        id: string;
+        kind: "text";
+        text: string;
+        level: "normal" | "warn" | "critical";
+        align: "start" | "center" | "end";
+        optional: boolean;
+        tooltip?: string | undefined;
+    }, {
+        id: string;
+        kind: "text";
+        text: string;
+        level?: "normal" | "warn" | "critical" | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    }>, z.ZodObject<{
+        align: z.ZodDefault<z.ZodEnum<["start", "center", "end"]>>;
+        optional: z.ZodDefault<z.ZodBoolean>;
+        tooltip: z.ZodOptional<z.ZodString>;
+        kind: z.ZodLiteral<"meter">;
+        id: z.ZodEffects<z.ZodString, string, string>;
+        label: z.ZodString;
+        value: z.ZodNumber;
+        level: z.ZodDefault<z.ZodEnum<["normal", "warn", "critical"]>>;
+        text: z.ZodOptional<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        value: number;
+        id: string;
+        label: string;
+        kind: "meter";
+        level: "normal" | "warn" | "critical";
+        align: "start" | "center" | "end";
+        optional: boolean;
+        text?: string | undefined;
+        tooltip?: string | undefined;
+    }, {
+        value: number;
+        id: string;
+        label: string;
+        kind: "meter";
+        text?: string | undefined;
+        level?: "normal" | "warn" | "critical" | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    }>, z.ZodObject<{
+        options: z.ZodArray<z.ZodObject<{
+            id: z.ZodEffects<z.ZodString, string, string>;
+            label: z.ZodString;
+        }, "strip", z.ZodTypeAny, {
+            id: string;
+            label: string;
+        }, {
+            id: string;
+            label: string;
+        }>, "many">;
+        value: z.ZodEffects<z.ZodString, string, string>;
+        id: z.ZodEffects<z.ZodString, string, string>;
+        label: z.ZodString;
+        icon: z.ZodOptional<z.ZodString>;
+        shortcut: z.ZodOptional<z.ZodString>;
+        group: z.ZodOptional<z.ZodString>;
+        agents: z.ZodDefault<z.ZodBoolean>;
+        tool: z.ZodOptional<z.ZodString>;
+        kind: z.ZodLiteral<"switch">;
+    } & {
+        align: z.ZodDefault<z.ZodEnum<["start", "center", "end"]>>;
+        optional: z.ZodDefault<z.ZodBoolean>;
+        tooltip: z.ZodOptional<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        value: string;
+        options: {
+            id: string;
+            label: string;
+        }[];
+        id: string;
+        label: string;
+        kind: "switch";
+        agents: boolean;
+        align: "start" | "center" | "end";
+        optional: boolean;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        tool?: string | undefined;
+        tooltip?: string | undefined;
+    }, {
+        value: string;
+        options: {
+            id: string;
+            label: string;
+        }[];
+        id: string;
+        label: string;
+        kind: "switch";
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    }>, z.ZodObject<{
+        checked: z.ZodBoolean;
+        id: z.ZodEffects<z.ZodString, string, string>;
+        label: z.ZodString;
+        icon: z.ZodOptional<z.ZodString>;
+        shortcut: z.ZodOptional<z.ZodString>;
+        group: z.ZodOptional<z.ZodString>;
+        agents: z.ZodDefault<z.ZodBoolean>;
+        tool: z.ZodOptional<z.ZodString>;
+        kind: z.ZodLiteral<"toggle">;
+    } & {
+        align: z.ZodDefault<z.ZodEnum<["start", "center", "end"]>>;
+        optional: z.ZodDefault<z.ZodBoolean>;
+        tooltip: z.ZodOptional<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        id: string;
+        label: string;
+        kind: "toggle";
+        agents: boolean;
+        checked: boolean;
+        align: "start" | "center" | "end";
+        optional: boolean;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        tool?: string | undefined;
+        tooltip?: string | undefined;
+    }, {
+        id: string;
+        label: string;
+        kind: "toggle";
+        checked: boolean;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    }>, z.ZodObject<{
+        options: z.ZodArray<z.ZodObject<{
+            id: z.ZodEffects<z.ZodString, string, string>;
+            label: z.ZodString;
+        }, "strip", z.ZodTypeAny, {
+            id: string;
+            label: string;
+        }, {
+            id: string;
+            label: string;
+        }>, "many">;
+        id: z.ZodEffects<z.ZodString, string, string>;
+        label: z.ZodString;
+        icon: z.ZodOptional<z.ZodString>;
+        shortcut: z.ZodOptional<z.ZodString>;
+        group: z.ZodOptional<z.ZodString>;
+        agents: z.ZodDefault<z.ZodBoolean>;
+        tool: z.ZodOptional<z.ZodString>;
+        kind: z.ZodLiteral<"go">;
+    } & {
+        align: z.ZodDefault<z.ZodEnum<["start", "center", "end"]>>;
+        optional: z.ZodDefault<z.ZodBoolean>;
+        tooltip: z.ZodOptional<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        options: {
+            id: string;
+            label: string;
+        }[];
+        id: string;
+        label: string;
+        kind: "go";
+        agents: boolean;
+        align: "start" | "center" | "end";
+        optional: boolean;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        tool?: string | undefined;
+        tooltip?: string | undefined;
+    }, {
+        options: {
+            id: string;
+            label: string;
+        }[];
+        id: string;
+        label: string;
+        kind: "go";
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    }>, z.ZodObject<Omit<{
+        state: z.ZodDefault<z.ZodEnum<["idle", "busy", "failed"]>>;
+        result: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+        disabled: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+        confirm: z.ZodDefault<z.ZodBoolean>;
+        surface: z.ZodOptional<z.ZodEnum<["fullscreen"]>>;
+        pinned: z.ZodOptional<z.ZodBoolean>;
+        id: z.ZodEffects<z.ZodString, string, string>;
+        label: z.ZodString;
+        icon: z.ZodOptional<z.ZodString>;
+        shortcut: z.ZodOptional<z.ZodString>;
+        group: z.ZodOptional<z.ZodString>;
+        agents: z.ZodDefault<z.ZodBoolean>;
+        tool: z.ZodOptional<z.ZodString>;
+        kind: z.ZodLiteral<"run">;
+    }, "pinned" | "surface"> & {
+        align: z.ZodDefault<z.ZodEnum<["start", "center", "end"]>>;
+        optional: z.ZodDefault<z.ZodBoolean>;
+        tooltip: z.ZodOptional<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        id: string;
+        state: "failed" | "idle" | "busy";
+        label: string;
+        kind: "run";
+        agents: boolean;
+        result: string | null;
+        disabled: string | null;
+        confirm: boolean;
+        align: "start" | "center" | "end";
+        optional: boolean;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        tool?: string | undefined;
+        tooltip?: string | undefined;
+    }, {
+        id: string;
+        label: string;
+        kind: "run";
+        state?: "failed" | "idle" | "busy" | undefined;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+        result?: string | null | undefined;
+        disabled?: string | null | undefined;
+        confirm?: boolean | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    }>]>, {
+        id: string;
+        kind: "text";
+        text: string;
+        level: "normal" | "warn" | "critical";
+        align: "start" | "center" | "end";
+        optional: boolean;
+        tooltip?: string | undefined;
+    } | {
+        value: number;
+        id: string;
+        label: string;
+        kind: "meter";
+        level: "normal" | "warn" | "critical";
+        align: "start" | "center" | "end";
+        optional: boolean;
+        text?: string | undefined;
+        tooltip?: string | undefined;
+    } | {
+        value: string;
+        options: {
+            id: string;
+            label: string;
+        }[];
+        id: string;
+        label: string;
+        kind: "switch";
+        agents: boolean;
+        align: "start" | "center" | "end";
+        optional: boolean;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        tool?: string | undefined;
+        tooltip?: string | undefined;
+    } | {
+        id: string;
+        label: string;
+        kind: "toggle";
+        agents: boolean;
+        checked: boolean;
+        align: "start" | "center" | "end";
+        optional: boolean;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        tool?: string | undefined;
+        tooltip?: string | undefined;
+    } | {
+        options: {
+            id: string;
+            label: string;
+        }[];
+        id: string;
+        label: string;
+        kind: "go";
+        agents: boolean;
+        align: "start" | "center" | "end";
+        optional: boolean;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        tool?: string | undefined;
+        tooltip?: string | undefined;
+    } | {
+        id: string;
+        state: "failed" | "idle" | "busy";
+        label: string;
+        kind: "run";
+        agents: boolean;
+        result: string | null;
+        disabled: string | null;
+        confirm: boolean;
+        align: "start" | "center" | "end";
+        optional: boolean;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        tool?: string | undefined;
+        tooltip?: string | undefined;
+    }, {
+        id: string;
+        kind: "text";
+        text: string;
+        level?: "normal" | "warn" | "critical" | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    } | {
+        value: number;
+        id: string;
+        label: string;
+        kind: "meter";
+        text?: string | undefined;
+        level?: "normal" | "warn" | "critical" | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    } | {
+        value: string;
+        options: {
+            id: string;
+            label: string;
+        }[];
+        id: string;
+        label: string;
+        kind: "switch";
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    } | {
+        id: string;
+        label: string;
+        kind: "toggle";
+        checked: boolean;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    } | {
+        options: {
+            id: string;
+            label: string;
+        }[];
+        id: string;
+        label: string;
+        kind: "go";
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    } | {
+        id: string;
+        label: string;
+        kind: "run";
+        state?: "failed" | "idle" | "busy" | undefined;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+        result?: string | null | undefined;
+        disabled?: string | null | undefined;
+        confirm?: boolean | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    }>, "many">, ({
+        id: string;
+        kind: "text";
+        text: string;
+        level: "normal" | "warn" | "critical";
+        align: "start" | "center" | "end";
+        optional: boolean;
+        tooltip?: string | undefined;
+    } | {
+        value: number;
+        id: string;
+        label: string;
+        kind: "meter";
+        level: "normal" | "warn" | "critical";
+        align: "start" | "center" | "end";
+        optional: boolean;
+        text?: string | undefined;
+        tooltip?: string | undefined;
+    } | {
+        value: string;
+        options: {
+            id: string;
+            label: string;
+        }[];
+        id: string;
+        label: string;
+        kind: "switch";
+        agents: boolean;
+        align: "start" | "center" | "end";
+        optional: boolean;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        tool?: string | undefined;
+        tooltip?: string | undefined;
+    } | {
+        id: string;
+        label: string;
+        kind: "toggle";
+        agents: boolean;
+        checked: boolean;
+        align: "start" | "center" | "end";
+        optional: boolean;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        tool?: string | undefined;
+        tooltip?: string | undefined;
+    } | {
+        options: {
+            id: string;
+            label: string;
+        }[];
+        id: string;
+        label: string;
+        kind: "go";
+        agents: boolean;
+        align: "start" | "center" | "end";
+        optional: boolean;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        tool?: string | undefined;
+        tooltip?: string | undefined;
+    } | {
+        id: string;
+        state: "failed" | "idle" | "busy";
+        label: string;
+        kind: "run";
+        agents: boolean;
+        result: string | null;
+        disabled: string | null;
+        confirm: boolean;
+        align: "start" | "center" | "end";
+        optional: boolean;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        tool?: string | undefined;
+        tooltip?: string | undefined;
+    })[], ({
+        id: string;
+        kind: "text";
+        text: string;
+        level?: "normal" | "warn" | "critical" | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    } | {
+        value: number;
+        id: string;
+        label: string;
+        kind: "meter";
+        text?: string | undefined;
+        level?: "normal" | "warn" | "critical" | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    } | {
+        value: string;
+        options: {
+            id: string;
+            label: string;
+        }[];
+        id: string;
+        label: string;
+        kind: "switch";
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    } | {
+        id: string;
+        label: string;
+        kind: "toggle";
+        checked: boolean;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    } | {
+        options: {
+            id: string;
+            label: string;
+        }[];
+        id: string;
+        label: string;
+        kind: "go";
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    } | {
+        id: string;
+        label: string;
+        kind: "run";
+        state?: "failed" | "idle" | "busy" | undefined;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+        result?: string | null | undefined;
+        disabled?: string | null | undefined;
+        confirm?: boolean | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    })[]>;
+}, "strip", z.ZodTypeAny, {
+    type: "kehikot.footer";
+    items: ({
+        id: string;
+        kind: "text";
+        text: string;
+        level: "normal" | "warn" | "critical";
+        align: "start" | "center" | "end";
+        optional: boolean;
+        tooltip?: string | undefined;
+    } | {
+        value: number;
+        id: string;
+        label: string;
+        kind: "meter";
+        level: "normal" | "warn" | "critical";
+        align: "start" | "center" | "end";
+        optional: boolean;
+        text?: string | undefined;
+        tooltip?: string | undefined;
+    } | {
+        value: string;
+        options: {
+            id: string;
+            label: string;
+        }[];
+        id: string;
+        label: string;
+        kind: "switch";
+        agents: boolean;
+        align: "start" | "center" | "end";
+        optional: boolean;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        tool?: string | undefined;
+        tooltip?: string | undefined;
+    } | {
+        id: string;
+        label: string;
+        kind: "toggle";
+        agents: boolean;
+        checked: boolean;
+        align: "start" | "center" | "end";
+        optional: boolean;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        tool?: string | undefined;
+        tooltip?: string | undefined;
+    } | {
+        options: {
+            id: string;
+            label: string;
+        }[];
+        id: string;
+        label: string;
+        kind: "go";
+        agents: boolean;
+        align: "start" | "center" | "end";
+        optional: boolean;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        tool?: string | undefined;
+        tooltip?: string | undefined;
+    } | {
+        id: string;
+        state: "failed" | "idle" | "busy";
+        label: string;
+        kind: "run";
+        agents: boolean;
+        result: string | null;
+        disabled: string | null;
+        confirm: boolean;
+        align: "start" | "center" | "end";
+        optional: boolean;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        tool?: string | undefined;
+        tooltip?: string | undefined;
+    })[];
+}, {
+    type: "kehikot.footer";
+    items: ({
+        id: string;
+        kind: "text";
+        text: string;
+        level?: "normal" | "warn" | "critical" | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    } | {
+        value: number;
+        id: string;
+        label: string;
+        kind: "meter";
+        text?: string | undefined;
+        level?: "normal" | "warn" | "critical" | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    } | {
+        value: string;
+        options: {
+            id: string;
+            label: string;
+        }[];
+        id: string;
+        label: string;
+        kind: "switch";
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    } | {
+        id: string;
+        label: string;
+        kind: "toggle";
+        checked: boolean;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    } | {
+        options: {
+            id: string;
+            label: string;
+        }[];
+        id: string;
+        label: string;
+        kind: "go";
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    } | {
+        id: string;
+        label: string;
+        kind: "run";
+        state?: "failed" | "idle" | "busy" | undefined;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+        result?: string | null | undefined;
+        disabled?: string | null | undefined;
+        confirm?: boolean | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    })[];
+}>;
+export type Footer = z.infer<typeof footerSchema>;
+/** Where a pressed item was declared (2.38.0): the header, or the footer. */
+export declare const PRESS_PLACES: readonly ["header", "footer"];
+export type PressPlace = (typeof PRESS_PLACES)[number];
+/**
  * Host → module. One item was pressed. `value` is the option chosen for a switch or a go item, the
  * state wanted for a toggle (so a press delivered twice does not flip twice), and absent for a run.
  * `id` pairs it with its `pressed`. A host sends this only for an item in the module's last header,
@@ -700,18 +1457,27 @@ export declare const pressSchema: z.ZodObject<{
     id: z.ZodString;
     item: z.ZodString;
     value: z.ZodOptional<z.ZodUnion<[z.ZodEffects<z.ZodString, string, string>, z.ZodBoolean]>>;
+    /**
+     * 2.38.0. `footer` for an item of the module's footer; absent (or `header`) for one of its header,
+     * as before. A module built before 2.38.0 strips it and judges the press against its header, where
+     * a footer item is not, and answers "not taken": a host sends footer presses only to a module that
+     * declared a footer, which an older one cannot have.
+     */
+    place: z.ZodOptional<z.ZodEnum<["header", "footer"]>>;
 }, "strip", z.ZodTypeAny, {
     type: "kehikot.press";
     id: string;
     protocol: number;
     item: string;
     value?: string | boolean | undefined;
+    place?: "header" | "footer" | undefined;
 }, {
     type: "kehikot.press";
     id: string;
     protocol: number;
     item: string;
     value?: string | boolean | undefined;
+    place?: "header" | "footer" | undefined;
 }>;
 export type Press = z.infer<typeof pressSchema>;
 /**
@@ -1418,6 +2184,12 @@ export declare const helloSchema: z.ZodObject<{
      * its own control. See docs/header.md.
      */
     header: z.ZodOptional<z.ZodBoolean>;
+    /**
+     * 2.38.0. Whether this host draws the module's declared footer (`kehikot.footer`) as a row at the
+     * bottom of its container. Absent from a host before 2.38.0: it does not, so a module keeps
+     * drawing its own footer. See docs/footer.md.
+     */
+    footer: z.ZodOptional<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
     type: "kehikot.hello";
     state: string | null;
@@ -1522,8 +2294,9 @@ export declare const helloSchema: z.ZodObject<{
         }[];
         scope?: "epic" | "kehikko" | "project" | "part" | "machine" | undefined;
     };
-    answers?: string[] | undefined;
     header?: boolean | undefined;
+    footer?: boolean | undefined;
+    answers?: string[] | undefined;
 }, {
     type: "kehikot.hello";
     protocol: number;
@@ -1628,8 +2401,9 @@ export declare const helloSchema: z.ZodObject<{
         }[] | undefined;
     };
     state?: string | null | undefined;
-    answers?: string[] | undefined;
     header?: boolean | undefined;
+    footer?: boolean | undefined;
+    answers?: string[] | undefined;
 }>;
 /**
  * Host → module. Which epic is open now: the `contextSchema` fields flat, not wrapped in `context`.
@@ -3276,6 +4050,12 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
      * its own control. See docs/header.md.
      */
     header: z.ZodOptional<z.ZodBoolean>;
+    /**
+     * 2.38.0. Whether this host draws the module's declared footer (`kehikot.footer`) as a row at the
+     * bottom of its container. Absent from a host before 2.38.0: it does not, so a module keeps
+     * drawing its own footer. See docs/footer.md.
+     */
+    footer: z.ZodOptional<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
     type: "kehikot.hello";
     state: string | null;
@@ -3380,8 +4160,9 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         }[];
         scope?: "epic" | "kehikko" | "project" | "part" | "machine" | undefined;
     };
-    answers?: string[] | undefined;
     header?: boolean | undefined;
+    footer?: boolean | undefined;
+    answers?: string[] | undefined;
 }, {
     type: "kehikot.hello";
     protocol: number;
@@ -3486,8 +4267,9 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         }[] | undefined;
     };
     state?: string | null | undefined;
-    answers?: string[] | undefined;
     header?: boolean | undefined;
+    footer?: boolean | undefined;
+    answers?: string[] | undefined;
 }>, z.ZodObject<{
     epic: z.ZodDefault<z.ZodNullable<z.ZodString>>;
     scope: z.ZodCatch<z.ZodOptional<z.ZodEnum<["machine", "project", "epic", "part", "kehikko"]>>>;
@@ -4304,18 +5086,27 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     id: z.ZodString;
     item: z.ZodString;
     value: z.ZodOptional<z.ZodUnion<[z.ZodEffects<z.ZodString, string, string>, z.ZodBoolean]>>;
+    /**
+     * 2.38.0. `footer` for an item of the module's footer; absent (or `header`) for one of its header,
+     * as before. A module built before 2.38.0 strips it and judges the press against its header, where
+     * a footer item is not, and answers "not taken": a host sends footer presses only to a module that
+     * declared a footer, which an older one cannot have.
+     */
+    place: z.ZodOptional<z.ZodEnum<["header", "footer"]>>;
 }, "strip", z.ZodTypeAny, {
     type: "kehikot.press";
     id: string;
     protocol: number;
     item: string;
     value?: string | boolean | undefined;
+    place?: "header" | "footer" | undefined;
 }, {
     type: "kehikot.press";
     id: string;
     protocol: number;
     item: string;
     value?: string | boolean | undefined;
+    place?: "header" | "footer" | undefined;
 }>, z.ZodObject<{
     type: z.ZodLiteral<"kehikot.opened">;
     protocol: z.ZodNumber;
@@ -5055,6 +5846,753 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
     id: string;
     ok: boolean;
     why?: string | undefined;
+}>, z.ZodObject<{
+    type: z.ZodLiteral<"kehikot.footer">;
+    items: z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodDiscriminatedUnion<"kind", [z.ZodObject<{
+        align: z.ZodDefault<z.ZodEnum<["start", "center", "end"]>>;
+        optional: z.ZodDefault<z.ZodBoolean>;
+        tooltip: z.ZodOptional<z.ZodString>;
+        kind: z.ZodLiteral<"text">;
+        id: z.ZodEffects<z.ZodString, string, string>;
+        text: z.ZodString;
+        level: z.ZodDefault<z.ZodEnum<["normal", "warn", "critical"]>>;
+    }, "strip", z.ZodTypeAny, {
+        id: string;
+        kind: "text";
+        text: string;
+        level: "normal" | "warn" | "critical";
+        align: "start" | "center" | "end";
+        optional: boolean;
+        tooltip?: string | undefined;
+    }, {
+        id: string;
+        kind: "text";
+        text: string;
+        level?: "normal" | "warn" | "critical" | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    }>, z.ZodObject<{
+        align: z.ZodDefault<z.ZodEnum<["start", "center", "end"]>>;
+        optional: z.ZodDefault<z.ZodBoolean>;
+        tooltip: z.ZodOptional<z.ZodString>;
+        kind: z.ZodLiteral<"meter">;
+        id: z.ZodEffects<z.ZodString, string, string>;
+        label: z.ZodString;
+        value: z.ZodNumber;
+        level: z.ZodDefault<z.ZodEnum<["normal", "warn", "critical"]>>;
+        text: z.ZodOptional<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        value: number;
+        id: string;
+        label: string;
+        kind: "meter";
+        level: "normal" | "warn" | "critical";
+        align: "start" | "center" | "end";
+        optional: boolean;
+        text?: string | undefined;
+        tooltip?: string | undefined;
+    }, {
+        value: number;
+        id: string;
+        label: string;
+        kind: "meter";
+        text?: string | undefined;
+        level?: "normal" | "warn" | "critical" | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    }>, z.ZodObject<{
+        options: z.ZodArray<z.ZodObject<{
+            id: z.ZodEffects<z.ZodString, string, string>;
+            label: z.ZodString;
+        }, "strip", z.ZodTypeAny, {
+            id: string;
+            label: string;
+        }, {
+            id: string;
+            label: string;
+        }>, "many">;
+        value: z.ZodEffects<z.ZodString, string, string>;
+        id: z.ZodEffects<z.ZodString, string, string>;
+        label: z.ZodString;
+        icon: z.ZodOptional<z.ZodString>;
+        shortcut: z.ZodOptional<z.ZodString>;
+        group: z.ZodOptional<z.ZodString>;
+        agents: z.ZodDefault<z.ZodBoolean>;
+        tool: z.ZodOptional<z.ZodString>;
+        kind: z.ZodLiteral<"switch">;
+    } & {
+        align: z.ZodDefault<z.ZodEnum<["start", "center", "end"]>>;
+        optional: z.ZodDefault<z.ZodBoolean>;
+        tooltip: z.ZodOptional<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        value: string;
+        options: {
+            id: string;
+            label: string;
+        }[];
+        id: string;
+        label: string;
+        kind: "switch";
+        agents: boolean;
+        align: "start" | "center" | "end";
+        optional: boolean;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        tool?: string | undefined;
+        tooltip?: string | undefined;
+    }, {
+        value: string;
+        options: {
+            id: string;
+            label: string;
+        }[];
+        id: string;
+        label: string;
+        kind: "switch";
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    }>, z.ZodObject<{
+        checked: z.ZodBoolean;
+        id: z.ZodEffects<z.ZodString, string, string>;
+        label: z.ZodString;
+        icon: z.ZodOptional<z.ZodString>;
+        shortcut: z.ZodOptional<z.ZodString>;
+        group: z.ZodOptional<z.ZodString>;
+        agents: z.ZodDefault<z.ZodBoolean>;
+        tool: z.ZodOptional<z.ZodString>;
+        kind: z.ZodLiteral<"toggle">;
+    } & {
+        align: z.ZodDefault<z.ZodEnum<["start", "center", "end"]>>;
+        optional: z.ZodDefault<z.ZodBoolean>;
+        tooltip: z.ZodOptional<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        id: string;
+        label: string;
+        kind: "toggle";
+        agents: boolean;
+        checked: boolean;
+        align: "start" | "center" | "end";
+        optional: boolean;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        tool?: string | undefined;
+        tooltip?: string | undefined;
+    }, {
+        id: string;
+        label: string;
+        kind: "toggle";
+        checked: boolean;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    }>, z.ZodObject<{
+        options: z.ZodArray<z.ZodObject<{
+            id: z.ZodEffects<z.ZodString, string, string>;
+            label: z.ZodString;
+        }, "strip", z.ZodTypeAny, {
+            id: string;
+            label: string;
+        }, {
+            id: string;
+            label: string;
+        }>, "many">;
+        id: z.ZodEffects<z.ZodString, string, string>;
+        label: z.ZodString;
+        icon: z.ZodOptional<z.ZodString>;
+        shortcut: z.ZodOptional<z.ZodString>;
+        group: z.ZodOptional<z.ZodString>;
+        agents: z.ZodDefault<z.ZodBoolean>;
+        tool: z.ZodOptional<z.ZodString>;
+        kind: z.ZodLiteral<"go">;
+    } & {
+        align: z.ZodDefault<z.ZodEnum<["start", "center", "end"]>>;
+        optional: z.ZodDefault<z.ZodBoolean>;
+        tooltip: z.ZodOptional<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        options: {
+            id: string;
+            label: string;
+        }[];
+        id: string;
+        label: string;
+        kind: "go";
+        agents: boolean;
+        align: "start" | "center" | "end";
+        optional: boolean;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        tool?: string | undefined;
+        tooltip?: string | undefined;
+    }, {
+        options: {
+            id: string;
+            label: string;
+        }[];
+        id: string;
+        label: string;
+        kind: "go";
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    }>, z.ZodObject<Omit<{
+        state: z.ZodDefault<z.ZodEnum<["idle", "busy", "failed"]>>;
+        result: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+        disabled: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+        confirm: z.ZodDefault<z.ZodBoolean>;
+        surface: z.ZodOptional<z.ZodEnum<["fullscreen"]>>;
+        pinned: z.ZodOptional<z.ZodBoolean>;
+        id: z.ZodEffects<z.ZodString, string, string>;
+        label: z.ZodString;
+        icon: z.ZodOptional<z.ZodString>;
+        shortcut: z.ZodOptional<z.ZodString>;
+        group: z.ZodOptional<z.ZodString>;
+        agents: z.ZodDefault<z.ZodBoolean>;
+        tool: z.ZodOptional<z.ZodString>;
+        kind: z.ZodLiteral<"run">;
+    }, "pinned" | "surface"> & {
+        align: z.ZodDefault<z.ZodEnum<["start", "center", "end"]>>;
+        optional: z.ZodDefault<z.ZodBoolean>;
+        tooltip: z.ZodOptional<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        id: string;
+        state: "failed" | "idle" | "busy";
+        label: string;
+        kind: "run";
+        agents: boolean;
+        result: string | null;
+        disabled: string | null;
+        confirm: boolean;
+        align: "start" | "center" | "end";
+        optional: boolean;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        tool?: string | undefined;
+        tooltip?: string | undefined;
+    }, {
+        id: string;
+        label: string;
+        kind: "run";
+        state?: "failed" | "idle" | "busy" | undefined;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+        result?: string | null | undefined;
+        disabled?: string | null | undefined;
+        confirm?: boolean | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    }>]>, {
+        id: string;
+        kind: "text";
+        text: string;
+        level: "normal" | "warn" | "critical";
+        align: "start" | "center" | "end";
+        optional: boolean;
+        tooltip?: string | undefined;
+    } | {
+        value: number;
+        id: string;
+        label: string;
+        kind: "meter";
+        level: "normal" | "warn" | "critical";
+        align: "start" | "center" | "end";
+        optional: boolean;
+        text?: string | undefined;
+        tooltip?: string | undefined;
+    } | {
+        value: string;
+        options: {
+            id: string;
+            label: string;
+        }[];
+        id: string;
+        label: string;
+        kind: "switch";
+        agents: boolean;
+        align: "start" | "center" | "end";
+        optional: boolean;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        tool?: string | undefined;
+        tooltip?: string | undefined;
+    } | {
+        id: string;
+        label: string;
+        kind: "toggle";
+        agents: boolean;
+        checked: boolean;
+        align: "start" | "center" | "end";
+        optional: boolean;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        tool?: string | undefined;
+        tooltip?: string | undefined;
+    } | {
+        options: {
+            id: string;
+            label: string;
+        }[];
+        id: string;
+        label: string;
+        kind: "go";
+        agents: boolean;
+        align: "start" | "center" | "end";
+        optional: boolean;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        tool?: string | undefined;
+        tooltip?: string | undefined;
+    } | {
+        id: string;
+        state: "failed" | "idle" | "busy";
+        label: string;
+        kind: "run";
+        agents: boolean;
+        result: string | null;
+        disabled: string | null;
+        confirm: boolean;
+        align: "start" | "center" | "end";
+        optional: boolean;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        tool?: string | undefined;
+        tooltip?: string | undefined;
+    }, {
+        id: string;
+        kind: "text";
+        text: string;
+        level?: "normal" | "warn" | "critical" | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    } | {
+        value: number;
+        id: string;
+        label: string;
+        kind: "meter";
+        text?: string | undefined;
+        level?: "normal" | "warn" | "critical" | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    } | {
+        value: string;
+        options: {
+            id: string;
+            label: string;
+        }[];
+        id: string;
+        label: string;
+        kind: "switch";
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    } | {
+        id: string;
+        label: string;
+        kind: "toggle";
+        checked: boolean;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    } | {
+        options: {
+            id: string;
+            label: string;
+        }[];
+        id: string;
+        label: string;
+        kind: "go";
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    } | {
+        id: string;
+        label: string;
+        kind: "run";
+        state?: "failed" | "idle" | "busy" | undefined;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+        result?: string | null | undefined;
+        disabled?: string | null | undefined;
+        confirm?: boolean | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    }>, "many">, ({
+        id: string;
+        kind: "text";
+        text: string;
+        level: "normal" | "warn" | "critical";
+        align: "start" | "center" | "end";
+        optional: boolean;
+        tooltip?: string | undefined;
+    } | {
+        value: number;
+        id: string;
+        label: string;
+        kind: "meter";
+        level: "normal" | "warn" | "critical";
+        align: "start" | "center" | "end";
+        optional: boolean;
+        text?: string | undefined;
+        tooltip?: string | undefined;
+    } | {
+        value: string;
+        options: {
+            id: string;
+            label: string;
+        }[];
+        id: string;
+        label: string;
+        kind: "switch";
+        agents: boolean;
+        align: "start" | "center" | "end";
+        optional: boolean;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        tool?: string | undefined;
+        tooltip?: string | undefined;
+    } | {
+        id: string;
+        label: string;
+        kind: "toggle";
+        agents: boolean;
+        checked: boolean;
+        align: "start" | "center" | "end";
+        optional: boolean;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        tool?: string | undefined;
+        tooltip?: string | undefined;
+    } | {
+        options: {
+            id: string;
+            label: string;
+        }[];
+        id: string;
+        label: string;
+        kind: "go";
+        agents: boolean;
+        align: "start" | "center" | "end";
+        optional: boolean;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        tool?: string | undefined;
+        tooltip?: string | undefined;
+    } | {
+        id: string;
+        state: "failed" | "idle" | "busy";
+        label: string;
+        kind: "run";
+        agents: boolean;
+        result: string | null;
+        disabled: string | null;
+        confirm: boolean;
+        align: "start" | "center" | "end";
+        optional: boolean;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        tool?: string | undefined;
+        tooltip?: string | undefined;
+    })[], ({
+        id: string;
+        kind: "text";
+        text: string;
+        level?: "normal" | "warn" | "critical" | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    } | {
+        value: number;
+        id: string;
+        label: string;
+        kind: "meter";
+        text?: string | undefined;
+        level?: "normal" | "warn" | "critical" | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    } | {
+        value: string;
+        options: {
+            id: string;
+            label: string;
+        }[];
+        id: string;
+        label: string;
+        kind: "switch";
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    } | {
+        id: string;
+        label: string;
+        kind: "toggle";
+        checked: boolean;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    } | {
+        options: {
+            id: string;
+            label: string;
+        }[];
+        id: string;
+        label: string;
+        kind: "go";
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    } | {
+        id: string;
+        label: string;
+        kind: "run";
+        state?: "failed" | "idle" | "busy" | undefined;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+        result?: string | null | undefined;
+        disabled?: string | null | undefined;
+        confirm?: boolean | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    })[]>;
+}, "strip", z.ZodTypeAny, {
+    type: "kehikot.footer";
+    items: ({
+        id: string;
+        kind: "text";
+        text: string;
+        level: "normal" | "warn" | "critical";
+        align: "start" | "center" | "end";
+        optional: boolean;
+        tooltip?: string | undefined;
+    } | {
+        value: number;
+        id: string;
+        label: string;
+        kind: "meter";
+        level: "normal" | "warn" | "critical";
+        align: "start" | "center" | "end";
+        optional: boolean;
+        text?: string | undefined;
+        tooltip?: string | undefined;
+    } | {
+        value: string;
+        options: {
+            id: string;
+            label: string;
+        }[];
+        id: string;
+        label: string;
+        kind: "switch";
+        agents: boolean;
+        align: "start" | "center" | "end";
+        optional: boolean;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        tool?: string | undefined;
+        tooltip?: string | undefined;
+    } | {
+        id: string;
+        label: string;
+        kind: "toggle";
+        agents: boolean;
+        checked: boolean;
+        align: "start" | "center" | "end";
+        optional: boolean;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        tool?: string | undefined;
+        tooltip?: string | undefined;
+    } | {
+        options: {
+            id: string;
+            label: string;
+        }[];
+        id: string;
+        label: string;
+        kind: "go";
+        agents: boolean;
+        align: "start" | "center" | "end";
+        optional: boolean;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        tool?: string | undefined;
+        tooltip?: string | undefined;
+    } | {
+        id: string;
+        state: "failed" | "idle" | "busy";
+        label: string;
+        kind: "run";
+        agents: boolean;
+        result: string | null;
+        disabled: string | null;
+        confirm: boolean;
+        align: "start" | "center" | "end";
+        optional: boolean;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        tool?: string | undefined;
+        tooltip?: string | undefined;
+    })[];
+}, {
+    type: "kehikot.footer";
+    items: ({
+        id: string;
+        kind: "text";
+        text: string;
+        level?: "normal" | "warn" | "critical" | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    } | {
+        value: number;
+        id: string;
+        label: string;
+        kind: "meter";
+        text?: string | undefined;
+        level?: "normal" | "warn" | "critical" | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    } | {
+        value: string;
+        options: {
+            id: string;
+            label: string;
+        }[];
+        id: string;
+        label: string;
+        kind: "switch";
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    } | {
+        id: string;
+        label: string;
+        kind: "toggle";
+        checked: boolean;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    } | {
+        options: {
+            id: string;
+            label: string;
+        }[];
+        id: string;
+        label: string;
+        kind: "go";
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    } | {
+        id: string;
+        label: string;
+        kind: "run";
+        state?: "failed" | "idle" | "busy" | undefined;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+        result?: string | null | undefined;
+        disabled?: string | null | undefined;
+        confirm?: boolean | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+    })[];
 }>]>;
 export type ModuleMessage = z.infer<typeof moduleMessageSchema>;
 export type WireMessage = HostMessage | ModuleMessage;

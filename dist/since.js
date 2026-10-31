@@ -161,6 +161,18 @@ export const SESSION_FIELD_SINCE = {
     agentSays: '2.36.0',
     absentSays: '2.36.0',
 };
+/**
+ * Wire messages and message fields added after 2.37.0, and the version that added each (2.38.0): what a
+ * module reads to know whether the host it is in will act on something it sends, or sends something
+ * it may count on. Like `TRACKER_FIELD_SINCE`, nothing `fitOf` holds a module to: a host before a
+ * message drops it without a word (a type it does not know), and one before a field leaves it out.
+ * The greeting says which of these a host does (`hello.footer`); a module goes by that, not by this.
+ */
+export const WIRE_SINCE = {
+    'kehikot.footer': '2.38.0',
+    'hello.footer': '2.38.0',
+    'press.place': '2.38.0',
+};
 /** Every table, in one place. Plain objects: read them with `sinceOf`, never by indexing with a stranger's string. */
 export const SINCE = {
     methods: METHOD_SINCE,
@@ -170,6 +182,7 @@ export const SINCE = {
     trackerFields: TRACKER_FIELD_SINCE,
     activityFields: ACTIVITY_FIELD_SINCE,
     sessionFields: SESSION_FIELD_SINCE,
+    wire: WIRE_SINCE,
 };
 const TABLE = {
     method: METHOD_SINCE,
@@ -179,6 +192,7 @@ const TABLE = {
     trackerField: TRACKER_FIELD_SINCE,
     activityField: ACTIVITY_FIELD_SINCE,
     sessionField: SESSION_FIELD_SINCE,
+    wire: WIRE_SINCE,
 };
 /**
  * The version a piece arrived in, or null when this package does not know it: a piece from a
@@ -241,7 +255,7 @@ export function pieceSaid(kind, piece) {
         return own(PIECE_SAID.declarations, piece) ?? piece;
     if (kind === 'capability')
         return own(PIECE_SAID.capabilities, piece) ?? piece;
-    if (kind === 'trackerField' || kind === 'activityField' || kind === 'sessionField')
+    if (kind === 'trackerField' || kind === 'activityField' || kind === 'sessionField' || kind === 'wire')
         return piece;
     const capability = methodCapability(piece);
     return capability ? (own(PIECE_SAID.capabilities, capability) ?? piece) : piece;
@@ -259,6 +273,7 @@ export const REMOVED = {
     trackerField: {},
     activityField: {},
     sessionField: {},
+    wire: {},
 };
 /** The version that removed a piece, or null when nothing has. */
 export function removedIn(kind, piece) {

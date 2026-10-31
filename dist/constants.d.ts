@@ -79,6 +79,12 @@ export declare const MESSAGE: {
      */
     readonly HEADER: "kehikot.header";
     /**
+     * Module → host (2.38.0). "This is what my container's footer says and offers": status text,
+     * meters, and the header's kinds of item. The whole list every time, like the header; an empty
+     * list takes the footer away. Presses on it come back as `kehikot.press` with `place: 'footer'`.
+     */
+    readonly FOOTER: "kehikot.footer";
+    /**
      * Host → module. "This item of yours was pressed", by a person in the header or by an agent
      * through the host. Carries a correlation id and is answered by exactly one `kehikot.pressed`.
      * Sent only to a module that declared the item.
@@ -107,7 +113,7 @@ export declare const MESSAGE_PREFIX = "kehikot.";
  */
 export declare const HOST_MESSAGES: readonly ["kehikot.hello", "kehikot.context", "kehikot.response", "kehikot.goto", "kehikot.event", "kehikot.clear", "kehikot.refresh", "kehikot.press", "kehikot.opened"];
 /** And what the module says. */
-export declare const MODULE_MESSAGES: readonly ["kehikot.ready", "kehikot.request", "kehikot.resize", "kehikot.went", "kehikot.filters", "kehikot.clearable", "kehikot.refreshable", "kehikot.header", "kehikot.pressed"];
+export declare const MODULE_MESSAGES: readonly ["kehikot.ready", "kehikot.request", "kehikot.resize", "kehikot.went", "kehikot.filters", "kehikot.clearable", "kehikot.refreshable", "kehikot.header", "kehikot.pressed", "kehikot.footer"];
 /**
  * How tall a frame may be asked to be, in pixels, bounded on both sides. `clampHeight` restates
  * the host's answer so a module can do the arithmetic on its own side.

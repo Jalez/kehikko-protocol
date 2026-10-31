@@ -1,4 +1,8 @@
 import { z } from 'zod';
+/** The id of a header item, or of one option of a switch or a go item. */
+export declare const headerIdSchema: z.ZodEffects<z.ZodString, string, string>;
+/** The words on an item or an option. Shared with the footer (2.38.0). */
+export declare const headerLabelSchema: z.ZodString;
 /** One thing a switch can be on, or a go item can jump to: an id and the words for it. */
 export declare const headerOptionSchema: z.ZodObject<{
     id: z.ZodEffects<z.ZodString, string, string>;
@@ -30,6 +34,259 @@ export type HeaderIcon = (typeof HEADER_ICONS)[number];
 /** A run is resting, in flight, or its last attempt failed. A host shows the last two on the menu's trigger. */
 export declare const RUN_STATES: readonly ["idle", "busy", "failed"];
 export type RunState = (typeof RUN_STATES)[number];
+/** The four kinds' shapes, before the rules that span fields. Shared with the footer (2.38.0). */
+export declare const HEADER_ITEM_SHAPES: {
+    readonly switch: z.ZodObject<{
+        options: z.ZodArray<z.ZodObject<{
+            id: z.ZodEffects<z.ZodString, string, string>;
+            label: z.ZodString;
+        }, "strip", z.ZodTypeAny, {
+            id: string;
+            label: string;
+        }, {
+            id: string;
+            label: string;
+        }>, "many">;
+        /** Which option the module is on now. One of `options`. */
+        value: z.ZodEffects<z.ZodString, string, string>;
+        id: z.ZodEffects<z.ZodString, string, string>;
+        label: z.ZodString;
+        /** An icon by name (`file-text`). A host draws the ones it has; an unknown name draws none. */
+        icon: z.ZodOptional<z.ZodString>;
+        /** A hint shown beside the label (`⌘B`). The host binds no key from it: the module's page does. */
+        shortcut: z.ZodOptional<z.ZodString>;
+        /** A heading inside the item's menu. Items naming the same group are drawn together under it. */
+        group: z.ZodOptional<z.ZodString>;
+        /**
+         * Whether an agent may press this through the host. False unless said: a module opts each item
+         * in. Refused together with `tool`, and on a run that has `confirm`.
+         */
+        agents: z.ZodDefault<z.ZodBoolean>;
+        /**
+         * The tool at this module's own MCP door that does what this item does. An agent is sent there
+         * instead of pressing: the host refuses the press and names the tool, so there is one way for a
+         * program to do each thing. Refused together with `agents`.
+         */
+        tool: z.ZodOptional<z.ZodString>;
+        kind: z.ZodLiteral<"switch">;
+    }, "strip", z.ZodTypeAny, {
+        value: string;
+        options: {
+            id: string;
+            label: string;
+        }[];
+        id: string;
+        label: string;
+        kind: "switch";
+        agents: boolean;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        tool?: string | undefined;
+    }, {
+        value: string;
+        options: {
+            id: string;
+            label: string;
+        }[];
+        id: string;
+        label: string;
+        kind: "switch";
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+    }>;
+    readonly toggle: z.ZodObject<{
+        checked: z.ZodBoolean;
+        id: z.ZodEffects<z.ZodString, string, string>;
+        label: z.ZodString;
+        /** An icon by name (`file-text`). A host draws the ones it has; an unknown name draws none. */
+        icon: z.ZodOptional<z.ZodString>;
+        /** A hint shown beside the label (`⌘B`). The host binds no key from it: the module's page does. */
+        shortcut: z.ZodOptional<z.ZodString>;
+        /** A heading inside the item's menu. Items naming the same group are drawn together under it. */
+        group: z.ZodOptional<z.ZodString>;
+        /**
+         * Whether an agent may press this through the host. False unless said: a module opts each item
+         * in. Refused together with `tool`, and on a run that has `confirm`.
+         */
+        agents: z.ZodDefault<z.ZodBoolean>;
+        /**
+         * The tool at this module's own MCP door that does what this item does. An agent is sent there
+         * instead of pressing: the host refuses the press and names the tool, so there is one way for a
+         * program to do each thing. Refused together with `agents`.
+         */
+        tool: z.ZodOptional<z.ZodString>;
+        kind: z.ZodLiteral<"toggle">;
+    }, "strip", z.ZodTypeAny, {
+        id: string;
+        label: string;
+        kind: "toggle";
+        agents: boolean;
+        checked: boolean;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        tool?: string | undefined;
+    }, {
+        id: string;
+        label: string;
+        kind: "toggle";
+        checked: boolean;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+    }>;
+    readonly go: z.ZodObject<{
+        options: z.ZodArray<z.ZodObject<{
+            id: z.ZodEffects<z.ZodString, string, string>;
+            label: z.ZodString;
+        }, "strip", z.ZodTypeAny, {
+            id: string;
+            label: string;
+        }, {
+            id: string;
+            label: string;
+        }>, "many">;
+        id: z.ZodEffects<z.ZodString, string, string>;
+        label: z.ZodString;
+        /** An icon by name (`file-text`). A host draws the ones it has; an unknown name draws none. */
+        icon: z.ZodOptional<z.ZodString>;
+        /** A hint shown beside the label (`⌘B`). The host binds no key from it: the module's page does. */
+        shortcut: z.ZodOptional<z.ZodString>;
+        /** A heading inside the item's menu. Items naming the same group are drawn together under it. */
+        group: z.ZodOptional<z.ZodString>;
+        /**
+         * Whether an agent may press this through the host. False unless said: a module opts each item
+         * in. Refused together with `tool`, and on a run that has `confirm`.
+         */
+        agents: z.ZodDefault<z.ZodBoolean>;
+        /**
+         * The tool at this module's own MCP door that does what this item does. An agent is sent there
+         * instead of pressing: the host refuses the press and names the tool, so there is one way for a
+         * program to do each thing. Refused together with `agents`.
+         */
+        tool: z.ZodOptional<z.ZodString>;
+        kind: z.ZodLiteral<"go">;
+    }, "strip", z.ZodTypeAny, {
+        options: {
+            id: string;
+            label: string;
+        }[];
+        id: string;
+        label: string;
+        kind: "go";
+        agents: boolean;
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        tool?: string | undefined;
+    }, {
+        options: {
+            id: string;
+            label: string;
+        }[];
+        id: string;
+        label: string;
+        kind: "go";
+        group?: string | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+    }>;
+    readonly run: z.ZodObject<{
+        state: z.ZodDefault<z.ZodEnum<["idle", "busy", "failed"]>>;
+        /** What the last run came to, in a word or three, or null. Shown beside the label. */
+        result: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+        /** Why it cannot be run right now, as a sentence, or null when it can. A host draws it flat and says why. */
+        disabled: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+        /** Whether a press arms it and a second press runs it. The arm is the host's; the module adds none. */
+        confirm: z.ZodDefault<z.ZodBoolean>;
+        /**
+         * 1.4.0. Where the press lands. A relayed press carries no user activation, so a module cannot
+         * ask for full screen from `onPress`; the host can, from the person's click. Absent: the press
+         * is only relayed. A host that does not know the field strips it and relays the press.
+         */
+        surface: z.ZodOptional<z.ZodEnum<["fullscreen"]>>;
+        /**
+         * 1.6.0. Draw this run as an icon button in the container header, left of the menus, as well
+         * as in the Run menu. Only drawing changes: an agent presses by id as before. At most
+         * `LIMITS.PINNED_MAX` are drawn (declaration order, see `pinnedRuns`). A host that does not
+         * know the field strips it and keeps the item in the menu.
+         */
+        pinned: z.ZodOptional<z.ZodBoolean>;
+        id: z.ZodEffects<z.ZodString, string, string>;
+        label: z.ZodString;
+        /** An icon by name (`file-text`). A host draws the ones it has; an unknown name draws none. */
+        icon: z.ZodOptional<z.ZodString>;
+        /** A hint shown beside the label (`⌘B`). The host binds no key from it: the module's page does. */
+        shortcut: z.ZodOptional<z.ZodString>;
+        /** A heading inside the item's menu. Items naming the same group are drawn together under it. */
+        group: z.ZodOptional<z.ZodString>;
+        /**
+         * Whether an agent may press this through the host. False unless said: a module opts each item
+         * in. Refused together with `tool`, and on a run that has `confirm`.
+         */
+        agents: z.ZodDefault<z.ZodBoolean>;
+        /**
+         * The tool at this module's own MCP door that does what this item does. An agent is sent there
+         * instead of pressing: the host refuses the press and names the tool, so there is one way for a
+         * program to do each thing. Refused together with `agents`.
+         */
+        tool: z.ZodOptional<z.ZodString>;
+        kind: z.ZodLiteral<"run">;
+    }, "strip", z.ZodTypeAny, {
+        id: string;
+        state: "failed" | "idle" | "busy";
+        label: string;
+        kind: "run";
+        agents: boolean;
+        result: string | null;
+        disabled: string | null;
+        confirm: boolean;
+        group?: string | undefined;
+        pinned?: boolean | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        tool?: string | undefined;
+        surface?: "fullscreen" | undefined;
+    }, {
+        id: string;
+        label: string;
+        kind: "run";
+        state?: "failed" | "idle" | "busy" | undefined;
+        group?: string | undefined;
+        pinned?: boolean | undefined;
+        icon?: string | undefined;
+        shortcut?: string | undefined;
+        agents?: boolean | undefined;
+        tool?: string | undefined;
+        result?: string | null | undefined;
+        disabled?: string | null | undefined;
+        confirm?: boolean | undefined;
+        surface?: "fullscreen" | undefined;
+    }>;
+};
+/**
+ * The rules that span an item's fields, for a header item and for a footer item of the same kinds
+ * (2.38.0): option ids unique, a switch's value one of its options, `agents` not beside `tool`, and
+ * not on a run that is confirmed.
+ */
+export declare function checkPressable(item: {
+    kind: string;
+    agents?: boolean;
+    tool?: string;
+    confirm?: boolean;
+    options?: readonly {
+        id: string;
+    }[];
+    value?: string;
+}, ctx: z.RefinementCtx): void;
 /**
  * One item of a module's header. `switch`: one of several views, with the one it is on. `toggle`:
  * on or off. `go`: a jump to one of several places, with nothing held afterwards. `run`: an act,

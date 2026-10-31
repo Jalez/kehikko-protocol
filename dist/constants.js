@@ -79,6 +79,12 @@ export const MESSAGE = {
      */
     HEADER: 'kehikot.header',
     /**
+     * Module → host (2.38.0). "This is what my container's footer says and offers": status text,
+     * meters, and the header's kinds of item. The whole list every time, like the header; an empty
+     * list takes the footer away. Presses on it come back as `kehikot.press` with `place: 'footer'`.
+     */
+    FOOTER: 'kehikot.footer',
+    /**
      * Host → module. "This item of yours was pressed", by a person in the header or by an agent
      * through the host. Carries a correlation id and is answered by exactly one `kehikot.pressed`.
      * Sent only to a module that declared the item.
@@ -126,6 +132,7 @@ export const MODULE_MESSAGES = [
     MESSAGE.REFRESHABLE,
     MESSAGE.HEADER,
     MESSAGE.PRESSED,
+    MESSAGE.FOOTER,
 ];
 /**
  * How tall a frame may be asked to be, in pixels, bounded on both sides. `clampHeight` restates

@@ -163,6 +163,19 @@ export declare const SESSION_FIELD_SINCE: {
     readonly absentSays: "2.36.0";
 };
 export type SessionField = keyof typeof SESSION_FIELD_SINCE;
+/**
+ * Wire messages and message fields added after 2.37.0, and the version that added each (2.38.0): what a
+ * module reads to know whether the host it is in will act on something it sends, or sends something
+ * it may count on. Like `TRACKER_FIELD_SINCE`, nothing `fitOf` holds a module to: a host before a
+ * message drops it without a word (a type it does not know), and one before a field leaves it out.
+ * The greeting says which of these a host does (`hello.footer`); a module goes by that, not by this.
+ */
+export declare const WIRE_SINCE: {
+    readonly 'kehikot.footer': "2.38.0";
+    readonly 'hello.footer': "2.38.0";
+    readonly 'press.place': "2.38.0";
+};
+export type WirePiece = keyof typeof WIRE_SINCE;
 /** Every table, in one place. Plain objects: read them with `sinceOf`, never by indexing with a stranger's string. */
 export declare const SINCE: {
     readonly methods: {
@@ -282,9 +295,14 @@ export declare const SINCE: {
         readonly agentSays: "2.36.0";
         readonly absentSays: "2.36.0";
     };
+    readonly wire: {
+        readonly 'kehikot.footer': "2.38.0";
+        readonly 'hello.footer': "2.38.0";
+        readonly 'press.place': "2.38.0";
+    };
 };
 /** The kinds of piece the tables know. */
-export type PieceKind = 'method' | 'capability' | 'serverMethod' | 'declaration' | 'trackerField' | 'activityField' | 'sessionField';
+export type PieceKind = 'method' | 'capability' | 'serverMethod' | 'declaration' | 'trackerField' | 'activityField' | 'sessionField' | 'wire';
 /**
  * The version a piece arrived in, or null when this package does not know it: a piece from a
  * newer protocol, or a word nobody defined.

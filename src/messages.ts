@@ -5,6 +5,7 @@ import { EPIC_SLUG, MODULE_ID, PROTOCOL_VERSION } from './ids.js'
 import { buildSchema } from './build.js'
 import { contextSchema } from './context.js'
 import { filterGroupSchema } from './filters.js'
+import { footerItemsSchema } from './footer.js'
 import { headerItemsSchema, pressValueSchema } from './header.js'
 import { gotoRef, kehikkoSchema, stepNumber } from './fragments.js'
 
@@ -110,6 +111,21 @@ export const headerSchema = z.object({
 export type Header = z.infer<typeof headerSchema>
 
 /**
+ * Module → host (2.38.0). Every footer item this module has, whole, every time, like the header: it
+ * replaces, never merges, and an empty `items` takes the footer away. A host draws it as one row at
+ * the bottom of the container. See `footer.ts` and docs/footer.md.
+ */
+export const footerSchema = z.object({
+  type: messageType(MESSAGE.FOOTER),
+  items: footerItemsSchema,
+})
+export type Footer = z.infer<typeof footerSchema>
+
+/** Where a pressed item was declared (2.38.0): the header, or the footer. */
+export const PRESS_PLACES = ['header', 'footer'] as const
+export type PressPlace = (typeof PRESS_PLACES)[number]
+
+/**
  * Host → module. One item was pressed. `value` is the option chosen for a switch or a go item, the
  * state wanted for a toggle (so a press delivered twice does not flip twice), and absent for a run.
  * `id` pairs it with its `pressed`. A host sends this only for an item in the module's last header,
@@ -121,6 +137,13 @@ export const pressSchema = z.object({
   id: correlation,
   item: z.string().min(1).max(LIMITS.HEADER_ID),
   value: pressValueSchema.optional(),
+  /**
+   * 2.38.0. `footer` for an item of the module's footer; absent (or `header`) for one of its header,
+   * as before. A module built before 2.38.0 strips it and judges the press against its header, where
+   * a footer item is not, and answers "not taken": a host sends footer presses only to a module that
+   * declared a footer, which an older one cannot have.
+   */
+  place: z.enum(PRESS_PLACES).optional(),
 })
 export type Press = z.infer<typeof pressSchema>
 
@@ -168,6 +191,12 @@ export const helloSchema = z.object({
    * its own control. See docs/header.md.
    */
   header: z.boolean().optional(),
+  /**
+   * 2.38.0. Whether this host draws the module's declared footer (`kehikot.footer`) as a row at the
+   * bottom of its container. Absent from a host before 2.38.0: it does not, so a module keeps
+   * drawing its own footer. See docs/footer.md.
+   */
+  footer: z.boolean().optional(),
 })
 
 /**
@@ -378,6 +407,7 @@ export const moduleMessageSchema = z.union([
   refreshableSchema,
   headerSchema,
   pressedSchema,
+  footerSchema,
 ])
 export type ModuleMessage = z.infer<typeof moduleMessageSchema>
 

@@ -3,7 +3,7 @@ import { MESSAGE, PROTOCOL, clampHeight, } from '../constants.js';
 import { LIMITS } from '../limits.js';
 import { activityItemsSchema } from '../activity.js';
 import { ORIGINS_ELEMENT, originAmong } from '../page.js';
-import { headerItemsSchema, hostMessageSchema, looksLikeWireMessage, pressRefusal, } from '../wire.js';
+import { footerItemsSchema, footerPressRefusal, headerItemsSchema, hostMessageSchema, looksLikeWireMessage, pressRefusal, } from '../wire.js';
 import { tooOldOf } from '../fit.js';
 import { mailbox } from './mailbox.js';
 /** The project folder a greeting or a context names, or null. */
@@ -114,6 +114,9 @@ export function connect(id, events = {}, options = {}) {
     /* The last header, replayed likewise, as it was written; and as parsed, to judge a press by. */
     let heading = null;
     let declared = [];
+    /* The last footer (2.38.0), replayed and judged likewise. */
+    let footing = null;
+    let footed = [];
     /* The last activity list, as written, and the text of the one the host last took (`null`: none yet on
        this greeting, so the next is sent). `answered` is the greeting's `answers`, `null` when it did not say. */
     let activityNow = null;
@@ -177,13 +180,15 @@ export function connect(id, events = {}, options = {}) {
                 send({ type: MESSAGE.REFRESHABLE, ...refreshing });
             if (heading !== null)
                 send({ type: MESSAGE.HEADER, items: heading });
+            if (footing !== null)
+                send({ type: MESSAGE.FOOTER, items: footing });
             answered = message.answers ?? null;
             activityTaken = null;
             byProject = false;
             projectNow = projectOf(message.context);
             projectIdNow = projectIdOf(message.context);
             sendActivity();
-            events.onHello?.(message.context, message.state, { answers: message.answers ?? null, header: message.header ?? null });
+            events.onHello?.(message.context, message.state, { answers: message.answers ?? null, header: message.header ?? null, footer: message.footer ?? null });
             return;
         }
         /* Everything after the greeting has to come from the window that gave it.
@@ -249,9 +254,10 @@ export function connect(id, events = {}, options = {}) {
                 send({ type: MESSAGE.PRESSED, id: message.id, ok, why: why.slice(0, LIMITS.REASON) });
             };
             const backstop = setTimeout(() => answer(false, 'This app did not say whether it took that press.'), pressBackstop);
-            const press = { item: message.item, ...(message.value !== undefined ? { value: message.value } : {}) };
-            /* Judged against what is declared NOW: the header may have changed since the menu was drawn. */
-            const refused = pressRefusal(declared, press);
+            const footer = message.place === 'footer';
+            const press = { item: message.item, ...(message.value !== undefined ? { value: message.value } : {}), ...(footer ? { place: 'footer' } : {}) };
+            /* Judged against what is declared NOW: the header (or footer) may have changed since it was drawn. */
+            const refused = footer ? footerPressRefusal(footed, press) : pressRefusal(declared, press);
             if (refused !== null)
                 answer(false, refused);
             else if (!events.onPress)
@@ -410,6 +416,13 @@ export function connect(id, events = {}, options = {}) {
             const parsed = headerItemsSchema.safeParse(items);
             declared = parsed.success ? parsed.data : [];
             send({ type: MESSAGE.HEADER, items });
+        },
+        footer(items) {
+            /* As `header`: kept before it is sent, and a list that does not parse is still sent for the host to report. */
+            footing = items;
+            const parsed = footerItemsSchema.safeParse(items);
+            footed = parsed.success ? parsed.data : [];
+            send({ type: MESSAGE.FOOTER, items });
         },
         activity(items) {
             const parsed = activityItemsSchema.safeParse(items);

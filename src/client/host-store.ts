@@ -1,4 +1,4 @@
-import type { ActivityItem, AddressIntent, AddressOpenResult, CanvasContainer, CodeLocation, EpicPart, FilterChoice, FilterGroup, HeaderItemInput, LocationIntent, LocationSetResult, ModuleContext, Passage, SharedAddress, SharedLocation } from '../index.js'
+import type { ActivityItem, AddressIntent, AddressOpenResult, CanvasContainer, CodeLocation, EpicPart, FilterChoice, FilterGroup, FooterItemInput, HeaderItemInput, LocationIntent, LocationSetResult, ModuleContext, Passage, SharedAddress, SharedLocation } from '../index.js'
 import type { PageTheme } from '../page.js'
 import { scopeOf, type ContextScope } from '../context.js'
 import { readScope, type ModuleScope } from '../scope.js'
@@ -146,6 +146,12 @@ export interface HostStanding<Kept = unknown> extends HostFields {
   answers: readonly string[] | null
   /** Whether the host draws this module's header (1.4.0), or `null` when it did not say. See docs/header.md. */
   drawsHeader: boolean | null
+  /**
+   * 2.38.0. Whether the host draws this module's declared footer, or `null` when it did not say (a host
+   * before 2.38.0, which does not). Declare a footer and draw none of your own only when this is `true`.
+   * See docs/footer.md.
+   */
+  drawsFooter: boolean | null
 }
 
 /** What a page says to its host, the same from the hook and from the store. */
@@ -183,6 +189,8 @@ export interface HostActions<Kept = unknown> {
   refreshable: (state: { can?: boolean; at?: string | null; busy?: boolean }) => void
   /** Declare this page's header items, whole (`kehikot.header`); `[]` withdraws them. See `Connection.header`. */
   header: (items: HeaderItemInput[]) => void
+  /** Declare this page's footer items, whole (`kehikot.footer`, 2.38.0); `[]` withdraws them. See `Connection.footer`. */
+  footer: (items: FooterItemInput[]) => void
   /** Say what this page's things are doing, whole (`activity.set`, 1.5.0); `[]` for nothing. See `Connection.activity`. */
   activity: (items: ActivityItem[]) => void
 }
@@ -259,7 +267,7 @@ export function hostStore<Kept = unknown>(
   const { grace = GREETING_GRACE_MS, kept: given, applyTheme: themed = true, reloadWhenStale: reloads = true, same, ...connectOptions } = options
   const codec = given ?? (JSON_KEPT as KeptCodec<Kept>)
 
-  let standing: HostStanding<Kept> = { where: 'listening', context: null, ...hostFields(null), theme: pageTheme() ?? 'light', kept: null, answers: null, drawsHeader: null }
+  let standing: HostStanding<Kept> = { where: 'listening', context: null, ...hostFields(null), theme: pageTheme() ?? 'light', kept: null, answers: null, drawsHeader: null, drawsFooter: null }
   const hearers = new Set<() => void>()
   let live: Connection | null = null
   let stopped = false
@@ -275,7 +283,7 @@ export function hostStore<Kept = unknown>(
     const theme: PageTheme = context.theme === 'dark' ? 'dark' : 'light'
     if (themed) applyTheme(theme, { remember: true })
     /* The kept state with the context, in one change, so the first hosted standing already has the remembered choice. */
-    change({ where: 'hosted', context, ...hostFields(context, standing, same), theme, ...(state !== undefined ? { kept: codec.read(state) } : {}), ...(facts ? { answers: facts.answers, drawsHeader: facts.header } : {}) })
+    change({ where: 'hosted', context, ...hostFields(context, standing, same), theme, ...(state !== undefined ? { kept: codec.read(state) } : {}), ...(facts ? { answers: facts.answers, drawsHeader: facts.header, drawsFooter: facts.footer ?? null } : {}) })
   }
 
   const store: HostStore<Kept> = {
@@ -405,6 +413,7 @@ export function hostStore<Kept = unknown>(
     clearable: (label) => live?.clearable(label),
     refreshable: (state) => live?.refreshable(state),
     header: (items) => live?.header(items),
+    footer: (items) => live?.footer(items),
     activity: (items) => live?.activity(items),
     connection: () => live,
   }
