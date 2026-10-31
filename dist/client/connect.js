@@ -243,6 +243,10 @@ export function connect(id, events = {}, options = {}) {
             events.onOpened?.({ item: message.item });
             return;
         }
+        if (message.type === MESSAGE.COVERED) {
+            events.onCovered?.({ top: message.top, bottom: message.bottom });
+            return;
+        }
         if (message.type === MESSAGE.PRESS) {
             /* Answered exactly once, like a `goto`: whatever the listener returns, throws or forgets. */
             let answered = false;

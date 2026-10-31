@@ -27,6 +27,7 @@ import {
 } from '../wire.js'
 
 import { tooOldOf } from '../fit.js'
+import type { Covered } from '../reveal.js'
 import { mailbox, type MessageSource } from './mailbox.js'
 
 
@@ -212,6 +213,13 @@ export interface HostEvents {
    * the module's next `activity` list. See `openedSchema`.
    */
   onOpened?: (opened: { item: string }) => void
+  /**
+   * How much of this page's frame the host's revealed header and footer cover now (2.42.0), in CSS
+   * pixels from the top and the bottom; `{ top: 0, bottom: 0 }` when they hid. Only for a module whose
+   * manifest says `reveal: 'over'`. The frame keeps its size: move what must stay readable out from
+   * under the rows (`keepInView`), never refit. `hostStore` and `useHost` also keep it as `covered`.
+   */
+  onCovered?: (covered: Covered) => void
 }
 
 /**
@@ -458,6 +466,11 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
 
     if (message.type === MESSAGE.OPENED) {
       events.onOpened?.({ item: message.item })
+      return
+    }
+
+    if (message.type === MESSAGE.COVERED) {
+      events.onCovered?.({ top: message.top, bottom: message.bottom })
       return
     }
 

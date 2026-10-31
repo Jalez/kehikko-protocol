@@ -3487,6 +3487,31 @@ export declare const openedSchema: z.ZodObject<{
 }>;
 export type Opened = z.infer<typeof openedSchema>;
 /**
+ * Host → module (2.42.0). How much of this module's frame the host's own rows cover now: `top` and
+ * `bottom` in CSS pixels. Sent only to a module whose manifest says `reveal: 'over'`, whenever it
+ * changes, and after a greeting while anything is covered; `{ top: 0, bottom: 0 }` says the rows
+ * are gone. The frame keeps its size throughout, so a module never refits for it: it moves what
+ * must stay readable out from under the rows (`keepInView`). Fire and forget. A host before 2.42.0
+ * sends nothing; a module before it drops the message unread (`HOST_MESSAGES`).
+ */
+export declare const coveredSchema: z.ZodObject<{
+    top: z.ZodNumber;
+    bottom: z.ZodNumber;
+    type: z.ZodLiteral<"kehikot.covered">;
+    protocol: z.ZodNumber;
+}, "strip", z.ZodTypeAny, {
+    type: "kehikot.covered";
+    protocol: number;
+    top: number;
+    bottom: number;
+}, {
+    type: "kehikot.covered";
+    protocol: number;
+    top: number;
+    bottom: number;
+}>;
+export type CoveredMessage = z.infer<typeof coveredSchema>;
+/**
  * Every message a host sends. A plain union, not a `discriminatedUnion`, because `responseSchema`
  * is itself a union on a different key and cannot be an option of one.
  */
@@ -5253,6 +5278,21 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     type: "kehikot.opened";
     protocol: number;
     item: string;
+}>, z.ZodObject<{
+    top: z.ZodNumber;
+    bottom: z.ZodNumber;
+    type: z.ZodLiteral<"kehikot.covered">;
+    protocol: z.ZodNumber;
+}, "strip", z.ZodTypeAny, {
+    type: "kehikot.covered";
+    protocol: number;
+    top: number;
+    bottom: number;
+}, {
+    type: "kehikot.covered";
+    protocol: number;
+    top: number;
+    bottom: number;
 }>]>;
 export type HostMessage = z.infer<typeof hostMessageSchema>;
 export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{

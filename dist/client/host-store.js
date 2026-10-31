@@ -4,6 +4,7 @@ import { addressOpenResult, locationSetResult } from '../methods.js';
 import { HostRefused, NOBODY_TO_ASK, connect, } from './connect.js';
 import { reloadWhenStale } from './ask.js';
 import { applyTheme, pageTheme, systemTheme } from './theme.js';
+import { NOT_COVERED } from '../reveal.js';
 /**
  * The host as one value outside React: everything `useHost` arranges — the grace before
  * "unhosted", the theme on `<html>`, the flattened context, the kept state, the stale reload — for
@@ -82,7 +83,7 @@ export function hostFields(context, was, same = {}) {
 export function hostStore(id, events = {}, options = {}) {
     const { grace = GREETING_GRACE_MS, kept: given, applyTheme: themed = true, reloadWhenStale: reloads = true, same, ...connectOptions } = options;
     const codec = given ?? JSON_KEPT;
-    let standing = { where: 'listening', context: null, ...hostFields(null), theme: pageTheme() ?? 'light', kept: null, answers: null, drawsHeader: null, drawsFooter: null, hostCarries: null };
+    let standing = { where: 'listening', context: null, ...hostFields(null), theme: pageTheme() ?? 'light', kept: null, answers: null, drawsHeader: null, drawsFooter: null, hostCarries: null, covered: NOT_COVERED };
     const hearers = new Set();
     let live = null;
     let stopped = false;
@@ -98,7 +99,7 @@ export function hostStore(id, events = {}, options = {}) {
         if (themed)
             applyTheme(theme, { remember: true });
         /* The kept state with the context, in one change, so the first hosted standing already has the remembered choice. */
-        change({ where: 'hosted', context, ...hostFields(context, standing, same), theme, ...(state !== undefined ? { kept: codec.read(state) } : {}), ...(facts ? { answers: facts.answers, drawsHeader: facts.header, drawsFooter: facts.footer ?? null, hostCarries: facts.carries ?? null } : {}) });
+        change({ where: 'hosted', context, ...hostFields(context, standing, same), theme, ...(state !== undefined ? { kept: codec.read(state) } : {}), ...(facts ? { answers: facts.answers, drawsHeader: facts.header, drawsFooter: facts.footer ?? null, hostCarries: facts.carries ?? null, covered: NOT_COVERED } : {}) });
     };
     const store = {
         get: () => standing,
@@ -146,6 +147,13 @@ export function hostStore(id, events = {}, options = {}) {
                 onOpened: (opened) => {
                     if (!stopped)
                         events.onOpened?.(opened);
+                },
+                onCovered: (covered) => {
+                    if (stopped)
+                        return;
+                    if (covered.top !== standing.covered.top || covered.bottom !== standing.covered.bottom)
+                        change({ covered });
+                    events.onCovered?.(covered);
                 },
                 /* Only when the page takes presses: without a listener the connection answers for it. */
                 ...(events.onPress ? { onPress: (press) => (stopped ? false : events.onPress(press)) } : {}),

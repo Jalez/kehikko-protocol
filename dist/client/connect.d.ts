@@ -1,5 +1,6 @@
 import { type ActivityItem } from '../activity.js';
 import { type FilterGroup, type FooterItemInput, type Goto, type HeaderItemInput, type ModuleContext, type ModuleEvent, type Press, type ResponseFailureReason } from '../wire.js';
+import type { Covered } from '../reveal.js';
 import { type MessageSource } from './mailbox.js';
 /**
  * The bridge: one conversation with one window, in the shape this package's schemas define.
@@ -144,6 +145,13 @@ export interface HostEvents {
     onOpened?: (opened: {
         item: string;
     }) => void;
+    /**
+     * How much of this page's frame the host's revealed header and footer cover now (2.42.0), in CSS
+     * pixels from the top and the bottom; `{ top: 0, bottom: 0 }` when they hid. Only for a module whose
+     * manifest says `reveal: 'over'`. The frame keeps its size: move what must stay readable out from
+     * under the rows (`keepInView`), never refit. `hostStore` and `useHost` also keep it as `covered`.
+     */
+    onCovered?: (covered: Covered) => void;
 }
 /**
  * What a single question may say about itself, beyond its params. A ceiling on waiting, never a

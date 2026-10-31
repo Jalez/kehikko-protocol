@@ -3,6 +3,7 @@ import type { PageTheme } from '../page.js';
 import { type ContextScope } from '../context.js';
 import { type ModuleScope } from '../scope.js';
 import { type AskOptions, type ConnectOptions, type Connection, type HostEvents } from './connect.js';
+import { type Covered } from '../reveal.js';
 /**
  * The host as one value outside React: everything `useHost` arranges — the grace before
  * "unhosted", the theme on `<html>`, the flattened context, the kept state, the stale reload — for
@@ -124,6 +125,13 @@ export interface HostStanding<Kept = unknown> extends HostFields {
     drawsFooter: boolean | null;
     /** 2.40.0. The acts the host carries out itself for a run (`copy`, `open`), or `null` when it did not say (none). */
     hostCarries: readonly string[] | null;
+    /**
+     * 2.42.0. How much of this page's frame the host's revealed header and footer cover now, in CSS
+     * pixels from the top and from the bottom (`kehikot.covered`). Only ever non-zero for a module whose
+     * manifest says `reveal: 'over'`, on a host that honours it; `{ top: 0, bottom: 0 }` otherwise. The
+     * frame is not resized for it: move what must stay readable (`keepInView`), never refit.
+     */
+    covered: Covered;
 }
 /** What a page says to its host, the same from the hook and from the store. */
 export interface HostActions<Kept = unknown> {

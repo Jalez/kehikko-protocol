@@ -13,6 +13,8 @@ export { follow } from './stream.js';
 export { subscribe } from './subscribe.js';
 export {} from './query.js';
 export { applyTheme, pageTheme, systemTheme } from './theme.js';
+/* What the host's revealed rows cover of a page that says `reveal: 'over'`, and how to keep the last line out from under them (2.42.0). */
+export { keepInView, NOT_COVERED } from '../reveal.js';
 export { pageBuild } from './build.js';
 /* A call the host is too old for (2.22.0): read it off a `HostRefused`, show the one line. */
 export { hostTooOld, FIT_SAYS } from '../fit.js';

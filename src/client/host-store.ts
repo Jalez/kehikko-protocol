@@ -15,6 +15,7 @@ import {
 } from './connect.js'
 import { reloadWhenStale } from './ask.js'
 import { applyTheme, pageTheme, systemTheme } from './theme.js'
+import { NOT_COVERED, type Covered } from '../reveal.js'
 
 /**
  * The host as one value outside React: everything `useHost` arranges — the grace before
@@ -154,6 +155,13 @@ export interface HostStanding<Kept = unknown> extends HostFields {
   drawsFooter: boolean | null
   /** 2.40.0. The acts the host carries out itself for a run (`copy`, `open`), or `null` when it did not say (none). */
   hostCarries: readonly string[] | null
+  /**
+   * 2.42.0. How much of this page's frame the host's revealed header and footer cover now, in CSS
+   * pixels from the top and from the bottom (`kehikot.covered`). Only ever non-zero for a module whose
+   * manifest says `reveal: 'over'`, on a host that honours it; `{ top: 0, bottom: 0 }` otherwise. The
+   * frame is not resized for it: move what must stay readable (`keepInView`), never refit.
+   */
+  covered: Covered
 }
 
 /** What a page says to its host, the same from the hook and from the store. */
@@ -269,7 +277,7 @@ export function hostStore<Kept = unknown>(
   const { grace = GREETING_GRACE_MS, kept: given, applyTheme: themed = true, reloadWhenStale: reloads = true, same, ...connectOptions } = options
   const codec = given ?? (JSON_KEPT as KeptCodec<Kept>)
 
-  let standing: HostStanding<Kept> = { where: 'listening', context: null, ...hostFields(null), theme: pageTheme() ?? 'light', kept: null, answers: null, drawsHeader: null, drawsFooter: null, hostCarries: null }
+  let standing: HostStanding<Kept> = { where: 'listening', context: null, ...hostFields(null), theme: pageTheme() ?? 'light', kept: null, answers: null, drawsHeader: null, drawsFooter: null, hostCarries: null, covered: NOT_COVERED }
   const hearers = new Set<() => void>()
   let live: Connection | null = null
   let stopped = false
@@ -285,7 +293,7 @@ export function hostStore<Kept = unknown>(
     const theme: PageTheme = context.theme === 'dark' ? 'dark' : 'light'
     if (themed) applyTheme(theme, { remember: true })
     /* The kept state with the context, in one change, so the first hosted standing already has the remembered choice. */
-    change({ where: 'hosted', context, ...hostFields(context, standing, same), theme, ...(state !== undefined ? { kept: codec.read(state) } : {}), ...(facts ? { answers: facts.answers, drawsHeader: facts.header, drawsFooter: facts.footer ?? null, hostCarries: facts.carries ?? null } : {}) })
+    change({ where: 'hosted', context, ...hostFields(context, standing, same), theme, ...(state !== undefined ? { kept: codec.read(state) } : {}), ...(facts ? { answers: facts.answers, drawsHeader: facts.header, drawsFooter: facts.footer ?? null, hostCarries: facts.carries ?? null, covered: NOT_COVERED } : {}) })
   }
 
   const store: HostStore<Kept> = {
@@ -328,6 +336,11 @@ export function hostStore<Kept = unknown>(
           },
           onOpened: (opened) => {
             if (!stopped) events.onOpened?.(opened)
+          },
+          onCovered: (covered) => {
+            if (stopped) return
+            if (covered.top !== standing.covered.top || covered.bottom !== standing.covered.bottom) change({ covered })
+            events.onCovered?.(covered)
           },
           /* Only when the page takes presses: without a listener the connection answers for it. */
           ...(events.onPress ? { onPress: (press) => (stopped ? false : events.onPress!(press)) } : {}),

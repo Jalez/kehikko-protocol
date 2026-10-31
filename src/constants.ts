@@ -103,6 +103,13 @@ export const MESSAGE = {
    * count it as seen; whether the item stays is still the module's next list.
    */
   OPENED: 'kehikot.opened',
+  /**
+   * Host → module (2.42.0). "My rows now cover this much of your frame": CSS pixels at its top and
+   * at its bottom, sent to a module whose manifest says `reveal: 'over'` whenever that changes (a
+   * hover revealed or hid the header and footer), and again after a greeting while anything is
+   * covered. No answer. The frame itself is not resized; see `reveal.ts`.
+   */
+  COVERED: 'kehikot.covered',
 } as const
 
 export type MessageType = (typeof MESSAGE)[keyof typeof MESSAGE]
@@ -128,6 +135,7 @@ export const HOST_MESSAGES = [
   MESSAGE.REFRESH,
   MESSAGE.PRESS,
   MESSAGE.OPENED,
+  MESSAGE.COVERED,
 ] as const
 
 /** And what the module says. */

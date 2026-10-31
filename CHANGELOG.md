@@ -7,6 +7,28 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.42.0 — 2026-10-31
+
+How the host's revealed header and footer meet a module's page. **Additive**; `PROTOCOL` is still 2.
+docs/manifest.md, "How the host's rows meet the page".
+
+### Added
+
+- **`reveal: 'push' | 'over'`**, a top-level manifest field (`REVEAL_MODES`, `revealModeSchema`,
+  `revealModeOf`, `push` when absent). `over` asks the host to keep the module's frame at its size
+  when it reveals its rows on hover and to draw them over the frame's top and bottom instead — for a
+  terminal, whose pty redraws on every resize. A host before 2.42.0 ignores it; an unknown word is
+  dropped.
+- **`kehikot.covered`** (`MESSAGE.COVERED`, in `HOST_MESSAGES`; `coveredSchema`, type
+  `CoveredMessage`; `coveredFields`, `Covered`, `NOT_COVERED`): host → module `{ protocol, top,
+  bottom }`, CSS pixels of the frame under the host's rows, capped at `LIMITS.COVERED_PX` (512). Sent
+  to an `over` module when it changes and after a greeting while anything is covered. Not answered.
+- **`onCovered({ top, bottom })`** on `connect`'s events and `useHost`; **`covered`** on
+  `HostStanding` (`hostStore`, `useHost`), back to nothing on every greeting.
+- **`keepInView(covered, height, last)`** (also from `/client`): how far to move content (a
+  `translateY`; negative is up) so the line ending at `last` stays above the footer, or moves down out
+  from under the header when the screen is short. Whole pixels; 0 when nothing is covered.
+
 ## 2.41.0 — 2026-10-31
 
 Messages between agent sessions, kept by the host. Additive. See [docs/agent-messages.md](docs/agent-messages.md).
