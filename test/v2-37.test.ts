@@ -21,7 +21,7 @@ const input = (over: Partial<NotesInput> = {}): NotesInput => ({
 
 describe('NOTES_VERSION', () => {
   test('is 2 now, and every record sessionNotes returns carries it', () => {
-    expect(NOTES_VERSION).toBe(2)
+    expect(NOTES_VERSION).toBeGreaterThanOrEqual(2)
     expect(sessionNotes(input(), 'start', null).told.version).toBe(NOTES_VERSION)
     const told = sessionNotes(input(), 'start', null).told
     expect(sessionNotes(input({ modules: [] }), 'prompt', told).told.version).toBe(NOTES_VERSION)

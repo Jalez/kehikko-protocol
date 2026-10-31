@@ -376,6 +376,24 @@ export const LIMITS = {
     SERVER_PASS_MS: 10_000,
     /** How long a module's server waits for the host to answer one question, in ms (`askHost`, 2.19.0). */
     SERVER_ASK_MS: 5000,
+    /* Messages between agent sessions (2.41.0). See `agent-messages.ts`. */
+    /** One message's body, in characters. Refused, not clipped, when longer: what is kept is what was sent. */
+    MESSAGE_BODY: 2000,
+    /** The most one `messages.read` returns. */
+    MESSAGES_READ: 50,
+    /** How many messages a host keeps per project; past it the oldest go. */
+    MESSAGES_KEPT: 1000,
+    /** How long a host keeps a message, in ms: 14 days. */
+    MESSAGES_KEPT_MS: 14 * 24 * 60 * 60 * 1000,
+    /** How many messages one session may send in a minute. */
+    MESSAGES_PER_MINUTE: 6,
+    /** How many messages one session may send in an hour. */
+    MESSAGES_PER_HOUR: 60,
+    /**
+     * How old a message may be and still be unread, in ms: 24 hours. A session that starts next week is
+     * not told last week's coordination; `messages.read` without `unread` still lists it.
+     */
+    MESSAGES_UNREAD_MS: 24 * 60 * 60 * 1000,
     /* Traffic (2.20.0). See `traffic.ts`. */
     /** How many rows of traffic a host keeps, and the most one `traffic.read` returns. */
     TRAFFIC_KEPT: 5000,

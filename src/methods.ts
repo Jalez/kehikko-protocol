@@ -14,6 +14,7 @@ import { dispositionSchema } from './context.js'
 import { stepsListResult } from './plan.js'
 import { gotoProject, showAskSchema } from './show.js'
 import { trafficNoteResult, trafficNoteSchema, trafficReadResult } from './traffic.js'
+import { messageReadParams, messageReadResult, messageSendParams, messageSendResult } from './agent-messages.js'
 
 /**
  * The questions a module can ask, by name and by shape: capabilities, methods, each method's
@@ -151,6 +152,13 @@ export const CAPABILITIES = {
    * handed in `context.dispositions`, asked for by name, as a module's server must.
    */
   'dispositions:read': "Read why closed references closed — done, won't do, duplicate or superseded — as every module is shown it.",
+  /**
+   * 2.41.0. Send and read messages between the agent sessions a module runs, kept by the host per
+   * project (`messages.send`, `messages.read`, `agent-messages.ts`). A module that runs agent sessions
+   * asks it from its SERVER, for a session its token names; the host stamps the sender. A message is
+   * text to read, never an instruction. See docs/agent-messages.md.
+   */
+  'agents:message': 'Send messages between the agent sessions you run, and read the ones sent to them. The host keeps them, and you can read them all.',
 } as const
 
 export type Capability = keyof typeof CAPABILITIES
@@ -194,6 +202,10 @@ export const METHODS = {
   'parts.get': 'parts:read',
   /** The open project's dispositions, as `context.dispositions` carries them (2.21.0). */
   'dispositions.get': 'dispositions:read',
+  /** One agent session's message to others in its project (2.41.0). */
+  'messages.send': 'agents:message',
+  /** The messages one agent session may read, and its unread ones (2.41.0). */
+  'messages.read': 'agents:message',
 } as const satisfies Record<string, Capability>
 
 export type Method = keyof typeof METHODS
@@ -503,6 +515,13 @@ export const methodParams = {
   'parts.get': z.object({ epic }),
   /** 2.21.0. Every disposition in the project; answered with `dispositionsGetResult`, as `context.dispositions`. */
   'dispositions.get': z.object({}),
+  /**
+   * 2.41.0. A message from the session `token` names, answered with `messageSendResult`. Asked by a
+   * module's SERVER (`SERVER_METHODS`); the project is the token's, never named. See `agent-messages.ts`.
+   */
+  'messages.send': messageSendParams,
+  /** 2.41.0. What the session `token` names may read, answered with `messageReadResult`. */
+  'messages.read': messageReadParams,
 } as const satisfies Record<Method, z.ZodTypeAny>
 
 /** The params one method takes, as a caller must construct them. */
@@ -706,6 +725,8 @@ export const methodResults: Partial<Record<Method, z.ZodTypeAny>> = {
   'steps.list': stepsListResult,
   'parts.get': partsGetResult,
   'dispositions.get': dispositionsGetResult,
+  'messages.send': messageSendResult,
+  'messages.read': messageReadResult,
 }
 
 /** The schema for one method's answer, or nothing — which means unspecified. */

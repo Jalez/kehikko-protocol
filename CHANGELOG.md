@@ -7,6 +7,28 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.41.0 — 2026-10-31
+
+Messages between agent sessions, kept by the host. Additive. See [docs/agent-messages.md](docs/agent-messages.md).
+
+- **`agents:message`**, a capability, with **`messages.send`** (`messageSendParams`, answered
+  `messageSendResult`: `sent` with an id, or `declined`) and **`messages.read`** (`messageReadParams`,
+  answered `messageReadResult`: `messages`, `unread`, `you`). Both in `SERVER_METHODS`, asked by a module's
+  server for the session its place token names; they name no project (the token's is used). The host
+  stamps the sender: module, registered name, session, place.
+- **Addressing** (`messageToSchema`): the project, a place (`epic`, `kehikko`), a module, or one session
+  (`agentSessionRefSchema`: `{ module, session }`). Messages are `agentMessageSchema`, threads `MESSAGE_THREAD`.
+- **Caps** in `LIMITS`: `MESSAGE_BODY` 2000, `MESSAGES_READ` 50, `MESSAGES_KEPT` 1000 and `MESSAGES_KEPT_MS`
+  14 days per project, `MESSAGES_PER_MINUTE` 6 and `MESSAGES_PER_HOUR` 60 per session, `MESSAGES_UNREAD_MS` 24 hours.
+- **The notes**: `messages: true` on `POST /host/place` (`placeIssueSchema`) asks the host to hand the
+  session's unread messages (`messages`, `messagesMore` on `placeDoorsSchema`, `SESSION_FIELD_SINCE`) and move
+  its cursor; `NotesInput.messages`, `messagesMore` and `messaging` say them (`messagesNotes`, `messageLine`,
+  `MESSAGES_HEAD`, `NOTES_MESSAGES_MOST` 8, `messagingLine`). Each body is one quoted line (`quotedBody`),
+  text to read, not instructions. `NOTES_VERSION` is 3.
+- **The adapter**: `messageTools()` (`send_message`, `read_messages`, `MESSAGE_TOOL_NAMES`, `isMessageTool`),
+  `readMessagesText`, `sentText`; in `/serve`, `messageToolsFor`, `hostKeepsMessages`, `answerMessageTool`,
+  `forgetMessageHosts`. `ServerAnswers` gains both methods.
+
 ## 2.40.0 — 2026-10-31
 
 A run may hand the host a copy or an open, which the host carries out in the person's click. Additive.

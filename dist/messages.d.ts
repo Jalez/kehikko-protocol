@@ -2309,8 +2309,8 @@ export declare const helloSchema: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     type: "kehikot.hello";
     state: string | null;
-    protocol: number;
     session: string;
+    protocol: number;
     context: {
         epic: string | null;
         parts: {
@@ -2416,8 +2416,8 @@ export declare const helloSchema: z.ZodObject<{
     carries?: string[] | undefined;
 }, {
     type: "kehikot.hello";
-    protocol: number;
     session: string;
+    protocol: number;
     context: {
         epic?: string | null | undefined;
         parts?: {
@@ -3263,8 +3263,8 @@ export declare const responseSchema: z.ZodDiscriminatedUnion<"ok", [z.ZodObject<
     reason: "failed" | "unknown-module" | "unknown-method";
     ok: false;
     since?: unknown;
-    error?: string | undefined;
     declined?: unknown;
+    error?: string | undefined;
 }>]>;
 /**
  * Host → module. Go to a reference. Names a `ref` or a 1-based `step`; an epic alone is refused,
@@ -3346,15 +3346,15 @@ export declare const eventSchema: z.ZodObject<{
         name: string;
         key?: string | undefined;
     } | null;
-    protocol: number;
     from: string;
+    protocol: number;
     extension: string;
     payload?: unknown;
 }, {
     at: string;
     type: "kehikot.event";
-    protocol: number;
     from: string;
+    protocol: number;
     extension: string;
     kehikko?: {
         id: number;
@@ -4183,8 +4183,8 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     type: "kehikot.hello";
     state: string | null;
-    protocol: number;
     session: string;
+    protocol: number;
     context: {
         epic: string | null;
         parts: {
@@ -4290,8 +4290,8 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     carries?: string[] | undefined;
 }, {
     type: "kehikot.hello";
-    protocol: number;
     session: string;
+    protocol: number;
     context: {
         epic?: string | null | undefined;
         parts?: {
@@ -5101,8 +5101,8 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     reason: "failed" | "unknown-module" | "unknown-method";
     ok: false;
     since?: unknown;
-    error?: string | undefined;
     declined?: unknown;
+    error?: string | undefined;
 }>]>, z.ZodEffects<z.ZodObject<{
     type: z.ZodLiteral<"kehikot.goto">;
     id: z.ZodString;
@@ -5172,15 +5172,15 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         name: string;
         key?: string | undefined;
     } | null;
-    protocol: number;
     from: string;
+    protocol: number;
     extension: string;
     payload?: unknown;
 }, {
     at: string;
     type: "kehikot.event";
-    protocol: number;
     from: string;
+    protocol: number;
     extension: string;
     kehikko?: {
         id: number;

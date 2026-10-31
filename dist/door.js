@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { LIMITS } from './limits.js';
 import { absentModuleSchema, sessionModuleSchema } from './notes.js';
+import { NOTES_MESSAGES_MOST, agentMessageSchema } from './agent-messages.js';
 import { EPIC_SLUG, KEHIKKO_KEY, MODULE_ID, PROJECT_ID, own } from './ids.js';
 import { skillNameSchema } from './skills.js';
 /**
@@ -129,6 +130,13 @@ export const placeIssueSchema = z.object({
     project: z.string().min(1).max(4096),
     projectId: z.string().regex(PROJECT_ID).nullable().optional(),
     kehikko: z.string().regex(KEHIKKO_KEY).nullable(),
+    /**
+     * 2.41.0. `true`: this module says its session's unread messages in the notes (`sessionNotes`), so
+     * hand them in the answer (`messages`) and count them delivered — the host moves the session's cursor
+     * past what it hands. Absent: none are handed and the cursor stays, so a module that cannot say them
+     * never makes them read.
+     */
+    messages: z.boolean().optional(),
 });
 /**
  * The host's answer to an issue: every Kehikot MCP door the session should be given, each with the
@@ -177,6 +185,15 @@ export const placeDoorsSchema = z.object({
      * official list. Absent: the host did not say (before 2.36.0, or the place has no kehikko).
      */
     absent: z.array(absentModuleSchema).max(LIMITS.ABSENT_MODULES).optional().catch(undefined),
+    /**
+     * 2.41.0. The session's unread messages, oldest first, at most `NOTES_MESSAGES_MOST`, when the module
+     * asked with `messages: true`: now counted delivered, for the notes (`NotesInput.messages`). Present
+     * (maybe empty) from a host that keeps messages; absent from an older one — then the module offers
+     * no message tools.
+     */
+    messages: z.array(agentMessageSchema).max(NOTES_MESSAGES_MOST).optional().catch(undefined),
+    /** 2.41.0. How many more unread wait beyond `messages`: handed at the next ask. */
+    messagesMore: z.number().int().min(0).optional().catch(undefined),
 });
 /**
  * Where a module that issues tokens answers for one, asked by the host:

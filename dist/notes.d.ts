@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { type AgentMessage } from './agent-messages.js';
 /**
  * 2.36.0. What an agent session is told about the modules around it, in ONE wording for every module
  * that runs agent sessions, so a Claude conversation and a Codex one on the same kehikko are told
@@ -53,8 +54,8 @@ export declare const sessionModuleSchema: z.ZodObject<{
     skills: z.ZodCatch<z.ZodArray<z.ZodString, "many">>;
 }, "strip", z.ZodTypeAny, {
     name: string;
-    summary: string;
     module: string;
+    summary: string;
     door: string | null;
     skills: string[];
     says?: string | undefined;
@@ -115,15 +116,31 @@ export interface NotesInput {
     connected?: readonly string[] | null;
     /** The place's key as the module keeps it, to notice a move; derived from `place` when absent. */
     key?: string | null;
+    /**
+     * 2.41.0. The session's unread messages, as the host handed them (`messages` in its answer to
+     * `POST /host/place` asked with `messages: true`), oldest first. Said whenever there are any, at a
+     * start or a prompt, under `MESSAGES_HEAD`. Null or absent: none, or a host that keeps none.
+     */
+    messages?: readonly AgentMessage[] | null;
+    /** 2.41.0. How many more unread wait beyond `messages` (`messagesMore`). */
+    messagesMore?: number | null;
+    /**
+     * 2.41.0. Present when the host keeps messages (its answer carried `messages`) and the module offers
+     * the tools (`messageTools`): the start says so, with the session's own address when known.
+     */
+    messaging?: {
+        session: string | null;
+    } | null;
 }
 /**
  * 2.37.0. The version of the notes' wording and content. Bump it WHENEVER the text a session is told
  * changes in content or format (a new line, a new section, a reworded rule): a session told by an
  * older version then gets the full new notes once, at its next prompt, instead of never (it would
  * otherwise only hear about modules added or removed). 1 is the era before the version was kept: a
- * `NotesTold` without `version` is read as 1.
+ * `NotesTold` without `version` is read as 1. 3 (2.41.0): the line about messaging other agent sessions,
+ * and the messages section.
  */
-export declare const NOTES_VERSION = 2;
+export declare const NOTES_VERSION = 3;
 /** What a session was last told: its place by key, and which modules (null when they could not be read). */
 export interface NotesTold {
     key: string | null;
@@ -159,7 +176,8 @@ export declare function changeNotes(input: NotesInput, told: NotesTold): string 
  * THE RULE for one hook: everything at a start, or when the place moved, or when the modules could
  * not be read last time and can now, or (2.37.0) once at a prompt when it was told by an older
  * `NOTES_VERSION` (headed `UPDATED_HEAD`); at a prompt, otherwise only what changed; otherwise nothing (`text`
- * null). `told` is what to keep for next time, whenever `text` is not null.
+ * null). (2.41.0) The session's unread messages follow whatever else is said, and are said on their
+ * own (`kind: 'change'`) when nothing else is. `told` is what to keep for next time, whenever `text` is not null.
  */
 export declare function sessionNotes(input: NotesInput, event: NotesEvent, told: NotesTold | null): {
     text: string | null;

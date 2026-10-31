@@ -338,18 +338,27 @@ export declare const placeIssueSchema: z.ZodObject<{
     project: z.ZodString;
     projectId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     kehikko: z.ZodNullable<z.ZodString>;
+    /**
+     * 2.41.0. `true`: this module says its session's unread messages in the notes (`sessionNotes`), so
+     * hand them in the answer (`messages`) and count them delivered — the host moves the session's cursor
+     * past what it hands. Absent: none are handed and the cursor stays, so a module that cannot say them
+     * never makes them read.
+     */
+    messages: z.ZodOptional<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
     kehikko: string | null;
     project: string;
     module: string;
     token: string;
     projectId?: string | null | undefined;
+    messages?: boolean | undefined;
 }, {
     kehikko: string | null;
     project: string;
     module: string;
     token: string;
     projectId?: string | null | undefined;
+    messages?: boolean | undefined;
 }>;
 export type PlaceIssue = z.infer<typeof placeIssueSchema>;
 /**
@@ -372,13 +381,13 @@ export declare const everywhereSkillSchema: z.ZodObject<{
     origin: z.ZodString;
 }, "strip", z.ZodTypeAny, {
     name: string;
-    version: string;
     module: string;
+    version: string;
     origin: string;
 }, {
     name: string;
-    version: string;
     module: string;
+    version: string;
     origin: string;
 }>;
 export type EverywhereSkill = z.infer<typeof everywhereSkillSchema>;
@@ -416,13 +425,13 @@ export declare const placeDoorsSchema: z.ZodObject<{
         origin: z.ZodString;
     }, "strip", z.ZodTypeAny, {
         name: string;
-        version: string;
         module: string;
+        version: string;
         origin: string;
     }, {
         name: string;
-        version: string;
         module: string;
+        version: string;
         origin: string;
     }>, "many">>>;
     /**
@@ -440,8 +449,8 @@ export declare const placeDoorsSchema: z.ZodObject<{
         skills: z.ZodCatch<z.ZodArray<z.ZodString, "many">>;
     }, "strip", z.ZodTypeAny, {
         name: string;
-        summary: string;
         module: string;
+        summary: string;
         door: string | null;
         skills: string[];
         says?: string | undefined;
@@ -471,6 +480,184 @@ export declare const placeDoorsSchema: z.ZodObject<{
         says: string;
         module: string;
     }>, "many">>>;
+    /**
+     * 2.41.0. The session's unread messages, oldest first, at most `NOTES_MESSAGES_MOST`, when the module
+     * asked with `messages: true`: now counted delivered, for the notes (`NotesInput.messages`). Present
+     * (maybe empty) from a host that keeps messages; absent from an older one — then the module offers
+     * no message tools.
+     */
+    messages: z.ZodCatch<z.ZodOptional<z.ZodArray<z.ZodObject<{
+        id: z.ZodNumber;
+        at: z.ZodString;
+        from: z.ZodObject<{
+            module: z.ZodString;
+            name: z.ZodCatch<z.ZodString>;
+            session: z.ZodNullable<z.ZodString>;
+            place: z.ZodObject<{
+                epic: z.ZodNullable<z.ZodString>;
+                parts: z.ZodCatch<z.ZodArray<z.ZodString, "many">>;
+                kehikko: z.ZodNullable<z.ZodString>;
+            }, "strip", z.ZodTypeAny, {
+                epic: string | null;
+                parts: string[];
+                kehikko: string | null;
+            }, {
+                epic: string | null;
+                kehikko: string | null;
+                parts?: unknown;
+            }>;
+        }, "strip", z.ZodTypeAny, {
+            name: string;
+            place: {
+                epic: string | null;
+                parts: string[];
+                kehikko: string | null;
+            };
+            module: string;
+            session: string | null;
+        }, {
+            place: {
+                epic: string | null;
+                kehikko: string | null;
+                parts?: unknown;
+            };
+            module: string;
+            session: string | null;
+            name?: unknown;
+        }>;
+        to: z.ZodEffects<z.ZodObject<{
+            project: z.ZodOptional<z.ZodLiteral<true>>;
+            place: z.ZodOptional<z.ZodEffects<z.ZodObject<{
+                epic: z.ZodOptional<z.ZodString>;
+                kehikko: z.ZodOptional<z.ZodString>;
+            }, "strip", z.ZodTypeAny, {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
+            }, {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
+            }>, {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
+            }, {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
+            }>>;
+            module: z.ZodOptional<z.ZodString>;
+            session: z.ZodOptional<z.ZodObject<{
+                module: z.ZodString;
+                session: z.ZodString;
+            }, "strip", z.ZodTypeAny, {
+                module: string;
+                session: string;
+            }, {
+                module: string;
+                session: string;
+            }>>;
+        }, "strip", z.ZodTypeAny, {
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
+            } | undefined;
+            project?: true | undefined;
+            module?: string | undefined;
+            session?: {
+                module: string;
+                session: string;
+            } | undefined;
+        }, {
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
+            } | undefined;
+            project?: true | undefined;
+            module?: string | undefined;
+            session?: {
+                module: string;
+                session: string;
+            } | undefined;
+        }>, {
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
+            } | undefined;
+            project?: true | undefined;
+            module?: string | undefined;
+            session?: {
+                module: string;
+                session: string;
+            } | undefined;
+        }, {
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
+            } | undefined;
+            project?: true | undefined;
+            module?: string | undefined;
+            session?: {
+                module: string;
+                session: string;
+            } | undefined;
+        }>;
+        thread: z.ZodCatch<z.ZodNullable<z.ZodString>>;
+        body: z.ZodString;
+    }, "strip", z.ZodTypeAny, {
+        at: string;
+        id: number;
+        from: {
+            name: string;
+            place: {
+                epic: string | null;
+                parts: string[];
+                kehikko: string | null;
+            };
+            module: string;
+            session: string | null;
+        };
+        to: {
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
+            } | undefined;
+            project?: true | undefined;
+            module?: string | undefined;
+            session?: {
+                module: string;
+                session: string;
+            } | undefined;
+        };
+        thread: string | null;
+        body: string;
+    }, {
+        at: string;
+        id: number;
+        from: {
+            place: {
+                epic: string | null;
+                kehikko: string | null;
+                parts?: unknown;
+            };
+            module: string;
+            session: string | null;
+            name?: unknown;
+        };
+        to: {
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
+            } | undefined;
+            project?: true | undefined;
+            module?: string | undefined;
+            session?: {
+                module: string;
+                session: string;
+            } | undefined;
+        };
+        body: string;
+        thread?: unknown;
+    }>, "many">>>;
+    /** 2.41.0. How many more unread wait beyond `messages`: handed at the next ask. */
+    messagesMore: z.ZodCatch<z.ZodOptional<z.ZodNumber>>;
 }, "strip", z.ZodTypeAny, {
     token: string;
     ok: true;
@@ -480,18 +667,46 @@ export declare const placeDoorsSchema: z.ZodObject<{
         module: string;
         transport: "http" | "sse";
     }[];
+    messages?: {
+        at: string;
+        id: number;
+        from: {
+            name: string;
+            place: {
+                epic: string | null;
+                parts: string[];
+                kehikko: string | null;
+            };
+            module: string;
+            session: string | null;
+        };
+        to: {
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
+            } | undefined;
+            project?: true | undefined;
+            module?: string | undefined;
+            session?: {
+                module: string;
+                session: string;
+            } | undefined;
+        };
+        thread: string | null;
+        body: string;
+    }[] | undefined;
     modules?: {
         name: string;
-        summary: string;
         module: string;
+        summary: string;
         door: string | null;
         skills: string[];
         says?: string | undefined;
     }[] | undefined;
     everywhere?: {
         name: string;
-        version: string;
         module: string;
+        version: string;
         origin: string;
     }[] | undefined;
     absent?: {
@@ -499,6 +714,7 @@ export declare const placeDoorsSchema: z.ZodObject<{
         says: string;
         module: string;
     }[] | undefined;
+    messagesMore?: number | undefined;
 }, {
     token: string;
     ok: true;
@@ -508,9 +724,11 @@ export declare const placeDoorsSchema: z.ZodObject<{
         module: string;
         transport?: unknown;
     }[];
+    messages?: unknown;
     modules?: unknown;
     everywhere?: unknown;
     absent?: unknown;
+    messagesMore?: unknown;
 }>;
 export type PlaceDoors = z.infer<typeof placeDoorsSchema>;
 /**

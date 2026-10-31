@@ -18,7 +18,7 @@ if (read.ok) read.data.rows        // TrackerRow[], exactly what the page's trac
 else read.why                      // a sentence; read.refused says when it was who asked or about what
 ```
 
-- **Which methods.** `SERVER_METHODS`: `tracker.get` and `tracker.columns`, reads of the host's material that need no frame; since 2.20.0 also `traffic.read` and `traffic.note` ([traffic](traffic.md)), which are about this computer and name no project; since 2.21.0 the epic's own material — `epics.list`, `epic.get`, `steps.list`, `parts.get` and `dispositions.get` (below). A method that writes into a canvas or waits on a person is the page's to ask. The list grows by an entry.
+- **Which methods.** `SERVER_METHODS`: `tracker.get` and `tracker.columns`, reads of the host's material that need no frame; since 2.20.0 also `traffic.read` and `traffic.note` ([traffic](traffic.md)), which are about this computer and name no project; since 2.21.0 the epic's own material — `epics.list`, `epic.get`, `steps.list`, `parts.get` and `dispositions.get` (below); since 2.41.0 `messages.send` and `messages.read` ([agent messages](agent-messages.md)), which take the project from the session's token and name none. A method that writes into a canvas or waits on a person is the page's to ask. The list grows by an entry.
 - **Which project.** `project` is the absolute folder the question is about — what a door is handed (`resolveDoorProject`, `resolveDoorPlace`). A host that holds no project there refuses it (`refused: 'project'`) and `askHost` asks the next origin.
 - **The same grant.** The host holds the call to the module's manifest exactly as it holds a page's: a method is answered only when `declares.uses` lists the capability `METHODS` files it under. A module that did not declare `trackers:read` gets `refused: 'grant'` and no rows.
 - **The same reading.** The answer is the host's stored reading, at once. A server's question costs no tracker request a page's question would not: a ref the host has not read comes back `pending`, as for a page.
@@ -46,6 +46,8 @@ const marks = await askHost('dispositions.get', {}, asking)             // { dis
 | `steps.list` | `steps:read` | `stepsListResult`: every provider's plan ([plans](plans.md)) |
 | `parts.get` | `parts:read` | `partsGetResult`: the parts, each with what the modules hold, `picked` false |
 | `dispositions.get` | `dispositions:read` | `dispositionsGetResult` |
+| `messages.send` | `agents:message` | `messageSendResult` (2.41.0; names no project — the session token's is used, see [agent messages](agent-messages.md)) |
+| `messages.read` | `agents:message` | `messageReadResult` (2.41.0) |
 
 Each is held to the same capability as on the page, through the same pass and the same grant, and answered from the same code: a server and a page asking the same question at the same moment get the same answer. `parts:read` and `dispositions:read` are new in 2.21.0 because a page is handed that material in its context and never asked for it; a server asks by name, with nobody looking, and says so in `declares.uses`.
 

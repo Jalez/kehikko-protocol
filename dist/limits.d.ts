@@ -358,6 +358,23 @@ export declare const LIMITS: {
     readonly SERVER_PASS_MS: 10000;
     /** How long a module's server waits for the host to answer one question, in ms (`askHost`, 2.19.0). */
     readonly SERVER_ASK_MS: 5000;
+    /** One message's body, in characters. Refused, not clipped, when longer: what is kept is what was sent. */
+    readonly MESSAGE_BODY: 2000;
+    /** The most one `messages.read` returns. */
+    readonly MESSAGES_READ: 50;
+    /** How many messages a host keeps per project; past it the oldest go. */
+    readonly MESSAGES_KEPT: 1000;
+    /** How long a host keeps a message, in ms: 14 days. */
+    readonly MESSAGES_KEPT_MS: number;
+    /** How many messages one session may send in a minute. */
+    readonly MESSAGES_PER_MINUTE: 6;
+    /** How many messages one session may send in an hour. */
+    readonly MESSAGES_PER_HOUR: 60;
+    /**
+     * How old a message may be and still be unread, in ms: 24 hours. A session that starts next week is
+     * not told last week's coordination; `messages.read` without `unread` still lists it.
+     */
+    readonly MESSAGES_UNREAD_MS: number;
     /** How many rows of traffic a host keeps, and the most one `traffic.read` returns. */
     readonly TRAFFIC_KEPT: 5000;
     /** How many calls one `traffic.note` carries. A module notes more in another. */

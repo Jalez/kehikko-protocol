@@ -24,6 +24,8 @@ export { PART_ID, partSchema, partsSchema, listedPartSchema, partListSchema, par
 export { OPENS, HOLDS, opensSchema, holdsSchema, opensOf, canOpen, holdsOf, holdsLiveSessions, } from './abilities.js';
 /* What an agent session is told about the modules around it, one wording for every agent module (2.36.0). */
 export { AGENT_SAYS_MAX, NOTES_MOST, agentSaysSchema, agentSaysOf, absentSaysOf, oneLine, sessionModuleSchema, absentModuleSchema, placeWords, moduleLine, absentLine, researchLine, startNotes, changeNotes, sessionNotes, NOTES_VERSION, UPDATED_HEAD, } from './notes.js';
+/* Messages between agent sessions, kept by the host (2.41.0). See `agent-messages.ts`. */
+export { MESSAGE_THREAD, MESSAGE_SEND_OUTCOMES, MESSAGE_TOOL_NAMES, MESSAGES_HEAD, NOTES_MESSAGES_MOST, agentSessionRefSchema, messagePlaceSchema, messageToSchema, messageFromPlaceSchema, agentMessageSchema, messageSendParams, messageReadParams, messageSendResult, messageReadResult, quotedBody, messageToWords, messageLine, messagesNotes, messagingLine, isMessageTool, messageTools, readMessagesText, sentText, } from './agent-messages.js';
 /* Going to another project, and asking for one thing to be shown there (2.28.0). */
 export { NAVIGATES, NAVIGATES_NAMES, SHOW_SUBJECTS, navigatesSchema, showSubject, showsSchema, showAskSchema, sharedShowSchema, showIsNews, showsOf, canShow, navigatesOf, gotoProject, gotoProjectIsId, } from './show.js';
 /* Run results any module publishes for the work they are for (2.27.0). The file is opened behind `/serve`. */
