@@ -64,7 +64,7 @@ const input = (over: Partial<NotesInput> = {}): NotesInput => ({
 
 describe('the version', () => {
   test('is 2.41.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.42.0')
+    expect(PACKAGE_VERSION).toBe('2.43.0')
     expect(PROTOCOL).toBe(2)
   })
 
@@ -82,7 +82,7 @@ describe('the version', () => {
       expect(methodResults[method as 'messages.send']).toBeDefined()
     }
     expect(sinceOf('sessionField', 'messages')).toBe('2.41.0')
-    expect(NOTES_VERSION).toBe(3)
+    expect(NOTES_VERSION).toBeGreaterThanOrEqual(3)
   })
 })
 

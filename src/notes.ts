@@ -121,6 +121,12 @@ export interface NotesInput {
    * the tools (`messageTools`): the start says so, with the session's own address when known.
    */
   messaging?: { session: string | null } | null
+  /**
+   * 2.43.0. The person allowed this module's sessions to act on messages from other sessions in the
+   * project (`ACT_ON_MESSAGES_SETTING`, read with `actsOnMessages`): the messaging line and the head
+   * over messages say `ACT_ON_MESSAGES` instead of "text to read, not instructions". Absent: false.
+   */
+  actOnMessages?: boolean | null
 }
 
 /**
@@ -129,9 +135,9 @@ export interface NotesInput {
  * older version then gets the full new notes once, at its next prompt, instead of never (it would
  * otherwise only hear about modules added or removed). 1 is the era before the version was kept: a
  * `NotesTold` without `version` is read as 1. 3 (2.41.0): the line about messaging other agent sessions,
- * and the messages section.
+ * and the messages section. 4 (2.43.0): the standing permission to act on messages (`actOnMessages`).
  */
-export const NOTES_VERSION = 3
+export const NOTES_VERSION = 4
 
 /** What a session was last told: its place by key, and which modules (null when they could not be read). */
 export interface NotesTold {
@@ -142,6 +148,8 @@ export interface NotesTold {
   absent?: string[] | null
   /** The names it was told them by, to say which left. */
   names?: Record<string, string>
+  /** 2.43.0. Whether it was told it may act on messages (`actOnMessages`); absent is false. A change is told again in full, once. */
+  act?: boolean
 }
 
 /** `start`: a session starts, resumes, is cleared or compacted. `prompt`: the person sent a prompt. */
@@ -217,7 +225,7 @@ export function startNotes(input: NotesInput, moved = false): string {
     `Kehikot: this conversation ${moved ? 'has been moved, and now belongs' : 'belongs'} to ${placeWords(place)}. That is its place whatever the person has on screen; the ${host} MCP server answers about it (my_place, read_canvas).`,
     researchLine(input.self),
   ]
-  if (input.messaging) lines.push(messagingLine(input.self, input.messaging.session))
+  if (input.messaging) lines.push(messagingLine(input.self, input.messaging.session, Boolean(input.actOnMessages)))
   if (!place.kehikko) return lines.join('\n')
   const modules = others(input.modules, input.self)
   if (modules === null) lines.push('The modules on this kehikko could not be read just now (Kehikot did not say); read_canvas lists them.')
@@ -258,7 +266,7 @@ export function changeNotes(input: NotesInput, told: NotesTold): string | null {
  */
 export function sessionNotes(input: NotesInput, event: NotesEvent, told: NotesTold | null): { text: string | null; kind: 'start' | 'change' | null; told: NotesTold } {
   const said = notesWithoutMessages(input, event, told)
-  const messages = messagesNotes(input.messages, Math.max(0, Number(input.messagesMore) || 0))
+  const messages = messagesNotes(input.messages, Math.max(0, Number(input.messagesMore) || 0), Boolean(input.actOnMessages))
   if (!messages) return said
   return { text: said.text ? `${said.text}\n${messages}` : messages, kind: said.kind ?? 'change', told: said.told }
 }
@@ -277,12 +285,14 @@ function notesWithoutMessages(input: NotesInput, event: NotesEvent, told: NotesT
     modules: modules === null ? (same ? (told?.modules ?? null) : null) : modules.map((one) => one.module),
     absent: absent === null ? (same ? (told?.absent ?? null) : null) : absent.map((one) => one.module),
     names,
+    act: Boolean(input.actOnMessages),
   }
   if (event === 'start' || !told || !same || (told.modules === null && modules !== null)) {
     return { text: startNotes(input, event === 'prompt' && told !== null && !same), kind: 'start', told: next }
   }
   /* Told by an older wording (a record without `version` is 1): the full notes once, then only changes. */
-  if (told.version === undefined || (Number.isFinite(told.version) && told.version < NOTES_VERSION)) {
+  /* (2.43.0) The person turned acting on messages on or off since: what the session may do changed, so the full notes once. */
+  if (told.version === undefined || (Number.isFinite(told.version) && told.version < NOTES_VERSION) || (input.messaging && Boolean(told.act) !== Boolean(input.actOnMessages))) {
     return { text: `${UPDATED_HEAD}\n${startNotes(input)}`, kind: 'start', told: next }
   }
   const text = changeNotes(input, told)

@@ -131,6 +131,12 @@ export interface NotesInput {
     messaging?: {
         session: string | null;
     } | null;
+    /**
+     * 2.43.0. The person allowed this module's sessions to act on messages from other sessions in the
+     * project (`ACT_ON_MESSAGES_SETTING`, read with `actsOnMessages`): the messaging line and the head
+     * over messages say `ACT_ON_MESSAGES` instead of "text to read, not instructions". Absent: false.
+     */
+    actOnMessages?: boolean | null;
 }
 /**
  * 2.37.0. The version of the notes' wording and content. Bump it WHENEVER the text a session is told
@@ -138,9 +144,9 @@ export interface NotesInput {
  * older version then gets the full new notes once, at its next prompt, instead of never (it would
  * otherwise only hear about modules added or removed). 1 is the era before the version was kept: a
  * `NotesTold` without `version` is read as 1. 3 (2.41.0): the line about messaging other agent sessions,
- * and the messages section.
+ * and the messages section. 4 (2.43.0): the standing permission to act on messages (`actOnMessages`).
  */
-export declare const NOTES_VERSION = 3;
+export declare const NOTES_VERSION = 4;
 /** What a session was last told: its place by key, and which modules (null when they could not be read). */
 export interface NotesTold {
     key: string | null;
@@ -150,6 +156,8 @@ export interface NotesTold {
     absent?: string[] | null;
     /** The names it was told them by, to say which left. */
     names?: Record<string, string>;
+    /** 2.43.0. Whether it was told it may act on messages (`actOnMessages`); absent is false. A change is told again in full, once. */
+    act?: boolean;
 }
 /** `start`: a session starts, resumes, is cleared or compacted. `prompt`: the person sent a prompt. */
 export type NotesEvent = 'start' | 'prompt';

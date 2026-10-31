@@ -159,10 +159,25 @@ export {
   forgetMessageHosts,
   hostKeepsMessages,
   messageToolsFor,
+  messageWaker,
+  WAKE_EVERY_MS,
+  WAKE_SETTLE_MS,
   type MessageToolAnswer,
   type MessageToolOptions,
+  type MessageWaker,
+  type MessageWakerOptions,
+  type WakeSession,
 } from './messages.js'
-export { messageTools, isMessageTool, MESSAGE_TOOL_NAMES, type MessageToolDefinition } from '../agent-messages.js'
+export {
+  messageTools,
+  isMessageTool,
+  MESSAGE_TOOL_NAMES,
+  ACT_ON_MESSAGES_SETTING,
+  WAKE_ON_MESSAGES_SETTING,
+  actsOnMessages,
+  wakesOnMessages,
+  type MessageToolDefinition,
+} from '../agent-messages.js'
 /* A question the host is too old for (2.22.0): read it off an `AskedHost`, show the one line. */
 export { hostTooOld, FIT_SAYS, type HostTooOld } from '../fit.js'
 

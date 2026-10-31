@@ -42,7 +42,7 @@ function folder(name: string): string {
 }
 
 describe('the version', () => {
-  test('is 2.21.1', () => expect(PACKAGE_VERSION).toBe('2.42.0'))
+  test('is 2.21.1', () => expect(PACKAGE_VERSION).toBe('2.43.0'))
   test('a yes is kept for a minute by default', () => expect(LIMITS.HOST_PROJECT_KEEP_MS).toBe(60_000))
 })
 
