@@ -73,9 +73,9 @@ export const absentModuleSchema = z.object({
  * older version then gets the full new notes once, at its next prompt, instead of never (it would
  * otherwise only hear about modules added or removed). 1 is the era before the version was kept: a
  * `NotesTold` without `version` is read as 1. 3 (2.41.0): the line about messaging other agent sessions,
- * and the messages section.
+ * and the messages section. 4 (2.43.0): the standing permission to act on messages (`actOnMessages`).
  */
-export const NOTES_VERSION = 3;
+export const NOTES_VERSION = 4;
 /** The line before the full notes a session gets again because the notes' wording changed since it was told. */
 export const UPDATED_HEAD = 'Kehikot: what this conversation is told was updated:';
 /** How many modules, and absent modules, are said at most; more are counted. */
@@ -133,7 +133,7 @@ export function startNotes(input, moved = false) {
         researchLine(input.self),
     ];
     if (input.messaging)
-        lines.push(messagingLine(input.self, input.messaging.session));
+        lines.push(messagingLine(input.self, input.messaging.session, Boolean(input.actOnMessages)));
     if (!place.kehikko)
         return lines.join('\n');
     const modules = others(input.modules, input.self);
@@ -182,7 +182,7 @@ export function changeNotes(input, told) {
  */
 export function sessionNotes(input, event, told) {
     const said = notesWithoutMessages(input, event, told);
-    const messages = messagesNotes(input.messages, Math.max(0, Number(input.messagesMore) || 0));
+    const messages = messagesNotes(input.messages, Math.max(0, Number(input.messagesMore) || 0), Boolean(input.actOnMessages));
     if (!messages)
         return said;
     return { text: said.text ? `${said.text}\n${messages}` : messages, kind: said.kind ?? 'change', told: said.told };
@@ -202,12 +202,14 @@ function notesWithoutMessages(input, event, told) {
         modules: modules === null ? (same ? (told?.modules ?? null) : null) : modules.map((one) => one.module),
         absent: absent === null ? (same ? (told?.absent ?? null) : null) : absent.map((one) => one.module),
         names,
+        act: Boolean(input.actOnMessages),
     };
     if (event === 'start' || !told || !same || (told.modules === null && modules !== null)) {
         return { text: startNotes(input, event === 'prompt' && told !== null && !same), kind: 'start', told: next };
     }
     /* Told by an older wording (a record without `version` is 1): the full notes once, then only changes. */
-    if (told.version === undefined || (Number.isFinite(told.version) && told.version < NOTES_VERSION)) {
+    /* (2.43.0) The person turned acting on messages on or off since: what the session may do changed, so the full notes once. */
+    if (told.version === undefined || (Number.isFinite(told.version) && told.version < NOTES_VERSION) || (input.messaging && Boolean(told.act) !== Boolean(input.actOnMessages))) {
         return { text: `${UPDATED_HEAD}\n${startNotes(input)}`, kind: 'start', told: next };
     }
     const text = changeNotes(input, told);

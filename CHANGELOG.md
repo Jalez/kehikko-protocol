@@ -7,6 +7,39 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.43.0 — 2026-10-31
+
+A message wakes an idle agent session, and the person's standing permission to act on messages.
+**Additive**; `PROTOCOL` is still 2. docs/agent-messages.md, "Waking an idle session" and "Acting
+on messages".
+
+### Added
+
+- **`shouldWake(message, you)`**: whether a message may wake a session idle at its prompt — to it,
+  its module or a place it is at; never one to the whole project, never its own.
+  **`wakeMessages(read, after)`**: the unread, wake-worthy messages of a `messages.read` answer asked
+  without `unread` (so nothing is counted delivered). **`wakeLine(messages, act)`**: the one line a
+  module types and submits — the host-stamped sender name (`wakeName`: plain words only), its module
+  id and place, how many, "Read it with read_messages". Never a message's body.
+- **`messageWaker(options)`** (`/serve`; `WakeSession`, `WAKE_EVERY_MS` 5 s, `WAKE_SETTLE_MS` 2 s):
+  the rule every agent module runs. Each tick it asks the host `messages.read` for each session the
+  module owns that is idle with the setting on, and types one line through the module's own
+  `type(key, line)`; once per idle period, after the session and the newest message settled. No
+  host change: it reads what 2.41.0 hosts already answer.
+- **`WAKE_ON_MESSAGES_SETTING`** ("Messages wake an idle session") and
+  **`ACT_ON_MESSAGES_SETTING`** ("Act on messages from other sessions"): booleans, on by default,
+  `personOnly`, to spread into a module's `declares.settings`; read with `wakesOnMessages(values)`
+  and `actsOnMessages(values)`.
+- **`ACT_ON_MESSAGES`**, **`MESSAGES_HEAD_ACT`**, `messagesHead(act)`: the wording a session is told
+  when its person allowed acting on messages. `act` on `messagesNotes`, `messagingLine`,
+  `readMessagesText`, `messageTools`, `MessageToolOptions` (`answerMessageTool`, `messageToolsFor`)
+  and `NotesInput.actOnMessages`; off, every one says exactly what 2.42.0 said.
+
+### Changed
+
+- **`NOTES_VERSION` is 4**: a session told by 3 gets the full notes once. `NotesTold.act` keeps what
+  it was told, and turning the setting on or off tells the full notes once at the next prompt.
+
 ## 2.42.0 — 2026-10-31
 
 How the host's revealed header and footer meet a module's page. **Additive**; `PROTOCOL` is still 2.
