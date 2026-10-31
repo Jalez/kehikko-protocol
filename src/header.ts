@@ -83,6 +83,44 @@ export const HEADER_ICONS = [
 ] as const
 export type HeaderIcon = (typeof HEADER_ICONS)[number]
 
+/**
+ * 2.40.0. What a host can carry out ITSELF, inside the person's click on a run, because a press
+ * relayed to the module's page carries no user activation: `copy` (write the clipboard) and `open`
+ * (open a web page in the person's browser). The press is still sent to the module afterwards, with
+ * `carried` naming what the host did. See docs/header.md, "Acts the host carries out".
+ */
+export const RUN_CARRIES = ['copy', 'open'] as const
+export type RunCarry = (typeof RUN_CARRIES)[number]
+
+/** 2.40.0. A clipboard write: `plain` always, `html` beside it when the module has a richer form. Both are text to the host: written, never drawn. */
+export const runCopySchema = z.object({
+  plain: z.string().min(1).max(LIMITS.RUN_COPY_PLAIN),
+  html: z.string().min(1).max(LIMITS.RUN_COPY_HTML).optional(),
+})
+export type RunCopy = z.infer<typeof runCopySchema>
+
+/** 2.40.0. Why an address is not one a host opens for a run, or null: `https:` only, a host name, no user name or password. */
+export function runOpenRefusal(value: unknown): string | null {
+  if (typeof value !== 'string' || value.length === 0) return 'An address to open is a string.'
+  if (value.length > LIMITS.URL) return `An address to open is at most ${LIMITS.URL} characters.`
+  let url: URL
+  try {
+    url = new URL(value)
+  } catch {
+    return 'That is not an address a browser could open.'
+  }
+  if (url.protocol !== 'https:') return 'A run opens only https: addresses.'
+  if (url.username !== '' || url.password !== '') return 'An address to open carries no user name or password.'
+  if (url.hostname === '') return 'An address to open names a host.'
+  return null
+}
+
+/** 2.40.0. A web page a host opens in the person's browser for a run. */
+export const runOpenSchema = z.string().superRefine((value, ctx) => {
+  const why = runOpenRefusal(value)
+  if (why !== null) ctx.addIssue({ code: z.ZodIssueCode.custom, message: why })
+})
+
 /** A run is resting, in flight, or its last attempt failed. A host shows the last two on the menu's trigger. */
 export const RUN_STATES = ['idle', 'busy', 'failed'] as const
 export type RunState = (typeof RUN_STATES)[number]
@@ -128,6 +166,13 @@ const runItem = z.object({
    * know the field strips it and keeps the item in the menu.
    */
   pinned: z.boolean().optional(),
+  /**
+   * 2.40.0. Text the HOST writes to the clipboard from the person's click, before it sends the
+   * press. A host before 2.40.0 strips it and only relays the press: look at `hello.carries`.
+   */
+  copy: runCopySchema.optional(),
+  /** 2.40.0. A page the HOST opens in the person's browser from their click, before it sends the press. https only. */
+  open: runOpenSchema.optional(),
 })
 
 /** The four kinds' shapes, before the rules that span fields. Shared with the footer (2.38.0). */
@@ -139,7 +184,7 @@ export const HEADER_ITEM_SHAPES = { switch: switchItem, toggle: toggleItem, go: 
  * not on a run that is confirmed.
  */
 export function checkPressable(
-  item: { kind: string; agents?: boolean; tool?: string; confirm?: boolean; options?: readonly { id: string }[]; value?: string },
+  item: { kind: string; agents?: boolean; tool?: string; confirm?: boolean; options?: readonly { id: string }[]; value?: string; copy?: unknown; open?: unknown; surface?: unknown },
   ctx: z.RefinementCtx,
 ): void {
   if ((item.kind === 'switch' || item.kind === 'go') && item.options) {
@@ -158,6 +203,15 @@ export function checkPressable(
   }
   if (item.kind === 'run' && item.agents && item.confirm) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'a run that has to be confirmed is not pressed by agents' })
+  }
+  if (item.kind === 'run' && item.copy !== undefined && item.open !== undefined) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'a run asks the host to copy or to open, not both' })
+  }
+  if (item.kind === 'run' && (item.copy !== undefined || item.open !== undefined) && item.agents) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'a run the host copies or opens for is done in a person’s click, so agents do not press it' })
+  }
+  if (item.kind === 'run' && (item.copy !== undefined || item.open !== undefined) && item.surface !== undefined) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'a run that copies or opens does not also ask for full screen' })
   }
 }
 

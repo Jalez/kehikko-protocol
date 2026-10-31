@@ -152,6 +152,8 @@ export interface HostStanding<Kept = unknown> extends HostFields {
    * See docs/footer.md.
    */
   drawsFooter: boolean | null
+  /** 2.40.0. The acts the host carries out itself for a run (`copy`, `open`), or `null` when it did not say (none). */
+  hostCarries: readonly string[] | null
 }
 
 /** What a page says to its host, the same from the hook and from the store. */
@@ -267,7 +269,7 @@ export function hostStore<Kept = unknown>(
   const { grace = GREETING_GRACE_MS, kept: given, applyTheme: themed = true, reloadWhenStale: reloads = true, same, ...connectOptions } = options
   const codec = given ?? (JSON_KEPT as KeptCodec<Kept>)
 
-  let standing: HostStanding<Kept> = { where: 'listening', context: null, ...hostFields(null), theme: pageTheme() ?? 'light', kept: null, answers: null, drawsHeader: null, drawsFooter: null }
+  let standing: HostStanding<Kept> = { where: 'listening', context: null, ...hostFields(null), theme: pageTheme() ?? 'light', kept: null, answers: null, drawsHeader: null, drawsFooter: null, hostCarries: null }
   const hearers = new Set<() => void>()
   let live: Connection | null = null
   let stopped = false
@@ -283,7 +285,7 @@ export function hostStore<Kept = unknown>(
     const theme: PageTheme = context.theme === 'dark' ? 'dark' : 'light'
     if (themed) applyTheme(theme, { remember: true })
     /* The kept state with the context, in one change, so the first hosted standing already has the remembered choice. */
-    change({ where: 'hosted', context, ...hostFields(context, standing, same), theme, ...(state !== undefined ? { kept: codec.read(state) } : {}), ...(facts ? { answers: facts.answers, drawsHeader: facts.header, drawsFooter: facts.footer ?? null } : {}) })
+    change({ where: 'hosted', context, ...hostFields(context, standing, same), theme, ...(state !== undefined ? { kept: codec.read(state) } : {}), ...(facts ? { answers: facts.answers, drawsHeader: facts.header, drawsFooter: facts.footer ?? null, hostCarries: facts.carries ?? null } : {}) })
   }
 
   const store: HostStore<Kept> = {

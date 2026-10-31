@@ -48,6 +48,8 @@ Every item also has:
 - `optional`: the first to go when the row is narrow (below).
 - `tooltip`: a sentence shown on hover and focus, for what the row has no room for.
 
+A footer `run` may also carry `copy` or `open` (2.40.0): the host writes the clipboard or opens the page itself in the person's click, then sends the press with `carried`. See [the header](header.md#acts-the-host-carries-out-2400).
+
 The four pressable kinds are the header's, with the header's fields (`label`, `icon`, `shortcut`, `group`, `agents`, `tool`) and the same rules: option ids unique, a switch's `value` one of its options, `agents` never beside `tool` and never on a `confirm` run. A footer run is always a button, so `pinned` is stripped, and `surface` (full screen) stays the header's: it is stripped too.
 
 `level` is `normal` (default), `warn` or `critical`. A host never says it with colour alone: a meter at `critical` carries a mark or a word as well as a colour.

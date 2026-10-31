@@ -187,6 +187,10 @@ export const WIRE_SINCE = {
   'kehikot.footer': '2.38.0',
   'hello.footer': '2.38.0',
   'press.place': '2.38.0',
+  'run.copy': '2.40.0',
+  'run.open': '2.40.0',
+  'press.carried': '2.40.0',
+  'hello.carries': '2.40.0',
 } as const
 export type WirePiece = keyof typeof WIRE_SINCE
 

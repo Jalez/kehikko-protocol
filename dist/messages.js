@@ -6,7 +6,7 @@ import { buildSchema } from './build.js';
 import { contextSchema } from './context.js';
 import { filterGroupSchema } from './filters.js';
 import { footerItemsSchema } from './footer.js';
-import { headerItemsSchema, pressValueSchema } from './header.js';
+import { RUN_CARRIES, headerItemsSchema, pressValueSchema } from './header.js';
 import { gotoRef, kehikkoSchema, stepNumber } from './fragments.js';
 /**
  * Everything the two sides say to each other: the schema of every `postMessage` between a host and
@@ -121,6 +121,12 @@ export const pressSchema = z.object({
      * declared a footer, which an older one cannot have.
      */
     place: z.enum(PRESS_PLACES).optional(),
+    /**
+     * 2.40.0. What the host carried out itself, in the person's click, before sending this press: the
+     * run's `copy` or its `open`. Absent when it did neither — a host before 2.40.0, a host that
+     * could not (the clipboard refused), or a run that asks for neither.
+     */
+    carried: z.enum(RUN_CARRIES).optional(),
 });
 /**
  * Module → host. What became of one press: taken, or not and why. "Taken" is not "finished": a run
@@ -169,6 +175,12 @@ export const helloSchema = z.object({
      * drawing its own footer. See docs/footer.md.
      */
     footer: z.boolean().optional(),
+    /**
+     * 2.40.0. The acts this host carries out itself for a run, in the person's click (`RUN_CARRIES`:
+     * `copy`, `open`). Absent from a host before 2.40.0, which carries out none: a module then does the
+     * act in its own page, where it has the person's click. Names a host does not know are kept.
+     */
+    carries: z.array(z.string().min(1).max(16)).max(8).optional(),
 });
 /**
  * Host → module. Which epic is open now: the `contextSchema` fields flat, not wrapped in `context`.

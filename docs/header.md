@@ -227,6 +227,36 @@ The contract, for a host:
 A host before 1.6.0 strips `pinned` when it parses and draws the item in the Run menu only; `icon`
 was already accepted. A module needs no check: it declares the same header either way.
 
+## Acts the host carries out (2.40.0)
+
+A press is relayed to the module's page as a message, and a relayed message carries no user
+activation: a page that writes the clipboard or opens a window from `onPress` is refused by the
+browser, or by the desktop shell, without a word. So a `run` (in the header or the footer) may hand
+the host the act itself, which the host does inside the person's own click:
+
+```ts
+{ kind: 'run', id: 'copy', label: 'Copy with links', copy: { plain: 'kehikko#12 Fix the bar', html: '<a href="https://github.com/…/12">kehikko#12</a> Fix the bar' } }
+{ kind: 'run', id: 'open', label: 'Open in browser', open: 'https://github.com/Jalez/kehikko/pull/12' }
+```
+
+| field | the host | limits |
+|---|---|---|
+| `copy: { plain, html? }` | writes the clipboard with `text/plain` and, when given, `text/html` | `RUN_COPY_PLAIN` 65 536, `RUN_COPY_HTML` 131 072 characters |
+| `open: string` | opens the page in the person's default browser, as its own external links | `https:` only, a host, no user name or password, `LIMITS.URL` |
+
+- **One act per run**, never both; a run that copies or opens is a person's (`agents: true` beside
+  either does not parse) and asks for no `surface`.
+- **Text only.** `html` is written to the clipboard as text/html and never drawn, parsed or opened by
+  the host. `open` is refused unless it is `https:` (`runOpenRefusal`).
+- **Then the press.** The host does the act first, from the click handler, and then sends the ordinary
+  `kehikot.press`, with `carried: 'copy'` or `carried: 'open'` when it did the act (absent when it
+  could not: the clipboard refused). The module updates its state ("Copied 3") and declares again.
+- **Which host does it.** The greeting's `carries` lists the acts (`['copy', 'open']`); in the client,
+  `facts.carries` and `useHost().hostCarries`. A module gives a run `copy` or `open` only when the act
+  is listed, and otherwise keeps the act in its own page, where it has the person's click (an in-page
+  menu). A host before 2.40.0 strips both fields and only relays the press.
+- **An agent's press** never reaches such a run: it does not parse with `agents: true`.
+
 ## What is not in 1.1.0
 
 - **`clearable` and `refreshable` stay**, and are not deprecated. Folding the host's clear and refresh into Run items is the last step of the proposal and a breaking one (2.0.0), after the modules that use them have moved.

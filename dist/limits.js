@@ -270,6 +270,10 @@ export const LIMITS = {
     HEADER_GROUP: 24,
     /** What a run last came to, in a word or three: `1.2 s`, `failed`, `p. 3/12`. */
     HEADER_RESULT: 32,
+    /** 2.40.0. The plain text a run asks the host to put on the clipboard (`copy.plain`): a few hundred references with their links. */
+    RUN_COPY_PLAIN: 65_536,
+    /** 2.40.0. The HTML beside it (`copy.html`), written to the clipboard as text/html and never drawn by the host. */
+    RUN_COPY_HTML: 131_072,
     /*
      * The footer a module declares (2.38.0, see `footer.ts`): one row the host draws at the bottom of
      * the container, with the header's item kinds plus status text and meters.

@@ -329,6 +329,17 @@ export declare const headerSchema: z.ZodObject<{
         confirm: z.ZodDefault<z.ZodBoolean>;
         surface: z.ZodOptional<z.ZodEnum<["fullscreen"]>>;
         pinned: z.ZodOptional<z.ZodBoolean>;
+        copy: z.ZodOptional<z.ZodObject<{
+            plain: z.ZodString;
+            html: z.ZodOptional<z.ZodString>;
+        }, "strip", z.ZodTypeAny, {
+            plain: string;
+            html?: string | undefined;
+        }, {
+            plain: string;
+            html?: string | undefined;
+        }>>;
+        open: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
         id: z.ZodEffects<z.ZodString, string, string>;
         label: z.ZodString;
         icon: z.ZodOptional<z.ZodString>;
@@ -347,7 +358,12 @@ export declare const headerSchema: z.ZodObject<{
         disabled: string | null;
         confirm: boolean;
         group?: string | undefined;
+        open?: string | undefined;
         pinned?: boolean | undefined;
+        copy?: {
+            plain: string;
+            html?: string | undefined;
+        } | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         tool?: string | undefined;
@@ -358,7 +374,12 @@ export declare const headerSchema: z.ZodObject<{
         kind: "run";
         state?: "failed" | "idle" | "busy" | undefined;
         group?: string | undefined;
+        open?: string | undefined;
         pinned?: boolean | undefined;
+        copy?: {
+            plain: string;
+            html?: string | undefined;
+        } | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         agents?: boolean | undefined;
@@ -414,7 +435,12 @@ export declare const headerSchema: z.ZodObject<{
         disabled: string | null;
         confirm: boolean;
         group?: string | undefined;
+        open?: string | undefined;
         pinned?: boolean | undefined;
+        copy?: {
+            plain: string;
+            html?: string | undefined;
+        } | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         tool?: string | undefined;
@@ -462,7 +488,12 @@ export declare const headerSchema: z.ZodObject<{
         kind: "run";
         state?: "failed" | "idle" | "busy" | undefined;
         group?: string | undefined;
+        open?: string | undefined;
         pinned?: boolean | undefined;
+        copy?: {
+            plain: string;
+            html?: string | undefined;
+        } | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         agents?: boolean | undefined;
@@ -518,7 +549,12 @@ export declare const headerSchema: z.ZodObject<{
         disabled: string | null;
         confirm: boolean;
         group?: string | undefined;
+        open?: string | undefined;
         pinned?: boolean | undefined;
+        copy?: {
+            plain: string;
+            html?: string | undefined;
+        } | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         tool?: string | undefined;
@@ -566,7 +602,12 @@ export declare const headerSchema: z.ZodObject<{
         kind: "run";
         state?: "failed" | "idle" | "busy" | undefined;
         group?: string | undefined;
+        open?: string | undefined;
         pinned?: boolean | undefined;
+        copy?: {
+            plain: string;
+            html?: string | undefined;
+        } | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         agents?: boolean | undefined;
@@ -625,7 +666,12 @@ export declare const headerSchema: z.ZodObject<{
         disabled: string | null;
         confirm: boolean;
         group?: string | undefined;
+        open?: string | undefined;
         pinned?: boolean | undefined;
+        copy?: {
+            plain: string;
+            html?: string | undefined;
+        } | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         tool?: string | undefined;
@@ -676,7 +722,12 @@ export declare const headerSchema: z.ZodObject<{
         kind: "run";
         state?: "failed" | "idle" | "busy" | undefined;
         group?: string | undefined;
+        open?: string | undefined;
         pinned?: boolean | undefined;
+        copy?: {
+            plain: string;
+            html?: string | undefined;
+        } | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         agents?: boolean | undefined;
@@ -909,6 +960,17 @@ export declare const footerSchema: z.ZodObject<{
         confirm: z.ZodDefault<z.ZodBoolean>;
         surface: z.ZodOptional<z.ZodEnum<["fullscreen"]>>;
         pinned: z.ZodOptional<z.ZodBoolean>;
+        copy: z.ZodOptional<z.ZodObject<{
+            plain: z.ZodString;
+            html: z.ZodOptional<z.ZodString>;
+        }, "strip", z.ZodTypeAny, {
+            plain: string;
+            html?: string | undefined;
+        }, {
+            plain: string;
+            html?: string | undefined;
+        }>>;
+        open: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
         id: z.ZodEffects<z.ZodString, string, string>;
         label: z.ZodString;
         icon: z.ZodOptional<z.ZodString>;
@@ -933,6 +995,11 @@ export declare const footerSchema: z.ZodObject<{
         align: "start" | "center" | "end";
         optional: boolean;
         group?: string | undefined;
+        open?: string | undefined;
+        copy?: {
+            plain: string;
+            html?: string | undefined;
+        } | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         tool?: string | undefined;
@@ -943,6 +1010,11 @@ export declare const footerSchema: z.ZodObject<{
         kind: "run";
         state?: "failed" | "idle" | "busy" | undefined;
         group?: string | undefined;
+        open?: string | undefined;
+        copy?: {
+            plain: string;
+            html?: string | undefined;
+        } | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         agents?: boolean | undefined;
@@ -1029,6 +1101,11 @@ export declare const footerSchema: z.ZodObject<{
         align: "start" | "center" | "end";
         optional: boolean;
         group?: string | undefined;
+        open?: string | undefined;
+        copy?: {
+            plain: string;
+            html?: string | undefined;
+        } | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         tool?: string | undefined;
@@ -1103,6 +1180,11 @@ export declare const footerSchema: z.ZodObject<{
         kind: "run";
         state?: "failed" | "idle" | "busy" | undefined;
         group?: string | undefined;
+        open?: string | undefined;
+        copy?: {
+            plain: string;
+            html?: string | undefined;
+        } | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         agents?: boolean | undefined;
@@ -1189,6 +1271,11 @@ export declare const footerSchema: z.ZodObject<{
         align: "start" | "center" | "end";
         optional: boolean;
         group?: string | undefined;
+        open?: string | undefined;
+        copy?: {
+            plain: string;
+            html?: string | undefined;
+        } | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         tool?: string | undefined;
@@ -1263,6 +1350,11 @@ export declare const footerSchema: z.ZodObject<{
         kind: "run";
         state?: "failed" | "idle" | "busy" | undefined;
         group?: string | undefined;
+        open?: string | undefined;
+        copy?: {
+            plain: string;
+            html?: string | undefined;
+        } | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         agents?: boolean | undefined;
@@ -1352,6 +1444,11 @@ export declare const footerSchema: z.ZodObject<{
         align: "start" | "center" | "end";
         optional: boolean;
         group?: string | undefined;
+        open?: string | undefined;
+        copy?: {
+            plain: string;
+            html?: string | undefined;
+        } | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         tool?: string | undefined;
@@ -1429,6 +1526,11 @@ export declare const footerSchema: z.ZodObject<{
         kind: "run";
         state?: "failed" | "idle" | "busy" | undefined;
         group?: string | undefined;
+        open?: string | undefined;
+        copy?: {
+            plain: string;
+            html?: string | undefined;
+        } | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         agents?: boolean | undefined;
@@ -1464,6 +1566,12 @@ export declare const pressSchema: z.ZodObject<{
      * declared a footer, which an older one cannot have.
      */
     place: z.ZodOptional<z.ZodEnum<["header", "footer"]>>;
+    /**
+     * 2.40.0. What the host carried out itself, in the person's click, before sending this press: the
+     * run's `copy` or its `open`. Absent when it did neither — a host before 2.40.0, a host that
+     * could not (the clipboard refused), or a run that asks for neither.
+     */
+    carried: z.ZodOptional<z.ZodEnum<["copy", "open"]>>;
 }, "strip", z.ZodTypeAny, {
     type: "kehikot.press";
     id: string;
@@ -1471,6 +1579,7 @@ export declare const pressSchema: z.ZodObject<{
     item: string;
     value?: string | boolean | undefined;
     place?: "header" | "footer" | undefined;
+    carried?: "open" | "copy" | undefined;
 }, {
     type: "kehikot.press";
     id: string;
@@ -1478,6 +1587,7 @@ export declare const pressSchema: z.ZodObject<{
     item: string;
     value?: string | boolean | undefined;
     place?: "header" | "footer" | undefined;
+    carried?: "open" | "copy" | undefined;
 }>;
 export type Press = z.infer<typeof pressSchema>;
 /**
@@ -2190,6 +2300,12 @@ export declare const helloSchema: z.ZodObject<{
      * drawing its own footer. See docs/footer.md.
      */
     footer: z.ZodOptional<z.ZodBoolean>;
+    /**
+     * 2.40.0. The acts this host carries out itself for a run, in the person's click (`RUN_CARRIES`:
+     * `copy`, `open`). Absent from a host before 2.40.0, which carries out none: a module then does the
+     * act in its own page, where it has the person's click. Names a host does not know are kept.
+     */
+    carries: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
 }, "strip", z.ZodTypeAny, {
     type: "kehikot.hello";
     state: string | null;
@@ -2297,6 +2413,7 @@ export declare const helloSchema: z.ZodObject<{
     header?: boolean | undefined;
     footer?: boolean | undefined;
     answers?: string[] | undefined;
+    carries?: string[] | undefined;
 }, {
     type: "kehikot.hello";
     protocol: number;
@@ -2404,6 +2521,7 @@ export declare const helloSchema: z.ZodObject<{
     header?: boolean | undefined;
     footer?: boolean | undefined;
     answers?: string[] | undefined;
+    carries?: string[] | undefined;
 }>;
 /**
  * Host → module. Which epic is open now: the `contextSchema` fields flat, not wrapped in `context`.
@@ -4056,6 +4174,12 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
      * drawing its own footer. See docs/footer.md.
      */
     footer: z.ZodOptional<z.ZodBoolean>;
+    /**
+     * 2.40.0. The acts this host carries out itself for a run, in the person's click (`RUN_CARRIES`:
+     * `copy`, `open`). Absent from a host before 2.40.0, which carries out none: a module then does the
+     * act in its own page, where it has the person's click. Names a host does not know are kept.
+     */
+    carries: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
 }, "strip", z.ZodTypeAny, {
     type: "kehikot.hello";
     state: string | null;
@@ -4163,6 +4287,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     header?: boolean | undefined;
     footer?: boolean | undefined;
     answers?: string[] | undefined;
+    carries?: string[] | undefined;
 }, {
     type: "kehikot.hello";
     protocol: number;
@@ -4270,6 +4395,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     header?: boolean | undefined;
     footer?: boolean | undefined;
     answers?: string[] | undefined;
+    carries?: string[] | undefined;
 }>, z.ZodObject<{
     epic: z.ZodDefault<z.ZodNullable<z.ZodString>>;
     scope: z.ZodCatch<z.ZodOptional<z.ZodEnum<["machine", "project", "epic", "part", "kehikko"]>>>;
@@ -5093,6 +5219,12 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
      * declared a footer, which an older one cannot have.
      */
     place: z.ZodOptional<z.ZodEnum<["header", "footer"]>>;
+    /**
+     * 2.40.0. What the host carried out itself, in the person's click, before sending this press: the
+     * run's `copy` or its `open`. Absent when it did neither — a host before 2.40.0, a host that
+     * could not (the clipboard refused), or a run that asks for neither.
+     */
+    carried: z.ZodOptional<z.ZodEnum<["copy", "open"]>>;
 }, "strip", z.ZodTypeAny, {
     type: "kehikot.press";
     id: string;
@@ -5100,6 +5232,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     item: string;
     value?: string | boolean | undefined;
     place?: "header" | "footer" | undefined;
+    carried?: "open" | "copy" | undefined;
 }, {
     type: "kehikot.press";
     id: string;
@@ -5107,6 +5240,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     item: string;
     value?: string | boolean | undefined;
     place?: "header" | "footer" | undefined;
+    carried?: "open" | "copy" | undefined;
 }>, z.ZodObject<{
     type: z.ZodLiteral<"kehikot.opened">;
     protocol: z.ZodNumber;
@@ -5474,6 +5608,17 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         confirm: z.ZodDefault<z.ZodBoolean>;
         surface: z.ZodOptional<z.ZodEnum<["fullscreen"]>>;
         pinned: z.ZodOptional<z.ZodBoolean>;
+        copy: z.ZodOptional<z.ZodObject<{
+            plain: z.ZodString;
+            html: z.ZodOptional<z.ZodString>;
+        }, "strip", z.ZodTypeAny, {
+            plain: string;
+            html?: string | undefined;
+        }, {
+            plain: string;
+            html?: string | undefined;
+        }>>;
+        open: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
         id: z.ZodEffects<z.ZodString, string, string>;
         label: z.ZodString;
         icon: z.ZodOptional<z.ZodString>;
@@ -5492,7 +5637,12 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         disabled: string | null;
         confirm: boolean;
         group?: string | undefined;
+        open?: string | undefined;
         pinned?: boolean | undefined;
+        copy?: {
+            plain: string;
+            html?: string | undefined;
+        } | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         tool?: string | undefined;
@@ -5503,7 +5653,12 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         kind: "run";
         state?: "failed" | "idle" | "busy" | undefined;
         group?: string | undefined;
+        open?: string | undefined;
         pinned?: boolean | undefined;
+        copy?: {
+            plain: string;
+            html?: string | undefined;
+        } | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         agents?: boolean | undefined;
@@ -5559,7 +5714,12 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         disabled: string | null;
         confirm: boolean;
         group?: string | undefined;
+        open?: string | undefined;
         pinned?: boolean | undefined;
+        copy?: {
+            plain: string;
+            html?: string | undefined;
+        } | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         tool?: string | undefined;
@@ -5607,7 +5767,12 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         kind: "run";
         state?: "failed" | "idle" | "busy" | undefined;
         group?: string | undefined;
+        open?: string | undefined;
         pinned?: boolean | undefined;
+        copy?: {
+            plain: string;
+            html?: string | undefined;
+        } | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         agents?: boolean | undefined;
@@ -5663,7 +5828,12 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         disabled: string | null;
         confirm: boolean;
         group?: string | undefined;
+        open?: string | undefined;
         pinned?: boolean | undefined;
+        copy?: {
+            plain: string;
+            html?: string | undefined;
+        } | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         tool?: string | undefined;
@@ -5711,7 +5881,12 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         kind: "run";
         state?: "failed" | "idle" | "busy" | undefined;
         group?: string | undefined;
+        open?: string | undefined;
         pinned?: boolean | undefined;
+        copy?: {
+            plain: string;
+            html?: string | undefined;
+        } | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         agents?: boolean | undefined;
@@ -5770,7 +5945,12 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         disabled: string | null;
         confirm: boolean;
         group?: string | undefined;
+        open?: string | undefined;
         pinned?: boolean | undefined;
+        copy?: {
+            plain: string;
+            html?: string | undefined;
+        } | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         tool?: string | undefined;
@@ -5821,7 +6001,12 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         kind: "run";
         state?: "failed" | "idle" | "busy" | undefined;
         group?: string | undefined;
+        open?: string | undefined;
         pinned?: boolean | undefined;
+        copy?: {
+            plain: string;
+            html?: string | undefined;
+        } | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         agents?: boolean | undefined;
@@ -6062,6 +6247,17 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         confirm: z.ZodDefault<z.ZodBoolean>;
         surface: z.ZodOptional<z.ZodEnum<["fullscreen"]>>;
         pinned: z.ZodOptional<z.ZodBoolean>;
+        copy: z.ZodOptional<z.ZodObject<{
+            plain: z.ZodString;
+            html: z.ZodOptional<z.ZodString>;
+        }, "strip", z.ZodTypeAny, {
+            plain: string;
+            html?: string | undefined;
+        }, {
+            plain: string;
+            html?: string | undefined;
+        }>>;
+        open: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
         id: z.ZodEffects<z.ZodString, string, string>;
         label: z.ZodString;
         icon: z.ZodOptional<z.ZodString>;
@@ -6086,6 +6282,11 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         align: "start" | "center" | "end";
         optional: boolean;
         group?: string | undefined;
+        open?: string | undefined;
+        copy?: {
+            plain: string;
+            html?: string | undefined;
+        } | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         tool?: string | undefined;
@@ -6096,6 +6297,11 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         kind: "run";
         state?: "failed" | "idle" | "busy" | undefined;
         group?: string | undefined;
+        open?: string | undefined;
+        copy?: {
+            plain: string;
+            html?: string | undefined;
+        } | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         agents?: boolean | undefined;
@@ -6182,6 +6388,11 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         align: "start" | "center" | "end";
         optional: boolean;
         group?: string | undefined;
+        open?: string | undefined;
+        copy?: {
+            plain: string;
+            html?: string | undefined;
+        } | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         tool?: string | undefined;
@@ -6256,6 +6467,11 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         kind: "run";
         state?: "failed" | "idle" | "busy" | undefined;
         group?: string | undefined;
+        open?: string | undefined;
+        copy?: {
+            plain: string;
+            html?: string | undefined;
+        } | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         agents?: boolean | undefined;
@@ -6342,6 +6558,11 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         align: "start" | "center" | "end";
         optional: boolean;
         group?: string | undefined;
+        open?: string | undefined;
+        copy?: {
+            plain: string;
+            html?: string | undefined;
+        } | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         tool?: string | undefined;
@@ -6416,6 +6637,11 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         kind: "run";
         state?: "failed" | "idle" | "busy" | undefined;
         group?: string | undefined;
+        open?: string | undefined;
+        copy?: {
+            plain: string;
+            html?: string | undefined;
+        } | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         agents?: boolean | undefined;
@@ -6505,6 +6731,11 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         align: "start" | "center" | "end";
         optional: boolean;
         group?: string | undefined;
+        open?: string | undefined;
+        copy?: {
+            plain: string;
+            html?: string | undefined;
+        } | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         tool?: string | undefined;
@@ -6582,6 +6813,11 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         kind: "run";
         state?: "failed" | "idle" | "busy" | undefined;
         group?: string | undefined;
+        open?: string | undefined;
+        copy?: {
+            plain: string;
+            html?: string | undefined;
+        } | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         agents?: boolean | undefined;

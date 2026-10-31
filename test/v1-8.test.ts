@@ -11,7 +11,7 @@ const B = '/work/portal'
 
 describe('an activity item’s project', () => {
   test('version and limit', () => {
-    expect(PACKAGE_VERSION).toBe('2.39.0')
+    expect(PACKAGE_VERSION).toBe('2.40.0')
     expect(LIMITS.ACTIVITY_PROJECT).toBe(1024)
   })
   test('optional, an absolute folder, and carried', () => {
