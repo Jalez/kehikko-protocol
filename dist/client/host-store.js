@@ -83,7 +83,7 @@ export function hostFields(context, was, same = {}) {
 export function hostStore(id, events = {}, options = {}) {
     const { grace = GREETING_GRACE_MS, kept: given, applyTheme: themed = true, reloadWhenStale: reloads = true, same, ...connectOptions } = options;
     const codec = given ?? JSON_KEPT;
-    let standing = { where: 'listening', context: null, ...hostFields(null), theme: pageTheme() ?? 'light', kept: null, answers: null, drawsHeader: null, drawsFooter: null, hostCarries: null, covered: NOT_COVERED };
+    let standing = { where: 'listening', context: null, ...hostFields(null), theme: pageTheme() ?? 'light', kept: null, answers: null, drawsHeader: null, drawsFooter: null, hostCarries: null, covered: NOT_COVERED, visible: true };
     const hearers = new Set();
     let live = null;
     let stopped = false;
@@ -154,6 +154,13 @@ export function hostStore(id, events = {}, options = {}) {
                     if (covered.top !== standing.covered.top || covered.bottom !== standing.covered.bottom)
                         change({ covered });
                     events.onCovered?.(covered);
+                },
+                onVisible: (visible) => {
+                    if (stopped)
+                        return;
+                    if (visible !== standing.visible)
+                        change({ visible });
+                    events.onVisible?.(visible);
                 },
                 /* Only when the page takes presses: without a listener the connection answers for it. */
                 ...(events.onPress ? { onPress: (press) => (stopped ? false : events.onPress(press)) } : {}),

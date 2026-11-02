@@ -119,6 +119,35 @@ Fire and forget; nothing answers it. The client hands it to `onOpened({ item })`
 its next list drops the item or moves it on. An id it no longer has is ignored. A host before 2.35.0
 sends nothing, and a module before it drops the message unread (`HOST_MESSAGES`).
 
+## Whether the person can see the page (2.45.0)
+
+A host may keep a module's page alive while nobody can see it: the person left for a kehikko the
+module is not on, and the page stays loaded, hidden with CSS, so coming back is instant. Inside the
+frame nothing says so — `document.visibilityState` stays `visible` and no `visibilitychange` fires
+for a CSS-hidden iframe. A module that decides "the person saw this" from what its page shows (a
+question on a session's screen, say) would count things as seen on a page nobody is looking at, and
+an `attention` item it then drops because it was "seen" was never seen at all.
+
+So the host says:
+
+```ts
+{ type: 'kehikot.visible', protocol: 2, visible: boolean }   // visibleSchema
+```
+
+- **`false`** when it hides the page, **`true`** when it shows it again, and **once after every
+  greeting** with whatever is true then. Only changes are sent between greetings.
+- **`true` after `false` is the person arriving** back at the page — returning to a kehikko it was
+  kept for. That is the moment to count what is in front of them as seen, the way `kehikot.opened`
+  is for one item. (`kehikot.opened` stays per item: it says which thing the person came for, and is
+  sent only when they came through the Inbox.)
+- **While `false`, nothing on the page is being looked at.** Count nothing as seen then; whatever
+  needs the person stays `attention` until they are back and it is on screen.
+
+Fire and forget; nothing answers it. The client hands it to `onVisible(visible)` (`connect`,
+`useHost`, `hostStore`), and `hostStore`/`useHost` keep it as `visible` on the standing. A host before
+2.45.0 sends nothing, and `visible` stays `true`: a page such a host frames is to be taken as shown,
+as before. A module before 2.45.0 drops the message unread (`HOST_MESSAGES`).
+
 ## Across projects (1.8.0)
 
 A module's things may belong to projects other than the one open: an agent session runs in its own

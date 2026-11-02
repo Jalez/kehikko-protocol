@@ -152,6 +152,14 @@ export interface HostEvents {
      * under the rows (`keepInView`), never refit. `hostStore` and `useHost` also keep it as `covered`.
      */
     onCovered?: (covered: Covered) => void;
+    /**
+     * Whether this page is on screen now (2.45.0): `false` when the host hid it (the person left for a
+     * kehikko it is not on; the page keeps running), `true` when it is shown again — the person
+     * arriving back — and once after every greeting. A hidden page is not being looked at: do not count
+     * anything as seen by the person while it is, and count what is in front of them when it is shown.
+     * A host before 2.45.0 never calls it. `hostStore` and `useHost` also keep it as `visible`.
+     */
+    onVisible?: (visible: boolean) => void;
 }
 /**
  * What a single question may say about itself, beyond its params. A ceiling on waiting, never a

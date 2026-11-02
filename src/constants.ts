@@ -110,6 +110,14 @@ export const MESSAGE = {
    * covered. No answer. The frame itself is not resized; see `reveal.ts`.
    */
   COVERED: 'kehikot.covered',
+  /**
+   * Host → module (2.45.0). "Your page is on screen now", or "it is not": `{ visible }`, sent when
+   * the host hides a page it keeps alive (the person left for a kehikko it is not on) or shows it
+   * again, and once after every greeting. `visible: true` after a hide is the person arriving back
+   * where this page is. No answer. A CSS-hidden frame fires no `visibilitychange`; this is the only
+   * way a page can know. See docs/activity.md, "Whether the person can see the page".
+   */
+  VISIBLE: 'kehikot.visible',
 } as const
 
 export type MessageType = (typeof MESSAGE)[keyof typeof MESSAGE]
@@ -136,6 +144,7 @@ export const HOST_MESSAGES = [
   MESSAGE.PRESS,
   MESSAGE.OPENED,
   MESSAGE.COVERED,
+  MESSAGE.VISIBLE,
 ] as const
 
 /** And what the module says. */
