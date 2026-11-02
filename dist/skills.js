@@ -127,6 +127,28 @@ export function missingNeeds(skill, present) {
     const on = [...present];
     return (skill.needs ?? []).filter((need) => !on.some((one) => meetsNeed(need, one)));
 }
+/**
+ * 2.44.0. THE RULE for which of a module's skills load into an agent session on one kehikko, shared
+ * by the host (what it lists to the session) and every module that loads skills (what it puts in the
+ * session): a skill loads when nothing it needs is missing among `present` (`missingNeeds`), so a
+ * skill with no `needs` always does. `present` is what is on the kehikko as MANIFESTS — each module's
+ * as parsed, or any object with the fields `ProvidingManifest` names — never bare ids: from a bare
+ * id a capability need (`{ provides: 'steps' }`) can never be met. A module known only by its id is
+ * passed as `{ id }`, and then meets only id needs. `nameOf` names a module for `said` (`needSaid`).
+ * Keeps the skills' order; decides nothing about the declaring module itself.
+ */
+export function skillsThatLoad(skills, present, nameOf) {
+    const load = [];
+    const left = [];
+    for (const skill of skills) {
+        const missing = missingNeeds(skill, present);
+        if (missing.length === 0)
+            load.push(skill);
+        else
+            left.push({ skill, missing, said: missing.map((need) => needSaid(need, nameOf)).join(', ') });
+    }
+    return { load, left };
+}
 /** What a capability need is in words, for a person: "a module that provides an epic's steps". */
 const NEED_SAID = {
     provides: (word) => word === 'steps'

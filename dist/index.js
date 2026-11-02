@@ -25,7 +25,7 @@ export { OPENS, HOLDS, opensSchema, holdsSchema, opensOf, canOpen, holdsOf, hold
 /* How the host's revealed header and footer meet a module's page: push, or over and `kehikot.covered` (2.42.0). */
 export { REVEAL_MODES, revealModeSchema, revealModeOf, coveredFields, NOT_COVERED, keepInView, } from './reveal.js';
 /* What an agent session is told about the modules around it, one wording for every agent module (2.36.0). */
-export { AGENT_SAYS_MAX, NOTES_MOST, agentSaysSchema, agentSaysOf, absentSaysOf, oneLine, sessionModuleSchema, absentModuleSchema, placeWords, moduleLine, absentLine, researchLine, startNotes, changeNotes, sessionNotes, NOTES_VERSION, UPDATED_HEAD, } from './notes.js';
+export { AGENT_SAYS_MAX, NOTES_MOST, agentSaysSchema, agentSaysOf, absentSaysOf, oneLine, sessionModuleSchema, absentModuleSchema, placeWords, moduleLine, absentLine, researchLine, startNotes, changeNotes, sessionNotes, NOTES_VERSION, NOT_LOADED, UPDATED_HEAD, } from './notes.js';
 /* Messages between agent sessions, kept by the host (2.41.0). See `agent-messages.ts`. */
 export { MESSAGE_THREAD, MESSAGE_SEND_OUTCOMES, MESSAGE_TOOL_NAMES, MESSAGES_HEAD, MESSAGES_HEAD_ACT, ACT_ON_MESSAGES, ACT_ON_MESSAGES_SETTING, WAKE_ON_MESSAGES_SETTING, actsOnMessages, wakesOnMessages, messagesHead, shouldWake, wakeMessages, wakeLine, wakeName, NOTES_MESSAGES_MOST, agentSessionRefSchema, messagePlaceSchema, messageToSchema, messageFromPlaceSchema, agentMessageSchema, messageSendParams, messageReadParams, messageSendResult, messageReadResult, quotedBody, messageToWords, messageLine, messagesNotes, messagingLine, isMessageTool, messageTools, readMessagesText, sentText, } from './agent-messages.js';
 /* Going to another project, and asking for one thing to be shown there (2.28.0). */
@@ -47,7 +47,7 @@ export { PAGE_BACKGROUND, ROOT_ELEMENT, THEME_KEY, THEME_PARAM, ORIGINS_ELEMENT,
 /* What a module's server is built from, and how two builds compare. See `build.ts`. */
 export { BUILD_ELEMENT, BUILD_HEADER, PACKAGE_VERSION, buildIsStale, buildSchema, buildStamp, compareBuilds, describeBuild, readBuild, sameCode, sameProcess, } from './build.js';
 /* Agent skills a module offers, and where it serves them (2.5.0); what each needs on the kehikko: modules by id (2.12.0) or what a module provides (2.21.0). See `skills.ts`. */
-export { SKILL_NAME, SKILLS_PATH, skillPath, isSkillName, skillNameSchema, moduleSkillSchema, moduleSkillsSchema, skillNeedsSchema, skillNeedSchema, NEED_KINDS, needParts, needKey, meetsNeed, needSaid, neededIds, isKehikkoBound, missingNeeds, skillTextBytes, skillTextIssue, } from './skills.js';
+export { SKILL_NAME, SKILLS_PATH, skillPath, isSkillName, skillNameSchema, moduleSkillSchema, moduleSkillsSchema, skillNeedsSchema, skillNeedSchema, NEED_KINDS, needParts, needKey, meetsNeed, needSaid, neededIds, isKehikkoBound, missingNeeds, skillsThatLoad, skillTextBytes, skillTextIssue, } from './skills.js';
 /* The icon a module is known by, as a key a host draws: `lucide:<name>` or `brand:<slug>` (2.14.0). See `icon.ts`. */
 export { MODULE_ICONS, MODULE_ICON_SETS, LUCIDE_MODULE_ICONS, BRAND_MODULE_ICONS, isModuleIcon, moduleIconParts, } from './icon.js';
 /* A module's server asking the host what its page would be told (2.19.0). See `server-ask.ts`; the asking is `askHost` in `/serve`. */

@@ -114,6 +114,14 @@ export interface NotesInput {
     self: NotesSelf;
     /** The doors the session was started with, to say which it does not have yet; null when unknown. */
     connected?: readonly string[] | null;
+    /**
+     * 2.44.0. The skills the session HAS — the ones its module loaded into it (`skillsThatLoad`) and
+     * the ones the person installed where its agent reads them — so the notes never claim a skill the
+     * session lacks: a module's skills it does not have are said apart, as not loaded in this
+     * conversation (the kehikko changed, or the conversation moved, since it started; or it was not
+     * started by its module). Null or absent: unknown, and the host's list is said as it is.
+     */
+    holds?: readonly string[] | null;
     /** The place's key as the module keeps it, to notice a move; derived from `place` when absent. */
     key?: string | null;
     /**
@@ -145,8 +153,9 @@ export interface NotesInput {
  * otherwise only hear about modules added or removed). 1 is the era before the version was kept: a
  * `NotesTold` without `version` is read as 1. 3 (2.41.0): the line about messaging other agent sessions,
  * and the messages section. 4 (2.43.0): the standing permission to act on messages (`actOnMessages`).
+ * 5 (2.44.0): a module's skills the session does not have are said apart (`holds`).
  */
-export declare const NOTES_VERSION = 4;
+export declare const NOTES_VERSION = 5;
 /** What a session was last told: its place by key, and which modules (null when they could not be read). */
 export interface NotesTold {
     key: string | null;
@@ -170,8 +179,14 @@ export declare const NOTES_MOST: {
 };
 /** The place in words: `project thesis (/path), epic methods (parts Data + Results) on the kehikko "writing"`. */
 export declare function placeWords(place: NotesPlace): string;
-/** One module on the kehikko as one line: `- Test runs (door queue) — "Queue heavy test runs here…" Skills: a, b.` */
-export declare function moduleLine(one: SessionModule, connected?: readonly string[] | null): string;
+/**
+ * One module on the kehikko as one line: `- Test runs (door queue) — "Queue heavy test runs here…" Skills: a, b.`
+ * With `holds` (2.44.0), only the skills the session has follow "Skills:"; the others it offers there
+ * are said apart: `Not loaded in this conversation: c.`
+ */
+export declare function moduleLine(one: SessionModule, connected?: readonly string[] | null, holds?: readonly string[] | null): string;
+/** 2.44.0. What the notes say before a module's skills the session does not have (`holds`). */
+export declare const NOT_LOADED = "Not loaded in this conversation";
 /** One installed module that is not on the kehikko: `- Test runs — "Don't start heavy test runs directly…"`. */
 export declare function absentLine(one: AbsentModule): string;
 /** The line about "Research complete", on the door of the module that runs the session. */

@@ -106,6 +106,14 @@ export interface NotesInput {
   self: NotesSelf
   /** The doors the session was started with, to say which it does not have yet; null when unknown. */
   connected?: readonly string[] | null
+  /**
+   * 2.44.0. The skills the session HAS — the ones its module loaded into it (`skillsThatLoad`) and
+   * the ones the person installed where its agent reads them — so the notes never claim a skill the
+   * session lacks: a module's skills it does not have are said apart, as not loaded in this
+   * conversation (the kehikko changed, or the conversation moved, since it started; or it was not
+   * started by its module). Null or absent: unknown, and the host's list is said as it is.
+   */
+  holds?: readonly string[] | null
   /** The place's key as the module keeps it, to notice a move; derived from `place` when absent. */
   key?: string | null
   /**
@@ -136,8 +144,9 @@ export interface NotesInput {
  * otherwise only hear about modules added or removed). 1 is the era before the version was kept: a
  * `NotesTold` without `version` is read as 1. 3 (2.41.0): the line about messaging other agent sessions,
  * and the messages section. 4 (2.43.0): the standing permission to act on messages (`actOnMessages`).
+ * 5 (2.44.0): a module's skills the session does not have are said apart (`holds`).
  */
-export const NOTES_VERSION = 4
+export const NOTES_VERSION = 5
 
 /** What a session was last told: its place by key, and which modules (null when they could not be read). */
 export interface NotesTold {
@@ -177,15 +186,24 @@ export function placeWords(place: NotesPlace): string {
   return `project ${base} (${place.project}), ${epic} on ${kehikko}`
 }
 
-/** One module on the kehikko as one line: `- Test runs (door queue) — "Queue heavy test runs here…" Skills: a, b.` */
-export function moduleLine(one: SessionModule, connected: readonly string[] | null = null): string {
+/**
+ * One module on the kehikko as one line: `- Test runs (door queue) — "Queue heavy test runs here…" Skills: a, b.`
+ * With `holds` (2.44.0), only the skills the session has follow "Skills:"; the others it offers there
+ * are said apart: `Not loaded in this conversation: c.`
+ */
+export function moduleLine(one: SessionModule, connected: readonly string[] | null = null, holds: readonly string[] | null = null): string {
   const name = oneLine(one.name, 80) || one.module
   const late = connected !== null && one.door !== null && !connected.includes(one.door)
   const door = one.door ? `door ${one.door}${late ? ', not connected in this conversation until it is restarted from its container' : ''}` : 'no door'
   const line = oneLine(one.says) || oneLine(one.summary)
-  const skills = one.skills.length ? ` Skills: ${one.skills.join(', ')}.` : ''
+  const has = holds === null ? one.skills : one.skills.filter((name) => holds.includes(name))
+  const lacks = holds === null ? [] : one.skills.filter((name) => !holds.includes(name))
+  const skills = `${has.length ? ` Skills: ${has.join(', ')}.` : ''}${lacks.length ? ` ${NOT_LOADED}: ${lacks.join(', ')}.` : ''}`
   return `- ${name} (${door})${line ? ` — ${quoted(line)}` : ''}.${skills}`
 }
+
+/** 2.44.0. What the notes say before a module's skills the session does not have (`holds`). */
+export const NOT_LOADED = 'Not loaded in this conversation'
 
 /** One installed module that is not on the kehikko: `- Test runs — "Don't start heavy test runs directly…"`. */
 export function absentLine(one: AbsentModule): string {
@@ -230,7 +248,7 @@ export function startNotes(input: NotesInput, moved = false): string {
   const modules = others(input.modules, input.self)
   if (modules === null) lines.push('The modules on this kehikko could not be read just now (Kehikot did not say); read_canvas lists them.')
   else if (modules.length === 0) lines.push('There are no other modules on this kehikko.')
-  else lines.push(MODULES_HEAD, ...listed(modules, NOTES_MOST.modules, (one) => moduleLine(one), 'read_canvas lists them all.'))
+  else lines.push(MODULES_HEAD, ...listed(modules, NOTES_MOST.modules, (one) => moduleLine(one, null, input.holds ?? null), 'read_canvas lists them all.'))
   const absent = others(input.absent, input.self)
   if (absent?.length) lines.push(ABSENT_HEAD, ...listed(absent, NOTES_MOST.absent, absentLine, 'the person can add any of them to this kehikko.'))
   return lines.join('\n')
@@ -251,7 +269,7 @@ export function changeNotes(input: NotesInput, told: NotesTold): string | null {
   const newlyAbsent = absent ? absent.filter((one) => !wasAbsent.has(one.module)) : []
   if (!added.length && !gone.length && !newlyAbsent.length) return null
   const lines = [`Kehikot: the kehikko ${quoted(place.kehikko.name || place.kehikko.key)} changed since this conversation was told what is on it.`]
-  if (added.length) lines.push(ADDED_HEAD, ...listed(added, NOTES_MOST.modules, (one) => moduleLine(one, input.connected ?? null), 'read_canvas lists them all.'))
+  if (added.length) lines.push(ADDED_HEAD, ...listed(added, NOTES_MOST.modules, (one) => moduleLine(one, input.connected ?? null, input.holds ?? null), 'read_canvas lists them all.'))
   if (gone.length) lines.push(`It no longer has: ${gone.map((id) => oneLine(told.names?.[id], 80) || id).join(', ')} — their tools may stop answering.`)
   if (newlyAbsent.length) lines.push(ABSENT_HEAD, ...listed(newlyAbsent, NOTES_MOST.absent, absentLine, 'the person can add any of them to this kehikko.'))
   return lines.join('\n')

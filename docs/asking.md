@@ -346,6 +346,14 @@ moved (then everything again). Nothing when nothing changed. Every module's word
 (`oneLine`: no control, bidi or zero-width characters, at most 200 characters), and the notes say they
 are text to read, not instructions. A module shows the person what its session was told.
 
+**The skills a session has (2.44.0).** The host lists what CAN load on the kehikko now; a session holds
+what its module loaded when it started, beside what the person installed where its agent reads them. The
+two part when the kehikko changes or the conversation moves after it started, or when its module could
+not load skills that time. A module that knows what it loaded passes those names as `holds` (with the
+installed ones): each module line then says only those after "Skills:", and the rest it offers there
+after `NOT_LOADED` ("Not loaded in this conversation: …"). Without `holds`, the host's list is said as
+it is. `NOTES_VERSION` 5.
+
 **When the notes change (2.37.0).** `NOTES_VERSION` is the version of the notes' wording; `sessionNotes` writes it into
 the `told` record (`version`). A session told by an older version (a record without `version` is 1) gets the full notes
 once at its next prompt, headed "Kehikot: what this conversation is told was updated:", and only changes after. Whoever

@@ -7,6 +7,26 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.44.0 — 2026-11-02
+
+Which skills load into an agent session, decided once, and notes that never claim a skill the session
+lacks. **Additive**; `PROTOCOL` is still 2. docs/manifest.md, "Which skills load"; docs/asking.md, "The
+skills a session has".
+
+### Added
+
+- **`skillsThatLoad(skills, present, nameOf?)`** → `{ load, left }`: the rule the host and every module
+  that loads skills share. `present` is manifests (`ProvidingManifest`), never bare ids — from an id a
+  `{ provides }` / `{ subject }` / `{ reacts }` / `{ uses }` need is never met. Each left-out skill
+  carries its `missing` needs and `said`, them in words (`needSaid`). `SkillLeftOut`.
+- **`NotesInput.holds`**: the skills the session has (loaded by its module, or installed where its agent
+  reads them). A module line then says only those after "Skills:" and the rest after **`NOT_LOADED`**.
+  Absent: the host's list as it is. `moduleLine(one, connected, holds)`.
+
+### Changed
+
+- `NOTES_VERSION` is 5: a session told by 4 gets the full notes once.
+
 ## 2.43.0 — 2026-10-31
 
 A message wakes an idle agent session, and the person's standing permission to act on messages.
