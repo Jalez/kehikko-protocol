@@ -7,6 +7,21 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.45.0 — 2026-11-02
+
+Whether a module's page is on screen. **Additive**; `PROTOCOL` is still 2.
+[docs/activity.md](docs/activity.md), "Whether the person can see the page".
+
+### Added
+
+- **`kehikot.visible`** (`MESSAGE.VISIBLE`, in `HOST_MESSAGES`; `visibleSchema`, type
+  `VisibleMessage`): host → module `{ protocol, visible }`. `false` when the host hides a page it keeps
+  alive for a kehikko the person left, `true` when it shows it again (the person arriving back), and
+  once after every greeting. A CSS-hidden frame fires no `visibilitychange`, so this is how a page
+  knows nobody is looking at it. Not answered.
+- **`onVisible(visible)`** on `connect`'s events and `useHost`; **`visible`** on `HostStanding`
+  (`hostStore`, `useHost`), `true` until a host says otherwise.
+
 ## 2.44.0 — 2026-11-02
 
 Which skills load into an agent session, decided once, and notes that never claim a skill the session

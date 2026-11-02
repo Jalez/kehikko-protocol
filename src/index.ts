@@ -282,6 +282,8 @@ export {
   openedSchema,
   coveredSchema,
   type CoveredMessage,
+  visibleSchema,
+  type VisibleMessage,
   footerSchema,
   footerItemSchema,
   footerItemsSchema,

@@ -132,6 +132,13 @@ export interface HostStanding<Kept = unknown> extends HostFields {
      * frame is not resized for it: move what must stay readable (`keepInView`), never refit.
      */
     covered: Covered;
+    /**
+     * 2.45.0. Whether the host has this page on screen (`kehikot.visible`). `true` until a host says
+     * otherwise — a host before 2.45.0 never does, and a page it frames is taken as shown. `false`
+     * while the host keeps the page hidden on a kehikko the person left; nothing on it is being looked
+     * at then.
+     */
+    visible: boolean;
 }
 /** What a page says to its host, the same from the hook and from the store. */
 export interface HostActions<Kept = unknown> {

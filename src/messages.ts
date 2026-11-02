@@ -409,6 +409,23 @@ export const coveredSchema = z.object({
 export type CoveredMessage = z.infer<typeof coveredSchema>
 
 /**
+ * Host → module (2.45.0). Whether this module's page is on screen: the host keeps the pages of
+ * kehikot the person left alive and hidden (CSS, so no `visibilitychange` fires inside), and tells
+ * a page `visible: false` when it hides it and `visible: true` when it shows it again — which is the
+ * person arriving back at it. Sent once after every greeting too, so a page always knows. Fire and
+ * forget. A page that is hidden is not being looked at: a module that counts "the person saw this"
+ * from what is on screen must not count it then, and may count what is in front of the person when
+ * it is shown. A host before 2.45.0 sends nothing (the page is to be taken as shown); a module before
+ * it drops the message unread (`HOST_MESSAGES`).
+ */
+export const visibleSchema = z.object({
+  type: messageType(MESSAGE.VISIBLE),
+  protocol: z.number().int().min(1),
+  visible: z.boolean(),
+})
+export type VisibleMessage = z.infer<typeof visibleSchema>
+
+/**
  * Every message a host sends. A plain union, not a `discriminatedUnion`, because `responseSchema`
  * is itself a union on a different key and cannot be an option of one.
  */
@@ -423,6 +440,7 @@ export const hostMessageSchema = z.union([
   pressSchema,
   openedSchema,
   coveredSchema,
+  visibleSchema,
 ])
 export type HostMessage = z.infer<typeof hostMessageSchema>
 

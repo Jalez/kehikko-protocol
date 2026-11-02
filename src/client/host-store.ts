@@ -162,6 +162,13 @@ export interface HostStanding<Kept = unknown> extends HostFields {
    * frame is not resized for it: move what must stay readable (`keepInView`), never refit.
    */
   covered: Covered
+  /**
+   * 2.45.0. Whether the host has this page on screen (`kehikot.visible`). `true` until a host says
+   * otherwise — a host before 2.45.0 never does, and a page it frames is taken as shown. `false`
+   * while the host keeps the page hidden on a kehikko the person left; nothing on it is being looked
+   * at then.
+   */
+  visible: boolean
 }
 
 /** What a page says to its host, the same from the hook and from the store. */
@@ -277,7 +284,7 @@ export function hostStore<Kept = unknown>(
   const { grace = GREETING_GRACE_MS, kept: given, applyTheme: themed = true, reloadWhenStale: reloads = true, same, ...connectOptions } = options
   const codec = given ?? (JSON_KEPT as KeptCodec<Kept>)
 
-  let standing: HostStanding<Kept> = { where: 'listening', context: null, ...hostFields(null), theme: pageTheme() ?? 'light', kept: null, answers: null, drawsHeader: null, drawsFooter: null, hostCarries: null, covered: NOT_COVERED }
+  let standing: HostStanding<Kept> = { where: 'listening', context: null, ...hostFields(null), theme: pageTheme() ?? 'light', kept: null, answers: null, drawsHeader: null, drawsFooter: null, hostCarries: null, covered: NOT_COVERED, visible: true }
   const hearers = new Set<() => void>()
   let live: Connection | null = null
   let stopped = false
@@ -341,6 +348,11 @@ export function hostStore<Kept = unknown>(
             if (stopped) return
             if (covered.top !== standing.covered.top || covered.bottom !== standing.covered.bottom) change({ covered })
             events.onCovered?.(covered)
+          },
+          onVisible: (visible) => {
+            if (stopped) return
+            if (visible !== standing.visible) change({ visible })
+            events.onVisible?.(visible)
           },
           /* Only when the page takes presses: without a listener the connection answers for it. */
           ...(events.onPress ? { onPress: (press) => (stopped ? false : events.onPress!(press)) } : {}),
