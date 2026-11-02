@@ -262,6 +262,15 @@ the skill's order: `present` is the manifests on the kehikko (any object with
 before, just the ids — which meet only id needs. `meetsNeed(need, manifest)` is
 one check; `needSaid(need, nameOf)` says a need in a person's words ("a module
 that keeps an epic's steps"); `neededIds(skill)` is the ids among the needs.
+
+**Which skills load (2.44.0).** `skillsThatLoad(skills, present, nameOf?)` is
+THE rule, the same in the host (what it lists to a session) and in every module
+that loads skills (what it puts in a session): `{ load, left }`, where each
+left-out one carries its `missing` needs and `said`, them in a person's words.
+`present` takes manifests only — a module known by its id alone is passed as
+`{ id }` — because from a bare id a capability need is never met: passing ids
+to `missingNeeds` silently drops every `{ provides }`, `{ subject }`, `{ reacts }`
+and `{ uses }` skill.
 Optional: a skill without `needs` works wherever its module is installed, as
 before.
 

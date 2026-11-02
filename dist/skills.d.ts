@@ -108,6 +108,27 @@ export declare function meetsNeed(need: SkillNeed, module: string | ProvidingMan
  * Decides nothing about the declaring module itself.
  */
 export declare function missingNeeds(skill: Pick<ModuleSkill, 'needs'>, present: Iterable<string | ProvidingManifest>): SkillNeed[];
+/** A skill `skillsThatLoad` leaves out: what nothing on the kehikko meets, and that in words. */
+export interface SkillLeftOut<T> {
+    skill: T;
+    missing: SkillNeed[];
+    /** The missing needs as a person reads them (`needSaid`), joined with commas. */
+    said: string;
+}
+/**
+ * 2.44.0. THE RULE for which of a module's skills load into an agent session on one kehikko, shared
+ * by the host (what it lists to the session) and every module that loads skills (what it puts in the
+ * session): a skill loads when nothing it needs is missing among `present` (`missingNeeds`), so a
+ * skill with no `needs` always does. `present` is what is on the kehikko as MANIFESTS — each module's
+ * as parsed, or any object with the fields `ProvidingManifest` names — never bare ids: from a bare
+ * id a capability need (`{ provides: 'steps' }`) can never be met. A module known only by its id is
+ * passed as `{ id }`, and then meets only id needs. `nameOf` names a module for `said` (`needSaid`).
+ * Keeps the skills' order; decides nothing about the declaring module itself.
+ */
+export declare function skillsThatLoad<T extends Pick<ModuleSkill, 'needs'>>(skills: readonly T[], present: readonly ProvidingManifest[], nameOf?: (id: string) => string): {
+    load: T[];
+    left: SkillLeftOut<T>[];
+};
 /**
  * One need in words a person reads (2.21.0): a module id as `nameOf` names it (the id's last part,
  * capitalised, by default), a capability need as what kind of module would meet it.
