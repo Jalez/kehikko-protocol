@@ -14,7 +14,7 @@ import { dispositionSchema } from './context.js'
 import { stepsListResult } from './plan.js'
 import { gotoProject, showAskSchema } from './show.js'
 import { trafficNoteResult, trafficNoteSchema, trafficReadResult } from './traffic.js'
-import { messageReadParams, messageReadResult, messageSendParams, messageSendResult } from './agent-messages.js'
+import { messageMineParams, messageMineResult, messagePostParams, messageReadParams, messageReadResult, messageSayParams, messageSendParams, messageSendResult } from './agent-messages.js'
 
 /**
  * The questions a module can ask, by name and by shape: capabilities, methods, each method's
@@ -159,6 +159,13 @@ export const CAPABILITIES = {
    * text to read, never an instruction. See docs/agent-messages.md.
    */
   'agents:message': 'Send messages between the agent sessions you run, and read the ones sent to them. The host keeps them, and you can read them all.',
+  /**
+   * 2.50.0. Send the PERSON's messages to agent sessions, marked by the host as theirs
+   * (`messages.say`, `from.person`): only from this module's page, only on a press of theirs there,
+   * and only once the person turned the module's `PERSON_MESSAGES_SETTING` on in the host. A receiver
+   * takes such a message as its person's instruction. Never asked by a module's server or an agent.
+   */
+  'messages:as-person': 'Send what you type or press in this module to agent sessions as your own instruction — only on your press, and only once you allow it in its settings.',
 } as const
 
 export type Capability = keyof typeof CAPABILITIES
@@ -206,6 +213,12 @@ export const METHODS = {
   'messages.send': 'agents:message',
   /** The messages one agent session may read, and its unread ones (2.41.0). */
   'messages.read': 'agents:message',
+  /** The messages addressed to the asking module, and the ones sent through it, from its page (2.50.0). */
+  'messages.mine': 'agents:message',
+  /** A module's own message from its page; `once` for an introduction (2.50.0). */
+  'messages.post': 'agents:message',
+  /** The person's own message, from a module's page on their press (2.50.0). */
+  'messages.say': 'messages:as-person',
 } as const satisfies Record<string, Capability>
 
 export type Method = keyof typeof METHODS
@@ -522,6 +535,15 @@ export const methodParams = {
   'messages.send': messageSendParams,
   /** 2.41.0. What the session `token` names may read, answered with `messageReadResult`. */
   'messages.read': messageReadParams,
+  /** 2.50.0. From a page: the messages to the asking module and the ones sent through it; answered with `messageMineResult`. */
+  'messages.mine': messageMineParams,
+  /** 2.50.0. From a page: the module's own message (`once` for an introduction); answered with `messageSendResult`. */
+  'messages.post': messagePostParams,
+  /**
+   * 2.50.0. From a page only, on the person's press, under `messages:as-person`: the person's message;
+   * answered with `messageSendResult`. See `messageSayParams` for every condition a host holds it to.
+   */
+  'messages.say': messageSayParams,
 } as const satisfies Record<Method, z.ZodTypeAny>
 
 /** The params one method takes, as a caller must construct them. */
@@ -727,6 +749,9 @@ export const methodResults: Partial<Record<Method, z.ZodTypeAny>> = {
   'dispositions.get': dispositionsGetResult,
   'messages.send': messageSendResult,
   'messages.read': messageReadResult,
+  'messages.mine': messageMineResult,
+  'messages.post': messageSendResult,
+  'messages.say': messageSendResult,
 }
 
 /** The schema for one method's answer, or nothing — which means unspecified. */

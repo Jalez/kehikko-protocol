@@ -39,7 +39,7 @@ export declare function scopeNeedsEpic(scope: ModuleScope): boolean;
  * author, and read through `readScope`, so a manifest from an older module or a newer protocol still
  * parses: `global`, an unknown word and absence all read as `epic`.
  */
-export declare const modeScopeSchema: z.ZodEffects<z.ZodCatch<z.ZodOptional<z.ZodEnum<["machine", "project", "epic", "part", "kehikko", "global"]>>>, "epic" | "kehikko" | "project" | "part" | "machine", unknown>;
+export declare const modeScopeSchema: z.ZodEffects<z.ZodCatch<z.ZodOptional<z.ZodEnum<["machine", "project", "epic", "part", "kehikko", "global"]>>>, "epic" | "kehikko" | "project" | "machine" | "part", unknown>;
 /** A mode's `scopeSays`: what the module shows at that scope, in one line. Optional; trimmed; empty reads as absent. */
 export declare const scopeSaysSchema: z.ZodEffects<z.ZodCatch<z.ZodOptional<z.ZodString>>, string | undefined, unknown>;
 /** One scope a module can work at, with its own line and the mode that declared it. */

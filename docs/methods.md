@@ -334,6 +334,9 @@ and a module that declares none gets none of the methods below.
 | `dispositions.get` | `dispositions:read` |
 | `messages.send` | `agents:message` |
 | `messages.read` | `agents:message` |
+| `messages.mine` | `agents:message` |
+| `messages.post` | `agents:message` |
+| `messages.say` | `messages:as-person` |
 
 The host's table is the protocol's `METHODS`, read by its `capabilityOf`
 (`src/host/grants.ts`): there is no second list to keep in step. A host keeps a
@@ -370,6 +373,28 @@ project. `messages.send { token, body, to?, thread? }` answers
 module's SERVER for the session whose place token is on the door's URL; the
 host stamps the sender and takes the project from the token. A page has no
 session, and a host declines them there. See [agent messages](agent-messages.md).
+
+2.50.0. `messages.send` also takes `kind` (`question`, `report`, `note`),
+`choices` (only with a question, at most `MESSAGE_CHOICES` of at most
+`MESSAGE_CHOICE` characters) and `replyTo` (a message id). And a module's PAGE
+may ask `messages.mine { since?, limit? }`, answered `messageMineResult`
+(`{ messages, more }`): the messages addressed to the asking module
+(`to: { module }`) and the ones sent through it; and `messages.post { body, to,
+once?, kind?, choices?, replyTo?, thread? }`, the module's own message (no
+session, not the person's), where `once` makes it an introduction each session
+is handed at most once from that module.
+
+#### `CAPABILITIES.messages:as-person`
+
+2.50.0. `messages.say { body, to, kind?, choices?, replyTo?, thread? }` sends
+the PERSON's own message through a module's page, answered `messageSendResult`;
+the host stamps `from.person: true` and receivers take it as their person's
+instruction. A host answers it only for a request that arrives during the
+person's fresh press in the module's frame, relayed by its own page on a route
+no other program reaches, from a module whose manifest asks for this capability
+and whose `PERSON_MESSAGES_SETTING` the host itself saw the person turn on. Never
+from a module's server (it is not in `SERVER_METHODS`) and never through an
+agent's door. See [agent messages](agent-messages.md), "The person's messages".
 
 #### `CAPABILITIES.steps:read`, from 2.21.0
 

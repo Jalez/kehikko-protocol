@@ -1,6 +1,6 @@
 # Messages between agent sessions
 
-2.41.0; waking and acting on messages 2.43.0; delivery by typing 2.48.0. `agent-messages.ts`, `serve/messages.ts`.
+2.41.0; waking and acting on messages 2.43.0; delivery by typing 2.48.0; questions, reports and the person's messages 2.50.0. `agent-messages.ts`, `serve/messages.ts`.
 
 A person runs several agent sessions in one project — one on each epic, often from different agents.
 They step on each other: two refactor the same file, one waits for a branch the other already merged.
@@ -275,3 +275,86 @@ messageDelivery({
 ```
 
 The setting's description says all of this; its key, label and default are unchanged.
+
+## Questions, reports, and the person's messages (2.50.0)
+
+An agent that needs its person used to stop at its own prompt and wait to be noticed. With a module
+that relays the person on the kehikko (one that declares `messages:as-person` and says so in its
+`agentSays`), it can ask through Kehikot instead, and the person answers from one place.
+
+### What a message may say beside its body
+
+`messages.send` (and `send_message`) take three optional fields, each held by the schema and dropped
+by a host before 2.50.0, which keeps the body:
+
+| field | |
+|---|---|
+| `kind` | `question` (it waits for an answer), `report` (what the sender works on, how it stands; nothing to answer) or `note` (the default) — `MESSAGE_KINDS` |
+| `choices` | only with `kind: 'question'`: at most `LIMITS.MESSAGE_CHOICES` (6) answers to pick from, each one line of at most `LIMITS.MESSAGE_CHOICE` (80) characters, no two the same; refused, not clipped |
+| `replyTo` | the id of the message this one answers |
+
+`agentMessageSchema` carries them back: `kind` (`note` when absent), `choices` (`[]`), `replyTo`
+(`null`). A label for the reader, never a command: nothing a host or module does is triggered by a
+kind. The lines in the notes and in `read_messages` say them (`, a question (choices: "A" | "B"),
+answering #3`); a typed delivery puts the kind and what it answers in the frame and the choices on a
+line under the body.
+
+### The person's messages: `messages.say` and `from.person`
+
+A module's page may send what the person types or presses there AS THE PERSON: `messages.say { body,
+to, kind?, choices?, replyTo?, thread? }` under the capability `messages:as-person`. The host stamps
+`from: { module, name, session: null, place, person: true }`, and every receiver is told it is their
+person's own instruction (`PERSON_MESSAGE_AUTHORITY`), not another agent's words.
+
+Because that is authority, the host holds it to all of these, and refuses otherwise:
+
+1. **A press of the person's.** The request arrives at the host's page while the person's activation
+   from a press in that module's frame is still fresh (`navigator.userActivation.isActive` in the
+   host's document, which a press in a child frame activates). A module cannot make one; a header
+   press relayed to the page, a timer or an agent's call is not one.
+2. **The host's own page relays it**, on a route only that page reaches — never `/host/call`, which
+   any program on the machine may post to, never `/host/server-ask` (`messages.say` is not in
+   `SERVER_METHODS`), never an MCP door.
+3. **The manifest asks for `messages:as-person`** (`declares.uses`), held like every method.
+4. **The person allowed it**: `PERSON_MESSAGES_SETTING` ("Send messages to agent sessions as you"),
+   a `personOnly` boolean, off by default, kept per machine. The host records the grant only when IT
+   relays the person's change from its own settings form; a value in the module's file or the
+   module's own word is not a grant, so an agent that edits a settings file grants nothing.
+5. **Bounded**: `LIMITS.PERSON_MESSAGES_PER_MINUTE` (20) per module.
+
+A person's message to the whole project is delivered to every session, unlike an agent's
+(`shouldWake`). Typed, it is framed `[Message from your person via Orchestrator, #15, answering #12]`
+(`typedFrame`), and the paragraph after says it is their instruction; in the notes it stands under
+`PERSON_MESSAGES_HEAD`, before any other session's messages. A body line that spells either frame is
+taken apart as before.
+
+A module built before 2.50.0 parses a person's message without `from.person` and says it as any
+other message — another program's words to read, never an instruction. That is the safe failure.
+
+### `messages.mine`: what a module's page reads
+
+A module that relays the person reads the messages addressed to it (`to: { module: <its id> }`) and
+the ones sent through it with `messages.mine { since?, limit? }` from its page, under `agents:message`
+(`messageMineResult`: `{ messages, more }`, oldest first). It reads no other session's mail.
+
+### `messages.post`: a module's own message, and introductions
+
+A module's page may also send in its OWN name — not a session's, not the person's —
+`messages.post { body, to, once?, kind?, choices?, replyTo?, thread? }` under `agents:message`. The
+host stamps `from: { module, name, session: null, person: false }`; receivers read it as any other
+program's words.
+
+`once: true` makes it an introduction. Each session is handed **at most one once-message from the same
+module, ever** — the host records which sessions it handed one to, so posting the introduction again
+(the module placed on another kehikko, or on the same one twice) reaches only sessions that never had
+one. A once-message to a place or a module also reaches a session that comes there LATER, regardless of
+its cursor and of `MESSAGES_UNREAD_MS`, for as long as the host keeps it (`MESSAGES_KEPT_MS`). It is
+delivered like any message: typed in by the module that runs the session, if its person lets messages
+wake it.
+
+### A module's words that changed (`NotesTold.lines`)
+
+`sessionNotes` keeps what each module on the kehikko said (`lines`, 2.50.0; not `said`, which agent modules keep for the words themselves). At a prompt, a module that
+is still there and now says something else is told again, under its own head. `NOTES_VERSION` is 6, so
+every running session is told the full notes once, which carries the new words to sessions whose
+record predates `lines`.

@@ -400,6 +400,12 @@ export const LIMITS = {
      * not told last week's coordination; `messages.read` without `unread` still lists it.
      */
     MESSAGES_UNREAD_MS: 24 * 60 * 60 * 1000,
+    /** How many choices a question may offer (2.50.0, `kind: 'question'`). */
+    MESSAGE_CHOICES: 6,
+    /** One choice's words, in characters (2.50.0). Refused, not clipped, when longer. */
+    MESSAGE_CHOICE: 80,
+    /** How many messages the person may send through one module in a minute (2.50.0, `messages.say`). */
+    PERSON_MESSAGES_PER_MINUTE: 20,
     /* Traffic (2.20.0). See `traffic.ts`. */
     /** How many rows of traffic a host keeps, and the most one `traffic.read` returns. */
     TRAFFIC_KEPT: 5000,
