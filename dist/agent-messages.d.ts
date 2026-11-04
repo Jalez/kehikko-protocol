@@ -790,12 +790,14 @@ export declare const ACT_ON_MESSAGES_SETTING: {
 };
 /**
  * 2.43.0. The module setting for waking an idle session when a message comes for it (`shouldWake`,
- * `wakeLine`, `messageWaker` in `/serve`): a boolean, on by default, the person's.
+ * `wakeLine`, `messageWaker` in `/serve`): a boolean, on by default, the person's. From 2.48.0 it
+ * also governs delivery by typing (`deliveryFor`, `messageDelivery`), resuming an asleep session
+ * included; the description says so.
  */
 export declare const WAKE_ON_MESSAGES_SETTING: {
     readonly key: "wakeOnMessages";
     readonly label: "Messages wake an idle session";
-    readonly description: "When a message comes for a session this module runs and the session is idle at its prompt, one line is typed into it saying a message came and from whom, so it reads it without you typing. Never while it works or waits for you, and never for a message to the whole project. Off: it sees the message at your next prompt.";
+    readonly description: "A message for a session this module runs is typed into it, framed as another agent’s words: at once, or when it is back at its prompt if its program cannot take typing while it works; a session that was put away is resumed with it. Never into a question waiting for you or text you have not sent, nor for a message to the whole project. Off: it sees it at your next prompt.";
     readonly type: "boolean";
     readonly default: true;
     readonly personOnly: true;
@@ -871,3 +873,97 @@ export declare function wakeName(name: unknown, fallback: string): string;
  * no control characters, and it never starts with `/`, `!`, `#` or `@`, so no agent reads it as a command.
  */
 export declare function wakeLine(messages: readonly AgentMessage[], act?: boolean): string;
+/**
+ * 2.48.0. How many messages one delivery types at once. The rest come at the next delivery, or in the
+ * notes at the next prompt.
+ */
+export declare const DELIVER_MOST = 8;
+/**
+ * 2.48.0. A message's body as it may be TYPED into a terminal: its lines kept, everything else a
+ * terminal acts on gone — escape sequences (so nothing can end a bracketed paste, move the cursor or
+ * set a title), carriage returns (so nothing is submitted early), every other control, bidi and
+ * zero-width character. Tabs become two spaces; more than one empty line becomes one; at most
+ * `LIMITS.MESSAGE_BODY` characters.
+ */
+export declare function typedBody(body: unknown): string;
+/**
+ * 2.48.0. The no-permission wording after typed messages: whose words they are and that they are text
+ * to read. `ACT_ON_MESSAGES` takes its place when the person allowed acting on messages.
+ */
+export declare const MESSAGES_TYPED_READ_ONLY: string;
+/**
+ * 2.48.0. The frame over one typed message: `[Kehikot message from Codex (epic methods on the kehikko
+ * writing), #12]`. Only host-stamped fields, the name flattened (`wakeName`).
+ */
+export declare function typedFrame(message: AgentMessage): string;
+/**
+ * 2.48.0. What a module TYPES into a session for messages that came for it: each message under its
+ * frame (`typedFrame`), its body as its sender wrote it with every line after the first indented two
+ * spaces (`typedBody`, so no line of a body can pass for a frame or for Kehikot's wording), oldest
+ * first; then one paragraph that says these were typed in by Kehikot, in their senders' words, how to
+ * answer, and either `ACT_ON_MESSAGES` (`act`) or `MESSAGES_TYPED_READ_ONLY`. Multi-line: type it as
+ * one bracketed paste (`pasted`) and submit after. Never starts with `/`, `!`, `#` or `@`. `''` for none.
+ */
+export declare function typedMessages(messages: readonly AgentMessage[], act?: boolean): string;
+/** 2.48.0. Text as one bracketed paste, so a terminal program takes it whole and no line is submitted early. Submit with `\r` after. */
+export declare const pasted: (text: string) => string;
+/**
+ * 2.48.0. Where a session stands, for delivering a message to it:
+ *  - `idle`: at its prompt, no turn running, nothing typed and unsent.
+ *  - `busy`: a turn is running.
+ *  - `asks`: it waits for the person — a question, a permission, a choice on screen. Never typed into.
+ *  - `typing`: the person has typed something at its prompt and not sent it. Never typed into.
+ *  - `asleep`: put away (no terminal) or not running, with a recorded id and place it can be resumed from.
+ *  - `unknown`: none of these is known.
+ */
+export declare const DELIVERY_STATES: readonly ["idle", "busy", "asks", "typing", "asleep", "unknown"];
+export type DeliveryState = (typeof DELIVERY_STATES)[number];
+/** 2.48.0. What to do with the messages waiting for one session now. */
+export declare const DELIVERY_ACTS: readonly ["type", "wait", "resume", "skip"];
+export type DeliveryAct = (typeof DELIVERY_ACTS)[number];
+/** 2.48.0. At most one resume for a message per session in this long, in ms. */
+export declare const RESUME_EVERY_MS: number;
+/** 2.48.0. At most this many sessions resumed for messages by one module in any `RESUME_EVERY_MS`. */
+export declare const RESUME_MOST = 3;
+/** 2.48.0. Everything `deliveryFor` decides from, for one session at one moment. */
+export interface DeliveryCase {
+    /** It runs in a terminal the module started and owns (or, asleep, it was one). False: one running elsewhere. */
+    own: boolean;
+    /** It has a place token: the host knows who it is. */
+    token: boolean;
+    /** The person's setting for its project (`wakesOnMessages`). */
+    wake: boolean;
+    state: DeliveryState;
+    /** Its program takes a line typed while a turn runs and sends it as the next prompt (or into the turn). */
+    queues: boolean;
+    /** Messages waiting that may wake it (`wakeMessages`, or ones already read for it and not yet typed). */
+    waiting: number;
+    /** How long the newest of them has waited, in ms. */
+    newestWaitedMs: number;
+    /** How long it has been `idle`, in ms (0 otherwise). */
+    idleForMs: number;
+    /** A burst is one delivery: neither typed nor resumed before the newest has waited, and an idle session has been idle, this long. Default `WAKE_SETTLE_MS` (2 s). */
+    settleMs?: number;
+    /** When it was last resumed for a message (ms), or null. */
+    resumedAt: number | null;
+    /** How many sessions this module resumed for messages in the last `RESUME_EVERY_MS`. */
+    resumedRecently: number;
+    now: number;
+}
+/** 2.48.0. A decision, and why, in a few words for a log line. */
+export interface Delivery {
+    act: DeliveryAct;
+    why: string;
+}
+/**
+ * 2.48.0. What to do with the messages waiting for one session (pure; `messageDelivery` in `/serve`
+ * runs it each tick):
+ *  - **skip**: nothing to do — one running elsewhere, no token, the person's setting off (the notes say
+ *    the messages at the next prompt), nothing waiting.
+ *  - **wait**: not yet — a burst still coming in; a question waiting for the person, or text they have
+ *    not sent (never typed into); a turn running in a program that does not take typing meanwhile; a
+ *    state not known; asleep and resumed within `RESUME_EVERY_MS`, or `RESUME_MOST` resumed lately.
+ *  - **type**: type them now — idle a moment, or busy in a program that queues what is typed.
+ *  - **resume**: asleep: resume it the way the module resumes a session, with them as its first prompt.
+ */
+export declare function deliveryFor(c: DeliveryCase): Delivery;

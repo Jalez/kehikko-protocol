@@ -333,7 +333,7 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     actsOn: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
 }, "strip", z.ZodTypeAny, {
     id: string;
-    state: "failed" | "idle" | "busy";
+    state: "idle" | "busy" | "failed";
     label: string;
     kind: "run";
     agents: boolean;
@@ -357,7 +357,7 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     id: string;
     label: string;
     kind: "run";
-    state?: "failed" | "idle" | "busy" | undefined;
+    state?: "idle" | "busy" | "failed" | undefined;
     group?: string | undefined;
     open?: string | undefined;
     copy?: {
@@ -488,7 +488,7 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     actsOn?: string | undefined;
 } | {
     id: string;
-    state: "failed" | "idle" | "busy";
+    state: "idle" | "busy" | "failed";
     label: string;
     kind: "run";
     agents: boolean;
@@ -590,7 +590,7 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     id: string;
     label: string;
     kind: "run";
-    state?: "failed" | "idle" | "busy" | undefined;
+    state?: "idle" | "busy" | "failed" | undefined;
     group?: string | undefined;
     open?: string | undefined;
     copy?: {
@@ -925,7 +925,7 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     actsOn: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
 }, "strip", z.ZodTypeAny, {
     id: string;
-    state: "failed" | "idle" | "busy";
+    state: "idle" | "busy" | "failed";
     label: string;
     kind: "run";
     agents: boolean;
@@ -949,7 +949,7 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     id: string;
     label: string;
     kind: "run";
-    state?: "failed" | "idle" | "busy" | undefined;
+    state?: "idle" | "busy" | "failed" | undefined;
     group?: string | undefined;
     open?: string | undefined;
     copy?: {
@@ -1080,7 +1080,7 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     actsOn?: string | undefined;
 } | {
     id: string;
-    state: "failed" | "idle" | "busy";
+    state: "idle" | "busy" | "failed";
     label: string;
     kind: "run";
     agents: boolean;
@@ -1182,7 +1182,7 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     id: string;
     label: string;
     kind: "run";
-    state?: "failed" | "idle" | "busy" | undefined;
+    state?: "idle" | "busy" | "failed" | undefined;
     group?: string | undefined;
     open?: string | undefined;
     copy?: {
@@ -1280,7 +1280,7 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     actsOn?: string | undefined;
 } | {
     id: string;
-    state: "failed" | "idle" | "busy";
+    state: "idle" | "busy" | "failed";
     label: string;
     kind: "run";
     agents: boolean;
@@ -1382,7 +1382,7 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     id: string;
     label: string;
     kind: "run";
-    state?: "failed" | "idle" | "busy" | undefined;
+    state?: "idle" | "busy" | "failed" | undefined;
     group?: string | undefined;
     open?: string | undefined;
     copy?: {

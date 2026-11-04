@@ -350,7 +350,7 @@ export declare const headerSchema: z.ZodObject<{
         kind: z.ZodLiteral<"run">;
     }, "strip", z.ZodTypeAny, {
         id: string;
-        state: "failed" | "idle" | "busy";
+        state: "idle" | "busy" | "failed";
         label: string;
         kind: "run";
         agents: boolean;
@@ -372,7 +372,7 @@ export declare const headerSchema: z.ZodObject<{
         id: string;
         label: string;
         kind: "run";
-        state?: "failed" | "idle" | "busy" | undefined;
+        state?: "idle" | "busy" | "failed" | undefined;
         group?: string | undefined;
         open?: string | undefined;
         pinned?: boolean | undefined;
@@ -427,7 +427,7 @@ export declare const headerSchema: z.ZodObject<{
         tool?: string | undefined;
     } | {
         id: string;
-        state: "failed" | "idle" | "busy";
+        state: "idle" | "busy" | "failed";
         label: string;
         kind: "run";
         agents: boolean;
@@ -486,7 +486,7 @@ export declare const headerSchema: z.ZodObject<{
         id: string;
         label: string;
         kind: "run";
-        state?: "failed" | "idle" | "busy" | undefined;
+        state?: "idle" | "busy" | "failed" | undefined;
         group?: string | undefined;
         open?: string | undefined;
         pinned?: boolean | undefined;
@@ -541,7 +541,7 @@ export declare const headerSchema: z.ZodObject<{
         tool?: string | undefined;
     } | {
         id: string;
-        state: "failed" | "idle" | "busy";
+        state: "idle" | "busy" | "failed";
         label: string;
         kind: "run";
         agents: boolean;
@@ -600,7 +600,7 @@ export declare const headerSchema: z.ZodObject<{
         id: string;
         label: string;
         kind: "run";
-        state?: "failed" | "idle" | "busy" | undefined;
+        state?: "idle" | "busy" | "failed" | undefined;
         group?: string | undefined;
         open?: string | undefined;
         pinned?: boolean | undefined;
@@ -658,7 +658,7 @@ export declare const headerSchema: z.ZodObject<{
         tool?: string | undefined;
     } | {
         id: string;
-        state: "failed" | "idle" | "busy";
+        state: "idle" | "busy" | "failed";
         label: string;
         kind: "run";
         agents: boolean;
@@ -720,7 +720,7 @@ export declare const headerSchema: z.ZodObject<{
         id: string;
         label: string;
         kind: "run";
-        state?: "failed" | "idle" | "busy" | undefined;
+        state?: "idle" | "busy" | "failed" | undefined;
         group?: string | undefined;
         open?: string | undefined;
         pinned?: boolean | undefined;
@@ -999,7 +999,7 @@ export declare const footerSchema: z.ZodObject<{
         actsOn: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
     }, "strip", z.ZodTypeAny, {
         id: string;
-        state: "failed" | "idle" | "busy";
+        state: "idle" | "busy" | "failed";
         label: string;
         kind: "run";
         agents: boolean;
@@ -1023,7 +1023,7 @@ export declare const footerSchema: z.ZodObject<{
         id: string;
         label: string;
         kind: "run";
-        state?: "failed" | "idle" | "busy" | undefined;
+        state?: "idle" | "busy" | "failed" | undefined;
         group?: string | undefined;
         open?: string | undefined;
         copy?: {
@@ -1143,7 +1143,7 @@ export declare const footerSchema: z.ZodObject<{
         actsOn?: string | undefined;
     } | {
         id: string;
-        state: "failed" | "idle" | "busy";
+        state: "idle" | "busy" | "failed";
         label: string;
         kind: "run";
         agents: boolean;
@@ -1245,7 +1245,7 @@ export declare const footerSchema: z.ZodObject<{
         id: string;
         label: string;
         kind: "run";
-        state?: "failed" | "idle" | "busy" | undefined;
+        state?: "idle" | "busy" | "failed" | undefined;
         group?: string | undefined;
         open?: string | undefined;
         copy?: {
@@ -1343,7 +1343,7 @@ export declare const footerSchema: z.ZodObject<{
         actsOn?: string | undefined;
     } | {
         id: string;
-        state: "failed" | "idle" | "busy";
+        state: "idle" | "busy" | "failed";
         label: string;
         kind: "run";
         agents: boolean;
@@ -1445,7 +1445,7 @@ export declare const footerSchema: z.ZodObject<{
         id: string;
         label: string;
         kind: "run";
-        state?: "failed" | "idle" | "busy" | undefined;
+        state?: "idle" | "busy" | "failed" | undefined;
         group?: string | undefined;
         open?: string | undefined;
         copy?: {
@@ -1546,7 +1546,7 @@ export declare const footerSchema: z.ZodObject<{
         actsOn?: string | undefined;
     } | {
         id: string;
-        state: "failed" | "idle" | "busy";
+        state: "idle" | "busy" | "failed";
         label: string;
         kind: "run";
         agents: boolean;
@@ -1651,7 +1651,7 @@ export declare const footerSchema: z.ZodObject<{
         id: string;
         label: string;
         kind: "run";
-        state?: "failed" | "idle" | "busy" | undefined;
+        state?: "idle" | "busy" | "failed" | undefined;
         group?: string | undefined;
         open?: string | undefined;
         copy?: {
@@ -5878,7 +5878,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         kind: z.ZodLiteral<"run">;
     }, "strip", z.ZodTypeAny, {
         id: string;
-        state: "failed" | "idle" | "busy";
+        state: "idle" | "busy" | "failed";
         label: string;
         kind: "run";
         agents: boolean;
@@ -5900,7 +5900,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         id: string;
         label: string;
         kind: "run";
-        state?: "failed" | "idle" | "busy" | undefined;
+        state?: "idle" | "busy" | "failed" | undefined;
         group?: string | undefined;
         open?: string | undefined;
         pinned?: boolean | undefined;
@@ -5955,7 +5955,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         tool?: string | undefined;
     } | {
         id: string;
-        state: "failed" | "idle" | "busy";
+        state: "idle" | "busy" | "failed";
         label: string;
         kind: "run";
         agents: boolean;
@@ -6014,7 +6014,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         id: string;
         label: string;
         kind: "run";
-        state?: "failed" | "idle" | "busy" | undefined;
+        state?: "idle" | "busy" | "failed" | undefined;
         group?: string | undefined;
         open?: string | undefined;
         pinned?: boolean | undefined;
@@ -6069,7 +6069,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         tool?: string | undefined;
     } | {
         id: string;
-        state: "failed" | "idle" | "busy";
+        state: "idle" | "busy" | "failed";
         label: string;
         kind: "run";
         agents: boolean;
@@ -6128,7 +6128,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         id: string;
         label: string;
         kind: "run";
-        state?: "failed" | "idle" | "busy" | undefined;
+        state?: "idle" | "busy" | "failed" | undefined;
         group?: string | undefined;
         open?: string | undefined;
         pinned?: boolean | undefined;
@@ -6186,7 +6186,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         tool?: string | undefined;
     } | {
         id: string;
-        state: "failed" | "idle" | "busy";
+        state: "idle" | "busy" | "failed";
         label: string;
         kind: "run";
         agents: boolean;
@@ -6248,7 +6248,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         id: string;
         label: string;
         kind: "run";
-        state?: "failed" | "idle" | "busy" | undefined;
+        state?: "idle" | "busy" | "failed" | undefined;
         group?: string | undefined;
         open?: string | undefined;
         pinned?: boolean | undefined;
@@ -6535,7 +6535,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         actsOn: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
     }, "strip", z.ZodTypeAny, {
         id: string;
-        state: "failed" | "idle" | "busy";
+        state: "idle" | "busy" | "failed";
         label: string;
         kind: "run";
         agents: boolean;
@@ -6559,7 +6559,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         id: string;
         label: string;
         kind: "run";
-        state?: "failed" | "idle" | "busy" | undefined;
+        state?: "idle" | "busy" | "failed" | undefined;
         group?: string | undefined;
         open?: string | undefined;
         copy?: {
@@ -6679,7 +6679,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         actsOn?: string | undefined;
     } | {
         id: string;
-        state: "failed" | "idle" | "busy";
+        state: "idle" | "busy" | "failed";
         label: string;
         kind: "run";
         agents: boolean;
@@ -6781,7 +6781,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         id: string;
         label: string;
         kind: "run";
-        state?: "failed" | "idle" | "busy" | undefined;
+        state?: "idle" | "busy" | "failed" | undefined;
         group?: string | undefined;
         open?: string | undefined;
         copy?: {
@@ -6879,7 +6879,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         actsOn?: string | undefined;
     } | {
         id: string;
-        state: "failed" | "idle" | "busy";
+        state: "idle" | "busy" | "failed";
         label: string;
         kind: "run";
         agents: boolean;
@@ -6981,7 +6981,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         id: string;
         label: string;
         kind: "run";
-        state?: "failed" | "idle" | "busy" | undefined;
+        state?: "idle" | "busy" | "failed" | undefined;
         group?: string | undefined;
         open?: string | undefined;
         copy?: {
@@ -7082,7 +7082,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         actsOn?: string | undefined;
     } | {
         id: string;
-        state: "failed" | "idle" | "busy";
+        state: "idle" | "busy" | "failed";
         label: string;
         kind: "run";
         agents: boolean;
@@ -7187,7 +7187,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         id: string;
         label: string;
         kind: "run";
-        state?: "failed" | "idle" | "busy" | undefined;
+        state?: "idle" | "busy" | "failed" | undefined;
         group?: string | undefined;
         open?: string | undefined;
         copy?: {

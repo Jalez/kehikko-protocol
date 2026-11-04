@@ -1,4 +1,4 @@
-import { type MessageToolDefinition } from '../agent-messages.js';
+import { type DeliveryState, type MessageToolDefinition } from '../agent-messages.js';
 import { type AskedHost, type AskHostOptions } from './ask.js';
 /**
  * 2.41.0. The thin adapter every module that runs agent sessions puts on its MCP door: `send_message`
@@ -105,3 +105,71 @@ export interface MessageWaker {
  * read of a few rows for each idle session every few seconds is cheap.
  */
 export declare function messageWaker(options: MessageWakerOptions): MessageWaker;
+/** 2.48.0. One session a module runs, or ran and can resume, as delivery needs to know it, each tick. */
+export interface DeliverySession {
+    /** The module's own key for it, stable across a rest and a resume (its session id): what `type` and `resume` are handed back. */
+    key: string;
+    /** Its place token (`kehikot-place`): who it is to the host. Null: never delivered to. */
+    token: string | null;
+    /** It runs (or, asleep, ran) in a terminal THIS module started and owns. False: never delivered to. */
+    own: boolean;
+    /** Where it stands (`DeliveryState`). `asleep` only for one with a recorded id and place the module can resume. */
+    state: DeliveryState;
+    /** The person's setting for its project (`wakesOnMessages`). */
+    wake: boolean;
+    /** The person's setting for its project (`actsOnMessages`): the typed text carries the standing permission. */
+    act: boolean;
+}
+export interface MessageDeliveryOptions extends Omit<AskHostOptions, 'project'> {
+    /** The sessions to consider now: every own session that runs, and every own session asleep that can be resumed. Called once per tick. */
+    sessions(): readonly DeliverySession[] | Promise<readonly DeliverySession[]>;
+    /**
+     * Type `text` (`typedMessages`: several lines) into that session's prompt as ONE bracketed paste
+     * (`pasted`) and submit it, through the pty the person's keys go to. True when it was typed; false
+     * (its state changed, it ended) and the same messages are tried again on a later tick.
+     */
+    type(key: string, text: string): boolean | Promise<boolean>;
+    /**
+     * Resume an asleep session the way the module resumes one, with `text` as its first prompt. True
+     * when it was started. Absent: an asleep session waits for its notes, as before 2.48.0.
+     */
+    resume?(key: string, text: string): boolean | Promise<boolean>;
+    /**
+     * The module's program takes a line typed while a turn runs and sends it as the next prompt (or into
+     * the turn): a busy session is typed into at once. False (the default): it waits until idle.
+     */
+    queues?: boolean;
+    /** How often to look, in ms. Default `WAKE_EVERY_MS`. */
+    everyMs?: number;
+    /** How often to ask the host about an asleep session, in ms: there may be many, and none is in a hurry. Default `ASLEEP_EVERY_MS`. */
+    asleepEveryMs?: number;
+    /** A burst is one delivery (`DeliveryCase.settleMs`). Default `WAKE_SETTLE_MS`. */
+    settleMs?: number;
+    now?: () => number;
+    /** Injected by the tests: `messages.read` for a token, `unread` or not. Default `askHost`. */
+    read?: (token: string, unread: boolean) => Promise<AskedHost<'messages.read'>>;
+    log?: (line: string) => void;
+}
+/** 2.48.0. How often an asleep session is asked about, at most, in ms. */
+export declare const ASLEEP_EVERY_MS = 30000;
+/** 2.48.0. Messages read for a session (so counted delivered) and not yet typed are kept this long while it is not listed, in ms. */
+export declare const DELIVERY_KEEP_MS: number;
+export interface MessageDelivery {
+    /** Look once. Resolves to how many sessions were typed into or resumed. */
+    tick(): Promise<number>;
+    start(): void;
+    stop(): void;
+}
+/**
+ * 2.48.0. Delivery by typing: what every agent module runs in place of `messageWaker`. Each tick, for
+ * each session the module lists: ask the host `messages.read` WITHOUT `unread` (nothing counted
+ * delivered) for the unread ones that may wake it (`wakeMessages`), and decide (`deliveryFor`). To
+ * type or resume: read them WITH `unread` (at most `DELIVER_MOST`; the host moves its cursor, so the
+ * notes and `read_messages({ unread: true })` do not say them again), and type `typedMessages` into
+ * its prompt — or resume it with that as the first prompt. A broadcast never causes a delivery, but
+ * one waiting unread rides along with one, since the host counts it delivered too. Messages read and
+ * not typed (the session moved on meanwhile) are kept and typed at the next chance, and never read
+ * again. Never into a question for the person or text they have not sent; never a session running
+ * elsewhere; never its own message. Never throws.
+ */
+export declare function messageDelivery(options: MessageDeliveryOptions): MessageDelivery;

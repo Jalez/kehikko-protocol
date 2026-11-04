@@ -7,6 +7,32 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.48.0 — 2026-11-04
+
+Delivery by typing: a message is typed into the session it is for. **Additive**; `PROTOCOL` is still 2.
+[docs/agent-messages.md](docs/agent-messages.md), "Delivery by typing".
+
+### Added
+
+- **`typedMessages(messages, act)`**: the text a module types for messages that came for a session —
+  each under `typedFrame` (`[Kehikot message from <name> (<place>), #<id>]`, host-stamped fields only),
+  its body as written (`typedBody`: lines kept, escape sequences, carriage returns, controls, bidi and
+  zero-width characters gone; later lines indented), at most `DELIVER_MOST`; then whose words they are
+  and `ACT_ON_MESSAGES` or `MESSAGES_TYPED_READ_ONLY`. `pasted(text)`: one bracketed paste.
+- **`deliveryFor(case)`**: the pure decision per session — `type`, `wait`, `resume` or `skip` — from
+  its `DeliveryState` (`idle`, `busy`, `asks`, `typing`, `asleep`, `unknown`), whether its program
+  queues typing during a turn, the person's setting, and the resume caps (`RESUME_EVERY_MS`,
+  `RESUME_MOST`). `DELIVERY_STATES`, `DELIVERY_ACTS`.
+- **`messageDelivery(options)`** (`/serve`): the loop every agent module runs in place of
+  `messageWaker`. Reads with `unread` before typing, so a typed message is counted delivered and the
+  notes do not repeat it; holds messages read and not yet typed (`DELIVERY_KEEP_MS`); asks about an asleep session at most every `ASLEEP_EVERY_MS`; resumes an asleep
+  session through the module's own `resume`, with the delivery as its first prompt.
+
+### Changed
+
+- `WAKE_ON_MESSAGES_SETTING.description` says the message is typed in and a put-away session resumed.
+  Key, label and default unchanged. `messageWaker` and `wakeLine` stay for older modules.
+
 ## 2.47.0 — 2026-11-04
 
 What goes in the header and what in the footer. **Additive**; `PROTOCOL` is still 2. [docs/footer.md](docs/footer.md),

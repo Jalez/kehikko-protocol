@@ -282,7 +282,7 @@ export declare const HEADER_ITEM_SHAPES: {
         kind: z.ZodLiteral<"run">;
     }, "strip", z.ZodTypeAny, {
         id: string;
-        state: "failed" | "idle" | "busy";
+        state: "idle" | "busy" | "failed";
         label: string;
         kind: "run";
         agents: boolean;
@@ -304,7 +304,7 @@ export declare const HEADER_ITEM_SHAPES: {
         id: string;
         label: string;
         kind: "run";
-        state?: "failed" | "idle" | "busy" | undefined;
+        state?: "idle" | "busy" | "failed" | undefined;
         group?: string | undefined;
         open?: string | undefined;
         pinned?: boolean | undefined;
@@ -564,7 +564,7 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     kind: z.ZodLiteral<"run">;
 }, "strip", z.ZodTypeAny, {
     id: string;
-    state: "failed" | "idle" | "busy";
+    state: "idle" | "busy" | "failed";
     label: string;
     kind: "run";
     agents: boolean;
@@ -586,7 +586,7 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     id: string;
     label: string;
     kind: "run";
-    state?: "failed" | "idle" | "busy" | undefined;
+    state?: "idle" | "busy" | "failed" | undefined;
     group?: string | undefined;
     open?: string | undefined;
     pinned?: boolean | undefined;
@@ -641,7 +641,7 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     tool?: string | undefined;
 } | {
     id: string;
-    state: "failed" | "idle" | "busy";
+    state: "idle" | "busy" | "failed";
     label: string;
     kind: "run";
     agents: boolean;
@@ -700,7 +700,7 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     id: string;
     label: string;
     kind: "run";
-    state?: "failed" | "idle" | "busy" | undefined;
+    state?: "idle" | "busy" | "failed" | undefined;
     group?: string | undefined;
     open?: string | undefined;
     pinned?: boolean | undefined;
@@ -940,7 +940,7 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     kind: z.ZodLiteral<"run">;
 }, "strip", z.ZodTypeAny, {
     id: string;
-    state: "failed" | "idle" | "busy";
+    state: "idle" | "busy" | "failed";
     label: string;
     kind: "run";
     agents: boolean;
@@ -962,7 +962,7 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     id: string;
     label: string;
     kind: "run";
-    state?: "failed" | "idle" | "busy" | undefined;
+    state?: "idle" | "busy" | "failed" | undefined;
     group?: string | undefined;
     open?: string | undefined;
     pinned?: boolean | undefined;
@@ -1017,7 +1017,7 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     tool?: string | undefined;
 } | {
     id: string;
-    state: "failed" | "idle" | "busy";
+    state: "idle" | "busy" | "failed";
     label: string;
     kind: "run";
     agents: boolean;
@@ -1076,7 +1076,7 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     id: string;
     label: string;
     kind: "run";
-    state?: "failed" | "idle" | "busy" | undefined;
+    state?: "idle" | "busy" | "failed" | undefined;
     group?: string | undefined;
     open?: string | undefined;
     pinned?: boolean | undefined;
@@ -1131,7 +1131,7 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     tool?: string | undefined;
 } | {
     id: string;
-    state: "failed" | "idle" | "busy";
+    state: "idle" | "busy" | "failed";
     label: string;
     kind: "run";
     agents: boolean;
@@ -1190,7 +1190,7 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     id: string;
     label: string;
     kind: "run";
-    state?: "failed" | "idle" | "busy" | undefined;
+    state?: "idle" | "busy" | "failed" | undefined;
     group?: string | undefined;
     open?: string | undefined;
     pinned?: boolean | undefined;
