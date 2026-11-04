@@ -76,6 +76,7 @@ export {
   hostFields,
   GREETING_GRACE_MS,
   JSON_KEPT,
+  KEEP_AFTER_MS,
   type HostActions,
   type HostFields,
   type HostStanding,

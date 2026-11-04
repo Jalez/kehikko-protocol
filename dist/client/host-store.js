@@ -13,6 +13,12 @@ import { NOT_COVERED } from '../reveal.js';
  */
 /** How long, in ms, a page stays `listening` before it will say nobody is there (`unhosted`). */
 export const GREETING_GRACE_MS = 700;
+/**
+ * 2.51.0. How long, in ms, `useKept` waits after the last change before it sends `state.set`: a run
+ * of presses through a switch is one write. A write still waiting when the person moves to another
+ * kehikko, or the page stops, is sent at once, for the kehikko it was about.
+ */
+export const KEEP_AFTER_MS = 300;
 /** The default: JSON, and `null` for anything that does not parse. */
 export const JSON_KEPT = {
     read: (state) => {
@@ -89,6 +95,22 @@ export function hostStore(id, events = {}, options = {}) {
     let stopped = false;
     let timer = null;
     let unwatch = null;
+    /* 2.51.0. The kehikko the kept value is for (`undefined` before the greeting), and a write waiting to be sent. */
+    let keptOn = undefined;
+    let waitingWrite = null;
+    let writeTimer = null;
+    const sendWrite = () => {
+        if (writeTimer !== null)
+            clearTimeout(writeTimer);
+        writeTimer = null;
+        const write = waitingWrite;
+        waitingWrite = null;
+        if (!write || !live || !live.greeted())
+            return;
+        void live.request('state.set', write.kehikko === null ? { state: write.state } : { state: write.state, kehikko: write.kehikko }).catch(() => {
+            /* Reported nowhere on purpose: the choice holds for this session. */
+        });
+    };
     const change = (next) => {
         standing = { ...standing, ...next };
         for (const heard of [...hearers])
@@ -98,8 +120,27 @@ export function hostStore(id, events = {}, options = {}) {
         const theme = context.theme === 'dark' ? 'dark' : 'light';
         if (themed)
             applyTheme(theme, { remember: true });
+        /*
+         * 2.51.0. Which string is this container's: the context's `kept` from a host that keeps one per
+         * container, read on the greeting and whenever the context names another kehikko — never on a
+         * context for the same one, which may be the echo of a write this page has since overtaken.
+         * From an older host, the greeting's `state`, as before.
+         */
+        const on = context.kehikko?.id ?? null;
+        const greeting = state !== undefined;
+        let kept;
+        if (context.kept !== undefined && (greeting || on !== keptOn))
+            kept = context.kept;
+        else if (greeting)
+            kept = state;
+        if (kept !== undefined) {
+            /* A write still waiting is about the kehikko it was made on: sent before the next one's value arrives. */
+            if (waitingWrite && on !== keptOn)
+                sendWrite();
+            keptOn = on;
+        }
         /* The kept state with the context, in one change, so the first hosted standing already has the remembered choice. */
-        change({ where: 'hosted', context, ...hostFields(context, standing, same), theme, ...(state !== undefined ? { kept: codec.read(state) } : {}), ...(facts ? { answers: facts.answers, drawsHeader: facts.header, drawsFooter: facts.footer ?? null, hostCarries: facts.carries ?? null, footerKinds: facts.footerKinds ?? null, covered: NOT_COVERED } : {}) });
+        change({ where: 'hosted', context, ...hostFields(context, standing, same), theme, ...(kept !== undefined ? { kept: codec.read(kept) } : {}), ...(facts ? { answers: facts.answers, drawsHeader: facts.header, drawsFooter: facts.footer ?? null, hostCarries: facts.carries ?? null, footerKinds: facts.footerKinds ?? null, covered: NOT_COVERED } : {}) });
     };
     const store = {
         get: () => standing,
@@ -188,6 +229,7 @@ export function hostStore(id, events = {}, options = {}) {
             return store;
         },
         stop() {
+            sendWrite();
             stopped = true;
             if (timer !== null)
                 clearTimeout(timer);
@@ -196,13 +238,18 @@ export function hostStore(id, events = {}, options = {}) {
             live = null;
             hearers.clear();
         },
-        remember(next) {
+        remember(next, after = 0) {
             change({ kept: next });
             if (!live || !live.greeted())
                 return;
-            void live.request('state.set', { state: codec.write(next) }).catch(() => {
-                /* Reported nowhere on purpose: the choice holds for this session. */
-            });
+            waitingWrite = { state: codec.write(next), kehikko: keptOn ?? null };
+            if (after > 0) {
+                if (writeTimer !== null)
+                    clearTimeout(writeTimer);
+                writeTimer = setTimeout(sendWrite, after);
+                return;
+            }
+            sendWrite();
         },
         point(passage) {
             if (!live || !live.greeted())

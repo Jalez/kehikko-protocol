@@ -15,4 +15,4 @@ export { keepInView, NOT_COVERED, type Covered } from '../reveal.js';
 export { pageBuild } from './build.js';
 export { hostTooOld, FIT_SAYS, type HostTooOld } from '../fit.js';
 export { held, heldDraft, type Draft, type Held, type HeldAt, type HeldReader } from './held.js';
-export { hostStore, hostFields, GREETING_GRACE_MS, JSON_KEPT, type HostActions, type HostFields, type HostStanding, type HostStore, type HostStoreOptions, type KeptCodec, type SteadyField, type Steadiness, type Where, } from './host-store.js';
+export { hostStore, hostFields, GREETING_GRACE_MS, JSON_KEPT, KEEP_AFTER_MS, type HostActions, type HostFields, type HostStanding, type HostStore, type HostStoreOptions, type KeptCodec, type SteadyField, type Steadiness, type Where, } from './host-store.js';

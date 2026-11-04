@@ -1048,16 +1048,32 @@ settings API the protocol would then have to describe — the moment the host
 knows that a module has "filters", every module's preferences are the
 protocol's business.
 
-##### Per module, not per pane
+##### Per container, since 2.51.0
 
-A module's page is loaded once and shown on whichever canvas asks for it, so
-one module is one document with one set of filters. State attached to a
-PANE would need the document to be told it had moved between canvases, and
-there is no message for that and should not be: a page cannot re-render its
-own controls in response to something it is never told.
+Before 2.51.0 it was one string per MODULE. A module's page is loaded once and
+shown on whichever kehikko asks for it, and the argument was that a page could
+not follow state attached to a pane without being told it had moved. But it IS
+told: every context names its kehikko (`context.kehikko`), and the host already
+tells each frame its own `filters`. One string per module meant the same module
+on two kehikot fought over one view, and the last kehikko written won on both.
 
-It comes back in the greeting rather than being fetched, so a module has it
-before its first render and does not draw the wrong filter first.
+So a host from 2.51.0 keeps one string per CONTAINER — this module on one
+kehikko — and tells each frame its container's string as `context.kept`, on the
+greeting and on every context after. `kehikko` on the call says which container
+a write is for: the kehikko the page was last told it is on, so a write that was
+still waiting when the person moved lands where it was made. The client does
+both (`hostStore`, `useHost`'s `remember`, `useKept`). A host before 2.51.0
+strips `kehikko`, keeps one string per module, and says no `context.kept`; the
+client then reads the greeting's `state`, as before.
+
+It still comes back in the greeting rather than being fetched, so a module has
+it before its first render and does not draw the wrong view first.
+
+A host keeps it in its own database, never in the project and never in browser
+storage, and it survives the app restarting. A module keeps its view there —
+the header's switches, sort, filters it does not offer through `filters.set`,
+and the item selected when that is a view and not a subject — and not in its own
+server process, which serves every kehikko at once.
 
 #### `methodParams.stage.report.note`
 

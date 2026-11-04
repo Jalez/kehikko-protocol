@@ -1983,6 +1983,7 @@ export declare const helloSchema: z.ZodObject<{
             key?: string | undefined;
         }>>>;
         filters: z.ZodDefault<z.ZodEffects<z.ZodRecord<z.ZodEffects<z.ZodString, string, string>, z.ZodUnion<[z.ZodString, z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">, string[], string[]>]>>, Record<string, string | string[]>, Record<string, string | string[]>>>;
+        kept: z.ZodOptional<z.ZodNullable<z.ZodString>>;
         containers: z.ZodDefault<z.ZodArray<z.ZodObject<{
             module: z.ZodString;
             selected: z.ZodDefault<z.ZodBoolean>;
@@ -2324,6 +2325,7 @@ export declare const helloSchema: z.ZodObject<{
             source: string;
         }[];
         scope?: "epic" | "kehikko" | "project" | "machine" | "part" | undefined;
+        kept?: string | null | undefined;
     }, {
         epic?: string | null | undefined;
         parts?: {
@@ -2389,6 +2391,7 @@ export declare const helloSchema: z.ZodObject<{
         pinned?: boolean | undefined;
         prompt?: string | null | undefined;
         filters?: Record<string, string | string[]> | undefined;
+        kept?: string | null | undefined;
         containers?: {
             module: string;
             selected?: boolean | undefined;
@@ -2569,6 +2572,7 @@ export declare const helloSchema: z.ZodObject<{
             source: string;
         }[];
         scope?: "epic" | "kehikko" | "project" | "machine" | "part" | undefined;
+        kept?: string | null | undefined;
     };
     header?: boolean | undefined;
     footer?: boolean | undefined;
@@ -2645,6 +2649,7 @@ export declare const helloSchema: z.ZodObject<{
         pinned?: boolean | undefined;
         prompt?: string | null | undefined;
         filters?: Record<string, string | string[]> | undefined;
+        kept?: string | null | undefined;
         containers?: {
             module: string;
             selected?: boolean | undefined;
@@ -2908,6 +2913,7 @@ export declare const contextMessageSchema: z.ZodObject<{
         key?: string | undefined;
     }>>>;
     filters: z.ZodDefault<z.ZodEffects<z.ZodRecord<z.ZodEffects<z.ZodString, string, string>, z.ZodUnion<[z.ZodString, z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">, string[], string[]>]>>, Record<string, string | string[]>, Record<string, string | string[]>>>;
+    kept: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     containers: z.ZodDefault<z.ZodArray<z.ZodObject<{
         module: z.ZodString;
         selected: z.ZodDefault<z.ZodBoolean>;
@@ -3254,6 +3260,7 @@ export declare const contextMessageSchema: z.ZodObject<{
         source: string;
     }[];
     scope?: "epic" | "kehikko" | "project" | "machine" | "part" | undefined;
+    kept?: string | null | undefined;
 }, {
     type: "kehikot.context";
     protocol: number;
@@ -3321,6 +3328,7 @@ export declare const contextMessageSchema: z.ZodObject<{
     pinned?: boolean | undefined;
     prompt?: string | null | undefined;
     filters?: Record<string, string | string[]> | undefined;
+    kept?: string | null | undefined;
     containers?: {
         module: string;
         selected?: boolean | undefined;
@@ -3949,6 +3957,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             key?: string | undefined;
         }>>>;
         filters: z.ZodDefault<z.ZodEffects<z.ZodRecord<z.ZodEffects<z.ZodString, string, string>, z.ZodUnion<[z.ZodString, z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">, string[], string[]>]>>, Record<string, string | string[]>, Record<string, string | string[]>>>;
+        kept: z.ZodOptional<z.ZodNullable<z.ZodString>>;
         containers: z.ZodDefault<z.ZodArray<z.ZodObject<{
             module: z.ZodString;
             selected: z.ZodDefault<z.ZodBoolean>;
@@ -4290,6 +4299,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             source: string;
         }[];
         scope?: "epic" | "kehikko" | "project" | "machine" | "part" | undefined;
+        kept?: string | null | undefined;
     }, {
         epic?: string | null | undefined;
         parts?: {
@@ -4355,6 +4365,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         pinned?: boolean | undefined;
         prompt?: string | null | undefined;
         filters?: Record<string, string | string[]> | undefined;
+        kept?: string | null | undefined;
         containers?: {
             module: string;
             selected?: boolean | undefined;
@@ -4535,6 +4546,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             source: string;
         }[];
         scope?: "epic" | "kehikko" | "project" | "machine" | "part" | undefined;
+        kept?: string | null | undefined;
     };
     header?: boolean | undefined;
     footer?: boolean | undefined;
@@ -4611,6 +4623,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         pinned?: boolean | undefined;
         prompt?: string | null | undefined;
         filters?: Record<string, string | string[]> | undefined;
+        kept?: string | null | undefined;
         containers?: {
             module: string;
             selected?: boolean | undefined;
@@ -4868,6 +4881,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         key?: string | undefined;
     }>>>;
     filters: z.ZodDefault<z.ZodEffects<z.ZodRecord<z.ZodEffects<z.ZodString, string, string>, z.ZodUnion<[z.ZodString, z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">, string[], string[]>]>>, Record<string, string | string[]>, Record<string, string | string[]>>>;
+    kept: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     containers: z.ZodDefault<z.ZodArray<z.ZodObject<{
         module: z.ZodString;
         selected: z.ZodDefault<z.ZodBoolean>;
@@ -5214,6 +5228,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         source: string;
     }[];
     scope?: "epic" | "kehikko" | "project" | "machine" | "part" | undefined;
+    kept?: string | null | undefined;
 }, {
     type: "kehikot.context";
     protocol: number;
@@ -5281,6 +5296,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     pinned?: boolean | undefined;
     prompt?: string | null | undefined;
     filters?: Record<string, string | string[]> | undefined;
+    kept?: string | null | undefined;
     containers?: {
         module: string;
         selected?: boolean | undefined;
