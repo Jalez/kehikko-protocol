@@ -516,6 +516,17 @@ export {
   type Covered,
 } from './reveal.js'
 
+/* How to use a module, in its own words, for a person: plain text a host draws as headings and bullets (2.52.0). */
+export {
+  HELP_LIMITS,
+  helpSchema,
+  helpSectionSchema,
+  helpOf,
+  hasHelp,
+  type Help,
+  type HelpSection,
+} from './help.js'
+
 /* What an agent session is told about the modules around it, one wording for every agent module (2.36.0). */
 export {
   AGENT_SAYS_MAX,

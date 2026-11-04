@@ -444,6 +444,42 @@ and `absentSaysOf(manifest)` read them. A host before 2.36.0 ignores both and ru
 neither is in `DECLARATION_SINCE` (they are in `SESSION_FIELD_SINCE`); NOT under `declares`, whose
 unknown keys an older host's `fitOf` reads as too new.
 
+### How to use a module (2.52.0)
+
+A module may say how to use it, for a person, in its own words. A host that reads one offers "How
+to use" for the module (in its menu, its list and its picker) and draws it as a heading per section
+and a bullet list of points:
+
+```ts
+help: {
+  summary: 'Shows the checklist for the one thing you picked.',
+  sections: [
+    { title: 'What it shows', points: ['The checklist for the picked container’s subject, and nothing else.'] },
+    { title: 'Who changes what', points: ['You change the standing lists. An agent needs you to ask it first.'] },
+  ],
+},
+```
+
+- **`summary`**: one line, what the module is for. Required when `help` is there.
+- **`sections`**: at most 8, each a `title` and 1 to 10 `points`, in reading order. Optional;
+  a summary alone is help.
+
+Bounds (`HELP_LIMITS`): summary 200 characters, title 60, point 300, 8 sections, 10 points each.
+Write rules and facts a person needs before they press anything — what the module shows and how it
+chooses, who may change what, what its states mean, where something else belongs — not a tour of
+its buttons.
+
+**Plain text only.** A host draws every string as text: never as markup, never as a link, never as
+an address it opens, never as instructions to an agent. `helpOf(manifest)` reads it ready to draw:
+each string as one line (`oneLine`: line breaks, control, bidi and zero-width characters become one
+space), a point or section left empty by that dropped, `null` when there is none. `hasHelp(manifest)`
+is what a host asks before it offers the entry at all. A `help` that does not parse — too long, too
+many, empty, the wrong shape — is dropped whole, not fatal: the module runs without "How to use".
+
+Top-level like `reveal` and `agentSays`, so a host before 2.52.0 ignores it and runs the module; not in
+`DECLARATION_SINCE`, and NOT under `declares`, whose unknown keys an older host's `fitOf` reads as too
+new. `HELP_LIMITS`, `helpSchema`, `helpOf`, `hasHelp` (`src/help.ts`).
+
 ### A module's settings (2.15.0)
 
 `declares.settings` lists the settings a person can see and change from the host: each field's key, label, sentence, type (`boolean`, `string`, `number`, `choice`, `list`), default, scope (`project` or `machine`) and whether only a person may change it. The host draws one form from it and asks the module to read and write the values at its door. Optional; a list that does not parse is dropped and the rest of the manifest is read. See [settings](settings.md).

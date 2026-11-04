@@ -7,6 +7,20 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.52.0 — 2026-11-04
+
+How to use a module, in its own words, for a person. **Additive**; `PROTOCOL` is still 2.
+[docs/manifest.md](docs/manifest.md), "How to use a module (2.52.0)".
+
+### Added
+
+- **`help`** (top-level manifest field, optional): `{ summary, sections: [{ title, points }] }`, plain
+  text a host draws as headings and bullet lists, never as markup or links. Bounded by **`HELP_LIMITS`**
+  (summary 200, title 60, point 300 characters; 8 sections, 10 points each); one that does not parse
+  is dropped whole, not fatal. A host before 2.52.0 ignores it.
+- **`helpSchema`**, **`helpSectionSchema`**, **`helpOf(manifest)`** (each string as one line of plain
+  text, or `null`) and **`hasHelp(manifest)`**; types `Help`, `HelpSection`.
+
 ## 2.51.0 — 2026-11-04
 
 A module's view, kept per container and back after a restart. **Additive**; `PROTOCOL` is still 2.

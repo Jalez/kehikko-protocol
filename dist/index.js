@@ -26,6 +26,8 @@ export { OPENS, HOLDS, opensSchema, holdsSchema, opensOf, canOpen, holdsOf, hold
 export { rowsAdvice } from './rows.js';
 /* How the host's revealed header and footer meet a module's page: push, or over and `kehikot.covered` (2.42.0). */
 export { REVEAL_MODES, revealModeSchema, revealModeOf, coveredFields, NOT_COVERED, keepInView, } from './reveal.js';
+/* How to use a module, in its own words, for a person: plain text a host draws as headings and bullets (2.52.0). */
+export { HELP_LIMITS, helpSchema, helpSectionSchema, helpOf, hasHelp, } from './help.js';
 /* What an agent session is told about the modules around it, one wording for every agent module (2.36.0). */
 export { AGENT_SAYS_MAX, NOTES_MOST, agentSaysSchema, agentSaysOf, absentSaysOf, oneLine, sessionModuleSchema, absentModuleSchema, placeWords, moduleLine, absentLine, researchLine, startNotes, changeNotes, sessionNotes, NOTES_VERSION, NOT_LOADED, UPDATED_HEAD, } from './notes.js';
 /* Messages between agent sessions, kept by the host (2.41.0). See `agent-messages.ts`. */

@@ -431,6 +431,38 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
      */
     absentSays: z.ZodCatch<z.ZodOptional<z.ZodString>>;
     /**
+     * 2.52.0. How to use this module, for a person: a one-line `summary` and short `sections` of
+     * points (`helpSchema`, bounded by `HELP_LIMITS`). Plain text only: a host draws every string as
+     * text, never as markup or a link. A host that has it offers "How to use" for the module. Top-level,
+     * optional, dropped when it does not parse, like `agentSays`; a host before 2.52.0 ignores it.
+     * See `help.ts`.
+     */
+    help: z.ZodCatch<z.ZodOptional<z.ZodObject<{
+        summary: z.ZodString;
+        sections: z.ZodDefault<z.ZodArray<z.ZodObject<{
+            title: z.ZodString;
+            points: z.ZodArray<z.ZodString, "many">;
+        }, "strip", z.ZodTypeAny, {
+            title: string;
+            points: string[];
+        }, {
+            title: string;
+            points: string[];
+        }>, "many">>;
+    }, "strip", z.ZodTypeAny, {
+        summary: string;
+        sections: {
+            title: string;
+            points: string[];
+        }[];
+    }, {
+        summary: string;
+        sections?: {
+            title: string;
+            points: string[];
+        }[] | undefined;
+    }>>>;
+    /**
      * The scopes this module can work at, as modes: one per scope, the default first (2.29.0; see
      * `modeSchema.scope`). Required, at least one, so a host older than 2.29.0 still parses it.
      */
@@ -813,6 +845,13 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     reveal?: "push" | "over" | undefined;
     agentSays?: string | undefined;
     absentSays?: string | undefined;
+    help?: {
+        summary: string;
+        sections: {
+            title: string;
+            points: string[];
+        }[];
+    } | undefined;
 }, {
     id: string;
     name: string;
@@ -876,6 +915,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     reveal?: unknown;
     agentSays?: unknown;
     absentSays?: unknown;
+    help?: unknown;
 }>, {
     id: string;
     name: string;
@@ -964,6 +1004,13 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     reveal?: "push" | "over" | undefined;
     agentSays?: string | undefined;
     absentSays?: string | undefined;
+    help?: {
+        summary: string;
+        sections: {
+            title: string;
+            points: string[];
+        }[];
+    } | undefined;
 }, {
     id: string;
     name: string;
@@ -1027,6 +1074,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     reveal?: unknown;
     agentSays?: unknown;
     absentSays?: unknown;
+    help?: unknown;
 }>;
 export type Manifest = z.infer<typeof manifestSchema>;
 /** What a module author writes, before defaults are filled in. */
