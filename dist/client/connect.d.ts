@@ -195,22 +195,31 @@ export interface ConnectOptions {
      */
     pointerTarget?: PointerTarget | false;
 }
+/** What `connect` reads of a press: which button, whether it is the primary pointer, and where (2.50.1). */
+export interface PointerEventLike {
+    button?: number;
+    isPrimary?: boolean;
+    clientX?: number;
+    clientY?: number;
+    /** `mouse`, `pen` or `touch`, on a pointer event. */
+    pointerType?: string;
+}
 /** What `connect` listens on for presses: a window, or anything shaped like one. */
 export interface PointerTarget {
-    addEventListener(type: string, listener: (event: {
-        button?: number;
-        isPrimary?: boolean;
-    }) => void, options?: {
+    addEventListener(type: string, listener: (event: PointerEventLike) => void, options?: {
         capture?: boolean;
         passive?: boolean;
     }): void;
-    removeEventListener(type: string, listener: (event: {
-        button?: number;
-        isPrimary?: boolean;
-    }) => void, options?: {
+    removeEventListener(type: string, listener: (event: PointerEventLike) => void, options?: {
         capture?: boolean;
     }): void;
 }
+/**
+ * 2.50.1. How far, in CSS pixels, a press may wander and still be a press held in place. Past it the
+ * press is a drag — a selection, a scroll, a move — and is told as `cancel`: a drag is not a long
+ * press. Under it a hand's tremor on a trackpad is still holding still.
+ */
+export declare const POINTER_SLOP_PX = 8;
 export interface Connection {
     /**
      * Start hearing messages. Call it AFTER the connection has been stored: the mailbox replays

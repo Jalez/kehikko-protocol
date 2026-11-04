@@ -7,6 +7,25 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.50.1 — 2026-11-04
+
+A long press inside a page of text. **A fix in the client**; nothing on the wire changes, and
+`PROTOCOL` is still 2. [docs/wire.md](docs/wire.md), `pointerSchema`.
+
+### Fixed
+
+- **`connect`'s `kehikot.pointer`** no longer ends a mouse press the browser cancels while it is held
+  still. WebKit fires `pointercancel` for a press held on text or on a selection; the press now ends
+  when the button comes up (`pointerup`, `mouseup` or `dragend`), so a host times it as the long press
+  it is. A touch or pen cancel is still told as `cancel`.
+
+### Added
+
+- **`POINTER_SLOP_PX`** (8): a press that moves farther than this from where it went down is a drag
+  and is told as `cancel` at once, so a text selection or a drag is never revealed as a long press.
+- **`PointerEventLike`**, what `connect` reads of a press (`button`, `isPrimary`, `clientX`,
+  `clientY`, `pointerType`); `PointerTarget` takes it.
+
 ## 2.50.0 — 2026-11-04
 
 Questions, reports and the person's own messages. **Additive**; `PROTOCOL` is still 2.
