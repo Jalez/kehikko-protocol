@@ -22,6 +22,48 @@ const TOKEN = /^[A-Za-z0-9_-]{22,64}$/
 export const MESSAGE_THREAD = /^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/
 
 /**
+ * 2.50.0. What a message is, by its sender's word: `question` (it waits for an answer, and may offer
+ * `choices`), `report` (what the sender is working on, how it stands: nothing to answer), or `note`
+ * (anything else; what a message without a kind is). A label for the reader, never a command.
+ */
+export const MESSAGE_KINDS = ['question', 'report', 'note'] as const
+export type MessageKind = (typeof MESSAGE_KINDS)[number]
+
+/**
+ * 2.50.0. A question's choices: at most `LIMITS.MESSAGE_CHOICES`, each one line of at most
+ * `LIMITS.MESSAGE_CHOICE` characters, no two the same. Refused, not clipped, when longer.
+ */
+export const messageChoicesSchema = z
+  .array(
+    z
+      .string()
+      .trim()
+      .min(1, 'a choice says something')
+      .max(LIMITS.MESSAGE_CHOICE)
+      .refine((one) => !/[\r\n]/.test(one), { message: 'a choice is one line' }),
+  )
+  .min(1)
+  .max(LIMITS.MESSAGE_CHOICES)
+  .refine((choices) => new Set(choices).size === choices.length, { message: 'two choices say the same' })
+
+/** 2.50.0. The id of the message this one answers: `replyTo`. */
+const replyToSchema = z.number().int().min(1)
+
+/** 2.50.0. The structured fields a message may carry beside its body, as a sender gives them. */
+const structured = {
+  kind: z.enum(MESSAGE_KINDS).optional(),
+  choices: messageChoicesSchema.optional(),
+  replyTo: replyToSchema.optional(),
+}
+
+/** 2.50.0. Choices belong to a question: a message with choices says `kind: 'question'`. */
+function choicesNeedAQuestion(asked: { kind?: MessageKind; choices?: string[] }, context: z.RefinementCtx): void {
+  if (asked.choices && asked.kind !== 'question') {
+    context.addIssue({ code: z.ZodIssueCode.custom, path: ['choices'], message: 'choices belong to a question (kind: "question")' })
+  }
+}
+
+/**
  * One agent session, as the module that runs it names it: the module's id and the session's id there
  * (the `agent-session` subject's id, `SHOW_SUBJECTS`: Claude Code's session id for Claude's). The
  * address a message is sent to, and the `from` a host stamps on one.
@@ -80,10 +122,23 @@ export const agentMessageSchema = z.object({
     name: z.string().max(80).catch(''),
     session: z.string().min(1).max(LIMITS.SHOW_ID).nullable(),
     place: messageFromPlaceSchema,
+    /**
+     * 2.50.0. The HOST's fact that the person wrote it, through `module`'s page (`messages.say`): a
+     * press in the host's own page, a module granted `messages:as-person` that the person allowed
+     * (`PERSON_MESSAGES_SETTING`). `session` is null then. Never set by any call; false from a host
+     * before 2.50.0.
+     */
+    person: z.boolean().default(false).catch(false),
   }),
   to: messageToSchema,
   thread: z.string().regex(MESSAGE_THREAD).nullable().catch(null),
   body: z.string().min(1).max(LIMITS.MESSAGE_BODY),
+  /** 2.50.0. What it is, by its sender's word; `note` from a host before 2.50.0. */
+  kind: z.enum(MESSAGE_KINDS).default('note').catch('note'),
+  /** 2.50.0. A question's choices; empty for anything else, and from a host before 2.50.0. */
+  choices: messageChoicesSchema.default([]).catch([]),
+  /** 2.50.0. The id of the message this one answers, or null. */
+  replyTo: replyToSchema.nullable().default(null).catch(null),
 })
 export type AgentMessage = z.infer<typeof agentMessageSchema>
 
@@ -93,13 +148,52 @@ const token = z.string().regex(TOKEN, 'token is the session’s place token (the
 /**
  * `messages.send`'s params. `token` names the sending session; `body` is text, at most
  * `LIMITS.MESSAGE_BODY` characters, REFUSED rather than clipped; `to` absent is the project.
+ * 2.50.0: `kind`, `choices` (only with `kind: 'question'`) and `replyTo`, each optional; a host
+ * before 2.50.0 drops them and keeps the body.
  */
-export const messageSendParams = z.object({
-  token,
-  body: z.string().trim().min(1, 'a message says something').max(LIMITS.MESSAGE_BODY),
-  to: messageToSchema.optional(),
-  thread: z.string().regex(MESSAGE_THREAD).optional(),
+export const messageSendParams = z
+  .object({
+    token,
+    body: z.string().trim().min(1, 'a message says something').max(LIMITS.MESSAGE_BODY),
+    to: messageToSchema.optional(),
+    thread: z.string().regex(MESSAGE_THREAD).optional(),
+    ...structured,
+  })
+  .superRefine(choicesNeedAQuestion)
+
+/**
+ * 2.50.0. `messages.say`'s params: the PERSON's message, from a module's PAGE, under
+ * `messages:as-person`. No token: it is nobody's session. `to` is required (one session, a place, a
+ * module or the project). A host answers it only for a press in its own page — the person's
+ * fresh gesture in the module's frame — from a module whose manifest asks for `messages:as-person`
+ * and whom the person allowed (`PERSON_MESSAGES_SETTING`, a change the host itself saw made); never
+ * from a module's server, never through an agent's door. Answered with `messageSendResult`.
+ */
+export const messageSayParams = z
+  .object({
+    body: z.string().trim().min(1, 'a message says something').max(LIMITS.MESSAGE_BODY),
+    to: messageToSchema,
+    thread: z.string().regex(MESSAGE_THREAD).optional(),
+    ...structured,
+  })
+  .superRefine(choicesNeedAQuestion)
+
+/**
+ * 2.50.0. `messages.mine`'s params, from a module's page under `agents:message`: the messages
+ * addressed to the asking MODULE (`to: { module }`) and the ones it sent (the person's, through it),
+ * oldest first — the latest `limit`, or the first `limit` after `since`.
+ */
+export const messageMineParams = z.object({
+  since: z.number().int().min(0).optional(),
+  limit: z.number().int().min(1).max(LIMITS.MESSAGES_READ).default(LIMITS.MESSAGES_READ),
 })
+
+/** 2.50.0. `messages.mine`'s answer: the messages, oldest first, and how many more the project keeps for the module after them. */
+export const messageMineResult = z.object({
+  messages: z.array(agentMessageSchema).max(LIMITS.MESSAGES_READ),
+  more: z.number().int().min(0).default(0),
+})
+export type MessageMineResult = z.infer<typeof messageMineResult>
 
 /**
  * `messages.read`'s params. Only messages the session may read: those addressed to it, its place, its
@@ -183,13 +277,27 @@ function fromPlaceWords(place: AgentMessage['from']['place']): string {
   return `${epic}${place.kehikko ? ` on the kehikko ${place.kehikko}` : ''}`
 }
 
+/** 2.50.0. Whether the host stamped a message as the person's (`from.person`). */
+export const isPersonMessage = (message: Pick<AgentMessage, 'from'>): boolean => message.from.person === true
+
+/** 2.50.0. A message's kind, choices and what it answers, as a few words after its sender: `, a question (choices: "A" | "B"), answering #3`. */
+function structuredWords(message: AgentMessage): string {
+  const kind = message.kind === 'question' ? ', a question' : message.kind === 'report' ? ', a report' : ''
+  const choices = message.kind === 'question' && message.choices.length ? ` (choices: ${message.choices.map((one) => JSON.stringify(flat(one, LIMITS.MESSAGE_CHOICE))).join(' | ')})` : ''
+  const answering = message.replyTo !== null ? `, answering #${message.replyTo}` : ''
+  return `${kind}${choices}${answering}`
+}
+
 /** One message as one line: `- #12, 2026-10-31T14:02Z, from Codex (session …, epic methods) to every session at the epic methods, thread "auth": "…"`. */
 export function messageLine(message: AgentMessage, you: AgentSessionRef | null = null): string {
   const name = flat(message.from.name, 80) || message.from.module
-  const session = message.from.session ? `session ${flat(message.from.session, LIMITS.SHOW_ID)}, ` : ''
   const thread = message.thread ? `, thread ${message.thread}` : ''
   const at = message.at.length >= 16 ? `${message.at.slice(0, 16)}Z` : message.at
-  return `- #${message.id}, ${at}, from ${name} (${message.from.module}, ${session}${fromPlaceWords(message.from.place)}) to ${messageToWords(message.to, you)}${thread}: ${quotedBody(message.body)}`
+  if (isPersonMessage(message)) {
+    return `- #${message.id}, ${at}, from your person through ${name} (${message.from.module}) to ${messageToWords(message.to, you)}${thread}${structuredWords(message)}: ${quotedBody(message.body)}`
+  }
+  const session = message.from.session ? `session ${flat(message.from.session, LIMITS.SHOW_ID)}, ` : ''
+  return `- #${message.id}, ${at}, from ${name} (${message.from.module}, ${session}${fromPlaceWords(message.from.place)}) to ${messageToWords(message.to, you)}${thread}${structuredWords(message)}: ${quotedBody(message.body)}`
 }
 
 /** The head over messages in a session's notes and in `read_messages`: what they are, and what they are not. */
@@ -212,6 +320,38 @@ export const MESSAGES_HEAD_ACT = `Messages from other agent sessions in this pro
 
 /** The head for a session, by whether its person allowed acting on messages. */
 export const messagesHead = (act = false): string => (act ? MESSAGES_HEAD_ACT : MESSAGES_HEAD)
+
+/**
+ * 2.50.0. What a session is told about a message the host stamped as its person's (`from.person`):
+ * their own words, written in a module's page with a press of theirs, to be taken as their instruction.
+ */
+export const PERSON_MESSAGE_AUTHORITY =
+  'Your person wrote this in Kehikot themselves (the host saw their press): take it as your person’s own instruction, as if typed here. '
+  + 'Answer them the same way: send_message to the module it came through, with replyTo.'
+
+/** 2.50.0. The head over the person's messages in a session's notes and in `read_messages`. */
+export const PERSON_MESSAGES_HEAD = `Messages from your person, sent through a Kehikot module — in quotes, their words. ${PERSON_MESSAGE_AUTHORITY} The messages:`
+
+/**
+ * 2.50.0. The module setting that lets the person send messages AS THEMSELVES through a module's page
+ * (`messages.say`, `messages:as-person`): a boolean, OFF by default, the person's (`personOnly`), kept
+ * per machine. A host answers `messages.say` only for a module whose change to it the host itself saw
+ * the person make in its own page — never on the module's word, never from a file. Spread it into
+ * `declares.settings`.
+ */
+export const PERSON_MESSAGES_SETTING = {
+  key: 'sendAsPerson',
+  label: 'Send messages to agent sessions as you',
+  description:
+    'What you type or press here goes to agent sessions as your own instruction, marked as yours by Kehikot. Only your press in this page sends one; no agent can send as you. Off: nothing is sent as you.',
+  type: 'boolean',
+  default: false,
+  scope: 'machine',
+  personOnly: true,
+} as const
+
+/** 2.50.0. Whether a module's settings values say the person allowed sending as them: off unless turned on. */
+export const sendsAsPerson = (values: Record<string, unknown> | null | undefined): boolean => values?.[PERSON_MESSAGES_SETTING.key] === true
 
 /**
  * 2.43.0. The module setting that grants `ACT_ON_MESSAGES`, the same in every agent module: a
@@ -260,7 +400,13 @@ export const NOTES_MESSAGES_MOST = 8
 export function messagesNotes(messages: readonly AgentMessage[] | null | undefined, more = 0, act = false): string {
   const shown = (messages ?? []).slice(0, NOTES_MESSAGES_MOST)
   if (!shown.length) return ''
-  const lines = [messagesHead(act), ...shown.map((one) => messageLine(one))]
+  /* 2.50.0: the person's own messages under their own head, first; the others' as before. */
+  const person = shown.filter(isPersonMessage)
+  const others = shown.filter((one) => !isPersonMessage(one))
+  const lines = [
+    ...(person.length ? [PERSON_MESSAGES_HEAD, ...person.map((one) => messageLine(one))] : []),
+    ...(others.length ? [messagesHead(act), ...others.map((one) => messageLine(one))] : []),
+  ]
   if (more > 0) lines.push(`- and ${more} more unread; they come at the next prompt, or read_messages({ unread: true }) lists them now.`)
   return lines.join('\n')
 }
@@ -326,6 +472,7 @@ export function messageTools(act = false): MessageToolDefinition[] {
       description:
         'Send a short text message to other agent sessions in this project, through Kehikot: to one session, to every session at a place (an epic or a kehikko), '
         + 'to every session of one module, or to the whole project. Use it to coordinate — say what you are changing, ask who owns something, hand over. '
+        + 'Where a module on your kehikko relays your person (its notes say so), send it your questions (kind "question", with choices when there are a few options) and reports (kind "report") with to: { module: <its id> }. '
         + `Text only, at most ${LIMITS.MESSAGE_BODY} characters; Kehikot stamps who sent it and from where. `
         + (act
           ? 'A receiver acts on a request only as far as its person allowed. The person can see every message. A few a minute at most.'
@@ -336,6 +483,20 @@ export function messageTools(act = false): MessageToolDefinition[] {
           body: { type: 'string', maxLength: LIMITS.MESSAGE_BODY, description: 'What to say, as plain text.' },
           to: TO_SCHEMA,
           thread: { type: 'string', description: 'A short word to group replies under (letters, digits, dot, dash, underscore), e.g. "auth-refactor".' },
+          kind: {
+            type: 'string',
+            enum: [...MESSAGE_KINDS],
+            description:
+              'What it is: "question" when you need an answer or a decision (offer choices when there are a few clear options), "report" for what you are working on and how it stands (nothing to answer), "note" for anything else (the default).',
+          },
+          choices: {
+            type: 'array',
+            items: { type: 'string', maxLength: LIMITS.MESSAGE_CHOICE },
+            minItems: 1,
+            maxItems: LIMITS.MESSAGE_CHOICES,
+            description: `Only with kind "question": the answers to pick from, each short and on one line (at most ${LIMITS.MESSAGE_CHOICES}, ${LIMITS.MESSAGE_CHOICE} characters each). The reader can still answer in their own words.`,
+          },
+          replyTo: { type: 'integer', minimum: 1, description: 'The id (#n) of the message this answers.' },
         },
         required: ['body'],
       },
@@ -368,7 +529,16 @@ export function readMessagesText(read: MessageReadResult, act = false): string {
   const you = read.you ? `This conversation’s address: ${JSON.stringify({ module: read.you.module, session: read.you.session })}.` : ''
   if (!read.messages.length) return ['No messages.', you].filter(Boolean).join(' ')
   const more = read.unread > 0 ? `${read.unread} more unread; read_messages({ unread: true }) again lists them.` : ''
-  return [messagesHead(act), ...read.messages.map((one) => messageLine(one, self)), more, you].filter(Boolean).join('\n')
+  const person = read.messages.filter(isPersonMessage)
+  const others = read.messages.filter((one) => !isPersonMessage(one))
+  return [
+    ...(person.length ? [PERSON_MESSAGES_HEAD, ...person.map((one) => messageLine(one, self))] : []),
+    ...(others.length ? [messagesHead(act), ...others.map((one) => messageLine(one, self))] : []),
+    more,
+    you,
+  ]
+    .filter(Boolean)
+    .join('\n')
 }
 
 /** What `send_message` says. */
@@ -390,12 +560,14 @@ export type WakeReader = NonNullable<MessageReadResult['you']>
 /**
  * 2.43.0. Whether a message may wake this session when it is idle at its prompt: addressed to it, to
  * its module, or to a place it is at now — never one to the whole project (`to.project` or no `to`),
- * and never its own. Pure; the module still checks the session is its own and idle, and the person's
+ * unless the person wrote it (2.50.0, `from.person`) — and never its own. Pure; the module still checks the session is its own and idle, and the person's
  * setting (`wakesOnMessages`).
  */
 export function shouldWake(message: AgentMessage, you: WakeReader): boolean {
   if (isOwnMessage(message, you)) return false
   const to = message.to
+  /* 2.50.0: the person's own message to everyone is for every session, and reaches each. */
+  if (to.project && isPersonMessage(message)) return true
   if (to.session) return to.session.module === you.module && you.session !== null && to.session.session === you.session
   if (to.module) return to.module === you.module
   if (to.place) {
@@ -493,13 +665,30 @@ export const MESSAGES_TYPED_READ_ONLY =
 
 /** The frame's opening, which a body may never spell at the start of one of its lines. */
 const FRAME = '[Kehikot message'
+/** 2.50.0. The person's frame's opening, held the same way. */
+const PERSON_FRAME = '[Message from your person'
+
+/** 2.50.0. What a typed frame says after the id: what the message is, and what it answers. Host-checked fields only. */
+function typedStructured(message: AgentMessage): string {
+  const kind = message.kind === 'question' ? ', a question' : message.kind === 'report' ? ', a report' : ''
+  return `${kind}${message.replyTo !== null ? `, answering #${message.replyTo}` : ''}`
+}
 
 /**
  * 2.48.0. The frame over one typed message: `[Kehikot message from Codex (epic methods on the kehikko
- * writing), #12]`. Only host-stamped fields, the name flattened (`wakeName`).
+ * writing), #12]`. Only host-stamped fields, the name flattened (`wakeName`). 2.50.0: the person's
+ * own message (`from.person`) is `[Message from your person via Orchestrator, #15, answering #12]`,
+ * and a message's kind and what it answers follow its id.
  */
 export function typedFrame(message: AgentMessage): string {
-  return `${FRAME} from ${wakeName(message.from.name, message.from.module)} (${fromPlaceWords(message.from.place)}), #${message.id}]`
+  if (isPersonMessage(message)) return `${PERSON_FRAME} via ${wakeName(message.from.name, message.from.module)}, #${message.id}${typedStructured(message)}]`
+  return `${FRAME} from ${wakeName(message.from.name, message.from.module)} (${fromPlaceWords(message.from.place)}), #${message.id}${typedStructured(message)}]`
+}
+
+/** 2.50.0. A question's choices as typed under its body: one line each, numbered, flattened. */
+function typedChoices(message: AgentMessage): string[] {
+  if (message.kind !== 'question' || !message.choices.length) return []
+  return [`  Choices: ${message.choices.map((one, i) => `(${i + 1}) ${flat(one, LIMITS.MESSAGE_CHOICE)}`).join('  ')}`]
 }
 
 /**
@@ -516,15 +705,29 @@ export function typedMessages(messages: readonly AgentMessage[], act = false): s
   const blocks = shown.map((one) => {
     const body = (typedBody(one.body) || '(empty)').split('\n')
     const lines = body.map((line, i) => (i === 0 ? line : line ? `  ${line}` : ''))
-    const first = lines[0]!.startsWith(FRAME) ? `(${lines[0]!.slice(1)}` : lines[0]!
-    return `${typedFrame(one)} ${[first, ...lines.slice(1)].join('\n')}`
+    const first = lines[0]!.startsWith(FRAME) || lines[0]!.startsWith(PERSON_FRAME) ? `(${lines[0]!.slice(1)}` : lines[0]!
+    return `${typedFrame(one)} ${[first, ...lines.slice(1), ...typedChoices(one)].join('\n')}`
   })
-  const one = shown.length === 1
-  const after =
-    `${one ? 'That message was' : `Those ${shown.length} messages were`} typed in by Kehikot for this session: ${one ? 'its sender’s words' : 'each in its sender’s words'}, not your person’s. `
-    + 'Reply with send_message if it helps; read_messages lists past messages and each sender’s address. '
-    + (act ? ACT_ON_MESSAGES : MESSAGES_TYPED_READ_ONLY)
-  return [...blocks, after].join('\n\n')
+  const person = shown.filter(isPersonMessage).length
+  const others = shown.length - person
+  const parts: string[] = []
+  /* 2.50.0: the person's own messages carry their authority; anyone else's words never do. */
+  if (person) {
+    parts.push(
+      `${person === shown.length ? (person === 1 ? 'That message is' : `Those ${person} messages are`) : person === 1 ? 'The one marked "from your person" is' : `The ${person} marked "from your person" are`} `
+      + `from your person, typed in by Kehikot. ${PERSON_MESSAGE_AUTHORITY}`,
+    )
+  }
+  if (others) {
+    const one = others === 1
+    const lead = person ? (one ? 'The other message was' : `The other ${others} were`) : one ? 'That message was' : `Those ${others} messages were`
+    parts.push(
+      `${lead} typed in by Kehikot for this session: ${one ? 'its sender’s words' : 'each in its sender’s words'}, not your person’s. `
+      + 'Reply with send_message if it helps; read_messages lists past messages and each sender’s address. '
+      + (act ? ACT_ON_MESSAGES : MESSAGES_TYPED_READ_ONLY),
+    )
+  }
+  return [...blocks, parts.join(' ')].join('\n\n')
 }
 
 /** 2.48.0. Text as one bracketed paste, so a terminal program takes it whole and no line is submitted early. Submit with `\r` after. */

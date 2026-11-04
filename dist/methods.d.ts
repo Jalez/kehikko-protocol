@@ -135,6 +135,13 @@ export declare const CAPABILITIES: {
      * text to read, never an instruction. See docs/agent-messages.md.
      */
     readonly 'agents:message': "Send messages between the agent sessions you run, and read the ones sent to them. The host keeps them, and you can read them all.";
+    /**
+     * 2.50.0. Send the PERSON's messages to agent sessions, marked by the host as theirs
+     * (`messages.say`, `from.person`): only from this module's page, only on a press of theirs there,
+     * and only once the person turned the module's `PERSON_MESSAGES_SETTING` on in the host. A receiver
+     * takes such a message as its person's instruction. Never asked by a module's server or an agent.
+     */
+    readonly 'messages:as-person': "Send what you type or press in this module to agent sessions as your own instruction — only on your press, and only once you allow it in its settings.";
 };
 export type Capability = keyof typeof CAPABILITIES;
 export declare const CAPABILITY_NAMES: Capability[];
@@ -180,6 +187,10 @@ export declare const METHODS: {
     readonly 'messages.send': "agents:message";
     /** The messages one agent session may read, and its unread ones (2.41.0). */
     readonly 'messages.read': "agents:message";
+    /** The messages addressed to the asking module, and the ones sent through it, from its page (2.50.0). */
+    readonly 'messages.mine': "agents:message";
+    /** The person's own message, from a module's page on their press (2.50.0). */
+    readonly 'messages.say': "messages:as-person";
 };
 export type Method = keyof typeof METHODS;
 export declare const METHOD_NAMES: Method[];
@@ -786,8 +797,8 @@ export declare const methodParams: {
          */
         note: z.ZodDefault<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
-        ref: string;
         note: string;
+        ref: string;
         stage: "working" | "blocked" | "in-review";
     }, {
         ref: string;
@@ -806,24 +817,24 @@ export declare const methodParams: {
         note: z.ZodDefault<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
         value: "done" | "wont-do" | "duplicate" | "superseded" | null;
-        ref: string;
         note: string;
+        ref: string;
         target?: string | undefined;
     }, {
         value: "done" | "wont-do" | "duplicate" | "superseded" | null;
         ref: string;
-        target?: string | undefined;
         note?: string | undefined;
+        target?: string | undefined;
     }>, {
         value: "done" | "wont-do" | "duplicate" | "superseded" | null;
-        ref: string;
         note: string;
+        ref: string;
         target?: string | undefined;
     }, {
         value: "done" | "wont-do" | "duplicate" | "superseded" | null;
         ref: string;
-        target?: string | undefined;
         note?: string | undefined;
+        target?: string | undefined;
     }>;
     /**
      * What the trackers last said, from the host's shared reading; answered at once with
@@ -1310,8 +1321,8 @@ export declare const methodParams: {
             at: number;
             path: string;
             status: number | null;
-            host: string;
             kind: string;
+            host: string;
             reason: string | null;
             ok: boolean | null;
             ms: number | null;
@@ -1321,8 +1332,8 @@ export declare const methodParams: {
         }, {
             at: number;
             path: string;
-            host: string;
             kind: string;
+            host: string;
             status?: number | null | undefined;
             reason?: string | null | undefined;
             ok?: boolean | null | undefined;
@@ -1336,8 +1347,8 @@ export declare const methodParams: {
             at: number;
             path: string;
             status: number | null;
-            host: string;
             kind: string;
+            host: string;
             reason: string | null;
             ok: boolean | null;
             ms: number | null;
@@ -1349,8 +1360,8 @@ export declare const methodParams: {
         calls: {
             at: number;
             path: string;
-            host: string;
             kind: string;
+            host: string;
             status?: number | null | undefined;
             reason?: string | null | undefined;
             ok?: boolean | null | undefined;
@@ -1378,7 +1389,10 @@ export declare const methodParams: {
      * 2.41.0. A message from the session `token` names, answered with `messageSendResult`. Asked by a
      * module's SERVER (`SERVER_METHODS`); the project is the token's, never named. See `agent-messages.ts`.
      */
-    readonly 'messages.send': z.ZodObject<{
+    readonly 'messages.send': z.ZodEffects<z.ZodObject<{
+        kind: z.ZodOptional<z.ZodEnum<["question", "report", "note"]>>;
+        choices: z.ZodOptional<z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">, string[], string[]>>;
+        replyTo: z.ZodOptional<z.ZodNumber>;
         token: z.ZodString;
         body: z.ZodString;
         to: z.ZodOptional<z.ZodEffects<z.ZodObject<{
@@ -1459,6 +1473,7 @@ export declare const methodParams: {
     }, "strip", z.ZodTypeAny, {
         body: string;
         token: string;
+        choices?: string[] | undefined;
         to?: {
             place?: {
                 epic?: string | undefined;
@@ -1472,9 +1487,12 @@ export declare const methodParams: {
             } | undefined;
         } | undefined;
         thread?: string | undefined;
+        kind?: "question" | "report" | "note" | undefined;
+        replyTo?: number | undefined;
     }, {
         body: string;
         token: string;
+        choices?: string[] | undefined;
         to?: {
             place?: {
                 epic?: string | undefined;
@@ -1488,6 +1506,46 @@ export declare const methodParams: {
             } | undefined;
         } | undefined;
         thread?: string | undefined;
+        kind?: "question" | "report" | "note" | undefined;
+        replyTo?: number | undefined;
+    }>, {
+        body: string;
+        token: string;
+        choices?: string[] | undefined;
+        to?: {
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
+            } | undefined;
+            project?: true | undefined;
+            module?: string | undefined;
+            session?: {
+                module: string;
+                session: string;
+            } | undefined;
+        } | undefined;
+        thread?: string | undefined;
+        kind?: "question" | "report" | "note" | undefined;
+        replyTo?: number | undefined;
+    }, {
+        body: string;
+        token: string;
+        choices?: string[] | undefined;
+        to?: {
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
+            } | undefined;
+            project?: true | undefined;
+            module?: string | undefined;
+            session?: {
+                module: string;
+                session: string;
+            } | undefined;
+        } | undefined;
+        thread?: string | undefined;
+        kind?: "question" | "report" | "note" | undefined;
+        replyTo?: number | undefined;
     }>;
     /** 2.41.0. What the session `token` names may read, answered with `messageReadResult`. */
     readonly 'messages.read': z.ZodObject<{
@@ -1498,16 +1556,184 @@ export declare const methodParams: {
         limit: z.ZodDefault<z.ZodNumber>;
     }, "strip", z.ZodTypeAny, {
         token: string;
-        unread: boolean;
         limit: number;
+        unread: boolean;
         since?: number | undefined;
         thread?: string | undefined;
     }, {
         token: string;
         since?: number | undefined;
         thread?: string | undefined;
-        unread?: boolean | undefined;
         limit?: number | undefined;
+        unread?: boolean | undefined;
+    }>;
+    /** 2.50.0. From a page: the messages to the asking module and the ones sent through it; answered with `messageMineResult`. */
+    readonly 'messages.mine': z.ZodObject<{
+        since: z.ZodOptional<z.ZodNumber>;
+        limit: z.ZodDefault<z.ZodNumber>;
+    }, "strip", z.ZodTypeAny, {
+        limit: number;
+        since?: number | undefined;
+    }, {
+        since?: number | undefined;
+        limit?: number | undefined;
+    }>;
+    /**
+     * 2.50.0. From a page only, on the person's press, under `messages:as-person`: the person's message;
+     * answered with `messageSendResult`. See `messageSayParams` for every condition a host holds it to.
+     */
+    readonly 'messages.say': z.ZodEffects<z.ZodObject<{
+        kind: z.ZodOptional<z.ZodEnum<["question", "report", "note"]>>;
+        choices: z.ZodOptional<z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">, string[], string[]>>;
+        replyTo: z.ZodOptional<z.ZodNumber>;
+        body: z.ZodString;
+        to: z.ZodEffects<z.ZodObject<{
+            project: z.ZodOptional<z.ZodLiteral<true>>;
+            place: z.ZodOptional<z.ZodEffects<z.ZodObject<{
+                epic: z.ZodOptional<z.ZodString>;
+                kehikko: z.ZodOptional<z.ZodString>;
+            }, "strip", z.ZodTypeAny, {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
+            }, {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
+            }>, {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
+            }, {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
+            }>>;
+            module: z.ZodOptional<z.ZodString>;
+            session: z.ZodOptional<z.ZodObject<{
+                module: z.ZodString;
+                session: z.ZodString;
+            }, "strip", z.ZodTypeAny, {
+                module: string;
+                session: string;
+            }, {
+                module: string;
+                session: string;
+            }>>;
+        }, "strip", z.ZodTypeAny, {
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
+            } | undefined;
+            project?: true | undefined;
+            module?: string | undefined;
+            session?: {
+                module: string;
+                session: string;
+            } | undefined;
+        }, {
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
+            } | undefined;
+            project?: true | undefined;
+            module?: string | undefined;
+            session?: {
+                module: string;
+                session: string;
+            } | undefined;
+        }>, {
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
+            } | undefined;
+            project?: true | undefined;
+            module?: string | undefined;
+            session?: {
+                module: string;
+                session: string;
+            } | undefined;
+        }, {
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
+            } | undefined;
+            project?: true | undefined;
+            module?: string | undefined;
+            session?: {
+                module: string;
+                session: string;
+            } | undefined;
+        }>;
+        thread: z.ZodOptional<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        to: {
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
+            } | undefined;
+            project?: true | undefined;
+            module?: string | undefined;
+            session?: {
+                module: string;
+                session: string;
+            } | undefined;
+        };
+        body: string;
+        choices?: string[] | undefined;
+        thread?: string | undefined;
+        kind?: "question" | "report" | "note" | undefined;
+        replyTo?: number | undefined;
+    }, {
+        to: {
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
+            } | undefined;
+            project?: true | undefined;
+            module?: string | undefined;
+            session?: {
+                module: string;
+                session: string;
+            } | undefined;
+        };
+        body: string;
+        choices?: string[] | undefined;
+        thread?: string | undefined;
+        kind?: "question" | "report" | "note" | undefined;
+        replyTo?: number | undefined;
+    }>, {
+        to: {
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
+            } | undefined;
+            project?: true | undefined;
+            module?: string | undefined;
+            session?: {
+                module: string;
+                session: string;
+            } | undefined;
+        };
+        body: string;
+        choices?: string[] | undefined;
+        thread?: string | undefined;
+        kind?: "question" | "report" | "note" | undefined;
+        replyTo?: number | undefined;
+    }, {
+        to: {
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
+            } | undefined;
+            project?: true | undefined;
+            module?: string | undefined;
+            session?: {
+                module: string;
+                session: string;
+            } | undefined;
+        };
+        body: string;
+        choices?: string[] | undefined;
+        thread?: string | undefined;
+        kind?: "question" | "report" | "note" | undefined;
+        replyTo?: number | undefined;
     }>;
 };
 /** The params one method takes, as a caller must construct them. */
@@ -1800,25 +2026,25 @@ export declare const dispositionsGetResult: z.ZodObject<{
         value: "done" | "wont-do" | "duplicate" | "superseded";
         at: string | null;
         by: string | null;
+        note: string;
         ref: string;
         target: string | null;
-        note: string;
     }, {
         value: "done" | "wont-do" | "duplicate" | "superseded";
         ref: string;
         at?: string | null | undefined;
         by?: string | null | undefined;
-        target?: string | null | undefined;
         note?: string | undefined;
+        target?: string | null | undefined;
     }>, "many">;
 }, "strip", z.ZodTypeAny, {
     dispositions: {
         value: "done" | "wont-do" | "duplicate" | "superseded";
         at: string | null;
         by: string | null;
+        note: string;
         ref: string;
         target: string | null;
-        note: string;
     }[];
 }, {
     dispositions: {
@@ -1826,8 +2052,8 @@ export declare const dispositionsGetResult: z.ZodObject<{
         ref: string;
         at?: string | null | undefined;
         by?: string | null | undefined;
-        target?: string | null | undefined;
         note?: string | undefined;
+        target?: string | null | undefined;
     }[];
 }>;
 export type DispositionsGetResult = z.infer<typeof dispositionsGetResult>;

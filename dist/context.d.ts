@@ -21,16 +21,16 @@ export declare const dispositionSchema: z.ZodObject<{
     value: "done" | "wont-do" | "duplicate" | "superseded";
     at: string | null;
     by: string | null;
+    note: string;
     ref: string;
     target: string | null;
-    note: string;
 }, {
     value: "done" | "wont-do" | "duplicate" | "superseded";
     ref: string;
     at?: string | null | undefined;
     by?: string | null | undefined;
-    target?: string | null | undefined;
     note?: string | undefined;
+    target?: string | null | undefined;
 }>;
 export type Disposition = z.infer<typeof dispositionSchema>;
 /**
@@ -873,16 +873,16 @@ export declare const contextSchema: z.ZodObject<{
         value: "done" | "wont-do" | "duplicate" | "superseded";
         at: string | null;
         by: string | null;
+        note: string;
         ref: string;
         target: string | null;
-        note: string;
     }, {
         value: "done" | "wont-do" | "duplicate" | "superseded";
         ref: string;
         at?: string | null | undefined;
         by?: string | null | undefined;
-        target?: string | null | undefined;
         note?: string | undefined;
+        target?: string | null | undefined;
     }>, "many">>;
     /**
      * When the open project's shared tracker reading last changed, and whether a read is in flight: the
@@ -1032,16 +1032,16 @@ export declare const contextSchema: z.ZodObject<{
         value: "done" | "wont-do" | "duplicate" | "superseded";
         at: string | null;
         by: string | null;
+        note: string;
         ref: string;
         target: string | null;
-        note: string;
     }[];
     content: {
         at: string;
         epic: string | null;
         source: string;
     }[];
-    scope?: "epic" | "kehikko" | "project" | "part" | "machine" | undefined;
+    scope?: "epic" | "kehikko" | "project" | "machine" | "part" | undefined;
 }, {
     epic?: string | null | undefined;
     parts?: {
@@ -1132,8 +1132,8 @@ export declare const contextSchema: z.ZodObject<{
         ref: string;
         at?: string | null | undefined;
         by?: string | null | undefined;
-        target?: string | null | undefined;
         note?: string | undefined;
+        target?: string | null | undefined;
     }[] | undefined;
     content?: {
         at: string;

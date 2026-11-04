@@ -222,13 +222,13 @@ export declare const trackerActivitySchema: z.ZodObject<{
     mine: z.ZodOptional<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
     at: string;
-    login: string;
     kind: "state" | "commit" | "comment" | "review";
+    login: string;
     mine?: boolean | undefined;
 }, {
     at: string;
-    login: string;
     kind: "state" | "commit" | "comment" | "review";
+    login: string;
     mine?: boolean | undefined;
 }>;
 export type TrackerActivity = z.infer<typeof trackerActivitySchema>;
@@ -502,13 +502,13 @@ export declare const trackerRowSchema: z.ZodObject<{
         mine: z.ZodOptional<z.ZodBoolean>;
     }, "strip", z.ZodTypeAny, {
         at: string;
-        login: string;
         kind: "state" | "commit" | "comment" | "review";
+        login: string;
         mine?: boolean | undefined;
     }, {
         at: string;
-        login: string;
         kind: "state" | "commit" | "comment" | "review";
+        login: string;
         mine?: boolean | undefined;
     }>>;
     /**
@@ -620,10 +620,10 @@ export declare const trackerRowSchema: z.ZodObject<{
     state: "open" | "closed" | "merged";
     url: string;
     title: string;
+    kind: "issue" | "change";
     host: string;
     ref: string;
     readAt: string;
-    kind: "issue" | "change";
     tracker: "github" | "gitlab";
     repo: string;
     labels: string[];
@@ -690,8 +690,8 @@ export declare const trackerRowSchema: z.ZodObject<{
     } | undefined;
     lastActivity?: {
         at: string;
-        login: string;
         kind: "state" | "commit" | "comment" | "review";
+        login: string;
         mine?: boolean | undefined;
     } | undefined;
     people?: Record<string, {
@@ -708,10 +708,10 @@ export declare const trackerRowSchema: z.ZodObject<{
     state: "open" | "closed" | "merged";
     url: string;
     title: string;
+    kind: "issue" | "change";
     host: string;
     ref: string;
     readAt: string;
-    kind: "issue" | "change";
     tracker: "github" | "gitlab";
     repo: string;
     detail?: {
@@ -778,8 +778,8 @@ export declare const trackerRowSchema: z.ZodObject<{
     } | undefined;
     lastActivity?: {
         at: string;
-        login: string;
         kind: "state" | "commit" | "comment" | "review";
+        login: string;
         mine?: boolean | undefined;
     } | undefined;
     people?: Record<string, {
@@ -1100,13 +1100,13 @@ export declare const trackerReadingResult: z.ZodObject<{
             mine: z.ZodOptional<z.ZodBoolean>;
         }, "strip", z.ZodTypeAny, {
             at: string;
-            login: string;
             kind: "state" | "commit" | "comment" | "review";
+            login: string;
             mine?: boolean | undefined;
         }, {
             at: string;
-            login: string;
             kind: "state" | "commit" | "comment" | "review";
+            login: string;
             mine?: boolean | undefined;
         }>>;
         /**
@@ -1218,10 +1218,10 @@ export declare const trackerReadingResult: z.ZodObject<{
         state: "open" | "closed" | "merged";
         url: string;
         title: string;
+        kind: "issue" | "change";
         host: string;
         ref: string;
         readAt: string;
-        kind: "issue" | "change";
         tracker: "github" | "gitlab";
         repo: string;
         labels: string[];
@@ -1288,8 +1288,8 @@ export declare const trackerReadingResult: z.ZodObject<{
         } | undefined;
         lastActivity?: {
             at: string;
-            login: string;
             kind: "state" | "commit" | "comment" | "review";
+            login: string;
             mine?: boolean | undefined;
         } | undefined;
         people?: Record<string, {
@@ -1306,10 +1306,10 @@ export declare const trackerReadingResult: z.ZodObject<{
         state: "open" | "closed" | "merged";
         url: string;
         title: string;
+        kind: "issue" | "change";
         host: string;
         ref: string;
         readAt: string;
-        kind: "issue" | "change";
         tracker: "github" | "gitlab";
         repo: string;
         detail?: {
@@ -1376,8 +1376,8 @@ export declare const trackerReadingResult: z.ZodObject<{
         } | undefined;
         lastActivity?: {
             at: string;
-            login: string;
             kind: "state" | "commit" | "comment" | "review";
+            login: string;
             mine?: boolean | undefined;
         } | undefined;
         people?: Record<string, {
@@ -1418,10 +1418,10 @@ export declare const trackerReadingResult: z.ZodObject<{
         state: "open" | "closed" | "merged";
         url: string;
         title: string;
+        kind: "issue" | "change";
         host: string;
         ref: string;
         readAt: string;
-        kind: "issue" | "change";
         tracker: "github" | "gitlab";
         repo: string;
         labels: string[];
@@ -1488,8 +1488,8 @@ export declare const trackerReadingResult: z.ZodObject<{
         } | undefined;
         lastActivity?: {
             at: string;
-            login: string;
             kind: "state" | "commit" | "comment" | "review";
+            login: string;
             mine?: boolean | undefined;
         } | undefined;
         people?: Record<string, {
@@ -1524,10 +1524,10 @@ export declare const trackerReadingResult: z.ZodObject<{
         state: "open" | "closed" | "merged";
         url: string;
         title: string;
+        kind: "issue" | "change";
         host: string;
         ref: string;
         readAt: string;
-        kind: "issue" | "change";
         tracker: "github" | "gitlab";
         repo: string;
         detail?: {
@@ -1594,8 +1594,8 @@ export declare const trackerReadingResult: z.ZodObject<{
         } | undefined;
         lastActivity?: {
             at: string;
-            login: string;
             kind: "state" | "commit" | "comment" | "review";
+            login: string;
             mine?: boolean | undefined;
         } | undefined;
         people?: Record<string, {

@@ -53,8 +53,8 @@ export declare const trafficNoteSchema: z.ZodObject<{
     at: number;
     path: string;
     status: number | null;
-    host: string;
     kind: string;
+    host: string;
     reason: string | null;
     ok: boolean | null;
     ms: number | null;
@@ -64,8 +64,8 @@ export declare const trafficNoteSchema: z.ZodObject<{
 }, {
     at: number;
     path: string;
-    host: string;
     kind: string;
+    host: string;
     status?: number | null | undefined;
     reason?: string | null | undefined;
     ok?: boolean | null | undefined;
@@ -183,8 +183,8 @@ export declare const trafficCallSchema: z.ZodObject<{
     path: string;
     status: number | null;
     by: string;
-    host: string;
     kind: string;
+    host: string;
     reason: string | null;
     side: "out" | "in" | "seen";
     ok: boolean | null;
@@ -208,8 +208,8 @@ export declare const trafficCallSchema: z.ZodObject<{
     at: number;
     path: string;
     by: string;
-    host: string;
     kind: string;
+    host: string;
     side: "out" | "in" | "seen";
     seq: number;
     via: "page" | "server" | "process";
@@ -238,8 +238,8 @@ export declare const trafficBudgetSchema: z.ZodObject<{
     note: z.ZodDefault<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     name: string;
-    limit: number;
     note: string;
+    limit: number;
     used: number;
     left: number;
     resets: number | null;
@@ -614,8 +614,8 @@ export declare const trafficLimitsSchema: z.ZodObject<{
             note: z.ZodDefault<z.ZodString>;
         }, "strip", z.ZodTypeAny, {
             name: string;
-            limit: number;
             note: string;
+            limit: number;
             used: number;
             left: number;
             resets: number | null;
@@ -659,8 +659,8 @@ export declare const trafficLimitsSchema: z.ZodObject<{
         } | null;
         anonymous: {
             name: string;
-            limit: number;
             note: string;
+            limit: number;
             used: number;
             left: number;
             resets: number | null;
@@ -936,8 +936,8 @@ export declare const trafficLimitsSchema: z.ZodObject<{
         } | null;
         anonymous: {
             name: string;
-            limit: number;
             note: string;
+            limit: number;
             used: number;
             left: number;
             resets: number | null;
@@ -1228,8 +1228,8 @@ export declare const trafficReadResult: z.ZodObject<{
         path: string;
         status: number | null;
         by: string;
-        host: string;
         kind: string;
+        host: string;
         reason: string | null;
         side: "out" | "in" | "seen";
         ok: boolean | null;
@@ -1253,8 +1253,8 @@ export declare const trafficReadResult: z.ZodObject<{
         at: number;
         path: string;
         by: string;
-        host: string;
         kind: string;
+        host: string;
         side: "out" | "in" | "seen";
         seq: number;
         via: "page" | "server" | "process";
@@ -1283,8 +1283,8 @@ export declare const trafficReadResult: z.ZodObject<{
         note: z.ZodDefault<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
         name: string;
-        limit: number;
         note: string;
+        limit: number;
         used: number;
         left: number;
         resets: number | null;
@@ -1526,8 +1526,8 @@ export declare const trafficReadResult: z.ZodObject<{
                 note: z.ZodDefault<z.ZodString>;
             }, "strip", z.ZodTypeAny, {
                 name: string;
-                limit: number;
                 note: string;
+                limit: number;
                 used: number;
                 left: number;
                 resets: number | null;
@@ -1571,8 +1571,8 @@ export declare const trafficReadResult: z.ZodObject<{
             } | null;
             anonymous: {
                 name: string;
-                limit: number;
                 note: string;
+                limit: number;
                 used: number;
                 left: number;
                 resets: number | null;
@@ -1848,8 +1848,8 @@ export declare const trafficReadResult: z.ZodObject<{
             } | null;
             anonymous: {
                 name: string;
-                limit: number;
                 note: string;
+                limit: number;
                 used: number;
                 left: number;
                 resets: number | null;
@@ -1965,8 +1965,8 @@ export declare const trafficReadResult: z.ZodObject<{
         path: string;
         status: number | null;
         by: string;
-        host: string;
         kind: string;
+        host: string;
         reason: string | null;
         side: "out" | "in" | "seen";
         ok: boolean | null;
@@ -1993,8 +1993,8 @@ export declare const trafficReadResult: z.ZodObject<{
     kept: number;
     budgets: {
         name: string;
-        limit: number;
         note: string;
+        limit: number;
         used: number;
         left: number;
         resets: number | null;
@@ -2050,8 +2050,8 @@ export declare const trafficReadResult: z.ZodObject<{
             } | null;
             anonymous: {
                 name: string;
-                limit: number;
                 note: string;
+                limit: number;
                 used: number;
                 left: number;
                 resets: number | null;
@@ -2095,8 +2095,8 @@ export declare const trafficReadResult: z.ZodObject<{
         at: number;
         path: string;
         by: string;
-        host: string;
         kind: string;
+        host: string;
         side: "out" | "in" | "seen";
         seq: number;
         via: "page" | "server" | "process";

@@ -100,6 +100,8 @@ export async function answerMessageTool(name: string, args: Record<string, unkno
     const params: Record<string, unknown> = { token, body: given.body }
     if (given.to !== undefined) params.to = given.to
     if (given.thread !== undefined) params.thread = given.thread
+    /* 2.50.0: what it is, a question's choices, and what it answers. A host before 2.50.0 drops them. */
+    for (const key of ['kind', 'choices', 'replyTo'] as const) if (given[key] !== undefined) params[key] = given[key]
     const sent = await askHost('messages.send', params, rest)
     if (!sent.ok) return { text: `Not sent: ${sent.why}`, isError: true }
     return { text: sentText(sent.data), isError: sent.data.outcome !== 'sent' }

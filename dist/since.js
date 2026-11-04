@@ -40,6 +40,8 @@ export const METHOD_SINCE = {
     'dispositions.get': '2.21.0',
     'messages.send': '2.41.0',
     'messages.read': '2.41.0',
+    'messages.mine': '2.50.0',
+    'messages.say': '2.50.0',
 };
 /** Each capability, and the version that added it: the oldest of its methods. */
 export const CAPABILITY_SINCE = {
@@ -69,6 +71,7 @@ export const CAPABILITY_SINCE = {
     'parts:read': '2.21.0',
     'dispositions:read': '2.21.0',
     'agents:message': '2.41.0',
+    'messages:as-person': '2.50.0',
 };
 /** Each method a module's server may ask (`SERVER_METHODS`), and the version a server could first ask it in. */
 export const SERVER_METHOD_SINCE = {
@@ -250,6 +253,7 @@ export const PIECE_SAID = {
         'parts:read': "an epic's parts from the host",
         'dispositions:read': 'marks for why references closed, from the host',
         'agents:message': 'messages between agent sessions',
+        'messages:as-person': 'messages to agent sessions as the person',
     },
     declarations: {
         'mcp.subjects': 'door subjects',

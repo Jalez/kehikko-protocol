@@ -16,7 +16,7 @@ declare const modeSchema: z.ZodObject<{
      * tells the one in use as `context.scope`. Absent, the pre-2.29.0 `global` and a word a later
      * version adds all read as `epic` (`readScope`), so no manifest is refused for it. See `scope.ts`.
      */
-    scope: z.ZodEffects<z.ZodCatch<z.ZodOptional<z.ZodEnum<["machine", "project", "epic", "part", "kehikko", "global"]>>>, "epic" | "kehikko" | "project" | "part" | "machine", unknown>;
+    scope: z.ZodEffects<z.ZodCatch<z.ZodOptional<z.ZodEnum<["machine", "project", "epic", "part", "kehikko", "global"]>>>, "epic" | "kehikko" | "project" | "machine" | "part", unknown>;
     /**
      * 2.29.0. What the module shows at this scope, in one line a host puts beside the scope's name
      * ("every project's test runs, whatever is open here"). Optional; a host ignores it before 2.29.0.
@@ -25,7 +25,7 @@ declare const modeSchema: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     id: string;
     label: string;
-    scope: "epic" | "kehikko" | "project" | "part" | "machine";
+    scope: "epic" | "kehikko" | "project" | "machine" | "part";
     scopeSays?: string | undefined;
 }, {
     id: string;
@@ -444,7 +444,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
          * tells the one in use as `context.scope`. Absent, the pre-2.29.0 `global` and a word a later
          * version adds all read as `epic` (`readScope`), so no manifest is refused for it. See `scope.ts`.
          */
-        scope: z.ZodEffects<z.ZodCatch<z.ZodOptional<z.ZodEnum<["machine", "project", "epic", "part", "kehikko", "global"]>>>, "epic" | "kehikko" | "project" | "part" | "machine", unknown>;
+        scope: z.ZodEffects<z.ZodCatch<z.ZodOptional<z.ZodEnum<["machine", "project", "epic", "part", "kehikko", "global"]>>>, "epic" | "kehikko" | "project" | "machine" | "part", unknown>;
         /**
          * 2.29.0. What the module shows at this scope, in one line a host puts beside the scope's name
          * ("every project's test runs, whatever is open here"). Optional; a host ignores it before 2.29.0.
@@ -453,7 +453,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     }, "strip", z.ZodTypeAny, {
         id: string;
         label: string;
-        scope: "epic" | "kehikko" | "project" | "part" | "machine";
+        scope: "epic" | "kehikko" | "project" | "machine" | "part";
         scopeSays?: string | undefined;
     }, {
         id: string;
@@ -582,22 +582,22 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             scope: "project" | "machine";
             description: string;
             personOnly: boolean;
-            default?: unknown;
             choices?: {
                 value: string;
                 label: string;
             }[] | undefined;
+            default?: unknown;
         }, {
             type: "string" | "number" | "boolean" | "choice" | "list";
             key: string;
             label: string;
-            default?: unknown;
-            scope?: "project" | "machine" | undefined;
-            description?: string | undefined;
             choices?: {
                 value: string;
                 label: string;
             }[] | undefined;
+            default?: unknown;
+            scope?: "project" | "machine" | undefined;
+            description?: string | undefined;
             personOnly?: boolean | undefined;
         }>, {
             type: "string" | "number" | "boolean" | "choice" | "list";
@@ -606,22 +606,22 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             scope: "project" | "machine";
             description: string;
             personOnly: boolean;
-            default?: unknown;
             choices?: {
                 value: string;
                 label: string;
             }[] | undefined;
+            default?: unknown;
         }, {
             type: "string" | "number" | "boolean" | "choice" | "list";
             key: string;
             label: string;
-            default?: unknown;
-            scope?: "project" | "machine" | undefined;
-            description?: string | undefined;
             choices?: {
                 value: string;
                 label: string;
             }[] | undefined;
+            default?: unknown;
+            scope?: "project" | "machine" | undefined;
+            description?: string | undefined;
             personOnly?: boolean | undefined;
         }>, "many">, {
             type: "string" | "number" | "boolean" | "choice" | "list";
@@ -630,22 +630,22 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             scope: "project" | "machine";
             description: string;
             personOnly: boolean;
-            default?: unknown;
             choices?: {
                 value: string;
                 label: string;
             }[] | undefined;
+            default?: unknown;
         }[], {
             type: "string" | "number" | "boolean" | "choice" | "list";
             key: string;
             label: string;
-            default?: unknown;
-            scope?: "project" | "machine" | undefined;
-            description?: string | undefined;
             choices?: {
                 value: string;
                 label: string;
             }[] | undefined;
+            default?: unknown;
+            scope?: "project" | "machine" | undefined;
+            description?: string | undefined;
             personOnly?: boolean | undefined;
         }[]>>>;
         /**
@@ -676,11 +676,11 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             scope: "project" | "machine";
             description: string;
             personOnly: boolean;
-            default?: unknown;
             choices?: {
                 value: string;
                 label: string;
             }[] | undefined;
+            default?: unknown;
         }[] | undefined;
         agentSessions?: {
             loadsSkills: boolean;
@@ -728,10 +728,10 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     id: string;
     name: string;
+    kind: "kehikot.module";
     version: string;
     protocol: number;
     summary: string;
-    kind: "kehikot.module";
     declares: {
         protocol: string;
         prompt: boolean;
@@ -751,11 +751,11 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             scope: "project" | "machine";
             description: string;
             personOnly: boolean;
-            default?: unknown;
             choices?: {
                 value: string;
                 label: string;
             }[] | undefined;
+            default?: unknown;
         }[] | undefined;
         agentSessions?: {
             loadsSkills: boolean;
@@ -776,7 +776,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     modes: {
         id: string;
         label: string;
-        scope: "epic" | "kehikko" | "project" | "part" | "machine";
+        scope: "epic" | "kehikko" | "project" | "machine" | "part";
         scopeSays?: string | undefined;
     }[];
     opens?: string[] | undefined;
@@ -816,8 +816,8 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
 }, {
     id: string;
     name: string;
-    protocol: number;
     kind: "kehikot.module";
+    protocol: number;
     entry: string;
     modes: {
         id: string;
@@ -879,10 +879,10 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
 }>, {
     id: string;
     name: string;
+    kind: "kehikot.module";
     version: string;
     protocol: number;
     summary: string;
-    kind: "kehikot.module";
     declares: {
         protocol: string;
         prompt: boolean;
@@ -902,11 +902,11 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             scope: "project" | "machine";
             description: string;
             personOnly: boolean;
-            default?: unknown;
             choices?: {
                 value: string;
                 label: string;
             }[] | undefined;
+            default?: unknown;
         }[] | undefined;
         agentSessions?: {
             loadsSkills: boolean;
@@ -927,7 +927,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     modes: {
         id: string;
         label: string;
-        scope: "epic" | "kehikko" | "project" | "part" | "machine";
+        scope: "epic" | "kehikko" | "project" | "machine" | "part";
         scopeSays?: string | undefined;
     }[];
     opens?: string[] | undefined;
@@ -967,8 +967,8 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
 }, {
     id: string;
     name: string;
-    protocol: number;
     kind: "kehikot.module";
+    protocol: number;
     entry: string;
     modes: {
         id: string;

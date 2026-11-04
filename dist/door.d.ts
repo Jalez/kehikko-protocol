@@ -506,6 +506,7 @@ export declare const placeDoorsSchema: z.ZodObject<{
                 kehikko: string | null;
                 parts?: unknown;
             }>;
+            person: z.ZodCatch<z.ZodDefault<z.ZodBoolean>>;
         }, "strip", z.ZodTypeAny, {
             name: string;
             place: {
@@ -515,6 +516,7 @@ export declare const placeDoorsSchema: z.ZodObject<{
             };
             module: string;
             session: string | null;
+            person: boolean;
         }, {
             place: {
                 epic: string | null;
@@ -524,6 +526,7 @@ export declare const placeDoorsSchema: z.ZodObject<{
             module: string;
             session: string | null;
             name?: unknown;
+            person?: unknown;
         }>;
         to: z.ZodEffects<z.ZodObject<{
             project: z.ZodOptional<z.ZodLiteral<true>>;
@@ -601,9 +604,13 @@ export declare const placeDoorsSchema: z.ZodObject<{
         }>;
         thread: z.ZodCatch<z.ZodNullable<z.ZodString>>;
         body: z.ZodString;
+        kind: z.ZodCatch<z.ZodDefault<z.ZodEnum<["question", "report", "note"]>>>;
+        choices: z.ZodCatch<z.ZodDefault<z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">, string[], string[]>>>;
+        replyTo: z.ZodCatch<z.ZodDefault<z.ZodNullable<z.ZodNumber>>>;
     }, "strip", z.ZodTypeAny, {
         at: string;
         id: number;
+        choices: string[];
         from: {
             name: string;
             place: {
@@ -613,6 +620,7 @@ export declare const placeDoorsSchema: z.ZodObject<{
             };
             module: string;
             session: string | null;
+            person: boolean;
         };
         to: {
             place?: {
@@ -628,6 +636,8 @@ export declare const placeDoorsSchema: z.ZodObject<{
         };
         thread: string | null;
         body: string;
+        kind: "question" | "report" | "note";
+        replyTo: number | null;
     }, {
         at: string;
         id: number;
@@ -640,6 +650,7 @@ export declare const placeDoorsSchema: z.ZodObject<{
             module: string;
             session: string | null;
             name?: unknown;
+            person?: unknown;
         };
         to: {
             place?: {
@@ -654,7 +665,10 @@ export declare const placeDoorsSchema: z.ZodObject<{
             } | undefined;
         };
         body: string;
+        choices?: unknown;
         thread?: unknown;
+        kind?: unknown;
+        replyTo?: unknown;
     }>, "many">>>;
     /** 2.41.0. How many more unread wait beyond `messages`: handed at the next ask. */
     messagesMore: z.ZodCatch<z.ZodOptional<z.ZodNumber>>;
@@ -670,6 +684,7 @@ export declare const placeDoorsSchema: z.ZodObject<{
     messages?: {
         at: string;
         id: number;
+        choices: string[];
         from: {
             name: string;
             place: {
@@ -679,6 +694,7 @@ export declare const placeDoorsSchema: z.ZodObject<{
             };
             module: string;
             session: string | null;
+            person: boolean;
         };
         to: {
             place?: {
@@ -694,6 +710,8 @@ export declare const placeDoorsSchema: z.ZodObject<{
         };
         thread: string | null;
         body: string;
+        kind: "question" | "report" | "note";
+        replyTo: number | null;
     }[] | undefined;
     modules?: {
         name: string;
