@@ -1025,6 +1025,39 @@ export declare const footerSchema: z.ZodObject<{
         align?: "start" | "center" | "end" | undefined;
         optional?: boolean | undefined;
         tooltip?: string | undefined;
+    }>, z.ZodObject<{
+        align: z.ZodDefault<z.ZodEnum<["start", "center", "end"]>>;
+        optional: z.ZodDefault<z.ZodBoolean>;
+        tooltip: z.ZodOptional<z.ZodString>;
+        kind: z.ZodLiteral<"input">;
+        id: z.ZodEffects<z.ZodString, string, string>;
+        label: z.ZodString;
+        value: z.ZodDefault<z.ZodString>;
+        placeholder: z.ZodOptional<z.ZodString>;
+        grow: z.ZodDefault<z.ZodBoolean>;
+        agents: z.ZodDefault<z.ZodBoolean>;
+    }, "strip", z.ZodTypeAny, {
+        value: string;
+        id: string;
+        label: string;
+        kind: "input";
+        agents: boolean;
+        align: "start" | "center" | "end";
+        optional: boolean;
+        grow: boolean;
+        tooltip?: string | undefined;
+        placeholder?: string | undefined;
+    }, {
+        id: string;
+        label: string;
+        kind: "input";
+        value?: string | undefined;
+        agents?: boolean | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+        placeholder?: string | undefined;
+        grow?: boolean | undefined;
     }>]>, {
         id: string;
         kind: "text";
@@ -1110,6 +1143,17 @@ export declare const footerSchema: z.ZodObject<{
         shortcut?: string | undefined;
         tool?: string | undefined;
         tooltip?: string | undefined;
+    } | {
+        value: string;
+        id: string;
+        label: string;
+        kind: "input";
+        agents: boolean;
+        align: "start" | "center" | "end";
+        optional: boolean;
+        grow: boolean;
+        tooltip?: string | undefined;
+        placeholder?: string | undefined;
     }, {
         id: string;
         kind: "text";
@@ -1195,6 +1239,17 @@ export declare const footerSchema: z.ZodObject<{
         align?: "start" | "center" | "end" | undefined;
         optional?: boolean | undefined;
         tooltip?: string | undefined;
+    } | {
+        id: string;
+        label: string;
+        kind: "input";
+        value?: string | undefined;
+        agents?: boolean | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+        placeholder?: string | undefined;
+        grow?: boolean | undefined;
     }>, "many">, ({
         id: string;
         kind: "text";
@@ -1280,6 +1335,17 @@ export declare const footerSchema: z.ZodObject<{
         shortcut?: string | undefined;
         tool?: string | undefined;
         tooltip?: string | undefined;
+    } | {
+        value: string;
+        id: string;
+        label: string;
+        kind: "input";
+        agents: boolean;
+        align: "start" | "center" | "end";
+        optional: boolean;
+        grow: boolean;
+        tooltip?: string | undefined;
+        placeholder?: string | undefined;
     })[], ({
         id: string;
         kind: "text";
@@ -1365,6 +1431,17 @@ export declare const footerSchema: z.ZodObject<{
         align?: "start" | "center" | "end" | undefined;
         optional?: boolean | undefined;
         tooltip?: string | undefined;
+    } | {
+        id: string;
+        label: string;
+        kind: "input";
+        value?: string | undefined;
+        agents?: boolean | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+        placeholder?: string | undefined;
+        grow?: boolean | undefined;
     })[]>;
 }, "strip", z.ZodTypeAny, {
     type: "kehikot.footer";
@@ -1453,6 +1530,17 @@ export declare const footerSchema: z.ZodObject<{
         shortcut?: string | undefined;
         tool?: string | undefined;
         tooltip?: string | undefined;
+    } | {
+        value: string;
+        id: string;
+        label: string;
+        kind: "input";
+        agents: boolean;
+        align: "start" | "center" | "end";
+        optional: boolean;
+        grow: boolean;
+        tooltip?: string | undefined;
+        placeholder?: string | undefined;
     })[];
 }, {
     type: "kehikot.footer";
@@ -1541,6 +1629,17 @@ export declare const footerSchema: z.ZodObject<{
         align?: "start" | "center" | "end" | undefined;
         optional?: boolean | undefined;
         tooltip?: string | undefined;
+    } | {
+        id: string;
+        label: string;
+        kind: "input";
+        value?: string | undefined;
+        agents?: boolean | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+        placeholder?: string | undefined;
+        grow?: boolean | undefined;
     })[];
 }>;
 export type Footer = z.infer<typeof footerSchema>;
@@ -1572,6 +1671,12 @@ export declare const pressSchema: z.ZodObject<{
      * could not (the clipboard refused), or a run that asks for neither.
      */
     carried: z.ZodOptional<z.ZodEnum<["copy", "open"]>>;
+    /**
+     * 2.46.0. The text submitted in a footer field (`kind: 'input'`): what the person typed when they
+     * pressed Enter, whole, possibly empty. Only for a field; absent for every other press. A module
+     * built before 2.46.0 strips it, and could not have declared a field.
+     */
+    text: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     type: "kehikot.press";
     id: string;
@@ -1579,6 +1684,7 @@ export declare const pressSchema: z.ZodObject<{
     item: string;
     value?: string | boolean | undefined;
     place?: "header" | "footer" | undefined;
+    text?: string | undefined;
     carried?: "open" | "copy" | undefined;
 }, {
     type: "kehikot.press";
@@ -1587,6 +1693,7 @@ export declare const pressSchema: z.ZodObject<{
     item: string;
     value?: string | boolean | undefined;
     place?: "header" | "footer" | undefined;
+    text?: string | undefined;
     carried?: "open" | "copy" | undefined;
 }>;
 export type Press = z.infer<typeof pressSchema>;
@@ -2306,6 +2413,13 @@ export declare const helloSchema: z.ZodObject<{
      * act in its own page, where it has the person's click. Names a host does not know are kept.
      */
     carries: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+    /**
+     * 2.46.0. The footer item kinds this host draws (`FOOTER_KINDS`), when it draws a footer at all.
+     * Absent from a host before 2.46.0, which draws the 2.38.0 kinds (`FOOTER_KINDS_2_38`) and refuses
+     * a footer naming any other: declare a field (`input`) only when this names it. `footerDraws` is
+     * the rule. Names a host does not know are kept.
+     */
+    footerKinds: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
 }, "strip", z.ZodTypeAny, {
     type: "kehikot.hello";
     state: string | null;
@@ -2414,6 +2528,7 @@ export declare const helloSchema: z.ZodObject<{
     footer?: boolean | undefined;
     answers?: string[] | undefined;
     carries?: string[] | undefined;
+    footerKinds?: string[] | undefined;
 }, {
     type: "kehikot.hello";
     session: string;
@@ -2522,6 +2637,7 @@ export declare const helloSchema: z.ZodObject<{
     footer?: boolean | undefined;
     answers?: string[] | undefined;
     carries?: string[] | undefined;
+    footerKinds?: string[] | undefined;
 }>;
 /**
  * Host → module. Which epic is open now: the `contextSchema` fields flat, not wrapped in `context`.
@@ -4229,6 +4345,13 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
      * act in its own page, where it has the person's click. Names a host does not know are kept.
      */
     carries: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+    /**
+     * 2.46.0. The footer item kinds this host draws (`FOOTER_KINDS`), when it draws a footer at all.
+     * Absent from a host before 2.46.0, which draws the 2.38.0 kinds (`FOOTER_KINDS_2_38`) and refuses
+     * a footer naming any other: declare a field (`input`) only when this names it. `footerDraws` is
+     * the rule. Names a host does not know are kept.
+     */
+    footerKinds: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
 }, "strip", z.ZodTypeAny, {
     type: "kehikot.hello";
     state: string | null;
@@ -4337,6 +4460,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     footer?: boolean | undefined;
     answers?: string[] | undefined;
     carries?: string[] | undefined;
+    footerKinds?: string[] | undefined;
 }, {
     type: "kehikot.hello";
     session: string;
@@ -4445,6 +4569,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     footer?: boolean | undefined;
     answers?: string[] | undefined;
     carries?: string[] | undefined;
+    footerKinds?: string[] | undefined;
 }>, z.ZodObject<{
     epic: z.ZodDefault<z.ZodNullable<z.ZodString>>;
     scope: z.ZodCatch<z.ZodOptional<z.ZodEnum<["machine", "project", "epic", "part", "kehikko"]>>>;
@@ -5274,6 +5399,12 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
      * could not (the clipboard refused), or a run that asks for neither.
      */
     carried: z.ZodOptional<z.ZodEnum<["copy", "open"]>>;
+    /**
+     * 2.46.0. The text submitted in a footer field (`kind: 'input'`): what the person typed when they
+     * pressed Enter, whole, possibly empty. Only for a field; absent for every other press. A module
+     * built before 2.46.0 strips it, and could not have declared a field.
+     */
+    text: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     type: "kehikot.press";
     id: string;
@@ -5281,6 +5412,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     item: string;
     value?: string | boolean | undefined;
     place?: "header" | "footer" | undefined;
+    text?: string | undefined;
     carried?: "open" | "copy" | undefined;
 }, {
     type: "kehikot.press";
@@ -5289,6 +5421,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     item: string;
     value?: string | boolean | undefined;
     place?: "header" | "footer" | undefined;
+    text?: string | undefined;
     carried?: "open" | "copy" | undefined;
 }>, z.ZodObject<{
     type: z.ZodLiteral<"kehikot.opened">;
@@ -6388,6 +6521,39 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         align?: "start" | "center" | "end" | undefined;
         optional?: boolean | undefined;
         tooltip?: string | undefined;
+    }>, z.ZodObject<{
+        align: z.ZodDefault<z.ZodEnum<["start", "center", "end"]>>;
+        optional: z.ZodDefault<z.ZodBoolean>;
+        tooltip: z.ZodOptional<z.ZodString>;
+        kind: z.ZodLiteral<"input">;
+        id: z.ZodEffects<z.ZodString, string, string>;
+        label: z.ZodString;
+        value: z.ZodDefault<z.ZodString>;
+        placeholder: z.ZodOptional<z.ZodString>;
+        grow: z.ZodDefault<z.ZodBoolean>;
+        agents: z.ZodDefault<z.ZodBoolean>;
+    }, "strip", z.ZodTypeAny, {
+        value: string;
+        id: string;
+        label: string;
+        kind: "input";
+        agents: boolean;
+        align: "start" | "center" | "end";
+        optional: boolean;
+        grow: boolean;
+        tooltip?: string | undefined;
+        placeholder?: string | undefined;
+    }, {
+        id: string;
+        label: string;
+        kind: "input";
+        value?: string | undefined;
+        agents?: boolean | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+        placeholder?: string | undefined;
+        grow?: boolean | undefined;
     }>]>, {
         id: string;
         kind: "text";
@@ -6473,6 +6639,17 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         shortcut?: string | undefined;
         tool?: string | undefined;
         tooltip?: string | undefined;
+    } | {
+        value: string;
+        id: string;
+        label: string;
+        kind: "input";
+        agents: boolean;
+        align: "start" | "center" | "end";
+        optional: boolean;
+        grow: boolean;
+        tooltip?: string | undefined;
+        placeholder?: string | undefined;
     }, {
         id: string;
         kind: "text";
@@ -6558,6 +6735,17 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         align?: "start" | "center" | "end" | undefined;
         optional?: boolean | undefined;
         tooltip?: string | undefined;
+    } | {
+        id: string;
+        label: string;
+        kind: "input";
+        value?: string | undefined;
+        agents?: boolean | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+        placeholder?: string | undefined;
+        grow?: boolean | undefined;
     }>, "many">, ({
         id: string;
         kind: "text";
@@ -6643,6 +6831,17 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         shortcut?: string | undefined;
         tool?: string | undefined;
         tooltip?: string | undefined;
+    } | {
+        value: string;
+        id: string;
+        label: string;
+        kind: "input";
+        agents: boolean;
+        align: "start" | "center" | "end";
+        optional: boolean;
+        grow: boolean;
+        tooltip?: string | undefined;
+        placeholder?: string | undefined;
     })[], ({
         id: string;
         kind: "text";
@@ -6728,6 +6927,17 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         align?: "start" | "center" | "end" | undefined;
         optional?: boolean | undefined;
         tooltip?: string | undefined;
+    } | {
+        id: string;
+        label: string;
+        kind: "input";
+        value?: string | undefined;
+        agents?: boolean | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+        placeholder?: string | undefined;
+        grow?: boolean | undefined;
     })[]>;
 }, "strip", z.ZodTypeAny, {
     type: "kehikot.footer";
@@ -6816,6 +7026,17 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         shortcut?: string | undefined;
         tool?: string | undefined;
         tooltip?: string | undefined;
+    } | {
+        value: string;
+        id: string;
+        label: string;
+        kind: "input";
+        agents: boolean;
+        align: "start" | "center" | "end";
+        optional: boolean;
+        grow: boolean;
+        tooltip?: string | undefined;
+        placeholder?: string | undefined;
     })[];
 }, {
     type: "kehikot.footer";
@@ -6904,6 +7125,17 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         align?: "start" | "center" | "end" | undefined;
         optional?: boolean | undefined;
         tooltip?: string | undefined;
+    } | {
+        id: string;
+        label: string;
+        kind: "input";
+        value?: string | undefined;
+        agents?: boolean | undefined;
+        align?: "start" | "center" | "end" | undefined;
+        optional?: boolean | undefined;
+        tooltip?: string | undefined;
+        placeholder?: string | undefined;
+        grow?: boolean | undefined;
     })[];
 }>]>;
 export type ModuleMessage = z.infer<typeof moduleMessageSchema>;

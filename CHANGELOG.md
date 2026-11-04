@@ -7,6 +7,34 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.46.0 — 2026-11-04
+
+A field in the footer. **Additive**; `PROTOCOL` is still 2. [docs/footer.md](docs/footer.md), "A field
+to type into".
+
+### Added
+
+- **Footer `input`** (`FOOTER_KINDS` gains `'input'`; type `InputFooterItem`, guard
+  `inputFooterItem`): `{ kind: 'input', id, label, value, placeholder?, grow?, agents? }` plus the
+  footer's `align`, `optional` and `tooltip`. One line the person types into: `value` is the text the
+  module holds now, `label` the field's accessible name, `grow` takes the width the row has left.
+  Enter sends `kehikot.press` with `place: 'footer'` and `text`; Escape puts `value` back. A host keeps
+  what the person is typing while the field has focus and shows `value` again when it loses focus
+  without a submit. Kept in the row at every width (shrinking) unless `optional`; never in "⋯".
+- **`press.text`**: the text submitted in a footer field, at most `LIMITS.FOOTER_INPUT` characters.
+  Handed to `onPress` with the rest of the press. `footerPressRefusal` refuses a field's press without it.
+- **`hello.footerKinds`**: the footer kinds a host draws. Absent from a host before 2.46.0, which draws
+  `FOOTER_KINDS_2_38` and refuses a footer that names any other kind. `HostFacts.footerKinds`,
+  `footerKinds` on `hostStore` and `useHost`. `footerDraws(facts, kind)` is the rule a module asks
+  before it declares a field.
+- `LIMITS.FOOTER_INPUT` (2048) and `LIMITS.FOOTER_PLACEHOLDER` (80). `WIRE_SINCE` gains `footer.input`,
+  `press.text` and `hello.footerKinds`.
+
+### Changed
+
+- `pressableFooterItem` is true only for the header's four kinds; a field is submitted, not pressed.
+  A press for an id that is not there names the fields among what can be pressed.
+
 ## 2.45.0 — 2026-11-02
 
 Whether a module's page is on screen. **Additive**; `PROTOCOL` is still 2.

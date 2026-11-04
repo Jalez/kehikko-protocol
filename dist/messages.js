@@ -128,6 +128,12 @@ export const pressSchema = z.object({
      * could not (the clipboard refused), or a run that asks for neither.
      */
     carried: z.enum(RUN_CARRIES).optional(),
+    /**
+     * 2.46.0. The text submitted in a footer field (`kind: 'input'`): what the person typed when they
+     * pressed Enter, whole, possibly empty. Only for a field; absent for every other press. A module
+     * built before 2.46.0 strips it, and could not have declared a field.
+     */
+    text: z.string().max(LIMITS.FOOTER_INPUT).optional(),
 });
 /**
  * Module → host. What became of one press: taken, or not and why. "Taken" is not "finished": a run
@@ -182,6 +188,13 @@ export const helloSchema = z.object({
      * act in its own page, where it has the person's click. Names a host does not know are kept.
      */
     carries: z.array(z.string().min(1).max(16)).max(8).optional(),
+    /**
+     * 2.46.0. The footer item kinds this host draws (`FOOTER_KINDS`), when it draws a footer at all.
+     * Absent from a host before 2.46.0, which draws the 2.38.0 kinds (`FOOTER_KINDS_2_38`) and refuses
+     * a footer naming any other: declare a field (`input`) only when this names it. `footerDraws` is
+     * the rule. Names a host does not know are kept.
+     */
+    footerKinds: z.array(z.string().min(1).max(16)).max(16).optional(),
 });
 /**
  * Host → module. Which epic is open now: the `contextSchema` fields flat, not wrapped in `context`.

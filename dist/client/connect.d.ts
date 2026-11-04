@@ -94,6 +94,11 @@ export interface HostFacts {
      * names the act; otherwise do the act in your own page.
      */
     carries: readonly string[] | null;
+    /**
+     * 2.46.0. The footer item kinds this host draws, or `null` from a host before 2.46.0, which draws
+     * the 2.38.0 kinds and no field. `footerDraws(facts, 'input')` is the rule.
+     */
+    footerKinds: readonly string[] | null;
 }
 export interface HostEvents {
     /**
@@ -132,10 +137,11 @@ export interface HostEvents {
      * through the host: `item` is its id, `value` the option chosen (switch, go) or the state wanted
      * (toggle). Only reaches a page that declared the item with `header`; a press the last header
      * cannot take is refused before this is called. 2.38.0: `place` is `'footer'` for an item of the
-     * page's footer (declared with `footer`), absent for one of its header. Do it, declare the header again, and return
+     * page's footer (declared with `footer`), absent for one of its header. 2.46.0: a footer field
+     * submitted with Enter arrives here too, with `text` (what was typed). Do it, declare the header again, and return
      * nothing — or return the sentence saying why not. `connect` answers the host exactly once.
      */
-    onPress?: (press: Pick<Press, 'item' | 'value' | 'place' | 'carried'>) => PressAnswer | Promise<PressAnswer>;
+    onPress?: (press: Pick<Press, 'item' | 'value' | 'place' | 'carried' | 'text'>) => PressAnswer | Promise<PressAnswer>;
     /**
      * The person opened one of this module's Inbox items (2.35.0): pressed it in the Inbox, on a
      * toast or with Next, and the host has gone to its place. `item` is the id the module reported.

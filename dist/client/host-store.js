@@ -83,7 +83,7 @@ export function hostFields(context, was, same = {}) {
 export function hostStore(id, events = {}, options = {}) {
     const { grace = GREETING_GRACE_MS, kept: given, applyTheme: themed = true, reloadWhenStale: reloads = true, same, ...connectOptions } = options;
     const codec = given ?? JSON_KEPT;
-    let standing = { where: 'listening', context: null, ...hostFields(null), theme: pageTheme() ?? 'light', kept: null, answers: null, drawsHeader: null, drawsFooter: null, hostCarries: null, covered: NOT_COVERED, visible: true };
+    let standing = { where: 'listening', context: null, ...hostFields(null), theme: pageTheme() ?? 'light', kept: null, answers: null, drawsHeader: null, drawsFooter: null, hostCarries: null, footerKinds: null, covered: NOT_COVERED, visible: true };
     const hearers = new Set();
     let live = null;
     let stopped = false;
@@ -99,7 +99,7 @@ export function hostStore(id, events = {}, options = {}) {
         if (themed)
             applyTheme(theme, { remember: true });
         /* The kept state with the context, in one change, so the first hosted standing already has the remembered choice. */
-        change({ where: 'hosted', context, ...hostFields(context, standing, same), theme, ...(state !== undefined ? { kept: codec.read(state) } : {}), ...(facts ? { answers: facts.answers, drawsHeader: facts.header, drawsFooter: facts.footer ?? null, hostCarries: facts.carries ?? null, covered: NOT_COVERED } : {}) });
+        change({ where: 'hosted', context, ...hostFields(context, standing, same), theme, ...(state !== undefined ? { kept: codec.read(state) } : {}), ...(facts ? { answers: facts.answers, drawsHeader: facts.header, drawsFooter: facts.footer ?? null, hostCarries: facts.carries ?? null, footerKinds: facts.footerKinds ?? null, covered: NOT_COVERED } : {}) });
     };
     const store = {
         get: () => standing,

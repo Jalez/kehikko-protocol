@@ -12,8 +12,27 @@ import { LIMITS } from './limits.js';
 export const FOOTER_ALIGNS = ['start', 'center', 'end'];
 /** How much a text or a meter asks to be noticed. A host never says it with colour alone. */
 export const FOOTER_LEVELS = ['normal', 'warn', 'critical'];
-/** The kinds of footer item: two that only say something, and the header's four that can be pressed. */
-export const FOOTER_KINDS = ['text', 'meter', 'switch', 'toggle', 'go', 'run'];
+/**
+ * The kinds of footer item: two that only say something, the header's four that can be pressed, and
+ * (2.46.0) a field the person types into.
+ */
+export const FOOTER_KINDS = ['text', 'meter', 'switch', 'toggle', 'go', 'run', 'input'];
+/**
+ * The kinds a host before 2.46.0 draws: what a module may count on when the greeting says
+ * `footer: true` and names no `footerKinds`.
+ */
+export const FOOTER_KINDS_2_38 = ['text', 'meter', 'switch', 'toggle', 'go', 'run'];
+/**
+ * Whether the host draws footer items of this kind (2.46.0): `footer` and `footerKinds` as the
+ * greeting said them (`HostFacts`, or `drawsFooter` and `footerKinds` on `hostStore`). No footer at
+ * all is no kind; a host that draws a footer and names no kinds draws the 2.38.0 ones.
+ */
+export function footerDraws(facts, kind) {
+    if (facts.footer !== true)
+        return false;
+    const kinds = facts.footerKinds ?? FOOTER_KINDS_2_38;
+    return kinds.includes(kind);
+}
 /** The kinds a person (or an agent, when the item says so) can press. */
 export const FOOTER_PRESSABLE = ['switch', 'toggle', 'go', 'run'];
 /** What every footer item has besides its kind's own fields. */
@@ -56,12 +75,32 @@ const toggleItem = HEADER_ITEM_SHAPES.toggle.extend(placed);
 const goItem = HEADER_ITEM_SHAPES.go.extend(placed);
 const runItem = HEADER_ITEM_SHAPES.run.omit({ surface: true, pinned: true }).extend(placed);
 /**
+ * A field the person types one line into (2.46.0): an address, a search, a filter. The module owns
+ * the text: `value` is what it holds now, and the host draws it in the field until the person types.
+ * Enter sends the typed text as a press (`text`, `place: 'footer'`); Escape puts `value` back.
+ */
+const inputItem = z.object({
+    kind: z.literal('input'),
+    id: headerIdSchema,
+    /** The field's accessible name: `Address`, `Search`. Not drawn beside it; the placeholder is what shows. */
+    label: headerLabelSchema,
+    /** The text the module holds now. Drawn in the field whenever the person is not typing in it. */
+    value: z.string().max(LIMITS.FOOTER_INPUT).default(''),
+    /** What the empty field says: `Type an address`. Text, never markup. */
+    placeholder: z.string().min(1).max(LIMITS.FOOTER_PLACEHOLDER).optional(),
+    /** Take the width the row has left over. Without it the field keeps a modest width and still shrinks. */
+    grow: z.boolean().default(false),
+    /** Whether an agent may submit text into it through the host. False unless said. */
+    agents: z.boolean().default(false),
+    ...placed,
+});
+/**
  * One item of a module's footer. `text`: a status line or a count. `meter`: how full something is,
  * with how worried to be about it. `switch`, `toggle`, `go`, `run`: the header's kinds, the same
- * fields and the same press.
+ * fields and the same press. `input` (2.46.0): a one-line field, submitted with Enter.
  */
 export const footerItemSchema = z
-    .discriminatedUnion('kind', [textItem, meterItem, switchItem, toggleItem, goItem, runItem])
+    .discriminatedUnion('kind', [textItem, meterItem, switchItem, toggleItem, goItem, runItem, inputItem])
     .superRefine((item, ctx) => {
     if (pressableFooterItem(item))
         checkPressable(item, ctx);
@@ -73,19 +112,35 @@ export const footerItemsSchema = z
     .refine((items) => new Set(items.map((item) => item.id)).size === items.length, {
     message: 'two footer items cannot share an id',
 });
-/** Whether a footer item can be pressed. */
+/** Whether a footer item can be pressed: one of the header's kinds. A field is submitted, not pressed (`inputFooterItem`). */
 export function pressableFooterItem(item) {
-    return item.kind !== 'text' && item.kind !== 'meter';
+    return FOOTER_PRESSABLE.includes(item.kind);
+}
+/** Whether a footer item is a field the person types into (2.46.0). */
+export function inputFooterItem(item) {
+    return item.kind === 'input';
 }
 /**
  * Why a press on a footer item cannot be taken, or `null` when it can: `pressRefusal`'s rule over the
- * footer's pressable items, and a sentence for a text or a meter, which only say something.
+ * footer's pressable items, a sentence for a text or a meter, which only say something, and for a
+ * field (2.46.0) the typed `text`, which its press has to carry.
  */
 export function footerPressRefusal(items, press) {
     const item = items.find((one) => one.id === press.item);
+    if (item && inputFooterItem(item)) {
+        if (typeof press.text !== 'string')
+            return `"${item.id}" is a field: say the text to submit.`;
+        return press.text.length > LIMITS.FOOTER_INPUT ? `"${item.id}" takes at most ${LIMITS.FOOTER_INPUT} characters.` : null;
+    }
     if (item && !pressableFooterItem(item))
         return `"${item.id}" only says something; it cannot be pressed.`;
-    return pressRefusal(items.filter(pressableFooterItem), press);
+    const pressable = items.filter(pressableFooterItem);
+    if (!item) {
+        /* Name every item that takes a press, fields included, when the id is not there. */
+        const names = items.filter((one) => pressableFooterItem(one) || inputFooterItem(one)).map((one) => one.id);
+        return `There is no "${press.item}" here now. ${names.length ? `What can be pressed: ${names.join(', ')}.` : 'Nothing here can be pressed.'}`;
+    }
+    return pressRefusal(pressable, press);
 }
 /** The rounded percentage a meter shows when it gives no `text`: `62%`. */
 export function meterSaid(item) {
@@ -114,6 +169,9 @@ export function footerModeFor(width) {
  *     moves into "⋯", a pressable item with an icon is the icon alone, and meters lose their label;
  *  3. under `FOOTER_MERGE_BELOW`, every pressable item is in "⋯", the centre group joins the left,
  *     only the first text is kept, and only the meters that are not optional.
+ *
+ * A field (2.46.0) stays in the row at every width, shrinking, unless it is `optional`: it goes with
+ * the optional texts and meters under `FOOTER_ICONS_BELOW`. It is never in "⋯".
  *
  * Nothing pressable is ever lost: an item not drawn in the row is in "⋯". Pure, the same rule for
  * every host; a host may be stricter (drop a group it cannot fit) but never wraps to a second row.
