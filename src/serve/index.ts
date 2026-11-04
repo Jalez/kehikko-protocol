@@ -160,6 +160,8 @@ export {
   hostKeepsMessages,
   messageToolsFor,
   messageWaker,
+  messageDelivery,
+  DELIVERY_KEEP_MS,
   WAKE_EVERY_MS,
   WAKE_SETTLE_MS,
   type MessageToolAnswer,
@@ -167,6 +169,9 @@ export {
   type MessageWaker,
   type MessageWakerOptions,
   type WakeSession,
+  type DeliverySession,
+  type MessageDelivery,
+  type MessageDeliveryOptions,
 } from './messages.js'
 export {
   messageTools,
@@ -176,6 +181,13 @@ export {
   WAKE_ON_MESSAGES_SETTING,
   actsOnMessages,
   wakesOnMessages,
+  typedMessages,
+  pasted,
+  deliveryFor,
+  DELIVERY_STATES,
+  RESUME_EVERY_MS,
+  RESUME_MOST,
+  type DeliveryState,
   type MessageToolDefinition,
 } from '../agent-messages.js'
 /* A question the host is too old for (2.22.0): read it off an `AskedHost`, show the one line. */
