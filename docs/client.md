@@ -438,9 +438,12 @@ is there" apart.
 The greeting arrived, carrying the context that came with it and whatever
 this module last asked the host to keep for it.
 
-The kept string rides beside the context rather than inside it because it
-belongs to one module and the context is broadcast to all of them — the
-protocol's own note on `state` in `helloSchema` makes that argument. It is
+The kept string rides beside the context in the greeting. From 2.51.0 a host
+that keeps one per CONTAINER also says it as `context.kept`, each frame its
+own, on the greeting and every context after; `hostStore` reads that when it
+is present, takes a new value only when the context names another kehikko,
+and stamps each `state.set` with the kehikko it is for (`methods.md`,
+`state.set`). It is
 `null` when the host keeps nothing, which is a first run, a host that does
 not answer `state.set`, or a module that has never written any; a module has
 to be able to tell that from a field that is missing because the host is

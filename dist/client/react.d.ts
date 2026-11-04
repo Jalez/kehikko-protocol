@@ -6,6 +6,6 @@
  */
 export { GREETING_GRACE_MS, type Where } from './host-store.js';
 export { useFocus, type Focus } from './focus.js';
-export { useHost, hostFields, JSON_KEPT, type Host, type KeptCodec, type UseHostOptions } from './host.js';
+export { useHost, useKept, hostFields, JSON_KEPT, KEEP_AFTER_MS, type Host, type KeepsFor, type KeptCodec, type UseHostOptions } from './host.js';
 export { type HostActions, type HostFields, type HostStanding, type Steadiness } from './host-store.js';
 export { Cover, coverFor, useServerStanding, COVER_CSS, COVER_STYLE_ID, COVER_WORDS, TRY_AGAIN, type CoverProps, type CoverState, } from './cover.js';

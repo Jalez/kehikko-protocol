@@ -667,6 +667,17 @@ export declare const contextSchema: z.ZodObject<{
      */
     filters: z.ZodDefault<z.ZodEffects<z.ZodRecord<z.ZodEffects<z.ZodString, string, string>, z.ZodUnion<[z.ZodString, z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">, string[], string[]>]>>, Record<string, string | string[]>, Record<string, string | string[]>>>;
     /**
+     * 2.51.0. What this module last asked the host to keep for THIS container (`state.set`), verbatim
+     * and opaque, or `null` when nothing is kept for it. A container is one module on one kehikko, so
+     * the same module on two kehikot keeps two views, and its one page is told the other one's when the
+     * person moves between them. Each frame is told its own, like `filters`; no other module sees it.
+     *
+     * Absent (not null) from a host before 2.51.0, which keeps one string per MODULE and hands it over
+     * only in the greeting (`hello.state`). The client reads this field when it is present and the
+     * greeting's `state` when it is not; see `hostStore` and `useKept`.
+     */
+    kept: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    /**
      * Every container on this kehikko, broadcast whole to every frame; see `containerSchema`. `[]` when
      * the host says nothing about containers. When none is picked out, everything is in front of the person;
      * when some are, only the union of what those show, and a consumer lets the person turn that off.
@@ -1042,6 +1053,7 @@ export declare const contextSchema: z.ZodObject<{
         source: string;
     }[];
     scope?: "epic" | "kehikko" | "project" | "machine" | "part" | undefined;
+    kept?: string | null | undefined;
 }, {
     epic?: string | null | undefined;
     parts?: {
@@ -1107,6 +1119,7 @@ export declare const contextSchema: z.ZodObject<{
     pinned?: boolean | undefined;
     prompt?: string | null | undefined;
     filters?: Record<string, string | string[]> | undefined;
+    kept?: string | null | undefined;
     containers?: {
         module: string;
         selected?: boolean | undefined;

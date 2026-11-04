@@ -339,6 +339,11 @@ costume.
 Opaque. The host stored a string and hands the same string back; see
 `state.set` in `methods.ts` for why it must never learn what is in it.
 
+2.51.0. A host that keeps one string per container puts that container's here
+AND in `context.kept`, which every later context carries too: the page learns
+the other kehikko's string when the person moves there. `context.kept` absent
+is a host before 2.51.0.
+
 #### `contextMessageSchema`
 
 Which epic is open now.

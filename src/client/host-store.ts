@@ -28,6 +28,13 @@ import { NOT_COVERED, type Covered } from '../reveal.js'
 export const GREETING_GRACE_MS = 700
 
 /**
+ * 2.51.0. How long, in ms, `useKept` waits after the last change before it sends `state.set`: a run
+ * of presses through a switch is one write. A write still waiting when the person moves to another
+ * kehikko, or the page stops, is sent at once, for the kehikko it was about.
+ */
+export const KEEP_AFTER_MS = 300
+
+/**
  * Whether anything is framing this page: `listening` (not heard yet, under a second), `unhosted`
  * (nobody is there, the standalone case) or `hosted`.
  */
@@ -137,7 +144,12 @@ export interface HostStanding<Kept = unknown> extends HostFields {
   context: ModuleContext | null
   /** What is on `<html>`: the host's theme once it has said one, the page's own first guess before. */
   theme: PageTheme
-  /** What the host kept for this module, read through the codec. `null` when nothing, or nothing recognised. */
+  /**
+   * What the host kept for this module, read through the codec. `null` when nothing, or nothing recognised.
+   * 2.51.0: for this CONTAINER — this module on the kehikko it was last told it is on — from a host
+   * that says `context.kept`; replaced when the context names another kehikko. From an older host,
+   * the one string per module its greeting carried.
+   */
   kept: Kept | null
   /**
    * The methods this host said it will answer for this module (1.4.0), or `null` before the
@@ -182,8 +194,13 @@ export interface HostActions<Kept = unknown> {
    * Keep a value with the host (`state.set`) and hold it here. Fire and
    * forget: a host may refuse, and then the choice holds for this session.
    * Silent when nothing is framing the page.
+   *
+   * 2.51.0. Sent with the kehikko it is for (`state.set`'s `kehikko`), so a host keeps it for this
+   * container. `after` (ms) waits for more before sending, the newest value winning; a write still
+   * waiting is sent at once when the context names another kehikko, when the page stops, and by the
+   * next `remember` without `after`. `useKept` passes `KEEP_AFTER_MS`.
    */
-  remember: (next: Kept) => void
+  remember: (next: Kept, after?: number) => void
   /**
    * Say which passage this page is pointing at (`passage.set`), or `null` for
    * none. Fire and forget, like `remember`.
@@ -295,6 +312,20 @@ export function hostStore<Kept = unknown>(
   let stopped = false
   let timer: ReturnType<typeof setTimeout> | null = null
   let unwatch: (() => void) | null = null
+  /* 2.51.0. The kehikko the kept value is for (`undefined` before the greeting), and a write waiting to be sent. */
+  let keptOn: number | null | undefined = undefined
+  let waitingWrite: { state: string; kehikko: number | null } | null = null
+  let writeTimer: ReturnType<typeof setTimeout> | null = null
+  const sendWrite = () => {
+    if (writeTimer !== null) clearTimeout(writeTimer)
+    writeTimer = null
+    const write = waitingWrite
+    waitingWrite = null
+    if (!write || !live || !live.greeted()) return
+    void live.request('state.set', write.kehikko === null ? { state: write.state } : { state: write.state, kehikko: write.kehikko }).catch(() => {
+      /* Reported nowhere on purpose: the choice holds for this session. */
+    })
+  }
 
   const change = (next: Partial<HostStanding<Kept>>) => {
     standing = { ...standing, ...next }
@@ -304,8 +335,24 @@ export function hostStore<Kept = unknown>(
   const arrived = (context: ModuleContext, state?: string | null, facts?: HostFacts) => {
     const theme: PageTheme = context.theme === 'dark' ? 'dark' : 'light'
     if (themed) applyTheme(theme, { remember: true })
+    /*
+     * 2.51.0. Which string is this container's: the context's `kept` from a host that keeps one per
+     * container, read on the greeting and whenever the context names another kehikko — never on a
+     * context for the same one, which may be the echo of a write this page has since overtaken.
+     * From an older host, the greeting's `state`, as before.
+     */
+    const on = context.kehikko?.id ?? null
+    const greeting = state !== undefined
+    let kept: string | null | undefined
+    if (context.kept !== undefined && (greeting || on !== keptOn)) kept = context.kept
+    else if (greeting) kept = state
+    if (kept !== undefined) {
+      /* A write still waiting is about the kehikko it was made on: sent before the next one's value arrives. */
+      if (waitingWrite && on !== keptOn) sendWrite()
+      keptOn = on
+    }
     /* The kept state with the context, in one change, so the first hosted standing already has the remembered choice. */
-    change({ where: 'hosted', context, ...hostFields(context, standing, same), theme, ...(state !== undefined ? { kept: codec.read(state) } : {}), ...(facts ? { answers: facts.answers, drawsHeader: facts.header, drawsFooter: facts.footer ?? null, hostCarries: facts.carries ?? null, footerKinds: facts.footerKinds ?? null, covered: NOT_COVERED } : {}) })
+    change({ where: 'hosted', context, ...hostFields(context, standing, same), theme, ...(kept !== undefined ? { kept: codec.read(kept) } : {}), ...(facts ? { answers: facts.answers, drawsHeader: facts.header, drawsFooter: facts.footer ?? null, hostCarries: facts.carries ?? null, footerKinds: facts.footerKinds ?? null, covered: NOT_COVERED } : {}) })
   }
 
   const store: HostStore<Kept> = {
@@ -386,6 +433,7 @@ export function hostStore<Kept = unknown>(
     },
 
     stop() {
+      sendWrite()
       stopped = true
       if (timer !== null) clearTimeout(timer)
       unwatch?.()
@@ -394,12 +442,16 @@ export function hostStore<Kept = unknown>(
       hearers.clear()
     },
 
-    remember(next) {
+    remember(next, after = 0) {
       change({ kept: next })
       if (!live || !live.greeted()) return
-      void live.request('state.set', { state: codec.write(next) }).catch(() => {
-        /* Reported nowhere on purpose: the choice holds for this session. */
-      })
+      waitingWrite = { state: codec.write(next), kehikko: keptOn ?? null }
+      if (after > 0) {
+        if (writeTimer !== null) clearTimeout(writeTimer)
+        writeTimer = setTimeout(sendWrite, after)
+        return
+      }
+      sendWrite()
     },
 
     point(passage) {

@@ -785,10 +785,21 @@ export declare const methodParams: {
      */
     readonly 'state.set': z.ZodObject<{
         state: z.ZodString;
+        /**
+         * 2.51.0. Which container the string is for: the `id` of the kehikko this page was last told it
+         * is on (`context.kehikko.id`). A host that keeps state per container files it there when this
+         * module is on that kehikko, and under the kehikko the person has open when it is absent. Sent
+         * by the client from the context it last heard, so a write that was still waiting when the person
+         * moved lands on the kehikko it was about. A host before 2.51.0 strips it and keeps one string
+         * per module.
+         */
+        kehikko: z.ZodOptional<z.ZodNumber>;
     }, "strip", z.ZodTypeAny, {
         state: string;
+        kehikko?: number | undefined;
     }, {
         state: string;
+        kehikko?: number | undefined;
     }>;
     readonly 'stage.report': z.ZodObject<{
         ref: z.ZodString;

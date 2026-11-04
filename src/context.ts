@@ -177,6 +177,17 @@ export const contextSchema = z.object({
    */
   filters: filterChoiceSchema.default({}),
   /**
+   * 2.51.0. What this module last asked the host to keep for THIS container (`state.set`), verbatim
+   * and opaque, or `null` when nothing is kept for it. A container is one module on one kehikko, so
+   * the same module on two kehikot keeps two views, and its one page is told the other one's when the
+   * person moves between them. Each frame is told its own, like `filters`; no other module sees it.
+   *
+   * Absent (not null) from a host before 2.51.0, which keeps one string per MODULE and hands it over
+   * only in the greeting (`hello.state`). The client reads this field when it is present and the
+   * greeting's `state` when it is not; see `hostStore` and `useKept`.
+   */
+  kept: z.string().max(LIMITS.MODULE_STATE).nullable().optional(),
+  /**
    * Every container on this kehikko, broadcast whole to every frame; see `containerSchema`. `[]` when
    * the host says nothing about containers. When none is picked out, everything is in front of the person;
    * when some are, only the union of what those show, and a consumer lets the person turn that off.

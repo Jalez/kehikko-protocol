@@ -13,6 +13,12 @@ import { type Covered } from '../reveal.js';
 /** How long, in ms, a page stays `listening` before it will say nobody is there (`unhosted`). */
 export declare const GREETING_GRACE_MS = 700;
 /**
+ * 2.51.0. How long, in ms, `useKept` waits after the last change before it sends `state.set`: a run
+ * of presses through a switch is one write. A write still waiting when the person moves to another
+ * kehikko, or the page stops, is sent at once, for the kehikko it was about.
+ */
+export declare const KEEP_AFTER_MS = 300;
+/**
  * Whether anything is framing this page: `listening` (not heard yet, under a second), `unhosted`
  * (nobody is there, the standalone case) or `hosted`.
  */
@@ -107,7 +113,12 @@ export interface HostStanding<Kept = unknown> extends HostFields {
     context: ModuleContext | null;
     /** What is on `<html>`: the host's theme once it has said one, the page's own first guess before. */
     theme: PageTheme;
-    /** What the host kept for this module, read through the codec. `null` when nothing, or nothing recognised. */
+    /**
+     * What the host kept for this module, read through the codec. `null` when nothing, or nothing recognised.
+     * 2.51.0: for this CONTAINER — this module on the kehikko it was last told it is on — from a host
+     * that says `context.kept`; replaced when the context names another kehikko. From an older host,
+     * the one string per module its greeting carried.
+     */
     kept: Kept | null;
     /**
      * The methods this host said it will answer for this module (1.4.0), or `null` before the
@@ -151,8 +162,13 @@ export interface HostActions<Kept = unknown> {
      * Keep a value with the host (`state.set`) and hold it here. Fire and
      * forget: a host may refuse, and then the choice holds for this session.
      * Silent when nothing is framing the page.
+     *
+     * 2.51.0. Sent with the kehikko it is for (`state.set`'s `kehikko`), so a host keeps it for this
+     * container. `after` (ms) waits for more before sending, the newest value winning; a write still
+     * waiting is sent at once when the context names another kehikko, when the page stops, and by the
+     * next `remember` without `after`. `useKept` passes `KEEP_AFTER_MS`.
      */
-    remember: (next: Kept) => void;
+    remember: (next: Kept, after?: number) => void;
     /**
      * Say which passage this page is pointing at (`passage.set`), or `null` for
      * none. Fire and forget, like `remember`.

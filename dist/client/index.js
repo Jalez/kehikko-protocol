@@ -21,4 +21,4 @@ export { hostTooOld, FIT_SAYS } from '../fit.js';
 /* What a page holds across a reload of itself: written as it changes, read back by the next load. */
 export { held, heldDraft } from './held.js';
 /* The host as a store, for a page whose state lives outside React. `useHost` is this, bound to a component. */
-export { hostStore, hostFields, GREETING_GRACE_MS, JSON_KEPT, } from './host-store.js';
+export { hostStore, hostFields, GREETING_GRACE_MS, JSON_KEPT, KEEP_AFTER_MS, } from './host-store.js';

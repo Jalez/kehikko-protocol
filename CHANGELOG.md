@@ -7,6 +7,25 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.51.0 — 2026-11-04
+
+A module's view, kept per container and back after a restart. **Additive**; `PROTOCOL` is still 2.
+[docs/methods.md](docs/methods.md), `state.set`, "Per container, since 2.51.0".
+
+### Added
+
+- **`context.kept`**: what this module asked the host to keep for THIS container — the module on one
+  kehikko — verbatim and opaque, or `null`. Optional: absent from an older host, which keeps one
+  string per module and hands it over only as `hello.state`.
+- **`kehikko` on `state.set`**: the id of the kehikko the write is for. A host keeping per container
+  files it there; an older host strips it.
+- **`hostStore` / `useHost`** read `context.kept` on the greeting and whenever the context names
+  another kehikko (never on a context for the same kehikko, which may echo an older write), and fall
+  back to `hello.state`. `remember(next, after?)` stamps the kehikko and may wait `after` ms; a write
+  still waiting is sent for its own kehikko when the person moves, and when the page stops.
+- **`useKept(host, key, initial, valid?)`** (`./client/react`) and **`KEEP_AFTER_MS`** (300): one field
+  of the kept view, as `useState`, written back after the delay with the other fields kept.
+
 ## 2.50.1 — 2026-11-04
 
 A long press inside a page of text. **A fix in the client**; nothing on the wire changes, and

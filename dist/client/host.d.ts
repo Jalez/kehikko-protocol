@@ -5,7 +5,7 @@ import { type HostActions, type HostStanding, type HostStoreOptions } from './ho
  * the flattened context, the kept state. A thin binding over `hostStore` (`host-store.ts`), which
  * is the same thing for a page whose state lives outside React. See docs/module-plumbing.md.
  */
-export { JSON_KEPT, hostFields, type KeptCodec } from './host-store.js';
+export { JSON_KEPT, KEEP_AFTER_MS, hostFields, type KeptCodec } from './host-store.js';
 export type UseHostOptions<Kept = unknown> = HostStoreOptions<Kept>;
 export interface Host<Kept = unknown> extends HostStanding<Kept>, HostActions<Kept> {
     /**
@@ -21,3 +21,25 @@ export interface Host<Kept = unknown> extends HostStanding<Kept>, HostActions<Ke
  * render — it is read through a ref — so `onGoto` needs no memoising.
  */
 export declare function useHost<Kept = unknown>(id: string, events?: HostEvents, options?: UseHostOptions<Kept>): Host<Kept>;
+/** What `useKept` needs of a host: `useHost`'s value, or anything with the same three members. */
+export interface KeepsFor {
+    kept: unknown;
+    read: () => {
+        kept: unknown;
+    };
+    remember: (next: never, after?: number) => void;
+}
+/**
+ * 2.51.0. One field of this container's kept view, as `useState`: `const [view, setView] =
+ * useKept(host, 'view', 'list')`. Read from the host's kept value (a JSON object, one key per field)
+ * and written back into it, the other fields kept, after `KEEP_AFTER_MS`. The host keeps it per
+ * container — this module on this kehikko — so the same module on two kehikot keeps two views, and
+ * each is back after the app restarts. Nothing goes to browser storage.
+ *
+ * `initial` is what is shown when nothing is kept, or what is kept is not the same kind of value
+ * (`valid`, when given, decides instead: a switch's options, say). The kept value arrives with the
+ * greeting, before the first hosted render, so a page that waits for `where === 'hosted'` never
+ * draws the default first. Several `useKept` on one host share its kept object; a page that also
+ * calls `remember` itself must keep that object's other keys.
+ */
+export declare function useKept<T>(host: KeepsFor, key: string, initial: T, valid?: (value: unknown) => boolean): [T, (next: T | ((was: T) => T)) => void];
