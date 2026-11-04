@@ -126,6 +126,11 @@ export interface HostStanding<Kept = unknown> extends HostFields {
     /** 2.40.0. The acts the host carries out itself for a run (`copy`, `open`), or `null` when it did not say (none). */
     hostCarries: readonly string[] | null;
     /**
+     * 2.46.0. The footer item kinds the host draws, or `null` when it did not say (a host before 2.46.0:
+     * the 2.38.0 kinds, no field). `footerDraws({ footer: drawsFooter, footerKinds }, 'input')` is the rule.
+     */
+    footerKinds: readonly string[] | null;
+    /**
      * 2.42.0. How much of this page's frame the host's revealed header and footer cover now, in CSS
      * pixels from the top and from the bottom (`kehikot.covered`). Only ever non-zero for a module whose
      * manifest says `reveal: 'over'`, on a host that honours it; `{ top: 0, bottom: 0 }` otherwise. The

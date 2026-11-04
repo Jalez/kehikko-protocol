@@ -13,15 +13,32 @@ export type FooterAlign = (typeof FOOTER_ALIGNS)[number];
 /** How much a text or a meter asks to be noticed. A host never says it with colour alone. */
 export declare const FOOTER_LEVELS: readonly ["normal", "warn", "critical"];
 export type FooterLevel = (typeof FOOTER_LEVELS)[number];
-/** The kinds of footer item: two that only say something, and the header's four that can be pressed. */
-export declare const FOOTER_KINDS: readonly ["text", "meter", "switch", "toggle", "go", "run"];
+/**
+ * The kinds of footer item: two that only say something, the header's four that can be pressed, and
+ * (2.46.0) a field the person types into.
+ */
+export declare const FOOTER_KINDS: readonly ["text", "meter", "switch", "toggle", "go", "run", "input"];
 export type FooterKind = (typeof FOOTER_KINDS)[number];
+/**
+ * The kinds a host before 2.46.0 draws: what a module may count on when the greeting says
+ * `footer: true` and names no `footerKinds`.
+ */
+export declare const FOOTER_KINDS_2_38: readonly ["text", "meter", "switch", "toggle", "go", "run"];
+/**
+ * Whether the host draws footer items of this kind (2.46.0): `footer` and `footerKinds` as the
+ * greeting said them (`HostFacts`, or `drawsFooter` and `footerKinds` on `hostStore`). No footer at
+ * all is no kind; a host that draws a footer and names no kinds draws the 2.38.0 ones.
+ */
+export declare function footerDraws(facts: {
+    footer: boolean | null;
+    footerKinds?: readonly string[] | null;
+}, kind: FooterKind): boolean;
 /** The kinds a person (or an agent, when the item says so) can press. */
 export declare const FOOTER_PRESSABLE: readonly ["switch", "toggle", "go", "run"];
 /**
  * One item of a module's footer. `text`: a status line or a count. `meter`: how full something is,
  * with how worried to be about it. `switch`, `toggle`, `go`, `run`: the header's kinds, the same
- * fields and the same press.
+ * fields and the same press. `input` (2.46.0): a one-line field, submitted with Enter.
  */
 export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kind", [z.ZodObject<{
     /** The group the item stands in. Items keep declaration order within their group. */
@@ -342,6 +359,50 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     align?: "start" | "center" | "end" | undefined;
     optional?: boolean | undefined;
     tooltip?: string | undefined;
+}>, z.ZodObject<{
+    /** The group the item stands in. Items keep declaration order within their group. */
+    align: z.ZodDefault<z.ZodEnum<["start", "center", "end"]>>;
+    /**
+     * The first to go when the row is narrow (see `footerLayout`): under `FOOTER_ICONS_BELOW` an optional
+     * text or meter is not drawn, and an optional pressable item moves into the row's "⋯" menu.
+     */
+    optional: z.ZodDefault<z.ZodBoolean>;
+    /** More than the row has room for, as a sentence shown on hover and focus. Text, never markup. */
+    tooltip: z.ZodOptional<z.ZodString>;
+    kind: z.ZodLiteral<"input">;
+    id: z.ZodEffects<z.ZodString, string, string>;
+    /** The field's accessible name: `Address`, `Search`. Not drawn beside it; the placeholder is what shows. */
+    label: z.ZodString;
+    /** The text the module holds now. Drawn in the field whenever the person is not typing in it. */
+    value: z.ZodDefault<z.ZodString>;
+    /** What the empty field says: `Type an address`. Text, never markup. */
+    placeholder: z.ZodOptional<z.ZodString>;
+    /** Take the width the row has left over. Without it the field keeps a modest width and still shrinks. */
+    grow: z.ZodDefault<z.ZodBoolean>;
+    /** Whether an agent may submit text into it through the host. False unless said. */
+    agents: z.ZodDefault<z.ZodBoolean>;
+}, "strip", z.ZodTypeAny, {
+    value: string;
+    id: string;
+    label: string;
+    kind: "input";
+    agents: boolean;
+    align: "start" | "center" | "end";
+    optional: boolean;
+    grow: boolean;
+    tooltip?: string | undefined;
+    placeholder?: string | undefined;
+}, {
+    id: string;
+    label: string;
+    kind: "input";
+    value?: string | undefined;
+    agents?: boolean | undefined;
+    align?: "start" | "center" | "end" | undefined;
+    optional?: boolean | undefined;
+    tooltip?: string | undefined;
+    placeholder?: string | undefined;
+    grow?: boolean | undefined;
 }>]>, {
     id: string;
     kind: "text";
@@ -427,6 +488,17 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     shortcut?: string | undefined;
     tool?: string | undefined;
     tooltip?: string | undefined;
+} | {
+    value: string;
+    id: string;
+    label: string;
+    kind: "input";
+    agents: boolean;
+    align: "start" | "center" | "end";
+    optional: boolean;
+    grow: boolean;
+    tooltip?: string | undefined;
+    placeholder?: string | undefined;
 }, {
     id: string;
     kind: "text";
@@ -512,6 +584,17 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     align?: "start" | "center" | "end" | undefined;
     optional?: boolean | undefined;
     tooltip?: string | undefined;
+} | {
+    id: string;
+    label: string;
+    kind: "input";
+    value?: string | undefined;
+    agents?: boolean | undefined;
+    align?: "start" | "center" | "end" | undefined;
+    optional?: boolean | undefined;
+    tooltip?: string | undefined;
+    placeholder?: string | undefined;
+    grow?: boolean | undefined;
 }>;
 export type FooterItem = z.infer<typeof footerItemSchema>;
 /** An item as a module writes it, before defaults are filled in. */
@@ -519,6 +602,10 @@ export type FooterItemInput = z.input<typeof footerItemSchema>;
 /** A footer item that can be pressed: one of the header's kinds. */
 export type PressableFooterItem = Extract<FooterItem, {
     kind: (typeof FOOTER_PRESSABLE)[number];
+}>;
+/** A footer field the person types into (2.46.0). */
+export type InputFooterItem = Extract<FooterItem, {
+    kind: 'input';
 }>;
 /** A module's whole footer: every item, in order within its group. Ids are unique within the footer. */
 export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodDiscriminatedUnion<"kind", [z.ZodObject<{
@@ -840,6 +927,50 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     align?: "start" | "center" | "end" | undefined;
     optional?: boolean | undefined;
     tooltip?: string | undefined;
+}>, z.ZodObject<{
+    /** The group the item stands in. Items keep declaration order within their group. */
+    align: z.ZodDefault<z.ZodEnum<["start", "center", "end"]>>;
+    /**
+     * The first to go when the row is narrow (see `footerLayout`): under `FOOTER_ICONS_BELOW` an optional
+     * text or meter is not drawn, and an optional pressable item moves into the row's "⋯" menu.
+     */
+    optional: z.ZodDefault<z.ZodBoolean>;
+    /** More than the row has room for, as a sentence shown on hover and focus. Text, never markup. */
+    tooltip: z.ZodOptional<z.ZodString>;
+    kind: z.ZodLiteral<"input">;
+    id: z.ZodEffects<z.ZodString, string, string>;
+    /** The field's accessible name: `Address`, `Search`. Not drawn beside it; the placeholder is what shows. */
+    label: z.ZodString;
+    /** The text the module holds now. Drawn in the field whenever the person is not typing in it. */
+    value: z.ZodDefault<z.ZodString>;
+    /** What the empty field says: `Type an address`. Text, never markup. */
+    placeholder: z.ZodOptional<z.ZodString>;
+    /** Take the width the row has left over. Without it the field keeps a modest width and still shrinks. */
+    grow: z.ZodDefault<z.ZodBoolean>;
+    /** Whether an agent may submit text into it through the host. False unless said. */
+    agents: z.ZodDefault<z.ZodBoolean>;
+}, "strip", z.ZodTypeAny, {
+    value: string;
+    id: string;
+    label: string;
+    kind: "input";
+    agents: boolean;
+    align: "start" | "center" | "end";
+    optional: boolean;
+    grow: boolean;
+    tooltip?: string | undefined;
+    placeholder?: string | undefined;
+}, {
+    id: string;
+    label: string;
+    kind: "input";
+    value?: string | undefined;
+    agents?: boolean | undefined;
+    align?: "start" | "center" | "end" | undefined;
+    optional?: boolean | undefined;
+    tooltip?: string | undefined;
+    placeholder?: string | undefined;
+    grow?: boolean | undefined;
 }>]>, {
     id: string;
     kind: "text";
@@ -925,6 +1056,17 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     shortcut?: string | undefined;
     tool?: string | undefined;
     tooltip?: string | undefined;
+} | {
+    value: string;
+    id: string;
+    label: string;
+    kind: "input";
+    agents: boolean;
+    align: "start" | "center" | "end";
+    optional: boolean;
+    grow: boolean;
+    tooltip?: string | undefined;
+    placeholder?: string | undefined;
 }, {
     id: string;
     kind: "text";
@@ -1010,6 +1152,17 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     align?: "start" | "center" | "end" | undefined;
     optional?: boolean | undefined;
     tooltip?: string | undefined;
+} | {
+    id: string;
+    label: string;
+    kind: "input";
+    value?: string | undefined;
+    agents?: boolean | undefined;
+    align?: "start" | "center" | "end" | undefined;
+    optional?: boolean | undefined;
+    tooltip?: string | undefined;
+    placeholder?: string | undefined;
+    grow?: boolean | undefined;
 }>, "many">, ({
     id: string;
     kind: "text";
@@ -1095,6 +1248,17 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     shortcut?: string | undefined;
     tool?: string | undefined;
     tooltip?: string | undefined;
+} | {
+    value: string;
+    id: string;
+    label: string;
+    kind: "input";
+    agents: boolean;
+    align: "start" | "center" | "end";
+    optional: boolean;
+    grow: boolean;
+    tooltip?: string | undefined;
+    placeholder?: string | undefined;
 })[], ({
     id: string;
     kind: "text";
@@ -1180,16 +1344,31 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     align?: "start" | "center" | "end" | undefined;
     optional?: boolean | undefined;
     tooltip?: string | undefined;
+} | {
+    id: string;
+    label: string;
+    kind: "input";
+    value?: string | undefined;
+    agents?: boolean | undefined;
+    align?: "start" | "center" | "end" | undefined;
+    optional?: boolean | undefined;
+    tooltip?: string | undefined;
+    placeholder?: string | undefined;
+    grow?: boolean | undefined;
 })[]>;
-/** Whether a footer item can be pressed. */
+/** Whether a footer item can be pressed: one of the header's kinds. A field is submitted, not pressed (`inputFooterItem`). */
 export declare function pressableFooterItem(item: FooterItem): item is PressableFooterItem;
+/** Whether a footer item is a field the person types into (2.46.0). */
+export declare function inputFooterItem(item: FooterItem): item is InputFooterItem;
 /**
  * Why a press on a footer item cannot be taken, or `null` when it can: `pressRefusal`'s rule over the
- * footer's pressable items, and a sentence for a text or a meter, which only say something.
+ * footer's pressable items, a sentence for a text or a meter, which only say something, and for a
+ * field (2.46.0) the typed `text`, which its press has to carry.
  */
 export declare function footerPressRefusal(items: readonly FooterItem[], press: {
     item: string;
     value?: PressValue;
+    text?: string;
 }): string | null;
 /** The rounded percentage a meter shows when it gives no `text`: `62%`. */
 export declare function meterSaid(item: Extract<FooterItem, {
@@ -1225,6 +1404,9 @@ export interface FooterLayout {
  *     moves into "⋯", a pressable item with an icon is the icon alone, and meters lose their label;
  *  3. under `FOOTER_MERGE_BELOW`, every pressable item is in "⋯", the centre group joins the left,
  *     only the first text is kept, and only the meters that are not optional.
+ *
+ * A field (2.46.0) stays in the row at every width, shrinking, unless it is `optional`: it goes with
+ * the optional texts and meters under `FOOTER_ICONS_BELOW`. It is never in "⋯".
  *
  * Nothing pressable is ever lost: an item not drawn in the row is in "⋯". Pure, the same rule for
  * every host; a host may be stricter (drop a group it cannot fit) but never wraps to a second row.

@@ -41,6 +41,7 @@ host.footer([
 | `toggle` | on or off | `checked` | yes, with the state wanted |
 | `go` | a jump to one of several places | `options` | yes, with the option's id |
 | `run` | an act | `state`, `result`, `disabled`, `confirm` | yes |
+| `input` (2.46.0) | one line the person types into | `label`, `value`, `placeholder`, `grow`, `agents` | submitted with Enter, with `text` |
 
 Every item also has:
 
@@ -64,6 +65,8 @@ The four pressable kinds are the header's, with the header's fields (`label`, `i
 | `FOOTER_TEXT` | 120 characters of a text |
 | `FOOTER_METER_TEXT` | 24 characters of a meter's `text` |
 | `FOOTER_TOOLTIP` | 240 characters of a tooltip |
+| `FOOTER_INPUT` | 2048 characters of a field's `value`, and of the `text` a press submits |
+| `FOOTER_PLACEHOLDER` | 80 characters of a field's `placeholder` |
 | ids, labels, options, icons | the header's (`HEADER_ID`, `HEADER_LABEL`, …) |
 
 Ids are unique within a footer. A footer id may repeat a header id: the press says which it meant.
@@ -82,6 +85,67 @@ const host = useHost(ID, {
 
 Who may press is said per item, exactly as in the header: `agents: true`, `tool`, or nobody but the person. A host's agent door may press a footer item marked `agents: true` and refuses the rest in the header's words.
 
+## A field to type into (2.46.0)
+
+An address, a search, a filter: one line the person types into, drawn by the host in the row.
+
+```ts
+host.footer([
+  { kind: 'run', id: 'back', label: 'Back', icon: 'arrow-left' },
+  { kind: 'input', id: 'address', label: 'Address', value: 'https://example.com/', placeholder: 'Type an address', grow: true },
+  { kind: 'run', id: 'reload', label: 'Reload', icon: 'refresh', align: 'end' },
+])
+```
+
+| field | is |
+|---|---|
+| `id` | the item's id, as for every item |
+| `label` | the field's accessible name (`Address`). Not drawn beside the field |
+| `value` | the text the module holds now; `''` by default |
+| `placeholder` | what the empty field says |
+| `grow` | take the width the row has left over. Without it the field keeps a modest width; either way it shrinks |
+| `agents` | an agent may submit text into it through the host. False unless said |
+
+**The module owns the text.** `value` is what it holds now; the host draws it whenever the person is
+not typing.
+
+- **While the field has focus**, what the person types is theirs: a new declaration with another
+  `value` does not overwrite it.
+- **Enter** submits: the host sends `kehikot.press` with `item`, `place: 'footer'` and `text` (what is in
+  the field, whole, possibly empty), and moves focus to the module's page, as after a header press.
+  The module does what the text asks and declares the footer again with the `value` it now holds.
+- **Escape** puts `value` back in the field and leaves the focus where it is.
+- **Leaving the field** without Enter shows `value` again: nothing is sent.
+
+```ts
+const host = useHost(ID, {
+  onPress: ({ item, place, text }) => {
+    if (place === 'footer' && item === 'address' && text !== undefined) return go(text)
+  },
+})
+```
+
+Keys typed in the field are the field's: a host binds none of its own chords while it has focus.
+
+`text` is a stranger's string to the module, as `value` is to the host: neither side treats it as
+markup, and a host opens nothing from it. The module decides what the text means.
+
+**Does the host draw it?** A host before 2.46.0 refuses a footer naming a kind it does not know, so the
+whole row would go. The greeting says which kinds a host draws: `hello.footerKinds`, absent from a host
+before 2.46.0, which draws the 2.38.0 kinds (`FOOTER_KINDS_2_38`). Ask `footerDraws`:
+
+```ts
+const { drawsFooter, footerKinds } = useHost(ID, { … })
+if (footerDraws({ footer: drawsFooter, footerKinds }, 'input')) declareTheFieldInTheFooter()
+else drawYourOwnField()
+```
+
+**Fit.** A field stays in the row at every width, shrinking, unless it is `optional`: then it goes with
+the optional texts and meters under `FOOTER_ICONS_BELOW`. It is never in "⋯".
+
+**Agents.** A field marked `agents: true` may be submitted by an agent through the host's door, with the
+text to submit; `footerPressRefusal` refuses a field's press that carries no `text`.
+
 ## Fit: one row at every width
 
 The footer is one row, as the header is, at every container width a person drags it to. `footerLayout(items, width)` is the rule, the same for every host; it uses the header's widths:
@@ -90,7 +154,7 @@ The footer is one row, as the header is, at every container width a person drags
 2. **Under `FOOTER_ICONS_BELOW` (300 px).** An `optional` text or meter is not drawn; an `optional` pressable item moves into the row's "⋯" menu; a pressable item with an icon is drawn as the icon alone (its label is its tooltip and accessible name); a meter loses its label and keeps its bar and value.
 3. **Under `FOOTER_MERGE_BELOW` (220 px).** Every pressable item is in "⋯", the centre group joins the left, only the first text stays, and only the meters that are not optional.
 
-Nothing pressable is lost: an item not in the row is in "⋯". A host may be stricter than this, but never wraps the footer to a second row.
+Nothing pressable is lost: an item not in the row is in "⋯". A field (2.46.0) stays in the row unless it is `optional`. A host may be stricter than this, but never wraps the footer to a second row.
 
 ## Does the host draw it?
 
@@ -107,5 +171,5 @@ So a module that moves to the declared footer keeps working in an older app. Unl
 
 1. **Read `kehikot.footer`** beside the header, and drop it with the frame that sent it. An older host drops the type without a word (it is in neither list it knows).
 2. **Draw** one row at the bottom of the container, in the header's look, laid out by `footerLayout` at the container's measured width; no row for a module that declared nothing or `[]`.
-3. **Send `kehikot.press`** with `place: 'footer'`, only for a pressable item in the last footer and only when `footerPressRefusal` is `null`; arm a `confirm` run on the first press; time out.
-4. **Say `footer: true`** in the greeting.
+3. **Send `kehikot.press`** with `place: 'footer'`, only for a pressable item in the last footer and only when `footerPressRefusal` is `null`; arm a `confirm` run on the first press; time out. For a field (2.46.0), on Enter, with `text`.
+4. **Say `footer: true`** in the greeting, and (2.46.0) `footerKinds`: the kinds it draws.

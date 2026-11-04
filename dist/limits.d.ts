@@ -275,6 +275,10 @@ export declare const LIMITS: {
     readonly FOOTER_METER_TEXT: 24;
     /** A footer item's tooltip: a sentence that says more than the row has room for. */
     readonly FOOTER_TOOLTIP: 240;
+    /** 2.46.0. The text of a footer field, as the module holds it (`value`) and as a press submits it (`text`): an address fits. */
+    readonly FOOTER_INPUT: 2048;
+    /** 2.46.0. What an empty footer field says. */
+    readonly FOOTER_PLACEHOLDER: 80;
     /** How many kinds of subject one module may declare. */
     readonly SUBJECTS: 8;
     /** The name a module asks its MCP door to be registered under: `mcp.as`. */
