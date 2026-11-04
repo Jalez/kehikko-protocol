@@ -582,6 +582,7 @@ export {
   MESSAGE_KINDS,
   messageChoicesSchema,
   messageSayParams,
+  messagePostParams,
   messageMineParams,
   messageMineResult,
   isPersonMessage,

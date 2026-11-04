@@ -189,6 +189,8 @@ export declare const METHODS: {
     readonly 'messages.read': "agents:message";
     /** The messages addressed to the asking module, and the ones sent through it, from its page (2.50.0). */
     readonly 'messages.mine': "agents:message";
+    /** A module's own message from its page; `once` for an introduction (2.50.0). */
+    readonly 'messages.post': "agents:message";
     /** The person's own message, from a module's page on their press (2.50.0). */
     readonly 'messages.say': "messages:as-person";
 };
@@ -1577,6 +1579,165 @@ export declare const methodParams: {
     }, {
         since?: number | undefined;
         limit?: number | undefined;
+    }>;
+    /** 2.50.0. From a page: the module's own message (`once` for an introduction); answered with `messageSendResult`. */
+    readonly 'messages.post': z.ZodEffects<z.ZodObject<{
+        kind: z.ZodOptional<z.ZodEnum<["question", "report", "note"]>>;
+        choices: z.ZodOptional<z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">, string[], string[]>>;
+        replyTo: z.ZodOptional<z.ZodNumber>;
+        body: z.ZodString;
+        to: z.ZodEffects<z.ZodObject<{
+            project: z.ZodOptional<z.ZodLiteral<true>>;
+            place: z.ZodOptional<z.ZodEffects<z.ZodObject<{
+                epic: z.ZodOptional<z.ZodString>;
+                kehikko: z.ZodOptional<z.ZodString>;
+            }, "strip", z.ZodTypeAny, {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
+            }, {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
+            }>, {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
+            }, {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
+            }>>;
+            module: z.ZodOptional<z.ZodString>;
+            session: z.ZodOptional<z.ZodObject<{
+                module: z.ZodString;
+                session: z.ZodString;
+            }, "strip", z.ZodTypeAny, {
+                module: string;
+                session: string;
+            }, {
+                module: string;
+                session: string;
+            }>>;
+        }, "strip", z.ZodTypeAny, {
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
+            } | undefined;
+            project?: true | undefined;
+            module?: string | undefined;
+            session?: {
+                module: string;
+                session: string;
+            } | undefined;
+        }, {
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
+            } | undefined;
+            project?: true | undefined;
+            module?: string | undefined;
+            session?: {
+                module: string;
+                session: string;
+            } | undefined;
+        }>, {
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
+            } | undefined;
+            project?: true | undefined;
+            module?: string | undefined;
+            session?: {
+                module: string;
+                session: string;
+            } | undefined;
+        }, {
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
+            } | undefined;
+            project?: true | undefined;
+            module?: string | undefined;
+            session?: {
+                module: string;
+                session: string;
+            } | undefined;
+        }>;
+        thread: z.ZodOptional<z.ZodString>;
+        once: z.ZodOptional<z.ZodBoolean>;
+    }, "strip", z.ZodTypeAny, {
+        to: {
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
+            } | undefined;
+            project?: true | undefined;
+            module?: string | undefined;
+            session?: {
+                module: string;
+                session: string;
+            } | undefined;
+        };
+        body: string;
+        choices?: string[] | undefined;
+        thread?: string | undefined;
+        kind?: "question" | "report" | "note" | undefined;
+        replyTo?: number | undefined;
+        once?: boolean | undefined;
+    }, {
+        to: {
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
+            } | undefined;
+            project?: true | undefined;
+            module?: string | undefined;
+            session?: {
+                module: string;
+                session: string;
+            } | undefined;
+        };
+        body: string;
+        choices?: string[] | undefined;
+        thread?: string | undefined;
+        kind?: "question" | "report" | "note" | undefined;
+        replyTo?: number | undefined;
+        once?: boolean | undefined;
+    }>, {
+        to: {
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
+            } | undefined;
+            project?: true | undefined;
+            module?: string | undefined;
+            session?: {
+                module: string;
+                session: string;
+            } | undefined;
+        };
+        body: string;
+        choices?: string[] | undefined;
+        thread?: string | undefined;
+        kind?: "question" | "report" | "note" | undefined;
+        replyTo?: number | undefined;
+        once?: boolean | undefined;
+    }, {
+        to: {
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
+            } | undefined;
+            project?: true | undefined;
+            module?: string | undefined;
+            session?: {
+                module: string;
+                session: string;
+            } | undefined;
+        };
+        body: string;
+        choices?: string[] | undefined;
+        thread?: string | undefined;
+        kind?: "question" | "report" | "note" | undefined;
+        replyTo?: number | undefined;
+        once?: boolean | undefined;
     }>;
     /**
      * 2.50.0. From a page only, on the person's press, under `messages:as-person`: the person's message;

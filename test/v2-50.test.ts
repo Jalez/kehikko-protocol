@@ -19,6 +19,11 @@ import {
   isPersonMessage,
   messageLine,
   messageMineParams,
+  messagePostParams,
+  NOTES_VERSION,
+  sessionNotes,
+  type NotesInput,
+  type SessionModule,
   messageMineResult,
   messageReadResult,
   messageSayParams,
@@ -278,5 +283,51 @@ describe('the send_message tool', () => {
     expect(said?.isError).toBe(false)
     const params = asked.at(-1)?.params
     expect(params).toMatchObject({ kind: 'question', choices: ['A', 'B'], replyTo: 3, to: { module: 'kehikot.orchestrator' } })
+  })
+})
+
+describe('messages.post: a module’s own message, and introductions', () => {
+  test('to required, once optional, the same fields held', () => {
+    expect(messagePostParams.safeParse({ body: 'Hello', to: { place: { kehikko: 'writing' } }, once: true }).success).toBe(true)
+    expect(messagePostParams.safeParse({ body: 'Hello' }).success).toBe(false)
+    expect(messagePostParams.safeParse({ body: 'Pick', to: { project: true }, choices: ['a'] }).success).toBe(false)
+    expect(METHODS['messages.post']).toBe('agents:message')
+    expect(METHOD_SINCE['messages.post']).toBe('2.50.0')
+    expect((SERVER_METHODS as readonly string[]).includes('messages.post')).toBe(false)
+  })
+  test('a message carries once, false from an older host', () => {
+    expect(message().once).toBe(false)
+    expect(message({ once: true }).once).toBe(true)
+    expect(message({ once: 'yes' }).once).toBe(false)
+  })
+})
+
+describe('a module that rewords what it says to agents is told again', () => {
+  const relay = (says: string): SessionModule => ({ module: 'kehikot.relay', name: 'Relay', summary: 'Relays.', says, door: 'relay', skills: [] })
+  const input = (says: string): NotesInput => ({
+    place: { project: '/work/thesis', epic: 'methods', parts: [], kehikko: { key: 'writing', name: 'Writing' } },
+    modules: [relay(says)],
+    absent: [],
+    hostDoor: 'kehikko',
+    self: { module: 'kehikot.claude', name: 'Claude', door: 'kehikko-claude' },
+  })
+  test('NOTES_VERSION is 6', () => expect(NOTES_VERSION).toBe(6))
+  test('the told record keeps what each module said', () => {
+    expect(sessionNotes(input('Old words.'), 'start', null).told.said).toEqual({ 'kehikot.relay': 'Old words.' })
+  })
+  test('same words: nothing; new words: told once at the next prompt', () => {
+    const told = sessionNotes(input('Old words.'), 'start', null).told
+    expect(sessionNotes(input('Old words.'), 'prompt', told).text).toBeNull()
+    const changed = sessionNotes(input('Talk to your person through me.'), 'prompt', told)
+    expect(changed.kind).toBe('change')
+    expect(changed.text).toContain('now say something new')
+    expect(changed.text).toContain('"Talk to your person through me."')
+    expect(sessionNotes(input('Talk to your person through me.'), 'prompt', changed.told).text).toBeNull()
+  })
+  test('a record from before said (version 5) gets the full notes once', () => {
+    const { said: _none, ...old } = sessionNotes(input('Old words.'), 'start', null).told
+    const again = sessionNotes(input('New words.'), 'prompt', { ...old, version: 5 })
+    expect(again.text).toContain('New words.')
+    expect(again.kind).toBe('start')
   })
 })

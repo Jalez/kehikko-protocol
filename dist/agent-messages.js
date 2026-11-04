@@ -119,6 +119,11 @@ export const agentMessageSchema = z.object({
     choices: messageChoicesSchema.default([]).catch([]),
     /** 2.50.0. The id of the message this one answers, or null. */
     replyTo: replyToSchema.nullable().default(null).catch(null),
+    /**
+     * 2.50.0. A module's once-only message (`messages.post` with `once`): the host hands each session at
+     * most ONE once-message from the same module, ever. False from a host before 2.50.0.
+     */
+    once: z.boolean().default(false).catch(false),
 });
 /** `token` in a call: the place token on the session's door URL, which names who is asking. The host checks the asking module issued it. */
 const token = z.string().regex(TOKEN, 'token is the session’s place token (the kehikot-place on its door’s URL)');
@@ -150,6 +155,24 @@ export const messageSayParams = z
     body: z.string().trim().min(1, 'a message says something').max(LIMITS.MESSAGE_BODY),
     to: messageToSchema,
     thread: z.string().regex(MESSAGE_THREAD).optional(),
+    ...structured,
+})
+    .superRefine(choicesNeedAQuestion);
+/**
+ * 2.50.0. `messages.post`'s params: a module's OWN message from its PAGE, under `agents:message` — not
+ * a session's and not the person's. The host stamps `from: { module, name, session: null, person: false }`.
+ * `once: true` is an introduction: each session is handed at most one once-message from this module,
+ * ever, whatever it is addressed to and however often it is posted; to a place or a module it reaches a
+ * session that comes there later too, for as long as the host keeps it (not only for
+ * `LIMITS.MESSAGES_UNREAD_MS`). Bounded like a session's (`MESSAGES_PER_MINUTE`, per module).
+ * Answered with `messageSendResult`.
+ */
+export const messagePostParams = z
+    .object({
+    body: z.string().trim().min(1, 'a message says something').max(LIMITS.MESSAGE_BODY),
+    to: messageToSchema,
+    thread: z.string().regex(MESSAGE_THREAD).optional(),
+    once: z.boolean().optional(),
     ...structured,
 })
     .superRefine(choicesNeedAQuestion);

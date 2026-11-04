@@ -14,7 +14,7 @@ import { dispositionSchema } from './context.js';
 import { stepsListResult } from './plan.js';
 import { gotoProject, showAskSchema } from './show.js';
 import { trafficNoteResult, trafficNoteSchema, trafficReadResult } from './traffic.js';
-import { messageMineParams, messageMineResult, messageReadParams, messageReadResult, messageSayParams, messageSendParams, messageSendResult } from './agent-messages.js';
+import { messageMineParams, messageMineResult, messagePostParams, messageReadParams, messageReadResult, messageSayParams, messageSendParams, messageSendResult } from './agent-messages.js';
 /**
  * The questions a module can ask, by name and by shape: capabilities, methods, each method's
  * params, and a few result schemas. No answering is here: no dispatch table, no handlers. A
@@ -205,6 +205,8 @@ export const METHODS = {
     'messages.read': 'agents:message',
     /** The messages addressed to the asking module, and the ones sent through it, from its page (2.50.0). */
     'messages.mine': 'agents:message',
+    /** A module's own message from its page; `once` for an introduction (2.50.0). */
+    'messages.post': 'agents:message',
     /** The person's own message, from a module's page on their press (2.50.0). */
     'messages.say': 'messages:as-person',
 };
@@ -507,6 +509,8 @@ export const methodParams = {
     'messages.read': messageReadParams,
     /** 2.50.0. From a page: the messages to the asking module and the ones sent through it; answered with `messageMineResult`. */
     'messages.mine': messageMineParams,
+    /** 2.50.0. From a page: the module's own message (`once` for an introduction); answered with `messageSendResult`. */
+    'messages.post': messagePostParams,
     /**
      * 2.50.0. From a page only, on the person's press, under `messages:as-person`: the person's message;
      * answered with `messageSendResult`. See `messageSayParams` for every condition a host holds it to.
@@ -675,6 +679,7 @@ export const methodResults = {
     'messages.send': messageSendResult,
     'messages.read': messageReadResult,
     'messages.mine': messageMineResult,
+    'messages.post': messageSendResult,
     'messages.say': messageSendResult,
 };
 /** The schema for one method's answer, or nothing — which means unspecified. */

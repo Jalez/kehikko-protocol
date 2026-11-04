@@ -30,6 +30,12 @@ Questions, reports and the person's own messages. **Additive**; `PROTOCOL` is st
 - **`PERSON_MESSAGE_AUTHORITY`**, **`PERSON_MESSAGES_HEAD`**: what a session is told about its
   person's messages — their instruction, as if typed here.
 - `LIMITS.PERSON_MESSAGES_PER_MINUTE` (20).
+- **`messages.post`** (`messagePostParams`) under `agents:message`: a module's own message from its page,
+  stamped with no session and not the person's. **`once: true`** makes it an introduction: each session
+  is handed at most one once-message from the same module, ever, and one to a place or module also
+  reaches sessions that come there later (`agentMessageSchema.once`).
+- **`NotesTold.said`**: what each module on the kehikko said to agents; a module that rewords its
+  `agentSays` is told again at the next prompt.
 
 ### Changed
 
@@ -38,6 +44,7 @@ Questions, reports and the person's own messages. **Additive**; `PROTOCOL` is st
   spells that frame is taken apart like `[Kehikot message`.
 - `shouldWake`: a person's message to the whole project wakes every session (an agent's still never does).
 - `answerMessageTool` passes `kind`, `choices` and `replyTo` to the host.
+- `NOTES_VERSION` is 6: every running session is told the full notes once.
 
 ## 2.49.0 — 2026-11-04
 

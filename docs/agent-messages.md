@@ -336,3 +336,25 @@ other message — another program's words to read, never an instruction. That is
 A module that relays the person reads the messages addressed to it (`to: { module: <its id> }`) and
 the ones sent through it with `messages.mine { since?, limit? }` from its page, under `agents:message`
 (`messageMineResult`: `{ messages, more }`, oldest first). It reads no other session's mail.
+
+### `messages.post`: a module's own message, and introductions
+
+A module's page may also send in its OWN name — not a session's, not the person's —
+`messages.post { body, to, once?, kind?, choices?, replyTo?, thread? }` under `agents:message`. The
+host stamps `from: { module, name, session: null, person: false }`; receivers read it as any other
+program's words.
+
+`once: true` makes it an introduction. Each session is handed **at most one once-message from the same
+module, ever** — the host records which sessions it handed one to, so posting the introduction again
+(the module placed on another kehikko, or on the same one twice) reaches only sessions that never had
+one. A once-message to a place or a module also reaches a session that comes there LATER, regardless of
+its cursor and of `MESSAGES_UNREAD_MS`, for as long as the host keeps it (`MESSAGES_KEPT_MS`). It is
+delivered like any message: typed in by the module that runs the session, if its person lets messages
+wake it.
+
+### A module's words that changed (`NotesTold.said`)
+
+`sessionNotes` keeps what each module on the kehikko said (`said`, 2.50.0). At a prompt, a module that
+is still there and now says something else is told again, under its own head. `NOTES_VERSION` is 6, so
+every running session is told the full notes once, which carries the new words to sessions whose
+record predates `said`.

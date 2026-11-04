@@ -39,6 +39,7 @@ export declare const METHOD_SINCE: {
     readonly 'messages.send': "2.41.0";
     readonly 'messages.read': "2.41.0";
     readonly 'messages.mine': "2.50.0";
+    readonly 'messages.post': "2.50.0";
     readonly 'messages.say': "2.50.0";
 };
 /** Each capability, and the version that added it: the oldest of its methods. */
@@ -228,6 +229,7 @@ export declare const SINCE: {
         readonly 'messages.send': "2.41.0";
         readonly 'messages.read': "2.41.0";
         readonly 'messages.mine': "2.50.0";
+        readonly 'messages.post': "2.50.0";
         readonly 'messages.say': "2.50.0";
     };
     readonly capabilities: {

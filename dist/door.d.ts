@@ -607,6 +607,7 @@ export declare const placeDoorsSchema: z.ZodObject<{
         kind: z.ZodCatch<z.ZodDefault<z.ZodEnum<["question", "report", "note"]>>>;
         choices: z.ZodCatch<z.ZodDefault<z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">, string[], string[]>>>;
         replyTo: z.ZodCatch<z.ZodDefault<z.ZodNullable<z.ZodNumber>>>;
+        once: z.ZodCatch<z.ZodDefault<z.ZodBoolean>>;
     }, "strip", z.ZodTypeAny, {
         at: string;
         id: number;
@@ -638,6 +639,7 @@ export declare const placeDoorsSchema: z.ZodObject<{
         body: string;
         kind: "question" | "report" | "note";
         replyTo: number | null;
+        once: boolean;
     }, {
         at: string;
         id: number;
@@ -669,6 +671,7 @@ export declare const placeDoorsSchema: z.ZodObject<{
         thread?: unknown;
         kind?: unknown;
         replyTo?: unknown;
+        once?: unknown;
     }>, "many">>>;
     /** 2.41.0. How many more unread wait beyond `messages`: handed at the next ask. */
     messagesMore: z.ZodCatch<z.ZodOptional<z.ZodNumber>>;
@@ -712,6 +715,7 @@ export declare const placeDoorsSchema: z.ZodObject<{
         body: string;
         kind: "question" | "report" | "note";
         replyTo: number | null;
+        once: boolean;
     }[] | undefined;
     modules?: {
         name: string;

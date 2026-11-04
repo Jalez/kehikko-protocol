@@ -335,6 +335,7 @@ and a module that declares none gets none of the methods below.
 | `messages.send` | `agents:message` |
 | `messages.read` | `agents:message` |
 | `messages.mine` | `agents:message` |
+| `messages.post` | `agents:message` |
 | `messages.say` | `messages:as-person` |
 
 The host's table is the protocol's `METHODS`, read by its `capabilityOf`
@@ -378,7 +379,10 @@ session, and a host declines them there. See [agent messages](agent-messages.md)
 `MESSAGE_CHOICE` characters) and `replyTo` (a message id). And a module's PAGE
 may ask `messages.mine { since?, limit? }`, answered `messageMineResult`
 (`{ messages, more }`): the messages addressed to the asking module
-(`to: { module }`) and the ones sent through it.
+(`to: { module }`) and the ones sent through it; and `messages.post { body, to,
+once?, kind?, choices?, replyTo?, thread? }`, the module's own message (no
+session, not the person's), where `once` makes it an introduction each session
+is handed at most once from that module.
 
 #### `CAPABILITIES.messages:as-person`
 

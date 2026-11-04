@@ -278,6 +278,11 @@ export declare const agentMessageSchema: z.ZodObject<{
     choices: z.ZodCatch<z.ZodDefault<z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">, string[], string[]>>>;
     /** 2.50.0. The id of the message this one answers, or null. */
     replyTo: z.ZodCatch<z.ZodDefault<z.ZodNullable<z.ZodNumber>>>;
+    /**
+     * 2.50.0. A module's once-only message (`messages.post` with `once`): the host hands each session at
+     * most ONE once-message from the same module, ever. False from a host before 2.50.0.
+     */
+    once: z.ZodCatch<z.ZodDefault<z.ZodBoolean>>;
 }, "strip", z.ZodTypeAny, {
     at: string;
     id: number;
@@ -309,6 +314,7 @@ export declare const agentMessageSchema: z.ZodObject<{
     body: string;
     kind: "question" | "report" | "note";
     replyTo: number | null;
+    once: boolean;
 }, {
     at: string;
     id: number;
@@ -340,6 +346,7 @@ export declare const agentMessageSchema: z.ZodObject<{
     thread?: unknown;
     kind?: unknown;
     replyTo?: unknown;
+    once?: unknown;
 }>;
 export type AgentMessage = z.infer<typeof agentMessageSchema>;
 /**
@@ -668,6 +675,173 @@ export declare const messageSayParams: z.ZodEffects<z.ZodObject<{
     replyTo?: number | undefined;
 }>;
 /**
+ * 2.50.0. `messages.post`'s params: a module's OWN message from its PAGE, under `agents:message` — not
+ * a session's and not the person's. The host stamps `from: { module, name, session: null, person: false }`.
+ * `once: true` is an introduction: each session is handed at most one once-message from this module,
+ * ever, whatever it is addressed to and however often it is posted; to a place or a module it reaches a
+ * session that comes there later too, for as long as the host keeps it (not only for
+ * `LIMITS.MESSAGES_UNREAD_MS`). Bounded like a session's (`MESSAGES_PER_MINUTE`, per module).
+ * Answered with `messageSendResult`.
+ */
+export declare const messagePostParams: z.ZodEffects<z.ZodObject<{
+    kind: z.ZodOptional<z.ZodEnum<["question", "report", "note"]>>;
+    choices: z.ZodOptional<z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">, string[], string[]>>;
+    replyTo: z.ZodOptional<z.ZodNumber>;
+    body: z.ZodString;
+    to: z.ZodEffects<z.ZodObject<{
+        project: z.ZodOptional<z.ZodLiteral<true>>;
+        place: z.ZodOptional<z.ZodEffects<z.ZodObject<{
+            epic: z.ZodOptional<z.ZodString>;
+            kehikko: z.ZodOptional<z.ZodString>;
+        }, "strip", z.ZodTypeAny, {
+            epic?: string | undefined;
+            kehikko?: string | undefined;
+        }, {
+            epic?: string | undefined;
+            kehikko?: string | undefined;
+        }>, {
+            epic?: string | undefined;
+            kehikko?: string | undefined;
+        }, {
+            epic?: string | undefined;
+            kehikko?: string | undefined;
+        }>>;
+        module: z.ZodOptional<z.ZodString>;
+        session: z.ZodOptional<z.ZodObject<{
+            module: z.ZodString;
+            session: z.ZodString;
+        }, "strip", z.ZodTypeAny, {
+            module: string;
+            session: string;
+        }, {
+            module: string;
+            session: string;
+        }>>;
+    }, "strip", z.ZodTypeAny, {
+        place?: {
+            epic?: string | undefined;
+            kehikko?: string | undefined;
+        } | undefined;
+        project?: true | undefined;
+        module?: string | undefined;
+        session?: {
+            module: string;
+            session: string;
+        } | undefined;
+    }, {
+        place?: {
+            epic?: string | undefined;
+            kehikko?: string | undefined;
+        } | undefined;
+        project?: true | undefined;
+        module?: string | undefined;
+        session?: {
+            module: string;
+            session: string;
+        } | undefined;
+    }>, {
+        place?: {
+            epic?: string | undefined;
+            kehikko?: string | undefined;
+        } | undefined;
+        project?: true | undefined;
+        module?: string | undefined;
+        session?: {
+            module: string;
+            session: string;
+        } | undefined;
+    }, {
+        place?: {
+            epic?: string | undefined;
+            kehikko?: string | undefined;
+        } | undefined;
+        project?: true | undefined;
+        module?: string | undefined;
+        session?: {
+            module: string;
+            session: string;
+        } | undefined;
+    }>;
+    thread: z.ZodOptional<z.ZodString>;
+    once: z.ZodOptional<z.ZodBoolean>;
+}, "strip", z.ZodTypeAny, {
+    to: {
+        place?: {
+            epic?: string | undefined;
+            kehikko?: string | undefined;
+        } | undefined;
+        project?: true | undefined;
+        module?: string | undefined;
+        session?: {
+            module: string;
+            session: string;
+        } | undefined;
+    };
+    body: string;
+    choices?: string[] | undefined;
+    thread?: string | undefined;
+    kind?: "question" | "report" | "note" | undefined;
+    replyTo?: number | undefined;
+    once?: boolean | undefined;
+}, {
+    to: {
+        place?: {
+            epic?: string | undefined;
+            kehikko?: string | undefined;
+        } | undefined;
+        project?: true | undefined;
+        module?: string | undefined;
+        session?: {
+            module: string;
+            session: string;
+        } | undefined;
+    };
+    body: string;
+    choices?: string[] | undefined;
+    thread?: string | undefined;
+    kind?: "question" | "report" | "note" | undefined;
+    replyTo?: number | undefined;
+    once?: boolean | undefined;
+}>, {
+    to: {
+        place?: {
+            epic?: string | undefined;
+            kehikko?: string | undefined;
+        } | undefined;
+        project?: true | undefined;
+        module?: string | undefined;
+        session?: {
+            module: string;
+            session: string;
+        } | undefined;
+    };
+    body: string;
+    choices?: string[] | undefined;
+    thread?: string | undefined;
+    kind?: "question" | "report" | "note" | undefined;
+    replyTo?: number | undefined;
+    once?: boolean | undefined;
+}, {
+    to: {
+        place?: {
+            epic?: string | undefined;
+            kehikko?: string | undefined;
+        } | undefined;
+        project?: true | undefined;
+        module?: string | undefined;
+        session?: {
+            module: string;
+            session: string;
+        } | undefined;
+    };
+    body: string;
+    choices?: string[] | undefined;
+    thread?: string | undefined;
+    kind?: "question" | "report" | "note" | undefined;
+    replyTo?: number | undefined;
+    once?: boolean | undefined;
+}>;
+/**
  * 2.50.0. `messages.mine`'s params, from a module's page under `agents:message`: the messages
  * addressed to the asking MODULE (`to: { module }`) and the ones it sent (the person's, through it),
  * oldest first — the latest `limit`, or the first `limit` after `since`.
@@ -814,6 +988,11 @@ export declare const messageMineResult: z.ZodObject<{
         choices: z.ZodCatch<z.ZodDefault<z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">, string[], string[]>>>;
         /** 2.50.0. The id of the message this one answers, or null. */
         replyTo: z.ZodCatch<z.ZodDefault<z.ZodNullable<z.ZodNumber>>>;
+        /**
+         * 2.50.0. A module's once-only message (`messages.post` with `once`): the host hands each session at
+         * most ONE once-message from the same module, ever. False from a host before 2.50.0.
+         */
+        once: z.ZodCatch<z.ZodDefault<z.ZodBoolean>>;
     }, "strip", z.ZodTypeAny, {
         at: string;
         id: number;
@@ -845,6 +1024,7 @@ export declare const messageMineResult: z.ZodObject<{
         body: string;
         kind: "question" | "report" | "note";
         replyTo: number | null;
+        once: boolean;
     }, {
         at: string;
         id: number;
@@ -876,6 +1056,7 @@ export declare const messageMineResult: z.ZodObject<{
         thread?: unknown;
         kind?: unknown;
         replyTo?: unknown;
+        once?: unknown;
     }>, "many">;
     more: z.ZodDefault<z.ZodNumber>;
 }, "strip", z.ZodTypeAny, {
@@ -910,6 +1091,7 @@ export declare const messageMineResult: z.ZodObject<{
         body: string;
         kind: "question" | "report" | "note";
         replyTo: number | null;
+        once: boolean;
     }[];
     more: number;
 }, {
@@ -944,6 +1126,7 @@ export declare const messageMineResult: z.ZodObject<{
         thread?: unknown;
         kind?: unknown;
         replyTo?: unknown;
+        once?: unknown;
     }[];
     more?: number | undefined;
 }>;
@@ -1128,6 +1311,11 @@ export declare const messageReadResult: z.ZodObject<{
         choices: z.ZodCatch<z.ZodDefault<z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">, string[], string[]>>>;
         /** 2.50.0. The id of the message this one answers, or null. */
         replyTo: z.ZodCatch<z.ZodDefault<z.ZodNullable<z.ZodNumber>>>;
+        /**
+         * 2.50.0. A module's once-only message (`messages.post` with `once`): the host hands each session at
+         * most ONE once-message from the same module, ever. False from a host before 2.50.0.
+         */
+        once: z.ZodCatch<z.ZodDefault<z.ZodBoolean>>;
     }, "strip", z.ZodTypeAny, {
         at: string;
         id: number;
@@ -1159,6 +1347,7 @@ export declare const messageReadResult: z.ZodObject<{
         body: string;
         kind: "question" | "report" | "note";
         replyTo: number | null;
+        once: boolean;
     }, {
         at: string;
         id: number;
@@ -1190,6 +1379,7 @@ export declare const messageReadResult: z.ZodObject<{
         thread?: unknown;
         kind?: unknown;
         replyTo?: unknown;
+        once?: unknown;
     }>, "many">;
     unread: z.ZodDefault<z.ZodNumber>;
     you: z.ZodDefault<z.ZodNullable<z.ZodObject<{
@@ -1257,6 +1447,7 @@ export declare const messageReadResult: z.ZodObject<{
         body: string;
         kind: "question" | "report" | "note";
         replyTo: number | null;
+        once: boolean;
     }[];
     unread: number;
     you: {
@@ -1300,6 +1491,7 @@ export declare const messageReadResult: z.ZodObject<{
         thread?: unknown;
         kind?: unknown;
         replyTo?: unknown;
+        once?: unknown;
     }[];
     unread?: number | undefined;
     you?: {
