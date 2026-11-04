@@ -6,6 +6,12 @@ The shapes are in `src/header.ts` and `src/messages.ts`; the client is `Connecti
 
 Back to the [index](README.md).
 
+## What goes in the header, and what in the footer (2.47.0)
+
+The header says **how the module is set up**: view switches, modes, layouts, sorting, filters, scope, toggles that change behaviour, starting or creating things, and picking which thing is shown when that is a choice. Live state — meters, counts, status, progress, where you are in the content — goes in the [footer](footer.md#what-goes-in-the-header-and-what-in-the-footer-2470), with the few actions that act on one of those readouts.
+
+It matters because a host can fold a container to one row, the header alone: what is left has to be enough to see how the module is set up. Folded to two rows, the footer shows as well, and it carries what is going on now. A header label that reads as a readout (`41%`, `3 / 12`) is pointed out by `rowsAdvice`, as advice and never as a refusal. The whole rule, with its tests, is in [the footer](footer.md#what-goes-in-the-header-and-what-in-the-footer-2470).
+
 ## The three messages
 
 | message | direction | carries | answered |

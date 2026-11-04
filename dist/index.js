@@ -22,6 +22,8 @@ export { TRACKERS, TRACKER_KINDS, TRACKER_STATES, TRACKER_DETAILS, PIPELINE_STAT
 export { PART_ID, partSchema, partsSchema, listedPartSchema, partListSchema, partIdFor, partsFor, PARTS_BEFORE_1_2, pickedParts, isFocused, refInFocus, partInFocus, focusCount, PAPER_MODULE, partFile, isPartFile, paperFileOf, partsOfFile, pickedFiles, fileInFocus, partDocument, isPartDocument, documentOf, pickedDocuments, anchorInFocus, narrowToFocus, emptySaid, focusSentence, FOCUS_WHERE, sameParts, } from './parts.js';
 /* What a module can open when pointed at, and what a restart of it ends (2.33.0). */
 export { OPENS, HOLDS, opensSchema, holdsSchema, opensOf, canOpen, holdsOf, holdsLiveSessions, } from './abilities.js';
+/* What goes in the header and what in the footer, and the advice that points out a misplacement (2.47.0). */
+export { rowsAdvice } from './rows.js';
 /* How the host's revealed header and footer meet a module's page: push, or over and `kehikot.covered` (2.42.0). */
 export { REVEAL_MODES, revealModeSchema, revealModeOf, coveredFields, NOT_COVERED, keepInView, } from './reveal.js';
 /* What an agent session is told about the modules around it, one wording for every agent module (2.36.0). */

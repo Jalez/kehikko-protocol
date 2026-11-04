@@ -68,12 +68,20 @@ const meterItem = z.object({
     text: z.string().min(1).max(LIMITS.FOOTER_METER_TEXT).optional(),
     ...placed,
 });
+/**
+ * 2.47.0. The readout a pressable footer item acts on: the id of a `text`, `meter` or `input` in the
+ * same footer that it sits beside (Compact beside the context meter, Reload beside the address). A
+ * hint, never a refusal: it is how a module says a switch or a toggle in its footer acts on what the
+ * footer shows rather than on how the module is set up, which `rowsAdvice` would otherwise point out.
+ * See docs/footer.md, "What goes in the header, and what in the footer".
+ */
+const actsOn = { actsOn: headerIdSchema.optional() };
 /* The header's own kinds, with the same fields and rules. A run in a footer is always a button, so
    `pinned` means nothing here, and `surface` (full screen) is the header's alone: both are stripped. */
-const switchItem = HEADER_ITEM_SHAPES.switch.extend(placed);
-const toggleItem = HEADER_ITEM_SHAPES.toggle.extend(placed);
-const goItem = HEADER_ITEM_SHAPES.go.extend(placed);
-const runItem = HEADER_ITEM_SHAPES.run.omit({ surface: true, pinned: true }).extend(placed);
+const switchItem = HEADER_ITEM_SHAPES.switch.extend(placed).extend(actsOn);
+const toggleItem = HEADER_ITEM_SHAPES.toggle.extend(placed).extend(actsOn);
+const goItem = HEADER_ITEM_SHAPES.go.extend(placed).extend(actsOn);
+const runItem = HEADER_ITEM_SHAPES.run.omit({ surface: true, pinned: true }).extend(placed).extend(actsOn);
 /**
  * A field the person types one line into (2.46.0): an address, a search, a filter. The module owns
  * the text: `value` is what it holds now, and the host draws it in the field until the person types.

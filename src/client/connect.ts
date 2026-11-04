@@ -27,6 +27,7 @@ import {
 } from '../wire.js'
 
 import { tooOldOf } from '../fit.js'
+import { rowsAdvice } from '../rows.js'
 import type { Covered } from '../reveal.js'
 import { mailbox, type MessageSource } from './mailbox.js'
 
@@ -354,6 +355,16 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
   /* The last footer (2.38.0), replayed and judged likewise. */
   let footing: FooterItemInput[] | null = null
   let footed: FooterItem[] = []
+  /* 2.47.0. What `rowsAdvice` has already said on the console about the header and footer, so each
+     sentence is said once per page and never again for a re-declaration. Advice only: nothing is held back. */
+  const advised = new Set<string>()
+  const advise = () => {
+    for (const line of rowsAdvice(heading, footing)) {
+      if (advised.has(line)) continue
+      advised.add(line)
+      console.warn(`[kehikot] ${line}`)
+    }
+  }
   /* The last activity list, as written, and the text of the one the host last took (`null`: none yet on
      this greeting, so the next is sent). `answered` is the greeting's `answers`, `null` when it did not say. */
   let activityNow: ActivityItem[] | null = null
@@ -664,6 +675,7 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
       const parsed = headerItemsSchema.safeParse(items)
       declared = parsed.success ? parsed.data : []
       send({ type: MESSAGE.HEADER, items })
+      advise()
     },
 
     footer(items) {
@@ -672,6 +684,7 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
       const parsed = footerItemsSchema.safeParse(items)
       footed = parsed.success ? parsed.data : []
       send({ type: MESSAGE.FOOTER, items })
+      advise()
     },
 
     activity(items) {

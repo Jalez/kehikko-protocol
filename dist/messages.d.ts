@@ -824,6 +824,8 @@ export declare const footerSchema: z.ZodObject<{
         align: z.ZodDefault<z.ZodEnum<["start", "center", "end"]>>;
         optional: z.ZodDefault<z.ZodBoolean>;
         tooltip: z.ZodOptional<z.ZodString>;
+    } & {
+        actsOn: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
     }, "strip", z.ZodTypeAny, {
         value: string;
         options: {
@@ -841,6 +843,7 @@ export declare const footerSchema: z.ZodObject<{
         shortcut?: string | undefined;
         tool?: string | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     }, {
         value: string;
         options: {
@@ -858,6 +861,7 @@ export declare const footerSchema: z.ZodObject<{
         align?: "start" | "center" | "end" | undefined;
         optional?: boolean | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     }>, z.ZodObject<{
         checked: z.ZodBoolean;
         id: z.ZodEffects<z.ZodString, string, string>;
@@ -872,6 +876,8 @@ export declare const footerSchema: z.ZodObject<{
         align: z.ZodDefault<z.ZodEnum<["start", "center", "end"]>>;
         optional: z.ZodDefault<z.ZodBoolean>;
         tooltip: z.ZodOptional<z.ZodString>;
+    } & {
+        actsOn: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
     }, "strip", z.ZodTypeAny, {
         id: string;
         label: string;
@@ -885,6 +891,7 @@ export declare const footerSchema: z.ZodObject<{
         shortcut?: string | undefined;
         tool?: string | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     }, {
         id: string;
         label: string;
@@ -898,6 +905,7 @@ export declare const footerSchema: z.ZodObject<{
         align?: "start" | "center" | "end" | undefined;
         optional?: boolean | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     }>, z.ZodObject<{
         options: z.ZodArray<z.ZodObject<{
             id: z.ZodEffects<z.ZodString, string, string>;
@@ -921,6 +929,8 @@ export declare const footerSchema: z.ZodObject<{
         align: z.ZodDefault<z.ZodEnum<["start", "center", "end"]>>;
         optional: z.ZodDefault<z.ZodBoolean>;
         tooltip: z.ZodOptional<z.ZodString>;
+    } & {
+        actsOn: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
     }, "strip", z.ZodTypeAny, {
         options: {
             id: string;
@@ -937,6 +947,7 @@ export declare const footerSchema: z.ZodObject<{
         shortcut?: string | undefined;
         tool?: string | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     }, {
         options: {
             id: string;
@@ -953,6 +964,7 @@ export declare const footerSchema: z.ZodObject<{
         align?: "start" | "center" | "end" | undefined;
         optional?: boolean | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     }>, z.ZodObject<Omit<{
         state: z.ZodDefault<z.ZodEnum<["idle", "busy", "failed"]>>;
         result: z.ZodDefault<z.ZodNullable<z.ZodString>>;
@@ -983,6 +995,8 @@ export declare const footerSchema: z.ZodObject<{
         align: z.ZodDefault<z.ZodEnum<["start", "center", "end"]>>;
         optional: z.ZodDefault<z.ZodBoolean>;
         tooltip: z.ZodOptional<z.ZodString>;
+    } & {
+        actsOn: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
     }, "strip", z.ZodTypeAny, {
         id: string;
         state: "failed" | "idle" | "busy";
@@ -1004,6 +1018,7 @@ export declare const footerSchema: z.ZodObject<{
         shortcut?: string | undefined;
         tool?: string | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     }, {
         id: string;
         label: string;
@@ -1025,6 +1040,7 @@ export declare const footerSchema: z.ZodObject<{
         align?: "start" | "center" | "end" | undefined;
         optional?: boolean | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     }>, z.ZodObject<{
         align: z.ZodDefault<z.ZodEnum<["start", "center", "end"]>>;
         optional: z.ZodDefault<z.ZodBoolean>;
@@ -1093,6 +1109,7 @@ export declare const footerSchema: z.ZodObject<{
         shortcut?: string | undefined;
         tool?: string | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         id: string;
         label: string;
@@ -1106,6 +1123,7 @@ export declare const footerSchema: z.ZodObject<{
         shortcut?: string | undefined;
         tool?: string | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         options: {
             id: string;
@@ -1122,6 +1140,7 @@ export declare const footerSchema: z.ZodObject<{
         shortcut?: string | undefined;
         tool?: string | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         id: string;
         state: "failed" | "idle" | "busy";
@@ -1143,6 +1162,7 @@ export declare const footerSchema: z.ZodObject<{
         shortcut?: string | undefined;
         tool?: string | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         value: string;
         id: string;
@@ -1189,6 +1209,7 @@ export declare const footerSchema: z.ZodObject<{
         align?: "start" | "center" | "end" | undefined;
         optional?: boolean | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         id: string;
         label: string;
@@ -1202,6 +1223,7 @@ export declare const footerSchema: z.ZodObject<{
         align?: "start" | "center" | "end" | undefined;
         optional?: boolean | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         options: {
             id: string;
@@ -1218,6 +1240,7 @@ export declare const footerSchema: z.ZodObject<{
         align?: "start" | "center" | "end" | undefined;
         optional?: boolean | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         id: string;
         label: string;
@@ -1239,6 +1262,7 @@ export declare const footerSchema: z.ZodObject<{
         align?: "start" | "center" | "end" | undefined;
         optional?: boolean | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         id: string;
         label: string;
@@ -1285,6 +1309,7 @@ export declare const footerSchema: z.ZodObject<{
         shortcut?: string | undefined;
         tool?: string | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         id: string;
         label: string;
@@ -1298,6 +1323,7 @@ export declare const footerSchema: z.ZodObject<{
         shortcut?: string | undefined;
         tool?: string | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         options: {
             id: string;
@@ -1314,6 +1340,7 @@ export declare const footerSchema: z.ZodObject<{
         shortcut?: string | undefined;
         tool?: string | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         id: string;
         state: "failed" | "idle" | "busy";
@@ -1335,6 +1362,7 @@ export declare const footerSchema: z.ZodObject<{
         shortcut?: string | undefined;
         tool?: string | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         value: string;
         id: string;
@@ -1381,6 +1409,7 @@ export declare const footerSchema: z.ZodObject<{
         align?: "start" | "center" | "end" | undefined;
         optional?: boolean | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         id: string;
         label: string;
@@ -1394,6 +1423,7 @@ export declare const footerSchema: z.ZodObject<{
         align?: "start" | "center" | "end" | undefined;
         optional?: boolean | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         options: {
             id: string;
@@ -1410,6 +1440,7 @@ export declare const footerSchema: z.ZodObject<{
         align?: "start" | "center" | "end" | undefined;
         optional?: boolean | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         id: string;
         label: string;
@@ -1431,6 +1462,7 @@ export declare const footerSchema: z.ZodObject<{
         align?: "start" | "center" | "end" | undefined;
         optional?: boolean | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         id: string;
         label: string;
@@ -1480,6 +1512,7 @@ export declare const footerSchema: z.ZodObject<{
         shortcut?: string | undefined;
         tool?: string | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         id: string;
         label: string;
@@ -1493,6 +1526,7 @@ export declare const footerSchema: z.ZodObject<{
         shortcut?: string | undefined;
         tool?: string | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         options: {
             id: string;
@@ -1509,6 +1543,7 @@ export declare const footerSchema: z.ZodObject<{
         shortcut?: string | undefined;
         tool?: string | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         id: string;
         state: "failed" | "idle" | "busy";
@@ -1530,6 +1565,7 @@ export declare const footerSchema: z.ZodObject<{
         shortcut?: string | undefined;
         tool?: string | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         value: string;
         id: string;
@@ -1579,6 +1615,7 @@ export declare const footerSchema: z.ZodObject<{
         align?: "start" | "center" | "end" | undefined;
         optional?: boolean | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         id: string;
         label: string;
@@ -1592,6 +1629,7 @@ export declare const footerSchema: z.ZodObject<{
         align?: "start" | "center" | "end" | undefined;
         optional?: boolean | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         options: {
             id: string;
@@ -1608,6 +1646,7 @@ export declare const footerSchema: z.ZodObject<{
         align?: "start" | "center" | "end" | undefined;
         optional?: boolean | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         id: string;
         label: string;
@@ -1629,6 +1668,7 @@ export declare const footerSchema: z.ZodObject<{
         align?: "start" | "center" | "end" | undefined;
         optional?: boolean | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         id: string;
         label: string;
@@ -6320,6 +6360,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         align: z.ZodDefault<z.ZodEnum<["start", "center", "end"]>>;
         optional: z.ZodDefault<z.ZodBoolean>;
         tooltip: z.ZodOptional<z.ZodString>;
+    } & {
+        actsOn: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
     }, "strip", z.ZodTypeAny, {
         value: string;
         options: {
@@ -6337,6 +6379,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         shortcut?: string | undefined;
         tool?: string | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     }, {
         value: string;
         options: {
@@ -6354,6 +6397,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         align?: "start" | "center" | "end" | undefined;
         optional?: boolean | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     }>, z.ZodObject<{
         checked: z.ZodBoolean;
         id: z.ZodEffects<z.ZodString, string, string>;
@@ -6368,6 +6412,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         align: z.ZodDefault<z.ZodEnum<["start", "center", "end"]>>;
         optional: z.ZodDefault<z.ZodBoolean>;
         tooltip: z.ZodOptional<z.ZodString>;
+    } & {
+        actsOn: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
     }, "strip", z.ZodTypeAny, {
         id: string;
         label: string;
@@ -6381,6 +6427,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         shortcut?: string | undefined;
         tool?: string | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     }, {
         id: string;
         label: string;
@@ -6394,6 +6441,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         align?: "start" | "center" | "end" | undefined;
         optional?: boolean | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     }>, z.ZodObject<{
         options: z.ZodArray<z.ZodObject<{
             id: z.ZodEffects<z.ZodString, string, string>;
@@ -6417,6 +6465,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         align: z.ZodDefault<z.ZodEnum<["start", "center", "end"]>>;
         optional: z.ZodDefault<z.ZodBoolean>;
         tooltip: z.ZodOptional<z.ZodString>;
+    } & {
+        actsOn: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
     }, "strip", z.ZodTypeAny, {
         options: {
             id: string;
@@ -6433,6 +6483,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         shortcut?: string | undefined;
         tool?: string | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     }, {
         options: {
             id: string;
@@ -6449,6 +6500,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         align?: "start" | "center" | "end" | undefined;
         optional?: boolean | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     }>, z.ZodObject<Omit<{
         state: z.ZodDefault<z.ZodEnum<["idle", "busy", "failed"]>>;
         result: z.ZodDefault<z.ZodNullable<z.ZodString>>;
@@ -6479,6 +6531,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         align: z.ZodDefault<z.ZodEnum<["start", "center", "end"]>>;
         optional: z.ZodDefault<z.ZodBoolean>;
         tooltip: z.ZodOptional<z.ZodString>;
+    } & {
+        actsOn: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
     }, "strip", z.ZodTypeAny, {
         id: string;
         state: "failed" | "idle" | "busy";
@@ -6500,6 +6554,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         shortcut?: string | undefined;
         tool?: string | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     }, {
         id: string;
         label: string;
@@ -6521,6 +6576,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         align?: "start" | "center" | "end" | undefined;
         optional?: boolean | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     }>, z.ZodObject<{
         align: z.ZodDefault<z.ZodEnum<["start", "center", "end"]>>;
         optional: z.ZodDefault<z.ZodBoolean>;
@@ -6589,6 +6645,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         shortcut?: string | undefined;
         tool?: string | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         id: string;
         label: string;
@@ -6602,6 +6659,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         shortcut?: string | undefined;
         tool?: string | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         options: {
             id: string;
@@ -6618,6 +6676,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         shortcut?: string | undefined;
         tool?: string | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         id: string;
         state: "failed" | "idle" | "busy";
@@ -6639,6 +6698,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         shortcut?: string | undefined;
         tool?: string | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         value: string;
         id: string;
@@ -6685,6 +6745,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         align?: "start" | "center" | "end" | undefined;
         optional?: boolean | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         id: string;
         label: string;
@@ -6698,6 +6759,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         align?: "start" | "center" | "end" | undefined;
         optional?: boolean | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         options: {
             id: string;
@@ -6714,6 +6776,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         align?: "start" | "center" | "end" | undefined;
         optional?: boolean | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         id: string;
         label: string;
@@ -6735,6 +6798,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         align?: "start" | "center" | "end" | undefined;
         optional?: boolean | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         id: string;
         label: string;
@@ -6781,6 +6845,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         shortcut?: string | undefined;
         tool?: string | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         id: string;
         label: string;
@@ -6794,6 +6859,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         shortcut?: string | undefined;
         tool?: string | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         options: {
             id: string;
@@ -6810,6 +6876,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         shortcut?: string | undefined;
         tool?: string | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         id: string;
         state: "failed" | "idle" | "busy";
@@ -6831,6 +6898,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         shortcut?: string | undefined;
         tool?: string | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         value: string;
         id: string;
@@ -6877,6 +6945,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         align?: "start" | "center" | "end" | undefined;
         optional?: boolean | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         id: string;
         label: string;
@@ -6890,6 +6959,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         align?: "start" | "center" | "end" | undefined;
         optional?: boolean | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         options: {
             id: string;
@@ -6906,6 +6976,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         align?: "start" | "center" | "end" | undefined;
         optional?: boolean | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         id: string;
         label: string;
@@ -6927,6 +6998,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         align?: "start" | "center" | "end" | undefined;
         optional?: boolean | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         id: string;
         label: string;
@@ -6976,6 +7048,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         shortcut?: string | undefined;
         tool?: string | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         id: string;
         label: string;
@@ -6989,6 +7062,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         shortcut?: string | undefined;
         tool?: string | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         options: {
             id: string;
@@ -7005,6 +7079,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         shortcut?: string | undefined;
         tool?: string | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         id: string;
         state: "failed" | "idle" | "busy";
@@ -7026,6 +7101,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         shortcut?: string | undefined;
         tool?: string | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         value: string;
         id: string;
@@ -7075,6 +7151,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         align?: "start" | "center" | "end" | undefined;
         optional?: boolean | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         id: string;
         label: string;
@@ -7088,6 +7165,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         align?: "start" | "center" | "end" | undefined;
         optional?: boolean | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         options: {
             id: string;
@@ -7104,6 +7182,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         align?: "start" | "center" | "end" | undefined;
         optional?: boolean | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         id: string;
         label: string;
@@ -7125,6 +7204,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         align?: "start" | "center" | "end" | undefined;
         optional?: boolean | undefined;
         tooltip?: string | undefined;
+        actsOn?: string | undefined;
     } | {
         id: string;
         label: string;

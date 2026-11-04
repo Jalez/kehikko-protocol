@@ -7,6 +7,24 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.47.0 — 2026-11-04
+
+What goes in the header and what in the footer. **Additive**; `PROTOCOL` is still 2. [docs/footer.md](docs/footer.md),
+"What goes in the header, and what in the footer".
+
+### Added
+
+- **The rule, written down**: the header says how the module is set up (switches, modes, sorting, filters,
+  toggles, starting things, picking what is shown); the footer says what is going on now (status, meters,
+  counts, progress, location) and holds only the actions that act on one of those readouts. It matters
+  because a host folds a container to one row (the header) or two (header and footer).
+- **`actsOn`** on the footer's `switch`, `toggle`, `go` and `run`: the id of the `text`, `meter` or `input`
+  beside it that it acts on. A hint, never refused for naming nothing. `WIRE_SINCE` gains `footer.actsOn`.
+- **`rowsAdvice(header, footer)`**: one sentence per obvious misplacement — a `meter` in the header, a header
+  label that reads as a readout, a footer `switch` or `toggle` without `actsOn`, an `actsOn` naming no
+  readout. Advice only. The client says each sentence once on the console (`console.warn`) when a page
+  declares its header or footer; the lists are sent as before.
+
 ## 2.46.0 — 2026-11-04
 
 A field in the footer. **Additive**; `PROTOCOL` is still 2. [docs/footer.md](docs/footer.md), "A field

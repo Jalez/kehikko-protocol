@@ -140,6 +140,8 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     optional: z.ZodDefault<z.ZodBoolean>;
     /** More than the row has room for, as a sentence shown on hover and focus. Text, never markup. */
     tooltip: z.ZodOptional<z.ZodString>;
+} & {
+    actsOn: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
 }, "strip", z.ZodTypeAny, {
     value: string;
     options: {
@@ -157,6 +159,7 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     shortcut?: string | undefined;
     tool?: string | undefined;
     tooltip?: string | undefined;
+    actsOn?: string | undefined;
 }, {
     value: string;
     options: {
@@ -174,6 +177,7 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     align?: "start" | "center" | "end" | undefined;
     optional?: boolean | undefined;
     tooltip?: string | undefined;
+    actsOn?: string | undefined;
 }>, z.ZodObject<{
     checked: z.ZodBoolean;
     id: z.ZodEffects<z.ZodString, string, string>;
@@ -194,6 +198,8 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     optional: z.ZodDefault<z.ZodBoolean>;
     /** More than the row has room for, as a sentence shown on hover and focus. Text, never markup. */
     tooltip: z.ZodOptional<z.ZodString>;
+} & {
+    actsOn: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
 }, "strip", z.ZodTypeAny, {
     id: string;
     label: string;
@@ -207,6 +213,7 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     shortcut?: string | undefined;
     tool?: string | undefined;
     tooltip?: string | undefined;
+    actsOn?: string | undefined;
 }, {
     id: string;
     label: string;
@@ -220,6 +227,7 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     align?: "start" | "center" | "end" | undefined;
     optional?: boolean | undefined;
     tooltip?: string | undefined;
+    actsOn?: string | undefined;
 }>, z.ZodObject<{
     options: z.ZodArray<z.ZodObject<{
         id: z.ZodEffects<z.ZodString, string, string>;
@@ -249,6 +257,8 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     optional: z.ZodDefault<z.ZodBoolean>;
     /** More than the row has room for, as a sentence shown on hover and focus. Text, never markup. */
     tooltip: z.ZodOptional<z.ZodString>;
+} & {
+    actsOn: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
 }, "strip", z.ZodTypeAny, {
     options: {
         id: string;
@@ -265,6 +275,7 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     shortcut?: string | undefined;
     tool?: string | undefined;
     tooltip?: string | undefined;
+    actsOn?: string | undefined;
 }, {
     options: {
         id: string;
@@ -281,6 +292,7 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     align?: "start" | "center" | "end" | undefined;
     optional?: boolean | undefined;
     tooltip?: string | undefined;
+    actsOn?: string | undefined;
 }>, z.ZodObject<Omit<{
     state: z.ZodDefault<z.ZodEnum<["idle", "busy", "failed"]>>;
     result: z.ZodDefault<z.ZodNullable<z.ZodString>>;
@@ -317,6 +329,8 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     optional: z.ZodDefault<z.ZodBoolean>;
     /** More than the row has room for, as a sentence shown on hover and focus. Text, never markup. */
     tooltip: z.ZodOptional<z.ZodString>;
+} & {
+    actsOn: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
 }, "strip", z.ZodTypeAny, {
     id: string;
     state: "failed" | "idle" | "busy";
@@ -338,6 +352,7 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     shortcut?: string | undefined;
     tool?: string | undefined;
     tooltip?: string | undefined;
+    actsOn?: string | undefined;
 }, {
     id: string;
     label: string;
@@ -359,6 +374,7 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     align?: "start" | "center" | "end" | undefined;
     optional?: boolean | undefined;
     tooltip?: string | undefined;
+    actsOn?: string | undefined;
 }>, z.ZodObject<{
     /** The group the item stands in. Items keep declaration order within their group. */
     align: z.ZodDefault<z.ZodEnum<["start", "center", "end"]>>;
@@ -438,6 +454,7 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     shortcut?: string | undefined;
     tool?: string | undefined;
     tooltip?: string | undefined;
+    actsOn?: string | undefined;
 } | {
     id: string;
     label: string;
@@ -451,6 +468,7 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     shortcut?: string | undefined;
     tool?: string | undefined;
     tooltip?: string | undefined;
+    actsOn?: string | undefined;
 } | {
     options: {
         id: string;
@@ -467,6 +485,7 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     shortcut?: string | undefined;
     tool?: string | undefined;
     tooltip?: string | undefined;
+    actsOn?: string | undefined;
 } | {
     id: string;
     state: "failed" | "idle" | "busy";
@@ -488,6 +507,7 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     shortcut?: string | undefined;
     tool?: string | undefined;
     tooltip?: string | undefined;
+    actsOn?: string | undefined;
 } | {
     value: string;
     id: string;
@@ -534,6 +554,7 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     align?: "start" | "center" | "end" | undefined;
     optional?: boolean | undefined;
     tooltip?: string | undefined;
+    actsOn?: string | undefined;
 } | {
     id: string;
     label: string;
@@ -547,6 +568,7 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     align?: "start" | "center" | "end" | undefined;
     optional?: boolean | undefined;
     tooltip?: string | undefined;
+    actsOn?: string | undefined;
 } | {
     options: {
         id: string;
@@ -563,6 +585,7 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     align?: "start" | "center" | "end" | undefined;
     optional?: boolean | undefined;
     tooltip?: string | undefined;
+    actsOn?: string | undefined;
 } | {
     id: string;
     label: string;
@@ -584,6 +607,7 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     align?: "start" | "center" | "end" | undefined;
     optional?: boolean | undefined;
     tooltip?: string | undefined;
+    actsOn?: string | undefined;
 } | {
     id: string;
     label: string;
@@ -708,6 +732,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     optional: z.ZodDefault<z.ZodBoolean>;
     /** More than the row has room for, as a sentence shown on hover and focus. Text, never markup. */
     tooltip: z.ZodOptional<z.ZodString>;
+} & {
+    actsOn: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
 }, "strip", z.ZodTypeAny, {
     value: string;
     options: {
@@ -725,6 +751,7 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     shortcut?: string | undefined;
     tool?: string | undefined;
     tooltip?: string | undefined;
+    actsOn?: string | undefined;
 }, {
     value: string;
     options: {
@@ -742,6 +769,7 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     align?: "start" | "center" | "end" | undefined;
     optional?: boolean | undefined;
     tooltip?: string | undefined;
+    actsOn?: string | undefined;
 }>, z.ZodObject<{
     checked: z.ZodBoolean;
     id: z.ZodEffects<z.ZodString, string, string>;
@@ -762,6 +790,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     optional: z.ZodDefault<z.ZodBoolean>;
     /** More than the row has room for, as a sentence shown on hover and focus. Text, never markup. */
     tooltip: z.ZodOptional<z.ZodString>;
+} & {
+    actsOn: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
 }, "strip", z.ZodTypeAny, {
     id: string;
     label: string;
@@ -775,6 +805,7 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     shortcut?: string | undefined;
     tool?: string | undefined;
     tooltip?: string | undefined;
+    actsOn?: string | undefined;
 }, {
     id: string;
     label: string;
@@ -788,6 +819,7 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     align?: "start" | "center" | "end" | undefined;
     optional?: boolean | undefined;
     tooltip?: string | undefined;
+    actsOn?: string | undefined;
 }>, z.ZodObject<{
     options: z.ZodArray<z.ZodObject<{
         id: z.ZodEffects<z.ZodString, string, string>;
@@ -817,6 +849,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     optional: z.ZodDefault<z.ZodBoolean>;
     /** More than the row has room for, as a sentence shown on hover and focus. Text, never markup. */
     tooltip: z.ZodOptional<z.ZodString>;
+} & {
+    actsOn: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
 }, "strip", z.ZodTypeAny, {
     options: {
         id: string;
@@ -833,6 +867,7 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     shortcut?: string | undefined;
     tool?: string | undefined;
     tooltip?: string | undefined;
+    actsOn?: string | undefined;
 }, {
     options: {
         id: string;
@@ -849,6 +884,7 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     align?: "start" | "center" | "end" | undefined;
     optional?: boolean | undefined;
     tooltip?: string | undefined;
+    actsOn?: string | undefined;
 }>, z.ZodObject<Omit<{
     state: z.ZodDefault<z.ZodEnum<["idle", "busy", "failed"]>>;
     result: z.ZodDefault<z.ZodNullable<z.ZodString>>;
@@ -885,6 +921,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     optional: z.ZodDefault<z.ZodBoolean>;
     /** More than the row has room for, as a sentence shown on hover and focus. Text, never markup. */
     tooltip: z.ZodOptional<z.ZodString>;
+} & {
+    actsOn: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
 }, "strip", z.ZodTypeAny, {
     id: string;
     state: "failed" | "idle" | "busy";
@@ -906,6 +944,7 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     shortcut?: string | undefined;
     tool?: string | undefined;
     tooltip?: string | undefined;
+    actsOn?: string | undefined;
 }, {
     id: string;
     label: string;
@@ -927,6 +966,7 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     align?: "start" | "center" | "end" | undefined;
     optional?: boolean | undefined;
     tooltip?: string | undefined;
+    actsOn?: string | undefined;
 }>, z.ZodObject<{
     /** The group the item stands in. Items keep declaration order within their group. */
     align: z.ZodDefault<z.ZodEnum<["start", "center", "end"]>>;
@@ -1006,6 +1046,7 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     shortcut?: string | undefined;
     tool?: string | undefined;
     tooltip?: string | undefined;
+    actsOn?: string | undefined;
 } | {
     id: string;
     label: string;
@@ -1019,6 +1060,7 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     shortcut?: string | undefined;
     tool?: string | undefined;
     tooltip?: string | undefined;
+    actsOn?: string | undefined;
 } | {
     options: {
         id: string;
@@ -1035,6 +1077,7 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     shortcut?: string | undefined;
     tool?: string | undefined;
     tooltip?: string | undefined;
+    actsOn?: string | undefined;
 } | {
     id: string;
     state: "failed" | "idle" | "busy";
@@ -1056,6 +1099,7 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     shortcut?: string | undefined;
     tool?: string | undefined;
     tooltip?: string | undefined;
+    actsOn?: string | undefined;
 } | {
     value: string;
     id: string;
@@ -1102,6 +1146,7 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     align?: "start" | "center" | "end" | undefined;
     optional?: boolean | undefined;
     tooltip?: string | undefined;
+    actsOn?: string | undefined;
 } | {
     id: string;
     label: string;
@@ -1115,6 +1160,7 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     align?: "start" | "center" | "end" | undefined;
     optional?: boolean | undefined;
     tooltip?: string | undefined;
+    actsOn?: string | undefined;
 } | {
     options: {
         id: string;
@@ -1131,6 +1177,7 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     align?: "start" | "center" | "end" | undefined;
     optional?: boolean | undefined;
     tooltip?: string | undefined;
+    actsOn?: string | undefined;
 } | {
     id: string;
     label: string;
@@ -1152,6 +1199,7 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     align?: "start" | "center" | "end" | undefined;
     optional?: boolean | undefined;
     tooltip?: string | undefined;
+    actsOn?: string | undefined;
 } | {
     id: string;
     label: string;
@@ -1198,6 +1246,7 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     shortcut?: string | undefined;
     tool?: string | undefined;
     tooltip?: string | undefined;
+    actsOn?: string | undefined;
 } | {
     id: string;
     label: string;
@@ -1211,6 +1260,7 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     shortcut?: string | undefined;
     tool?: string | undefined;
     tooltip?: string | undefined;
+    actsOn?: string | undefined;
 } | {
     options: {
         id: string;
@@ -1227,6 +1277,7 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     shortcut?: string | undefined;
     tool?: string | undefined;
     tooltip?: string | undefined;
+    actsOn?: string | undefined;
 } | {
     id: string;
     state: "failed" | "idle" | "busy";
@@ -1248,6 +1299,7 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     shortcut?: string | undefined;
     tool?: string | undefined;
     tooltip?: string | undefined;
+    actsOn?: string | undefined;
 } | {
     value: string;
     id: string;
@@ -1294,6 +1346,7 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     align?: "start" | "center" | "end" | undefined;
     optional?: boolean | undefined;
     tooltip?: string | undefined;
+    actsOn?: string | undefined;
 } | {
     id: string;
     label: string;
@@ -1307,6 +1360,7 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     align?: "start" | "center" | "end" | undefined;
     optional?: boolean | undefined;
     tooltip?: string | undefined;
+    actsOn?: string | undefined;
 } | {
     options: {
         id: string;
@@ -1323,6 +1377,7 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     align?: "start" | "center" | "end" | undefined;
     optional?: boolean | undefined;
     tooltip?: string | undefined;
+    actsOn?: string | undefined;
 } | {
     id: string;
     label: string;
@@ -1344,6 +1399,7 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     align?: "start" | "center" | "end" | undefined;
     optional?: boolean | undefined;
     tooltip?: string | undefined;
+    actsOn?: string | undefined;
 } | {
     id: string;
     label: string;
