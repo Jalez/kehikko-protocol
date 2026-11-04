@@ -23,7 +23,7 @@ import {
   type MessageReadResult,
   type WakeReader,
 } from '../src/index.js'
-import { DELIVERY_KEEP_MS, messageDelivery, type DeliverySession } from '../src/serve/index.js'
+import { ASLEEP_EVERY_MS, DELIVERY_KEEP_MS, messageDelivery, type DeliverySession } from '../src/serve/index.js'
 
 /**
  * 2.48.0: delivery by typing. The message itself is typed into the session, framed as another agent's
@@ -329,6 +329,17 @@ describe('messageDelivery', () => {
     r.advance(RESUME_EVERY_MS)
     expect(await r.delivery.tick()).toBe(1)
     expect(r.resumed.at(-1)!.key).toBe('s3')
+  })
+
+  test('an asleep session is asked about at most every ASLEEP_EVERY_MS', async () => {
+    const r = rig({ sessions: [session({ state: 'asleep' })], inbox: { [TOKEN]: [] } })
+    await r.delivery.tick()
+    r.advance(5000)
+    await r.delivery.tick()
+    expect(r.asked).toHaveLength(1)
+    r.advance(ASLEEP_EVERY_MS)
+    await r.delivery.tick()
+    expect(r.asked).toHaveLength(2)
   })
 
   test('asleep, with no way to resume or the setting off: left for its notes', async () => {

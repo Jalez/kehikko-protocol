@@ -25,7 +25,7 @@ Delivery by typing: a message is typed into the session it is for. **Additive**;
   `RESUME_MOST`). `DELIVERY_STATES`, `DELIVERY_ACTS`.
 - **`messageDelivery(options)`** (`/serve`): the loop every agent module runs in place of
   `messageWaker`. Reads with `unread` before typing, so a typed message is counted delivered and the
-  notes do not repeat it; holds messages read and not yet typed (`DELIVERY_KEEP_MS`); resumes an asleep
+  notes do not repeat it; holds messages read and not yet typed (`DELIVERY_KEEP_MS`); asks about an asleep session at most every `ASLEEP_EVERY_MS`; resumes an asleep
   session through the module's own `resume`, with the delivery as its first prompt.
 
 ### Changed

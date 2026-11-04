@@ -162,6 +162,7 @@ export {
   messageWaker,
   messageDelivery,
   DELIVERY_KEEP_MS,
+  ASLEEP_EVERY_MS,
   WAKE_EVERY_MS,
   WAKE_SETTLE_MS,
   type MessageToolAnswer,

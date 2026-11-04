@@ -287,6 +287,8 @@ export interface MessageDeliveryOptions extends Omit<AskHostOptions, 'project'> 
   queues?: boolean
   /** How often to look, in ms. Default `WAKE_EVERY_MS`. */
   everyMs?: number
+  /** How often to ask the host about an asleep session, in ms: there may be many, and none is in a hurry. Default `ASLEEP_EVERY_MS`. */
+  asleepEveryMs?: number
   /** A burst is one delivery (`DeliveryCase.settleMs`). Default `WAKE_SETTLE_MS`. */
   settleMs?: number
   now?: () => number
@@ -294,6 +296,9 @@ export interface MessageDeliveryOptions extends Omit<AskHostOptions, 'project'> 
   read?: (token: string, unread: boolean) => Promise<AskedHost<'messages.read'>>
   log?: (line: string) => void
 }
+
+/** 2.48.0. How often an asleep session is asked about, at most, in ms. */
+export const ASLEEP_EVERY_MS = 30_000
 
 /** 2.48.0. Messages read for a session (so counted delivered) and not yet typed are kept this long while it is not listed, in ms. */
 export const DELIVERY_KEEP_MS = 10 * 60_000
@@ -324,6 +329,7 @@ export function messageDelivery(options: MessageDeliveryOptions): MessageDeliver
     resume,
     queues = false,
     everyMs = WAKE_EVERY_MS,
+    asleepEveryMs = ASLEEP_EVERY_MS,
     settleMs = WAKE_SETTLE_MS,
     now = Date.now,
     read: readFor,
@@ -333,7 +339,7 @@ export function messageDelivery(options: MessageDeliveryOptions): MessageDeliver
   const read =
     readFor ?? ((token: string, unread: boolean) => askHost('messages.read', unread ? { token, unread: true, limit: DELIVER_MOST } : { token, limit: LIMITS.MESSAGES_READ }, ask))
   /* Per session: since when it is idle, what was read for it and not yet typed, when it was last resumed for a message, and when it was last listed. */
-  const memory = new Map<string, { idleSince: number | null; held: AgentMessage[]; resumedAt: number | null; seenAt: number }>()
+  const memory = new Map<string, { idleSince: number | null; held: AgentMessage[]; resumedAt: number | null; seenAt: number; peekedAt: number }>()
   let resumes: number[] = []
   let busy = false
   let timer: ReturnType<typeof setInterval> | null = null
@@ -354,7 +360,7 @@ export function messageDelivery(options: MessageDeliveryOptions): MessageDeliver
       for (const one of listed) {
         const at = now()
         let mem = memory.get(one.key)
-        if (!mem) memory.set(one.key, (mem = { idleSince: null, held: [], resumedAt: null, seenAt: at }))
+        if (!mem) memory.set(one.key, (mem = { idleSince: null, held: [], resumedAt: null, seenAt: at, peekedAt: Number.NEGATIVE_INFINITY }))
         mem.seenAt = at
         if (one.state === 'idle') mem.idleSince ??= at
         else mem.idleSince = null
@@ -364,6 +370,8 @@ export function messageDelivery(options: MessageDeliveryOptions): MessageDeliver
         let waiting = mem.held.length
         let newestAt = Number.NEGATIVE_INFINITY
         if (!waiting) {
+          if (one.state === 'asleep' && at - mem.peekedAt < asleepEveryMs) continue
+          mem.peekedAt = at
           let peeked: AskedHost<'messages.read'>
           try {
             peeked = await read(one.token, false)

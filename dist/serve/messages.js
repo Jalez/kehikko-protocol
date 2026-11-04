@@ -168,6 +168,8 @@ export function messageWaker(options) {
         },
     };
 }
+/** 2.48.0. How often an asleep session is asked about, at most, in ms. */
+export const ASLEEP_EVERY_MS = 30_000;
 /** 2.48.0. Messages read for a session (so counted delivered) and not yet typed are kept this long while it is not listed, in ms. */
 export const DELIVERY_KEEP_MS = 10 * 60_000;
 /**
@@ -183,7 +185,7 @@ export const DELIVERY_KEEP_MS = 10 * 60_000;
  * elsewhere; never its own message. Never throws.
  */
 export function messageDelivery(options) {
-    const { sessions, type, resume, queues = false, everyMs = WAKE_EVERY_MS, settleMs = WAKE_SETTLE_MS, now = Date.now, read: readFor, log = () => { }, ...ask } = options;
+    const { sessions, type, resume, queues = false, everyMs = WAKE_EVERY_MS, asleepEveryMs = ASLEEP_EVERY_MS, settleMs = WAKE_SETTLE_MS, now = Date.now, read: readFor, log = () => { }, ...ask } = options;
     const read = readFor ?? ((token, unread) => askHost('messages.read', unread ? { token, unread: true, limit: DELIVER_MOST } : { token, limit: LIMITS.MESSAGES_READ }, ask));
     /* Per session: since when it is idle, what was read for it and not yet typed, when it was last resumed for a message, and when it was last listed. */
     const memory = new Map();
@@ -210,7 +212,7 @@ export function messageDelivery(options) {
                 const at = now();
                 let mem = memory.get(one.key);
                 if (!mem)
-                    memory.set(one.key, (mem = { idleSince: null, held: [], resumedAt: null, seenAt: at }));
+                    memory.set(one.key, (mem = { idleSince: null, held: [], resumedAt: null, seenAt: at, peekedAt: Number.NEGATIVE_INFINITY }));
                 mem.seenAt = at;
                 if (one.state === 'idle')
                     mem.idleSince ??= at;
@@ -224,6 +226,9 @@ export function messageDelivery(options) {
                 let waiting = mem.held.length;
                 let newestAt = Number.NEGATIVE_INFINITY;
                 if (!waiting) {
+                    if (one.state === 'asleep' && at - mem.peekedAt < asleepEveryMs)
+                        continue;
+                    mem.peekedAt = at;
                     let peeked;
                     try {
                         peeked = await read(one.token, false);

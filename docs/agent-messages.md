@@ -250,7 +250,7 @@ the messages at the next prompt, as before). Nothing is typed or resumed before 
 waited `WAKE_SETTLE_MS`, so a burst is one paste.
 
 **Resuming is capped**: at most one resume per session per `RESUME_EVERY_MS` (10 min), and at most
-`RESUME_MOST` (3) sessions resumed for messages by one module in any 10 minutes. Only the module's own
+`RESUME_MOST` (3) sessions resumed for messages by one module in any 10 minutes. An asleep session is asked about at most every `ASLEEP_EVERY_MS` (30 s). Only the module's own
 way of resuming (`resume` in the options): absent, an asleep session waits for its notes.
 
 **Which programs queue typing during a turn** (checked from their sources, 2026-11): Claude Code queues

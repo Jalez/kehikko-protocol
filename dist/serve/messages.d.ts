@@ -141,6 +141,8 @@ export interface MessageDeliveryOptions extends Omit<AskHostOptions, 'project'> 
     queues?: boolean;
     /** How often to look, in ms. Default `WAKE_EVERY_MS`. */
     everyMs?: number;
+    /** How often to ask the host about an asleep session, in ms: there may be many, and none is in a hurry. Default `ASLEEP_EVERY_MS`. */
+    asleepEveryMs?: number;
     /** A burst is one delivery (`DeliveryCase.settleMs`). Default `WAKE_SETTLE_MS`. */
     settleMs?: number;
     now?: () => number;
@@ -148,6 +150,8 @@ export interface MessageDeliveryOptions extends Omit<AskHostOptions, 'project'> 
     read?: (token: string, unread: boolean) => Promise<AskedHost<'messages.read'>>;
     log?: (line: string) => void;
 }
+/** 2.48.0. How often an asleep session is asked about, at most, in ms. */
+export declare const ASLEEP_EVERY_MS = 30000;
 /** 2.48.0. Messages read for a session (so counted delivered) and not yet typed are kept this long while it is not listed, in ms. */
 export declare const DELIVERY_KEEP_MS: number;
 export interface MessageDelivery {
