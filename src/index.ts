@@ -497,6 +497,9 @@ export {
   type AbleManifest,
 } from './abilities.js'
 
+/* What goes in the header and what in the footer, and the advice that points out a misplacement (2.47.0). */
+export { rowsAdvice } from './rows.js'
+
 /* How the host's revealed header and footer meet a module's page: push, or over and `kehikot.covered` (2.42.0). */
 export {
   REVEAL_MODES,

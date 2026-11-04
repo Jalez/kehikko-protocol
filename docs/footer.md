@@ -6,6 +6,34 @@ The shapes are in `src/footer.ts` and `src/messages.ts`; the client is `Connecti
 
 Back to the [index](README.md).
 
+## What goes in the header, and what in the footer (2.47.0)
+
+A container has two rows the host draws: the header at the top and the footer at the bottom. They answer two different questions, and a module that keeps them apart works in every way a person folds or hides them.
+
+**The header says how the module is set up.** What it shows, and how:
+
+- view switches, modes, layouts, sorting, filters and scope;
+- toggles and settings that change behaviour;
+- creating or starting things (a new item, a new session, a run) and menus of general actions;
+- picking which thing is shown (a document, a list, a branch), when that is a choice rather than a readout.
+
+**The footer says what is going on now.** Live readouts about the thing on screen, and the actions that act directly on one of them:
+
+- status and state: context or usage meters, model, cost, counts, progress, sync or compile state, errors, "last updated";
+- where you are inside the content: the current location or address, page or stage x of y, the selected item's identity;
+- an action tied to a readout beside it: Compact or Clear beside the context meter, Back, Forward and Reload beside the address, Retry beside an error, Next and Previous beside a stage counter.
+
+Four tests for each item:
+
+1. Would a person glance at it to KNOW something about the current state? The footer.
+2. Would they press it to CHANGE how the module is set up, or to start something new? The header.
+3. An action belongs in the footer only if it acts on a footer readout and sits beside it. Say which one with `actsOn` (2.47.0): the id of the `text`, `meter` or `input` it acts on. Otherwise it goes in the header.
+4. Never put the same item in both rows. And leave nothing crucial drawn by your own page when a row can hold it: a module with state worth knowing (a count, a status, a location) should declare a footer.
+
+**Why it matters.** A host folds a container to ONE row, the header alone, or to TWO rows, the header and the footer; the module's page is not drawn either way. One row has to be enough to see how the module is set up, and two rows enough to know how it is doing, so the footer carries the module's crucial at-a-glance state. A host may also hide both rows until the person points at the container or clicks into it, depending on that person's setting for it.
+
+**Advice, never a refusal.** `rowsAdvice(header, footer)` returns one sentence per obvious misplacement: a `meter` in the header (which the header's schema refuses anyway, without saying where it belongs), a header label that reads as a readout (`41%`, `3 / 12`, `2 of 5`), a `switch` or `toggle` in the footer with no `actsOn`, and an `actsOn` that names no readout in the same footer. The client says each sentence once on the console when the page declares its rows; nothing is held back and nothing is refused.
+
 ## The messages
 
 | message | direction | carries | answered |
@@ -48,6 +76,7 @@ Every item also has:
 - `align`: `start` (default), `center` or `end`, the group it stands in. Items keep declaration order within a group.
 - `optional`: the first to go when the row is narrow (below).
 - `tooltip`: a sentence shown on hover and focus, for what the row has no room for.
+- `actsOn` (2.47.0, the four pressable kinds): the id of the `text`, `meter` or `input` beside it that it acts on. A hint for the rule above, never checked as a refusal.
 
 A footer `run` may also carry `copy` or `open` (2.40.0): the host writes the clipboard or opens the page itself in the person's click, then sends the press with `carried`. See [the header](header.md#acts-the-host-carries-out-2400).
 

@@ -202,6 +202,7 @@ export const WIRE_SINCE = {
   'footer.input': '2.46.0',
   'press.text': '2.46.0',
   'hello.footerKinds': '2.46.0',
+  'footer.actsOn': '2.47.0',
 } as const
 export type WirePiece = keyof typeof WIRE_SINCE
 

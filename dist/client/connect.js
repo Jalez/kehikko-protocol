@@ -5,6 +5,7 @@ import { activityItemsSchema } from '../activity.js';
 import { ORIGINS_ELEMENT, originAmong } from '../page.js';
 import { footerItemsSchema, footerPressRefusal, headerItemsSchema, hostMessageSchema, looksLikeWireMessage, pressRefusal, } from '../wire.js';
 import { tooOldOf } from '../fit.js';
+import { rowsAdvice } from '../rows.js';
 import { mailbox } from './mailbox.js';
 /** The project folder a greeting or a context names, or null. */
 function projectOf(context) {
@@ -117,6 +118,17 @@ export function connect(id, events = {}, options = {}) {
     /* The last footer (2.38.0), replayed and judged likewise. */
     let footing = null;
     let footed = [];
+    /* 2.47.0. What `rowsAdvice` has already said on the console about the header and footer, so each
+       sentence is said once per page and never again for a re-declaration. Advice only: nothing is held back. */
+    const advised = new Set();
+    const advise = () => {
+        for (const line of rowsAdvice(heading, footing)) {
+            if (advised.has(line))
+                continue;
+            advised.add(line);
+            console.warn(`[kehikot] ${line}`);
+        }
+    };
     /* The last activity list, as written, and the text of the one the host last took (`null`: none yet on
        this greeting, so the next is sent). `answered` is the greeting's `answers`, `null` when it did not say. */
     let activityNow = null;
@@ -424,6 +436,7 @@ export function connect(id, events = {}, options = {}) {
             const parsed = headerItemsSchema.safeParse(items);
             declared = parsed.success ? parsed.data : [];
             send({ type: MESSAGE.HEADER, items });
+            advise();
         },
         footer(items) {
             /* As `header`: kept before it is sent, and a list that does not parse is still sent for the host to report. */
@@ -431,6 +444,7 @@ export function connect(id, events = {}, options = {}) {
             const parsed = footerItemsSchema.safeParse(items);
             footed = parsed.success ? parsed.data : [];
             send({ type: MESSAGE.FOOTER, items });
+            advise();
         },
         activity(items) {
             const parsed = activityItemsSchema.safeParse(items);
