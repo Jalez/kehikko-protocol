@@ -559,6 +559,30 @@ timeout is the backstop and a timeout already means what `found: false`
 means. A slow honest answer degrades to the fallback. A fast dishonest one
 degrades to silence.
 
+#### `pointerSchema` (2.49.0)
+
+Module → host: `{ phase: 'down' | 'up' | 'cancel', at }`, sent only to a host
+whose greeting said `pointer: true`.
+
+A host can see a press on its own chrome, and a press that moves the keyboard
+into a framed page shows up as the host window losing it. A press inside a
+page that already has the keyboard shows up as nothing at all. So a host that
+reveals a container's header and footer when the person clicks inside it (or
+holds a press inside it) could not do so reliably without the page saying so.
+This is the page saying so, and nothing more: no position, no target, no
+answer. What was pressed stays the page's business.
+
+`at` is the page's `performance.now()`. Only the difference between a `down`
+and the `up` after it means anything — how long the press was held — so the
+two clocks never have to agree. `cancel` is a press taken away (a scroll, the
+window losing it) and ends the press like `up` without having been one.
+
+`connect` does this by itself: it listens on the page's `window` (capture,
+passive) while the newest greeting asks, sends the primary button, a touch or
+a pen, and stops on `stop()` or a greeting that no longer asks.
+`pointerTarget: false` turns it off. A hand-rolled page may send it; a host
+before 2.49.0 never asks and drops it unread (`MODULE_MESSAGES`).
+
 #### `hostMessageSchema`
 
 Not a `discriminatedUnion`, because `responseSchema` is itself a union on a

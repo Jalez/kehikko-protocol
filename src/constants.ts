@@ -118,6 +118,14 @@ export const MESSAGE = {
    * way a page can know. See docs/activity.md, "Whether the person can see the page".
    */
   VISIBLE: 'kehikot.visible',
+  /**
+   * Module → host (2.49.0). "The person pressed, or let go, inside my page": `{ phase, at }`, sent
+   * only to a host whose greeting asked (`pointer: true`). A press inside a framed page is invisible
+   * to the host otherwise — a click into a page that already has the keyboard moves no focus — so
+   * this is how a host reveals a container's rows on a click or a held press inside it. `at` is the
+   * page's own clock (`performance.now()`), for the length of a press; nothing else. No answer.
+   */
+  POINTER: 'kehikot.pointer',
 } as const
 
 export type MessageType = (typeof MESSAGE)[keyof typeof MESSAGE]
@@ -159,6 +167,7 @@ export const MODULE_MESSAGES = [
   MESSAGE.HEADER,
   MESSAGE.PRESSED,
   MESSAGE.FOOTER,
+  MESSAGE.POINTER,
 ] as const
 
 /**

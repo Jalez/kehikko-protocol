@@ -2460,6 +2460,12 @@ export declare const helloSchema: z.ZodObject<{
      * the rule. Names a host does not know are kept.
      */
     footerKinds: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+    /**
+     * 2.49.0. Whether this host wants to hear the person's presses inside the page (`kehikot.pointer`).
+     * Absent from a host before 2.49.0: it does not, and nothing is sent. `connect` sends them for a
+     * page by itself when this is `true`; a hand-rolled page may.
+     */
+    pointer: z.ZodOptional<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
     type: "kehikot.hello";
     state: string | null;
@@ -2569,6 +2575,7 @@ export declare const helloSchema: z.ZodObject<{
     answers?: string[] | undefined;
     carries?: string[] | undefined;
     footerKinds?: string[] | undefined;
+    pointer?: boolean | undefined;
 }, {
     type: "kehikot.hello";
     session: string;
@@ -2678,6 +2685,7 @@ export declare const helloSchema: z.ZodObject<{
     answers?: string[] | undefined;
     carries?: string[] | undefined;
     footerKinds?: string[] | undefined;
+    pointer?: boolean | undefined;
 }>;
 /**
  * Host → module. Which epic is open now: the `contextSchema` fields flat, not wrapped in `context`.
@@ -3691,6 +3699,32 @@ export declare const visibleSchema: z.ZodObject<{
     visible: boolean;
 }>;
 export type VisibleMessage = z.infer<typeof visibleSchema>;
+/** 2.49.0. What a `kehikot.pointer` says happened: a press began, ended, or was taken away (`cancel`). */
+export declare const POINTER_PHASES: readonly ["down", "up", "cancel"];
+export type PointerPhase = (typeof POINTER_PHASES)[number];
+/**
+ * Module → host (2.49.0). A press inside the page: `down` when the primary button (or a touch, or a
+ * pen) went down, `up` when it came up, `cancel` when the press was taken away (a scroll, the window
+ * losing it). `at` is the page's `performance.now()` in milliseconds: only the difference between a
+ * `down` and its `up` means anything, which is how long the press was held. Sent only to a host whose
+ * greeting said `pointer: true`; carries no position and no target — what was pressed is the page's.
+ * Fire and forget. A host before 2.49.0 drops it unread; one that asked uses it for when a
+ * container's rows show (a click, or a held press, inside the page).
+ */
+export declare const pointerSchema: z.ZodObject<{
+    type: z.ZodLiteral<"kehikot.pointer">;
+    phase: z.ZodEnum<["down", "up", "cancel"]>;
+    at: z.ZodNumber;
+}, "strip", z.ZodTypeAny, {
+    at: number;
+    type: "kehikot.pointer";
+    phase: "down" | "up" | "cancel";
+}, {
+    at: number;
+    type: "kehikot.pointer";
+    phase: "down" | "up" | "cancel";
+}>;
+export type PointerMessage = z.infer<typeof pointerSchema>;
 /**
  * Every message a host sends. A plain union, not a `discriminatedUnion`, because `responseSchema`
  * is itself a union on a different key and cannot be an option of one.
@@ -4392,6 +4426,12 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
      * the rule. Names a host does not know are kept.
      */
     footerKinds: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+    /**
+     * 2.49.0. Whether this host wants to hear the person's presses inside the page (`kehikot.pointer`).
+     * Absent from a host before 2.49.0: it does not, and nothing is sent. `connect` sends them for a
+     * page by itself when this is `true`; a hand-rolled page may.
+     */
+    pointer: z.ZodOptional<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
     type: "kehikot.hello";
     state: string | null;
@@ -4501,6 +4541,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     answers?: string[] | undefined;
     carries?: string[] | undefined;
     footerKinds?: string[] | undefined;
+    pointer?: boolean | undefined;
 }, {
     type: "kehikot.hello";
     session: string;
@@ -4610,6 +4651,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     answers?: string[] | undefined;
     carries?: string[] | undefined;
     footerKinds?: string[] | undefined;
+    pointer?: boolean | undefined;
 }>, z.ZodObject<{
     epic: z.ZodDefault<z.ZodNullable<z.ZodString>>;
     scope: z.ZodCatch<z.ZodOptional<z.ZodEnum<["machine", "project", "epic", "part", "kehikko"]>>>;
@@ -7217,6 +7259,18 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         placeholder?: string | undefined;
         grow?: boolean | undefined;
     })[];
+}>, z.ZodObject<{
+    type: z.ZodLiteral<"kehikot.pointer">;
+    phase: z.ZodEnum<["down", "up", "cancel"]>;
+    at: z.ZodNumber;
+}, "strip", z.ZodTypeAny, {
+    at: number;
+    type: "kehikot.pointer";
+    phase: "down" | "up" | "cancel";
+}, {
+    at: number;
+    type: "kehikot.pointer";
+    phase: "down" | "up" | "cancel";
 }>]>;
 export type ModuleMessage = z.infer<typeof moduleMessageSchema>;
 export type WireMessage = HostMessage | ModuleMessage;

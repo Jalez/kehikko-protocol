@@ -7,6 +7,25 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.49.0 — 2026-11-04
+
+The person's presses inside a page, for a host that asks. **Additive**; `PROTOCOL` is still 2.
+[docs/wire.md](docs/wire.md), "`pointerSchema` (2.49.0)".
+
+### Added
+
+- **`kehikot.pointer`** (`MESSAGE.POINTER`, in `MODULE_MESSAGES`; `pointerSchema`, `POINTER_PHASES`,
+  types `PointerMessage`, `PointerPhase`): module → host `{ phase: 'down' | 'up' | 'cancel', at }`, `at`
+  the page's `performance.now()`. A press inside a framed page moves no focus when the page already
+  has it, so the host could not see a click, or a held press, inside a container; this is how it
+  reveals a container's rows on one. No position, no target, no answer.
+- **`hello.pointer`**: a host that wants them says `pointer: true`. Absent from a host before 2.49.0,
+  and then nothing is sent.
+- **`connect`** sends them by itself to a host that asked: the primary button, a touch or a pen, down
+  and up, and a cancelled press; it listens once across greetings and stops when a greeting stops
+  asking or the page stops. `ConnectOptions.pointerTarget` (`PointerTarget`) is where it listens,
+  this page's `window` by default; `false` sends none.
+
 ## 2.48.0 — 2026-11-04
 
 Delivery by typing: a message is typed into the session it is for. **Additive**; `PROTOCOL` is still 2.
