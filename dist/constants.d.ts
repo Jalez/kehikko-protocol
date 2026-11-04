@@ -114,6 +114,14 @@ export declare const MESSAGE: {
      * way a page can know. See docs/activity.md, "Whether the person can see the page".
      */
     readonly VISIBLE: "kehikot.visible";
+    /**
+     * Module → host (2.49.0). "The person pressed, or let go, inside my page": `{ phase, at }`, sent
+     * only to a host whose greeting asked (`pointer: true`). A press inside a framed page is invisible
+     * to the host otherwise — a click into a page that already has the keyboard moves no focus — so
+     * this is how a host reveals a container's rows on a click or a held press inside it. `at` is the
+     * page's own clock (`performance.now()`), for the length of a press; nothing else. No answer.
+     */
+    readonly POINTER: "kehikot.pointer";
 };
 export type MessageType = (typeof MESSAGE)[keyof typeof MESSAGE];
 /** The prefix every message type carries, so a listener can drop the rest cheaply. There is one spelling. */
@@ -128,7 +136,7 @@ export declare const MESSAGE_PREFIX = "kehikot.";
  */
 export declare const HOST_MESSAGES: readonly ["kehikot.hello", "kehikot.context", "kehikot.response", "kehikot.goto", "kehikot.event", "kehikot.clear", "kehikot.refresh", "kehikot.press", "kehikot.opened", "kehikot.covered", "kehikot.visible"];
 /** And what the module says. */
-export declare const MODULE_MESSAGES: readonly ["kehikot.ready", "kehikot.request", "kehikot.resize", "kehikot.went", "kehikot.filters", "kehikot.clearable", "kehikot.refreshable", "kehikot.header", "kehikot.pressed", "kehikot.footer"];
+export declare const MODULE_MESSAGES: readonly ["kehikot.ready", "kehikot.request", "kehikot.resize", "kehikot.went", "kehikot.filters", "kehikot.clearable", "kehikot.refreshable", "kehikot.header", "kehikot.pressed", "kehikot.footer", "kehikot.pointer"];
 /**
  * How tall a frame may be asked to be, in pixels, bounded on both sides. `clampHeight` restates
  * the host's answer so a module can do the arithmetic on its own side.

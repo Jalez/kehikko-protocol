@@ -189,6 +189,27 @@ export interface ConnectOptions {
      * (`pageOrigins`): for a page that is not served by this package's doors.
      */
     origins?: readonly string[];
+    /**
+     * 2.49.0. Where the person's presses are heard, to tell a host that asked (`hello.pointer`):
+     * this page's `window` by default; injectable so tests need no browser. `false` sends none.
+     */
+    pointerTarget?: PointerTarget | false;
+}
+/** What `connect` listens on for presses: a window, or anything shaped like one. */
+export interface PointerTarget {
+    addEventListener(type: string, listener: (event: {
+        button?: number;
+        isPrimary?: boolean;
+    }) => void, options?: {
+        capture?: boolean;
+        passive?: boolean;
+    }): void;
+    removeEventListener(type: string, listener: (event: {
+        button?: number;
+        isPrimary?: boolean;
+    }) => void, options?: {
+        capture?: boolean;
+    }): void;
 }
 export interface Connection {
     /**

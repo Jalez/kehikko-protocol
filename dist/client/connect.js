@@ -91,6 +91,8 @@ export const GOTO_BACKSTOP_MS = 500;
 export const PRESS_BACKSTOP_MS = 2_000;
 /** What a question asked before any greeting is refused with. The React hook says the same between mounts. */
 export const NOBODY_TO_ASK = 'Nothing has greeted this page, so there is nobody to ask.';
+/** The page's clock for `kehikot.pointer`'s `at`: `performance.now()` where there is one. */
+const pointerClock = () => (typeof performance !== 'undefined' ? performance.now() : Date.now());
 /**
  * Build one conversation. Nothing is sent, and nothing is heard, until `listen`; nothing is sent
  * before a greeting arrives either.
@@ -139,6 +141,39 @@ export function connect(id, events = {}, options = {}) {
     let byProject = false;
     let projectNow = null;
     let projectIdNow = null;
+    /* 2.49.0. Presses, told to a host whose greeting asked; `null` while nothing is listened to. */
+    const pointerTarget = options.pointerTarget === false ? null : (options.pointerTarget ?? (typeof window === 'undefined' ? null : window));
+    let pointing = null;
+    const pointer = (want) => {
+        if (!want || !pointerTarget) {
+            pointing?.();
+            pointing = null;
+            return;
+        }
+        if (pointing)
+            return;
+        const target = pointerTarget;
+        /* The primary button, a touch or a pen: a right click is a menu, not a press. */
+        const down = (event) => {
+            if ((event.button ?? 0) !== 0 || event.isPrimary === false)
+                return;
+            send({ type: MESSAGE.POINTER, phase: 'down', at: pointerClock() });
+        };
+        const up = (event) => {
+            if (event.isPrimary === false)
+                return;
+            send({ type: MESSAGE.POINTER, phase: 'up', at: pointerClock() });
+        };
+        const cancel = () => send({ type: MESSAGE.POINTER, phase: 'cancel', at: pointerClock() });
+        target.addEventListener('pointerdown', down, { capture: true, passive: true });
+        target.addEventListener('pointerup', up, { capture: true, passive: true });
+        target.addEventListener('pointercancel', cancel, { capture: true, passive: true });
+        pointing = () => {
+            target.removeEventListener('pointerdown', down, { capture: true });
+            target.removeEventListener('pointerup', up, { capture: true });
+            target.removeEventListener('pointercancel', cancel, { capture: true });
+        };
+    };
     /** Correlation id -> the promise waiting on it. A `Map`, per the protocol's note on lookups. */
     const waiting = new Map();
     let counter = 0;
@@ -200,6 +235,7 @@ export function connect(id, events = {}, options = {}) {
             projectNow = projectOf(message.context);
             projectIdNow = projectIdOf(message.context);
             sendActivity();
+            pointer(message.pointer === true);
             events.onHello?.(message.context, message.state, { answers: message.answers ?? null, header: message.header ?? null, footer: message.footer ?? null, carries: message.carries ?? null, footerKinds: message.footerKinds ?? null });
             return;
         }
@@ -456,6 +492,7 @@ export function connect(id, events = {}, options = {}) {
         greeted: () => host !== null,
         stop() {
             live = false;
+            pointer(false);
             if (listening) {
                 listening = false;
                 source.removeEventListener('message', onMessage);

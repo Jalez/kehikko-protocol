@@ -260,7 +260,21 @@ export interface ConnectOptions {
    * (`pageOrigins`): for a page that is not served by this package's doors.
    */
   origins?: readonly string[]
+  /**
+   * 2.49.0. Where the person's presses are heard, to tell a host that asked (`hello.pointer`):
+   * this page's `window` by default; injectable so tests need no browser. `false` sends none.
+   */
+  pointerTarget?: PointerTarget | false
 }
+
+/** What `connect` listens on for presses: a window, or anything shaped like one. */
+export interface PointerTarget {
+  addEventListener(type: string, listener: (event: { button?: number; isPrimary?: boolean }) => void, options?: { capture?: boolean; passive?: boolean }): void
+  removeEventListener(type: string, listener: (event: { button?: number; isPrimary?: boolean }) => void, options?: { capture?: boolean }): void
+}
+
+/** The page's clock for `kehikot.pointer`'s `at`: `performance.now()` where there is one. */
+const pointerClock = (): number => (typeof performance !== 'undefined' ? performance.now() : Date.now())
 
 export interface Connection {
   /**
@@ -375,6 +389,37 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
   let byProject = false
   let projectNow: string | null = null
   let projectIdNow: string | null = null
+  /* 2.49.0. Presses, told to a host whose greeting asked; `null` while nothing is listened to. */
+  const pointerTarget: PointerTarget | null =
+    options.pointerTarget === false ? null : (options.pointerTarget ?? (typeof window === 'undefined' ? null : (window as unknown as PointerTarget)))
+  let pointing: (() => void) | null = null
+  const pointer = (want: boolean) => {
+    if (!want || !pointerTarget) {
+      pointing?.()
+      pointing = null
+      return
+    }
+    if (pointing) return
+    const target = pointerTarget
+    /* The primary button, a touch or a pen: a right click is a menu, not a press. */
+    const down = (event: { button?: number; isPrimary?: boolean }) => {
+      if ((event.button ?? 0) !== 0 || event.isPrimary === false) return
+      send({ type: MESSAGE.POINTER, phase: 'down', at: pointerClock() })
+    }
+    const up = (event: { button?: number; isPrimary?: boolean }) => {
+      if (event.isPrimary === false) return
+      send({ type: MESSAGE.POINTER, phase: 'up', at: pointerClock() })
+    }
+    const cancel = () => send({ type: MESSAGE.POINTER, phase: 'cancel', at: pointerClock() })
+    target.addEventListener('pointerdown', down, { capture: true, passive: true })
+    target.addEventListener('pointerup', up, { capture: true, passive: true })
+    target.addEventListener('pointercancel', cancel, { capture: true, passive: true })
+    pointing = () => {
+      target.removeEventListener('pointerdown', down, { capture: true })
+      target.removeEventListener('pointerup', up, { capture: true })
+      target.removeEventListener('pointercancel', cancel, { capture: true })
+    }
+  }
 
   /** Correlation id -> the promise waiting on it. A `Map`, per the protocol's note on lookups. */
   const waiting = new Map<
@@ -434,6 +479,7 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
       projectNow = projectOf(message.context)
       projectIdNow = projectIdOf(message.context)
       sendActivity()
+      pointer(message.pointer === true)
       events.onHello?.(message.context, message.state, { answers: message.answers ?? null, header: message.header ?? null, footer: message.footer ?? null, carries: message.carries ?? null, footerKinds: message.footerKinds ?? null })
       return
     }
@@ -698,6 +744,7 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
 
     stop() {
       live = false
+      pointer(false)
       if (listening) {
         listening = false
         source.removeEventListener('message', onMessage)

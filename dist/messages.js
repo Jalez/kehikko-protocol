@@ -195,6 +195,12 @@ export const helloSchema = z.object({
      * the rule. Names a host does not know are kept.
      */
     footerKinds: z.array(z.string().min(1).max(16)).max(16).optional(),
+    /**
+     * 2.49.0. Whether this host wants to hear the person's presses inside the page (`kehikot.pointer`).
+     * Absent from a host before 2.49.0: it does not, and nothing is sent. `connect` sends them for a
+     * page by itself when this is `true`; a hand-rolled page may.
+     */
+    pointer: z.boolean().optional(),
 });
 /**
  * Host → module. Which epic is open now: the `contextSchema` fields flat, not wrapped in `context`.
@@ -388,6 +394,22 @@ export const visibleSchema = z.object({
     protocol: z.number().int().min(1),
     visible: z.boolean(),
 });
+/** 2.49.0. What a `kehikot.pointer` says happened: a press began, ended, or was taken away (`cancel`). */
+export const POINTER_PHASES = ['down', 'up', 'cancel'];
+/**
+ * Module → host (2.49.0). A press inside the page: `down` when the primary button (or a touch, or a
+ * pen) went down, `up` when it came up, `cancel` when the press was taken away (a scroll, the window
+ * losing it). `at` is the page's `performance.now()` in milliseconds: only the difference between a
+ * `down` and its `up` means anything, which is how long the press was held. Sent only to a host whose
+ * greeting said `pointer: true`; carries no position and no target — what was pressed is the page's.
+ * Fire and forget. A host before 2.49.0 drops it unread; one that asked uses it for when a
+ * container's rows show (a click, or a held press, inside the page).
+ */
+export const pointerSchema = z.object({
+    type: messageType(MESSAGE.POINTER),
+    phase: z.enum(POINTER_PHASES),
+    at: z.number().finite().min(0),
+});
 /**
  * Every message a host sends. A plain union, not a `discriminatedUnion`, because `responseSchema`
  * is itself a union on a different key and cannot be an option of one.
@@ -416,6 +438,7 @@ export const moduleMessageSchema = z.union([
     headerSchema,
     pressedSchema,
     footerSchema,
+    pointerSchema,
 ]);
 /**
  * Is this worth parsing at all? The cheap first filter: true when the value is an object whose
