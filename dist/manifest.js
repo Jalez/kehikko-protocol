@@ -11,6 +11,7 @@ import { agentSessionsSchema, providesSchema } from './provides.js';
 import { holdsSchema, opensSchema } from './abilities.js';
 import { revealModeSchema } from './reveal.js';
 import { agentSaysSchema } from './notes.js';
+import { helpSchema } from './help.js';
 import { navigatesSchema, showsSchema } from './show.js';
 import { modeScopeSchema, scopeSaysSchema, supportedScopes } from './scope.js';
 /**
@@ -309,6 +310,14 @@ const manifestFields = z.object({
      * parse, like `agentSays`.
      */
     absentSays: agentSaysSchema.optional().catch(undefined),
+    /**
+     * 2.52.0. How to use this module, for a person: a one-line `summary` and short `sections` of
+     * points (`helpSchema`, bounded by `HELP_LIMITS`). Plain text only: a host draws every string as
+     * text, never as markup or a link. A host that has it offers "How to use" for the module. Top-level,
+     * optional, dropped when it does not parse, like `agentSays`; a host before 2.52.0 ignores it.
+     * See `help.ts`.
+     */
+    help: helpSchema.optional().catch(undefined),
     /**
      * The scopes this module can work at, as modes: one per scope, the default first (2.29.0; see
      * `modeSchema.scope`). Required, at least one, so a host older than 2.29.0 still parses it.
