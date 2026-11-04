@@ -154,7 +154,7 @@ export interface NotesInput {
  * `NotesTold` without `version` is read as 1. 3 (2.41.0): the line about messaging other agent sessions,
  * and the messages section. 4 (2.43.0): the standing permission to act on messages (`actOnMessages`).
  * 5 (2.44.0): a module's skills the session does not have are said apart (`holds`). 6 (2.50.0): the
- * person's messages and a message's kind and choices; and what each module says is kept (`said`), so a
+ * person's messages and a message's kind and choices; and what each module says is kept (`lines`), so a
  * module that changes its `agentSays` is told again at the next prompt.
  */
 export declare const NOTES_VERSION = 6;
@@ -172,9 +172,10 @@ export interface NotesTold {
     /**
      * 2.50.0. What each module on the kehikko said to agents when it was told (`agentSays`, else its
      * summary, as one line), by id. A module whose line changed since is told again at the next prompt.
-     * Absent in a record kept before 2.50.0, which `NOTES_VERSION` 6 tells in full once anyway.
+     * Absent in a record kept before 2.50.0, which `NOTES_VERSION` 6 tells in full once anyway. Not
+     * `said`: agent modules keep their own `said` (the words themselves) beside these fields.
      */
-    said?: Record<string, string>;
+    lines?: Record<string, string>;
 }
 /** `start`: a session starts, resumes, is cleared or compacted. `prompt`: the person sent a prompt. */
 export type NotesEvent = 'start' | 'prompt';

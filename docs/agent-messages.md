@@ -352,9 +352,9 @@ its cursor and of `MESSAGES_UNREAD_MS`, for as long as the host keeps it (`MESSA
 delivered like any message: typed in by the module that runs the session, if its person lets messages
 wake it.
 
-### A module's words that changed (`NotesTold.said`)
+### A module's words that changed (`NotesTold.lines`)
 
-`sessionNotes` keeps what each module on the kehikko said (`said`, 2.50.0). At a prompt, a module that
+`sessionNotes` keeps what each module on the kehikko said (`lines`, 2.50.0; not `said`, which agent modules keep for the words themselves). At a prompt, a module that
 is still there and now says something else is told again, under its own head. `NOTES_VERSION` is 6, so
 every running session is told the full notes once, which carries the new words to sessions whose
-record predates `said`.
+record predates `lines`.

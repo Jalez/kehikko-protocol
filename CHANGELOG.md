@@ -34,7 +34,7 @@ Questions, reports and the person's own messages. **Additive**; `PROTOCOL` is st
   stamped with no session and not the person's. **`once: true`** makes it an introduction: each session
   is handed at most one once-message from the same module, ever, and one to a place or module also
   reaches sessions that come there later (`agentMessageSchema.once`).
-- **`NotesTold.said`**: what each module on the kehikko said to agents; a module that rewords its
+- **`NotesTold.lines`**: what each module on the kehikko said to agents; a module that rewords its
   `agentSays` is told again at the next prompt.
 
 ### Changed

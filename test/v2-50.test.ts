@@ -313,7 +313,7 @@ describe('a module that rewords what it says to agents is told again', () => {
   })
   test('NOTES_VERSION is 6', () => expect(NOTES_VERSION).toBe(6))
   test('the told record keeps what each module said', () => {
-    expect(sessionNotes(input('Old words.'), 'start', null).told.said).toEqual({ 'kehikot.relay': 'Old words.' })
+    expect(sessionNotes(input('Old words.'), 'start', null).told.lines).toEqual({ 'kehikot.relay': 'Old words.' })
   })
   test('same words: nothing; new words: told once at the next prompt', () => {
     const told = sessionNotes(input('Old words.'), 'start', null).told
@@ -324,8 +324,13 @@ describe('a module that rewords what it says to agents is told again', () => {
     expect(changed.text).toContain('"Talk to your person through me."')
     expect(sessionNotes(input('Talk to your person through me.'), 'prompt', changed.told).text).toBeNull()
   })
-  test('a record from before said (version 5) gets the full notes once', () => {
-    const { said: _none, ...old } = sessionNotes(input('Old words.'), 'start', null).told
+  test('a module’s own `said` beside the record does not disturb it', () => {
+    const told = { ...sessionNotes(input('Old words.'), 'start', null).told, said: { start: { at: 1, text: 'x' }, changes: [] } }
+    expect(sessionNotes(input('Old words.'), 'prompt', told as never).text).toBeNull()
+    expect(sessionNotes(input('New words.'), 'prompt', told as never).text).toContain('New words.')
+  })
+  test('a record from before lines (version 5) gets the full notes once', () => {
+    const { lines: _none, ...old } = sessionNotes(input('Old words.'), 'start', null).told
     const again = sessionNotes(input('New words.'), 'prompt', { ...old, version: 5 })
     expect(again.text).toContain('New words.')
     expect(again.kind).toBe('start')
