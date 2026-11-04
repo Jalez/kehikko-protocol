@@ -267,11 +267,28 @@ export interface ConnectOptions {
   pointerTarget?: PointerTarget | false
 }
 
+/** What `connect` reads of a press: which button, whether it is the primary pointer, and where (2.50.1). */
+export interface PointerEventLike {
+  button?: number
+  isPrimary?: boolean
+  clientX?: number
+  clientY?: number
+  /** `mouse`, `pen` or `touch`, on a pointer event. */
+  pointerType?: string
+}
+
 /** What `connect` listens on for presses: a window, or anything shaped like one. */
 export interface PointerTarget {
-  addEventListener(type: string, listener: (event: { button?: number; isPrimary?: boolean }) => void, options?: { capture?: boolean; passive?: boolean }): void
-  removeEventListener(type: string, listener: (event: { button?: number; isPrimary?: boolean }) => void, options?: { capture?: boolean }): void
+  addEventListener(type: string, listener: (event: PointerEventLike) => void, options?: { capture?: boolean; passive?: boolean }): void
+  removeEventListener(type: string, listener: (event: PointerEventLike) => void, options?: { capture?: boolean }): void
 }
+
+/**
+ * 2.50.1. How far, in CSS pixels, a press may wander and still be a press held in place. Past it the
+ * press is a drag — a selection, a scroll, a move — and is told as `cancel`: a drag is not a long
+ * press. Under it a hand's tremor on a trackpad is still holding still.
+ */
+export const POINTER_SLOP_PX = 8
 
 /** The page's clock for `kehikot.pointer`'s `at`: `performance.now()` where there is one. */
 const pointerClock = (): number => (typeof performance !== 'undefined' ? performance.now() : Date.now())
@@ -401,23 +418,69 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
     }
     if (pointing) return
     const target = pointerTarget
+    /*
+     * One press at a time: where it went down, whether the page's own browser took it away
+     * (`pointercancel`) while it was held still, and whether it has been told as over.
+     *
+     * 2.50.1. A browser cancels a press for reasons of its own that are not the person letting go:
+     * WebKit hands a press held on text, or on a selection, to its own drag or look-up machinery and
+     * fires `pointercancel` while the button is still down. Told as `cancel`, that ended a long press
+     * a person was still holding — in exactly the pages that are mostly text. So a cancel of a mouse
+     * press that has not moved is not told; the press ends when the button comes up, which is then heard
+     * as whichever of `pointerup`, `mouseup` or `dragend` the browser still sends. A press that moved
+     * past `POINTER_SLOP_PX` is a drag, and is told as `cancel` the moment it does.
+     */
+    let pressed: { x: number; y: number; mouse: boolean } | null = null
+    const end = (phase: 'up' | 'cancel') => {
+      if (!pressed) return
+      pressed = null
+      send({ type: MESSAGE.POINTER, phase, at: pointerClock() })
+    }
     /* The primary button, a touch or a pen: a right click is a menu, not a press. */
-    const down = (event: { button?: number; isPrimary?: boolean }) => {
+    const down = (event: PointerEventLike) => {
       if ((event.button ?? 0) !== 0 || event.isPrimary === false) return
+      pressed = { x: event.clientX ?? 0, y: event.clientY ?? 0, mouse: (event.pointerType ?? 'mouse') === 'mouse' }
       send({ type: MESSAGE.POINTER, phase: 'down', at: pointerClock() })
     }
-    const up = (event: { button?: number; isPrimary?: boolean }) => {
+    const up = (event: PointerEventLike) => {
       if (event.isPrimary === false) return
-      send({ type: MESSAGE.POINTER, phase: 'up', at: pointerClock() })
+      /* An up with no press this page saw (one that began outside it) is still said, as before. */
+      if (!pressed) {
+        send({ type: MESSAGE.POINTER, phase: 'up', at: pointerClock() })
+        return
+      }
+      end('up')
     }
-    const cancel = () => send({ type: MESSAGE.POINTER, phase: 'cancel', at: pointerClock() })
-    target.addEventListener('pointerdown', down, { capture: true, passive: true })
-    target.addEventListener('pointerup', up, { capture: true, passive: true })
-    target.addEventListener('pointercancel', cancel, { capture: true, passive: true })
+    const moved = (event: PointerEventLike) => {
+      if (!pressed || event.isPrimary === false) return
+      if (event.clientX === undefined || event.clientY === undefined) return
+      if (Math.hypot(event.clientX - pressed.x, event.clientY - pressed.y) > POINTER_SLOP_PX) end('cancel')
+    }
+    /* A mouse held still: the browser took the press, not the person, and it ends when the button
+       comes up. A touch or a pen cancelled is the browser's scroll or zoom starting, which no button
+       coming up will follow: that is a cancel, as before. */
+    const cancel = () => {
+      if (pressed?.mouse) return
+      pressed = null
+      send({ type: MESSAGE.POINTER, phase: 'cancel', at: pointerClock() })
+    }
+    /* After a cancel, the button coming up is a mouse event or the end of the browser's drag. */
+    const released = () => end('up')
+    const listening: [string, (event: PointerEventLike) => void][] = [
+      ['pointerdown', down],
+      ['pointerup', up],
+      ['pointercancel', cancel],
+      ['pointermove', moved],
+      ['mousemove', moved],
+      ['mouseup', released],
+      ['dragend', released],
+    ]
+    /* On the window, in the capture phase: before any element of the page can stop it, and still
+       heard while an element holds the pointer captured. */
+    for (const [type, listener] of listening) target.addEventListener(type, listener, { capture: true, passive: true })
     pointing = () => {
-      target.removeEventListener('pointerdown', down, { capture: true })
-      target.removeEventListener('pointerup', up, { capture: true })
-      target.removeEventListener('pointercancel', cancel, { capture: true })
+      for (const [type, listener] of listening) target.removeEventListener(type, listener, { capture: true })
+      pressed = null
     }
   }
 

@@ -583,6 +583,17 @@ a pen, and stops on `stop()` or a greeting that no longer asks.
 `pointerTarget: false` turns it off. A hand-rolled page may send it; a host
 before 2.49.0 never asks and drops it unread (`MODULE_MESSAGES`).
 
+2.50.1. A press is a press held in place. One that moves more than
+`POINTER_SLOP_PX` (8 CSS pixels) from where it went down is a drag — a text
+selection, a scroll — and `connect` says `cancel` the moment it does, so a drag
+is never timed as a long press. And a mouse press the BROWSER cancels while it
+has not moved is not told as `cancel`: WebKit fires `pointercancel` for a press
+held on text or on a selection, handing it to its own drag or look-up, while
+the person is still holding the button. That press ends when the button comes
+up, heard as `pointerup`, `mouseup` or `dragend`, whichever the browser still
+sends. A touch or pen cancelled is the browser's scroll starting, and is a
+`cancel` as before.
+
 #### `hostMessageSchema`
 
 Not a `discriminatedUnion`, because `responseSchema` is itself a union on a
