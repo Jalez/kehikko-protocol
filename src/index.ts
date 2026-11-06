@@ -547,6 +547,9 @@ export {
   NOTES_VERSION,
   NOT_LOADED,
   UPDATED_HEAD,
+  KEHIKKO_SKILLS_TOOL,
+  KEHIKKO_SKILLS_HEAD,
+  kehikkoSkillMark,
   type SessionModule,
   type AbsentModule,
   type NotesPlace,
@@ -555,6 +558,17 @@ export {
   type NotesTold,
   type NotesEvent,
 } from './notes.js'
+
+/* A kehikko's own skills, written by the person for every agent session on it (2.53.0). See `kehikko-skills.ts`. */
+export {
+  KEHIKKO_SKILL_LIMITS,
+  kehikkoSkillDescription,
+  kehikkoSkillText,
+  kehikkoSkillIssue,
+  kehikkoSkillSchema,
+  kehikkoSkillsSchema,
+  type KehikkoSkill,
+} from './kehikko-skills.js'
 
 /* Messages between agent sessions, kept by the host (2.41.0). See `agent-messages.ts`. */
 export {

@@ -7,6 +7,27 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.53.0 — 2026-11-06
+
+A kehikko's own skills, written by the person for every agent session on it. **Additive**; `PROTOCOL`
+is still 2. [docs/asking.md](docs/asking.md), "A kehikko's own skills (2.53.0)".
+
+### Added
+
+- **`kehikkoSkills`** in the answer to `POST /host/place` (`placeDoorsSchema`, `kehikkoSkillsSchema`):
+  each `{ name, description, text }`, `text` the whole SKILL.md, at most `KEHIKKO_SKILL_LIMITS.MOST`
+  (20), each name once; one that does not parse is left out and the rest kept. A module that runs agent
+  sessions loads every one into a session on that kehikko. Absent from a host before 2.53.0.
+  `SESSION_FIELD_SINCE.kehikkoSkills`.
+- **`kehikkoSkillText(name, description, body)`**, **`kehikkoSkillIssue({ name, description, body })`**,
+  **`kehikkoSkillDescription`**, **`kehikkoSkillSchema`**, **`KEHIKKO_SKILL_LIMITS`** (description 300
+  characters, body 32,000), type `KehikkoSkill`.
+- **`NotesInput.kehikkoSkills`** and **`NotesTold.kehikkoSkills`** (`kehikkoSkillMark`): the notes list
+  them at a start (`KEHIKKO_SKILLS_HEAD`) and say one added, changed or removed at a prompt; one the
+  session does not `hold` (or every one, with **`NotesInput.loadsKehikkoSkills: false`** from a module
+  that loads none) is said as not loaded, to be read with **`KEHIKKO_SKILLS_TOOL`** (`kehikko_skills`) on
+  the host's door. `NOTES_VERSION` 7.
+
 ## 2.52.0 — 2026-11-04
 
 How to use a module, in its own words, for a person. **Additive**; `PROTOCOL` is still 2.

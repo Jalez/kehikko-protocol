@@ -354,6 +354,31 @@ installed ones): each module line then says only those after "Skills:", and the 
 after `NOT_LOADED` ("Not loaded in this conversation: …"). Without `holds`, the host's list is said as
 it is. `NOTES_VERSION` 5.
 
+**A kehikko's own skills (2.53.0).** The person may write skills for one kehikko: each a name
+(`SKILL_NAME`), a one-line description (what an agent decides to use it by, at most
+`KEHIKKO_SKILL_LIMITS.DESCRIPTION` characters) and a markdown body (`KEHIKKO_SKILL_LIMITS.BODY`), at most
+`KEHIKKO_SKILL_LIMITS.MOST` per kehikko; `kehikkoSkillIssue` says in one sentence what is wrong with one.
+They belong to the kehikko, not to a module or an epic: EVERY agent session placed on that kehikko gets
+them, whichever module runs it and whatever epic it works on. Only the person writes one (a host takes
+an edit from its own page alone); a host's MCP door may let an agent read them with `KEHIKKO_SKILLS_TOOL`
+(`kehikko_skills`), never write them.
+
+The answer to `POST /host/place` carries them as `kehikkoSkills` (`kehikkoSkillsSchema`): each
+`{ name, description, text }`, `text` the whole SKILL.md (`kehikkoSkillText(name, description, body)`:
+front matter with `name` and the description as a JSON string, then the body). A module that runs agent
+sessions writes each where its agent reads skills for that session, as it loads a module's skill that
+can work there, counts them among what the session `holds`, and passes them to `sessionNotes` as
+`kehikkoSkills`. A name a module's skill already uses there is the person's: the kehikko's skill wins.
+Absent: the host did not say (older, or no kehikko), and nothing is loaded or said. One that does not
+parse is left out and the rest kept.
+
+At a start the notes list them under `KEHIKKO_SKILLS_HEAD`, each with its description in quotes. At a
+prompt they say a skill the person added, changed (`NotesTold.kehikkoSkills` keeps `kehikkoSkillMark`
+of each text) or removed since. A module that cannot load skills into a running session leaves a new one
+out of `holds`, and one that cannot load skills into its agent at all passes `loadsKehikkoSkills: false`;
+the notes then say which are not loaded as skills and to read one with `kehikko_skills` on the host's
+door when its description fits. A changed one is always to be read again there. `NOTES_VERSION` 7.
+
 **When the notes change (2.37.0).** `NOTES_VERSION` is the version of the notes' wording; `sessionNotes` writes it into
 the `told` record (`version`). A session told by an older version (a record without `version` is 1) gets the full notes
 once at its next prompt, headed "Kehikot: what this conversation is told was updated:", and only changes after. Whoever

@@ -694,13 +694,13 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         prompt: boolean;
         uses: string[];
         storage: boolean;
+        provides?: string[] | undefined;
         skills?: {
             name: string;
             version: string;
             summary: string;
             needs?: import("./skills.js").SkillNeed[] | undefined;
         }[] | undefined;
-        provides?: string[] | undefined;
         settings?: {
             type: "string" | "number" | "boolean" | "choice" | "list";
             key: string;
@@ -723,14 +723,14 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     }, {
         protocol?: string | undefined;
         prompt?: boolean | undefined;
+        provides?: unknown;
+        uses?: string[] | undefined;
         skills?: {
             name: string;
             version: string;
             summary: string;
             needs?: import("./skills.js").SkillNeed[] | undefined;
         }[] | undefined;
-        provides?: unknown;
-        uses?: string[] | undefined;
         settings?: unknown;
         storage?: boolean | undefined;
         agentSessions?: unknown;
@@ -769,13 +769,13 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         prompt: boolean;
         uses: string[];
         storage: boolean;
+        provides?: string[] | undefined;
         skills?: {
             name: string;
             version: string;
             summary: string;
             needs?: import("./skills.js").SkillNeed[] | undefined;
         }[] | undefined;
-        provides?: string[] | undefined;
         settings?: {
             type: "string" | "number" | "boolean" | "choice" | "list";
             key: string;
@@ -873,14 +873,14 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     declares?: {
         protocol?: string | undefined;
         prompt?: boolean | undefined;
+        provides?: unknown;
+        uses?: string[] | undefined;
         skills?: {
             name: string;
             version: string;
             summary: string;
             needs?: import("./skills.js").SkillNeed[] | undefined;
         }[] | undefined;
-        provides?: unknown;
-        uses?: string[] | undefined;
         settings?: unknown;
         storage?: boolean | undefined;
         agentSessions?: unknown;
@@ -928,13 +928,13 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         prompt: boolean;
         uses: string[];
         storage: boolean;
+        provides?: string[] | undefined;
         skills?: {
             name: string;
             version: string;
             summary: string;
             needs?: import("./skills.js").SkillNeed[] | undefined;
         }[] | undefined;
-        provides?: string[] | undefined;
         settings?: {
             type: "string" | "number" | "boolean" | "choice" | "list";
             key: string;
@@ -1032,14 +1032,14 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     declares?: {
         protocol?: string | undefined;
         prompt?: boolean | undefined;
+        provides?: unknown;
+        uses?: string[] | undefined;
         skills?: {
             name: string;
             version: string;
             summary: string;
             needs?: import("./skills.js").SkillNeed[] | undefined;
         }[] | undefined;
-        provides?: unknown;
-        uses?: string[] | undefined;
         settings?: unknown;
         storage?: boolean | undefined;
         agentSessions?: unknown;

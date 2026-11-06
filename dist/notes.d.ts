@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { type AgentMessage } from './agent-messages.js';
+import type { KehikkoSkill } from './kehikko-skills.js';
 /**
  * 2.36.0. What an agent session is told about the modules around it, in ONE wording for every module
  * that runs agent sessions, so a Claude conversation and a Codex one on the same kehikko are told
@@ -145,6 +146,21 @@ export interface NotesInput {
      * over messages say `ACT_ON_MESSAGES` instead of "text to read, not instructions". Absent: false.
      */
     actOnMessages?: boolean | null;
+    /**
+     * 2.53.0. The skills the person wrote for this kehikko, as the host handed them (`kehikkoSkills` in
+     * its answer to `POST /host/place`): said at a start under `KEHIKKO_SKILLS_HEAD`, and at a prompt
+     * when one was added, changed or removed since the session was told. With `holds`, one the session
+     * does not have (added after it started, by a module that cannot load skills into a running
+     * session) is said apart, with the host's tool to read it (`KEHIKKO_SKILLS_TOOL`). Null or absent:
+     * the host did not say, and nothing is said about them.
+     */
+    kehikkoSkills?: readonly Pick<KehikkoSkill, 'name' | 'description' | 'text'>[] | null;
+    /**
+     * 2.53.0. `false`: this module cannot load skills into its agent's sessions at all, so every one of
+     * the kehikko's skills is said as one to read with `KEHIKKO_SKILLS_TOOL` and follow, whatever `holds`
+     * says. Absent or true: `holds` decides which it has.
+     */
+    loadsKehikkoSkills?: boolean | null;
 }
 /**
  * 2.37.0. The version of the notes' wording and content. Bump it WHENEVER the text a session is told
@@ -155,9 +171,10 @@ export interface NotesInput {
  * and the messages section. 4 (2.43.0): the standing permission to act on messages (`actOnMessages`).
  * 5 (2.44.0): a module's skills the session does not have are said apart (`holds`). 6 (2.50.0): the
  * person's messages and a message's kind and choices; and what each module says is kept (`lines`), so a
- * module that changes its `agentSays` is told again at the next prompt.
+ * module that changes its `agentSays` is told again at the next prompt. 7 (2.53.0): the kehikko's own
+ * skills (`kehikkoSkills`).
  */
-export declare const NOTES_VERSION = 6;
+export declare const NOTES_VERSION = 7;
 /** What a session was last told: its place by key, and which modules (null when they could not be read). */
 export interface NotesTold {
     key: string | null;
@@ -176,6 +193,12 @@ export interface NotesTold {
      * `said`: agent modules keep their own `said` (the words themselves) beside these fields.
      */
     lines?: Record<string, string>;
+    /**
+     * 2.53.0. The kehikko's own skills it was told of, by name, each with `kehikkoSkillMark` of its text,
+     * so one added, changed or removed since is told at the next prompt. Absent: told none, or by a
+     * module older than these notes.
+     */
+    kehikkoSkills?: Record<string, string>;
 }
 /** `start`: a session starts, resumes, is cleared or compacted. `prompt`: the person sent a prompt. */
 export type NotesEvent = 'start' | 'prompt';
@@ -198,6 +221,15 @@ export declare function moduleLine(one: SessionModule, connected?: readonly stri
 export declare const NOT_LOADED = "Not loaded in this conversation";
 /** One installed module that is not on the kehikko: `- Test runs — "Don't start heavy test runs directly…"`. */
 export declare function absentLine(one: AbsentModule): string;
+/**
+ * A short fingerprint of a skill's text (FNV-1a, 32 bits, hex), for a module to notice that a skill
+ * it told a session about was changed since. Not a security check: nothing is trusted by it.
+ */
+export declare function kehikkoSkillMark(text: string): string;
+/** 2.53.0. The host's MCP tool that reads the kehikko's own skills, name, description and text. A host offers it read-only. */
+export declare const KEHIKKO_SKILLS_TOOL = "kehikko_skills";
+/** 2.53.0. Over the kehikko's own skills at a start. */
+export declare const KEHIKKO_SKILLS_HEAD = "Skills of this kehikko, written by the person for every agent session on it \u2014 use one when its description fits the task:";
 /** The line about "Research complete", on the door of the module that runs the session. */
 export declare function researchLine(self: NotesSelf): string;
 /** Everything a session is told at its start: its place, the modules on its kehikko, and the installed ones not on it. */
