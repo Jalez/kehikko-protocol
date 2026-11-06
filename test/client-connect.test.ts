@@ -1002,11 +1002,20 @@ describe('a question that waits on a person', () => {
     const host = speaker()
     const live = attach({}, { source, answerWithin: 5 })
     deliver(hello(host))
-    void live.request('projects.pick', {}, { within: 5_000 })
+    const pick = live.request('projects.pick', {}, { within: 5_000 })
     await live.request('live.get', {}).then(
       () => expect.unreachable(),
       (error: HostRefused) => expect(error.refusal.reason).toBe('silent'),
     )
+    /* Answer the long one, so its five-second timer is cleared here. Left waiting, it was refused five
+       seconds later in whatever test file ran next, as an unhandled rejection that failed that file. */
+    const asked = host.said.find((m) => (m as { type: string; method?: string }).type === MESSAGE.REQUEST && (m as { method?: string }).method === 'projects.pick') as { id: string }
+    deliver({
+      data: { type: MESSAGE.RESPONSE, protocol: PROTOCOL, id: asked.id, ok: true, data: { outcome: 'cancelled', project: null, why: '' } },
+      origin: 'null',
+      source: host,
+    })
+    expect(await pick).toEqual({ outcome: 'cancelled', project: null, why: '' })
   })
 
   test('a deadline that is not a number falls back rather than refusing before the message is posted', async () => {
