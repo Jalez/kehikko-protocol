@@ -375,8 +375,9 @@ parse is left out and the rest kept.
 At a start the notes list them under `KEHIKKO_SKILLS_HEAD`, each with its description in quotes. At a
 prompt they say a skill the person added, changed (`NotesTold.kehikkoSkills` keeps `kehikkoSkillMark`
 of each text) or removed since. A module that cannot load skills into a running session leaves a new one
-out of `holds`; the notes then say it is not loaded until a restart and to read it with
-`kehikko_skills` on the host's door, and a changed one is always to be read again there. `NOTES_VERSION` 7.
+out of `holds`, and one that cannot load skills into its agent at all passes `loadsKehikkoSkills: false`;
+the notes then say which are not loaded as skills and to read one with `kehikko_skills` on the host's
+door when its description fits. A changed one is always to be read again there. `NOTES_VERSION` 7.
 
 **When the notes change (2.37.0).** `NOTES_VERSION` is the version of the notes' wording; `sessionNotes` writes it into
 the `told` record (`version`). A session told by an older version (a record without `version` is 1) gets the full notes

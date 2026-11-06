@@ -24,8 +24,9 @@ is still 2. [docs/asking.md](docs/asking.md), "A kehikko's own skills (2.53.0)".
   characters, body 32,000), type `KehikkoSkill`.
 - **`NotesInput.kehikkoSkills`** and **`NotesTold.kehikkoSkills`** (`kehikkoSkillMark`): the notes list
   them at a start (`KEHIKKO_SKILLS_HEAD`) and say one added, changed or removed at a prompt; one the
-  session does not `hold` is said as not loaded until a restart, to be read with **`KEHIKKO_SKILLS_TOOL`**
-  (`kehikko_skills`) on the host's door. `NOTES_VERSION` 7.
+  session does not `hold` (or every one, with **`NotesInput.loadsKehikkoSkills: false`** from a module
+  that loads none) is said as not loaded, to be read with **`KEHIKKO_SKILLS_TOOL`** (`kehikko_skills`) on
+  the host's door. `NOTES_VERSION` 7.
 
 ## 2.52.0 — 2026-11-04
 

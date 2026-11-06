@@ -155,6 +155,12 @@ export interface NotesInput {
      * the host did not say, and nothing is said about them.
      */
     kehikkoSkills?: readonly Pick<KehikkoSkill, 'name' | 'description' | 'text'>[] | null;
+    /**
+     * 2.53.0. `false`: this module cannot load skills into its agent's sessions at all, so every one of
+     * the kehikko's skills is said as one to read with `KEHIKKO_SKILLS_TOOL` and follow, whatever `holds`
+     * says. Absent or true: `holds` decides which it has.
+     */
+    loadsKehikkoSkills?: boolean | null;
 }
 /**
  * 2.37.0. The version of the notes' wording and content. Bump it WHENEVER the text a session is told

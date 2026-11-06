@@ -151,14 +151,18 @@ function kehikkoSkillLine(one) {
     const said = oneLine(one.description, 300);
     return `- ${one.name}${said ? ` — ${quoted(said)}` : ''}`;
 }
-/** The kehikko's skills the session does not have, in one line, with where to read them; '' when it has them all or nobody knows. */
-function notHeldLine(names, holds, host) {
+/**
+ * The kehikko's skills the session does not have loaded, in one line, with where to read them; '' when
+ * it has them all or nobody knows. Every one, for a module that loads none (`loadsKehikkoSkills: false`).
+ */
+function notHeldLine(names, input, host) {
+    const holds = input.loadsKehikkoSkills === false ? [] : (input.holds ?? null);
     if (holds === null)
         return '';
     const lacks = names.filter((name) => !holds.includes(name));
     if (!lacks.length)
         return '';
-    return `${NOT_LOADED} (it loads when the conversation is restarted): ${lacks.join(', ')} — read ${lacks.length === 1 ? 'it' : 'them'} with ${KEHIKKO_SKILLS_TOOL} on the ${host} MCP server and follow ${lacks.length === 1 ? 'it' : 'them'} as a skill.`;
+    return `${NOT_LOADED} as ${lacks.length === 1 ? 'a skill' : 'skills'}: ${lacks.join(', ')} — when ${lacks.length === 1 ? 'its description fits' : 'one’s description fits'} the task, read ${lacks.length === 1 ? 'it' : 'that one'} with ${KEHIKKO_SKILLS_TOOL} on the ${host} MCP server and follow it as a skill.`;
 }
 /** What a start says about the kehikko's own skills: nothing when it has none or the host did not say. */
 function kehikkoSkillsStart(input, host) {
@@ -166,7 +170,7 @@ function kehikkoSkillsStart(input, host) {
     if (!all?.length)
         return [];
     const lines = [KEHIKKO_SKILLS_HEAD, ...all.map(kehikkoSkillLine)];
-    const lacking = notHeldLine(all.map((one) => one.name), input.holds ?? null, host);
+    const lacking = notHeldLine(all.map((one) => one.name), input, host);
     if (lacking)
         lines.push(lacking);
     return lines;
@@ -183,12 +187,12 @@ function kehikkoSkillsChange(input, told, host) {
     const lines = [];
     if (added.length) {
         lines.push('The person added skills to this kehikko — use one when its description fits the task:', ...added.map(kehikkoSkillLine));
-        const lacking = notHeldLine(added.map((one) => one.name), input.holds ?? null, host);
+        const lacking = notHeldLine(added.map((one) => one.name), input, host);
         if (lacking)
             lines.push(lacking);
     }
     if (changed.length) {
-        lines.push(`The person changed ${changed.length === 1 ? 'this skill' : 'these skills'} of this kehikko: ${changed.map((one) => one.name).join(', ')}. Read the current text with ${KEHIKKO_SKILLS_TOOL} on the ${host} MCP server before using ${changed.length === 1 ? 'it' : 'them'}; it is what to follow.`);
+        lines.push(`The person changed ${changed.length === 1 ? 'this skill' : 'these skills'} of this kehikko: ${changed.map((one) => one.name).join(', ')}. Read the current text with ${KEHIKKO_SKILLS_TOOL} on the ${host} MCP server before using ${changed.length === 1 ? 'it' : 'one'}; it is what to follow.`);
     }
     if (gone.length)
         lines.push(`The person removed ${gone.length === 1 ? 'this skill' : 'these skills'} from this kehikko: ${gone.join(', ')} — stop following ${gone.length === 1 ? 'it' : 'them'}.`);

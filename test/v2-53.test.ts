@@ -113,8 +113,13 @@ describe('the notes', () => {
 
   test('a skill the session does not hold is said apart, with the tool to read it', () => {
     const { text } = sessionNotes(input({ kehikkoSkills: [skill('a'), skill('b')], holds: ['a'] }), 'start', null)
-    expect(text).toContain(`${NOT_LOADED} (it loads when the conversation is restarted): b`)
+    expect(text).toContain(`${NOT_LOADED} as a skill: b`)
     expect(text).toContain(KEHIKKO_SKILLS_TOOL)
+  })
+
+  test('a module that loads no skills has every one said as to be read, whatever holds says', () => {
+    const { text } = sessionNotes(input({ kehikkoSkills: [skill('a'), skill('b')], holds: ['a', 'b'], loadsKehikkoSkills: false }), 'start', null)
+    expect(text).toContain(`${NOT_LOADED} as skills: a, b`)
   })
 
   test('a prompt says one added, changed or removed, and nothing when none was', () => {
@@ -124,7 +129,7 @@ describe('the notes', () => {
     expect(next.kind).toBe('change')
     expect(next.text).toContain('The person added skills to this kehikko')
     expect(next.text).toContain('- c — "When c applies."')
-    expect(next.text).toContain(`${NOT_LOADED} (it loads when the conversation is restarted): c`)
+    expect(next.text).toContain(`${NOT_LOADED} as a skill: c`)
     expect(next.text).toContain('The person changed this skill of this kehikko: a.')
     expect(next.text).toContain('The person removed this skill from this kehikko: b')
     expect(sessionNotes(input({ kehikkoSkills: [skill('a', 'When a.', 'New text.'), skill('c')] }), 'prompt', next.told).text).toBeNull()
