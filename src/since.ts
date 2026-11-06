@@ -185,6 +185,8 @@ export const SESSION_FIELD_SINCE = {
   /** Unread messages for the session, and how many more wait (2.41.0), when the module asked with `messages: true`. */
   messages: '2.41.0',
   messagesMore: '2.41.0',
+  /** The skills the person wrote for the session's kehikko, each with its SKILL.md (2.53.0). */
+  kehikkoSkills: '2.53.0',
 } as const
 export type SessionField = keyof typeof SESSION_FIELD_SINCE
 

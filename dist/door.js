@@ -4,6 +4,7 @@ import { absentModuleSchema, sessionModuleSchema } from './notes.js';
 import { NOTES_MESSAGES_MOST, agentMessageSchema } from './agent-messages.js';
 import { EPIC_SLUG, KEHIKKO_KEY, MODULE_ID, PROJECT_ID, own } from './ids.js';
 import { skillNameSchema } from './skills.js';
+import { kehikkoSkillsSchema } from './kehikko-skills.js';
 /**
  * What a module's MCP door agrees with every other module's: how its tools spell the two context
  * arguments, how a tool says whether it only reads, and the shape of the two answers a caller acts
@@ -194,6 +195,15 @@ export const placeDoorsSchema = z.object({
     messages: z.array(agentMessageSchema).max(NOTES_MESSAGES_MOST).optional().catch(undefined),
     /** 2.41.0. How many more unread wait beyond `messages`: handed at the next ask. */
     messagesMore: z.number().int().min(0).optional().catch(undefined),
+    /**
+     * 2.53.0. The skills the person wrote for the session's kehikko (`kehikko-skills.ts`), each with its
+     * whole SKILL.md: the module loads every one into the session where its agent reads skills, as it
+     * loads a module's skill that can work there, and says them in the notes (`NotesInput.kehikkoSkills`).
+     * Absent: the host did not say (before 2.53.0, or the place has no kehikko) — the module loads none
+     * and says nothing about them. Present and empty: the kehikko has none. One that does not parse is
+     * left out and the rest kept (`kehikkoSkillsSchema`).
+     */
+    kehikkoSkills: kehikkoSkillsSchema.optional().catch(undefined),
 });
 /**
  * Where a module that issues tokens answers for one, asked by the host:

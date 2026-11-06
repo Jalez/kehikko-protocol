@@ -675,6 +675,19 @@ export declare const placeDoorsSchema: z.ZodObject<{
     }>, "many">>>;
     /** 2.41.0. How many more unread wait beyond `messages`: handed at the next ask. */
     messagesMore: z.ZodCatch<z.ZodOptional<z.ZodNumber>>;
+    /**
+     * 2.53.0. The skills the person wrote for the session's kehikko (`kehikko-skills.ts`), each with its
+     * whole SKILL.md: the module loads every one into the session where its agent reads skills, as it
+     * loads a module's skill that can work there, and says them in the notes (`NotesInput.kehikkoSkills`).
+     * Absent: the host did not say (before 2.53.0, or the place has no kehikko) — the module loads none
+     * and says nothing about them. Present and empty: the kehikko has none. One that does not parse is
+     * left out and the rest kept (`kehikkoSkillsSchema`).
+     */
+    kehikkoSkills: z.ZodCatch<z.ZodOptional<z.ZodEffects<z.ZodArray<z.ZodUnknown, "many">, {
+        name: string;
+        text: string;
+        description: string;
+    }[], unknown[]>>>;
 }, "strip", z.ZodTypeAny, {
     token: string;
     ok: true;
@@ -737,6 +750,11 @@ export declare const placeDoorsSchema: z.ZodObject<{
         module: string;
     }[] | undefined;
     messagesMore?: number | undefined;
+    kehikkoSkills?: {
+        name: string;
+        text: string;
+        description: string;
+    }[] | undefined;
 }, {
     token: string;
     ok: true;
@@ -751,6 +769,7 @@ export declare const placeDoorsSchema: z.ZodObject<{
     everywhere?: unknown;
     absent?: unknown;
     messagesMore?: unknown;
+    kehikkoSkills?: unknown;
 }>;
 export type PlaceDoors = z.infer<typeof placeDoorsSchema>;
 /**
