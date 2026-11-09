@@ -1,6 +1,6 @@
 # Messages between agent sessions
 
-2.41.0; waking and acting on messages 2.43.0; delivery by typing 2.48.0; questions, reports and the person's messages 2.50.0. `agent-messages.ts`, `serve/messages.ts`.
+2.41.0; waking and acting on messages 2.43.0; delivery by typing 2.48.0; questions, reports and the person's messages 2.50.0; a module's notice to the session that asked 2.54.0. `agent-messages.ts`, `serve/messages.ts`.
 
 A person runs several agent sessions in one project — one on each epic, often from different agents.
 They step on each other: two refactor the same file, one waits for a branch the other already merged.
@@ -362,3 +362,55 @@ wake it.
 is still there and now says something else is told again, under its own head. `NOTES_VERSION` is 6, so
 every running session is told the full notes once, which carries the new words to sessions whose
 record predates `lines`.
+
+## A module's notice to the session that asked (2.54.0)
+
+A session that asks a module for something that takes a long time — a queued test run, a build — used
+to learn how it came out only while it was still waiting on a tool call. If it ended its turn, nothing
+brought it back. Now the module tells it, and the module that runs the session types the notice in.
+
+`messages.notify { token, body, kind?, thread? }` is asked from the module's SERVER (`askHost`), under
+`agents:message`:
+
+- **`token`** is the place token that came with the request: the `kehikot-place` on the module's door
+  URL when an agent called its MCP door, or the token a CLI was handed. It need not be a token this
+  module issued. A session hands its token to every door it calls, so only a module the session called
+  can have it.
+- **The host sends it to that session and no one else**, in that token's project: `to: { session:
+  { module, session } }` with the module that runs the session and its id there. A call names no `to`,
+  no project, no `once` and no `choices`. A notice tells; it does not ask.
+- **The host stamps the sender**: `from: { module, name, session: null, place, person: false }`, the
+  module that asked (proved by its pass), its registered name, and the ASKING session's place. Nothing
+  in the call says who sent it.
+- **Bounded** per sending module and receiving session: `LIMITS.NOTICES_PER_MINUTE` (6) and
+  `NOTICES_PER_HOUR` (60). Past them it is `declined`, with why.
+- A token the host does not hold, or one whose session its module has no record of just now, is
+  refused. A host before 2.54.0 answers `host-too-old`. Either way the module carries on: the notice is
+  a courtesy, never the only place a result is kept.
+
+**Delivery is unchanged.** It is a message to one session, so the module that runs that session
+delivers it through `messageDelivery` like any other: typed when the session is idle, held while it asks
+the person something or while the person types, resumed if asleep (with the caps), and only when the
+person's setting "Messages wake an idle session" is on. Otherwise the session's notes say it at its next
+prompt. No agent module needs a change to deliver one.
+
+**What the session is told** (`typedMessages`): the frame names the module from host-stamped fields
+(`[Kehikot message from Queue (epic methods on the kehikko writing), #41, a report]`), the body follows
+as the module wrote it, and the paragraph after says a module typed it on its own behalf, not an agent
+session or the person (`MODULE_MESSAGES_TYPED`). `isModuleMessage` tells one apart: no session, not the
+person's. `messages.post` messages are said the same way.
+
+**What a module should say**: one line built only from its own fields — what it was asked for, how it
+came out, and how to read more with its own tools. For example:
+
+```
+Run "kehikko main" passed (exit 0) in 4m 12s. Output: queue_status {"id":"r-12"} or `kehikot-queue status r-12`.
+```
+
+```ts
+import { askHost } from 'kehikot-module-protocol/serve'
+
+if (run.asker.token) {
+  await askHost('messages.notify', { token: run.asker.token, body: line, kind: 'report' }, { module: ID }).catch(() => null)
+}
+```

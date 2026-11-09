@@ -40,6 +40,33 @@ How an agent session's turn ended, in one rule for every module that runs agent 
   is dropped and the item kept.
 - **`answers`** on `agentMessageSchema`: the Inbox question a person's message answers; frames and
   lines say `answering “…”`.
+## 2.54.0 — 2026-11-09
+
+A module can tell the session that asked it for something how it came out, through delivery by typing
+(issue #106). **Additive**; `PROTOCOL` is still 2.
+[docs/agent-messages.md](docs/agent-messages.md), "A module's notice to the session that asked (2.54.0)".
+
+### Added
+
+- **`messages.notify { token, body, kind?, thread? }`**, a SERVER method (`SERVER_METHODS`) under
+  `agents:message`, answered `messageSendResult`: the module's own notice to the ONE session whose place
+  token came with its request. The host stamps `from: { module, name, session: null, place, person:
+  false }` (the asking session's place) and `to: { session }`, so the module that runs the session types
+  it in under the existing rules (`messageDelivery`, 2.48.0). `kind` is `note` or `report` only.
+  **`messageNotifyParams`**; `METHOD_SINCE` and `SERVER_METHOD_SINCE` say 2.54.0.
+- **`LIMITS.NOTICES_PER_MINUTE`** (6) and **`LIMITS.NOTICES_PER_HOUR`** (60), per sending module and
+  receiving session.
+- **`isModuleMessage(message)`**: a module's own message (no session, not the person's), from
+  `messages.post` or `messages.notify`.
+- **`MODULE_MESSAGES_TYPED`**: `typedMessages` says a module's own message is the module's words — not
+  another agent session's, not the person's — instead of `MESSAGES_TYPED_READ_ONLY` and the reply hint.
+  A session's and the person's messages are typed exactly as before.
+
+### Compatibility
+
+- A host before 2.54.0 answers `messages.notify` with `host-too-old`; the module carries on without it.
+- An agent module needs no change to deliver a notice: it is a message to one of its sessions. One built
+  before 2.54.0 types it with the other-session wording.
 
 ## 2.53.0 — 2026-11-06
 

@@ -406,6 +406,10 @@ export const LIMITS = {
   MESSAGE_CHOICES: 6,
   /** One choice's words, in characters (2.50.0). Refused, not clipped, when longer. */
   MESSAGE_CHOICE: 80,
+  /** How many notices one module may send to one session in a minute (2.54.0, `messages.notify`). */
+  NOTICES_PER_MINUTE: 6,
+  /** How many notices one module may send to one session in an hour (2.54.0, `messages.notify`). */
+  NOTICES_PER_HOUR: 60,
   /** How many messages the person may send through one module in a minute (2.50.0, `messages.say`). */
   PERSON_MESSAGES_PER_MINUTE: 20,
   /* Traffic (2.20.0). See `traffic.ts`. */

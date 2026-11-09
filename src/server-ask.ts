@@ -45,6 +45,8 @@ export const SERVER_METHODS = [
   /* 2.41.0: messages between agent sessions. The project is the one the session's token names, so they name none. */
   'messages.send',
   'messages.read',
+  /* 2.54.0: a module's own notice to the session whose token asked it for something. The project is the token's. */
+  'messages.notify',
 ] as const
 export type ServerMethod = (typeof SERVER_METHODS)[number]
 

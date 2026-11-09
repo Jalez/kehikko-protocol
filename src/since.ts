@@ -46,6 +46,7 @@ export const METHOD_SINCE = {
   'messages.read': '2.41.0',
   'messages.mine': '2.50.0',
   'messages.post': '2.50.0',
+  'messages.notify': '2.54.0',
   'messages.say': '2.50.0',
 } as const satisfies Record<Method, string>
 
@@ -93,6 +94,7 @@ export const SERVER_METHOD_SINCE = {
   'dispositions.get': '2.21.0',
   'messages.send': '2.41.0',
   'messages.read': '2.41.0',
+  'messages.notify': '2.54.0',
 } as const satisfies Record<ServerMethod, string>
 
 /**
