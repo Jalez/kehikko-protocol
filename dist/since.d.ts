@@ -17,6 +17,7 @@ export declare const METHOD_SINCE: {
     readonly 'events.emit': "0.25.0";
     readonly 'view.goto': "0.25.0";
     readonly 'view.fold': "1.1.0";
+    readonly 'view.expand': "2.58.0";
     readonly 'selection.set': "0.25.0";
     readonly 'passage.set': "0.25.0";
     readonly 'location.set': "2.13.0";
@@ -52,6 +53,7 @@ export declare const CAPABILITY_SINCE: {
     readonly 'events:emit': "0.25.0";
     readonly 'view:navigate': "0.25.0";
     readonly 'view:fold': "1.1.0";
+    readonly 'view:expand': "2.58.0";
     readonly 'selection:set': "0.25.0";
     readonly 'passage:set': "0.25.0";
     readonly 'location:set': "2.13.0";
@@ -211,6 +213,7 @@ export declare const SINCE: {
         readonly 'events.emit': "0.25.0";
         readonly 'view.goto': "0.25.0";
         readonly 'view.fold': "1.1.0";
+        readonly 'view.expand': "2.58.0";
         readonly 'selection.set': "0.25.0";
         readonly 'passage.set': "0.25.0";
         readonly 'location.set': "2.13.0";
@@ -245,6 +248,7 @@ export declare const SINCE: {
         readonly 'events:emit': "0.25.0";
         readonly 'view:navigate': "0.25.0";
         readonly 'view:fold': "1.1.0";
+        readonly 'view:expand': "2.58.0";
         readonly 'selection:set': "0.25.0";
         readonly 'passage:set': "0.25.0";
         readonly 'location:set': "2.13.0";
@@ -369,6 +373,7 @@ export declare const PIECE_SAID: {
         readonly 'events:emit': "notices to other modules";
         readonly 'view:navigate': "navigation";
         readonly 'view:fold': "container folding";
+        readonly 'view:expand': "showing its container large";
         readonly 'selection:set': "the shared selection";
         readonly 'passage:set': "the shared passage";
         readonly 'location:set': "places in code";

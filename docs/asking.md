@@ -489,3 +489,32 @@ The rules are the ones [kehikko#61](https://github.com/Jalez/kehikko/issues/61) 
 **Putting things back** is the caller's half. `folded` and `unfolded` are what the call changed, so `{ fold: said.unfolded, unfold: said.folded }` undoes it. Before sending that, drop every id whose `folded` in `context.containers` is no longer what this caller left it at: a person moved it, and it is theirs.
 
 An agent does the same at the host's own door with `fold_modules`, which takes the same two lists.
+
+## Showing the container large: `view.expand`
+
+A container that is small on the canvas — an agent module kept as a tile, say — can ask to be shown
+large over the canvas for a while (2.58.0, capability `view:expand`):
+
+```ts
+const said = expandResult.parse(await host.request('view.expand', { expand: true }))
+// { outcome: 'expanded', why: '' }
+```
+
+| `outcome` | |
+|---|---|
+| `expanded` | the container is shown large now |
+| `shrunk` | it is back in its place (`expand: false`) |
+| `unchanged` | it already was as asked |
+| `declined` | the host will not, right now, and `why` says so |
+
+The rules are the host's to keep:
+
+- Only the asker's own container; the call names no id.
+- Expanding only on the person's fresh press in the page. Putting back is always honoured.
+- Nothing in the arrangement changes: no placement, size or fold is written. The person puts it back
+  with Escape, a press outside it or the host's own "Shrink back".
+- The page is moved, never reloaded: whatever it was running goes on. Its frame is resized twice,
+  once each way; a terminal fits itself to the large size and need not refit when it goes back to
+  its tile (see "An agent module as a tile" in [client.md](client.md)).
+
+A host before 2.58.0 answers `unknown-method`.

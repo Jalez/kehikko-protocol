@@ -880,3 +880,41 @@ arrives, a stopped store's answer never overwriting the live one — outside Rea
 The first hook, `useKehikot`, was deprecated in 0.37 and is gone: it
 returned the raw context and a `state` string, and never delivered `onClear` or `onRefresh`.
 [MIGRATING.md](../MIGRATING.md) has the before and after.
+
+## An agent module as a tile (2.58.0)
+
+A person keeps an agent module in a small square on the canvas, and a terminal in a square two
+hundred pixels wide is unreadable. So below `TILE_BELOW` (220 by 160 CSS pixels of its own page) an
+agent module draws a TILE instead of its terminal, the same in every agent module:
+
+```tsx
+import { AgentTile, useTileSize } from 'kehikot-module-protocol/client/react'
+import { tileItemOf } from 'kehikot-module-protocol'
+
+const size = useTileSize()
+if (size.tile) return (
+  <AgentTile
+    name="Claude" icon="brand:claude" title={title} size={size}
+    item={tileItemOf(itemsForThisSession)}
+    onExpand={() => void host.request('view.expand', { expand: true })}
+    onAnswer={(text) => typeIntoSession(text)}
+    onCompact={compact} onClear={clear}
+  />
+)
+```
+
+- **What it shows** is read off what the module already reports (`activity.set`): the session's
+  item, mapped by `tileStateOf` — working (the ring turns; it stands still under reduced motion), a
+  question waiting ("?", in the attention colour), stopped without finishing or needing the person
+  ("!"), finished ("✓"), idle. The title under the icon, an unread dot, and the whole state in one
+  sentence as the tooltip and the tile's accessible name.
+- **The whole tile expands** (`view.expand`, on the person's press). Where there is room
+  (`tileRoom`): Answer, when a question waits — the question, its choices as buttons and a reply
+  field, over the tile, closed with Escape — then Expand, Compact and Clear. Every one is a button
+  reached by Tab.
+- **Keep the terminal mounted** under the tile, hidden with `display: none` so it measures nothing
+  and fits nothing: going to the tile then resizes no pty, and coming back from it fits once, to
+  the size it comes back to. `useTileSize` leaves the tile only `TILE_LEAVE_PX` past the line, so a
+  box resized around it does not flip.
+- **A host before 2.58.0** does not answer `view.expand` (`hello.answers` does not list it): offer no
+  Expand, or show the large view in place on a press.

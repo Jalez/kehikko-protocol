@@ -31,6 +31,12 @@ export declare const CAPABILITIES: {
      */
     readonly 'view:fold': "Ask the host to fold containers to their headers or unfold them. The host decides, and you see it happen.";
     /**
+     * 2.58.0. Asks the host to show THIS container large over the canvas for a while, and to put it
+     * back (`view.expand`): only on the person's press in the module's page. Moves, resizes and saves
+     * nothing in the arrangement; the page is not reloaded.
+     */
+    readonly 'view:expand': "Show this container large over the canvas when you press to, and put it back. Nothing in your arrangement changes.";
+    /**
      * Say which references the person has picked out. A SHARED write: the selection goes into the
      * context every framed module receives.
      */
@@ -159,6 +165,8 @@ export declare const METHODS: {
     readonly 'events.emit': "events:emit";
     readonly 'view.goto': "view:navigate";
     readonly 'view.fold': "view:fold";
+    /** This container shown large over the canvas, or put back (2.58.0). */
+    readonly 'view.expand': "view:expand";
     readonly 'selection.set': "selection:set";
     readonly 'passage.set': "passage:set";
     readonly 'location.set': "location:set";
@@ -389,6 +397,20 @@ export declare const methodParams: {
     }, {
         fold?: string[] | undefined;
         unfold?: string[] | undefined;
+    }>;
+    /**
+     * 2.58.0. Ask the host to show the asking module's own container large over the canvas
+     * (`expand: true`, the default) or to put it back (`expand: false`); answered with `expandResult`.
+     * Only the asker's own container, so there is no id. Expanding is honoured only on the person's
+     * fresh press in the page; putting back, always. Nothing in the arrangement changes, and the page
+     * keeps running: the host moves the frame, never reloads it.
+     */
+    readonly 'view.expand': z.ZodObject<{
+        expand: z.ZodDefault<z.ZodBoolean>;
+    }, "strip", z.ZodTypeAny, {
+        expand: boolean;
+    }, {
+        expand?: boolean | undefined;
     }>;
     /**
      * Say which references the person has picked out. Refs only, never their kinds: the host relays
@@ -2051,6 +2073,25 @@ export declare const foldResult: z.ZodObject<{
     unfolded?: string[] | undefined;
 }>;
 export type FoldResult = z.infer<typeof foldResult>;
+/**
+ * 2.58.0. What became of a `view.expand`; all four are `ok: true`. `expanded`: the container is shown
+ * large now. `shrunk`: it is back in its place. `unchanged`: it already was as asked. `declined`: the
+ * host will not, right now (no press of the person's, a drag in hand, the container is not on the
+ * open kehikko) and `why` says so.
+ */
+export declare const EXPAND_OUTCOMES: readonly ["expanded", "shrunk", "unchanged", "declined"];
+export type ExpandOutcome = (typeof EXPAND_OUTCOMES)[number];
+export declare const expandResult: z.ZodObject<{
+    outcome: z.ZodEnum<["expanded", "shrunk", "unchanged", "declined"]>;
+    why: z.ZodDefault<z.ZodString>;
+}, "strip", z.ZodTypeAny, {
+    outcome: "declined" | "unchanged" | "expanded" | "shrunk";
+    why: string;
+}, {
+    outcome: "declined" | "unchanged" | "expanded" | "shrunk";
+    why?: string | undefined;
+}>;
+export type ExpandResult = z.infer<typeof expandResult>;
 /**
  * What became of a `parts.set`; all four are `ok: true`. `changed`: the list is different now. `unchanged`:
  * it already was as asked (the same name, the same place). `declined`: the host will not, and `why` says so
