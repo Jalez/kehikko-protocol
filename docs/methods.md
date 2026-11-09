@@ -336,6 +336,7 @@ and a module that declares none gets none of the methods below.
 | `messages.read` | `agents:message` |
 | `messages.mine` | `agents:message` |
 | `messages.post` | `agents:message` |
+| `messages.notify` | `agents:message` |
 | `messages.say` | `messages:as-person` |
 
 The host's table is the protocol's `METHODS`, read by its `capabilityOf`
@@ -383,6 +384,13 @@ may ask `messages.mine { since?, limit? }`, answered `messageMineResult`
 once?, kind?, choices?, replyTo?, thread? }`, the module's own message (no
 session, not the person's), where `once` makes it an introduction each session
 is handed at most once from that module.
+
+2.54.0. A module's SERVER may ask `messages.notify { token, body, kind?, thread? }`,
+answered `messageSendResult`: the module's own notice to the one session whose
+place token came with its request (a run it queued has ended, say). The host
+sends it to that session only and stamps the module as its sender; the module
+that runs the session types it in like any message. See
+[agent messages](agent-messages.md#a-modules-notice-to-the-session-that-asked-2540).
 
 #### `CAPABILITIES.messages:as-person`
 

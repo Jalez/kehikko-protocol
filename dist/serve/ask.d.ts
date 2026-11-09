@@ -36,6 +36,8 @@ export interface ServerAnswers {
     'messages.send': MessageSendResult;
     /** 2.41.0. The messages a session may read. */
     'messages.read': MessageReadResult;
+    /** 2.54.0. What became of a module's notice to the session that asked. */
+    'messages.notify': MessageSendResult;
 }
 /**
  * What came of one question. `ok: true`: the host's answer, held to the method's result schema.
