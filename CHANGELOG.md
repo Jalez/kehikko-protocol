@@ -7,6 +7,40 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.58.0 — 2026-11-09
+
+An agent module that is small on the canvas is drawn as a tile, and a container can be shown large
+over the canvas for a while. **Additive**; `PROTOCOL` is still 2. [docs/client.md](docs/client.md),
+"An agent module as a tile (2.58.0)", and [docs/asking.md](docs/asking.md), "Showing the container
+large: `view.expand`".
+
+### Added
+
+- **`view.expand { expand }`**, a method under the new capability **`view:expand`**, answered
+  **`expandResult`** (`EXPAND_OUTCOMES`: `expanded`, `shrunk`, `unchanged`, `declined`): ask the host
+  to show the asking module's own container large over the canvas (`expand: true`, the default), or
+  to put it back. Expanding only on the person's fresh press in the page; nothing in the
+  arrangement changes and the page is moved, never reloaded. `METHOD_SINCE` and `CAPABILITY_SINCE`
+  say 2.58.0.
+- **`isTile(size, was)`**, **`TILE_BELOW`** (220 by 160 CSS pixels) and **`TILE_LEAVE_PX`**: when an
+  agent module's page is too small for its terminal and draws its tile instead, with a margin before
+  it leaves the tile again.
+- **`tileStateOf(item, { title, name, unread })`**: THE mapping from the session's activity item to
+  a tile's look (`TILE_LOOKS`: idle, working, question, attention, stalled, done), its badge
+  (`TILE_BADGES`, so a look is never told by colour alone) and the whole state in one sentence;
+  `tileItemOf(items)` picks the item that needs the person most; `tileRoom(size)` says what fits;
+  `TILE_ACTIONS` the quick actions' words; `unreadWords(n)`.
+- In `./client/react`: **`AgentTile`**, the tile every agent module draws — the module's icon
+  (`TILE_MARKS` for the agent tools' marks), a ring for its state (turning while working, still under
+  reduced motion), the title, an unread dot, and the quick actions Answer (the question's choices and
+  a reply field, over the tile), Expand, Compact and Clear; and **`useTileSize()`**, the page's own
+  size with `isTile`'s margin.
+
+### Compatibility
+
+- A host before 2.58.0 answers `view.expand` with `unknown-method`, and a module's tile then offers
+  no Expand (it shows its large view in place on a press instead, if it chooses).
+
 ## 2.57.0 — 2026-11-09
 
 A module's own short introduction, as data a host shows in its own introduction dialog. **Additive

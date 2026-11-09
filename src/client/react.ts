@@ -25,3 +25,7 @@ export {
   type CoverProps,
   type CoverState,
 } from './cover.js'
+
+/* 2.58.0: an agent module's tile, for a page too small for its terminal. See `tile.ts`. */
+export { AgentTile, useTileSize, TILE_CSS, TILE_STYLE_ID, type AgentTileProps } from './tile.js'
+export { TILE_MARKS } from './marks.js'

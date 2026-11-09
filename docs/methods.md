@@ -61,6 +61,11 @@ of module ids, `fold` and `unfold`, and answers with `foldResult`: an outcome
 and the containers this call changed, which is the list that puts them back.
 The rules it keeps and the putting-back are in [asking](asking.md#bringing-the-module-into-view-viewfold).
 
+`view.expand` (2.58.0, capability `view:expand`) shows the asker's OWN container large over the
+canvas for a while, or puts it back (`{ expand: false }`), and answers with `expandResult`. Only on
+the person's fresh press in the page; nothing in the arrangement changes and the page is not
+reloaded. See [asking](asking.md#showing-the-container-large-viewexpand).
+
 ### Asking the host to edit an epic's list of parts
 
 `parts.set` (1.2.0, capability `parts:set`) is how a module, or the host's own
@@ -313,6 +318,7 @@ and a module that declares none gets none of the methods below.
 | `events.emit` | `events:emit` |
 | `view.goto` | `view:navigate` |
 | `view.fold` | `view:fold` |
+| `view.expand` | `view:expand` |
 | `selection.set` | `selection:set` |
 | `passage.set` | `passage:set` |
 | `location.set` | `location:set` |

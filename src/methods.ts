@@ -49,6 +49,12 @@ export const CAPABILITIES = {
    */
   'view:fold': 'Ask the host to fold containers to their headers or unfold them. The host decides, and you see it happen.',
   /**
+   * 2.58.0. Asks the host to show THIS container large over the canvas for a while, and to put it
+   * back (`view.expand`): only on the person's press in the module's page. Moves, resizes and saves
+   * nothing in the arrangement; the page is not reloaded.
+   */
+  'view:expand': 'Show this container large over the canvas when you press to, and put it back. Nothing in your arrangement changes.',
+  /**
    * Say which references the person has picked out. A SHARED write: the selection goes into the
    * context every framed module receives.
    */
@@ -185,6 +191,8 @@ export const METHODS = {
   'events.emit': 'events:emit',
   'view.goto': 'view:navigate',
   'view.fold': 'view:fold',
+  /** This container shown large over the canvas, or put back (2.58.0). */
+  'view.expand': 'view:expand',
   'selection.set': 'selection:set',
   'passage.set': 'passage:set',
   'location.set': 'location:set',
@@ -331,6 +339,14 @@ export const methodParams = {
     .refine((f) => !f.fold.some((id) => f.unfold.includes(id)), {
       message: 'a container cannot be in both fold and unfold',
     }),
+  /**
+   * 2.58.0. Ask the host to show the asking module's own container large over the canvas
+   * (`expand: true`, the default) or to put it back (`expand: false`); answered with `expandResult`.
+   * Only the asker's own container, so there is no id. Expanding is honoured only on the person's
+   * fresh press in the page; putting back, always. Nothing in the arrangement changes, and the page
+   * keeps running: the host moves the frame, never reloads it.
+   */
+  'view.expand': z.object({ expand: z.boolean().default(true) }),
   /**
    * Say which references the person has picked out. Refs only, never their kinds: the host relays
    * this into the context every module receives, and a module that needs the kind asks `live.get`.
@@ -604,6 +620,21 @@ export const foldResult = z.object({
 export type FoldResult = z.infer<typeof foldResult>
 
 /**
+ * 2.58.0. What became of a `view.expand`; all four are `ok: true`. `expanded`: the container is shown
+ * large now. `shrunk`: it is back in its place. `unchanged`: it already was as asked. `declined`: the
+ * host will not, right now (no press of the person's, a drag in hand, the container is not on the
+ * open kehikko) and `why` says so.
+ */
+export const EXPAND_OUTCOMES = ['expanded', 'shrunk', 'unchanged', 'declined'] as const
+export type ExpandOutcome = (typeof EXPAND_OUTCOMES)[number]
+
+export const expandResult = z.object({
+  outcome: z.enum(EXPAND_OUTCOMES),
+  why: z.string().max(LIMITS.REASON).default(''),
+})
+export type ExpandResult = z.infer<typeof expandResult>
+
+/**
  * What became of a `parts.set`; all four are `ok: true`. `changed`: the list is different now. `unchanged`:
  * it already was as asked (the same name, the same place). `declined`: the host will not, and `why` says so
  * (no such epic, the list is full, not now). `no-such-part`: an `id` or an `after` names no part; nothing changed.
@@ -741,6 +772,7 @@ export const methodResults: Partial<Record<Method, z.ZodTypeAny>> = {
   'epics.list': epicsListResult,
   'view.goto': navigationResult,
   'view.fold': foldResult,
+  'view.expand': expandResult,
   'projects.pick': projectPickResult,
   /**
    * The tracker reading is specified though it is a host's material, and the

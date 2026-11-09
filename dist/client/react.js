@@ -12,3 +12,6 @@ export { useFocus } from './focus.js';
 export { useHost, useKept, hostFields, JSON_KEPT, KEEP_AFTER_MS } from './host.js';
 export {} from './host-store.js';
 export { Cover, coverFor, useServerStanding, COVER_CSS, COVER_STYLE_ID, COVER_WORDS, TRY_AGAIN, } from './cover.js';
+/* 2.58.0: an agent module's tile, for a page too small for its terminal. See `tile.ts`. */
+export { AgentTile, useTileSize, TILE_CSS, TILE_STYLE_ID } from './tile.js';
+export { TILE_MARKS } from './marks.js';

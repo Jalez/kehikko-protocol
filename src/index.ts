@@ -154,6 +154,8 @@ export {
   NAVIGATION_OUTCOMES,
   foldResult,
   FOLD_OUTCOMES,
+  expandResult,
+  EXPAND_OUTCOMES,
   partsSetResult,
   PARTS_SET_OUTCOMES,
   activitySetResult,
@@ -177,6 +179,8 @@ export {
   type NavigationResult,
   type FoldOutcome,
   type FoldResult,
+  type ExpandOutcome,
+  type ExpandResult,
   type PartsSetOutcome,
   type PartsSetResult,
   type ActivitySetOutcome,
@@ -628,6 +632,26 @@ export {
   type Refusal,
   type TurnEnd,
 } from './turns.js'
+
+/* 2.58.0: an agent module drawn as a tile when its box is small. See `tile.ts`. */
+export {
+  TILE_ACTIONS,
+  TILE_BADGES,
+  TILE_BELOW,
+  TILE_LEAVE_PX,
+  TILE_LOOKS,
+  TILE_NEEDS_YOU,
+  isTile,
+  tileItemOf,
+  tileRoom,
+  tileStateOf,
+  unreadWords,
+  type BoxSize,
+  type TileAction,
+  type TileItem,
+  type TileLook,
+  type TileState,
+} from './tile.js'
 
 /* A kehikko's own skills, written by the person for every agent session on it (2.53.0). See `kehikko-skills.ts`. */
 export {
