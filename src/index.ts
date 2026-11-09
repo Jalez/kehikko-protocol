@@ -530,6 +530,38 @@ export {
   type HelpSection,
 } from './help.js'
 
+/* A module's own introduction, as slides a host shows in its introduction dialog (2.57.0). */
+export {
+  INTRO_VIEW,
+  INTRO_LIMITS,
+  INTRO_TONES,
+  INTRO_MOTIONS,
+  introSchema,
+  introSlideSchema,
+  introArtSchema,
+  introShapeSchema,
+  introPaneSchema,
+  introBoxSchema,
+  introRowsSchema,
+  introDotSchema,
+  introLineSchema,
+  introTextSchema,
+  introPointerSchema,
+  introOf,
+  hasIntro,
+  introSeconds,
+  introFromFile,
+  INTRO_FILE,
+  INTRO_FILE_BYTES,
+  type Intro,
+  type IntroSlide,
+  type IntroArt,
+  type IntroShape,
+  type IntroShapeKind,
+  type IntroTone,
+  type IntroMotion,
+} from './intro.js'
+
 /* What an agent session is told about the modules around it, one wording for every agent module (2.36.0). */
 export {
   AGENT_SAYS_MAX,

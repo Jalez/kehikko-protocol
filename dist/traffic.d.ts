@@ -1961,6 +1961,7 @@ export declare const trafficReadResult: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     started: number;
     kept: number;
+    gap: boolean;
     calls: {
         at: number;
         path: string;
@@ -1990,7 +1991,6 @@ export declare const trafficReadResult: z.ZodObject<{
     }[];
     newest: number;
     oldest: number;
-    gap: boolean;
     budgets: {
         name: string;
         note: string;
