@@ -320,6 +320,24 @@ the first. `turns.ts` is the one rule every agent module applies:
 The events are declared like any other (`events: TURN_EVENTS`); a host before 2.31.0 ignores `event`
 and shows an ordinary item of its state.
 
+### The reminder after a stall (2.56.0)
+
+A turn that stalls stays `attention`, "Stopped without finishing". So that the agent says how it
+ended, every agent module reminds it once, as the person's setting `REMIND_TURN_SETTING` ("Remind the
+agent to say how its turn ended", on by default, `personOnly`; `remindsTurnEnd(values)`):
+
+- A CLI whose `Stop` hook can block answers it once with `stopBlockReason`, never when the turn
+  already went on because of a stop hook.
+- Any other module types `TURN_REMINDER`, one fixed line, into its own session by the same path as a
+  message, when `shouldRemind` says so: the setting and the module's typing (`wakesOnMessages`) on,
+  the session its own, the turn a stall, `TURN_REMINDER_DELAY_MS` (20 s) after it ended, idle at its
+  prompt (never into a question, or text the person has not sent), nothing typed or sent by the person
+  since, at most once a turn and never twice in a row without a prompt of the person's between.
+  `turnReminder()` keeps what that needs per session; a prompt within `TURN_REMINDER_OWN_MS` of the
+  module typing is the module's, not the person's.
+
+When the agent then declares, its item follows `turnEnd` as usual: `done` replaces the stall.
+
 ### Answered from the Inbox
 
 A decision and a refusal carry `question` (`turnQuestion(end, { module, session })`): the whole

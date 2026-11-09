@@ -7,6 +7,24 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.56.0 — 2026-11-09
+
+The reminder after a turn that ended without saying how. **Additive**; `PROTOCOL` is still 2.
+[docs/activity.md](docs/activity.md), "The reminder after a stall (2.56.0)".
+
+### Added
+
+- **`TURN_REMINDER`**: the one fixed line a module types into its own idle session after a stall,
+  when its CLI cannot send a stopping turn back.
+- **`shouldRemind(case)`**: pure. Reminds only with the setting and typing on, in the module's own
+  session, after a stall, `TURN_REMINDER_DELAY_MS` (20 s) after it, idle at its prompt, with nothing
+  from the person since, at most once a turn and never twice without the person's prompt between.
+- **`turnReminder()`**: the per-session memory for it, pure; `TURN_REMINDER_OWN_MS` tells the module's
+  own typed prompt from the person's.
+- **`REMIND_TURN_SETTING`** ("Remind the agent to say how its turn ended", on by default,
+  `personOnly`) and `remindsTurnEnd(values)`. A module whose CLI can block a stop uses it for
+  `stopBlockReason`, which is now on by default.
+
 ## 2.55.0 — 2026-11-09
 
 How an agent session's turn ended, in one rule for every module that runs agent sessions. **Additive**;

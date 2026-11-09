@@ -563,7 +563,7 @@ export {
   type NotesEvent,
 } from './notes.js'
 
-/* How an agent session's turn ended, one rule for every agent module (2.55.0). See `turns.ts`. */
+/* How an agent session's turn ended, one rule for every agent module (2.55.0), and the reminder after a stall (2.56.0). See `turns.ts`. */
 export {
   TURN_KINDS,
   TURN_EVENTS,
@@ -582,6 +582,15 @@ export {
   refusalWords,
   turnEnd,
   stopBlockReason,
+  TURN_REMINDER,
+  TURN_REMINDER_DELAY_MS,
+  TURN_REMINDER_OWN_MS,
+  REMIND_TURN_SETTING,
+  remindsTurnEnd,
+  shouldRemind,
+  turnReminder,
+  type ReminderCase,
+  type TurnReminder,
   type TurnKind,
   type TurnTold,
   type Refusal,
