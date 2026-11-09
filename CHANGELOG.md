@@ -7,10 +7,10 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
-## 2.54.0 — 2026-11-09
+## 2.55.0 — 2026-11-09
 
 How an agent session's turn ended, in one rule for every module that runs agent sessions. **Additive**;
-`PROTOCOL` is still 2. [docs/activity.md](docs/activity.md), "How an agent's turn ended (2.54.0)".
+`PROTOCOL` is still 2. [docs/activity.md](docs/activity.md), "How an agent's turn ended (2.55.0)".
 
 ### Added
 

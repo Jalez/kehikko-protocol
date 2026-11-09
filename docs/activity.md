@@ -290,7 +290,7 @@ The spec for a host's inbox; the protocol cannot enforce it.
 10. **`events.emit` notices** (`kehikot.notifications@1`) go into the same store as items born
     closed: `refs` to `refs`, `place` to `place`, the line to `label`.
 
-## How an agent's turn ended (2.54.0)
+## How an agent's turn ended (2.55.0)
 
 A module that runs agent sessions used to report every turn's end as `done`, whatever the reason:
 the work finished, the agent stopped on a question only the person can answer, or it stopped

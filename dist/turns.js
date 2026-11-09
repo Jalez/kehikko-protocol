@@ -1,10 +1,10 @@
 import { LIMITS } from './limits.js';
 import { oneLine } from './notes.js';
 /**
- * 2.54.0. How an agent session's turn ended, in ONE rule for every module that runs agent sessions,
+ * 2.55.0. How an agent session's turn ended, in ONE rule for every module that runs agent sessions,
  * so a Claude conversation and a Codex one that stop the same way say the same thing in the Inbox.
  * Pure: the module hears the turn end by its own means (a CLI's `Stop` hook, its own event) and
- * reports the item. Design notes: docs/activity.md, "How an agent's turn ended (2.54.0)".
+ * reports the item. Design notes: docs/activity.md, "How an agent's turn ended (2.55.0)".
  *
  * A turn ends in one of three ways the agent declares with `tell_finished` on the module's door:
  *

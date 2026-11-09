@@ -560,7 +560,7 @@ export {
   type NotesEvent,
 } from './notes.js'
 
-/* How an agent session's turn ended, one rule for every agent module (2.54.0). See `turns.ts`. */
+/* How an agent session's turn ended, one rule for every agent module (2.55.0). See `turns.ts`. */
 export {
   TURN_KINDS,
   TURN_EVENTS,

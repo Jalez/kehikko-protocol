@@ -77,7 +77,7 @@ export const absentModuleSchema = z.object({
  * 5 (2.44.0): a module's skills the session does not have are said apart (`holds`). 6 (2.50.0): the
  * person's messages and a message's kind and choices; and what each module says is kept (`lines`), so a
  * module that changes its `agentSays` is told again at the next prompt. 7 (2.53.0): the kehikko's own
- * skills (`kehikkoSkills`). 8 (2.54.0): how to end a turn (`finishLine`).
+ * skills (`kehikkoSkills`). 8 (2.55.0): how to end a turn (`finishLine`).
  */
 export const NOTES_VERSION = 8;
 /** 2.50.0. What one module on the kehikko says to agents, as the notes say it. */
@@ -204,7 +204,7 @@ export function researchLine(self) {
         + `tell_finished({ event: "research-complete", label }) on the ${self.name} module’s MCP server (${self.door}): the person `
         + 'gets a “Research complete” notice. The label is a few words saying what was researched.');
 }
-/** 2.54.0. The line every agent session is told about ending its turns, on the door of the module that runs it (`turns.ts`). */
+/** 2.55.0. The line every agent session is told about ending its turns, on the door of the module that runs it (`turns.ts`). */
 export function finishLine(self) {
     return ('End every turn in one of three ways. Finished: call tell_finished({ event: "done" }) on the '
         + `${self.name} module’s MCP server (${self.door}). A question only the person can answer: call tell_finished({ event: "needs-decision", label }) `

@@ -22,15 +22,15 @@ import {
 } from '../src/index.js'
 
 /**
- * 2.54.0: how an agent session's turn ended. The agent declares done, needs-decision or research;
+ * 2.55.0: how an agent session's turn ended. The agent declares done, needs-decision or research;
  * a turn that declares nothing and set up nothing to wake it is a stall; a refused action is an ask.
  */
 
 const SELF = { module: 'kehikot.claude', name: 'Claude', door: 'kehikko-claude' }
 
-describe('2.54.0', () => {
+describe('2.55.0', () => {
   test('is the package version, and the notes are told again', () => {
-    expect(PACKAGE_VERSION).toBe('2.54.0')
+    expect(PACKAGE_VERSION).toBe('2.55.0')
     expect(NOTES_VERSION).toBe(8)
   })
 
