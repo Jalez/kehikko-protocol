@@ -214,7 +214,7 @@ export function refusalEnd(refused, folder = null) {
 }
 /**
  * What a module's `Stop` hook may answer, once, when a turn would end as a stall and the person asked
- * for it (a module setting, off by default): the reason the agent reads before it goes on. Never
+ * for it (`REMIND_TURN_SETTING`, on by default since 2.56.0): the reason the agent reads before it goes on. Never
  * when the CLI says the turn is already going on because of a stop hook (`stop_hook_active`).
  */
 export function stopBlockReason(self) {
@@ -222,4 +222,117 @@ export function stopBlockReason(self) {
         + `tell_finished({ event: "done" }) on the ${self.name} module’s MCP server (${self.door}) if the work is finished; `
         + 'call it with event "needs-decision" and label set to the one question only the person can answer; or set up what '
         + 'will wake you (a background command, a queued run that notifies this session). Do not end on “waiting”.');
+}
+/* ------------------------------------------------------------------------ *
+ * The reminder after an undeclared turn end (2.56.0)
+ * ------------------------------------------------------------------------ */
+/**
+ * 2.56.0. The ONE line a module types into its own idle session after a turn ended as a stall, when
+ * its CLI has no way to send a stopping turn back (`stopBlockReason` is for one that has). Fixed
+ * words, the module's own; nothing of the session's or anyone's is put in it.
+ */
+export const TURN_REMINDER = '[Kehikot] Your turn ended without saying how. If the work is done, call tell_finished with done; if you need the person, '
+    + "call tell_finished with needs-decision and the question; if you're waiting on something, set up a wake. Then stop.";
+/** 2.56.0. How long after a stalled turn ends the reminder waits, in ms, so the person's quick follow-up wins. */
+export const TURN_REMINDER_DELAY_MS = 20_000;
+/** 2.56.0. A prompt this soon after the module typed into the session, in ms, is the module's own (its reminder, a message), not the person's. */
+export const TURN_REMINDER_OWN_MS = 15_000;
+/**
+ * 2.56.0. The module setting for it, the same in every agent module: a boolean, ON by default, the
+ * person's (`personOnly`). A module whose CLI can send a stopping turn back once uses it for that
+ * (`stopBlockReason`); any other types `TURN_REMINDER`. Spread it into `declares.settings`; read it
+ * with `remindsTurnEnd(values)`.
+ */
+export const REMIND_TURN_SETTING = {
+    key: 'remindTurnEnd',
+    label: 'Remind the agent to say how its turn ended',
+    description: 'A session started here that stops without saying it finished, asking you a decision or setting up a wake is reminded once: before it stops where its program allows, else typed in when it is idle a moment. Never after you typed or sent anything, into a question for you, or twice without your prompt between. Off: the Inbox says \u201cStopped without finishing\u201d.',
+    type: 'boolean',
+    default: true,
+    personOnly: true,
+};
+/** 2.56.0. Whether a module's settings values let it remind: on unless the person turned it off. */
+export const remindsTurnEnd = (values) => values?.[REMIND_TURN_SETTING.key] !== false;
+/**
+ * 2.56.0. Whether to type `TURN_REMINDER` into a session now (pure). In order: never with the
+ * setting or typing off, into a session running elsewhere, after a turn that did not stall, twice
+ * for one turn or twice in a row without a prompt of the person's between, once the person typed or
+ * sent anything, before the delay, or into anything but an idle prompt (a question on screen, text
+ * not sent, a turn running).
+ */
+export function shouldRemind(c) {
+    const no = (why) => ({ remind: false, why });
+    if (!c.on)
+        return no('the person turned the reminder off');
+    if (!c.wake)
+        return no('the person turned typing into sessions off');
+    if (!c.own)
+        return no('it runs elsewhere');
+    if (!c.stalled)
+        return no('its turn did not end as a stall');
+    if (c.remindedThisTurn)
+        return no('it was already reminded for this turn');
+    if (c.afterReminder)
+        return no('it was reminded before this turn, and the person has not prompted since');
+    if (c.personSince)
+        return no('the person typed or sent something since the turn ended');
+    if (c.endedForMs < (c.delayMs ?? TURN_REMINDER_DELAY_MS))
+        return no('the person may still follow up');
+    if (c.state === 'asks')
+        return no('it waits for the person\u2019s answer');
+    if (c.state === 'typing')
+        return no('the person has typed at its prompt and not sent it');
+    if (c.state !== 'idle')
+        return no(`it is ${c.state}`);
+    return { remind: true, why: 'its turn ended without saying how, and it is idle at its prompt' };
+}
+/**
+ * 2.56.0. The memory `shouldRemind` needs for one session, pure (no timers, no clock of its own):
+ * the module tells it what happened, as it hears it, and asks on its own tick.
+ */
+export function turnReminder() {
+    let endedAt = null;
+    let stalled = false;
+    let remindedThisTurn = false;
+    let afterReminder = false;
+    let personAt = Number.NEGATIVE_INFINITY;
+    let typedAt = Number.NEGATIVE_INFINITY;
+    return {
+        ended(at, wasStalled) {
+            endedAt = at;
+            stalled = wasStalled;
+            remindedThisTurn = false;
+        },
+        prompt(at) {
+            endedAt = null;
+            stalled = false;
+            if (at - typedAt <= TURN_REMINDER_OWN_MS) {
+                typedAt = Number.NEGATIVE_INFINITY;
+                return;
+            }
+            personAt = at;
+            afterReminder = false;
+        },
+        person(at) {
+            personAt = at;
+        },
+        typed(at) {
+            typedAt = at;
+        },
+        reminded(at) {
+            remindedThisTurn = true;
+            afterReminder = true;
+            typedAt = at;
+        },
+        decide(now, given) {
+            return shouldRemind({
+                ...given,
+                stalled: endedAt !== null && stalled,
+                endedForMs: endedAt === null ? 0 : now - endedAt,
+                personSince: endedAt !== null && personAt >= endedAt,
+                remindedThisTurn,
+                afterReminder,
+            });
+        },
+    };
 }

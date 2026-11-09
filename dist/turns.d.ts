@@ -1,5 +1,5 @@
 import type { ActivityQuestion, InboxEvent } from './activity.js';
-import { type AgentSessionRef } from './agent-messages.js';
+import { type AgentSessionRef, type DeliveryState } from './agent-messages.js';
 import { type NotesSelf } from './notes.js';
 /**
  * 2.55.0. How an agent session's turn ended, in ONE rule for every module that runs agent sessions,
@@ -133,7 +133,92 @@ export declare function turnEnd(input: {
 export declare function refusalEnd(refused: Refusal, folder?: string | null): TurnEnd;
 /**
  * What a module's `Stop` hook may answer, once, when a turn would end as a stall and the person asked
- * for it (a module setting, off by default): the reason the agent reads before it goes on. Never
+ * for it (`REMIND_TURN_SETTING`, on by default since 2.56.0): the reason the agent reads before it goes on. Never
  * when the CLI says the turn is already going on because of a stop hook (`stop_hook_active`).
  */
 export declare function stopBlockReason(self: NotesSelf): string;
+/**
+ * 2.56.0. The ONE line a module types into its own idle session after a turn ended as a stall, when
+ * its CLI has no way to send a stopping turn back (`stopBlockReason` is for one that has). Fixed
+ * words, the module's own; nothing of the session's or anyone's is put in it.
+ */
+export declare const TURN_REMINDER: string;
+/** 2.56.0. How long after a stalled turn ends the reminder waits, in ms, so the person's quick follow-up wins. */
+export declare const TURN_REMINDER_DELAY_MS = 20000;
+/** 2.56.0. A prompt this soon after the module typed into the session, in ms, is the module's own (its reminder, a message), not the person's. */
+export declare const TURN_REMINDER_OWN_MS = 15000;
+/**
+ * 2.56.0. The module setting for it, the same in every agent module: a boolean, ON by default, the
+ * person's (`personOnly`). A module whose CLI can send a stopping turn back once uses it for that
+ * (`stopBlockReason`); any other types `TURN_REMINDER`. Spread it into `declares.settings`; read it
+ * with `remindsTurnEnd(values)`.
+ */
+export declare const REMIND_TURN_SETTING: {
+    readonly key: "remindTurnEnd";
+    readonly label: "Remind the agent to say how its turn ended";
+    readonly description: "A session started here that stops without saying it finished, asking you a decision or setting up a wake is reminded once: before it stops where its program allows, else typed in when it is idle a moment. Never after you typed or sent anything, into a question for you, or twice without your prompt between. Off: the Inbox says “Stopped without finishing”.";
+    readonly type: "boolean";
+    readonly default: true;
+    readonly personOnly: true;
+};
+/** 2.56.0. Whether a module's settings values let it remind: on unless the person turned it off. */
+export declare const remindsTurnEnd: (values: Record<string, unknown> | null | undefined) => boolean;
+/** 2.56.0. Everything `shouldRemind` decides from, for one session at one moment. */
+export interface ReminderCase {
+    /** The person's setting (`remindsTurnEnd`). */
+    on: boolean;
+    /** The module's setting for typing into its sessions (`wakesOnMessages`): off, nothing is typed. */
+    wake: boolean;
+    /** It runs in a terminal THIS module started and owns. */
+    own: boolean;
+    /** Its last turn ended as a stall (`turnEnd`'s `STALLED_EVENT`), and no turn began since. */
+    stalled: boolean;
+    /** Where it stands now. Only `idle` is typed into. */
+    state: DeliveryState;
+    /** How long ago that turn ended, in ms. */
+    endedForMs: number;
+    /** The person typed or sent anything into it since the turn ended. */
+    personSince: boolean;
+    /** It was already reminded for this turn's end. */
+    remindedThisTurn: boolean;
+    /** That turn followed a reminder, with no prompt of the person's between. */
+    afterReminder: boolean;
+    /** Default `TURN_REMINDER_DELAY_MS`. */
+    delayMs?: number;
+}
+/**
+ * 2.56.0. Whether to type `TURN_REMINDER` into a session now (pure). In order: never with the
+ * setting or typing off, into a session running elsewhere, after a turn that did not stall, twice
+ * for one turn or twice in a row without a prompt of the person's between, once the person typed or
+ * sent anything, before the delay, or into anything but an idle prompt (a question on screen, text
+ * not sent, a turn running).
+ */
+export declare function shouldRemind(c: ReminderCase): {
+    remind: boolean;
+    why: string;
+};
+/** 2.56.0. What a module keeps per session for `shouldRemind` (`turnReminder`). */
+export interface TurnReminder {
+    /** A turn ended; `stalled` when `turnEnd` said `STALLED_EVENT`. */
+    ended(at: number, stalled: boolean): void;
+    /** A prompt was submitted (its CLI's prompt hook). The person's, unless the module typed into it within `TURN_REMINDER_OWN_MS`. */
+    prompt(at: number): void;
+    /** The person typed into the session, or sent it something from the page. */
+    person(at: number): void;
+    /** The module typed something else into it (a message): the prompt that follows is not the person's. */
+    typed(at: number): void;
+    /** The reminder was typed. */
+    reminded(at: number): void;
+    /** The case for `shouldRemind`, given what only the module knows now. */
+    decide(now: number, given: Pick<ReminderCase, 'on' | 'wake' | 'own' | 'state'> & {
+        delayMs?: number;
+    }): {
+        remind: boolean;
+        why: string;
+    };
+}
+/**
+ * 2.56.0. The memory `shouldRemind` needs for one session, pure (no timers, no clock of its own):
+ * the module tells it what happened, as it hears it, and asks on its own tick.
+ */
+export declare function turnReminder(): TurnReminder;
