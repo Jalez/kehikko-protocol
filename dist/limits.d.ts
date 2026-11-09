@@ -385,6 +385,10 @@ export declare const LIMITS: {
     readonly MESSAGE_CHOICES: 6;
     /** One choice's words, in characters (2.50.0). Refused, not clipped, when longer. */
     readonly MESSAGE_CHOICE: 80;
+    /** How many notices one module may send to one session in a minute (2.54.0, `messages.notify`). */
+    readonly NOTICES_PER_MINUTE: 6;
+    /** How many notices one module may send to one session in an hour (2.54.0, `messages.notify`). */
+    readonly NOTICES_PER_HOUR: 60;
     /** How many messages the person may send through one module in a minute (2.50.0, `messages.say`). */
     readonly PERSON_MESSAGES_PER_MINUTE: 20;
     /** How many rows of traffic a host keeps, and the most one `traffic.read` returns. */

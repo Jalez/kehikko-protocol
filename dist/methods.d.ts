@@ -191,6 +191,8 @@ export declare const METHODS: {
     readonly 'messages.mine': "agents:message";
     /** A module's own message from its page; `once` for an introduction (2.50.0). */
     readonly 'messages.post': "agents:message";
+    /** A module's own notice to the one session whose place token asked it for something, from its server (2.54.0). */
+    readonly 'messages.notify': "agents:message";
     /** The person's own message, from a module's page on their press (2.50.0). */
     readonly 'messages.say': "messages:as-person";
 };
@@ -1749,6 +1751,23 @@ export declare const methodParams: {
         kind?: "question" | "report" | "note" | undefined;
         replyTo?: number | undefined;
         once?: boolean | undefined;
+    }>;
+    /** 2.54.0. From a module's server: its notice to the session the `token` names; answered with `messageSendResult`. */
+    readonly 'messages.notify': z.ZodObject<{
+        token: z.ZodString;
+        body: z.ZodString;
+        kind: z.ZodOptional<z.ZodEnum<["note", "report"]>>;
+        thread: z.ZodOptional<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        body: string;
+        token: string;
+        thread?: string | undefined;
+        kind?: "report" | "note" | undefined;
+    }, {
+        body: string;
+        token: string;
+        thread?: string | undefined;
+        kind?: "report" | "note" | undefined;
     }>;
     /**
      * 2.50.0. From a page only, on the person's press, under `messages:as-person`: the person's message;

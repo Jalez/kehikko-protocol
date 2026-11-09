@@ -40,6 +40,8 @@ export const SERVER_METHODS = [
     /* 2.41.0: messages between agent sessions. The project is the one the session's token names, so they name none. */
     'messages.send',
     'messages.read',
+    /* 2.54.0: a module's own notice to the session whose token asked it for something. The project is the token's. */
+    'messages.notify',
 ];
 /**
  * The server methods that are about one project, and so name it. The traffic methods (2.20.0) are
