@@ -2,6 +2,25 @@ import { z } from 'zod';
 import { LIMITS } from './limits.js';
 import { placeSchema, ref } from './fragments.js';
 import { PROJECT_ID } from './ids.js';
+import { agentSessionRefSchema, messageChoicesSchema } from './agent-messages.js';
+/**
+ * 2.55.0. A question an item asks the person, answered from the Inbox itself: the host shows `text`
+ * in full in the row and its notice, `choices` as buttons, and a reply field; an answer goes to the
+ * agent session `to` as the PERSON's own message (`from.person`, by the name `INBOX_VIA`), delivered
+ * like any other, answering `replyTo` when the question was a message (`messages.send`, `kind:
+ * 'question'`) and the text otherwise (`answers`). The host marks the item answered; the module
+ * withdraws it once its session has the answer. `to.module` is the reporting module's own, or —
+ * for a module that relays sessions' questions and declares `messages:as-person` — another's.
+ * The same limits as a message's choices (2.50.0). A host before 2.55.0 strips it.
+ */
+export const activityQuestionSchema = z.object({
+    text: z.string().trim().min(1).max(LIMITS.ACTIVITY_QUESTION),
+    choices: messageChoicesSchema.optional(),
+    to: agentSessionRefSchema,
+    replyTo: z.number().int().min(1).optional(),
+});
+/** 2.55.0. The name an answer from the Inbox is sent by (`from.name`): its frame says "via Inbox". */
+export const INBOX_VIA = 'Inbox';
 /**
  * What a module's things are doing right now (1.5.0): the list `activity.set` carries, and the one
  * rule a host and a module share about it. Shapes and one pure function; the drawing is the host's.
@@ -120,6 +139,8 @@ export const activityItemSchema = z.object({
      * strips it. An item is still one of the states: an event names a case, it is not a new state.
      */
     event: z.string().max(LIMITS.EVENT_ID).regex(EVENT_ID, 'an event id is lowercase letters, digits and single dashes').optional(),
+    /** 2.55.0. A question the person can answer from the Inbox (`activityQuestionSchema`), on an `attention` item. One that does not parse is dropped and the item kept. */
+    question: activityQuestionSchema.optional().catch(undefined),
 }).refine((item) => item.projectId === undefined || item.project !== undefined, {
     message: 'an activity item that names its project’s id names its folder too (`project`)',
     path: ['project'],

@@ -57,7 +57,7 @@ export declare const filterGroupSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
     }[];
     id: string;
     label: string;
-    kind?: "choice" | "text" | "toggles" | undefined;
+    kind?: "text" | "choice" | "toggles" | undefined;
     fallback?: string | undefined;
 }, {
     id: string;
@@ -66,7 +66,7 @@ export declare const filterGroupSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
         id: string;
         label: string;
     }[] | undefined;
-    kind?: "choice" | "text" | "toggles" | undefined;
+    kind?: "text" | "choice" | "toggles" | undefined;
     fallback?: string | undefined;
 }>, {
     options: {
@@ -75,7 +75,7 @@ export declare const filterGroupSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
     }[];
     id: string;
     label: string;
-    kind?: "choice" | "text" | "toggles" | undefined;
+    kind?: "text" | "choice" | "toggles" | undefined;
     fallback?: string | undefined;
 }, {
     id: string;
@@ -84,7 +84,7 @@ export declare const filterGroupSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
         id: string;
         label: string;
     }[] | undefined;
-    kind?: "choice" | "text" | "toggles" | undefined;
+    kind?: "text" | "choice" | "toggles" | undefined;
     fallback?: string | undefined;
 }>, {
     options: {
@@ -93,7 +93,7 @@ export declare const filterGroupSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
     }[];
     id: string;
     label: string;
-    kind?: "choice" | "text" | "toggles" | undefined;
+    kind?: "text" | "choice" | "toggles" | undefined;
     fallback?: string | undefined;
 }, {
     id: string;
@@ -102,7 +102,7 @@ export declare const filterGroupSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
         id: string;
         label: string;
     }[] | undefined;
-    kind?: "choice" | "text" | "toggles" | undefined;
+    kind?: "text" | "choice" | "toggles" | undefined;
     fallback?: string | undefined;
 }>;
 export type FilterGroup = z.infer<typeof filterGroupSchema>;

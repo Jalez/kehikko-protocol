@@ -30,6 +30,12 @@ type ActivityItem = {
   group?: string                   // 1.7.0; a fold key, 1..LIMITS.ACTIVITY_GROUP (64)
   project?: string                 // 1.8.0; the absolute folder of the project it belongs to
   event?: string                   // 2.31.0; one of the ids in the manifest's `events`
+  question?: {                     // 2.55.0; answered from the Inbox itself
+    text: string                   // shown in full, at most LIMITS.ACTIVITY_QUESTION (1000)
+    choices?: string[]             // a message's choices' limits (2.50.0)
+    to: { module: string; session: string }   // the agent session the answer goes to
+    replyTo?: number               // the message it answers, when the question was one
+  }
 }
 ```
 
@@ -290,6 +296,43 @@ The spec for a host's inbox; the protocol cannot enforce it.
 10. **`events.emit` notices** (`kehikot.notifications@1`) go into the same store as items born
     closed: `refs` to `refs`, `place` to `place`, the line to `label`.
 
+## How an agent's turn ended (2.55.0)
+
+A module that runs agent sessions used to report every turn's end as `done`, whatever the reason:
+the work finished, the agent stopped on a question only the person can answer, or it stopped
+"waiting on X" with nothing set up to bring it back. The last two need the person and looked like
+the first. `turns.ts` is the one rule every agent module applies:
+
+- The agent declares how its turn ends with `tell_finished` on the module's door
+  (`tellFinishedTool`, `readTellFinished`): `done`, `needs-decision` with the one-line question, or
+  `research-complete` with a few words.
+- At the turn's end the module asks `turnEnd({ told, waking, refused })` for the item: a decision is
+  `attention` with the question as its label and event `needs-decision`, kept until the person answers
+  in the session; `done` and research are `done`; a refusal the CLI made on its own account (an
+  auto-mode permission classifier: Claude Code's `PermissionDenied`) with nothing declared is
+  `attention`, `action-refused`, labelled with the ask (`refusalWords`); a turn with background tasks
+  or scheduled wake-ups still pending (`waking`) is paused, `done`; anything else is `attention`,
+  `stalled`.
+- The session's notes say the contract (`finishLine`); a module may, as a person's setting, answer
+  its CLI's `Stop` hook once with `stopBlockReason` so a stalling agent finishes, asks or sets up a
+  wake first. It never does so when the CLI says the turn already went on because of a stop hook.
+
+The events are declared like any other (`events: TURN_EVENTS`); a host before 2.31.0 ignores `event`
+and shows an ordinary item of its state.
+
+### Answered from the Inbox
+
+A decision and a refusal carry `question` (`turnQuestion(end, { module, session })`): the whole
+question, its choices, and the session the answer goes to. A host shows the question in full in the
+row and in its notice, the choices as buttons and a reply field. An answer — a press or typed words,
+only on the person's own gesture in the host's page — is sent to that session as the PERSON's message
+(`from.person`, `from.name` `INBOX_VIA`, `answers` the question, or `replyTo` when the question was a
+message), and delivered like any other: typed in under `[Message from your person via Inbox, #15,
+answering “…”]`. The host marks the item answered; the module withdraws it once its session has the
+answer (Claude Code: the typed prompt). `to.module` is the reporting module's own, or, for a module
+that relays sessions' questions and declares `messages:as-person`, another's — the same pieces a
+relaying module's own answer flow uses (`messages.say`, `kind: 'question'`, `choices`, `replyTo`).
+
 ## What a module author should report
 
 - **A session waits for a permission**: `{ id: sessionId, state: 'attention', label: 'Wants to run
@@ -299,6 +342,8 @@ The spec for a host's inbox; the protocol cannot enforce it.
   group: 'tests', refs: ['gh#12'] }`; drop it when the next run passes.
 - **A compile failed and nothing else will build**: the same with `priority: 'urgent'`.
 - **A long job finished**: `{ id: jobId, state: 'done', label: 'Export finished', priority: 'low' }`.
+- **A session's turn ended on a question for the person**: `{ id: sessionId, state: 'attention',
+  label: 'Force-push the rebased branch?', event: 'needs-decision' }` (`turnEnd`).
 - **A session finished a piece of research**: `{ id: sessionId, state: 'done', label: 'Protocol
   audit', event: 'research-complete' }`, with `research-complete` in `events`.
 - **An unread review comment**: `{ id: 'review:' + commentId, state: 'attention', label: 'Comment

@@ -122,7 +122,7 @@ export declare const serverAskResult: z.ZodDiscriminatedUnion<"ok", [z.ZodObject
     ok: false;
     since?: string | undefined;
     declined?: "host-too-old" | undefined;
-    refused?: "project" | "module" | "pass" | "grant" | undefined;
+    refused?: "module" | "project" | "pass" | "grant" | undefined;
 }, {
     error: string;
     reason: "failed" | "unknown-module" | "unknown-method";

@@ -293,6 +293,10 @@ by a host before 2.50.0, which keeps the body:
 | `choices` | only with `kind: 'question'`: at most `LIMITS.MESSAGE_CHOICES` (6) answers to pick from, each one line of at most `LIMITS.MESSAGE_CHOICE` (80) characters, no two the same; refused, not clipped |
 | `replyTo` | the id of the message this one answers |
 
+2.55.0: `answers` on `agentMessageSchema` is the HOST's: the question of an Inbox item the message
+answers (`activityQuestionSchema`, an answer given in the Inbox), when that question was not a message.
+Null otherwise. Lines and frames say it as `answering “…”`.
+
 `agentMessageSchema` carries them back: `kind` (`note` when absent), `choices` (`[]`), `replyTo`
 (`null`). A label for the reader, never a command: nothing a host or module does is triggered by a
 kind. The lines in the notes and in `read_messages` say them (`, a question (choices: "A" | "B"),

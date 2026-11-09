@@ -93,8 +93,8 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
 }, "strip", z.ZodTypeAny, {
     value: number;
     id: string;
-    label: string;
     kind: "meter";
+    label: string;
     level: "normal" | "warn" | "critical";
     align: "start" | "center" | "end";
     optional: boolean;
@@ -103,8 +103,8 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
 }, {
     value: number;
     id: string;
-    label: string;
     kind: "meter";
+    label: string;
     text?: string | undefined;
     level?: "normal" | "warn" | "critical" | undefined;
     align?: "start" | "center" | "end" | undefined;
@@ -149,8 +149,8 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
         label: string;
     }[];
     id: string;
-    label: string;
     kind: "switch";
+    label: string;
     agents: boolean;
     align: "start" | "center" | "end";
     optional: boolean;
@@ -167,8 +167,8 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
         label: string;
     }[];
     id: string;
-    label: string;
     kind: "switch";
+    label: string;
     group?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
@@ -202,8 +202,8 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     actsOn: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
 }, "strip", z.ZodTypeAny, {
     id: string;
-    label: string;
     kind: "toggle";
+    label: string;
     agents: boolean;
     checked: boolean;
     align: "start" | "center" | "end";
@@ -216,8 +216,8 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     actsOn?: string | undefined;
 }, {
     id: string;
-    label: string;
     kind: "toggle";
+    label: string;
     checked: boolean;
     group?: string | undefined;
     icon?: string | undefined;
@@ -265,8 +265,8 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
         label: string;
     }[];
     id: string;
-    label: string;
     kind: "go";
+    label: string;
     agents: boolean;
     align: "start" | "center" | "end";
     optional: boolean;
@@ -282,8 +282,8 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
         label: string;
     }[];
     id: string;
-    label: string;
     kind: "go";
+    label: string;
     group?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
@@ -333,9 +333,9 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     actsOn: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
 }, "strip", z.ZodTypeAny, {
     id: string;
+    kind: "run";
     state: "idle" | "busy" | "failed";
     label: string;
-    kind: "run";
     agents: boolean;
     result: string | null;
     disabled: string | null;
@@ -355,8 +355,8 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     actsOn?: string | undefined;
 }, {
     id: string;
-    label: string;
     kind: "run";
+    label: string;
     state?: "idle" | "busy" | "failed" | undefined;
     group?: string | undefined;
     open?: string | undefined;
@@ -400,8 +400,8 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
 }, "strip", z.ZodTypeAny, {
     value: string;
     id: string;
-    label: string;
     kind: "input";
+    label: string;
     agents: boolean;
     align: "start" | "center" | "end";
     optional: boolean;
@@ -410,8 +410,8 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     placeholder?: string | undefined;
 }, {
     id: string;
-    label: string;
     kind: "input";
+    label: string;
     value?: string | undefined;
     agents?: boolean | undefined;
     align?: "start" | "center" | "end" | undefined;
@@ -430,8 +430,8 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
 } | {
     value: number;
     id: string;
-    label: string;
     kind: "meter";
+    label: string;
     level: "normal" | "warn" | "critical";
     align: "start" | "center" | "end";
     optional: boolean;
@@ -444,8 +444,8 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
         label: string;
     }[];
     id: string;
-    label: string;
     kind: "switch";
+    label: string;
     agents: boolean;
     align: "start" | "center" | "end";
     optional: boolean;
@@ -457,8 +457,8 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     actsOn?: string | undefined;
 } | {
     id: string;
-    label: string;
     kind: "toggle";
+    label: string;
     agents: boolean;
     checked: boolean;
     align: "start" | "center" | "end";
@@ -475,8 +475,8 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
         label: string;
     }[];
     id: string;
-    label: string;
     kind: "go";
+    label: string;
     agents: boolean;
     align: "start" | "center" | "end";
     optional: boolean;
@@ -488,9 +488,9 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     actsOn?: string | undefined;
 } | {
     id: string;
+    kind: "run";
     state: "idle" | "busy" | "failed";
     label: string;
-    kind: "run";
     agents: boolean;
     result: string | null;
     disabled: string | null;
@@ -511,8 +511,8 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
 } | {
     value: string;
     id: string;
-    label: string;
     kind: "input";
+    label: string;
     agents: boolean;
     align: "start" | "center" | "end";
     optional: boolean;
@@ -530,8 +530,8 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
 } | {
     value: number;
     id: string;
-    label: string;
     kind: "meter";
+    label: string;
     text?: string | undefined;
     level?: "normal" | "warn" | "critical" | undefined;
     align?: "start" | "center" | "end" | undefined;
@@ -544,8 +544,8 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
         label: string;
     }[];
     id: string;
-    label: string;
     kind: "switch";
+    label: string;
     group?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
@@ -557,8 +557,8 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     actsOn?: string | undefined;
 } | {
     id: string;
-    label: string;
     kind: "toggle";
+    label: string;
     checked: boolean;
     group?: string | undefined;
     icon?: string | undefined;
@@ -575,8 +575,8 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
         label: string;
     }[];
     id: string;
-    label: string;
     kind: "go";
+    label: string;
     group?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
@@ -588,8 +588,8 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     actsOn?: string | undefined;
 } | {
     id: string;
-    label: string;
     kind: "run";
+    label: string;
     state?: "idle" | "busy" | "failed" | undefined;
     group?: string | undefined;
     open?: string | undefined;
@@ -610,8 +610,8 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     actsOn?: string | undefined;
 } | {
     id: string;
-    label: string;
     kind: "input";
+    label: string;
     value?: string | undefined;
     agents?: boolean | undefined;
     align?: "start" | "center" | "end" | undefined;
@@ -685,8 +685,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
 }, "strip", z.ZodTypeAny, {
     value: number;
     id: string;
-    label: string;
     kind: "meter";
+    label: string;
     level: "normal" | "warn" | "critical";
     align: "start" | "center" | "end";
     optional: boolean;
@@ -695,8 +695,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
 }, {
     value: number;
     id: string;
-    label: string;
     kind: "meter";
+    label: string;
     text?: string | undefined;
     level?: "normal" | "warn" | "critical" | undefined;
     align?: "start" | "center" | "end" | undefined;
@@ -741,8 +741,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
         label: string;
     }[];
     id: string;
-    label: string;
     kind: "switch";
+    label: string;
     agents: boolean;
     align: "start" | "center" | "end";
     optional: boolean;
@@ -759,8 +759,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
         label: string;
     }[];
     id: string;
-    label: string;
     kind: "switch";
+    label: string;
     group?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
@@ -794,8 +794,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     actsOn: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
 }, "strip", z.ZodTypeAny, {
     id: string;
-    label: string;
     kind: "toggle";
+    label: string;
     agents: boolean;
     checked: boolean;
     align: "start" | "center" | "end";
@@ -808,8 +808,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     actsOn?: string | undefined;
 }, {
     id: string;
-    label: string;
     kind: "toggle";
+    label: string;
     checked: boolean;
     group?: string | undefined;
     icon?: string | undefined;
@@ -857,8 +857,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
         label: string;
     }[];
     id: string;
-    label: string;
     kind: "go";
+    label: string;
     agents: boolean;
     align: "start" | "center" | "end";
     optional: boolean;
@@ -874,8 +874,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
         label: string;
     }[];
     id: string;
-    label: string;
     kind: "go";
+    label: string;
     group?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
@@ -925,9 +925,9 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     actsOn: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
 }, "strip", z.ZodTypeAny, {
     id: string;
+    kind: "run";
     state: "idle" | "busy" | "failed";
     label: string;
-    kind: "run";
     agents: boolean;
     result: string | null;
     disabled: string | null;
@@ -947,8 +947,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     actsOn?: string | undefined;
 }, {
     id: string;
-    label: string;
     kind: "run";
+    label: string;
     state?: "idle" | "busy" | "failed" | undefined;
     group?: string | undefined;
     open?: string | undefined;
@@ -992,8 +992,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
 }, "strip", z.ZodTypeAny, {
     value: string;
     id: string;
-    label: string;
     kind: "input";
+    label: string;
     agents: boolean;
     align: "start" | "center" | "end";
     optional: boolean;
@@ -1002,8 +1002,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     placeholder?: string | undefined;
 }, {
     id: string;
-    label: string;
     kind: "input";
+    label: string;
     value?: string | undefined;
     agents?: boolean | undefined;
     align?: "start" | "center" | "end" | undefined;
@@ -1022,8 +1022,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
 } | {
     value: number;
     id: string;
-    label: string;
     kind: "meter";
+    label: string;
     level: "normal" | "warn" | "critical";
     align: "start" | "center" | "end";
     optional: boolean;
@@ -1036,8 +1036,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
         label: string;
     }[];
     id: string;
-    label: string;
     kind: "switch";
+    label: string;
     agents: boolean;
     align: "start" | "center" | "end";
     optional: boolean;
@@ -1049,8 +1049,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     actsOn?: string | undefined;
 } | {
     id: string;
-    label: string;
     kind: "toggle";
+    label: string;
     agents: boolean;
     checked: boolean;
     align: "start" | "center" | "end";
@@ -1067,8 +1067,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
         label: string;
     }[];
     id: string;
-    label: string;
     kind: "go";
+    label: string;
     agents: boolean;
     align: "start" | "center" | "end";
     optional: boolean;
@@ -1080,9 +1080,9 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     actsOn?: string | undefined;
 } | {
     id: string;
+    kind: "run";
     state: "idle" | "busy" | "failed";
     label: string;
-    kind: "run";
     agents: boolean;
     result: string | null;
     disabled: string | null;
@@ -1103,8 +1103,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
 } | {
     value: string;
     id: string;
-    label: string;
     kind: "input";
+    label: string;
     agents: boolean;
     align: "start" | "center" | "end";
     optional: boolean;
@@ -1122,8 +1122,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
 } | {
     value: number;
     id: string;
-    label: string;
     kind: "meter";
+    label: string;
     text?: string | undefined;
     level?: "normal" | "warn" | "critical" | undefined;
     align?: "start" | "center" | "end" | undefined;
@@ -1136,8 +1136,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
         label: string;
     }[];
     id: string;
-    label: string;
     kind: "switch";
+    label: string;
     group?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
@@ -1149,8 +1149,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     actsOn?: string | undefined;
 } | {
     id: string;
-    label: string;
     kind: "toggle";
+    label: string;
     checked: boolean;
     group?: string | undefined;
     icon?: string | undefined;
@@ -1167,8 +1167,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
         label: string;
     }[];
     id: string;
-    label: string;
     kind: "go";
+    label: string;
     group?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
@@ -1180,8 +1180,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     actsOn?: string | undefined;
 } | {
     id: string;
-    label: string;
     kind: "run";
+    label: string;
     state?: "idle" | "busy" | "failed" | undefined;
     group?: string | undefined;
     open?: string | undefined;
@@ -1202,8 +1202,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     actsOn?: string | undefined;
 } | {
     id: string;
-    label: string;
     kind: "input";
+    label: string;
     value?: string | undefined;
     agents?: boolean | undefined;
     align?: "start" | "center" | "end" | undefined;
@@ -1222,8 +1222,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
 } | {
     value: number;
     id: string;
-    label: string;
     kind: "meter";
+    label: string;
     level: "normal" | "warn" | "critical";
     align: "start" | "center" | "end";
     optional: boolean;
@@ -1236,8 +1236,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
         label: string;
     }[];
     id: string;
-    label: string;
     kind: "switch";
+    label: string;
     agents: boolean;
     align: "start" | "center" | "end";
     optional: boolean;
@@ -1249,8 +1249,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     actsOn?: string | undefined;
 } | {
     id: string;
-    label: string;
     kind: "toggle";
+    label: string;
     agents: boolean;
     checked: boolean;
     align: "start" | "center" | "end";
@@ -1267,8 +1267,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
         label: string;
     }[];
     id: string;
-    label: string;
     kind: "go";
+    label: string;
     agents: boolean;
     align: "start" | "center" | "end";
     optional: boolean;
@@ -1280,9 +1280,9 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     actsOn?: string | undefined;
 } | {
     id: string;
+    kind: "run";
     state: "idle" | "busy" | "failed";
     label: string;
-    kind: "run";
     agents: boolean;
     result: string | null;
     disabled: string | null;
@@ -1303,8 +1303,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
 } | {
     value: string;
     id: string;
-    label: string;
     kind: "input";
+    label: string;
     agents: boolean;
     align: "start" | "center" | "end";
     optional: boolean;
@@ -1322,8 +1322,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
 } | {
     value: number;
     id: string;
-    label: string;
     kind: "meter";
+    label: string;
     text?: string | undefined;
     level?: "normal" | "warn" | "critical" | undefined;
     align?: "start" | "center" | "end" | undefined;
@@ -1336,8 +1336,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
         label: string;
     }[];
     id: string;
-    label: string;
     kind: "switch";
+    label: string;
     group?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
@@ -1349,8 +1349,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     actsOn?: string | undefined;
 } | {
     id: string;
-    label: string;
     kind: "toggle";
+    label: string;
     checked: boolean;
     group?: string | undefined;
     icon?: string | undefined;
@@ -1367,8 +1367,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
         label: string;
     }[];
     id: string;
-    label: string;
     kind: "go";
+    label: string;
     group?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
@@ -1380,8 +1380,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     actsOn?: string | undefined;
 } | {
     id: string;
-    label: string;
     kind: "run";
+    label: string;
     state?: "idle" | "busy" | "failed" | undefined;
     group?: string | undefined;
     open?: string | undefined;
@@ -1402,8 +1402,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     actsOn?: string | undefined;
 } | {
     id: string;
-    label: string;
     kind: "input";
+    label: string;
     value?: string | undefined;
     agents?: boolean | undefined;
     align?: "start" | "center" | "end" | undefined;

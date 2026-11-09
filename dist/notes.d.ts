@@ -76,12 +76,12 @@ export declare const absentModuleSchema: z.ZodObject<{
     says: z.ZodString;
 }, "strip", z.ZodTypeAny, {
     name: string;
-    says: string;
     module: string;
+    says: string;
 }, {
     name: string;
-    says: string;
     module: string;
+    says: string;
 }>;
 export type AbsentModule = z.infer<typeof absentModuleSchema>;
 /** A session's place, as the notes say it. `project` is the folder. */
@@ -172,9 +172,9 @@ export interface NotesInput {
  * 5 (2.44.0): a module's skills the session does not have are said apart (`holds`). 6 (2.50.0): the
  * person's messages and a message's kind and choices; and what each module says is kept (`lines`), so a
  * module that changes its `agentSays` is told again at the next prompt. 7 (2.53.0): the kehikko's own
- * skills (`kehikkoSkills`).
+ * skills (`kehikkoSkills`). 8 (2.55.0): how to end a turn (`finishLine`).
  */
-export declare const NOTES_VERSION = 7;
+export declare const NOTES_VERSION = 8;
 /** What a session was last told: its place by key, and which modules (null when they could not be read). */
 export interface NotesTold {
     key: string | null;
@@ -232,6 +232,8 @@ export declare const KEHIKKO_SKILLS_TOOL = "kehikko_skills";
 export declare const KEHIKKO_SKILLS_HEAD = "Skills of this kehikko, written by the person for every agent session on it \u2014 use one when its description fits the task:";
 /** The line about "Research complete", on the door of the module that runs the session. */
 export declare function researchLine(self: NotesSelf): string;
+/** 2.55.0. The line every agent session is told about ending its turns, on the door of the module that runs it (`turns.ts`). */
+export declare function finishLine(self: NotesSelf): string;
 /** Everything a session is told at its start: its place, the modules on its kehikko, and the installed ones not on it. */
 export declare function startNotes(input: NotesInput, moved?: boolean): string;
 /** What a session is told at a prompt when the modules on its kehikko changed; null when nothing it was told did. */

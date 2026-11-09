@@ -124,6 +124,12 @@ export const agentMessageSchema = z.object({
      * most ONE once-message from the same module, ever. False from a host before 2.50.0.
      */
     once: z.boolean().default(false).catch(false),
+    /**
+     * 2.55.0. The question from the Inbox this message answers (an item's `question.text`), when it
+     * answers one that was not a message (`replyTo` says that). The host's fact; null otherwise, and from
+     * a host before 2.55.0.
+     */
+    answers: z.string().max(LIMITS.ACTIVITY_QUESTION).nullable().default(null).catch(null),
 });
 /** `token` in a call: the place token on the session's door URL, which names who is asking. The host checks the asking module issued it. */
 const token = z.string().regex(TOKEN, 'token is the session’s place token (the kehikot-place on its door’s URL)');
@@ -255,6 +261,8 @@ export const messageReadResult = z.object({
 const range = (from, to) => `${String.fromCharCode(from)}-${String.fromCharCode(to)}`;
 const UNSAFE = new RegExp(`[\\s${range(0, 0x1f)}${range(0x7f, 0x9f)}${range(0x200b, 0x200f)}${range(0x2028, 0x202e)}${range(0x2060, 0x206f)}${String.fromCharCode(0xfeff)}]+`, 'g');
 /** Words from another program as one line of text, at most `max` characters. */
+/** 2.55.0. How much of an answered question a frame or a line repeats. */
+const ANSWERS_SHOWN = 120;
 const flat = (text, max) => {
     if (typeof text !== 'string')
         return '';
@@ -292,7 +300,7 @@ export const isModuleMessage = (message) => message.from.session === null && mes
 function structuredWords(message) {
     const kind = message.kind === 'question' ? ', a question' : message.kind === 'report' ? ', a report' : '';
     const choices = message.kind === 'question' && message.choices.length ? ` (choices: ${message.choices.map((one) => JSON.stringify(flat(one, LIMITS.MESSAGE_CHOICE))).join(' | ')})` : '';
-    const answering = message.replyTo !== null ? `, answering #${message.replyTo}` : '';
+    const answering = message.replyTo !== null ? `, answering #${message.replyTo}` : message.answers ? `, answering ${JSON.stringify(flat(message.answers, ANSWERS_SHOWN))}` : '';
     return `${kind}${choices}${answering}`;
 }
 /** One message as one line: `- #12, 2026-10-31T14:02Z, from Codex (session …, epic methods) to every session at the epic methods, thread "auth": "…"`. */
@@ -633,7 +641,7 @@ const PERSON_FRAME = '[Message from your person';
 /** 2.50.0. What a typed frame says after the id: what the message is, and what it answers. Host-checked fields only. */
 function typedStructured(message) {
     const kind = message.kind === 'question' ? ', a question' : message.kind === 'report' ? ', a report' : '';
-    return `${kind}${message.replyTo !== null ? `, answering #${message.replyTo}` : ''}`;
+    return `${kind}${message.replyTo !== null ? `, answering #${message.replyTo}` : message.answers ? `, answering “${flat(message.answers, ANSWERS_SHOWN).replace(/[\[\]“”]/g, '')}”` : ''}`;
 }
 /**
  * 2.48.0. The frame over one typed message: `[Kehikot message from Codex (epic methods on the kehikko

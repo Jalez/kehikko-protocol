@@ -200,6 +200,9 @@ export {
   ACTIVITY_PRIORITIES,
   type ActivityPriority,
   activityItemSchema,
+  activityQuestionSchema,
+  INBOX_VIA,
+  type ActivityQuestion,
   activityItemsSchema,
   worstActivity,
   EVENT_ID,
@@ -541,6 +544,7 @@ export {
   moduleLine,
   absentLine,
   researchLine,
+  finishLine,
   startNotes,
   changeNotes,
   sessionNotes,
@@ -558,6 +562,31 @@ export {
   type NotesTold,
   type NotesEvent,
 } from './notes.js'
+
+/* How an agent session's turn ended, one rule for every agent module (2.55.0). See `turns.ts`. */
+export {
+  TURN_KINDS,
+  TURN_EVENTS,
+  RESEARCH_COMPLETE_EVENT,
+  DECISION_EVENT,
+  REFUSED_EVENT,
+  STALLED_EVENT,
+  TELL_FINISHED_TOOL,
+  REFUSAL_CHOICES,
+  turnQuestion,
+  refusalEnd,
+  tellFinishedTool,
+  readTellFinished,
+  toldReply,
+  refusalOf,
+  refusalWords,
+  turnEnd,
+  stopBlockReason,
+  type TurnKind,
+  type TurnTold,
+  type Refusal,
+  type TurnEnd,
+} from './turns.js'
 
 /* A kehikko's own skills, written by the person for every agent session on it (2.53.0). See `kehikko-skills.ts`. */
 export {

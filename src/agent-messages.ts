@@ -144,6 +144,12 @@ export const agentMessageSchema = z.object({
    * most ONE once-message from the same module, ever. False from a host before 2.50.0.
    */
   once: z.boolean().default(false).catch(false),
+  /**
+   * 2.55.0. The question from the Inbox this message answers (an item's `question.text`), when it
+   * answers one that was not a message (`replyTo` says that). The host's fact; null otherwise, and from
+   * a host before 2.55.0.
+   */
+  answers: z.string().max(LIMITS.ACTIVITY_QUESTION).nullable().default(null).catch(null),
 })
 export type AgentMessage = z.infer<typeof agentMessageSchema>
 
@@ -294,6 +300,9 @@ const range = (from: number, to: number): string => `${String.fromCharCode(from)
 const UNSAFE = new RegExp(`[\\s${range(0, 0x1f)}${range(0x7f, 0x9f)}${range(0x200b, 0x200f)}${range(0x2028, 0x202e)}${range(0x2060, 0x206f)}${String.fromCharCode(0xfeff)}]+`, 'g')
 
 /** Words from another program as one line of text, at most `max` characters. */
+/** 2.55.0. How much of an answered question a frame or a line repeats. */
+const ANSWERS_SHOWN = 120
+
 const flat = (text: unknown, max: number): string => {
   if (typeof text !== 'string') return ''
   const one = text.replace(UNSAFE, ' ').trim()
@@ -334,7 +343,7 @@ export const isModuleMessage = (message: Pick<AgentMessage, 'from'>): boolean =>
 function structuredWords(message: AgentMessage): string {
   const kind = message.kind === 'question' ? ', a question' : message.kind === 'report' ? ', a report' : ''
   const choices = message.kind === 'question' && message.choices.length ? ` (choices: ${message.choices.map((one) => JSON.stringify(flat(one, LIMITS.MESSAGE_CHOICE))).join(' | ')})` : ''
-  const answering = message.replyTo !== null ? `, answering #${message.replyTo}` : ''
+  const answering = message.replyTo !== null ? `, answering #${message.replyTo}` : message.answers ? `, answering ${JSON.stringify(flat(message.answers, ANSWERS_SHOWN))}` : ''
   return `${kind}${choices}${answering}`
 }
 
@@ -730,7 +739,7 @@ const PERSON_FRAME = '[Message from your person'
 /** 2.50.0. What a typed frame says after the id: what the message is, and what it answers. Host-checked fields only. */
 function typedStructured(message: AgentMessage): string {
   const kind = message.kind === 'question' ? ', a question' : message.kind === 'report' ? ', a report' : ''
-  return `${kind}${message.replyTo !== null ? `, answering #${message.replyTo}` : ''}`
+  return `${kind}${message.replyTo !== null ? `, answering #${message.replyTo}` : message.answers ? `, answering “${flat(message.answers, ANSWERS_SHOWN).replace(/[\[\]“”]/g, '')}”` : ''}`
 }
 
 /**

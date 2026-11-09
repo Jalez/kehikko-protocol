@@ -617,10 +617,10 @@ export declare const trackerRowSchema: z.ZodObject<{
     }>>;
 }, "strip", z.ZodTypeAny, {
     number: number;
+    kind: "issue" | "change";
     state: "open" | "closed" | "merged";
     url: string;
     title: string;
-    kind: "issue" | "change";
     host: string;
     ref: string;
     readAt: string;
@@ -705,10 +705,10 @@ export declare const trackerRowSchema: z.ZodObject<{
     }[] | undefined;
 }, {
     number: number;
+    kind: "issue" | "change";
     state: "open" | "closed" | "merged";
     url: string;
     title: string;
-    kind: "issue" | "change";
     host: string;
     ref: string;
     readAt: string;
@@ -1215,10 +1215,10 @@ export declare const trackerReadingResult: z.ZodObject<{
         }>>;
     }, "strip", z.ZodTypeAny, {
         number: number;
+        kind: "issue" | "change";
         state: "open" | "closed" | "merged";
         url: string;
         title: string;
-        kind: "issue" | "change";
         host: string;
         ref: string;
         readAt: string;
@@ -1303,10 +1303,10 @@ export declare const trackerReadingResult: z.ZodObject<{
         }[] | undefined;
     }, {
         number: number;
+        kind: "issue" | "change";
         state: "open" | "closed" | "merged";
         url: string;
         title: string;
-        kind: "issue" | "change";
         host: string;
         ref: string;
         readAt: string;
@@ -1415,10 +1415,10 @@ export declare const trackerReadingResult: z.ZodObject<{
     }[];
     rows: {
         number: number;
+        kind: "issue" | "change";
         state: "open" | "closed" | "merged";
         url: string;
         title: string;
-        kind: "issue" | "change";
         host: string;
         ref: string;
         readAt: string;
@@ -1521,10 +1521,10 @@ export declare const trackerReadingResult: z.ZodObject<{
     }[] | undefined;
     rows?: {
         number: number;
+        kind: "issue" | "change";
         state: "open" | "closed" | "merged";
         url: string;
         title: string;
-        kind: "issue" | "change";
         host: string;
         ref: string;
         readAt: string;
