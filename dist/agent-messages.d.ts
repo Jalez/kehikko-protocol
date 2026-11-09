@@ -83,48 +83,48 @@ export declare const messageToSchema: z.ZodEffects<z.ZodObject<{
         session: string;
     }>>;
 }, "strip", z.ZodTypeAny, {
-    place?: {
-        epic?: string | undefined;
-        kehikko?: string | undefined;
-    } | undefined;
-    project?: true | undefined;
     module?: string | undefined;
     session?: {
         module: string;
         session: string;
+    } | undefined;
+    project?: true | undefined;
+    place?: {
+        epic?: string | undefined;
+        kehikko?: string | undefined;
     } | undefined;
 }, {
-    place?: {
-        epic?: string | undefined;
-        kehikko?: string | undefined;
-    } | undefined;
-    project?: true | undefined;
     module?: string | undefined;
     session?: {
         module: string;
         session: string;
+    } | undefined;
+    project?: true | undefined;
+    place?: {
+        epic?: string | undefined;
+        kehikko?: string | undefined;
     } | undefined;
 }>, {
-    place?: {
-        epic?: string | undefined;
-        kehikko?: string | undefined;
-    } | undefined;
-    project?: true | undefined;
     module?: string | undefined;
     session?: {
         module: string;
         session: string;
+    } | undefined;
+    project?: true | undefined;
+    place?: {
+        epic?: string | undefined;
+        kehikko?: string | undefined;
     } | undefined;
 }, {
-    place?: {
-        epic?: string | undefined;
-        kehikko?: string | undefined;
-    } | undefined;
-    project?: true | undefined;
     module?: string | undefined;
     session?: {
         module: string;
         session: string;
+    } | undefined;
+    project?: true | undefined;
+    place?: {
+        epic?: string | undefined;
+        kehikko?: string | undefined;
     } | undefined;
 }>;
 export type MessageTo = z.infer<typeof messageToSchema>;
@@ -177,22 +177,22 @@ export declare const agentMessageSchema: z.ZodObject<{
         person: z.ZodCatch<z.ZodDefault<z.ZodBoolean>>;
     }, "strip", z.ZodTypeAny, {
         name: string;
+        module: string;
+        session: string | null;
         place: {
             epic: string | null;
             parts: string[];
             kehikko: string | null;
         };
-        module: string;
-        session: string | null;
         person: boolean;
     }, {
+        module: string;
+        session: string | null;
         place: {
             epic: string | null;
             kehikko: string | null;
             parts?: unknown;
         };
-        module: string;
-        session: string | null;
         name?: unknown;
         person?: unknown;
     }>;
@@ -226,48 +226,48 @@ export declare const agentMessageSchema: z.ZodObject<{
             session: string;
         }>>;
     }, "strip", z.ZodTypeAny, {
-        place?: {
-            epic?: string | undefined;
-            kehikko?: string | undefined;
-        } | undefined;
-        project?: true | undefined;
         module?: string | undefined;
         session?: {
             module: string;
             session: string;
+        } | undefined;
+        project?: true | undefined;
+        place?: {
+            epic?: string | undefined;
+            kehikko?: string | undefined;
         } | undefined;
     }, {
-        place?: {
-            epic?: string | undefined;
-            kehikko?: string | undefined;
-        } | undefined;
-        project?: true | undefined;
         module?: string | undefined;
         session?: {
             module: string;
             session: string;
+        } | undefined;
+        project?: true | undefined;
+        place?: {
+            epic?: string | undefined;
+            kehikko?: string | undefined;
         } | undefined;
     }>, {
-        place?: {
-            epic?: string | undefined;
-            kehikko?: string | undefined;
-        } | undefined;
-        project?: true | undefined;
         module?: string | undefined;
         session?: {
             module: string;
             session: string;
+        } | undefined;
+        project?: true | undefined;
+        place?: {
+            epic?: string | undefined;
+            kehikko?: string | undefined;
         } | undefined;
     }, {
-        place?: {
-            epic?: string | undefined;
-            kehikko?: string | undefined;
-        } | undefined;
-        project?: true | undefined;
         module?: string | undefined;
         session?: {
             module: string;
             session: string;
+        } | undefined;
+        project?: true | undefined;
+        place?: {
+            epic?: string | undefined;
+            kehikko?: string | undefined;
         } | undefined;
     }>;
     thread: z.ZodCatch<z.ZodNullable<z.ZodString>>;
@@ -283,31 +283,37 @@ export declare const agentMessageSchema: z.ZodObject<{
      * most ONE once-message from the same module, ever. False from a host before 2.50.0.
      */
     once: z.ZodCatch<z.ZodDefault<z.ZodBoolean>>;
+    /**
+     * 2.55.0. The question from the Inbox this message answers (an item's `question.text`), when it
+     * answers one that was not a message (`replyTo` says that). The host's fact; null otherwise, and from
+     * a host before 2.55.0.
+     */
+    answers: z.ZodCatch<z.ZodDefault<z.ZodNullable<z.ZodString>>>;
 }, "strip", z.ZodTypeAny, {
     at: string;
     id: number;
     choices: string[];
     from: {
         name: string;
+        module: string;
+        session: string | null;
         place: {
             epic: string | null;
             parts: string[];
             kehikko: string | null;
         };
-        module: string;
-        session: string | null;
         person: boolean;
     };
     to: {
-        place?: {
-            epic?: string | undefined;
-            kehikko?: string | undefined;
-        } | undefined;
-        project?: true | undefined;
         module?: string | undefined;
         session?: {
             module: string;
             session: string;
+        } | undefined;
+        project?: true | undefined;
+        place?: {
+            epic?: string | undefined;
+            kehikko?: string | undefined;
         } | undefined;
     };
     thread: string | null;
@@ -315,30 +321,31 @@ export declare const agentMessageSchema: z.ZodObject<{
     kind: "question" | "report" | "note";
     replyTo: number | null;
     once: boolean;
+    answers: string | null;
 }, {
     at: string;
     id: number;
     from: {
+        module: string;
+        session: string | null;
         place: {
             epic: string | null;
             kehikko: string | null;
             parts?: unknown;
         };
-        module: string;
-        session: string | null;
         name?: unknown;
         person?: unknown;
     };
     to: {
-        place?: {
-            epic?: string | undefined;
-            kehikko?: string | undefined;
-        } | undefined;
-        project?: true | undefined;
         module?: string | undefined;
         session?: {
             module: string;
             session: string;
+        } | undefined;
+        project?: true | undefined;
+        place?: {
+            epic?: string | undefined;
+            kehikko?: string | undefined;
         } | undefined;
     };
     body: string;
@@ -347,6 +354,7 @@ export declare const agentMessageSchema: z.ZodObject<{
     kind?: unknown;
     replyTo?: unknown;
     once?: unknown;
+    answers?: unknown;
 }>;
 export type AgentMessage = z.infer<typeof agentMessageSchema>;
 /**
@@ -391,48 +399,48 @@ export declare const messageSendParams: z.ZodEffects<z.ZodObject<{
             session: string;
         }>>;
     }, "strip", z.ZodTypeAny, {
-        place?: {
-            epic?: string | undefined;
-            kehikko?: string | undefined;
-        } | undefined;
-        project?: true | undefined;
         module?: string | undefined;
         session?: {
             module: string;
             session: string;
+        } | undefined;
+        project?: true | undefined;
+        place?: {
+            epic?: string | undefined;
+            kehikko?: string | undefined;
         } | undefined;
     }, {
-        place?: {
-            epic?: string | undefined;
-            kehikko?: string | undefined;
-        } | undefined;
-        project?: true | undefined;
         module?: string | undefined;
         session?: {
             module: string;
             session: string;
+        } | undefined;
+        project?: true | undefined;
+        place?: {
+            epic?: string | undefined;
+            kehikko?: string | undefined;
         } | undefined;
     }>, {
-        place?: {
-            epic?: string | undefined;
-            kehikko?: string | undefined;
-        } | undefined;
-        project?: true | undefined;
         module?: string | undefined;
         session?: {
             module: string;
             session: string;
+        } | undefined;
+        project?: true | undefined;
+        place?: {
+            epic?: string | undefined;
+            kehikko?: string | undefined;
         } | undefined;
     }, {
-        place?: {
-            epic?: string | undefined;
-            kehikko?: string | undefined;
-        } | undefined;
-        project?: true | undefined;
         module?: string | undefined;
         session?: {
             module: string;
             session: string;
+        } | undefined;
+        project?: true | undefined;
+        place?: {
+            epic?: string | undefined;
+            kehikko?: string | undefined;
         } | undefined;
     }>>;
     thread: z.ZodOptional<z.ZodString>;
@@ -441,15 +449,15 @@ export declare const messageSendParams: z.ZodEffects<z.ZodObject<{
     token: string;
     choices?: string[] | undefined;
     to?: {
-        place?: {
-            epic?: string | undefined;
-            kehikko?: string | undefined;
-        } | undefined;
-        project?: true | undefined;
         module?: string | undefined;
         session?: {
             module: string;
             session: string;
+        } | undefined;
+        project?: true | undefined;
+        place?: {
+            epic?: string | undefined;
+            kehikko?: string | undefined;
         } | undefined;
     } | undefined;
     thread?: string | undefined;
@@ -460,15 +468,15 @@ export declare const messageSendParams: z.ZodEffects<z.ZodObject<{
     token: string;
     choices?: string[] | undefined;
     to?: {
-        place?: {
-            epic?: string | undefined;
-            kehikko?: string | undefined;
-        } | undefined;
-        project?: true | undefined;
         module?: string | undefined;
         session?: {
             module: string;
             session: string;
+        } | undefined;
+        project?: true | undefined;
+        place?: {
+            epic?: string | undefined;
+            kehikko?: string | undefined;
         } | undefined;
     } | undefined;
     thread?: string | undefined;
@@ -479,15 +487,15 @@ export declare const messageSendParams: z.ZodEffects<z.ZodObject<{
     token: string;
     choices?: string[] | undefined;
     to?: {
-        place?: {
-            epic?: string | undefined;
-            kehikko?: string | undefined;
-        } | undefined;
-        project?: true | undefined;
         module?: string | undefined;
         session?: {
             module: string;
             session: string;
+        } | undefined;
+        project?: true | undefined;
+        place?: {
+            epic?: string | undefined;
+            kehikko?: string | undefined;
         } | undefined;
     } | undefined;
     thread?: string | undefined;
@@ -498,15 +506,15 @@ export declare const messageSendParams: z.ZodEffects<z.ZodObject<{
     token: string;
     choices?: string[] | undefined;
     to?: {
-        place?: {
-            epic?: string | undefined;
-            kehikko?: string | undefined;
-        } | undefined;
-        project?: true | undefined;
         module?: string | undefined;
         session?: {
             module: string;
             session: string;
+        } | undefined;
+        project?: true | undefined;
+        place?: {
+            epic?: string | undefined;
+            kehikko?: string | undefined;
         } | undefined;
     } | undefined;
     thread?: string | undefined;
@@ -556,62 +564,62 @@ export declare const messageSayParams: z.ZodEffects<z.ZodObject<{
             session: string;
         }>>;
     }, "strip", z.ZodTypeAny, {
-        place?: {
-            epic?: string | undefined;
-            kehikko?: string | undefined;
-        } | undefined;
-        project?: true | undefined;
         module?: string | undefined;
         session?: {
             module: string;
             session: string;
+        } | undefined;
+        project?: true | undefined;
+        place?: {
+            epic?: string | undefined;
+            kehikko?: string | undefined;
         } | undefined;
     }, {
-        place?: {
-            epic?: string | undefined;
-            kehikko?: string | undefined;
-        } | undefined;
-        project?: true | undefined;
         module?: string | undefined;
         session?: {
             module: string;
             session: string;
+        } | undefined;
+        project?: true | undefined;
+        place?: {
+            epic?: string | undefined;
+            kehikko?: string | undefined;
         } | undefined;
     }>, {
-        place?: {
-            epic?: string | undefined;
-            kehikko?: string | undefined;
-        } | undefined;
-        project?: true | undefined;
         module?: string | undefined;
         session?: {
             module: string;
             session: string;
+        } | undefined;
+        project?: true | undefined;
+        place?: {
+            epic?: string | undefined;
+            kehikko?: string | undefined;
         } | undefined;
     }, {
-        place?: {
-            epic?: string | undefined;
-            kehikko?: string | undefined;
-        } | undefined;
-        project?: true | undefined;
         module?: string | undefined;
         session?: {
             module: string;
             session: string;
+        } | undefined;
+        project?: true | undefined;
+        place?: {
+            epic?: string | undefined;
+            kehikko?: string | undefined;
         } | undefined;
     }>;
     thread: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     to: {
-        place?: {
-            epic?: string | undefined;
-            kehikko?: string | undefined;
-        } | undefined;
-        project?: true | undefined;
         module?: string | undefined;
         session?: {
             module: string;
             session: string;
+        } | undefined;
+        project?: true | undefined;
+        place?: {
+            epic?: string | undefined;
+            kehikko?: string | undefined;
         } | undefined;
     };
     body: string;
@@ -621,15 +629,15 @@ export declare const messageSayParams: z.ZodEffects<z.ZodObject<{
     replyTo?: number | undefined;
 }, {
     to: {
-        place?: {
-            epic?: string | undefined;
-            kehikko?: string | undefined;
-        } | undefined;
-        project?: true | undefined;
         module?: string | undefined;
         session?: {
             module: string;
             session: string;
+        } | undefined;
+        project?: true | undefined;
+        place?: {
+            epic?: string | undefined;
+            kehikko?: string | undefined;
         } | undefined;
     };
     body: string;
@@ -639,15 +647,15 @@ export declare const messageSayParams: z.ZodEffects<z.ZodObject<{
     replyTo?: number | undefined;
 }>, {
     to: {
-        place?: {
-            epic?: string | undefined;
-            kehikko?: string | undefined;
-        } | undefined;
-        project?: true | undefined;
         module?: string | undefined;
         session?: {
             module: string;
             session: string;
+        } | undefined;
+        project?: true | undefined;
+        place?: {
+            epic?: string | undefined;
+            kehikko?: string | undefined;
         } | undefined;
     };
     body: string;
@@ -657,15 +665,15 @@ export declare const messageSayParams: z.ZodEffects<z.ZodObject<{
     replyTo?: number | undefined;
 }, {
     to: {
-        place?: {
-            epic?: string | undefined;
-            kehikko?: string | undefined;
-        } | undefined;
-        project?: true | undefined;
         module?: string | undefined;
         session?: {
             module: string;
             session: string;
+        } | undefined;
+        project?: true | undefined;
+        place?: {
+            epic?: string | undefined;
+            kehikko?: string | undefined;
         } | undefined;
     };
     body: string;
@@ -718,63 +726,63 @@ export declare const messagePostParams: z.ZodEffects<z.ZodObject<{
             session: string;
         }>>;
     }, "strip", z.ZodTypeAny, {
-        place?: {
-            epic?: string | undefined;
-            kehikko?: string | undefined;
-        } | undefined;
-        project?: true | undefined;
         module?: string | undefined;
         session?: {
             module: string;
             session: string;
+        } | undefined;
+        project?: true | undefined;
+        place?: {
+            epic?: string | undefined;
+            kehikko?: string | undefined;
         } | undefined;
     }, {
-        place?: {
-            epic?: string | undefined;
-            kehikko?: string | undefined;
-        } | undefined;
-        project?: true | undefined;
         module?: string | undefined;
         session?: {
             module: string;
             session: string;
+        } | undefined;
+        project?: true | undefined;
+        place?: {
+            epic?: string | undefined;
+            kehikko?: string | undefined;
         } | undefined;
     }>, {
-        place?: {
-            epic?: string | undefined;
-            kehikko?: string | undefined;
-        } | undefined;
-        project?: true | undefined;
         module?: string | undefined;
         session?: {
             module: string;
             session: string;
+        } | undefined;
+        project?: true | undefined;
+        place?: {
+            epic?: string | undefined;
+            kehikko?: string | undefined;
         } | undefined;
     }, {
-        place?: {
-            epic?: string | undefined;
-            kehikko?: string | undefined;
-        } | undefined;
-        project?: true | undefined;
         module?: string | undefined;
         session?: {
             module: string;
             session: string;
+        } | undefined;
+        project?: true | undefined;
+        place?: {
+            epic?: string | undefined;
+            kehikko?: string | undefined;
         } | undefined;
     }>;
     thread: z.ZodOptional<z.ZodString>;
     once: z.ZodOptional<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
     to: {
-        place?: {
-            epic?: string | undefined;
-            kehikko?: string | undefined;
-        } | undefined;
-        project?: true | undefined;
         module?: string | undefined;
         session?: {
             module: string;
             session: string;
+        } | undefined;
+        project?: true | undefined;
+        place?: {
+            epic?: string | undefined;
+            kehikko?: string | undefined;
         } | undefined;
     };
     body: string;
@@ -785,15 +793,15 @@ export declare const messagePostParams: z.ZodEffects<z.ZodObject<{
     once?: boolean | undefined;
 }, {
     to: {
-        place?: {
-            epic?: string | undefined;
-            kehikko?: string | undefined;
-        } | undefined;
-        project?: true | undefined;
         module?: string | undefined;
         session?: {
             module: string;
             session: string;
+        } | undefined;
+        project?: true | undefined;
+        place?: {
+            epic?: string | undefined;
+            kehikko?: string | undefined;
         } | undefined;
     };
     body: string;
@@ -804,15 +812,15 @@ export declare const messagePostParams: z.ZodEffects<z.ZodObject<{
     once?: boolean | undefined;
 }>, {
     to: {
-        place?: {
-            epic?: string | undefined;
-            kehikko?: string | undefined;
-        } | undefined;
-        project?: true | undefined;
         module?: string | undefined;
         session?: {
             module: string;
             session: string;
+        } | undefined;
+        project?: true | undefined;
+        place?: {
+            epic?: string | undefined;
+            kehikko?: string | undefined;
         } | undefined;
     };
     body: string;
@@ -823,15 +831,15 @@ export declare const messagePostParams: z.ZodEffects<z.ZodObject<{
     once?: boolean | undefined;
 }, {
     to: {
-        place?: {
-            epic?: string | undefined;
-            kehikko?: string | undefined;
-        } | undefined;
-        project?: true | undefined;
         module?: string | undefined;
         session?: {
             module: string;
             session: string;
+        } | undefined;
+        project?: true | undefined;
+        place?: {
+            epic?: string | undefined;
+            kehikko?: string | undefined;
         } | undefined;
     };
     body: string;
@@ -887,22 +895,22 @@ export declare const messageMineResult: z.ZodObject<{
             person: z.ZodCatch<z.ZodDefault<z.ZodBoolean>>;
         }, "strip", z.ZodTypeAny, {
             name: string;
+            module: string;
+            session: string | null;
             place: {
                 epic: string | null;
                 parts: string[];
                 kehikko: string | null;
             };
-            module: string;
-            session: string | null;
             person: boolean;
         }, {
+            module: string;
+            session: string | null;
             place: {
                 epic: string | null;
                 kehikko: string | null;
                 parts?: unknown;
             };
-            module: string;
-            session: string | null;
             name?: unknown;
             person?: unknown;
         }>;
@@ -936,48 +944,48 @@ export declare const messageMineResult: z.ZodObject<{
                 session: string;
             }>>;
         }, "strip", z.ZodTypeAny, {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         }, {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         }>, {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         }, {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         }>;
         thread: z.ZodCatch<z.ZodNullable<z.ZodString>>;
@@ -993,31 +1001,37 @@ export declare const messageMineResult: z.ZodObject<{
          * most ONE once-message from the same module, ever. False from a host before 2.50.0.
          */
         once: z.ZodCatch<z.ZodDefault<z.ZodBoolean>>;
+        /**
+         * 2.55.0. The question from the Inbox this message answers (an item's `question.text`), when it
+         * answers one that was not a message (`replyTo` says that). The host's fact; null otherwise, and from
+         * a host before 2.55.0.
+         */
+        answers: z.ZodCatch<z.ZodDefault<z.ZodNullable<z.ZodString>>>;
     }, "strip", z.ZodTypeAny, {
         at: string;
         id: number;
         choices: string[];
         from: {
             name: string;
+            module: string;
+            session: string | null;
             place: {
                 epic: string | null;
                 parts: string[];
                 kehikko: string | null;
             };
-            module: string;
-            session: string | null;
             person: boolean;
         };
         to: {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         };
         thread: string | null;
@@ -1025,30 +1039,31 @@ export declare const messageMineResult: z.ZodObject<{
         kind: "question" | "report" | "note";
         replyTo: number | null;
         once: boolean;
+        answers: string | null;
     }, {
         at: string;
         id: number;
         from: {
+            module: string;
+            session: string | null;
             place: {
                 epic: string | null;
                 kehikko: string | null;
                 parts?: unknown;
             };
-            module: string;
-            session: string | null;
             name?: unknown;
             person?: unknown;
         };
         to: {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         };
         body: string;
@@ -1057,6 +1072,7 @@ export declare const messageMineResult: z.ZodObject<{
         kind?: unknown;
         replyTo?: unknown;
         once?: unknown;
+        answers?: unknown;
     }>, "many">;
     more: z.ZodDefault<z.ZodNumber>;
 }, "strip", z.ZodTypeAny, {
@@ -1066,25 +1082,25 @@ export declare const messageMineResult: z.ZodObject<{
         choices: string[];
         from: {
             name: string;
+            module: string;
+            session: string | null;
             place: {
                 epic: string | null;
                 parts: string[];
                 kehikko: string | null;
             };
-            module: string;
-            session: string | null;
             person: boolean;
         };
         to: {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         };
         thread: string | null;
@@ -1092,6 +1108,7 @@ export declare const messageMineResult: z.ZodObject<{
         kind: "question" | "report" | "note";
         replyTo: number | null;
         once: boolean;
+        answers: string | null;
     }[];
     more: number;
 }, {
@@ -1099,26 +1116,26 @@ export declare const messageMineResult: z.ZodObject<{
         at: string;
         id: number;
         from: {
+            module: string;
+            session: string | null;
             place: {
                 epic: string | null;
                 kehikko: string | null;
                 parts?: unknown;
             };
-            module: string;
-            session: string | null;
             name?: unknown;
             person?: unknown;
         };
         to: {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         };
         body: string;
@@ -1127,6 +1144,7 @@ export declare const messageMineResult: z.ZodObject<{
         kind?: unknown;
         replyTo?: unknown;
         once?: unknown;
+        answers?: unknown;
     }[];
     more?: number | undefined;
 }>;
@@ -1147,12 +1165,12 @@ export declare const messageReadParams: z.ZodObject<{
     token: string;
     limit: number;
     unread: boolean;
-    since?: number | undefined;
     thread?: string | undefined;
+    since?: number | undefined;
 }, {
     token: string;
-    since?: number | undefined;
     thread?: string | undefined;
+    since?: number | undefined;
     limit?: number | undefined;
     unread?: boolean | undefined;
 }>;
@@ -1210,22 +1228,22 @@ export declare const messageReadResult: z.ZodObject<{
             person: z.ZodCatch<z.ZodDefault<z.ZodBoolean>>;
         }, "strip", z.ZodTypeAny, {
             name: string;
+            module: string;
+            session: string | null;
             place: {
                 epic: string | null;
                 parts: string[];
                 kehikko: string | null;
             };
-            module: string;
-            session: string | null;
             person: boolean;
         }, {
+            module: string;
+            session: string | null;
             place: {
                 epic: string | null;
                 kehikko: string | null;
                 parts?: unknown;
             };
-            module: string;
-            session: string | null;
             name?: unknown;
             person?: unknown;
         }>;
@@ -1259,48 +1277,48 @@ export declare const messageReadResult: z.ZodObject<{
                 session: string;
             }>>;
         }, "strip", z.ZodTypeAny, {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         }, {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         }>, {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         }, {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         }>;
         thread: z.ZodCatch<z.ZodNullable<z.ZodString>>;
@@ -1316,31 +1334,37 @@ export declare const messageReadResult: z.ZodObject<{
          * most ONE once-message from the same module, ever. False from a host before 2.50.0.
          */
         once: z.ZodCatch<z.ZodDefault<z.ZodBoolean>>;
+        /**
+         * 2.55.0. The question from the Inbox this message answers (an item's `question.text`), when it
+         * answers one that was not a message (`replyTo` says that). The host's fact; null otherwise, and from
+         * a host before 2.55.0.
+         */
+        answers: z.ZodCatch<z.ZodDefault<z.ZodNullable<z.ZodString>>>;
     }, "strip", z.ZodTypeAny, {
         at: string;
         id: number;
         choices: string[];
         from: {
             name: string;
+            module: string;
+            session: string | null;
             place: {
                 epic: string | null;
                 parts: string[];
                 kehikko: string | null;
             };
-            module: string;
-            session: string | null;
             person: boolean;
         };
         to: {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         };
         thread: string | null;
@@ -1348,30 +1372,31 @@ export declare const messageReadResult: z.ZodObject<{
         kind: "question" | "report" | "note";
         replyTo: number | null;
         once: boolean;
+        answers: string | null;
     }, {
         at: string;
         id: number;
         from: {
+            module: string;
+            session: string | null;
             place: {
                 epic: string | null;
                 kehikko: string | null;
                 parts?: unknown;
             };
-            module: string;
-            session: string | null;
             name?: unknown;
             person?: unknown;
         };
         to: {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         };
         body: string;
@@ -1380,6 +1405,7 @@ export declare const messageReadResult: z.ZodObject<{
         kind?: unknown;
         replyTo?: unknown;
         once?: unknown;
+        answers?: unknown;
     }>, "many">;
     unread: z.ZodDefault<z.ZodNumber>;
     you: z.ZodDefault<z.ZodNullable<z.ZodObject<{
@@ -1399,21 +1425,21 @@ export declare const messageReadResult: z.ZodObject<{
             parts?: unknown;
         }>;
     }, "strip", z.ZodTypeAny, {
+        module: string;
+        session: string | null;
         place: {
             epic: string | null;
             parts: string[];
             kehikko: string | null;
         };
+    }, {
         module: string;
         session: string | null;
-    }, {
         place: {
             epic: string | null;
             kehikko: string | null;
             parts?: unknown;
         };
-        module: string;
-        session: string | null;
     }>>>;
 }, "strip", z.ZodTypeAny, {
     messages: {
@@ -1422,25 +1448,25 @@ export declare const messageReadResult: z.ZodObject<{
         choices: string[];
         from: {
             name: string;
+            module: string;
+            session: string | null;
             place: {
                 epic: string | null;
                 parts: string[];
                 kehikko: string | null;
             };
-            module: string;
-            session: string | null;
             person: boolean;
         };
         to: {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         };
         thread: string | null;
@@ -1448,42 +1474,43 @@ export declare const messageReadResult: z.ZodObject<{
         kind: "question" | "report" | "note";
         replyTo: number | null;
         once: boolean;
+        answers: string | null;
     }[];
     unread: number;
     you: {
+        module: string;
+        session: string | null;
         place: {
             epic: string | null;
             parts: string[];
             kehikko: string | null;
         };
-        module: string;
-        session: string | null;
     } | null;
 }, {
     messages: {
         at: string;
         id: number;
         from: {
+            module: string;
+            session: string | null;
             place: {
                 epic: string | null;
                 kehikko: string | null;
                 parts?: unknown;
             };
-            module: string;
-            session: string | null;
             name?: unknown;
             person?: unknown;
         };
         to: {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         };
         body: string;
@@ -1492,16 +1519,17 @@ export declare const messageReadResult: z.ZodObject<{
         kind?: unknown;
         replyTo?: unknown;
         once?: unknown;
+        answers?: unknown;
     }[];
     unread?: number | undefined;
     you?: {
+        module: string;
+        session: string | null;
         place: {
             epic: string | null;
             kehikko: string | null;
             parts?: unknown;
         };
-        module: string;
-        session: string | null;
     } | null | undefined;
 }>;
 export type MessageReadResult = z.infer<typeof messageReadResult>;

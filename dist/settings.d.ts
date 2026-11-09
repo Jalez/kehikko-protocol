@@ -325,7 +325,7 @@ export declare const doorMethodParams: {
         pass: z.ZodOptional<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
         key: string;
-        by: "agent" | "person";
+        by: "person" | "agent";
         value?: unknown;
         project?: string | undefined;
         pass?: string | undefined;
@@ -333,7 +333,7 @@ export declare const doorMethodParams: {
         key: string;
         value?: unknown;
         project?: string | undefined;
-        by?: "agent" | "person" | undefined;
+        by?: "person" | "agent" | undefined;
         pass?: string | undefined;
     }>;
 };

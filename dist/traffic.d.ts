@@ -182,8 +182,8 @@ export declare const trafficCallSchema: z.ZodObject<{
     at: number;
     path: string;
     status: number | null;
-    by: string;
     kind: string;
+    by: string;
     host: string;
     reason: string | null;
     side: "out" | "in" | "seen";
@@ -207,8 +207,8 @@ export declare const trafficCallSchema: z.ZodObject<{
 }, {
     at: number;
     path: string;
-    by: string;
     kind: string;
+    by: string;
     host: string;
     side: "out" | "in" | "seen";
     seq: number;
@@ -1227,8 +1227,8 @@ export declare const trafficReadResult: z.ZodObject<{
         at: number;
         path: string;
         status: number | null;
-        by: string;
         kind: string;
+        by: string;
         host: string;
         reason: string | null;
         side: "out" | "in" | "seen";
@@ -1252,8 +1252,8 @@ export declare const trafficReadResult: z.ZodObject<{
     }, {
         at: number;
         path: string;
-        by: string;
         kind: string;
+        by: string;
         host: string;
         side: "out" | "in" | "seen";
         seq: number;
@@ -1965,8 +1965,8 @@ export declare const trafficReadResult: z.ZodObject<{
         at: number;
         path: string;
         status: number | null;
-        by: string;
         kind: string;
+        by: string;
         host: string;
         reason: string | null;
         side: "out" | "in" | "seen";
@@ -2095,8 +2095,8 @@ export declare const trafficReadResult: z.ZodObject<{
     calls: {
         at: number;
         path: string;
-        by: string;
         kind: string;
+        by: string;
         host: string;
         side: "out" | "in" | "seen";
         seq: number;

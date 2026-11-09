@@ -1,5 +1,49 @@
 import { z } from 'zod';
 /**
+ * 2.55.0. A question an item asks the person, answered from the Inbox itself: the host shows `text`
+ * in full in the row and its notice, `choices` as buttons, and a reply field; an answer goes to the
+ * agent session `to` as the PERSON's own message (`from.person`, by the name `INBOX_VIA`), delivered
+ * like any other, answering `replyTo` when the question was a message (`messages.send`, `kind:
+ * 'question'`) and the text otherwise (`answers`). The host marks the item answered; the module
+ * withdraws it once its session has the answer. `to.module` is the reporting module's own, or —
+ * for a module that relays sessions' questions and declares `messages:as-person` — another's.
+ * The same limits as a message's choices (2.50.0). A host before 2.55.0 strips it.
+ */
+export declare const activityQuestionSchema: z.ZodObject<{
+    text: z.ZodString;
+    choices: z.ZodOptional<z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">, string[], string[]>>;
+    to: z.ZodObject<{
+        module: z.ZodString;
+        session: z.ZodString;
+    }, "strip", z.ZodTypeAny, {
+        module: string;
+        session: string;
+    }, {
+        module: string;
+        session: string;
+    }>;
+    replyTo: z.ZodOptional<z.ZodNumber>;
+}, "strip", z.ZodTypeAny, {
+    to: {
+        module: string;
+        session: string;
+    };
+    text: string;
+    choices?: string[] | undefined;
+    replyTo?: number | undefined;
+}, {
+    to: {
+        module: string;
+        session: string;
+    };
+    text: string;
+    choices?: string[] | undefined;
+    replyTo?: number | undefined;
+}>;
+export type ActivityQuestion = z.infer<typeof activityQuestionSchema>;
+/** 2.55.0. The name an answer from the Inbox is sent by (`from.name`): its frame says "via Inbox". */
+export declare const INBOX_VIA = "Inbox";
+/**
  * What a module's things are doing right now (1.5.0): the list `activity.set` carries, and the one
  * rule a host and a module share about it. Shapes and one pure function; the drawing is the host's.
  * Design notes: docs/activity.md.
@@ -158,10 +202,52 @@ export declare const activityItemSchema: z.ZodEffects<z.ZodObject<{
      * strips it. An item is still one of the states: an event names a case, it is not a new state.
      */
     event: z.ZodOptional<z.ZodString>;
+    /** 2.55.0. A question the person can answer from the Inbox (`activityQuestionSchema`), on an `attention` item. One that does not parse is dropped and the item kept. */
+    question: z.ZodCatch<z.ZodOptional<z.ZodObject<{
+        text: z.ZodString;
+        choices: z.ZodOptional<z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">, string[], string[]>>;
+        to: z.ZodObject<{
+            module: z.ZodString;
+            session: z.ZodString;
+        }, "strip", z.ZodTypeAny, {
+            module: string;
+            session: string;
+        }, {
+            module: string;
+            session: string;
+        }>;
+        replyTo: z.ZodOptional<z.ZodNumber>;
+    }, "strip", z.ZodTypeAny, {
+        to: {
+            module: string;
+            session: string;
+        };
+        text: string;
+        choices?: string[] | undefined;
+        replyTo?: number | undefined;
+    }, {
+        to: {
+            module: string;
+            session: string;
+        };
+        text: string;
+        choices?: string[] | undefined;
+        replyTo?: number | undefined;
+    }>>>;
 }, "strip", z.ZodTypeAny, {
     id: string;
     state: "working" | "attention" | "done";
     label: string;
+    question?: {
+        to: {
+            module: string;
+            session: string;
+        };
+        text: string;
+        choices?: string[] | undefined;
+        replyTo?: number | undefined;
+    } | undefined;
+    project?: string | undefined;
     place?: {
         epic?: string | undefined;
         parts?: string[] | undefined;
@@ -172,13 +258,14 @@ export declare const activityItemSchema: z.ZodEffects<z.ZodObject<{
     priority?: "urgent" | "normal" | "low" | undefined;
     refs?: string[] | undefined;
     group?: string | undefined;
-    project?: string | undefined;
     projectId?: string | undefined;
     event?: string | undefined;
 }, {
     id: string;
     state: "working" | "attention" | "done";
     label: string;
+    question?: unknown;
+    project?: string | undefined;
     place?: {
         epic?: string | undefined;
         parts?: string[] | undefined;
@@ -189,13 +276,22 @@ export declare const activityItemSchema: z.ZodEffects<z.ZodObject<{
     priority?: "urgent" | "normal" | "low" | undefined;
     refs?: string[] | undefined;
     group?: string | undefined;
-    project?: string | undefined;
     projectId?: string | undefined;
     event?: string | undefined;
 }>, {
     id: string;
     state: "working" | "attention" | "done";
     label: string;
+    question?: {
+        to: {
+            module: string;
+            session: string;
+        };
+        text: string;
+        choices?: string[] | undefined;
+        replyTo?: number | undefined;
+    } | undefined;
+    project?: string | undefined;
     place?: {
         epic?: string | undefined;
         parts?: string[] | undefined;
@@ -206,13 +302,14 @@ export declare const activityItemSchema: z.ZodEffects<z.ZodObject<{
     priority?: "urgent" | "normal" | "low" | undefined;
     refs?: string[] | undefined;
     group?: string | undefined;
-    project?: string | undefined;
     projectId?: string | undefined;
     event?: string | undefined;
 }, {
     id: string;
     state: "working" | "attention" | "done";
     label: string;
+    question?: unknown;
+    project?: string | undefined;
     place?: {
         epic?: string | undefined;
         parts?: string[] | undefined;
@@ -223,7 +320,6 @@ export declare const activityItemSchema: z.ZodEffects<z.ZodObject<{
     priority?: "urgent" | "normal" | "low" | undefined;
     refs?: string[] | undefined;
     group?: string | undefined;
-    project?: string | undefined;
     projectId?: string | undefined;
     event?: string | undefined;
 }>;
@@ -280,10 +376,52 @@ export declare const activityItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z
      * strips it. An item is still one of the states: an event names a case, it is not a new state.
      */
     event: z.ZodOptional<z.ZodString>;
+    /** 2.55.0. A question the person can answer from the Inbox (`activityQuestionSchema`), on an `attention` item. One that does not parse is dropped and the item kept. */
+    question: z.ZodCatch<z.ZodOptional<z.ZodObject<{
+        text: z.ZodString;
+        choices: z.ZodOptional<z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">, string[], string[]>>;
+        to: z.ZodObject<{
+            module: z.ZodString;
+            session: z.ZodString;
+        }, "strip", z.ZodTypeAny, {
+            module: string;
+            session: string;
+        }, {
+            module: string;
+            session: string;
+        }>;
+        replyTo: z.ZodOptional<z.ZodNumber>;
+    }, "strip", z.ZodTypeAny, {
+        to: {
+            module: string;
+            session: string;
+        };
+        text: string;
+        choices?: string[] | undefined;
+        replyTo?: number | undefined;
+    }, {
+        to: {
+            module: string;
+            session: string;
+        };
+        text: string;
+        choices?: string[] | undefined;
+        replyTo?: number | undefined;
+    }>>>;
 }, "strip", z.ZodTypeAny, {
     id: string;
     state: "working" | "attention" | "done";
     label: string;
+    question?: {
+        to: {
+            module: string;
+            session: string;
+        };
+        text: string;
+        choices?: string[] | undefined;
+        replyTo?: number | undefined;
+    } | undefined;
+    project?: string | undefined;
     place?: {
         epic?: string | undefined;
         parts?: string[] | undefined;
@@ -294,13 +432,14 @@ export declare const activityItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z
     priority?: "urgent" | "normal" | "low" | undefined;
     refs?: string[] | undefined;
     group?: string | undefined;
-    project?: string | undefined;
     projectId?: string | undefined;
     event?: string | undefined;
 }, {
     id: string;
     state: "working" | "attention" | "done";
     label: string;
+    question?: unknown;
+    project?: string | undefined;
     place?: {
         epic?: string | undefined;
         parts?: string[] | undefined;
@@ -311,13 +450,22 @@ export declare const activityItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z
     priority?: "urgent" | "normal" | "low" | undefined;
     refs?: string[] | undefined;
     group?: string | undefined;
-    project?: string | undefined;
     projectId?: string | undefined;
     event?: string | undefined;
 }>, {
     id: string;
     state: "working" | "attention" | "done";
     label: string;
+    question?: {
+        to: {
+            module: string;
+            session: string;
+        };
+        text: string;
+        choices?: string[] | undefined;
+        replyTo?: number | undefined;
+    } | undefined;
+    project?: string | undefined;
     place?: {
         epic?: string | undefined;
         parts?: string[] | undefined;
@@ -328,13 +476,14 @@ export declare const activityItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z
     priority?: "urgent" | "normal" | "low" | undefined;
     refs?: string[] | undefined;
     group?: string | undefined;
-    project?: string | undefined;
     projectId?: string | undefined;
     event?: string | undefined;
 }, {
     id: string;
     state: "working" | "attention" | "done";
     label: string;
+    question?: unknown;
+    project?: string | undefined;
     place?: {
         epic?: string | undefined;
         parts?: string[] | undefined;
@@ -345,13 +494,22 @@ export declare const activityItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z
     priority?: "urgent" | "normal" | "low" | undefined;
     refs?: string[] | undefined;
     group?: string | undefined;
-    project?: string | undefined;
     projectId?: string | undefined;
     event?: string | undefined;
 }>, "many">, {
     id: string;
     state: "working" | "attention" | "done";
     label: string;
+    question?: {
+        to: {
+            module: string;
+            session: string;
+        };
+        text: string;
+        choices?: string[] | undefined;
+        replyTo?: number | undefined;
+    } | undefined;
+    project?: string | undefined;
     place?: {
         epic?: string | undefined;
         parts?: string[] | undefined;
@@ -362,13 +520,14 @@ export declare const activityItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z
     priority?: "urgent" | "normal" | "low" | undefined;
     refs?: string[] | undefined;
     group?: string | undefined;
-    project?: string | undefined;
     projectId?: string | undefined;
     event?: string | undefined;
 }[], {
     id: string;
     state: "working" | "attention" | "done";
     label: string;
+    question?: unknown;
+    project?: string | undefined;
     place?: {
         epic?: string | undefined;
         parts?: string[] | undefined;
@@ -379,7 +538,6 @@ export declare const activityItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z
     priority?: "urgent" | "normal" | "low" | undefined;
     refs?: string[] | undefined;
     group?: string | undefined;
-    project?: string | undefined;
     projectId?: string | undefined;
     event?: string | undefined;
 }[]>;

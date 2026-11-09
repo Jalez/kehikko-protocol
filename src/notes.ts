@@ -338,8 +338,10 @@ export function researchLine(self: NotesSelf): string {
 export function finishLine(self: NotesSelf): string {
   return (
     'End every turn in one of three ways. Finished: call tell_finished({ event: "done" }) on the '
-    + `${self.name} module’s MCP server (${self.door}). A question only the person can answer: call tell_finished({ event: "needs-decision", label }) `
-    + 'with the question in one line, then stop — the person is shown it until they answer. Waiting on something: set up what '
+    + `${self.name} module’s MCP server (${self.door}). A question only the person can answer: call tell_finished({ event: "needs-decision", label, choices }) `
+    + 'with the question and, when there are a few clear answers, up to 6 short choices, then stop and wait — the person '
+    + 'answers it from the Inbox and the answer is typed in here as theirs. Never leave a question only in your own reply. '
+    + 'If a module on this kehikko says to send it your questions, ask through it instead (it raises them in the Inbox too). Waiting on something: set up what '
     + 'will wake you first (a background command, a scheduled wake-up, a queued run that notifies this session). Never end a '
     + 'turn only saying you are waiting. If an action is refused (a permission check), ask with needs-decision and say what '
     + 'granting it means. A turn that ends any other way shows the person “Stopped without finishing”.'

@@ -69,8 +69,8 @@ export declare const callPayload: z.ZodObject<{
     /** Free, short, and only worth showing when the call failed. */
     why: z.ZodDefault<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    refs: string[];
     why: string;
+    refs: string[];
     target: string;
     ok: boolean;
     ms: number;
@@ -78,8 +78,8 @@ export declare const callPayload: z.ZodObject<{
     target: string;
     ok: boolean;
     ms: number;
-    refs?: string[] | undefined;
     why?: string | undefined;
+    refs?: string[] | undefined;
 }>;
 export type CallPayload = z.infer<typeof callPayload>;
 export interface ExtensionFormat {

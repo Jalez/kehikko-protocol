@@ -50,10 +50,10 @@ export declare const runResultSchema: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     id: string;
     epic: string | null;
+    kind: "push" | "review" | "verify" | "other";
     state: "failed" | "running" | "cancelled" | "queued" | "passed";
     label: string;
     refs: string[];
-    kind: "push" | "review" | "verify" | "other";
     queuedAt: number;
     startedAt: number | null;
     finishedAt: number | null;
@@ -64,8 +64,8 @@ export declare const runResultSchema: z.ZodObject<{
     label: string;
     queuedAt: number;
     epic?: unknown;
-    refs?: string[] | undefined;
     kind?: unknown;
+    refs?: string[] | undefined;
     startedAt?: number | null | undefined;
     finishedAt?: number | null | undefined;
     exit?: number | null | undefined;

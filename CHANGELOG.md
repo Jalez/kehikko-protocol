@@ -29,8 +29,17 @@ How an agent session's turn ended, in one rule for every module that runs agent 
   "Allow Bash: git push --force origin main?", with why and what granting it means.
 - **`stopBlockReason(self)`**: what a `Stop` hook answers, once, when a person asked for a stalled turn
   to be sent back.
-- **`finishLine(self)`** in the session notes: finish, ask with `needs-decision`, or set up a wake;
-  never end on "waiting". `NOTES_VERSION` is 8, so a running session is told the new notes once.
+- **`finishLine(self)`** in the session notes: finish, ask with `needs-decision` (with choices, answered
+  from the Inbox), or set up a wake; never end on "waiting" or a question only in the agent's own reply;
+  a module on the kehikko that asks for the questions is asked instead. `NOTES_VERSION` is 8.
+- **`question`** on an activity item (`activityQuestionSchema`): `text` (at most the new
+  `LIMITS.ACTIVITY_QUESTION`, 1000), `choices` (a message's limits), `to` (the agent session) and
+  `replyTo`. A host shows it in full with the choices as buttons and a reply field, and sends the
+  answer to `to` as the person's message by the name `INBOX_VIA`. `turnQuestion(end, to)` builds it
+  from a turn's end; `REFUSAL_CHOICES` and `refusalEnd` for a refused action. One that does not parse
+  is dropped and the item kept.
+- **`answers`** on `agentMessageSchema`: the Inbox question a person's message answers; frames and
+  lines say `answering “…”`.
 
 ## 2.53.0 — 2026-11-06
 

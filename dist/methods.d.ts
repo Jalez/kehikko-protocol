@@ -417,25 +417,25 @@ export declare const methodParams: {
                 from: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
                 to: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
             }, "strip", z.ZodTypeAny, {
-                title: string;
                 from: number | null;
                 to: number | null;
+                title: string;
             }, {
                 title: string;
                 from?: number | null | undefined;
                 to?: number | null | undefined;
             }>, {
-                title: string;
                 from: number | null;
                 to: number | null;
+                title: string;
             }, {
                 title: string;
                 from?: number | null | undefined;
                 to?: number | null | undefined;
             }>, {
-                title: string;
                 from: number | null;
                 to: number | null;
+                title: string;
             }, {
                 title: string;
                 from?: number | null | undefined;
@@ -448,9 +448,9 @@ export declare const methodParams: {
             page: number | null;
             quoted: string;
             section: {
-                title: string;
                 from: number | null;
                 to: number | null;
+                title: string;
             } | null;
         }, {
             path: string;
@@ -470,9 +470,9 @@ export declare const methodParams: {
             page: number | null;
             quoted: string;
             section: {
-                title: string;
                 from: number | null;
                 to: number | null;
+                title: string;
             } | null;
         }, {
             path: string;
@@ -492,9 +492,9 @@ export declare const methodParams: {
             page: number | null;
             quoted: string;
             section: {
-                title: string;
                 from: number | null;
                 to: number | null;
+                title: string;
             } | null;
         }, {
             path: string;
@@ -516,9 +516,9 @@ export declare const methodParams: {
             page: number | null;
             quoted: string;
             section: {
-                title: string;
                 from: number | null;
                 to: number | null;
+                title: string;
             } | null;
         } | null;
     }, {
@@ -652,25 +652,25 @@ export declare const methodParams: {
                 from: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
                 to: z.ZodDefault<z.ZodNullable<z.ZodNumber>>;
             }, "strip", z.ZodTypeAny, {
-                title: string;
                 from: number | null;
                 to: number | null;
+                title: string;
             }, {
                 title: string;
                 from?: number | null | undefined;
                 to?: number | null | undefined;
             }>, {
-                title: string;
                 from: number | null;
                 to: number | null;
+                title: string;
             }, {
                 title: string;
                 from?: number | null | undefined;
                 to?: number | null | undefined;
             }>, {
-                title: string;
                 from: number | null;
                 to: number | null;
+                title: string;
             }, {
                 title: string;
                 from?: number | null | undefined;
@@ -683,9 +683,9 @@ export declare const methodParams: {
             page: number | null;
             quoted: string;
             section: {
-                title: string;
                 from: number | null;
                 to: number | null;
+                title: string;
             } | null;
         }, {
             path: string;
@@ -705,9 +705,9 @@ export declare const methodParams: {
             page: number | null;
             quoted: string;
             section: {
-                title: string;
                 from: number | null;
                 to: number | null;
+                title: string;
             } | null;
         }, {
             path: string;
@@ -727,9 +727,9 @@ export declare const methodParams: {
             page: number | null;
             quoted: string;
             section: {
-                title: string;
                 from: number | null;
                 to: number | null;
+                title: string;
             } | null;
         }, {
             path: string;
@@ -752,9 +752,9 @@ export declare const methodParams: {
             page: number | null;
             quoted: string;
             section: {
-                title: string;
                 from: number | null;
                 to: number | null;
+                title: string;
             } | null;
         }[];
     }, {
@@ -868,50 +868,50 @@ export declare const methodParams: {
         detail: "detail" | "summary";
         epic?: string | undefined;
         parts?: boolean | undefined;
-        refs?: string[] | undefined;
         project?: true | undefined;
+        refs?: string[] | undefined;
     }, {
         epic?: string | undefined;
         parts?: boolean | undefined;
+        project?: true | undefined;
         detail?: "detail" | "summary" | undefined;
         refs?: string[] | undefined;
-        project?: true | undefined;
     }>, {
         detail: "detail" | "summary";
         epic?: string | undefined;
         parts?: boolean | undefined;
-        refs?: string[] | undefined;
         project?: true | undefined;
+        refs?: string[] | undefined;
     }, {
         epic?: string | undefined;
         parts?: boolean | undefined;
+        project?: true | undefined;
         detail?: "detail" | "summary" | undefined;
         refs?: string[] | undefined;
-        project?: true | undefined;
     }>, {
         detail: "detail" | "summary";
         epic?: string | undefined;
         parts?: boolean | undefined;
-        refs?: string[] | undefined;
         project?: true | undefined;
+        refs?: string[] | undefined;
     }, {
         epic?: string | undefined;
         parts?: boolean | undefined;
+        project?: true | undefined;
         detail?: "detail" | "summary" | undefined;
         refs?: string[] | undefined;
-        project?: true | undefined;
     }>, {
         detail: "detail" | "summary";
         epic?: string | undefined;
         parts?: boolean | undefined;
-        refs?: string[] | undefined;
         project?: true | undefined;
+        refs?: string[] | undefined;
     }, {
         epic?: string | undefined;
         parts?: boolean | undefined;
+        project?: true | undefined;
         detail?: "detail" | "summary" | undefined;
         refs?: string[] | undefined;
-        project?: true | undefined;
     }>;
     /**
      * Read the trackers again, for these refs or this epic or the whole project, and answer when the read lands.
@@ -924,20 +924,20 @@ export declare const methodParams: {
         project: z.ZodOptional<z.ZodLiteral<true>>;
     }, "strip", z.ZodTypeAny, {
         epic?: string | undefined;
-        refs?: string[] | undefined;
         project?: true | undefined;
+        refs?: string[] | undefined;
     }, {
         epic?: string | undefined;
-        refs?: string[] | undefined;
         project?: true | undefined;
+        refs?: string[] | undefined;
     }>, {
         epic?: string | undefined;
-        refs?: string[] | undefined;
         project?: true | undefined;
+        refs?: string[] | undefined;
     }, {
         epic?: string | undefined;
-        refs?: string[] | undefined;
         project?: true | undefined;
+        refs?: string[] | undefined;
     }>;
     /**
      * The boards of the open project's sources and their columns, from the host's reading; answered at
@@ -1138,10 +1138,51 @@ export declare const methodParams: {
             project: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
             projectId: z.ZodOptional<z.ZodString>;
             event: z.ZodOptional<z.ZodString>;
+            question: z.ZodCatch<z.ZodOptional<z.ZodObject<{
+                text: z.ZodString;
+                choices: z.ZodOptional<z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">, string[], string[]>>;
+                to: z.ZodObject<{
+                    module: z.ZodString;
+                    session: z.ZodString;
+                }, "strip", z.ZodTypeAny, {
+                    module: string;
+                    session: string;
+                }, {
+                    module: string;
+                    session: string;
+                }>;
+                replyTo: z.ZodOptional<z.ZodNumber>;
+            }, "strip", z.ZodTypeAny, {
+                to: {
+                    module: string;
+                    session: string;
+                };
+                text: string;
+                choices?: string[] | undefined;
+                replyTo?: number | undefined;
+            }, {
+                to: {
+                    module: string;
+                    session: string;
+                };
+                text: string;
+                choices?: string[] | undefined;
+                replyTo?: number | undefined;
+            }>>>;
         }, "strip", z.ZodTypeAny, {
             id: string;
             state: "working" | "attention" | "done";
             label: string;
+            question?: {
+                to: {
+                    module: string;
+                    session: string;
+                };
+                text: string;
+                choices?: string[] | undefined;
+                replyTo?: number | undefined;
+            } | undefined;
+            project?: string | undefined;
             place?: {
                 epic?: string | undefined;
                 parts?: string[] | undefined;
@@ -1152,13 +1193,14 @@ export declare const methodParams: {
             priority?: "urgent" | "normal" | "low" | undefined;
             refs?: string[] | undefined;
             group?: string | undefined;
-            project?: string | undefined;
             projectId?: string | undefined;
             event?: string | undefined;
         }, {
             id: string;
             state: "working" | "attention" | "done";
             label: string;
+            question?: unknown;
+            project?: string | undefined;
             place?: {
                 epic?: string | undefined;
                 parts?: string[] | undefined;
@@ -1169,13 +1211,22 @@ export declare const methodParams: {
             priority?: "urgent" | "normal" | "low" | undefined;
             refs?: string[] | undefined;
             group?: string | undefined;
-            project?: string | undefined;
             projectId?: string | undefined;
             event?: string | undefined;
         }>, {
             id: string;
             state: "working" | "attention" | "done";
             label: string;
+            question?: {
+                to: {
+                    module: string;
+                    session: string;
+                };
+                text: string;
+                choices?: string[] | undefined;
+                replyTo?: number | undefined;
+            } | undefined;
+            project?: string | undefined;
             place?: {
                 epic?: string | undefined;
                 parts?: string[] | undefined;
@@ -1186,13 +1237,14 @@ export declare const methodParams: {
             priority?: "urgent" | "normal" | "low" | undefined;
             refs?: string[] | undefined;
             group?: string | undefined;
-            project?: string | undefined;
             projectId?: string | undefined;
             event?: string | undefined;
         }, {
             id: string;
             state: "working" | "attention" | "done";
             label: string;
+            question?: unknown;
+            project?: string | undefined;
             place?: {
                 epic?: string | undefined;
                 parts?: string[] | undefined;
@@ -1203,13 +1255,22 @@ export declare const methodParams: {
             priority?: "urgent" | "normal" | "low" | undefined;
             refs?: string[] | undefined;
             group?: string | undefined;
-            project?: string | undefined;
             projectId?: string | undefined;
             event?: string | undefined;
         }>, "many">, {
             id: string;
             state: "working" | "attention" | "done";
             label: string;
+            question?: {
+                to: {
+                    module: string;
+                    session: string;
+                };
+                text: string;
+                choices?: string[] | undefined;
+                replyTo?: number | undefined;
+            } | undefined;
+            project?: string | undefined;
             place?: {
                 epic?: string | undefined;
                 parts?: string[] | undefined;
@@ -1220,13 +1281,14 @@ export declare const methodParams: {
             priority?: "urgent" | "normal" | "low" | undefined;
             refs?: string[] | undefined;
             group?: string | undefined;
-            project?: string | undefined;
             projectId?: string | undefined;
             event?: string | undefined;
         }[], {
             id: string;
             state: "working" | "attention" | "done";
             label: string;
+            question?: unknown;
+            project?: string | undefined;
             place?: {
                 epic?: string | undefined;
                 parts?: string[] | undefined;
@@ -1237,7 +1299,6 @@ export declare const methodParams: {
             priority?: "urgent" | "normal" | "low" | undefined;
             refs?: string[] | undefined;
             group?: string | undefined;
-            project?: string | undefined;
             projectId?: string | undefined;
             event?: string | undefined;
         }[]>;
@@ -1246,6 +1307,16 @@ export declare const methodParams: {
             id: string;
             state: "working" | "attention" | "done";
             label: string;
+            question?: {
+                to: {
+                    module: string;
+                    session: string;
+                };
+                text: string;
+                choices?: string[] | undefined;
+                replyTo?: number | undefined;
+            } | undefined;
+            project?: string | undefined;
             place?: {
                 epic?: string | undefined;
                 parts?: string[] | undefined;
@@ -1256,7 +1327,6 @@ export declare const methodParams: {
             priority?: "urgent" | "normal" | "low" | undefined;
             refs?: string[] | undefined;
             group?: string | undefined;
-            project?: string | undefined;
             projectId?: string | undefined;
             event?: string | undefined;
         }[];
@@ -1265,6 +1335,8 @@ export declare const methodParams: {
             id: string;
             state: "working" | "attention" | "done";
             label: string;
+            question?: unknown;
+            project?: string | undefined;
             place?: {
                 epic?: string | undefined;
                 parts?: string[] | undefined;
@@ -1275,7 +1347,6 @@ export declare const methodParams: {
             priority?: "urgent" | "normal" | "low" | undefined;
             refs?: string[] | undefined;
             group?: string | undefined;
-            project?: string | undefined;
             projectId?: string | undefined;
             event?: string | undefined;
         }[];
@@ -1438,48 +1509,48 @@ export declare const methodParams: {
                 session: string;
             }>>;
         }, "strip", z.ZodTypeAny, {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         }, {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         }>, {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         }, {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         }>>;
         thread: z.ZodOptional<z.ZodString>;
@@ -1488,15 +1559,15 @@ export declare const methodParams: {
         token: string;
         choices?: string[] | undefined;
         to?: {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         } | undefined;
         thread?: string | undefined;
@@ -1507,15 +1578,15 @@ export declare const methodParams: {
         token: string;
         choices?: string[] | undefined;
         to?: {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         } | undefined;
         thread?: string | undefined;
@@ -1526,15 +1597,15 @@ export declare const methodParams: {
         token: string;
         choices?: string[] | undefined;
         to?: {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         } | undefined;
         thread?: string | undefined;
@@ -1545,15 +1616,15 @@ export declare const methodParams: {
         token: string;
         choices?: string[] | undefined;
         to?: {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         } | undefined;
         thread?: string | undefined;
@@ -1571,12 +1642,12 @@ export declare const methodParams: {
         token: string;
         limit: number;
         unread: boolean;
-        since?: number | undefined;
         thread?: string | undefined;
+        since?: number | undefined;
     }, {
         token: string;
-        since?: number | undefined;
         thread?: string | undefined;
+        since?: number | undefined;
         limit?: number | undefined;
         unread?: boolean | undefined;
     }>;
@@ -1627,63 +1698,63 @@ export declare const methodParams: {
                 session: string;
             }>>;
         }, "strip", z.ZodTypeAny, {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         }, {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         }>, {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         }, {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         }>;
         thread: z.ZodOptional<z.ZodString>;
         once: z.ZodOptional<z.ZodBoolean>;
     }, "strip", z.ZodTypeAny, {
         to: {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         };
         body: string;
@@ -1694,15 +1765,15 @@ export declare const methodParams: {
         once?: boolean | undefined;
     }, {
         to: {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         };
         body: string;
@@ -1713,15 +1784,15 @@ export declare const methodParams: {
         once?: boolean | undefined;
     }>, {
         to: {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         };
         body: string;
@@ -1732,15 +1803,15 @@ export declare const methodParams: {
         once?: boolean | undefined;
     }, {
         to: {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         };
         body: string;
@@ -1789,62 +1860,62 @@ export declare const methodParams: {
                 session: string;
             }>>;
         }, "strip", z.ZodTypeAny, {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         }, {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         }>, {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         }, {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         }>;
         thread: z.ZodOptional<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
         to: {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         };
         body: string;
@@ -1854,15 +1925,15 @@ export declare const methodParams: {
         replyTo?: number | undefined;
     }, {
         to: {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         };
         body: string;
@@ -1872,15 +1943,15 @@ export declare const methodParams: {
         replyTo?: number | undefined;
     }>, {
         to: {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         };
         body: string;
@@ -1890,15 +1961,15 @@ export declare const methodParams: {
         replyTo?: number | undefined;
     }, {
         to: {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         };
         body: string;
@@ -2197,24 +2268,24 @@ export declare const dispositionsGetResult: z.ZodObject<{
     }, "strip", z.ZodTypeAny, {
         value: "done" | "wont-do" | "duplicate" | "superseded";
         at: string | null;
-        by: string | null;
         note: string;
+        by: string | null;
         ref: string;
         target: string | null;
     }, {
         value: "done" | "wont-do" | "duplicate" | "superseded";
         ref: string;
         at?: string | null | undefined;
-        by?: string | null | undefined;
         note?: string | undefined;
+        by?: string | null | undefined;
         target?: string | null | undefined;
     }>, "many">;
 }, "strip", z.ZodTypeAny, {
     dispositions: {
         value: "done" | "wont-do" | "duplicate" | "superseded";
         at: string | null;
-        by: string | null;
         note: string;
+        by: string | null;
         ref: string;
         target: string | null;
     }[];
@@ -2223,8 +2294,8 @@ export declare const dispositionsGetResult: z.ZodObject<{
         value: "done" | "wont-do" | "duplicate" | "superseded";
         ref: string;
         at?: string | null | undefined;
-        by?: string | null | undefined;
         note?: string | undefined;
+        by?: string | null | undefined;
         target?: string | null | undefined;
     }[];
 }>;

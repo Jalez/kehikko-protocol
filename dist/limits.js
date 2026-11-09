@@ -310,6 +310,8 @@ export const LIMITS = {
     ACTIVITY_LABEL: 120,
     /** An activity item's detail (1.5.0), in characters: a tooltip. */
     ACTIVITY_DETAIL: 200,
+    /** An activity item's question (2.55.0), in characters: shown in full in the Inbox, answered there. */
+    ACTIVITY_QUESTION: 1000,
     /** How many refs one activity item may name (1.7.0). */
     ACTIVITY_REFS: 16,
     /** An activity item's group key (1.7.0), in characters. */

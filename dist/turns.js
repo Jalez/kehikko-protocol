@@ -1,3 +1,4 @@
+import { messageChoicesSchema } from './agent-messages.js';
 import { LIMITS } from './limits.js';
 import { oneLine } from './notes.js';
 /**
@@ -35,6 +36,8 @@ export const TURN_EVENTS = [
     { id: REFUSED_EVENT, says: 'Action refused', state: 'attention', sound: 'bell' },
     { id: STALLED_EVENT, says: 'Stopped without finishing', state: 'attention', sound: 'twotone' },
 ];
+/** The choices a refused action is asked with: the person's answer is typed into the session as theirs. */
+export const REFUSAL_CHOICES = ['Yes, allow it', 'No, do it another way'];
 /** The name of the tool every agent module's door offers for it. */
 export const TELL_FINISHED_TOOL = 'tell_finished';
 /** The tool as a door lists it (`tools/list`). The same words on every agent module's door. */
@@ -43,8 +46,10 @@ export function tellFinishedTool() {
         name: TELL_FINISHED_TOOL,
         description: 'Say how this conversation’s turn ends, so its person sees it right in Kehikot’s Inbox. Call it once, as the last '
             + 'thing before you stop: event "done" when the work you were given is finished; event "needs-decision" with label '
-            + 'set to the one question only the person can answer (one line, e.g. "Force-push the rebased branch to origin?"), '
-            + 'and then stop — the person is shown that question until they answer; event "research-complete" with a label of a '
+            + 'set to the one question only the person can answer (e.g. "Force-push the rebased branch to origin?") and, when '
+            + 'there are a few clear answers, choices (at most 6, short), and then stop: the person sees the question in the Inbox, '
+            + 'answers it there with a choice or in words, and the answer is typed into this conversation as theirs. Never leave a '
+            + 'question only in your own reply. Event "research-complete" with a label of a '
             + 'few words when you or a subagent finished researching ("Protocol audit"). Never end a turn only saying you are '
             + 'waiting: set up what will wake you (a background command, a queued run) or ask with needs-decision. A turn that '
             + 'ends without this, and with nothing running that will bring it back, shows the person “Stopped without '
@@ -56,7 +61,13 @@ export function tellFinishedTool() {
                 label: {
                     type: 'string',
                     maxLength: LIMITS.ACTIVITY_LABEL,
-                    description: 'For needs-decision, the one-line question for the person (required). For research-complete, a few words saying what was researched (required). For done, optionally a few words saying what was finished.',
+                    description: 'For needs-decision, the question for the person (required). For research-complete, a few words saying what was researched (required). For done, optionally a few words saying what was finished.',
+                },
+                choices: {
+                    type: 'array',
+                    items: { type: 'string', maxLength: LIMITS.MESSAGE_CHOICE },
+                    maxItems: LIMITS.MESSAGE_CHOICES,
+                    description: 'For needs-decision only: the answers the person can press, each short and different. They can always answer in their own words instead.',
                 },
             },
             required: ['event'],
@@ -74,19 +85,32 @@ export function readTellFinished(args) {
     const kind = typeof given.event === 'string' ? given.event : '';
     if (!TURN_KINDS.includes(kind))
         return { ok: false, error: `event is one of: ${TURN_KINDS.join(', ')}.` };
-    const label = oneLine(typeof given.label === 'string' && given.label.trim() ? given.label : given.question, LIMITS.ACTIVITY_LABEL);
+    const words = typeof given.label === 'string' && given.label.trim() ? given.label : given.question;
+    /* A decision's question is shown in full, so it is kept to the item's question limit; anything else is a label. */
+    const label = kind === DECISION_EVENT ? clipQuestion(words) : oneLine(words, LIMITS.ACTIVITY_LABEL);
     if (kind === DECISION_EVENT && !label)
-        return { ok: false, error: 'label is the one question only the person can answer, in one line, e.g. "Force-push the rebased branch to origin?".' };
+        return { ok: false, error: 'label is the one question only the person can answer, e.g. "Force-push the rebased branch to origin?".' };
     if (kind === RESEARCH_COMPLETE_EVENT && !label)
         return { ok: false, error: 'label is a few words saying what was researched, e.g. "Protocol audit".' };
-    return { ok: true, told: { kind: kind, label } };
+    if (given.choices !== undefined && kind !== DECISION_EVENT)
+        return { ok: false, error: 'choices belong to a decision (event "needs-decision").' };
+    if (given.choices === undefined || (Array.isArray(given.choices) && given.choices.length === 0))
+        return { ok: true, told: { kind: kind, label } };
+    const choices = messageChoicesSchema.safeParse(given.choices);
+    if (!choices.success)
+        return { ok: false, error: `choices: ${choices.error.issues[0]?.message ?? 'malformed'} (at most ${LIMITS.MESSAGE_CHOICES}, each one line of at most ${LIMITS.MESSAGE_CHOICE} characters, all different).` };
+    return { ok: true, told: { kind: kind, label, choices: choices.data } };
+}
+/** A question as an item keeps it: whitespace runs made one space, at most `LIMITS.ACTIVITY_QUESTION` characters. */
+function clipQuestion(text) {
+    return oneLine(text, LIMITS.ACTIVITY_QUESTION);
 }
 /** What the agent is answered once it declared: when the person is told, and what. */
 export function toldReply(told, reports) {
     if (!reports)
         return 'Noted, but this conversation does not report when its turn ends, so the person is not told.';
     if (told.kind === DECISION_EVENT)
-        return `Noted. When this turn ends the person is shown “${told.label}” as a decision they need to make. Stop now and wait for their answer.`;
+        return `Noted. When this turn ends the person is shown “${oneLine(told.label, LIMITS.ACTIVITY_LABEL)}” in the Inbox as a decision they need to make, and their answer is typed in here. Stop now and wait for it.`;
     if (told.kind === RESEARCH_COMPLETE_EVENT)
         return 'Noted. The person is told “Research complete” when this turn ends.';
     return 'Noted. The person is told the work is finished when this turn ends.';
@@ -142,6 +166,15 @@ export function refusalWords(refusal, folder = null) {
     return { label, detail };
 }
 /**
+ * 2.55.0. A turn's end as the item's `question` (`activityQuestionSchema`): what it asks, addressed to
+ * the session the module runs (`to`). Undefined when it asks nothing.
+ */
+export function turnQuestion(end, to) {
+    if (!end.asks)
+        return undefined;
+    return { text: end.asks.text, ...(end.asks.choices.length ? { choices: [...end.asks.choices] } : {}), to: { ...to } };
+}
+/**
  * THE RULE for a turn that ended. In order:
  *
  * 1. Declared `needs-decision`: `attention`, the question.
@@ -158,19 +191,26 @@ export function turnEnd(input) {
     const { told, refused } = input;
     const waking = Number.isSafeInteger(input.waking) && input.waking > 0 ? input.waking : 0;
     const still = waking ? `; ${waking} background task${waking === 1 ? '' : 's'} still running` : '';
-    if (told?.kind === DECISION_EVENT)
-        return { state: 'attention', event: DECISION_EVENT, label: told.label, detail: 'asks you to decide: answer in the session' };
-    if (told?.kind === RESEARCH_COMPLETE_EVENT)
-        return { state: 'done', event: RESEARCH_COMPLETE_EVENT, label: told.label || null, detail: `research complete${still}` };
-    if (told?.kind === 'done')
-        return { state: 'done', event: null, label: told.label || null, detail: `finished${still}` };
-    if (refused) {
-        const words = refusalWords(refused, input.folder ?? null);
-        return { state: 'attention', event: REFUSED_EVENT, label: words.label, detail: words.detail };
+    if (told?.kind === DECISION_EVENT) {
+        return { state: 'attention', event: DECISION_EVENT, label: oneLine(told.label, LIMITS.ACTIVITY_LABEL), detail: 'asks you to decide: answer here or in the session', asks: { text: told.label, choices: [...(told.choices ?? [])] } };
     }
+    if (told?.kind === RESEARCH_COMPLETE_EVENT)
+        return { state: 'done', event: RESEARCH_COMPLETE_EVENT, label: told.label || null, detail: `research complete${still}`, asks: null };
+    if (told?.kind === 'done')
+        return { state: 'done', event: null, label: told.label || null, detail: `finished${still}`, asks: null };
+    if (refused)
+        return refusalEnd(refused, input.folder ?? null);
     if (waking)
-        return { state: 'done', event: null, label: null, detail: `turn ended${still}` };
-    return { state: 'attention', event: STALLED_EVENT, label: null, detail: 'stopped without finishing or asking' };
+        return { state: 'done', event: null, label: null, detail: `turn ended${still}`, asks: null };
+    return { state: 'attention', event: STALLED_EVENT, label: null, detail: 'stopped without finishing or asking', asks: null };
+}
+/**
+ * 2.55.0. A refused action as the item it is, whenever it is said (at once, or at the turn's end):
+ * `attention`, `action-refused`, the ask as its label and as a question with `REFUSAL_CHOICES`.
+ */
+export function refusalEnd(refused, folder = null) {
+    const words = refusalWords(refused, folder);
+    return { state: 'attention', event: REFUSED_EVENT, label: words.label, detail: words.detail, asks: { text: words.label, choices: [...REFUSAL_CHOICES] } };
 }
 /**
  * What a module's `Stop` hook may answer, once, when a turn would end as a stall and the person asked

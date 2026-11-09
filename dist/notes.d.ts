@@ -76,12 +76,12 @@ export declare const absentModuleSchema: z.ZodObject<{
     says: z.ZodString;
 }, "strip", z.ZodTypeAny, {
     name: string;
-    says: string;
     module: string;
+    says: string;
 }, {
     name: string;
-    says: string;
     module: string;
+    says: string;
 }>;
 export type AbsentModule = z.infer<typeof absentModuleSchema>;
 /** A session's place, as the notes say it. `project` is the folder. */

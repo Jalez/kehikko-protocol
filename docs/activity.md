@@ -30,6 +30,12 @@ type ActivityItem = {
   group?: string                   // 1.7.0; a fold key, 1..LIMITS.ACTIVITY_GROUP (64)
   project?: string                 // 1.8.0; the absolute folder of the project it belongs to
   event?: string                   // 2.31.0; one of the ids in the manifest's `events`
+  question?: {                     // 2.55.0; answered from the Inbox itself
+    text: string                   // shown in full, at most LIMITS.ACTIVITY_QUESTION (1000)
+    choices?: string[]             // a message's choices' limits (2.50.0)
+    to: { module: string; session: string }   // the agent session the answer goes to
+    replyTo?: number               // the message it answers, when the question was one
+  }
 }
 ```
 
@@ -313,6 +319,19 @@ the first. `turns.ts` is the one rule every agent module applies:
 
 The events are declared like any other (`events: TURN_EVENTS`); a host before 2.31.0 ignores `event`
 and shows an ordinary item of its state.
+
+### Answered from the Inbox
+
+A decision and a refusal carry `question` (`turnQuestion(end, { module, session })`): the whole
+question, its choices, and the session the answer goes to. A host shows the question in full in the
+row and in its notice, the choices as buttons and a reply field. An answer — a press or typed words,
+only on the person's own gesture in the host's page — is sent to that session as the PERSON's message
+(`from.person`, `from.name` `INBOX_VIA`, `answers` the question, or `replyTo` when the question was a
+message), and delivered like any other: typed in under `[Message from your person via Inbox, #15,
+answering “…”]`. The host marks the item answered; the module withdraws it once its session has the
+answer (Claude Code: the typed prompt). `to.module` is the reporting module's own, or, for a module
+that relays sessions' questions and declares `messages:as-person`, another's — the same pieces a
+relaying module's own answer flow uses (`messages.say`, `kind: 'question'`, `choices`, `replyTo`).
 
 ## What a module author should report
 

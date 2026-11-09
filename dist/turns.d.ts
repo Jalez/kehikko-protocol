@@ -1,4 +1,5 @@
-import type { InboxEvent } from './activity.js';
+import type { ActivityQuestion, InboxEvent } from './activity.js';
+import { type AgentSessionRef } from './agent-messages.js';
 import { type NotesSelf } from './notes.js';
 /**
  * 2.55.0. How an agent session's turn ended, in ONE rule for every module that runs agent sessions,
@@ -31,11 +32,15 @@ export declare const STALLED_EVENT = "stalled";
  * is the event modules declared since 2.31.0, unchanged; the three `attention` ones are new.
  */
 export declare const TURN_EVENTS: readonly InboxEvent[];
-/** What an agent declared: the kind, and its words (the question, for `needs-decision`). */
+/** What an agent declared: the kind, its words (the question, for `needs-decision`), and the question's choices. */
 export interface TurnTold {
     kind: TurnKind;
     label: string;
+    /** A decision's choices (the limits of a message's, 2.50.0); empty for none. The person may always answer in words too. */
+    choices?: string[];
 }
+/** The choices a refused action is asked with: the person's answer is typed into the session as theirs. */
+export declare const REFUSAL_CHOICES: readonly ["Yes, allow it", "No, do it another way"];
 /** The name of the tool every agent module's door offers for it. */
 export declare const TELL_FINISHED_TOOL = "tell_finished";
 /** The tool as a door lists it (`tools/list`). The same words on every agent module's door. */
@@ -88,10 +93,20 @@ export interface TurnEnd {
     state: 'done' | 'attention';
     /** One of `TURN_EVENTS`, or null for a plain item of its state. */
     event: string | null;
-    /** The item's label when the turn gives one (the question, the research); null for the session's own. */
+    /** The item's label when the turn gives one (the question's first line, the research); null for the session's own. */
     label: string | null;
     detail: string;
+    /** The question the person can answer from the Inbox (a decision, a refusal): its whole text and choices. Null for none. */
+    asks: {
+        text: string;
+        choices: string[];
+    } | null;
 }
+/**
+ * 2.55.0. A turn's end as the item's `question` (`activityQuestionSchema`): what it asks, addressed to
+ * the session the module runs (`to`). Undefined when it asks nothing.
+ */
+export declare function turnQuestion(end: TurnEnd, to: AgentSessionRef): ActivityQuestion | undefined;
 /**
  * THE RULE for a turn that ended. In order:
  *
@@ -111,6 +126,11 @@ export declare function turnEnd(input: {
     refused?: Refusal | null;
     folder?: string | null;
 }): TurnEnd;
+/**
+ * 2.55.0. A refused action as the item it is, whenever it is said (at once, or at the turn's end):
+ * `attention`, `action-refused`, the ask as its label and as a question with `REFUSAL_CHOICES`.
+ */
+export declare function refusalEnd(refused: Refusal, folder?: string | null): TurnEnd;
 /**
  * What a module's `Stop` hook may answer, once, when a turn would end as a stall and the person asked
  * for it (a module setting, off by default): the reason the agent reads before it goes on. Never

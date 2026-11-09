@@ -63,17 +63,17 @@ export declare const planGateSchema: z.ZodObject<{
     done: z.ZodDefault<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
     id: string;
+    kind: "ref" | "decision" | "access" | "work";
     done: boolean;
     title: string;
-    kind: "ref" | "decision" | "access" | "work";
     waitsOn: string[];
     epic?: string | undefined;
     ref?: string | undefined;
     owner?: string | undefined;
 }, {
     id: string;
-    title: string;
     kind: "ref" | "decision" | "access" | "work";
+    title: string;
     epic?: string | undefined;
     done?: boolean | undefined;
     ref?: string | undefined;
@@ -123,17 +123,17 @@ export declare const planStepSchema: z.ZodObject<{
         done: z.ZodDefault<z.ZodBoolean>;
     }, "strip", z.ZodTypeAny, {
         id: string;
+        kind: "ref" | "decision" | "access" | "work";
         done: boolean;
         title: string;
-        kind: "ref" | "decision" | "access" | "work";
         waitsOn: string[];
         epic?: string | undefined;
         ref?: string | undefined;
         owner?: string | undefined;
     }, {
         id: string;
-        title: string;
         kind: "ref" | "decision" | "access" | "work";
+        title: string;
         epic?: string | undefined;
         done?: boolean | undefined;
         ref?: string | undefined;
@@ -142,16 +142,16 @@ export declare const planStepSchema: z.ZodObject<{
     }>, "many">>;
 }, "strip", z.ZodTypeAny, {
     id: string;
+    body: string;
     refs: string[];
     title: string;
-    body: string;
     related: string[];
     after: string[];
     gates: {
         id: string;
+        kind: "ref" | "decision" | "access" | "work";
         done: boolean;
         title: string;
-        kind: "ref" | "decision" | "access" | "work";
         waitsOn: string[];
         epic?: string | undefined;
         ref?: string | undefined;
@@ -164,8 +164,8 @@ export declare const planStepSchema: z.ZodObject<{
 }, {
     id: string;
     title: string;
-    refs?: string[] | undefined;
     body?: string | undefined;
+    refs?: string[] | undefined;
     issue?: string | undefined;
     part?: string | undefined;
     phase?: string | undefined;
@@ -174,8 +174,8 @@ export declare const planStepSchema: z.ZodObject<{
     after?: string[] | undefined;
     gates?: {
         id: string;
-        title: string;
         kind: "ref" | "decision" | "access" | "work";
+        title: string;
         epic?: string | undefined;
         done?: boolean | undefined;
         ref?: string | undefined;
@@ -239,17 +239,17 @@ export declare const planSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
             done: z.ZodDefault<z.ZodBoolean>;
         }, "strip", z.ZodTypeAny, {
             id: string;
+            kind: "ref" | "decision" | "access" | "work";
             done: boolean;
             title: string;
-            kind: "ref" | "decision" | "access" | "work";
             waitsOn: string[];
             epic?: string | undefined;
             ref?: string | undefined;
             owner?: string | undefined;
         }, {
             id: string;
-            title: string;
             kind: "ref" | "decision" | "access" | "work";
+            title: string;
             epic?: string | undefined;
             done?: boolean | undefined;
             ref?: string | undefined;
@@ -258,16 +258,16 @@ export declare const planSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
         }>, "many">>;
     }, "strip", z.ZodTypeAny, {
         id: string;
+        body: string;
         refs: string[];
         title: string;
-        body: string;
         related: string[];
         after: string[];
         gates: {
             id: string;
+            kind: "ref" | "decision" | "access" | "work";
             done: boolean;
             title: string;
-            kind: "ref" | "decision" | "access" | "work";
             waitsOn: string[];
             epic?: string | undefined;
             ref?: string | undefined;
@@ -280,8 +280,8 @@ export declare const planSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
     }, {
         id: string;
         title: string;
-        refs?: string[] | undefined;
         body?: string | undefined;
+        refs?: string[] | undefined;
         issue?: string | undefined;
         part?: string | undefined;
         phase?: string | undefined;
@@ -290,8 +290,8 @@ export declare const planSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
         after?: string[] | undefined;
         gates?: {
             id: string;
-            title: string;
             kind: "ref" | "decision" | "access" | "work";
+            title: string;
             epic?: string | undefined;
             done?: boolean | undefined;
             ref?: string | undefined;
@@ -302,16 +302,16 @@ export declare const planSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     steps: {
         id: string;
+        body: string;
         refs: string[];
         title: string;
-        body: string;
         related: string[];
         after: string[];
         gates: {
             id: string;
+            kind: "ref" | "decision" | "access" | "work";
             done: boolean;
             title: string;
-            kind: "ref" | "decision" | "access" | "work";
             waitsOn: string[];
             epic?: string | undefined;
             ref?: string | undefined;
@@ -332,8 +332,8 @@ export declare const planSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
     steps?: {
         id: string;
         title: string;
-        refs?: string[] | undefined;
         body?: string | undefined;
+        refs?: string[] | undefined;
         issue?: string | undefined;
         part?: string | undefined;
         phase?: string | undefined;
@@ -342,8 +342,8 @@ export declare const planSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
         after?: string[] | undefined;
         gates?: {
             id: string;
-            title: string;
             kind: "ref" | "decision" | "access" | "work";
+            title: string;
             epic?: string | undefined;
             done?: boolean | undefined;
             ref?: string | undefined;
@@ -360,16 +360,16 @@ export declare const planSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
 }>, {
     steps: {
         id: string;
+        body: string;
         refs: string[];
         title: string;
-        body: string;
         related: string[];
         after: string[];
         gates: {
             id: string;
+            kind: "ref" | "decision" | "access" | "work";
             done: boolean;
             title: string;
-            kind: "ref" | "decision" | "access" | "work";
             waitsOn: string[];
             epic?: string | undefined;
             ref?: string | undefined;
@@ -390,8 +390,8 @@ export declare const planSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
     steps?: {
         id: string;
         title: string;
-        refs?: string[] | undefined;
         body?: string | undefined;
+        refs?: string[] | undefined;
         issue?: string | undefined;
         part?: string | undefined;
         phase?: string | undefined;
@@ -400,8 +400,8 @@ export declare const planSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
         after?: string[] | undefined;
         gates?: {
             id: string;
-            title: string;
             kind: "ref" | "decision" | "access" | "work";
+            title: string;
             epic?: string | undefined;
             done?: boolean | undefined;
             ref?: string | undefined;
@@ -418,16 +418,16 @@ export declare const planSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
 }>, {
     steps: {
         id: string;
+        body: string;
         refs: string[];
         title: string;
-        body: string;
         related: string[];
         after: string[];
         gates: {
             id: string;
+            kind: "ref" | "decision" | "access" | "work";
             done: boolean;
             title: string;
-            kind: "ref" | "decision" | "access" | "work";
             waitsOn: string[];
             epic?: string | undefined;
             ref?: string | undefined;
@@ -448,8 +448,8 @@ export declare const planSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
     steps?: {
         id: string;
         title: string;
-        refs?: string[] | undefined;
         body?: string | undefined;
+        refs?: string[] | undefined;
         issue?: string | undefined;
         part?: string | undefined;
         phase?: string | undefined;
@@ -458,8 +458,8 @@ export declare const planSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
         after?: string[] | undefined;
         gates?: {
             id: string;
-            title: string;
             kind: "ref" | "decision" | "access" | "work";
+            title: string;
             epic?: string | undefined;
             done?: boolean | undefined;
             ref?: string | undefined;
@@ -531,17 +531,17 @@ export declare const providedStepSchema: z.ZodObject<{
         done: z.ZodDefault<z.ZodBoolean>;
     }, "strip", z.ZodTypeAny, {
         id: string;
+        kind: "ref" | "decision" | "access" | "work";
         done: boolean;
         title: string;
-        kind: "ref" | "decision" | "access" | "work";
         waitsOn: string[];
         epic?: string | undefined;
         ref?: string | undefined;
         owner?: string | undefined;
     }, {
         id: string;
-        title: string;
         kind: "ref" | "decision" | "access" | "work";
+        title: string;
         epic?: string | undefined;
         done?: boolean | undefined;
         ref?: string | undefined;
@@ -552,17 +552,17 @@ export declare const providedStepSchema: z.ZodObject<{
     module: z.ZodString;
 }, "strip", z.ZodTypeAny, {
     id: string;
-    refs: string[];
-    title: string;
     module: string;
     body: string;
+    refs: string[];
+    title: string;
     related: string[];
     after: string[];
     gates: {
         id: string;
+        kind: "ref" | "decision" | "access" | "work";
         done: boolean;
         title: string;
-        kind: "ref" | "decision" | "access" | "work";
         waitsOn: string[];
         epic?: string | undefined;
         ref?: string | undefined;
@@ -574,10 +574,10 @@ export declare const providedStepSchema: z.ZodObject<{
     under?: string | undefined;
 }, {
     id: string;
-    title: string;
     module: string;
-    refs?: string[] | undefined;
+    title: string;
     body?: string | undefined;
+    refs?: string[] | undefined;
     issue?: string | undefined;
     part?: string | undefined;
     phase?: string | undefined;
@@ -586,8 +586,8 @@ export declare const providedStepSchema: z.ZodObject<{
     after?: string[] | undefined;
     gates?: {
         id: string;
-        title: string;
         kind: "ref" | "decision" | "access" | "work";
+        title: string;
         epic?: string | undefined;
         done?: boolean | undefined;
         ref?: string | undefined;
@@ -604,12 +604,12 @@ export declare const providedPhaseSchema: z.ZodObject<{
     module: z.ZodString;
 }, "strip", z.ZodTypeAny, {
     id: string;
-    title: string;
     module: string;
+    title: string;
 }, {
     id: string;
-    title: string;
     module: string;
+    title: string;
 }>;
 export type ProvidedPhase = z.infer<typeof providedPhaseSchema>;
 /**
@@ -678,17 +678,17 @@ export declare const stepsListResult: z.ZodObject<{
             done: z.ZodDefault<z.ZodBoolean>;
         }, "strip", z.ZodTypeAny, {
             id: string;
+            kind: "ref" | "decision" | "access" | "work";
             done: boolean;
             title: string;
-            kind: "ref" | "decision" | "access" | "work";
             waitsOn: string[];
             epic?: string | undefined;
             ref?: string | undefined;
             owner?: string | undefined;
         }, {
             id: string;
-            title: string;
             kind: "ref" | "decision" | "access" | "work";
+            title: string;
             epic?: string | undefined;
             done?: boolean | undefined;
             ref?: string | undefined;
@@ -699,17 +699,17 @@ export declare const stepsListResult: z.ZodObject<{
         module: z.ZodString;
     }, "strip", z.ZodTypeAny, {
         id: string;
-        refs: string[];
-        title: string;
         module: string;
         body: string;
+        refs: string[];
+        title: string;
         related: string[];
         after: string[];
         gates: {
             id: string;
+            kind: "ref" | "decision" | "access" | "work";
             done: boolean;
             title: string;
-            kind: "ref" | "decision" | "access" | "work";
             waitsOn: string[];
             epic?: string | undefined;
             ref?: string | undefined;
@@ -721,10 +721,10 @@ export declare const stepsListResult: z.ZodObject<{
         under?: string | undefined;
     }, {
         id: string;
-        title: string;
         module: string;
-        refs?: string[] | undefined;
+        title: string;
         body?: string | undefined;
+        refs?: string[] | undefined;
         issue?: string | undefined;
         part?: string | undefined;
         phase?: string | undefined;
@@ -733,8 +733,8 @@ export declare const stepsListResult: z.ZodObject<{
         after?: string[] | undefined;
         gates?: {
             id: string;
-            title: string;
             kind: "ref" | "decision" | "access" | "work";
+            title: string;
             epic?: string | undefined;
             done?: boolean | undefined;
             ref?: string | undefined;
@@ -749,12 +749,12 @@ export declare const stepsListResult: z.ZodObject<{
         module: z.ZodString;
     }, "strip", z.ZodTypeAny, {
         id: string;
-        title: string;
         module: string;
+        title: string;
     }, {
         id: string;
-        title: string;
         module: string;
+        title: string;
     }>, "many">>;
     providers: z.ZodOptional<z.ZodArray<z.ZodObject<{
         module: z.ZodString;
@@ -809,17 +809,17 @@ export declare const stepsListResult: z.ZodObject<{
             done: z.ZodDefault<z.ZodBoolean>;
         }, "strip", z.ZodTypeAny, {
             id: string;
+            kind: "ref" | "decision" | "access" | "work";
             done: boolean;
             title: string;
-            kind: "ref" | "decision" | "access" | "work";
             waitsOn: string[];
             epic?: string | undefined;
             ref?: string | undefined;
             owner?: string | undefined;
         }, {
             id: string;
-            title: string;
             kind: "ref" | "decision" | "access" | "work";
+            title: string;
             epic?: string | undefined;
             done?: boolean | undefined;
             ref?: string | undefined;
@@ -830,17 +830,17 @@ export declare const stepsListResult: z.ZodObject<{
         module: z.ZodString;
     }, "strip", z.ZodTypeAny, {
         id: string;
-        refs: string[];
-        title: string;
         module: string;
         body: string;
+        refs: string[];
+        title: string;
         related: string[];
         after: string[];
         gates: {
             id: string;
+            kind: "ref" | "decision" | "access" | "work";
             done: boolean;
             title: string;
-            kind: "ref" | "decision" | "access" | "work";
             waitsOn: string[];
             epic?: string | undefined;
             ref?: string | undefined;
@@ -852,10 +852,10 @@ export declare const stepsListResult: z.ZodObject<{
         under?: string | undefined;
     }, {
         id: string;
-        title: string;
         module: string;
-        refs?: string[] | undefined;
+        title: string;
         body?: string | undefined;
+        refs?: string[] | undefined;
         issue?: string | undefined;
         part?: string | undefined;
         phase?: string | undefined;
@@ -864,8 +864,8 @@ export declare const stepsListResult: z.ZodObject<{
         after?: string[] | undefined;
         gates?: {
             id: string;
-            title: string;
             kind: "ref" | "decision" | "access" | "work";
+            title: string;
             epic?: string | undefined;
             done?: boolean | undefined;
             ref?: string | undefined;
@@ -880,12 +880,12 @@ export declare const stepsListResult: z.ZodObject<{
         module: z.ZodString;
     }, "strip", z.ZodTypeAny, {
         id: string;
-        title: string;
         module: string;
+        title: string;
     }, {
         id: string;
-        title: string;
         module: string;
+        title: string;
     }>, "many">>;
     providers: z.ZodOptional<z.ZodArray<z.ZodObject<{
         module: z.ZodString;
@@ -940,17 +940,17 @@ export declare const stepsListResult: z.ZodObject<{
             done: z.ZodDefault<z.ZodBoolean>;
         }, "strip", z.ZodTypeAny, {
             id: string;
+            kind: "ref" | "decision" | "access" | "work";
             done: boolean;
             title: string;
-            kind: "ref" | "decision" | "access" | "work";
             waitsOn: string[];
             epic?: string | undefined;
             ref?: string | undefined;
             owner?: string | undefined;
         }, {
             id: string;
-            title: string;
             kind: "ref" | "decision" | "access" | "work";
+            title: string;
             epic?: string | undefined;
             done?: boolean | undefined;
             ref?: string | undefined;
@@ -961,17 +961,17 @@ export declare const stepsListResult: z.ZodObject<{
         module: z.ZodString;
     }, "strip", z.ZodTypeAny, {
         id: string;
-        refs: string[];
-        title: string;
         module: string;
         body: string;
+        refs: string[];
+        title: string;
         related: string[];
         after: string[];
         gates: {
             id: string;
+            kind: "ref" | "decision" | "access" | "work";
             done: boolean;
             title: string;
-            kind: "ref" | "decision" | "access" | "work";
             waitsOn: string[];
             epic?: string | undefined;
             ref?: string | undefined;
@@ -983,10 +983,10 @@ export declare const stepsListResult: z.ZodObject<{
         under?: string | undefined;
     }, {
         id: string;
-        title: string;
         module: string;
-        refs?: string[] | undefined;
+        title: string;
         body?: string | undefined;
+        refs?: string[] | undefined;
         issue?: string | undefined;
         part?: string | undefined;
         phase?: string | undefined;
@@ -995,8 +995,8 @@ export declare const stepsListResult: z.ZodObject<{
         after?: string[] | undefined;
         gates?: {
             id: string;
-            title: string;
             kind: "ref" | "decision" | "access" | "work";
+            title: string;
             epic?: string | undefined;
             done?: boolean | undefined;
             ref?: string | undefined;
@@ -1011,12 +1011,12 @@ export declare const stepsListResult: z.ZodObject<{
         module: z.ZodString;
     }, "strip", z.ZodTypeAny, {
         id: string;
-        title: string;
         module: string;
+        title: string;
     }, {
         id: string;
-        title: string;
         module: string;
+        title: string;
     }>, "many">>;
     providers: z.ZodOptional<z.ZodArray<z.ZodObject<{
         module: z.ZodString;

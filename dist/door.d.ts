@@ -159,8 +159,8 @@ export declare const doorPlaceSchema: z.ZodObject<{
         name?: string | undefined;
     } | null;
     project: string;
-    projectId: string;
     token: string;
+    projectId: string;
     conversation?: string | undefined;
     projectName?: string | undefined;
     looking?: {
@@ -181,8 +181,8 @@ export declare const doorPlaceSchema: z.ZodObject<{
         name?: unknown;
     } | null;
     project: string;
-    projectId: string;
     token: string;
+    projectId: string;
     conversation?: unknown;
     projectName?: unknown;
     looking?: unknown;
@@ -249,8 +249,8 @@ export declare const placeResult: z.ZodObject<{
             name?: string | undefined;
         } | null;
         project: string;
-        projectId: string;
         token: string;
+        projectId: string;
         conversation?: string | undefined;
         projectName?: string | undefined;
         looking?: {
@@ -271,8 +271,8 @@ export declare const placeResult: z.ZodObject<{
             name?: unknown;
         } | null;
         project: string;
-        projectId: string;
         token: string;
+        projectId: string;
         conversation?: unknown;
         projectName?: unknown;
         looking?: unknown;
@@ -288,8 +288,8 @@ export declare const placeResult: z.ZodObject<{
             name?: string | undefined;
         } | null;
         project: string;
-        projectId: string;
         token: string;
+        projectId: string;
         conversation?: string | undefined;
         projectName?: string | undefined;
         looking?: {
@@ -314,8 +314,8 @@ export declare const placeResult: z.ZodObject<{
             name?: unknown;
         } | null;
         project: string;
-        projectId: string;
         token: string;
+        projectId: string;
         conversation?: unknown;
         projectName?: unknown;
         looking?: unknown;
@@ -347,18 +347,18 @@ export declare const placeIssueSchema: z.ZodObject<{
     messages: z.ZodOptional<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
     kehikko: string | null;
-    project: string;
     module: string;
+    project: string;
     token: string;
-    projectId?: string | null | undefined;
     messages?: boolean | undefined;
+    projectId?: string | null | undefined;
 }, {
     kehikko: string | null;
-    project: string;
     module: string;
+    project: string;
     token: string;
-    projectId?: string | null | undefined;
     messages?: boolean | undefined;
+    projectId?: string | null | undefined;
 }>;
 export type PlaceIssue = z.infer<typeof placeIssueSchema>;
 /**
@@ -401,13 +401,13 @@ export declare const placeDoorsSchema: z.ZodObject<{
         transport: z.ZodCatch<z.ZodEnum<["http", "sse"]>>;
     }, "strip", z.ZodTypeAny, {
         name: string;
-        url: string;
         module: string;
+        url: string;
         transport: "http" | "sse";
     }, {
         name: string;
-        url: string;
         module: string;
+        url: string;
         transport?: unknown;
     }>, "many">;
     /**
@@ -473,12 +473,12 @@ export declare const placeDoorsSchema: z.ZodObject<{
         says: z.ZodString;
     }, "strip", z.ZodTypeAny, {
         name: string;
-        says: string;
         module: string;
+        says: string;
     }, {
         name: string;
-        says: string;
         module: string;
+        says: string;
     }>, "many">>>;
     /**
      * 2.41.0. The session's unread messages, oldest first, at most `NOTES_MESSAGES_MOST`, when the module
@@ -509,22 +509,22 @@ export declare const placeDoorsSchema: z.ZodObject<{
             person: z.ZodCatch<z.ZodDefault<z.ZodBoolean>>;
         }, "strip", z.ZodTypeAny, {
             name: string;
+            module: string;
+            session: string | null;
             place: {
                 epic: string | null;
                 parts: string[];
                 kehikko: string | null;
             };
-            module: string;
-            session: string | null;
             person: boolean;
         }, {
+            module: string;
+            session: string | null;
             place: {
                 epic: string | null;
                 kehikko: string | null;
                 parts?: unknown;
             };
-            module: string;
-            session: string | null;
             name?: unknown;
             person?: unknown;
         }>;
@@ -558,48 +558,48 @@ export declare const placeDoorsSchema: z.ZodObject<{
                 session: string;
             }>>;
         }, "strip", z.ZodTypeAny, {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         }, {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         }>, {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         }, {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         }>;
         thread: z.ZodCatch<z.ZodNullable<z.ZodString>>;
@@ -608,31 +608,32 @@ export declare const placeDoorsSchema: z.ZodObject<{
         choices: z.ZodCatch<z.ZodDefault<z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">, string[], string[]>>>;
         replyTo: z.ZodCatch<z.ZodDefault<z.ZodNullable<z.ZodNumber>>>;
         once: z.ZodCatch<z.ZodDefault<z.ZodBoolean>>;
+        answers: z.ZodCatch<z.ZodDefault<z.ZodNullable<z.ZodString>>>;
     }, "strip", z.ZodTypeAny, {
         at: string;
         id: number;
         choices: string[];
         from: {
             name: string;
+            module: string;
+            session: string | null;
             place: {
                 epic: string | null;
                 parts: string[];
                 kehikko: string | null;
             };
-            module: string;
-            session: string | null;
             person: boolean;
         };
         to: {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         };
         thread: string | null;
@@ -640,30 +641,31 @@ export declare const placeDoorsSchema: z.ZodObject<{
         kind: "question" | "report" | "note";
         replyTo: number | null;
         once: boolean;
+        answers: string | null;
     }, {
         at: string;
         id: number;
         from: {
+            module: string;
+            session: string | null;
             place: {
                 epic: string | null;
                 kehikko: string | null;
                 parts?: unknown;
             };
-            module: string;
-            session: string | null;
             name?: unknown;
             person?: unknown;
         };
         to: {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         };
         body: string;
@@ -672,6 +674,7 @@ export declare const placeDoorsSchema: z.ZodObject<{
         kind?: unknown;
         replyTo?: unknown;
         once?: unknown;
+        answers?: unknown;
     }>, "many">>>;
     /** 2.41.0. How many more unread wait beyond `messages`: handed at the next ask. */
     messagesMore: z.ZodCatch<z.ZodOptional<z.ZodNumber>>;
@@ -693,8 +696,8 @@ export declare const placeDoorsSchema: z.ZodObject<{
     ok: true;
     doors: {
         name: string;
-        url: string;
         module: string;
+        url: string;
         transport: "http" | "sse";
     }[];
     messages?: {
@@ -703,25 +706,25 @@ export declare const placeDoorsSchema: z.ZodObject<{
         choices: string[];
         from: {
             name: string;
+            module: string;
+            session: string | null;
             place: {
                 epic: string | null;
                 parts: string[];
                 kehikko: string | null;
             };
-            module: string;
-            session: string | null;
             person: boolean;
         };
         to: {
-            place?: {
-                epic?: string | undefined;
-                kehikko?: string | undefined;
-            } | undefined;
-            project?: true | undefined;
             module?: string | undefined;
             session?: {
                 module: string;
                 session: string;
+            } | undefined;
+            project?: true | undefined;
+            place?: {
+                epic?: string | undefined;
+                kehikko?: string | undefined;
             } | undefined;
         };
         thread: string | null;
@@ -729,6 +732,7 @@ export declare const placeDoorsSchema: z.ZodObject<{
         kind: "question" | "report" | "note";
         replyTo: number | null;
         once: boolean;
+        answers: string | null;
     }[] | undefined;
     modules?: {
         name: string;
@@ -746,8 +750,8 @@ export declare const placeDoorsSchema: z.ZodObject<{
     }[] | undefined;
     absent?: {
         name: string;
-        says: string;
         module: string;
+        says: string;
     }[] | undefined;
     messagesMore?: number | undefined;
     kehikkoSkills?: {
@@ -760,8 +764,8 @@ export declare const placeDoorsSchema: z.ZodObject<{
     ok: true;
     doors: {
         name: string;
-        url: string;
         module: string;
+        url: string;
         transport?: unknown;
     }[];
     messages?: unknown;
