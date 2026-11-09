@@ -7,6 +7,26 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.57.0 — 2026-11-09
+
+A module's own short introduction, as data a host shows in its own introduction dialog. **Additive
+and optional**; `PROTOCOL` is still 2. [docs/manifest.md](docs/manifest.md), "A module's
+introduction (2.57.0)".
+
+### Added
+
+- `intro` in a manifest (top-level, like `help`): 1 to 6 slides, each a `title`, a `body` and an
+  optional `art` — a picture said as shapes on a 320 by 150 canvas (`INTRO_VIEW`): `pane`, `box`,
+  `rows`, `dot`, `line`, `text` and `pointer`, each with a colour role (`INTRO_TONES`) and an
+  optional motion from the host's set (`INTRO_MOTIONS`) with a `delay`. The host draws it in its own
+  look, and still under reduced motion; nothing is loaded from the module and no markup is rendered.
+  Plain text only, bounded by `INTRO_LIMITS`; an `intro` that does not parse is dropped whole, a
+  picture that does not parse drops only itself.
+- `INTRO_FILE` (`intro.json` at the root of a module's repository, the same object as `intro`), so a
+  host can read an introduction without running the module, and `introFromFile(text)`.
+- `introOf(manifest)` (ready to draw, every string one line, or `null`), `hasIntro(manifest)`, and
+  `introSeconds(intro)`, about how long it takes to read, for a host's offer.
+
 ## 2.56.0 — 2026-11-09
 
 The reminder after a turn that ended without saying how. **Additive**; `PROTOCOL` is still 2.

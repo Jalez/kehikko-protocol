@@ -12,6 +12,7 @@ import { holdsSchema, opensSchema } from './abilities.js';
 import { revealModeSchema } from './reveal.js';
 import { agentSaysSchema } from './notes.js';
 import { helpSchema } from './help.js';
+import { introSchema } from './intro.js';
 import { navigatesSchema, showsSchema } from './show.js';
 import { modeScopeSchema, scopeSaysSchema, supportedScopes } from './scope.js';
 /**
@@ -318,6 +319,15 @@ const manifestFields = z.object({
      * See `help.ts`.
      */
     help: helpSchema.optional().catch(undefined),
+    /**
+     * 2.57.0. This module's own short introduction, for a person: 1 to 6 slides, each a title, a
+     * sentence or two and an optional picture said as shapes the host draws (`introSchema`, bounded by
+     * `INTRO_LIMITS`). Plain text only. A host that has it offers "Introduction" for the module and
+     * shows it in its own introduction dialog; nothing plays inside the module's page. Top-level,
+     * optional, dropped when it does not parse, like `help`; a host before 2.57.0 ignores it. See
+     * `intro.ts`.
+     */
+    intro: introSchema.optional().catch(undefined),
     /**
      * The scopes this module can work at, as modes: one per scope, the default first (2.29.0; see
      * `modeSchema.scope`). Required, at least one, so a host older than 2.29.0 still parses it.

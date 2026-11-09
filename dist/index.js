@@ -28,6 +28,8 @@ export { rowsAdvice } from './rows.js';
 export { REVEAL_MODES, revealModeSchema, revealModeOf, coveredFields, NOT_COVERED, keepInView, } from './reveal.js';
 /* How to use a module, in its own words, for a person: plain text a host draws as headings and bullets (2.52.0). */
 export { HELP_LIMITS, helpSchema, helpSectionSchema, helpOf, hasHelp, } from './help.js';
+/* A module's own introduction, as slides a host shows in its introduction dialog (2.57.0). */
+export { INTRO_VIEW, INTRO_LIMITS, INTRO_TONES, INTRO_MOTIONS, introSchema, introSlideSchema, introArtSchema, introShapeSchema, introPaneSchema, introBoxSchema, introRowsSchema, introDotSchema, introLineSchema, introTextSchema, introPointerSchema, introOf, hasIntro, introSeconds, introFromFile, INTRO_FILE, INTRO_FILE_BYTES, } from './intro.js';
 /* What an agent session is told about the modules around it, one wording for every agent module (2.36.0). */
 export { AGENT_SAYS_MAX, NOTES_MOST, agentSaysSchema, agentSaysOf, absentSaysOf, oneLine, sessionModuleSchema, absentModuleSchema, placeWords, moduleLine, absentLine, researchLine, finishLine, startNotes, changeNotes, sessionNotes, NOTES_VERSION, NOT_LOADED, UPDATED_HEAD, KEHIKKO_SKILLS_TOOL, KEHIKKO_SKILLS_HEAD, kehikkoSkillMark, } from './notes.js';
 /* How an agent session's turn ended, one rule for every agent module (2.55.0), and the reminder after a stall (2.56.0). See `turns.ts`. */

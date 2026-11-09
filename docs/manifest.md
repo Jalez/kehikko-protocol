@@ -480,6 +480,81 @@ Top-level like `reveal` and `agentSays`, so a host before 2.52.0 ignores it and 
 `DECLARATION_SINCE`, and NOT under `declares`, whose unknown keys an older host's `fitOf` reads as too
 new. `HELP_LIMITS`, `helpSchema`, `helpOf`, `hasHelp` (`src/help.ts`).
 
+### A module's introduction (2.57.0)
+
+A module may provide its own short introduction: a few slides a host shows in its own introduction
+dialog — the same dialog, controls and look as the app's — with the module's name and icon at the
+top. A host offers it as "Introduction" in the module's menu, and once when the module is first
+placed. Nothing plays inside the module's page, and the host sends the module nothing to show it.
+
+```ts
+intro: {
+  slides: [
+    {
+      title: 'One list for the work you are on',
+      body: 'Everything that still needs doing for the picked part, in one place.',
+      art: {
+        label: 'a list filling in, one line ticked',
+        shapes: [
+          { kind: 'pane', x: 40, y: 16, w: 240, h: 118 },
+          { kind: 'rows', x: 56, y: 40, widths: [160, 120, 140], gap: 16, motion: 'rise', delay: 0.3 },
+          { kind: 'dot', x: 48, y: 42, r: 3, tone: 'ok', motion: 'pop', delay: 1 },
+        ],
+      },
+    },
+  ],
+},
+```
+
+- **`slides`**: 1 to 6, read in order. About twenty seconds in all: say what the module is for,
+  then the two or three things to do first.
+- **`title`** (80) and **`body`** (320): plain text, one line each.
+- **`art`** (optional): what the picture shows, as `label` (160, for a screen reader), and up to 48
+  `shapes` drawn in order on a 320 by 150 canvas (`INTRO_VIEW`), later ones on top.
+
+**Why shapes, not an image.** The host's own introduction draws each picture as a small vector
+drawing in the theme's colours that moves a little — an entrance, a quiet loop — and stands still
+under `prefers-reduced-motion`. A module's picture is said in the same terms, so the host draws it
+with its own components: in its look, right in dark as in light, still when asked, with nothing
+loaded from the module's origin and no markup rendered from it. The shapes:
+
+| `kind` | Fields | Draws |
+|---|---|---|
+| `pane` | `x y w h` | a container with a header strip |
+| `box` | `x y w h`, `round?`, `dashed?` | a rounded box: a button, a card, a chip |
+| `rows` | `x y`, `widths[]` (≤ 12), `gap?` | lines of text, as bars |
+| `dot` | `x y r` | a status light, a badge |
+| `line` | `x y x2 y2`, `dashed?` | a link, a divider |
+| `text` | `x y text` (≤ 24), `size?`, `middle?`, `mono?` | a word or two, plain text |
+| `pointer` | `x y` | a mouse pointer, its tip at the point |
+
+Every shape may take a `tone` (`INTRO_TONES`: `card`, `muted`, `faint`, `text`, `strong`, `ok`,
+`busy`, `warn`, `danger` — colour roles a host maps to its theme, never colours), a `motion`
+(`INTRO_MOTIONS`: `pop`, `rise`, `draw`, `drop` play as the slide shows; `pulse`, `blink`, `ping`,
+`narrow`, `chip`, `fill`, `spin` loop quietly) and a `delay` (seconds, at most 8). Under reduced
+motion every shape stands in its final place, so draw the picture so that its still frame says the
+same thing. Unknown fields are refused.
+
+**Plain text only.** A host draws every string as text: never as markup, never as a link, never as
+an address it opens. `introOf(manifest)` reads it ready to draw, each string as one line, a slide
+left without a title or body dropped, `null` when there is none; `hasIntro(manifest)` is what a host
+asks before it offers the entry; `introSeconds(intro)` is about how long it takes to read. An
+`intro` that does not parse is dropped whole, not fatal; a picture that does not parse drops only
+that picture, and the slide keeps its words.
+
+**Readable without running the module: `intro.json`.** A person should be able to watch an
+introduction before the module is started, placed or even installed. So a module keeps it as a file
+at the root of its repository, `intro.json` (`INTRO_FILE`), holding exactly what `intro` holds, and
+puts the same object in its manifest (`import intro from './intro.json'`). A host reads it from the
+running module's manifest when there is one, from the installed copy's file when there is not, and,
+for a module on its official list that is not installed, from that file at the release it would
+install. `introFromFile(text)` reads the file (at most `INTRO_FILE_BYTES`), `null` when it is
+missing or not an introduction.
+
+Top-level like `help`, so a host before 2.57.0 ignores it and runs the module; NOT under `declares`.
+`INTRO_VIEW`, `INTRO_LIMITS`, `INTRO_TONES`, `INTRO_MOTIONS`, `introSchema`, `introOf`, `hasIntro`,
+`introSeconds` (`src/intro.ts`).
+
 ### A module's settings (2.15.0)
 
 `declares.settings` lists the settings a person can see and change from the host: each field's key, label, sentence, type (`boolean`, `string`, `number`, `choice`, `list`), default, scope (`project` or `machine`) and whether only a person may change it. The host draws one form from it and asks the module to read and write the values at its door. Optional; a list that does not parse is dropped and the rest of the manifest is read. See [settings](settings.md).

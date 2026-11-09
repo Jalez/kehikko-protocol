@@ -463,6 +463,511 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         }[] | undefined;
     }>>>;
     /**
+     * 2.57.0. This module's own short introduction, for a person: 1 to 6 slides, each a title, a
+     * sentence or two and an optional picture said as shapes the host draws (`introSchema`, bounded by
+     * `INTRO_LIMITS`). Plain text only. A host that has it offers "Introduction" for the module and
+     * shows it in its own introduction dialog; nothing plays inside the module's page. Top-level,
+     * optional, dropped when it does not parse, like `help`; a host before 2.57.0 ignores it. See
+     * `intro.ts`.
+     */
+    intro: z.ZodCatch<z.ZodOptional<z.ZodObject<{
+        slides: z.ZodArray<z.ZodObject<{
+            title: z.ZodString;
+            body: z.ZodString;
+            art: z.ZodCatch<z.ZodOptional<z.ZodObject<{
+                label: z.ZodString;
+                shapes: z.ZodArray<z.ZodDiscriminatedUnion<"kind", [z.ZodObject<{
+                    tone: z.ZodOptional<z.ZodEnum<["card", "muted", "faint", "text", "strong", "ok", "busy", "warn", "danger"]>>;
+                    motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
+                    delay: z.ZodOptional<z.ZodNumber>;
+                    kind: z.ZodLiteral<"pane">;
+                    x: z.ZodNumber;
+                    y: z.ZodNumber;
+                    w: z.ZodNumber;
+                    h: z.ZodNumber;
+                }, "strict", z.ZodTypeAny, {
+                    kind: "pane";
+                    x: number;
+                    y: number;
+                    w: number;
+                    h: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                }, {
+                    kind: "pane";
+                    x: number;
+                    y: number;
+                    w: number;
+                    h: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                }>, z.ZodObject<{
+                    tone: z.ZodOptional<z.ZodEnum<["card", "muted", "faint", "text", "strong", "ok", "busy", "warn", "danger"]>>;
+                    motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
+                    delay: z.ZodOptional<z.ZodNumber>;
+                    kind: z.ZodLiteral<"box">;
+                    x: z.ZodNumber;
+                    y: z.ZodNumber;
+                    w: z.ZodNumber;
+                    h: z.ZodNumber;
+                    round: z.ZodOptional<z.ZodNumber>;
+                    dashed: z.ZodOptional<z.ZodBoolean>;
+                }, "strict", z.ZodTypeAny, {
+                    kind: "box";
+                    x: number;
+                    y: number;
+                    w: number;
+                    h: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                    round?: number | undefined;
+                    dashed?: boolean | undefined;
+                }, {
+                    kind: "box";
+                    x: number;
+                    y: number;
+                    w: number;
+                    h: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                    round?: number | undefined;
+                    dashed?: boolean | undefined;
+                }>, z.ZodObject<{
+                    tone: z.ZodOptional<z.ZodEnum<["card", "muted", "faint", "text", "strong", "ok", "busy", "warn", "danger"]>>;
+                    motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
+                    delay: z.ZodOptional<z.ZodNumber>;
+                    kind: z.ZodLiteral<"rows">;
+                    x: z.ZodNumber;
+                    y: z.ZodNumber;
+                    widths: z.ZodArray<z.ZodNumber, "many">;
+                    gap: z.ZodOptional<z.ZodNumber>;
+                }, "strict", z.ZodTypeAny, {
+                    kind: "rows";
+                    x: number;
+                    y: number;
+                    widths: number[];
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                    gap?: number | undefined;
+                }, {
+                    kind: "rows";
+                    x: number;
+                    y: number;
+                    widths: number[];
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                    gap?: number | undefined;
+                }>, z.ZodObject<{
+                    tone: z.ZodOptional<z.ZodEnum<["card", "muted", "faint", "text", "strong", "ok", "busy", "warn", "danger"]>>;
+                    motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
+                    delay: z.ZodOptional<z.ZodNumber>;
+                    kind: z.ZodLiteral<"dot">;
+                    x: z.ZodNumber;
+                    y: z.ZodNumber;
+                    r: z.ZodNumber;
+                }, "strict", z.ZodTypeAny, {
+                    kind: "dot";
+                    x: number;
+                    y: number;
+                    r: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                }, {
+                    kind: "dot";
+                    x: number;
+                    y: number;
+                    r: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                }>, z.ZodObject<{
+                    tone: z.ZodOptional<z.ZodEnum<["card", "muted", "faint", "text", "strong", "ok", "busy", "warn", "danger"]>>;
+                    motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
+                    delay: z.ZodOptional<z.ZodNumber>;
+                    kind: z.ZodLiteral<"line">;
+                    x: z.ZodNumber;
+                    y: z.ZodNumber;
+                    x2: z.ZodNumber;
+                    y2: z.ZodNumber;
+                    dashed: z.ZodOptional<z.ZodBoolean>;
+                }, "strict", z.ZodTypeAny, {
+                    kind: "line";
+                    x: number;
+                    y: number;
+                    x2: number;
+                    y2: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                    dashed?: boolean | undefined;
+                }, {
+                    kind: "line";
+                    x: number;
+                    y: number;
+                    x2: number;
+                    y2: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                    dashed?: boolean | undefined;
+                }>, z.ZodObject<{
+                    tone: z.ZodOptional<z.ZodEnum<["card", "muted", "faint", "text", "strong", "ok", "busy", "warn", "danger"]>>;
+                    motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
+                    delay: z.ZodOptional<z.ZodNumber>;
+                    kind: z.ZodLiteral<"text">;
+                    x: z.ZodNumber;
+                    y: z.ZodNumber;
+                    text: z.ZodString;
+                    size: z.ZodOptional<z.ZodNumber>;
+                    middle: z.ZodOptional<z.ZodBoolean>;
+                    mono: z.ZodOptional<z.ZodBoolean>;
+                }, "strict", z.ZodTypeAny, {
+                    kind: "text";
+                    text: string;
+                    x: number;
+                    y: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                    size?: number | undefined;
+                    middle?: boolean | undefined;
+                    mono?: boolean | undefined;
+                }, {
+                    kind: "text";
+                    text: string;
+                    x: number;
+                    y: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                    size?: number | undefined;
+                    middle?: boolean | undefined;
+                    mono?: boolean | undefined;
+                }>, z.ZodObject<{
+                    tone: z.ZodOptional<z.ZodEnum<["card", "muted", "faint", "text", "strong", "ok", "busy", "warn", "danger"]>>;
+                    motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
+                    delay: z.ZodOptional<z.ZodNumber>;
+                    kind: z.ZodLiteral<"pointer">;
+                    x: z.ZodNumber;
+                    y: z.ZodNumber;
+                }, "strict", z.ZodTypeAny, {
+                    kind: "pointer";
+                    x: number;
+                    y: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                }, {
+                    kind: "pointer";
+                    x: number;
+                    y: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                }>]>, "many">;
+            }, "strip", z.ZodTypeAny, {
+                label: string;
+                shapes: ({
+                    kind: "pane";
+                    x: number;
+                    y: number;
+                    w: number;
+                    h: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                } | {
+                    kind: "box";
+                    x: number;
+                    y: number;
+                    w: number;
+                    h: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                    round?: number | undefined;
+                    dashed?: boolean | undefined;
+                } | {
+                    kind: "rows";
+                    x: number;
+                    y: number;
+                    widths: number[];
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                    gap?: number | undefined;
+                } | {
+                    kind: "dot";
+                    x: number;
+                    y: number;
+                    r: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                } | {
+                    kind: "line";
+                    x: number;
+                    y: number;
+                    x2: number;
+                    y2: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                    dashed?: boolean | undefined;
+                } | {
+                    kind: "text";
+                    text: string;
+                    x: number;
+                    y: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                    size?: number | undefined;
+                    middle?: boolean | undefined;
+                    mono?: boolean | undefined;
+                } | {
+                    kind: "pointer";
+                    x: number;
+                    y: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                })[];
+            }, {
+                label: string;
+                shapes: ({
+                    kind: "pane";
+                    x: number;
+                    y: number;
+                    w: number;
+                    h: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                } | {
+                    kind: "box";
+                    x: number;
+                    y: number;
+                    w: number;
+                    h: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                    round?: number | undefined;
+                    dashed?: boolean | undefined;
+                } | {
+                    kind: "rows";
+                    x: number;
+                    y: number;
+                    widths: number[];
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                    gap?: number | undefined;
+                } | {
+                    kind: "dot";
+                    x: number;
+                    y: number;
+                    r: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                } | {
+                    kind: "line";
+                    x: number;
+                    y: number;
+                    x2: number;
+                    y2: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                    dashed?: boolean | undefined;
+                } | {
+                    kind: "text";
+                    text: string;
+                    x: number;
+                    y: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                    size?: number | undefined;
+                    middle?: boolean | undefined;
+                    mono?: boolean | undefined;
+                } | {
+                    kind: "pointer";
+                    x: number;
+                    y: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                })[];
+            }>>>;
+        }, "strip", z.ZodTypeAny, {
+            body: string;
+            title: string;
+            art?: {
+                label: string;
+                shapes: ({
+                    kind: "pane";
+                    x: number;
+                    y: number;
+                    w: number;
+                    h: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                } | {
+                    kind: "box";
+                    x: number;
+                    y: number;
+                    w: number;
+                    h: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                    round?: number | undefined;
+                    dashed?: boolean | undefined;
+                } | {
+                    kind: "rows";
+                    x: number;
+                    y: number;
+                    widths: number[];
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                    gap?: number | undefined;
+                } | {
+                    kind: "dot";
+                    x: number;
+                    y: number;
+                    r: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                } | {
+                    kind: "line";
+                    x: number;
+                    y: number;
+                    x2: number;
+                    y2: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                    dashed?: boolean | undefined;
+                } | {
+                    kind: "text";
+                    text: string;
+                    x: number;
+                    y: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                    size?: number | undefined;
+                    middle?: boolean | undefined;
+                    mono?: boolean | undefined;
+                } | {
+                    kind: "pointer";
+                    x: number;
+                    y: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                })[];
+            } | undefined;
+        }, {
+            body: string;
+            title: string;
+            art?: unknown;
+        }>, "many">;
+    }, "strip", z.ZodTypeAny, {
+        slides: {
+            body: string;
+            title: string;
+            art?: {
+                label: string;
+                shapes: ({
+                    kind: "pane";
+                    x: number;
+                    y: number;
+                    w: number;
+                    h: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                } | {
+                    kind: "box";
+                    x: number;
+                    y: number;
+                    w: number;
+                    h: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                    round?: number | undefined;
+                    dashed?: boolean | undefined;
+                } | {
+                    kind: "rows";
+                    x: number;
+                    y: number;
+                    widths: number[];
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                    gap?: number | undefined;
+                } | {
+                    kind: "dot";
+                    x: number;
+                    y: number;
+                    r: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                } | {
+                    kind: "line";
+                    x: number;
+                    y: number;
+                    x2: number;
+                    y2: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                    dashed?: boolean | undefined;
+                } | {
+                    kind: "text";
+                    text: string;
+                    x: number;
+                    y: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                    size?: number | undefined;
+                    middle?: boolean | undefined;
+                    mono?: boolean | undefined;
+                } | {
+                    kind: "pointer";
+                    x: number;
+                    y: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                })[];
+            } | undefined;
+        }[];
+    }, {
+        slides: {
+            body: string;
+            title: string;
+            art?: unknown;
+        }[];
+    }>>>;
+    /**
      * The scopes this module can work at, as modes: one per scope, the default first (2.29.0; see
      * `modeSchema.scope`). Required, at least one, so a host older than 2.29.0 still parses it.
      */
@@ -852,6 +1357,81 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             points: string[];
         }[];
     } | undefined;
+    intro?: {
+        slides: {
+            body: string;
+            title: string;
+            art?: {
+                label: string;
+                shapes: ({
+                    kind: "pane";
+                    x: number;
+                    y: number;
+                    w: number;
+                    h: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                } | {
+                    kind: "box";
+                    x: number;
+                    y: number;
+                    w: number;
+                    h: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                    round?: number | undefined;
+                    dashed?: boolean | undefined;
+                } | {
+                    kind: "rows";
+                    x: number;
+                    y: number;
+                    widths: number[];
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                    gap?: number | undefined;
+                } | {
+                    kind: "dot";
+                    x: number;
+                    y: number;
+                    r: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                } | {
+                    kind: "line";
+                    x: number;
+                    y: number;
+                    x2: number;
+                    y2: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                    dashed?: boolean | undefined;
+                } | {
+                    kind: "text";
+                    text: string;
+                    x: number;
+                    y: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                    size?: number | undefined;
+                    middle?: boolean | undefined;
+                    mono?: boolean | undefined;
+                } | {
+                    kind: "pointer";
+                    x: number;
+                    y: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                })[];
+            } | undefined;
+        }[];
+    } | undefined;
 }, {
     id: string;
     name: string;
@@ -916,6 +1496,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     agentSays?: unknown;
     absentSays?: unknown;
     help?: unknown;
+    intro?: unknown;
 }>, {
     id: string;
     name: string;
@@ -1011,6 +1592,81 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             points: string[];
         }[];
     } | undefined;
+    intro?: {
+        slides: {
+            body: string;
+            title: string;
+            art?: {
+                label: string;
+                shapes: ({
+                    kind: "pane";
+                    x: number;
+                    y: number;
+                    w: number;
+                    h: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                } | {
+                    kind: "box";
+                    x: number;
+                    y: number;
+                    w: number;
+                    h: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                    round?: number | undefined;
+                    dashed?: boolean | undefined;
+                } | {
+                    kind: "rows";
+                    x: number;
+                    y: number;
+                    widths: number[];
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                    gap?: number | undefined;
+                } | {
+                    kind: "dot";
+                    x: number;
+                    y: number;
+                    r: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                } | {
+                    kind: "line";
+                    x: number;
+                    y: number;
+                    x2: number;
+                    y2: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                    dashed?: boolean | undefined;
+                } | {
+                    kind: "text";
+                    text: string;
+                    x: number;
+                    y: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                    size?: number | undefined;
+                    middle?: boolean | undefined;
+                    mono?: boolean | undefined;
+                } | {
+                    kind: "pointer";
+                    x: number;
+                    y: number;
+                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                    delay?: number | undefined;
+                })[];
+            } | undefined;
+        }[];
+    } | undefined;
 }, {
     id: string;
     name: string;
@@ -1075,6 +1731,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     agentSays?: unknown;
     absentSays?: unknown;
     help?: unknown;
+    intro?: unknown;
 }>;
 export type Manifest = z.infer<typeof manifestSchema>;
 /** What a module author writes, before defaults are filled in. */
