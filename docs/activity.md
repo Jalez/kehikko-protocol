@@ -290,6 +290,30 @@ The spec for a host's inbox; the protocol cannot enforce it.
 10. **`events.emit` notices** (`kehikot.notifications@1`) go into the same store as items born
     closed: `refs` to `refs`, `place` to `place`, the line to `label`.
 
+## How an agent's turn ended (2.54.0)
+
+A module that runs agent sessions used to report every turn's end as `done`, whatever the reason:
+the work finished, the agent stopped on a question only the person can answer, or it stopped
+"waiting on X" with nothing set up to bring it back. The last two need the person and looked like
+the first. `turns.ts` is the one rule every agent module applies:
+
+- The agent declares how its turn ends with `tell_finished` on the module's door
+  (`tellFinishedTool`, `readTellFinished`): `done`, `needs-decision` with the one-line question, or
+  `research-complete` with a few words.
+- At the turn's end the module asks `turnEnd({ told, waking, refused })` for the item: a decision is
+  `attention` with the question as its label and event `needs-decision`, kept until the person answers
+  in the session; `done` and research are `done`; a refusal the CLI made on its own account (an
+  auto-mode permission classifier: Claude Code's `PermissionDenied`) with nothing declared is
+  `attention`, `action-refused`, labelled with the ask (`refusalWords`); a turn with background tasks
+  or scheduled wake-ups still pending (`waking`) is paused, `done`; anything else is `attention`,
+  `stalled`.
+- The session's notes say the contract (`finishLine`); a module may, as a person's setting, answer
+  its CLI's `Stop` hook once with `stopBlockReason` so a stalling agent finishes, asks or sets up a
+  wake first. It never does so when the CLI says the turn already went on because of a stop hook.
+
+The events are declared like any other (`events: TURN_EVENTS`); a host before 2.31.0 ignores `event`
+and shows an ordinary item of its state.
+
 ## What a module author should report
 
 - **A session waits for a permission**: `{ id: sessionId, state: 'attention', label: 'Wants to run
@@ -299,6 +323,8 @@ The spec for a host's inbox; the protocol cannot enforce it.
   group: 'tests', refs: ['gh#12'] }`; drop it when the next run passes.
 - **A compile failed and nothing else will build**: the same with `priority: 'urgent'`.
 - **A long job finished**: `{ id: jobId, state: 'done', label: 'Export finished', priority: 'low' }`.
+- **A session's turn ended on a question for the person**: `{ id: sessionId, state: 'attention',
+  label: 'Force-push the rebased branch?', event: 'needs-decision' }` (`turnEnd`).
 - **A session finished a piece of research**: `{ id: sessionId, state: 'done', label: 'Protocol
   audit', event: 'research-complete' }`, with `research-complete` in `events`.
 - **An unread review comment**: `{ id: 'review:' + commentId, state: 'attention', label: 'Comment

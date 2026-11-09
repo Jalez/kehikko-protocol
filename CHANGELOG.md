@@ -7,6 +7,31 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.54.0 — 2026-11-09
+
+How an agent session's turn ended, in one rule for every module that runs agent sessions. **Additive**;
+`PROTOCOL` is still 2. [docs/activity.md](docs/activity.md), "How an agent's turn ended (2.54.0)".
+
+### Added
+
+- **`turnEnd({ told, waking, refused, folder })`**: THE RULE for a turn that ended. Declared
+  `needs-decision` is `attention` showing the question; declared `done` or `research-complete` is
+  `done`; a refused action with nothing declared is `attention` with the ask; something set up to wake
+  the session (`waking` > 0) is `done`; anything else is a stall, `attention`, "Stopped without finishing".
+- **`TURN_EVENTS`**: the Inbox events an agent module declares for it — `research-complete` (unchanged
+  from 2.31.0), and the new `attention` events `needs-decision`, `action-refused` and `stalled`, each
+  with a built-in sound.
+- **`tellFinishedTool()`, `readTellFinished(args)`, `toldReply(told, reports)`**: the `tell_finished`
+  tool in one wording for every agent module's door, now with `event` one of `TURN_KINDS` (`done`,
+  `needs-decision`, `research-complete`); `label` is the question for `needs-decision`.
+- **`refusalOf(payload)`, `refusalWords(refusal, folder)`**: an action a CLI refused on its own account
+  (Claude Code's `PermissionDenied`: `tool_name`, `tool_input`, `reason`), as the specific ask:
+  "Allow Bash: git push --force origin main?", with why and what granting it means.
+- **`stopBlockReason(self)`**: what a `Stop` hook answers, once, when a person asked for a stalled turn
+  to be sent back.
+- **`finishLine(self)`** in the session notes: finish, ask with `needs-decision`, or set up a wake;
+  never end on "waiting". `NOTES_VERSION` is 8, so a running session is told the new notes once.
+
 ## 2.53.0 — 2026-11-06
 
 A kehikko's own skills, written by the person for every agent session on it. **Additive**; `PROTOCOL`

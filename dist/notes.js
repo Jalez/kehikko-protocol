@@ -77,9 +77,9 @@ export const absentModuleSchema = z.object({
  * 5 (2.44.0): a module's skills the session does not have are said apart (`holds`). 6 (2.50.0): the
  * person's messages and a message's kind and choices; and what each module says is kept (`lines`), so a
  * module that changes its `agentSays` is told again at the next prompt. 7 (2.53.0): the kehikko's own
- * skills (`kehikkoSkills`).
+ * skills (`kehikkoSkills`). 8 (2.54.0): how to end a turn (`finishLine`).
  */
-export const NOTES_VERSION = 7;
+export const NOTES_VERSION = 8;
 /** 2.50.0. What one module on the kehikko says to agents, as the notes say it. */
 const sayOf = (one) => oneLine(one.says) || oneLine(one.summary);
 /** The line before the full notes a session gets again because the notes' wording changed since it was told. */
@@ -204,6 +204,15 @@ export function researchLine(self) {
         + `tell_finished({ event: "research-complete", label }) on the ${self.name} module’s MCP server (${self.door}): the person `
         + 'gets a “Research complete” notice. The label is a few words saying what was researched.');
 }
+/** 2.54.0. The line every agent session is told about ending its turns, on the door of the module that runs it (`turns.ts`). */
+export function finishLine(self) {
+    return ('End every turn in one of three ways. Finished: call tell_finished({ event: "done" }) on the '
+        + `${self.name} module’s MCP server (${self.door}). A question only the person can answer: call tell_finished({ event: "needs-decision", label }) `
+        + 'with the question in one line, then stop — the person is shown it until they answer. Waiting on something: set up what '
+        + 'will wake you first (a background command, a scheduled wake-up, a queued run that notifies this session). Never end a '
+        + 'turn only saying you are waiting. If an action is refused (a permission check), ask with needs-decision and say what '
+        + 'granting it means. A turn that ends any other way shows the person “Stopped without finishing”.');
+}
 const others = (all, self) => all ? all.filter((one) => one.module !== self.module) : null;
 /** Everything a session is told at its start: its place, the modules on its kehikko, and the installed ones not on it. */
 export function startNotes(input, moved = false) {
@@ -215,6 +224,7 @@ export function startNotes(input, moved = false) {
     const lines = [
         `Kehikot: this conversation ${moved ? 'has been moved, and now belongs' : 'belongs'} to ${placeWords(place)}. That is its place whatever the person has on screen; the ${host} MCP server answers about it (my_place, read_canvas).`,
         researchLine(input.self),
+        finishLine(input.self),
     ];
     if (input.messaging)
         lines.push(messagingLine(input.self, input.messaging.session, Boolean(input.actOnMessages)));

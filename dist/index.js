@@ -29,7 +29,9 @@ export { REVEAL_MODES, revealModeSchema, revealModeOf, coveredFields, NOT_COVERE
 /* How to use a module, in its own words, for a person: plain text a host draws as headings and bullets (2.52.0). */
 export { HELP_LIMITS, helpSchema, helpSectionSchema, helpOf, hasHelp, } from './help.js';
 /* What an agent session is told about the modules around it, one wording for every agent module (2.36.0). */
-export { AGENT_SAYS_MAX, NOTES_MOST, agentSaysSchema, agentSaysOf, absentSaysOf, oneLine, sessionModuleSchema, absentModuleSchema, placeWords, moduleLine, absentLine, researchLine, startNotes, changeNotes, sessionNotes, NOTES_VERSION, NOT_LOADED, UPDATED_HEAD, KEHIKKO_SKILLS_TOOL, KEHIKKO_SKILLS_HEAD, kehikkoSkillMark, } from './notes.js';
+export { AGENT_SAYS_MAX, NOTES_MOST, agentSaysSchema, agentSaysOf, absentSaysOf, oneLine, sessionModuleSchema, absentModuleSchema, placeWords, moduleLine, absentLine, researchLine, finishLine, startNotes, changeNotes, sessionNotes, NOTES_VERSION, NOT_LOADED, UPDATED_HEAD, KEHIKKO_SKILLS_TOOL, KEHIKKO_SKILLS_HEAD, kehikkoSkillMark, } from './notes.js';
+/* How an agent session's turn ended, one rule for every agent module (2.54.0). See `turns.ts`. */
+export { TURN_KINDS, TURN_EVENTS, RESEARCH_COMPLETE_EVENT, DECISION_EVENT, REFUSED_EVENT, STALLED_EVENT, TELL_FINISHED_TOOL, tellFinishedTool, readTellFinished, toldReply, refusalOf, refusalWords, turnEnd, stopBlockReason, } from './turns.js';
 /* A kehikko's own skills, written by the person for every agent session on it (2.53.0). See `kehikko-skills.ts`. */
 export { KEHIKKO_SKILL_LIMITS, kehikkoSkillDescription, kehikkoSkillText, kehikkoSkillIssue, kehikkoSkillSchema, kehikkoSkillsSchema, } from './kehikko-skills.js';
 /* Messages between agent sessions, kept by the host (2.41.0). See `agent-messages.ts`. */
