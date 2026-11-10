@@ -442,7 +442,7 @@ describe('what a module may say about its doors', () => {
     expect(closed.headers['access-control-allow-origin']).toBeUndefined()
     const open = await call('GET', '/healthz', { options: { openHealth: true } }).done
     expect(open.headers['access-control-allow-origin']).toBe('*')
-    expect(open.headers['access-control-expose-headers']).toBe(BUILD_HEADER)
+    expect(open.headers['access-control-expose-headers']).toBe(`${BUILD_HEADER}, x-kehikot-start`)
     const other = await call('GET', '/api/value', { options: { openHealth: true } }).done
     expect(other.headers['access-control-allow-origin']).toBeUndefined()
     const page = await call('GET', '/app', { options: { openHealth: true } }).done

@@ -932,6 +932,9 @@ export {
   BUILD_ELEMENT,
   BUILD_HEADER,
   PACKAGE_VERSION,
+  START_HEADER,
+  START_TOKEN,
+  START_TOKEN_ENV,
   buildIsStale,
   buildSchema,
   buildStamp,
@@ -940,8 +943,11 @@ export {
   readBuild,
   sameCode,
   sameProcess,
+  startTokenOf,
+  startVerdict,
   type Build,
   type BuildComparison,
+  type StartVerdict,
 } from './build.js'
 
 /* Agent skills a module offers, and where it serves them (2.5.0); what each needs on the kehikko: modules by id (2.12.0) or what a module provides (2.21.0). See `skills.ts`. */

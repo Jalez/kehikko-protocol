@@ -7,6 +7,30 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.60.0 — 2026-11-10
+
+A module says back the start token the host that started it handed it, so a host can tell the
+process it started from anything else answering on that port. **Additive**; `PROTOCOL` is still 2.
+[docs/module-plumbing.md](docs/module-plumbing.md), "The start token (2.60.0)".
+
+### Added
+
+- **`START_TOKEN_ENV`** (`KEHIKOT_START_TOKEN`), the variable a host hands a module it starts its
+  token in; **`START_TOKEN`**, its pattern (16 to 128 of `A-Za-z0-9_-`); **`startTokenOf(env)`**.
+- **`build.start`**, optional: `establishBuild` reads the token from the environment (or `start`
+  in its options; `null` for none). Malformed reads as absent; a build without one parses as before.
+- **`START_HEADER`** (`x-kehikot-start`) on every answer of the doors (`doors`, `doorsHandler`,
+  `doorsFetch`: replies, the page, streams) and of `run` (files of `dist/`, a module's own `before`
+  door, refusals, 404s), when the process was handed a token. The open health check exposes it.
+- **`startVerdict(expected, said)`**: `same`, `other` (refuse: another process), or `unsaid` (one
+  side has none: fall back to the manifest's id).
+- `personEnv` drops `KEHIKOT_START_TOKEN`: a module the person starts from a module's shell is not
+  the module whose token it is.
+
+### Unchanged
+
+- `buildStamp`, `sameProcess`, `sameCode` and `compareBuilds` ignore the token. It is an identity, not
+  a secret: it grants nothing, and a module never reads a request's token.
 ## 2.59.0 — 2026-11-10
 
 A module's page that fails says why, so a host can show the error instead of "not answering".

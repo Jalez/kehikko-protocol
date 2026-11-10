@@ -42,7 +42,7 @@ const base = {
 
 describe('the version', () => {
   test('is 2.29.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.59.0')
+    expect(PACKAGE_VERSION).toBe('2.60.0')
     expect(PROTOCOL).toBe(2)
   })
 })

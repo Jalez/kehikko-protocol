@@ -18,7 +18,8 @@ export interface PersonEnvOptions {
  * - a folder on `PATH` whose `bun` or `node` is this process's own runtime goes too, when that
  *   runtime is a compiled host rather than Bun or Node, and so does a `bun-node-*` or
  *   `kehikot-bun-*` folder whose `bun` or `node` is this runtime, whatever it is;
- * - `BUN_BE_BUN` and `KEHIKOT_HOST_PATH` are dropped.
+ * - `BUN_BE_BUN` and `KEHIKOT_HOST_PATH` are dropped, and so is `KEHIKOT_START_TOKEN` (2.60.0): it
+ *   names the module's process, and a module the person starts from a shell here is another one.
  *
  * Everything else is kept as it was. Unset values are left out.
  */

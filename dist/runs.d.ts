@@ -50,7 +50,7 @@ export declare const runResultSchema: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     id: string;
     epic: string | null;
-    kind: "push" | "review" | "verify" | "other";
+    kind: "push" | "other" | "review" | "verify";
     state: "failed" | "running" | "cancelled" | "queued" | "passed";
     label: string;
     refs: string[];
