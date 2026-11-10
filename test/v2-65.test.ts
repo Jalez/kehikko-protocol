@@ -13,7 +13,7 @@ import { anyPort, preferred, readRegistration, registryDir, serves } from '../sr
 
 describe('the version', () => {
   test('is 2.66.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.69.0')
+    expect(PACKAGE_VERSION).toBe('2.69.1')
     expect(PROTOCOL).toBe(2)
   })
 })

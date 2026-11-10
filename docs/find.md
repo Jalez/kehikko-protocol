@@ -98,7 +98,10 @@ a host that hears no result within a moment says the module cannot be searched y
   message of its own so one listener hears the whole life of a search.
 - **`findMatches(text, query, options)`**: non-overlapping `[start, end)` offsets. Case folds with
   `toLowerCase`; when folding changes a string's length the search is exact rather than misplaced.
-  A whole word has no letter, digit or underscore (Unicode) on either side.
+  A whole word has no letter, digit or underscore (Unicode) on either side, or begins or ends at
+  one of `breaks` (2.69.1): where two elements' text meets side by side with nothing between them
+  in the string (`<span>#12</span><span>Migrate</span>`). Text inside an element in a run of text
+  (`Re<b>find</b>ing`) is one run with it.
 - **`stepMatch(current, total, direction, start)`**: the 0-based current match after a step, -1
   for none.
 - **`findSaid(result, query)`**: `3 of 17`, `No results`, or nothing — the words a host draws.

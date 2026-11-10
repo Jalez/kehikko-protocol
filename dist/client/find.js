@@ -77,7 +77,7 @@ export function pageFind(onRecount, options = {}) {
     const collect = () => {
         const root = rootOf();
         if (!doc || !root)
-            return { text: '', segments: [] };
+            return { text: '', segments: [], breaks: new Set() };
         const shown = new Map();
         const isShown = (element) => {
             if (!element)
@@ -90,18 +90,28 @@ export function pageFind(onRecount, options = {}) {
             return answer;
         };
         const segments = [];
+        /* 2.69.1. Where two pieces of text meet with nothing between them that the page did not draw as
+           one run: a whole word may begin or end there. Two text nodes are one run when one's element
+           holds the other's (`Find <b>this</b> now`); side by side (`<span>#12</span><span>Fix</span>`,
+           a PDF's text runs), they are two. */
+        const breaks = new Set();
+        let before = null;
         let text = '';
         const walker = doc.createTreeWalker(root, 4 /* NodeFilter.SHOW_TEXT */);
         for (let node = walker.nextNode(); node; node = walker.nextNode()) {
             const value = node.nodeValue ?? '';
             if (!value)
                 continue;
-            if (!isShown(node.parentElement))
+            const parent = node.parentElement;
+            if (!isShown(parent))
                 continue;
+            if (before && parent && before !== parent && !before.contains(parent) && !parent.contains(before))
+                breaks.add(text.length);
+            before = parent;
             segments.push({ node, start: text.length });
             text += value;
         }
-        return { text, segments };
+        return { text, segments, breaks };
     };
     /* Which segment holds `at` in the collected string; `end` takes the one before a boundary. */
     const segmentAt = (segments, at, end) => {
@@ -241,8 +251,8 @@ export function pageFind(onRecount, options = {}) {
     const search = (direction) => {
         const was = current;
         unmark();
-        const { text, segments } = collect();
-        const found = findMatches(text, query, opts);
+        const { text, segments, breaks } = collect();
+        const found = findMatches(text, query, opts, breaks);
         total = found.length;
         if (!segments.length || !found.length) {
             current = -1;

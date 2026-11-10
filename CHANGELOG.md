@@ -7,6 +7,20 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.69.1 — 2026-11-10
+
+Find's whole words begin and end where two pieces of text meet side by side. **A fix**; `PROTOCOL` is still 2.
+[docs/find.md](docs/find.md).
+
+### Fixed
+
+- **`pageFind`**: the page's text is read as one string, so `<span>#12</span><span>Migrate</span>` was
+  `#12Migrate` and `Migrate` was not a whole word. Two text nodes whose elements are side by side
+  (neither holds the other) now meet at a break; text inside an element in a run of text
+  (`Re<b>find</b>ing`) is still one run with it. A match is not otherwise stopped by a break.
+- **`findMatches(text, query, options, breaks?)`**: the offsets where a whole word may begin or end
+  although the string has no space there.
+
 ## 2.69.0 — 2026-11-10
 
 Find: ⌘F in every container, with one bar the host draws and the page searching what it shows.
