@@ -1,6 +1,6 @@
 import { readFileSync, statSync } from 'node:fs';
 import { join, normalize, sep } from 'node:path';
-import { WELL_KNOWN } from '../index.js';
+import { START_HEADER, WELL_KNOWN } from '../index.js';
 import { beforeInfo } from '../serve/before.js';
 import { commitOf } from '../serve/build.js';
 import { PAGE_PATHS, doorsFetch } from '../serve/doors.js';
@@ -141,91 +141,111 @@ export async function run(options) {
     const sockets = options.sockets;
     const socketPaths = new Set(sockets?.paths ?? []);
     let port = claimed.port;
+    /* The start token the host handed this process (2.60.0), said on every answer, a file of `dist/`
+       and a refusal included: a host proxying to this port tells this process from a stranger by it. */
+    const start = options.build?.start ?? null;
+    const said = (response) => {
+        if (!response || !start)
+            return response;
+        try {
+            response.headers.set(START_HEADER, start);
+            return response;
+        }
+        catch {
+            /* A response with immutable headers (a module's own door relaying a `fetch`): copied. */
+            const headers = new Headers(response.headers);
+            headers.set(START_HEADER, start);
+            return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+        }
+    };
+    const answerOne = async (request, server) => {
+        const url = new URL(request.url);
+        const path = url.pathname;
+        const method = request.method.toUpperCase();
+        /* Asked under a name that is not this machine's: not answered, whatever the path. */
+        if (!hostFence(request.headers.get('host') ?? url.host, hosts)) {
+            return new Response(`${NOT_HERE}\n`, { status: 403, headers: TEXT });
+        }
+        /* Who may load a file of `dist/` from another origin, when the module said so. */
+        const crossed = corsOrigin(request.headers.get('origin'), corsAllowed());
+        /* A preflight for a file of `dist/`, from an origin `cors` answers. Every other OPTIONS goes on. */
+        if (crossed && method === 'OPTIONS' && request.headers.get('access-control-request-method')) {
+            const door = pages.has(path) || path === WELL_KNOWN || (options.ours ?? oursByDefault)(path);
+            if (!door && (fileIn(dist, path) ?? (path.startsWith('/app/') ? fileIn(dist, path.slice('/app'.length)) : null))) {
+                return new Response(null, {
+                    status: 204,
+                    headers: {
+                        ...corsHeaders(crossed),
+                        'access-control-allow-methods': 'GET, HEAD',
+                        'access-control-allow-headers': request.headers.get('access-control-request-headers') ?? '',
+                        'access-control-max-age': '600',
+                        'cache-control': 'no-store',
+                    },
+                });
+            }
+        }
+        if (sockets && socketPaths.has(path) && request.headers.get('upgrade')?.toLowerCase() === 'websocket') {
+            const gate = socketFence(request.headers, port);
+            if (!gate.ok) {
+                sockets.refused?.(gate.why);
+                return new Response(null, { status: 403, headers: { connection: 'close' } });
+            }
+            const data = (sockets.data ? sockets.data(request) : undefined);
+            if (server.upgrade(request, { data }))
+                return undefined;
+            return new Response('That was not a WebSocket handshake.\n', { status: 400, headers: TEXT });
+        }
+        if (before) {
+            try {
+                const mine = await before(request, beforeInfo(request));
+                if (mine)
+                    return mine;
+            }
+            catch (error) {
+                console.error(`${id}: a door of its own failed on ${method} ${path}:`, error);
+                return new Response('That door failed. The module says why in its log.\n', { status: 500, headers: TEXT });
+            }
+        }
+        const document = pages.has(path) && (method === 'GET' || method === 'HEAD');
+        if (document) {
+            const now = servable();
+            if (!now.ok)
+                return unservable(now.why);
+        }
+        const answered = await through(request);
+        if (answered)
+            return answered;
+        if (method === 'GET' || method === 'HEAD') {
+            const now = servable();
+            /* A page built with a relative base (`base: './'`) and opened at `/app/` asks for
+               `/app/assets/…`: the same file as `/assets/…`. */
+            const file = fileIn(dist, path) ?? (path.startsWith('/app/') ? fileIn(dist, path.slice('/app'.length)) : null);
+            if (file) {
+                if (!now.ok)
+                    return unservable(now.why, corsHeaders(crossed));
+                return new Response(bun.file(file), {
+                    headers: {
+                        'cache-control': path.startsWith('/assets/') || path.startsWith('/app/assets/') ? IMMUTABLE : 'no-cache',
+                        'x-content-type-options': 'nosniff',
+                        ...corsHeaders(crossed),
+                    },
+                });
+            }
+            const html = (request.headers.get('accept') ?? '').includes('text/html');
+            if (options.spa && html && !path.startsWith('/assets/')) {
+                if (!now.ok)
+                    return unservable(now.why);
+                return (await through(new Request(new URL('/app', url), request))) ?? unservable('The page could not be served.');
+            }
+        }
+        return new Response('Not found\n', { status: 404, headers: TEXT });
+    };
     const server = bun.serve({
         hostname: '127.0.0.1',
         port: claimed.port,
         idleTimeout: options.idleTimeout ?? 0,
         async fetch(request, server) {
-            const url = new URL(request.url);
-            const path = url.pathname;
-            const method = request.method.toUpperCase();
-            /* Asked under a name that is not this machine's: not answered, whatever the path. */
-            if (!hostFence(request.headers.get('host') ?? url.host, hosts)) {
-                return new Response(`${NOT_HERE}\n`, { status: 403, headers: TEXT });
-            }
-            /* Who may load a file of `dist/` from another origin, when the module said so. */
-            const crossed = corsOrigin(request.headers.get('origin'), corsAllowed());
-            /* A preflight for a file of `dist/`, from an origin `cors` answers. Every other OPTIONS goes on. */
-            if (crossed && method === 'OPTIONS' && request.headers.get('access-control-request-method')) {
-                const door = pages.has(path) || path === WELL_KNOWN || (options.ours ?? oursByDefault)(path);
-                if (!door && (fileIn(dist, path) ?? (path.startsWith('/app/') ? fileIn(dist, path.slice('/app'.length)) : null))) {
-                    return new Response(null, {
-                        status: 204,
-                        headers: {
-                            ...corsHeaders(crossed),
-                            'access-control-allow-methods': 'GET, HEAD',
-                            'access-control-allow-headers': request.headers.get('access-control-request-headers') ?? '',
-                            'access-control-max-age': '600',
-                            'cache-control': 'no-store',
-                        },
-                    });
-                }
-            }
-            if (sockets && socketPaths.has(path) && request.headers.get('upgrade')?.toLowerCase() === 'websocket') {
-                const gate = socketFence(request.headers, port);
-                if (!gate.ok) {
-                    sockets.refused?.(gate.why);
-                    return new Response(null, { status: 403, headers: { connection: 'close' } });
-                }
-                const data = (sockets.data ? sockets.data(request) : undefined);
-                if (server.upgrade(request, { data }))
-                    return undefined;
-                return new Response('That was not a WebSocket handshake.\n', { status: 400, headers: TEXT });
-            }
-            if (before) {
-                try {
-                    const mine = await before(request, beforeInfo(request));
-                    if (mine)
-                        return mine;
-                }
-                catch (error) {
-                    console.error(`${id}: a door of its own failed on ${method} ${path}:`, error);
-                    return new Response('That door failed. The module says why in its log.\n', { status: 500, headers: TEXT });
-                }
-            }
-            const document = pages.has(path) && (method === 'GET' || method === 'HEAD');
-            if (document) {
-                const now = servable();
-                if (!now.ok)
-                    return unservable(now.why);
-            }
-            const answered = await through(request);
-            if (answered)
-                return answered;
-            if (method === 'GET' || method === 'HEAD') {
-                const now = servable();
-                /* A page built with a relative base (`base: './'`) and opened at `/app/` asks for
-                   `/app/assets/…`: the same file as `/assets/…`. */
-                const file = fileIn(dist, path) ?? (path.startsWith('/app/') ? fileIn(dist, path.slice('/app'.length)) : null);
-                if (file) {
-                    if (!now.ok)
-                        return unservable(now.why, corsHeaders(crossed));
-                    return new Response(bun.file(file), {
-                        headers: {
-                            'cache-control': path.startsWith('/assets/') || path.startsWith('/app/assets/') ? IMMUTABLE : 'no-cache',
-                            'x-content-type-options': 'nosniff',
-                            ...corsHeaders(crossed),
-                        },
-                    });
-                }
-                const html = (request.headers.get('accept') ?? '').includes('text/html');
-                if (options.spa && html && !path.startsWith('/assets/')) {
-                    if (!now.ok)
-                        return unservable(now.why);
-                    return (await through(new Request(new URL('/app', url), request))) ?? unservable('The page could not be served.');
-                }
-            }
-            return new Response('Not found\n', { status: 404, headers: TEXT });
+            return said(await answerOne(request, server));
         },
         websocket: {
             maxPayloadLength: sockets?.maxPayloadLength ?? 1024 * 1024,

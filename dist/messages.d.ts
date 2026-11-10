@@ -3550,16 +3550,19 @@ export declare const readySchema: z.ZodObject<{
         commit: z.ZodDefault<z.ZodNullable<z.ZodString>>;
         started: z.ZodString;
         protocol: z.ZodString;
+        start: z.ZodCatch<z.ZodOptional<z.ZodString>>;
     }, "strip", z.ZodTypeAny, {
         version: string;
         commit: string | null;
         started: string;
         protocol: string;
+        start?: string | undefined;
     }, {
         version: string;
         started: string;
         protocol: string;
         commit?: string | null | undefined;
+        start?: unknown;
     }>>>;
 }, "strip", z.ZodTypeAny, {
     type: "kehikot.ready";
@@ -3570,6 +3573,7 @@ export declare const readySchema: z.ZodObject<{
         commit: string | null;
         started: string;
         protocol: string;
+        start?: string | undefined;
     } | undefined;
 }, {
     type: "kehikot.ready";
@@ -5610,16 +5614,19 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         commit: z.ZodDefault<z.ZodNullable<z.ZodString>>;
         started: z.ZodString;
         protocol: z.ZodString;
+        start: z.ZodCatch<z.ZodOptional<z.ZodString>>;
     }, "strip", z.ZodTypeAny, {
         version: string;
         commit: string | null;
         started: string;
         protocol: string;
+        start?: string | undefined;
     }, {
         version: string;
         started: string;
         protocol: string;
         commit?: string | null | undefined;
+        start?: unknown;
     }>>>;
 }, "strip", z.ZodTypeAny, {
     type: "kehikot.ready";
@@ -5630,6 +5637,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         commit: string | null;
         started: string;
         protocol: string;
+        start?: string | undefined;
     } | undefined;
 }, {
     type: "kehikot.ready";

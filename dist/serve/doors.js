@@ -1,4 +1,4 @@
-import { BUILD_HEADER, WELL_KNOWN, buildStamp } from '../index.js';
+import { BUILD_HEADER, START_HEADER, WELL_KNOWN, buildStamp } from '../index.js';
 import { ORIGINS_ELEMENT, TICKET_HEADER } from '../page.js';
 import { readJsonBody, readJsonRequest } from './body.js';
 import { ELSEWHERE_REFUSAL, admits, asker } from './gate.js';
@@ -25,6 +25,8 @@ function standing(options) {
         build,
         manifest: build ? { ...options.manifest, build } : options.manifest,
         stamp: build ? buildStamp(build) : null,
+        /* What every answer says about the process: its build stamp, and its start token (2.60.0). */
+        marks: marksOf(build),
         /* A module's own document is told who may frame it too, unless it already says. */
         document: typeof page === 'function'
             ? () => {
@@ -46,6 +48,7 @@ function standing(options) {
         },
         /* Worked out per request: who may frame the page is read from the environment as it is then. */
         pageHeaders: () => ({
+            ...(build?.start ? { [START_HEADER]: build.start } : {}),
             'content-type': 'text/html; charset=utf-8',
             /* Never cached: the ticket is per process. */
             'cache-control': 'no-store',
@@ -54,14 +57,18 @@ function standing(options) {
         open,
     };
 }
+/** The headers every answer carries about the process: `BUILD_HEADER`, and `START_HEADER` when it was handed a start token (2.60.0). */
+function marksOf(build) {
+    if (!build)
+        return {};
+    return { [BUILD_HEADER]: buildStamp(build), ...(build.start ? { [START_HEADER]: build.start } : {}) };
+}
 /**
  * A reply as headers and a payload. Nothing the doors send may be cached — an answer is this
  * process's, now — unless the reply names a `cache-control` of its own, or an empty one for none.
  */
-function wire(reply, stamp) {
-    const headers = { 'cache-control': 'no-store' };
-    if (stamp)
-        headers[BUILD_HEADER] = stamp;
+function wire(reply, marks) {
+    const headers = { 'cache-control': 'no-store', ...marks };
     for (const [name, value] of Object.entries(reply.headers ?? {})) {
         /* An empty value is "do not send this one": the only way to answer with no `cache-control`. */
         if (value === '')
@@ -83,7 +90,7 @@ const STREAM_HEADERS = {
 };
 const frame = eventFrame;
 /** What lets a page on another origin — an opaque one — read the health check, and the build on it. */
-const OPEN_HEALTH = { 'access-control-allow-origin': '*', 'access-control-expose-headers': BUILD_HEADER };
+const OPEN_HEALTH = { 'access-control-allow-origin': '*', 'access-control-expose-headers': `${BUILD_HEADER}, ${START_HEADER}` };
 /**
  * The health check says which build is answering, without each module spelling it; and, for a
  * module that asked (`openHealth`), that any page may read it. A header the reply names wins.
@@ -101,13 +108,13 @@ function healthy(reply, path, build, open) {
  * `transformIndexHtml` goes; without one the document is sent as built.
  */
 export function doorsHandler(options, transform) {
-    const { pages, ours, build, manifest, stamp, document, pageHeaders, refusal, open } = standing(options);
+    const { pages, ours, build, manifest, marks, document, pageHeaders, refusal, open } = standing(options);
     return (request, response, next) => {
         const url = new URL(request.url ?? '/', 'http://127.0.0.1');
         const path = url.pathname;
         const method = (request.method ?? 'GET').toUpperCase();
         const send = (reply) => {
-            const { headers, payload } = wire(reply, stamp);
+            const { headers, payload } = wire(reply, marks);
             response.statusCode = reply.status;
             for (const [name, value] of Object.entries(headers))
                 response.setHeader(name, value);
@@ -152,8 +159,8 @@ export function doorsHandler(options, transform) {
                 response.statusCode = 200;
                 for (const [name, value] of Object.entries(STREAM_HEADERS))
                     response.setHeader(name, value);
-                if (stamp)
-                    response.setHeader(BUILD_HEADER, stamp);
+                for (const [name, value] of Object.entries(marks))
+                    response.setHeader(name, value);
                 /* An event is a few bytes; held back for more, a live line arrives a beat late. */
                 try {
                     request.socket?.setNoDelay?.(true);
@@ -202,9 +209,9 @@ export function doorsHandler(options, transform) {
  * in `doorsHandler`; a page built ahead of time is `page: () => fillPage(built, { ticket, build })`.
  */
 export function doorsFetch(options, transform) {
-    const { pages, ours, build, manifest, stamp, document, pageHeaders, refusal, open } = standing(options);
+    const { pages, ours, build, manifest, marks, document, pageHeaders, refusal, open } = standing(options);
     const send = (reply) => {
-        const { headers, payload } = wire(reply, stamp);
+        const { headers, payload } = wire(reply, marks);
         return new Response(payload, { status: reply.status, headers });
     };
     return async (request) => {
@@ -273,7 +280,7 @@ export function doorsFetch(options, transform) {
                     },
                     cancel: leave,
                 });
-                return new Response(body, { status: 200, headers: stamp ? { ...STREAM_HEADERS, [BUILD_HEADER]: stamp } : STREAM_HEADERS });
+                return new Response(body, { status: 200, headers: { ...STREAM_HEADERS, ...marks } });
             }
         }
         const read = await readJsonRequest(request, { maxBytes: options.maxBodyBytes });

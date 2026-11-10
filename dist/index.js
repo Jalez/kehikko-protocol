@@ -57,7 +57,7 @@ export { CITE_STATUSES, CITE_MARKER, parseSource, serialiseSource, uncitable, ma
 /* The names a module's server and its own page agree on. See `page.ts`. */
 export { PAGE_BACKGROUND, ROOT_ELEMENT, THEME_KEY, THEME_PARAM, ORIGINS_ELEMENT, TICKET_ELEMENT, TICKET_HEADER, originAmong, TICKET_REFUSED, PAGE_ERRORS_MAX, STACK_LINES, } from './page.js';
 /* What a module's server is built from, and how two builds compare. See `build.ts`. */
-export { BUILD_ELEMENT, BUILD_HEADER, PACKAGE_VERSION, buildIsStale, buildSchema, buildStamp, compareBuilds, describeBuild, readBuild, sameCode, sameProcess, } from './build.js';
+export { BUILD_ELEMENT, BUILD_HEADER, PACKAGE_VERSION, START_HEADER, START_TOKEN, START_TOKEN_ENV, buildIsStale, buildSchema, buildStamp, compareBuilds, describeBuild, readBuild, sameCode, sameProcess, startTokenOf, startVerdict, } from './build.js';
 /* Agent skills a module offers, and where it serves them (2.5.0); what each needs on the kehikko: modules by id (2.12.0) or what a module provides (2.21.0). See `skills.ts`. */
 export { SKILL_NAME, SKILLS_PATH, skillPath, isSkillName, skillNameSchema, moduleSkillSchema, moduleSkillsSchema, skillNeedsSchema, skillNeedSchema, NEED_KINDS, needParts, needKey, meetsNeed, needSaid, neededIds, isKehikkoBound, missingNeeds, skillsThatLoad, skillTextBytes, skillTextIssue, } from './skills.js';
 /* The icon a module is known by, as a key a host draws: `lucide:<name>` or `brand:<slug>` (2.14.0). See `icon.ts`. */

@@ -312,6 +312,23 @@ plus `x-module-build: <buildStamp>` on every answer from the doors, which is wha
 
 **Compatibility.** Both new fields are optional and `.catch(undefined)`: a malformed `build` reads as absent and never fails a manifest or a handshake. `manifestSchema` and `readySchema` are plain `z.object`s, not strict, so a host on an older copy of this package strips the unknown key and behaves exactly as before. `PROTOCOL` is unchanged.
 
+### The start token (2.60.0)
+
+A host that starts a module hands it a fresh token per start in `KEHIKOT_START_TOKEN`
+(`START_TOKEN_ENV`). `establishBuild` reads it into `build.start`, and the module's server says it
+back: in the manifest's `build`, on `/healthz`, and in `x-kehikot-start` (`START_HEADER`) on every
+answer of the doors and of `run`. A module does nothing for it beyond calling `establishBuild` once,
+as before.
+
+It answers one question a port cannot: *is the program answering here the process I started?* A port
+is a number anything can bind — another module that drifted, a dev server somebody ran, a copy of the
+module left from an earlier start. `startVerdict(expected, said)` says `same`, `other` (route nothing
+to it as this module) or `unsaid` (the host did not start it, or the module is built before 2.60.0:
+fall back to the manifest's `id`).
+
+The token is an identity, not a credential: it is readable by any program on the machine that asks
+the manifest, it grants nothing, and no door checks a request against it.
+
 ### For the host (not built here)
 
 - **Is this page older than its server?** `buildIsStale(ready.build, health.build)`, where `ready.build` came with the page's `kehikot.ready` and `health.build` is `GET <origin>/healthz` now. That is the page-side seam, `isStale()` in the host's `src/host/standing.ts`.
