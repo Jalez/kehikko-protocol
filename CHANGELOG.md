@@ -7,6 +7,29 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.66.0 — 2026-11-10
+
+A session's notes and its door agree about messaging. **Additive**; `PROTOCOL` is still 2.
+[docs/agent-messages.md](docs/agent-messages.md), "The notes and the door agree (2.66.0)".
+
+### Changed
+
+- **`messageToolsFor(token, …)` lists `send_message` and `read_messages` for every door that carries
+  a token**, unless the host said it never can (a host before 2.41.0, or a module not granted
+  `agents:message`). Before, any failed ask hid them, and an agent lists a door's tools once, when it
+  connects: a session woken while Kehikot or its module was still starting had no message tools until
+  the person reconnected, while its notes said it could message. The host still checks the token on
+  every call.
+
+### Added
+
+- **`hostOnMessages(options)`** (`/serve`): `yes`, `never` or `not-now` — what `messageToolsFor` reads.
+- **`doorCarriesPlace(doors, { module, door })`**: whether the doors a module handed a session include
+  its own with the place token; false for `null` (started with none of the module's doors).
+- **`NotesInput.messaging.listed`**: false says, instead of the messaging line, that this
+  conversation's door has no message tools and how to get them (**`messagingUnlistedLine`**), with no
+  address. **`messagingLine`** takes `listed` as a fourth argument. Absent: true, as before.
+
 ## 2.65.0 — 2026-11-10
 
 `PORT=0` is any free port. **Additive**; `PROTOCOL` is still 2. [docs/serving.md](docs/serving.md),

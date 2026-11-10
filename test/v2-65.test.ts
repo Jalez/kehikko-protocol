@@ -12,8 +12,8 @@ import { anyPort, preferred, readRegistration, registryDir, serves } from '../sr
 /** 2.65.0: `PORT=0` is any free port. The module binds what the system gives and registers it. */
 
 describe('the version', () => {
-  test('is 2.65.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.65.0')
+  test('is 2.66.0, and PROTOCOL is still 2', () => {
+    expect(PACKAGE_VERSION).toBe('2.66.0')
     expect(PROTOCOL).toBe(2)
   })
 })

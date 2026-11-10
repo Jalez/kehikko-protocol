@@ -618,8 +618,8 @@ export declare const trackerRowSchema: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     number: number;
     kind: "change" | "issue";
-    state: "open" | "merged" | "closed";
     url: string;
+    state: "open" | "merged" | "closed";
     title: string;
     ref: string;
     readAt: string;
@@ -706,8 +706,8 @@ export declare const trackerRowSchema: z.ZodObject<{
 }, {
     number: number;
     kind: "change" | "issue";
-    state: "open" | "merged" | "closed";
     url: string;
+    state: "open" | "merged" | "closed";
     title: string;
     ref: string;
     readAt: string;
@@ -1216,8 +1216,8 @@ export declare const trackerReadingResult: z.ZodObject<{
     }, "strip", z.ZodTypeAny, {
         number: number;
         kind: "change" | "issue";
-        state: "open" | "merged" | "closed";
         url: string;
+        state: "open" | "merged" | "closed";
         title: string;
         ref: string;
         readAt: string;
@@ -1304,8 +1304,8 @@ export declare const trackerReadingResult: z.ZodObject<{
     }, {
         number: number;
         kind: "change" | "issue";
-        state: "open" | "merged" | "closed";
         url: string;
+        state: "open" | "merged" | "closed";
         title: string;
         ref: string;
         readAt: string;
@@ -1416,8 +1416,8 @@ export declare const trackerReadingResult: z.ZodObject<{
     rows: {
         number: number;
         kind: "change" | "issue";
-        state: "open" | "merged" | "closed";
         url: string;
+        state: "open" | "merged" | "closed";
         title: string;
         ref: string;
         readAt: string;
@@ -1522,8 +1522,8 @@ export declare const trackerReadingResult: z.ZodObject<{
     rows?: {
         number: number;
         kind: "change" | "issue";
-        state: "open" | "merged" | "closed";
         url: string;
+        state: "open" | "merged" | "closed";
         title: string;
         ref: string;
         readAt: string;

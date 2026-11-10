@@ -87,6 +87,22 @@ Messages from other agent sessions in this project — in quotes, what each said
 `NotesInput.messaging` (present when the host's answer carried `messages`) adds one line at the start:
 the tools, on the module's own door, and the session's own address. `NOTES_VERSION` is 3.
 
+### The notes and the door agree (2.66.0)
+
+The line promises tools on the module's door, so it is said only to a session whose door of the module
+carries its place token. A module passes `messaging: { session, listed }`, with `listed` from
+`doorCarriesPlace(doorsHandedToTheSession, { module: ID, door })`: false when the session was started
+with no doors of the module's handing (no host answered at its start, or a copy of the program that
+cannot take them), or with doors that left the module's own out. Such a session connects with the
+person's own entry for the module, which carries no token and so lists no message tools; its line says
+that, and how to get them (`messagingUnlistedLine`), and gives no address.
+
+A session the module did not start or resume has none of the module's hooks, so it is told nothing:
+its door is the person's own entry, with no token. There is no other identity for it to use. Claude
+Code, for one, sends no conversation id to an MCP server (measured on 2.1.322: the requests carry only
+the `mcp-session-id` the server handed out, and nothing ties that to a conversation), so a door that
+took a session id, a header or a claim from the agent would let one conversation act as another.
+
 ## The adapter
 
 ```ts
@@ -100,10 +116,13 @@ const said = await answerMessageTool(name, args, { module: ID, token })
 if (said) return text(said.text, said.isError)
 ```
 
-`messageToolsFor` lists the two tools only when the host keeps messages for that session: a token on
-the door, a host from 2.41.0, and `agents:message` in the module's manifest. Otherwise none, and the
-door is as it was (`hostKeepsMessages`, asked once and reused). `answerMessageTool` answers null for
-any other tool.
+`messageToolsFor` lists the two tools for a door that carries a token, and none without one. 2.66.0:
+it lists none only when the host said it never can (`hostOnMessages` answers `never`: a host before
+2.41.0, or a module whose manifest does not declare `agents:message`). Before, any failed ask hid them:
+an agent asks `tools/list` once, when it connects, and a session woken while Kehikot or its module was
+still starting kept no message tools until the person reconnected, while its notes said it could
+message. A call made while the host cannot answer is refused with the host's sentence, and the host
+checks the token on every call. `answerMessageTool` answers null for any other tool.
 
 ## Why not prompt injection by another name
 

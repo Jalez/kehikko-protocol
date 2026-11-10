@@ -44,7 +44,7 @@ export interface MessageToolOptions extends Omit<AskHostOptions, 'project'> {
 
 /** How long a host's answer about whether it keeps messages is reused, per token, in ms. */
 const KNOWN_FOR_MS = { yes: 5 * 60_000, no: 15_000 } as const
-const known = new Map<string, { at: number; yes: boolean }>()
+const known = new Map<string, { at: number; said: 'yes' | 'never' | 'not-now' }>()
 
 /** Forget what was learned about hosts keeping messages (tests). */
 export function forgetMessageHosts(): void {
@@ -57,24 +57,44 @@ export function forgetMessageHosts(): void {
  * `agents:message`). Asked once and reused for a while. Never throws.
  */
 export async function hostKeepsMessages(options: MessageToolOptions, now: number = Date.now()): Promise<boolean> {
-  const { token, act: _act, ...rest } = options
-  if (!token) return false
-  const key = `${options.module}\u0000${token}`
-  const had = known.get(key)
-  if (had && now - had.at < (had.yes ? KNOWN_FOR_MS.yes : KNOWN_FOR_MS.no)) return had.yes
-  const read = await askHost('messages.read', { token, limit: 1 }, rest)
-  known.set(key, { at: now, yes: read.ok })
-  if (known.size > 500) known.delete(known.keys().next().value!)
-  return read.ok
+  return (await hostOnMessages(options, now)) === 'yes'
 }
 
 /**
- * The message tools to list on this door for this session: `messageTools()` when the host keeps
- * messages for it, and none otherwise — no token (a session nothing started from a place), a host
- * before 2.41.0, a module whose manifest does not declare `agents:message`.
+ * 2.66.0. What the host says about messages for this session: `yes` it keeps them; `never`, it can
+ * not for this module whatever happens next (a host too old for the methods, or one that does not
+ * grant the module `agents:message`); `not-now` for anything else — no host answered, the module's
+ * pass was not vouched for yet, the token is not one it can place yet — which a restart of Kehikot
+ * or of the module gives for a moment. Never throws.
+ */
+export async function hostOnMessages(options: MessageToolOptions, now: number = Date.now()): Promise<'yes' | 'never' | 'not-now'> {
+  const { token, act: _act, ...rest } = options
+  if (!token) return 'never'
+  const key = `${options.module}\u0000${token}`
+  const had = known.get(key)
+  if (had && now - had.at < (had.said === 'yes' ? KNOWN_FOR_MS.yes : KNOWN_FOR_MS.no)) return had.said
+  const read = await askHost('messages.read', { token, limit: 1 }, rest)
+  const said = read.ok ? 'yes' : read.declined === 'host-too-old' || read.refused === 'grant' ? 'never' : 'not-now'
+  known.set(key, { at: now, said })
+  if (known.size > 500) known.delete(known.keys().next().value!)
+  return said
+}
+
+/**
+ * The message tools to list on this door for this session: `messageTools()` for every session whose
+ * door carries its place token, and none without one (a session nothing started from a place: there
+ * is no address to send from or read for).
+ *
+ * 2.66.0. Listed for a token unless the host said it never can (`hostOnMessages` `never`: too old, or
+ * the module is not granted `agents:message`). An agent asks `tools/list` once, when it connects, and
+ * a session is often woken while Kehikot or its module is still starting; the host's "not now" then
+ * hid the tools until the person reconnected, while the session's notes said it could message. A
+ * call made while the host cannot answer is refused with the host's sentence, and the identity is
+ * the host's to check on every call — the token is never trusted here.
  */
 export async function messageToolsFor(token: string | null, options: Omit<MessageToolOptions, 'token'>): Promise<MessageToolDefinition[]> {
-  return (await hostKeepsMessages({ ...options, token })) ? messageTools(Boolean(options.act)) : []
+  if (!token) return []
+  return (await hostOnMessages({ ...options, token })) === 'never' ? [] : messageTools(Boolean(options.act))
 }
 
 /** What a tool call answers: text for the agent, and whether it is a refusal. */

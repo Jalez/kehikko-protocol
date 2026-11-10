@@ -32,9 +32,24 @@ export declare function forgetMessageHosts(): void;
  */
 export declare function hostKeepsMessages(options: MessageToolOptions, now?: number): Promise<boolean>;
 /**
- * The message tools to list on this door for this session: `messageTools()` when the host keeps
- * messages for it, and none otherwise — no token (a session nothing started from a place), a host
- * before 2.41.0, a module whose manifest does not declare `agents:message`.
+ * 2.66.0. What the host says about messages for this session: `yes` it keeps them; `never`, it can
+ * not for this module whatever happens next (a host too old for the methods, or one that does not
+ * grant the module `agents:message`); `not-now` for anything else — no host answered, the module's
+ * pass was not vouched for yet, the token is not one it can place yet — which a restart of Kehikot
+ * or of the module gives for a moment. Never throws.
+ */
+export declare function hostOnMessages(options: MessageToolOptions, now?: number): Promise<'yes' | 'never' | 'not-now'>;
+/**
+ * The message tools to list on this door for this session: `messageTools()` for every session whose
+ * door carries its place token, and none without one (a session nothing started from a place: there
+ * is no address to send from or read for).
+ *
+ * 2.66.0. Listed for a token unless the host said it never can (`hostOnMessages` `never`: too old, or
+ * the module is not granted `agents:message`). An agent asks `tools/list` once, when it connects, and
+ * a session is often woken while Kehikot or its module is still starting; the host's "not now" then
+ * hid the tools until the person reconnected, while the session's notes said it could message. A
+ * call made while the host cannot answer is refused with the host's sentence, and the identity is
+ * the host's to check on every call — the token is never trusted here.
  */
 export declare function messageToolsFor(token: string | null, options: Omit<MessageToolOptions, 'token'>): Promise<MessageToolDefinition[]>;
 /** What a tool call answers: text for the agent, and whether it is a refusal. */

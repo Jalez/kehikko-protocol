@@ -178,8 +178,12 @@ export interface NotesInput {
   /**
    * 2.41.0. Present when the host keeps messages (its answer carried `messages`) and the module offers
    * the tools (`messageTools`): the start says so, with the session's own address when known.
+   *
+   * 2.66.0. `listed: false` when the session's door of this module carries no place token, so it lists
+   * no message tools (`doorCarriesPlace`): the start says that instead, and how to get them
+   * (`messagingUnlistedLine`). Absent: true, as before.
    */
-  messaging?: { session: string | null } | null
+  messaging?: { session: string | null; listed?: boolean } | null
   /**
    * 2.43.0. The person allowed this module's sessions to act on messages from other sessions in the
    * project (`ACT_ON_MESSAGES_SETTING`, read with `actsOnMessages`): the messaging line and the head
@@ -430,7 +434,7 @@ export function startNotes(input: NotesInput, moved = false): string {
     researchLine(input.self),
     finishLine(input.self),
   ]
-  if (input.messaging) lines.push(messagingLine(input.self, input.messaging.session, Boolean(input.actOnMessages)))
+  if (input.messaging) lines.push(messagingLine(input.self, input.messaging.session, Boolean(input.actOnMessages), input.messaging.listed !== false))
   if (!place.kehikko) return lines.join('\n')
   const modules = others(input.modules, input.self)
   if (modules === null) lines.push('The modules on this kehikko could not be read just now (Kehikot did not say); read_canvas lists them.')

@@ -202,9 +202,14 @@ export interface NotesInput {
     /**
      * 2.41.0. Present when the host keeps messages (its answer carried `messages`) and the module offers
      * the tools (`messageTools`): the start says so, with the session's own address when known.
+     *
+     * 2.66.0. `listed: false` when the session's door of this module carries no place token, so it lists
+     * no message tools (`doorCarriesPlace`): the start says that instead, and how to get them
+     * (`messagingUnlistedLine`). Absent: true, as before.
      */
     messaging?: {
         session: string | null;
+        listed?: boolean;
     } | null;
     /**
      * 2.43.0. The person allowed this module's sessions to act on messages from other sessions in the

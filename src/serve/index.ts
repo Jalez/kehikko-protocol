@@ -159,6 +159,7 @@ export {
   answerMessageTool,
   forgetMessageHosts,
   hostKeepsMessages,
+  hostOnMessages,
   messageToolsFor,
   messageWaker,
   messageDelivery,
