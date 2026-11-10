@@ -661,6 +661,8 @@ export {
   TILE_LEAVE_PX,
   TILE_LOOKS,
   TILE_NEEDS_YOU,
+  TILE_NOTE_MS,
+  expandDeclined,
   isTile,
   tileItemOf,
   tileRoom,

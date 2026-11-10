@@ -157,6 +157,22 @@ export const TILE_ACTIONS = {
 export type TileAction = keyof typeof TILE_ACTIONS
 
 /**
+ * 2.63.0. What a tile says after its Expand was not done: the host's `why` when the answer to
+ * `view.expand` was `declined` (a host shows a container large only on the person's own press, and
+ * says so when it saw none), else null. Takes whatever `onExpand` resolved to, so a module can hand
+ * the tile `request('view.expand', …)` as it is; anything that is not a declined outcome says nothing.
+ */
+export function expandDeclined(answer: unknown): string | null {
+  if (typeof answer !== 'object' || answer === null) return null
+  const { outcome, why } = answer as { outcome?: unknown; why?: unknown }
+  if (outcome !== 'declined') return null
+  return typeof why === 'string' && why.trim() ? why.trim() : 'The host did not show it large.'
+}
+
+/** How long a tile says why its Expand was not done, unless pressed again first. */
+export const TILE_NOTE_MS = 6000
+
+/**
  * Which of a tile's parts fit a box this size: the title under the icon, the row of quick actions
  * (Expand, and Answer when a question waits), and Compact and Clear beside them. Everything a tile
  * does is still reached without them: the whole tile expands, and the large view has the rest.
