@@ -2,16 +2,17 @@ import { type ReactElement, type ReactNode } from 'react';
 import type { FooterItemInput } from '../footer.js';
 import { type ShownProposal } from '../proposals/core.js';
 /**
- * The React half of proposals (2.71.0): a proposed change drawn inline as a
- * diff with the person's answers under it, the list of what is waiting, a walk
- * through them, and the footer line that says how many there are with Previous
- * and Next beside it. Theme-aware through the same tokens as `Cover`
- * (`--foreground`, `--muted-foreground`, `--border`, `--accent`, `--ring`, with
- * `.dark` on `<html>`), keyboard reachable throughout, and every string a
- * module or an agent wrote is rendered as text. Design notes: docs/proposals.md.
+ * The React half of proposals (2.71.0; shadcn from 2.72.0): a proposed change
+ * drawn inline as a diff with the person's answers under it, the list of what
+ * is waiting, a walk through them, and the footer line that says how many there
+ * are with Previous and Next beside it. Built from the shadcn/ui components in
+ * `./ui` — Button, Textarea, Tooltip, Badge, ScrollArea, Separator, Collapsible
+ * — so a proposal looks like the rest of the module: the same class names, the
+ * module's own theme tokens (`--primary`, `--border`, `--ring`, `.dark`), its
+ * Tailwind build reading this package's `dist/client` as a source. Keyboard
+ * reachable throughout; every string a module or an agent wrote is rendered as
+ * text. Design notes: docs/proposals.md.
  */
-export declare const PROPOSALS_STYLE_ID = "kehikot-proposals-style";
-export declare const PROPOSALS_CSS = "\n.kehikot-proposal{box-sizing:border-box;margin:8px 0;border:1px solid var(--border,currentColor);border-left:3px solid var(--kehikot-proposal-edge,oklch(0.7 0.15 250));border-radius:6px;padding:8px 10px;font:400 13px/1.5 ui-sans-serif,system-ui,sans-serif;color:var(--foreground,inherit);background:var(--card,transparent)}\n.kehikot-proposal[data-current=true]{outline:2px solid var(--ring,currentColor);outline-offset:1px}\n.kehikot-proposal[data-status=stale]{border-left-color:var(--kehikot-proposal-stale,oklch(0.75 0.15 70))}\n.kehikot-proposal[data-status=accepted]{border-left-color:var(--kehikot-proposal-ok,oklch(0.65 0.17 150))}\n.kehikot-proposal[data-status=declined],.kehikot-proposal[data-status=withdrawn]{border-left-color:var(--muted-foreground,currentColor);opacity:.8}\n.kehikot-proposal header{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline;margin:0 0 6px}\n.kehikot-proposal header b{font-weight:600}\n.kehikot-proposal header span{color:var(--muted-foreground,inherit);font-size:.92em}\n.kehikot-proposal p{margin:0 0 6px;overflow-wrap:anywhere}\n.kehikot-proposal p[data-stale]{color:var(--kehikot-proposal-stale,oklch(0.6 0.15 70))}\n.kehikot-proposal .kehikot-diff{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px}\n.kehikot-proposal .kehikot-diff li{display:grid;grid-template-columns:auto 1fr;gap:2px 8px;align-items:start}\n.kehikot-proposal .kehikot-diff li[data-whole=true]{grid-template-columns:1fr}\n.kehikot-proposal .kehikot-diff input{margin:4px 0 0}\n.kehikot-proposal .kehikot-diff pre{margin:0;padding:4px 6px;border-radius:4px;white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace}\n.kehikot-proposal .kehikot-diff del{display:block;text-decoration:none;background:var(--kehikot-proposal-old,oklch(0.93 0.05 25));color:var(--kehikot-proposal-old-text,oklch(0.4 0.15 25))}\n.kehikot-proposal .kehikot-diff ins{display:block;text-decoration:none;background:var(--kehikot-proposal-new,oklch(0.93 0.06 150));color:var(--kehikot-proposal-new-text,oklch(0.35 0.12 150))}\n.dark .kehikot-proposal .kehikot-diff del{background:var(--kehikot-proposal-old,oklch(0.3 0.08 25));color:var(--kehikot-proposal-old-text,oklch(0.85 0.08 25))}\n.dark .kehikot-proposal .kehikot-diff ins{background:var(--kehikot-proposal-new,oklch(0.3 0.08 150));color:var(--kehikot-proposal-new-text,oklch(0.85 0.08 150))}\n.kehikot-proposal .kehikot-diff del:empty::before,.kehikot-proposal .kehikot-diff ins:empty::before{content:\"(nothing)\";opacity:.6;font-style:italic}\n.kehikot-proposal .kehikot-diff li[data-skipped=true] ins{opacity:.45}\n.kehikot-proposal textarea{box-sizing:border-box;width:100%;min-height:5em;margin:6px 0;padding:6px;border:1px solid var(--border,currentColor);border-radius:4px;font:12px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;color:inherit;background:var(--background,transparent)}\n.kehikot-proposal input[type=text]{box-sizing:border-box;flex:1 1 12em;min-width:0;padding:3px 6px;border:1px solid var(--border,currentColor);border-radius:4px;font:inherit;color:inherit;background:var(--background,transparent)}\n.kehikot-proposal .kehikot-acts{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}\n.kehikot-proposal button{font:inherit;color:var(--foreground,inherit);background:transparent;border:1px solid var(--border,currentColor);border-radius:6px;padding:3px 10px;cursor:pointer}\n.kehikot-proposal button[data-primary=true]{border-color:var(--primary,currentColor);background:var(--primary,transparent);color:var(--primary-foreground,inherit)}\n.kehikot-proposal button:hover{background:var(--accent,transparent)}\n.kehikot-proposal button[data-primary=true]:hover{opacity:.9}\n.kehikot-proposal button:disabled{opacity:.5;cursor:default}\n.kehikot-proposal button:focus-visible,.kehikot-proposal input:focus-visible,.kehikot-proposal textarea:focus-visible{outline:2px solid var(--ring,currentColor);outline-offset:2px}\n.kehikot-proposal .kehikot-said{color:var(--muted-foreground,inherit);font-size:.92em;margin:6px 0 0}\n.kehikot-proposals{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:2px;font:400 13px/1.4 ui-sans-serif,system-ui,sans-serif}\n.kehikot-proposals li button{display:flex;gap:8px;align-items:baseline;width:100%;text-align:left;font:inherit;color:var(--foreground,inherit);background:transparent;border:1px solid transparent;border-radius:6px;padding:4px 8px;cursor:pointer}\n.kehikot-proposals li button:hover{background:var(--accent,transparent)}\n.kehikot-proposals li button[aria-current=true]{border-color:var(--ring,currentColor)}\n.kehikot-proposals li button:focus-visible{outline:2px solid var(--ring,currentColor);outline-offset:1px}\n.kehikot-proposals li b{font-weight:600;white-space:nowrap}\n.kehikot-proposals li span{color:var(--muted-foreground,inherit);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}\n.kehikot-proposals li em{color:var(--muted-foreground,inherit);font-style:normal;font-size:.92em;white-space:nowrap;margin-left:auto}\n";
 /** The words on the buttons and labels, in one place, for a module that mirrors them in a header or a tooltip. */
 export declare const PROPOSAL_WORDS: {
     readonly accept: "Accept";
@@ -28,6 +29,8 @@ export declare const PROPOSAL_WORDS: {
     readonly proposedBy: (name: string) => string;
     readonly revised: (n: number) => string;
     readonly whole: "The whole text is rewritten.";
+    readonly change: "The change";
+    readonly answer: "Answer";
 };
 export interface ProposalViewProps {
     proposal: ShownProposal;
@@ -50,24 +53,28 @@ export interface ProposalViewProps {
     said?: string | null;
     /** Draw the diff only: no header line, no reason. */
     bare?: boolean;
+    className?: string;
     children?: ReactNode;
 }
 /**
  * One proposal, inline: who proposes what and why, the change as hunks (red
  * leaves, green arrives; with `allowPartial`, a checkbox per hunk), and the
  * answers. A settled proposal is drawn with its outcome and no buttons. A stale
- * one says why and offers Decline only.
+ * one says why and offers Decline only. The diff folds (Collapsible) once a
+ * proposal is settled, so a list of outcomes stays short.
  */
-export declare function ProposalView({ proposal, onAccept, onDecline, allowEdit, allowPartial, busy, current, said, bare, children }: ProposalViewProps): ReactElement;
+export declare function ProposalView({ proposal, onAccept, onDecline, allowEdit, allowPartial, busy, current, said, bare, className, children }: ProposalViewProps): ReactElement;
 export interface ProposalListProps {
     proposals: readonly ShownProposal[];
     current?: string | null;
     onPick?: (id: string) => void;
     /** With nothing to list: the sentence, or nothing. Default `No proposed changes`. */
     empty?: string | null;
+    /** The list's height when it scrolls (a ScrollArea); default: as tall as its lines. */
+    className?: string;
 }
-/** What is waiting, one line each: the file, the reason, the state; the current one marked. */
-export declare function ProposalList({ proposals, current, onPick, empty }: ProposalListProps): ReactElement;
+/** What is waiting, one line each: the file, the reason, the state; the current one marked; separators between. */
+export declare function ProposalList({ proposals, current, onPick, empty, className }: ProposalListProps): ReactElement;
 /** The ids of the footer's items. */
 export declare const PROPOSAL_FOOT: {
     readonly COUNT: "proposals";

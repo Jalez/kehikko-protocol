@@ -4,6 +4,7 @@ import { createRoot, type Root } from 'react-dom/client'
 
 import { file, type ShownProposal } from '../src/proposals/index.js'
 import { PROPOSAL_FOOT, PROPOSAL_WORDS, ProposalList, ProposalView, proposalsFooter, proposalsFooterPress, stepWalk, useProposalWalk } from '../src/client/proposals.js'
+import { Badge, Button, Collapsible, ScrollArea, Separator, Textarea, Tooltip, cn } from '../src/client/ui/index.js'
 import { footerItemsSchema } from '../src/index.js'
 
 /**
@@ -118,7 +119,12 @@ describe('ProposalView', () => {
     const done = proposal('b\nc\nd', 'x', { status: 'declined', declinedReason: 'No.', decidedBy: 'J', decidedAt: 1 })
     const settled = mount(createElement(ProposalView, { proposal: done, onAccept: () => {}, onDecline: () => {} }))
     expect(settled.querySelector('[data-outcome]')?.textContent).toBe('declined: No.')
-    expect(settled.querySelector('button')).toBeNull()
+    /* No answer: only the fold on the change, which starts folded. */
+    expect(settled.querySelector('[role=group]')).toBeNull()
+    expect(buttons(settled).map((b) => b.textContent)).toEqual([PROPOSAL_WORDS.change])
+    expect(settled.querySelector('del')).toBeNull()
+    click(byText(settled, PROPOSAL_WORDS.change))
+    expect(settled.querySelector('del')?.textContent).toBe('b\nc\nd')
     expect(settled.querySelector('section')?.getAttribute('data-status')).toBe('declined')
   })
 
@@ -129,6 +135,33 @@ describe('ProposalView', () => {
     expect(node.querySelectorAll('input[type=checkbox]')).toHaveLength(0)
     expect(node.querySelector('del')?.textContent).toBe(BASE)
     expect(node.querySelector('ins')?.textContent).toBe('new\n')
+  })
+})
+
+describe('the shadcn components it is built from', () => {
+  test('are shadcn’s: data-slot, the variant classes, cn', () => {
+    const node = mount(createElement(Button, { variant: 'outline', size: 'sm' }, 'Press'))
+    const button = node.querySelector('button')!
+    expect(button.getAttribute('data-slot')).toBe('button')
+    expect(button.className).toContain('hover:bg-accent')
+    expect(button.className).toContain('h-8')
+    expect(cn('p-2', 'p-4', false && 'x')).toBe('p-4')
+    for (const [Component, slot] of [[Badge, 'badge'], [Textarea, 'textarea'], [Separator, 'separator'], [Collapsible, 'collapsible'], [ScrollArea, 'scroll-area']] as const) {
+      act(() => root!.unmount())
+      const drawn = mount(createElement(Component as never, {}))
+      expect(drawn.querySelector(`[data-slot="${slot}"]`)).not.toBeNull()
+    }
+    expect(typeof Tooltip).toBe('function')
+  })
+  test('the view draws shadcn buttons and a badge for the outcome', () => {
+    const node = mount(createElement(ProposalView, { proposal: proposal('b\nc\nd', 'x', { status: 'accepted', acceptedAs: 'edited' }), onAccept: () => {} }))
+    expect(node.querySelector('[data-slot="badge"]')?.textContent).toBe('accepted with the person’s edits')
+    /* The fold's trigger is the shadcn button, as the Collapsible's child (`asChild`): the trigger's slot over the button's classes. */
+    expect(node.querySelector('button')?.getAttribute('data-slot')).toBe('collapsible-trigger')
+    expect(node.querySelector('button')?.className).toContain('hover:bg-accent')
+    act(() => root!.unmount())
+    const open = mount(createElement(ProposalView, { proposal: proposal(), onAccept: () => {} }))
+    expect(open.querySelector('button')?.getAttribute('data-slot')).toBe('button')
   })
 })
 

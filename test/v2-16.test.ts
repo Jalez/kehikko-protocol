@@ -26,7 +26,7 @@ import { hostFields, hostStore, makeMailbox } from '../src/client/index.js'
 
 describe('the version', () => {
   test('is 2.18.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.71.0')
+    expect(PACKAGE_VERSION).toBe('2.72.0')
     expect(PROTOCOL).toBe(2)
   })
 })

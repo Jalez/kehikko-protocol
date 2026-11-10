@@ -97,11 +97,32 @@ leaves, green arrives), and the answers: Accept, Decline, Decline with reason
 (a one-line field, Enter sends), Edit then accept (a textarea; what is written
 is what the person typed), and a checkbox per hunk so part of a change is
 taken (`Accept chosen`). A stale proposal says why and offers Decline only. A
-settled one shows its outcome and no buttons. Every string a module or an agent
-wrote is rendered as text. Colours come from the page's own tokens
-(`--foreground`, `--border`, `--accent`, `--ring`, `--primary`) with `.dark` on
-`<html>`; the four diff colours are overridable
-(`--kehikot-proposal-old`, `-new`, `-old-text`, `-new-text`).
+settled one shows its outcome as a badge, its change folded. Every string a
+module or an agent wrote is rendered as text.
+
+**It is built from shadcn/ui** (2.72.0): Button, Textarea, Tooltip, Badge,
+ScrollArea, Separator and Collapsible, vendored once in
+`kehikot-module-protocol/client/ui` from shadcn's standard new-york sources on
+their Radix primitives — the same class names and CSS variables a module's own
+`components/ui` uses, so a proposal looks like the rest of the module in both
+themes. Two things a module does for that:
+
+1. its Tailwind reads this package's client as a source, in `src/index.css`:
+
+   ```css
+   @import 'tailwindcss';
+   @source "../node_modules/kehikot-module-protocol/dist/client";
+   ```
+
+2. the components' peer dependencies are in its `package.json` (a shadcn module
+   has most already): `@radix-ui/react-slot`, `@radix-ui/react-tooltip`,
+   `@radix-ui/react-scroll-area`, `@radix-ui/react-separator`,
+   `@radix-ui/react-collapsible`, `class-variance-authority`, `clsx`,
+   `tailwind-merge`, `lucide-react`.
+
+A module may import the same components for its own page
+(`import { Button } from 'kehikot-module-protocol/client/ui'`) instead of
+keeping a copy; they are shadcn's sources, unchanged but for the import of `cn`.
 
 ### 5. The release
 
