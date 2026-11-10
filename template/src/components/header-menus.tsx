@@ -1,7 +1,7 @@
 import { ChevronDown, LoaderCircle, TriangleAlert } from 'lucide-react'
 import { useState } from 'react'
 
-import { HEADER_MENUS, HEADER_MENU_NAMES, type HeaderItem, type HeaderMenu, type PressValue } from 'kehikot-module-protocol'
+import { HEADER_MENUS, HEADER_MENU_NAMES, optionSections, type HeaderItem, type HeaderMenu, type PressValue } from 'kehikot-module-protocol'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -121,19 +121,29 @@ function Rows({
     )
   }
 
-  /* A switch and a go item are both a list of options under the item's own label; only a switch has one checked. */
+  /* A switch and a go item are both a list of options under the item's own label; only a switch has one checked.
+     2.68.0: options under their group's heading (`optionSections`), each with its detail as a second line. */
   return (
     <>
       <DropdownMenuLabel>{item.label}</DropdownMenuLabel>
-      {item.options.map((option) => (
-        <DropdownMenuItem
-          key={option.id}
-          {...(item.kind === 'switch' ? { role: 'menuitemradio', 'aria-checked': option.id === item.value } : {})}
-          onSelect={() => onPress({ item: item.id, value: option.id })}
-        >
-          {item.kind === 'switch' ? <DropdownMenuCheck checked={option.id === item.value} /> : null}
-          <span className="flex-1">{option.label}</span>
-        </DropdownMenuItem>
+      {optionSections(item.options).map((section, at) => (
+        <div key={`${at}:${section.group ?? ''}`}>
+          {at > 0 ? <DropdownMenuSeparator /> : null}
+          {section.group ? <DropdownMenuLabel className="text-muted-foreground text-[10px] font-normal">{section.group}</DropdownMenuLabel> : null}
+          {section.options.map((option) => (
+            <DropdownMenuItem
+              key={option.id}
+              {...(item.kind === 'switch' ? { role: 'menuitemradio', 'aria-checked': option.id === item.value } : {})}
+              onSelect={() => onPress({ item: item.id, value: option.id })}
+            >
+              {item.kind === 'switch' ? <DropdownMenuCheck checked={option.id === item.value} /> : null}
+              <span className="flex min-w-0 flex-1 flex-col">
+                <span className="truncate">{option.label}</span>
+                {option.detail ? <span className="text-muted-foreground truncate text-[10px]">{option.detail}</span> : null}
+              </span>
+            </DropdownMenuItem>
+          ))}
+        </div>
       ))}
     </>
   )

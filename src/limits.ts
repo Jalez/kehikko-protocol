@@ -270,6 +270,10 @@ export const LIMITS = {
   HEADER_SHORTCUT: 16,
   /** The heading items are gathered under inside their menu. */
   HEADER_GROUP: 24,
+  /** 2.68.0. The heading an option is drawn under inside its switch or go item (`This kehikko’s conversation`). */
+  HEADER_OPTION_GROUP: 32,
+  /** 2.68.0. An option's second line (`needs you · 5 min ago`). A host truncates anyway, with the full text in a `title`. */
+  HEADER_OPTION_DETAIL: 64,
   /** What a run last came to, in a word or three: `1.2 s`, `failed`, `p. 3/12`. */
   HEADER_RESULT: 32,
   /** 2.40.0. The plain text a run asks the host to put on the clipboard (`copy.plain`): a few hundred references with their links. */

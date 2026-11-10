@@ -203,12 +203,18 @@ export declare const headerSchema: z.ZodObject<{
         options: z.ZodArray<z.ZodObject<{
             id: z.ZodEffects<z.ZodString, string, string>;
             label: z.ZodString;
+            group: z.ZodOptional<z.ZodString>;
+            detail: z.ZodOptional<z.ZodString>;
         }, "strip", z.ZodTypeAny, {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }, {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }>, "many">;
         value: z.ZodEffects<z.ZodString, string, string>;
         id: z.ZodEffects<z.ZodString, string, string>;
@@ -224,6 +230,8 @@ export declare const headerSchema: z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "switch";
@@ -238,6 +246,8 @@ export declare const headerSchema: z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "switch";
@@ -281,12 +291,18 @@ export declare const headerSchema: z.ZodObject<{
         options: z.ZodArray<z.ZodObject<{
             id: z.ZodEffects<z.ZodString, string, string>;
             label: z.ZodString;
+            group: z.ZodOptional<z.ZodString>;
+            detail: z.ZodOptional<z.ZodString>;
         }, "strip", z.ZodTypeAny, {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }, {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }>, "many">;
         id: z.ZodEffects<z.ZodString, string, string>;
         label: z.ZodString;
@@ -300,6 +316,8 @@ export declare const headerSchema: z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "go";
@@ -313,6 +331,8 @@ export declare const headerSchema: z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "go";
@@ -393,6 +413,8 @@ export declare const headerSchema: z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "switch";
@@ -416,6 +438,8 @@ export declare const headerSchema: z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "go";
@@ -450,6 +474,8 @@ export declare const headerSchema: z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "switch";
@@ -473,6 +499,8 @@ export declare const headerSchema: z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "go";
@@ -507,6 +535,8 @@ export declare const headerSchema: z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "switch";
@@ -530,6 +560,8 @@ export declare const headerSchema: z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "go";
@@ -564,6 +596,8 @@ export declare const headerSchema: z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "switch";
@@ -587,6 +621,8 @@ export declare const headerSchema: z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "go";
@@ -624,6 +660,8 @@ export declare const headerSchema: z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "switch";
@@ -647,6 +685,8 @@ export declare const headerSchema: z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "go";
@@ -684,6 +724,8 @@ export declare const headerSchema: z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "switch";
@@ -707,6 +749,8 @@ export declare const headerSchema: z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "go";
@@ -804,12 +848,18 @@ export declare const footerSchema: z.ZodObject<{
         options: z.ZodArray<z.ZodObject<{
             id: z.ZodEffects<z.ZodString, string, string>;
             label: z.ZodString;
+            group: z.ZodOptional<z.ZodString>;
+            detail: z.ZodOptional<z.ZodString>;
         }, "strip", z.ZodTypeAny, {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }, {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }>, "many">;
         value: z.ZodEffects<z.ZodString, string, string>;
         id: z.ZodEffects<z.ZodString, string, string>;
@@ -831,6 +881,8 @@ export declare const footerSchema: z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "switch";
@@ -849,6 +901,8 @@ export declare const footerSchema: z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "switch";
@@ -910,12 +964,18 @@ export declare const footerSchema: z.ZodObject<{
         options: z.ZodArray<z.ZodObject<{
             id: z.ZodEffects<z.ZodString, string, string>;
             label: z.ZodString;
+            group: z.ZodOptional<z.ZodString>;
+            detail: z.ZodOptional<z.ZodString>;
         }, "strip", z.ZodTypeAny, {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }, {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }>, "many">;
         id: z.ZodEffects<z.ZodString, string, string>;
         label: z.ZodString;
@@ -935,6 +995,8 @@ export declare const footerSchema: z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "go";
@@ -952,6 +1014,8 @@ export declare const footerSchema: z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "go";
@@ -1097,6 +1161,8 @@ export declare const footerSchema: z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "switch";
@@ -1128,6 +1194,8 @@ export declare const footerSchema: z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "go";
@@ -1197,6 +1265,8 @@ export declare const footerSchema: z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "switch";
@@ -1228,6 +1298,8 @@ export declare const footerSchema: z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "go";
@@ -1297,6 +1369,8 @@ export declare const footerSchema: z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "switch";
@@ -1328,6 +1402,8 @@ export declare const footerSchema: z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "go";
@@ -1397,6 +1473,8 @@ export declare const footerSchema: z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "switch";
@@ -1428,6 +1506,8 @@ export declare const footerSchema: z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "go";
@@ -1500,6 +1580,8 @@ export declare const footerSchema: z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "switch";
@@ -1531,6 +1613,8 @@ export declare const footerSchema: z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "go";
@@ -1603,6 +1687,8 @@ export declare const footerSchema: z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "switch";
@@ -1634,6 +1720,8 @@ export declare const footerSchema: z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "go";
@@ -5835,12 +5923,18 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         options: z.ZodArray<z.ZodObject<{
             id: z.ZodEffects<z.ZodString, string, string>;
             label: z.ZodString;
+            group: z.ZodOptional<z.ZodString>;
+            detail: z.ZodOptional<z.ZodString>;
         }, "strip", z.ZodTypeAny, {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }, {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }>, "many">;
         value: z.ZodEffects<z.ZodString, string, string>;
         id: z.ZodEffects<z.ZodString, string, string>;
@@ -5856,6 +5950,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "switch";
@@ -5870,6 +5966,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "switch";
@@ -5913,12 +6011,18 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         options: z.ZodArray<z.ZodObject<{
             id: z.ZodEffects<z.ZodString, string, string>;
             label: z.ZodString;
+            group: z.ZodOptional<z.ZodString>;
+            detail: z.ZodOptional<z.ZodString>;
         }, "strip", z.ZodTypeAny, {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }, {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }>, "many">;
         id: z.ZodEffects<z.ZodString, string, string>;
         label: z.ZodString;
@@ -5932,6 +6036,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "go";
@@ -5945,6 +6051,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "go";
@@ -6025,6 +6133,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "switch";
@@ -6048,6 +6158,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "go";
@@ -6082,6 +6194,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "switch";
@@ -6105,6 +6219,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "go";
@@ -6139,6 +6255,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "switch";
@@ -6162,6 +6280,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "go";
@@ -6196,6 +6316,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "switch";
@@ -6219,6 +6341,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "go";
@@ -6256,6 +6380,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "switch";
@@ -6279,6 +6405,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "go";
@@ -6316,6 +6444,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "switch";
@@ -6339,6 +6469,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "go";
@@ -6444,12 +6576,18 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         options: z.ZodArray<z.ZodObject<{
             id: z.ZodEffects<z.ZodString, string, string>;
             label: z.ZodString;
+            group: z.ZodOptional<z.ZodString>;
+            detail: z.ZodOptional<z.ZodString>;
         }, "strip", z.ZodTypeAny, {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }, {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }>, "many">;
         value: z.ZodEffects<z.ZodString, string, string>;
         id: z.ZodEffects<z.ZodString, string, string>;
@@ -6471,6 +6609,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "switch";
@@ -6489,6 +6629,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "switch";
@@ -6550,12 +6692,18 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         options: z.ZodArray<z.ZodObject<{
             id: z.ZodEffects<z.ZodString, string, string>;
             label: z.ZodString;
+            group: z.ZodOptional<z.ZodString>;
+            detail: z.ZodOptional<z.ZodString>;
         }, "strip", z.ZodTypeAny, {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }, {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }>, "many">;
         id: z.ZodEffects<z.ZodString, string, string>;
         label: z.ZodString;
@@ -6575,6 +6723,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "go";
@@ -6592,6 +6742,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "go";
@@ -6737,6 +6889,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "switch";
@@ -6768,6 +6922,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "go";
@@ -6837,6 +6993,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "switch";
@@ -6868,6 +7026,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "go";
@@ -6937,6 +7097,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "switch";
@@ -6968,6 +7130,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "go";
@@ -7037,6 +7201,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "switch";
@@ -7068,6 +7234,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "go";
@@ -7140,6 +7308,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "switch";
@@ -7171,6 +7341,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "go";
@@ -7243,6 +7415,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "switch";
@@ -7274,6 +7448,8 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "go";

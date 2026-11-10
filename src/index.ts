@@ -281,6 +281,7 @@ export {
   HEADER_ICONS,
   type HeaderIcon,
   pinnedRuns,
+  optionSections,
   headerItemSchema,
   headerItemsSchema,
   headerOptionSchema,

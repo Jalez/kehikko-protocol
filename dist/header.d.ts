@@ -3,16 +3,30 @@ import { z } from 'zod';
 export declare const headerIdSchema: z.ZodEffects<z.ZodString, string, string>;
 /** The words on an item or an option. Shared with the footer (2.38.0). */
 export declare const headerLabelSchema: z.ZodString;
-/** One thing a switch can be on, or a go item can jump to: an id and the words for it. */
+/**
+ * One thing a switch can be on, or a go item can jump to: an id and the words for it.
+ *
+ * 2.68.0: optionally a `group`, the heading the option is drawn under inside its item (options are
+ * drawn in the order given, and a heading starts wherever the group differs from the option before
+ * it), and a `detail`, a second, quieter line under the label (`needs you · 5 min ago`). Both are
+ * text, never markup. A host before 2.68.0 strips both and draws the label alone, so the label
+ * says what the option is by itself.
+ */
 export declare const headerOptionSchema: z.ZodObject<{
     id: z.ZodEffects<z.ZodString, string, string>;
     label: z.ZodString;
+    group: z.ZodOptional<z.ZodString>;
+    detail: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     id: string;
     label: string;
+    detail?: string | undefined;
+    group?: string | undefined;
 }, {
     id: string;
     label: string;
+    detail?: string | undefined;
+    group?: string | undefined;
 }>;
 export type HeaderOption = z.infer<typeof headerOptionSchema>;
 /** The four kinds of item. The kind decides which menu an item is drawn in; see `HEADER_MENUS`. */
@@ -64,12 +78,18 @@ export declare const HEADER_ITEM_SHAPES: {
         options: z.ZodArray<z.ZodObject<{
             id: z.ZodEffects<z.ZodString, string, string>;
             label: z.ZodString;
+            group: z.ZodOptional<z.ZodString>;
+            detail: z.ZodOptional<z.ZodString>;
         }, "strip", z.ZodTypeAny, {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }, {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }>, "many">;
         /** Which option the module is on now. One of `options`. */
         value: z.ZodEffects<z.ZodString, string, string>;
@@ -98,6 +118,8 @@ export declare const HEADER_ITEM_SHAPES: {
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "switch";
@@ -112,6 +134,8 @@ export declare const HEADER_ITEM_SHAPES: {
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "switch";
@@ -169,12 +193,18 @@ export declare const HEADER_ITEM_SHAPES: {
         options: z.ZodArray<z.ZodObject<{
             id: z.ZodEffects<z.ZodString, string, string>;
             label: z.ZodString;
+            group: z.ZodOptional<z.ZodString>;
+            detail: z.ZodOptional<z.ZodString>;
         }, "strip", z.ZodTypeAny, {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }, {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }>, "many">;
         id: z.ZodEffects<z.ZodString, string, string>;
         label: z.ZodString;
@@ -200,6 +230,8 @@ export declare const HEADER_ITEM_SHAPES: {
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "go";
@@ -213,6 +245,8 @@ export declare const HEADER_ITEM_SHAPES: {
         options: {
             id: string;
             label: string;
+            detail?: string | undefined;
+            group?: string | undefined;
         }[];
         id: string;
         kind: "go";
@@ -349,12 +383,18 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     options: z.ZodArray<z.ZodObject<{
         id: z.ZodEffects<z.ZodString, string, string>;
         label: z.ZodString;
+        group: z.ZodOptional<z.ZodString>;
+        detail: z.ZodOptional<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }, {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }>, "many">;
     /** Which option the module is on now. One of `options`. */
     value: z.ZodEffects<z.ZodString, string, string>;
@@ -383,6 +423,8 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     options: {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }[];
     id: string;
     kind: "switch";
@@ -397,6 +439,8 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     options: {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }[];
     id: string;
     kind: "switch";
@@ -452,12 +496,18 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     options: z.ZodArray<z.ZodObject<{
         id: z.ZodEffects<z.ZodString, string, string>;
         label: z.ZodString;
+        group: z.ZodOptional<z.ZodString>;
+        detail: z.ZodOptional<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }, {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }>, "many">;
     id: z.ZodEffects<z.ZodString, string, string>;
     label: z.ZodString;
@@ -483,6 +533,8 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     options: {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }[];
     id: string;
     kind: "go";
@@ -496,6 +548,8 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     options: {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }[];
     id: string;
     kind: "go";
@@ -607,6 +661,8 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     options: {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }[];
     id: string;
     kind: "switch";
@@ -630,6 +686,8 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     options: {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }[];
     id: string;
     kind: "go";
@@ -664,6 +722,8 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     options: {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }[];
     id: string;
     kind: "switch";
@@ -687,6 +747,8 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     options: {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }[];
     id: string;
     kind: "go";
@@ -725,12 +787,18 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     options: z.ZodArray<z.ZodObject<{
         id: z.ZodEffects<z.ZodString, string, string>;
         label: z.ZodString;
+        group: z.ZodOptional<z.ZodString>;
+        detail: z.ZodOptional<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }, {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }>, "many">;
     /** Which option the module is on now. One of `options`. */
     value: z.ZodEffects<z.ZodString, string, string>;
@@ -759,6 +827,8 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     options: {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }[];
     id: string;
     kind: "switch";
@@ -773,6 +843,8 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     options: {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }[];
     id: string;
     kind: "switch";
@@ -828,12 +900,18 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     options: z.ZodArray<z.ZodObject<{
         id: z.ZodEffects<z.ZodString, string, string>;
         label: z.ZodString;
+        group: z.ZodOptional<z.ZodString>;
+        detail: z.ZodOptional<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }, {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }>, "many">;
     id: z.ZodEffects<z.ZodString, string, string>;
     label: z.ZodString;
@@ -859,6 +937,8 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     options: {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }[];
     id: string;
     kind: "go";
@@ -872,6 +952,8 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     options: {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }[];
     id: string;
     kind: "go";
@@ -983,6 +1065,8 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     options: {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }[];
     id: string;
     kind: "switch";
@@ -1006,6 +1090,8 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     options: {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }[];
     id: string;
     kind: "go";
@@ -1040,6 +1126,8 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     options: {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }[];
     id: string;
     kind: "switch";
@@ -1063,6 +1151,8 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     options: {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }[];
     id: string;
     kind: "go";
@@ -1097,6 +1187,8 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     options: {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }[];
     id: string;
     kind: "switch";
@@ -1120,6 +1212,8 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     options: {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }[];
     id: string;
     kind: "go";
@@ -1154,6 +1248,8 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     options: {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }[];
     id: string;
     kind: "switch";
@@ -1177,6 +1273,8 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     options: {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }[];
     id: string;
     kind: "go";
@@ -1212,6 +1310,18 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
  * the first `LIMITS.PINNED_MAX` of them. The others stay in the Run menu only.
  */
 export declare function pinnedRuns(items: readonly HeaderItem[]): HeaderItem[];
+/**
+ * 2.68.0. A switch's or go item's options as a host draws them: runs of neighbouring options that
+ * name the same `group` (or none), in the order given, each run under its heading. An option without
+ * a group after a grouped one starts a run with no heading, which a host sets apart with a rule. A
+ * group named twice, apart, is two runs: the module's order wins over gathering.
+ */
+export declare function optionSections<O extends {
+    group?: string;
+}>(options: readonly O[]): {
+    group: string | null;
+    options: O[];
+}[];
 /**
  * Which menu each kind is drawn in. Fixed, so a module cannot scatter its items: switches and
  * toggles are View, jumps are Go, runs are Run. `frame` is the host's own menu and holds no item.

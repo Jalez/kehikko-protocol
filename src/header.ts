@@ -24,8 +24,21 @@ const headerId = headerIdSchema
 export const headerLabelSchema = z.string().min(1).max(LIMITS.HEADER_LABEL)
 const headerLabel = headerLabelSchema
 
-/** One thing a switch can be on, or a go item can jump to: an id and the words for it. */
-export const headerOptionSchema = z.object({ id: headerId, label: headerLabel })
+/**
+ * One thing a switch can be on, or a go item can jump to: an id and the words for it.
+ *
+ * 2.68.0: optionally a `group`, the heading the option is drawn under inside its item (options are
+ * drawn in the order given, and a heading starts wherever the group differs from the option before
+ * it), and a `detail`, a second, quieter line under the label (`needs you · 5 min ago`). Both are
+ * text, never markup. A host before 2.68.0 strips both and draws the label alone, so the label
+ * says what the option is by itself.
+ */
+export const headerOptionSchema = z.object({
+  id: headerId,
+  label: headerLabel,
+  group: z.string().min(1).max(LIMITS.HEADER_OPTION_GROUP).optional(),
+  detail: z.string().min(1).max(LIMITS.HEADER_OPTION_DETAIL).optional(),
+})
 export type HeaderOption = z.infer<typeof headerOptionSchema>
 
 const options = z.array(headerOptionSchema).min(1).max(LIMITS.HEADER_OPTIONS)
@@ -241,6 +254,23 @@ export const headerItemsSchema = z
  */
 export function pinnedRuns(items: readonly HeaderItem[]): HeaderItem[] {
   return items.filter((item) => item.kind === 'run' && item.pinned === true).slice(0, LIMITS.PINNED_MAX)
+}
+
+/**
+ * 2.68.0. A switch's or go item's options as a host draws them: runs of neighbouring options that
+ * name the same `group` (or none), in the order given, each run under its heading. An option without
+ * a group after a grouped one starts a run with no heading, which a host sets apart with a rule. A
+ * group named twice, apart, is two runs: the module's order wins over gathering.
+ */
+export function optionSections<O extends { group?: string }>(options: readonly O[]): { group: string | null; options: O[] }[] {
+  const sections: { group: string | null; options: O[] }[] = []
+  for (const option of options) {
+    const group = option.group ?? null
+    const last = sections[sections.length - 1]
+    if (last && last.group === group) last.options.push(option)
+    else sections.push({ group, options: [option] })
+  }
+  return sections
 }
 
 /**
