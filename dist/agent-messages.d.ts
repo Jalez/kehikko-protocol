@@ -1651,12 +1651,41 @@ export declare const NOTES_MESSAGES_MOST = 8;
  * wait. `''` when there are none.
  */
 export declare function messagesNotes(messages: readonly AgentMessage[] | null | undefined, more?: number, act?: boolean): string;
-/** The line at a session's start that it can message and be messaged, on the door of the module that runs it, and its own address. */
+/**
+ * The line at a session's start that it can message and be messaged, on the door of the module that runs it, and its own address.
+ *
+ * 2.66.0. `listed` false: the session's door of that module carries no place token (it was connected
+ * from the person's own agent configuration, not the doors its module handed it), so it lists no
+ * `send_message` or `read_messages`. The line then says so, and how to get them, instead of promising
+ * tools the session cannot find — and gives no address, since it could never read what was sent there.
+ */
 export declare function messagingLine(self: {
     name: string;
     door: string;
     module: string;
-}, session: string | null, act?: boolean): string;
+}, session: string | null, act?: boolean, listed?: boolean): string;
+/** A door this module handed a session: its name in the session's config, and its URL and module when known. */
+export type HandedDoor = string | {
+    name: string;
+    url?: string;
+    module?: string;
+};
+/**
+ * 2.66.0. Whether a session's door of this module carries its place token, and so lists the message
+ * tools (`messageToolsFor`): one of the doors the module handed the session at its start is its own —
+ * by module, or by the door's name — and its URL, when known, has `kehikot-place`. `doors` null: the
+ * session was started with no doors of the module's handing (no host answered, or the program could
+ * not take them), so it connects with the person's own entry, which carries no token.
+ */
+export declare function doorCarriesPlace(doors: readonly HandedDoor[] | null | undefined, self: {
+    module: string;
+    door: string;
+}): boolean;
+/** 2.66.0. What a session whose door lists no message tools is told about messaging (`messagingLine` with `listed` false). */
+export declare function messagingUnlistedLine(self: {
+    name: string;
+    door: string;
+}): string;
 /** The tools' names, the same on every agent module's door. */
 export declare const MESSAGE_TOOL_NAMES: readonly ["send_message", "read_messages"];
 export type MessageToolName = (typeof MESSAGE_TOOL_NAMES)[number];

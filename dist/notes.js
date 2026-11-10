@@ -274,7 +274,7 @@ export function startNotes(input, moved = false) {
         finishLine(input.self),
     ];
     if (input.messaging)
-        lines.push(messagingLine(input.self, input.messaging.session, Boolean(input.actOnMessages)));
+        lines.push(messagingLine(input.self, input.messaging.session, Boolean(input.actOnMessages), input.messaging.listed !== false));
     if (!place.kehikko)
         return lines.join('\n');
     const modules = others(input.modules, input.self);

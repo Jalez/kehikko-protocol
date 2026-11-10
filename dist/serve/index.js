@@ -41,7 +41,7 @@ export { SETTINGS_PATH, SETTINGS_PASS_PATH } from '../settings.js';
 export { askHost, hostAskUrls, mintServerPass, serverPassReply, spendServerPass, NO_HOST_TO_ASK, } from './ask.js';
 export { SERVER_ASK_PATH, SERVER_PASS_PATH, SERVER_METHODS } from '../server-ask.js';
 /* The message tools every module that runs agent sessions puts on its MCP door (2.41.0): a thin adapter over `askHost`. */
-export { answerMessageTool, forgetMessageHosts, hostKeepsMessages, messageToolsFor, messageWaker, messageDelivery, DELIVERY_KEEP_MS, ASLEEP_EVERY_MS, WAKE_EVERY_MS, WAKE_SETTLE_MS, } from './messages.js';
+export { answerMessageTool, forgetMessageHosts, hostKeepsMessages, hostOnMessages, messageToolsFor, messageWaker, messageDelivery, DELIVERY_KEEP_MS, ASLEEP_EVERY_MS, WAKE_EVERY_MS, WAKE_SETTLE_MS, } from './messages.js';
 export { messageTools, isMessageTool, MESSAGE_TOOL_NAMES, ACT_ON_MESSAGES_SETTING, WAKE_ON_MESSAGES_SETTING, actsOnMessages, wakesOnMessages, typedMessages, pasted, deliveryFor, DELIVERY_STATES, RESUME_EVERY_MS, RESUME_MOST, } from '../agent-messages.js';
 /* A question the host is too old for (2.22.0): read it off an `AskedHost`, show the one line. */
 export { hostTooOld, FIT_SAYS } from '../fit.js';
