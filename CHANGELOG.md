@@ -7,6 +7,21 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.67.0 — 2026-11-10
+
+What a reviewer did and what the latest activity was. **Additive**; `PROTOCOL` is still 2.
+[docs/tracker.md](docs/tracker.md), "What a reviewer did, and what the latest activity was (2.67.0)".
+
+### Added
+
+- **`TrackerReviewer.reviewedAt`, `activeAt`, `openThreads`**: when their latest review was
+  submitted, the latest thing of theirs the host read (a comment counts: a reviewer still
+  `requested` who commented has started), and the unresolved threads they started.
+- **`TrackerActivity.commits`, `path`, `line`, `verdict`**: how many commits a push added, the file
+  and line a diff comment is on, and what a review said.
+
+Each is optional and `.catch(undefined)`: a module built before them reads a newer host's rows whole.
+
 ## 2.66.0 — 2026-11-10
 
 A session's notes and its door agree about messaging. **Additive**; `PROTOCOL` is still 2.

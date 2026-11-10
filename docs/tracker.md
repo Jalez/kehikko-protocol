@@ -132,6 +132,21 @@ is, and a module that wants to say "somebody else had the last word" says
 nothing then. When the latest activity cannot be put to a login the field is
 absent; the host never falls back to an earlier one.
 
+### What a reviewer did, and what the latest activity was (2.67.0)
+
+A reviewer may carry `reviewedAt` (when their latest review was submitted),
+`activeAt` (the latest thing of theirs the host read: a comment, a thread note,
+a review or an approval) and `openThreads` (the unresolved review threads they
+started, only when every thread was read). A reviewer still `requested` with an
+`activeAt` has started: they commented without submitting a review. A
+`reviewedAt` older than the change's `lastPushAt` is a review of an older head.
+
+`lastActivity` may say more about what it was: `commits` on a `commit` (how many
+the push added), `path` and `line` on a `comment` on a change's diff, and
+`verdict` on a `review` (`approved`, `changes`, `commented`). Each is optional
+and dropped, not fatal, when it does not parse; a host that says none of them is
+an older host, not a contradiction.
+
 ### People and their pictures (2.10.0)
 
 A row names people by login in four places: `reviewers[].login`,

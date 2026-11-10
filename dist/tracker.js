@@ -111,6 +111,24 @@ export const trackerReviewerSchema = z.object({
     login: person,
     name: person.optional(),
     state: z.enum(REVIEWER_STATES),
+    /**
+     * When their latest review was submitted: the approval, the changes requested or the review that
+     * made `state` (2.67.0). Absent for `requested` with no review, and where the tracker did not say.
+     * Dropped, not fatal, when it does not parse.
+     */
+    reviewedAt: instant.optional().catch(undefined),
+    /**
+     * The latest thing they did on the item among what the host read (2.67.0): a comment, a note in a
+     * thread, a review or an approval. A reviewer still `requested` who has commented has started.
+     * Absent when the host read nothing of theirs, which is not "has done nothing": a host reads a
+     * bounded number of the newest notes. Dropped, not fatal, when it does not parse.
+     */
+    activeAt: instant.optional().catch(undefined),
+    /**
+     * The unresolved review threads they started (2.67.0). Only when the host read every thread on the
+     * change; absent otherwise. Dropped, not fatal, when it does not parse.
+     */
+    openThreads: z.number().int().min(0).optional().catch(undefined),
 });
 /** A change's review discussions: those that can be resolved, counted by whether they are. (2.7.0) */
 export const trackerDiscussionsSchema = z.object({
@@ -138,6 +156,23 @@ export const trackerActivitySchema = z.object({
      * host does not know who the person is there: a module then cannot tell, and does not guess.
      */
     mine: z.boolean().optional(),
+    /**
+     * On `commit`: how many commits that push added, when the tracker said (2.67.0). Dropped, not
+     * fatal, when it does not parse.
+     */
+    commits: z.number().int().min(1).optional().catch(undefined),
+    /**
+     * On `comment`: the file a comment on a change's diff is on, as the change spells it (2.67.0).
+     * Absent for a comment on the item as a whole. Dropped, not fatal, when it does not parse.
+     */
+    path: z.string().min(1).max(LIMITS.PATH).optional().catch(undefined),
+    /** On `comment` with a `path`: the line of the new file it is on, else of the old (2.67.0). */
+    line: z.number().int().min(1).optional().catch(undefined),
+    /**
+     * On `review`: what the review said (2.67.0) — `approved`, `changes` requested, or `commented`.
+     * The same words as a reviewer's `state`. Dropped, not fatal, when it does not parse.
+     */
+    verdict: z.enum(['approved', 'changes', 'commented']).optional().catch(undefined),
 });
 const branch = z.string().min(1).max(LIMITS.BRANCH);
 /**
