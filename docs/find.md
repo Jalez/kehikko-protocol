@@ -84,6 +84,25 @@ reaches `onFind`, which may hand the query to the editor's search.
 `findIn: false` turns the client's own search off: a page with no `onFind` then answers
 `unsupported`.
 
+### Adapters
+
+A page whose text is in the DOM but not all of it at once needs only the wait, and that is shared,
+under `kehikot-module-protocol/client/find` (`src/client/find-adapters.ts`), structural only:
+
+- **`pdfTextLayerFind`**: a PDF viewer that lays pdf.js's text layer only on the sheets near the view.
+  While the bar is open `open()` is true, so the sheet lays its layer whatever its distance
+  (`useSyncExternalStore(pdfFind.subscribe, pdfFind.open)`); `onFind` waits until every sheet has its
+  layer, or `PDF_LAID_OUT_WITHIN_MS`, and answers `'default'`, so `pageFind` searches the whole PDF.
+
+```ts
+import { pdfTextLayerFind } from 'kehikot-module-protocol/client/find'
+const pdfFind = pdfTextLayerFind()
+useHost({ onFind: pdfFind.onFind })
+```
+
+An editor with its own find (CodeMirror) keeps it: mark it `data-kehikot-find-skip` and its key
+handler takes ⌘F first (see "Keeping ⌘F").
+
 ### Older on either side
 
 A host before 2.69.0 greets with no `find`: the client hears no keys (a browser's own find may answer
