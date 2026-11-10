@@ -343,6 +343,7 @@ and a module that declares none gets none of the methods below.
 | `messages.mine` | `agents:message` |
 | `messages.post` | `agents:message` |
 | `messages.notify` | `agents:message` |
+| `messages.tell` | `agents:message` |
 | `messages.say` | `messages:as-person` |
 
 The host's table is the protocol's `METHODS`, read by its `capabilityOf`

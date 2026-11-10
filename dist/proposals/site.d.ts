@@ -22,7 +22,11 @@ export interface ProposalSite {
         ok: false;
         why: string;
     };
-    /** A proposal was answered or withdrawn: tell the filer where there is a way to (`decisionNews`), and the page. */
+    /**
+     * A proposal was answered or withdrawn: tell the filer where there is a way to, and the page. 2.75.0:
+     * hand it to a `proposalDigester` (`./digest.ts`) to tell the filer once, when the person has answered
+     * all of its proposals at that text (`digestNews`); `decisionNews` is the line for one decision.
+     */
     onSettled?(project: string, proposal: Proposal): void;
     /** The book changed: a page that subscribes is told. `file` names the text concerned where one call concerned one. */
     onChanged?(project: string, file?: string): void;

@@ -42,6 +42,7 @@ export declare const METHOD_SINCE: {
     readonly 'messages.mine': "2.50.0";
     readonly 'messages.post': "2.50.0";
     readonly 'messages.notify': "2.54.0";
+    readonly 'messages.tell': "2.75.0";
     readonly 'messages.say': "2.50.0";
 };
 /** Each capability, and the version that added it: the oldest of its methods. */
@@ -89,6 +90,7 @@ export declare const SERVER_METHOD_SINCE: {
     readonly 'messages.send': "2.41.0";
     readonly 'messages.read': "2.41.0";
     readonly 'messages.notify': "2.54.0";
+    readonly 'messages.tell': "2.75.0";
 };
 /**
  * The manifest declarations a host has to know to do what the module asks, and the version that
@@ -246,6 +248,7 @@ export declare const SINCE: {
         readonly 'messages.mine': "2.50.0";
         readonly 'messages.post': "2.50.0";
         readonly 'messages.notify': "2.54.0";
+        readonly 'messages.tell': "2.75.0";
         readonly 'messages.say': "2.50.0";
     };
     readonly capabilities: {
@@ -291,6 +294,7 @@ export declare const SINCE: {
         readonly 'messages.send': "2.41.0";
         readonly 'messages.read': "2.41.0";
         readonly 'messages.notify': "2.54.0";
+        readonly 'messages.tell': "2.75.0";
     };
     readonly declarations: {
         readonly 'mcp.subjects': "1.1.0";

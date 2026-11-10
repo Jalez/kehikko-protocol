@@ -198,6 +198,37 @@ can reach the filer's session (an agent module's messages, its activity), it
 sends `decisionNews(proposal)` from `onSettled`. The library sends nothing
 itself: it has no wire.
 
+### The follow-up digest (2.75.0)
+
+One message per decision interrupts an agent five times while the person
+reviews five proposals. `proposalDigester` tells the filer ONCE, when the
+person has finished: when the last open proposal from one filer (its session,
+else its kind and name: `filerKey`) at one text is settled and nothing more is
+decided for `DIGEST_QUIET_MS` (30 s), it sends one `digestNews`:
+
+```
+Your 5 proposed changes to main.tex were answered: 3 accepted (1 with edits), 2 declined: "Too long."; "Off topic.". list_proposals shows each one.
+```
+
+A decision in the quiet while starts it again; a proposal the filer files
+meanwhile holds the digest until that one is answered too. Withdrawals are the
+filer's own act and are not reported back; the person's own proposals never.
+Per-decision lines (`decisionNews`) only with `each: true`.
+
+```ts
+import { openProposals, proposalDigester } from 'kehikot-module-protocol/proposals'
+import { askHost } from 'kehikot-module-protocol/serve'
+
+const digester = proposalDigester({
+  open: (project, file) => openProposals(site, project, file),
+  send: async ({ by, text }) => {
+    const token = tokenOfSession(by.session) // the place token the filer's request came with
+    if (token) await askHost('messages.notify', { token, body: text, kind: 'report' }, { module: ID })
+  },
+})
+const site: ProposalSite = { /* … */ onSettled: (project, proposal) => digester.settled(project, proposal) }
+```
+
 ## The header and footer rule
 
 The count is a readout about the text on screen, so it is a footer `text`

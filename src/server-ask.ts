@@ -47,6 +47,8 @@ export const SERVER_METHODS = [
   'messages.read',
   /* 2.54.0: a module's own notice to the session whose token asked it for something. The project is the token's. */
   'messages.notify',
+  /* 2.75.0: a module's own news to every session at a place. No token, so it names its project. */
+  'messages.tell',
 ] as const
 export type ServerMethod = (typeof SERVER_METHODS)[number]
 
@@ -64,6 +66,7 @@ export const SERVER_PROJECT_METHODS: readonly ServerMethod[] = [
   'steps.list',
   'parts.get',
   'dispositions.get',
+  'messages.tell',
 ]
 
 /** Whether a question with this method has to name its project. */

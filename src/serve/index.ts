@@ -175,6 +175,11 @@ export {
   type DeliverySession,
   type MessageDelivery,
   type MessageDeliveryOptions,
+  placeTeller,
+  tellDigest,
+  TELL_EVERY_MS,
+  type PlaceTeller,
+  type PlaceTellerOptions,
 } from './messages.js'
 export {
   messageTools,
@@ -185,6 +190,9 @@ export {
   actsOnMessages,
   wakesOnMessages,
   typedMessages,
+  markersNote,
+  shortPath,
+  type TypedOptions,
   pasted,
   deliveryFor,
   DELIVERY_STATES,
@@ -224,7 +232,7 @@ export {
 } from './events.js'
 
 /* The environment for what a module starts on the person's behalf, without the host's own Bun. */
-export { personEnv, HOST_PATH_ENV, type PersonEnvOptions } from './person.js'
+export { personEnv, utf8Locale, HOST_PATH_ENV, type PersonEnvOptions } from './person.js'
 
 /* A door's tools changed: MCP's `notifications/tools/list_changed` on its listening stream (2.62.0). See `tools-changed.ts`. */
 export {

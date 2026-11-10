@@ -49,6 +49,7 @@ const marks = await askHost('dispositions.get', {}, asking)             // { dis
 | `messages.send` | `agents:message` | `messageSendResult` (2.41.0; names no project — the session token's is used, see [agent messages](agent-messages.md)) |
 | `messages.read` | `agents:message` | `messageReadResult` (2.41.0) |
 | `messages.notify` | `agents:message` | `messageSendResult` (2.54.0; names no project — the token's, any issuer's; sent to that session only) |
+| `messages.tell` | `agents:message` | `messageSendResult` (2.75.0; names its project; to every session at a place, one a minute per session) |
 
 Each is held to the same capability as on the page, through the same pass and the same grant, and answered from the same code: a server and a page asking the same question at the same moment get the same answer. `parts:read` and `dispositions:read` are new in 2.21.0 because a page is handed that material in its context and never asked for it; a server asks by name, with nobody looking, and says so in `declares.uses`.
 

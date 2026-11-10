@@ -416,6 +416,11 @@ export const LIMITS = {
   NOTICES_PER_MINUTE: 6,
   /** How many notices one module may send to one session in an hour (2.54.0, `messages.notify`). */
   NOTICES_PER_HOUR: 60,
+  /**
+   * How many messages one module may tell one RECEIVING session a minute through `messages.tell`
+   * (2.75.0): more within the minute are merged by the host into one digest at its end.
+   */
+  TELLS_PER_MINUTE: 1,
   /** How many messages the person may send through one module in a minute (2.50.0, `messages.say`). */
   PERSON_MESSAGES_PER_MINUTE: 20,
   /* Traffic (2.20.0). See `traffic.ts`. */

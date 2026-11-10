@@ -44,6 +44,7 @@ export const METHOD_SINCE = {
     'messages.mine': '2.50.0',
     'messages.post': '2.50.0',
     'messages.notify': '2.54.0',
+    'messages.tell': '2.75.0',
     'messages.say': '2.50.0',
 };
 /** Each capability, and the version that added it: the oldest of its methods. */
@@ -91,6 +92,7 @@ export const SERVER_METHOD_SINCE = {
     'messages.send': '2.41.0',
     'messages.read': '2.41.0',
     'messages.notify': '2.54.0',
+    'messages.tell': '2.75.0',
 };
 /**
  * The manifest declarations a host has to know to do what the module asks, and the version that

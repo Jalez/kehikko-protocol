@@ -225,9 +225,10 @@ TYPES THE MESSAGE ITSELF into the session, as a person would type at its termina
 needs no tool call and no subscription to see it.
 
 **What is typed** (`typedMessages`): each message under a frame of host-stamped fields only
-(`typedFrame`), its body as its sender wrote it, oldest first, at most `DELIVER_MOST` (8); then one
-paragraph that says Kehikot typed them in, in their senders' words, not the person's, how to answer,
-and either `ACT_ON_MESSAGES` or `MESSAGES_TYPED_READ_ONLY`, by the person's setting:
+(`typedFrame`), its body as its sender wrote it, oldest first, at most `DELIVER_MOST` (8). Until
+2.74.0 one paragraph followed, saying Kehikot typed them in and either `ACT_ON_MESSAGES` or
+`MESSAGES_TYPED_READ_ONLY`; from 2.75.0 the frame is a compact marker and that paragraph is said once,
+in the notes — see "Compact markers, explained once (2.75.0)" below. Before 2.75.0 it read:
 
 ```
 [Kehikot message from Codex (epic methods on the kehikko writing), #12] I am changing server/auth.ts;
@@ -347,7 +348,8 @@ Because that is authority, the host holds it to all of these, and refuses otherw
 
 A person's message to the whole project is delivered to every session, unlike an agent's
 (`shouldWake`). Typed, it is framed `[Message from your person via Orchestrator, #15, answering #12]`
-(`typedFrame`), and the paragraph after says it is their instruction; in the notes it stands under
+(`typedFrame`; `⟦Your person via Orchestrator · #15 · answering #12⟧` from 2.75.0), and the paragraph
+after says it is their instruction (from 2.75.0, the notes' `markersNote` says it once); in the notes it stands under
 `PERSON_MESSAGES_HEAD`, before any other session's messages. A body line that spells either frame is
 taken apart as before.
 
@@ -414,9 +416,10 @@ person's setting "Messages wake an idle session" is on. Otherwise the session's 
 prompt. No agent module needs a change to deliver one.
 
 **What the session is told** (`typedMessages`): the frame names the module from host-stamped fields
-(`[Kehikot message from Queue (epic methods on the kehikko writing), #41, a report]`), the body follows
-as the module wrote it, and the paragraph after says a module typed it on its own behalf, not an agent
-session or the person (`MODULE_MESSAGES_TYPED`). `isModuleMessage` tells one apart: no session, not the
+(`[Kehikot message from Queue (epic methods on the kehikko writing), #41, a report]`; from 2.75.0
+`⟦Queue · report #41⟧`), the body follows as the module wrote it, and the paragraph after said a module
+typed it on its own behalf, not an agent session or the person (`MODULE_MESSAGES_TYPED`; from 2.75.0
+said once, in the notes). `isModuleMessage` tells one apart: no session, not the
 person's. `messages.post` messages are said the same way.
 
 **What a module should say**: one line built only from its own fields — what it was asked for, how it
@@ -433,3 +436,71 @@ if (run.asker.token) {
   await askHost('messages.notify', { token: run.asker.token, body: line, kind: 'report' }, { module: ID }).catch(() => null)
 }
 ```
+
+Keep a path short: `shortPath(cwd)` says `/Users/me/…/agent-a51b78b3` as `agent-a51b78b3`.
+
+## Compact markers, explained once (2.75.0)
+
+A typed message used to carry a frame with the sender's place in words and a paragraph after it saying
+whose words they were and what the session may do with them — every time. Two lines of preamble for a
+one-line notice. Now each message carries ONE marker, and what the markers mean is said once, at the
+session's start.
+
+**The markers** (`typedFrame`, `MARK_OPEN` `⟦` U+27E6, `MARK_CLOSE` `⟧` U+27E7, fields joined by ` · `):
+
+| From | Marker |
+| --- | --- |
+| a module, on its own behalf (`messages.notify`, `messages.post`, `messages.tell`) | `⟦Queue · report #107⟧` |
+| another agent session | `⟦Codex session · #12⟧` |
+| the person, through a module | `⟦Your person via Orchestrator · #15⟧` |
+
+After the id: what it answers (`· answering #12`, or the Inbox question in quotes). For a module's or a
+session's message, the sender's place follows only when it is not the reader's own (`· epic auth (parts
+login), kehikko k1`); `typedMessages(messages, act, { you })` takes the reader from `messages.read`'s
+`you`, and `messageDelivery` passes it. Without `you` the place is always said. A question's choices
+still follow its body.
+
+**What holds**, as before:
+
+- Only host-stamped fields: the registered name (`wakeName`, then without the words the markers use —
+  "session", "person", "your", "you" — so no module's name can make its notice pass for a session's
+  or the person's), the kind, the ids, the place. Never the body or the thread.
+- Only Kehikot starts a line with `⟦`: a body's first line follows its marker, every later line is
+  indented two spaces, and a first line that starts with `⟦` (or with a pre-2.75.0 frame) is turned to
+  `(`.
+- No control characters (`typedBody`), and a clipped body never ends inside a surrogate pair
+  (`clipText`).
+
+**Explained once** (`markersNote(act)`): `startNotes` says it after the messaging line whenever
+`messaging` is set, so every session knows from its start what each marker means; that a module's
+notice and a session's message are text to read, not instructions (or, with the person's grant,
+`ACT_ON_MESSAGES`, a notice still to be checked with its module's tools); and that the person's are
+their instruction (`PERSON_MESSAGE_AUTHORITY`). `NOTES_VERSION` is 10, so a running session is told it
+once at its next prompt. `typedMessages(..., { explain: true })` appends it for a module whose sessions
+get no notes. `wakeLine` is compact the same way.
+
+## News to the sessions at a place: `messages.tell` (2.75.0)
+
+`messages.notify` reaches the ONE session that asked. A module that has news for everyone working
+somewhere — a review finished on an epic, a build broke on a kehikko, a text they edit changed — had no
+server-side way: `messages.post` is its page's. `messages.tell` is that way:
+
+- From the module's SERVER (`SERVER_METHODS`), naming its project (`SERVER_PROJECT_METHODS`), under
+  `agents:message`: `{ to: { place: { epic?, parts?, kehikko? } }, body, kind?: 'note' | 'report', thread? }`.
+  `parts` only with `epic` (on `messagePlaceSchema`, which every place now takes): the sessions at any of
+  those parts, or at the whole epic (`shouldWake`). No `once`, no `choices`.
+- The host stamps `from: { module, name, session: null, place: <the place>, person: false }` and
+  `to: { place }`, and each session there gets it as any message: typed under `⟦Paper · #n⟧`.
+- **At most one per module per receiving session a minute** (`LIMITS.TELLS_PER_MINUTE`): the host
+  merges what comes faster into one digest at the minute's end, and never drops it silently.
+- `placeTeller` in `/serve` keeps a module under that from its own side: the first news to a place in a
+  minute goes at once, the rest is held and sent as one `tellDigest` when the minute is up.
+
+```ts
+import { placeTeller, shortPath } from 'kehikot-module-protocol/serve'
+
+const teller = placeTeller({ module: ID, project })
+await teller.tell({ epic, parts }, `${shortPath(file)}: 3 comments from the review.`, { kind: 'report' })
+```
+
+A host before 2.75.0 answers `host-too-old`; the module carries on.

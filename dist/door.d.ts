@@ -542,20 +542,33 @@ export declare const placeDoorsSchema: z.ZodObject<{
         }>;
         to: z.ZodEffects<z.ZodObject<{
             project: z.ZodOptional<z.ZodLiteral<true>>;
-            place: z.ZodOptional<z.ZodEffects<z.ZodObject<{
+            place: z.ZodOptional<z.ZodEffects<z.ZodEffects<z.ZodObject<{
                 epic: z.ZodOptional<z.ZodString>;
+                parts: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
                 kehikko: z.ZodOptional<z.ZodString>;
             }, "strip", z.ZodTypeAny, {
                 epic?: string | undefined;
+                parts?: string[] | undefined;
                 kehikko?: string | undefined;
             }, {
                 epic?: string | undefined;
+                parts?: string[] | undefined;
                 kehikko?: string | undefined;
             }>, {
                 epic?: string | undefined;
+                parts?: string[] | undefined;
                 kehikko?: string | undefined;
             }, {
                 epic?: string | undefined;
+                parts?: string[] | undefined;
+                kehikko?: string | undefined;
+            }>, {
+                epic?: string | undefined;
+                parts?: string[] | undefined;
+                kehikko?: string | undefined;
+            }, {
+                epic?: string | undefined;
+                parts?: string[] | undefined;
                 kehikko?: string | undefined;
             }>>;
             module: z.ZodOptional<z.ZodString>;
@@ -578,6 +591,7 @@ export declare const placeDoorsSchema: z.ZodObject<{
             project?: true | undefined;
             place?: {
                 epic?: string | undefined;
+                parts?: string[] | undefined;
                 kehikko?: string | undefined;
             } | undefined;
         }, {
@@ -589,6 +603,7 @@ export declare const placeDoorsSchema: z.ZodObject<{
             project?: true | undefined;
             place?: {
                 epic?: string | undefined;
+                parts?: string[] | undefined;
                 kehikko?: string | undefined;
             } | undefined;
         }>, {
@@ -600,6 +615,7 @@ export declare const placeDoorsSchema: z.ZodObject<{
             project?: true | undefined;
             place?: {
                 epic?: string | undefined;
+                parts?: string[] | undefined;
                 kehikko?: string | undefined;
             } | undefined;
         }, {
@@ -611,6 +627,7 @@ export declare const placeDoorsSchema: z.ZodObject<{
             project?: true | undefined;
             place?: {
                 epic?: string | undefined;
+                parts?: string[] | undefined;
                 kehikko?: string | undefined;
             } | undefined;
         }>;
@@ -645,6 +662,7 @@ export declare const placeDoorsSchema: z.ZodObject<{
             project?: true | undefined;
             place?: {
                 epic?: string | undefined;
+                parts?: string[] | undefined;
                 kehikko?: string | undefined;
             } | undefined;
         };
@@ -677,6 +695,7 @@ export declare const placeDoorsSchema: z.ZodObject<{
             project?: true | undefined;
             place?: {
                 epic?: string | undefined;
+                parts?: string[] | undefined;
                 kehikko?: string | undefined;
             } | undefined;
         };
@@ -784,6 +803,7 @@ export declare const placeDoorsSchema: z.ZodObject<{
             project?: true | undefined;
             place?: {
                 epic?: string | undefined;
+                parts?: string[] | undefined;
                 kehikko?: string | undefined;
             } | undefined;
         };
@@ -793,19 +813,6 @@ export declare const placeDoorsSchema: z.ZodObject<{
         replyTo: number | null;
         once: boolean;
         answers: string | null;
-    }[] | undefined;
-    modules?: {
-        name: string;
-        module: string;
-        summary: string;
-        door: string | null;
-        skills: string[];
-        says?: string | undefined;
-        version?: string | undefined;
-        changes?: {
-            version: string;
-            lines: string[];
-        }[] | undefined;
     }[] | undefined;
     host?: {
         version: string;
@@ -819,6 +826,19 @@ export declare const placeDoorsSchema: z.ZodObject<{
         module: string;
         version: string;
         origin: string;
+    }[] | undefined;
+    modules?: {
+        name: string;
+        module: string;
+        summary: string;
+        door: string | null;
+        skills: string[];
+        says?: string | undefined;
+        version?: string | undefined;
+        changes?: {
+            version: string;
+            lines: string[];
+        }[] | undefined;
     }[] | undefined;
     absent?: {
         name: string;
@@ -859,9 +879,9 @@ export declare const placeDoorsSchema: z.ZodObject<{
         transport?: unknown;
     }[];
     messages?: unknown;
-    modules?: unknown;
     host?: unknown;
     everywhere?: unknown;
+    modules?: unknown;
     absent?: unknown;
     messagesMore?: unknown;
     kehikkoSkills?: unknown;
