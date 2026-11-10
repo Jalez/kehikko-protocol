@@ -67,8 +67,12 @@ export const findCountFields = {
  * An empty query matches nothing. Case folds with `toLowerCase` unless `caseSensitive`; a whole word
  * is one with no letter, digit or underscore on either side. Pure, so a page's own search (a
  * terminal's buffer, a document's model) can use the same rule as the client's.
+ *
+ * 2.69.1: `breaks`, the offsets where one piece of text ends and another begins with nothing
+ * between them in the string (two elements side by side: `<span>#12</span><span>Migrate</span>`).
+ * A whole word may begin or end at a break, as at a space; a match is not otherwise stopped by one.
  */
-export function findMatches(text: string, query: string, options: Partial<FindOptions> = {}): Array<[number, number]> {
+export function findMatches(text: string, query: string, options: Partial<FindOptions> = {}, breaks?: ReadonlySet<number>): Array<[number, number]> {
   if (!query) return []
   const haystack = options.caseSensitive ? text : text.toLowerCase()
   const needle = options.caseSensitive ? query : query.toLowerCase()
@@ -82,7 +86,9 @@ export function findMatches(text: string, query: string, options: Partial<FindOp
     const at = hay.indexOf(pin, from)
     if (at < 0) break
     const end = at + pin.length
-    if (!options.wholeWord || (!isWordChar(text, at - 1) && !isWordChar(text, end))) {
+    const starts = breaks?.has(at) || !isWordChar(text, at - 1)
+    const ends = breaks?.has(end) || !isWordChar(text, end)
+    if (!options.wholeWord || (starts && ends)) {
       out.push([at, end])
       from = end
     } else from = at + 1

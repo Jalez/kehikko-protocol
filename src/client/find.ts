@@ -120,9 +120,9 @@ export function pageFind(onRecount: (count: FindCount) => void, options: PageFin
   }
 
   /* The visible text under the root, as one string, with where each text node starts in it. */
-  const collect = (): { text: string; segments: Segment[] } => {
+  const collect = (): { text: string; segments: Segment[]; breaks: Set<number> } => {
     const root = rootOf()
-    if (!doc || !root) return { text: '', segments: [] }
+    if (!doc || !root) return { text: '', segments: [], breaks: new Set() }
     const shown = new Map<Element, boolean>()
     const isShown = (element: Element | null): boolean => {
       if (!element) return true
@@ -133,16 +133,25 @@ export function pageFind(onRecount: (count: FindCount) => void, options: PageFin
       return answer
     }
     const segments: Segment[] = []
+    /* 2.69.1. Where two pieces of text meet with nothing between them that the page did not draw as
+       one run: a whole word may begin or end there. Two text nodes are one run when one's element
+       holds the other's (`Find <b>this</b> now`); side by side (`<span>#12</span><span>Fix</span>`,
+       a PDF's text runs), they are two. */
+    const breaks = new Set<number>()
+    let before: Element | null = null
     let text = ''
     const walker = doc.createTreeWalker(root, 4 /* NodeFilter.SHOW_TEXT */)
     for (let node = walker.nextNode() as Text | null; node; node = walker.nextNode() as Text | null) {
       const value = node.nodeValue ?? ''
       if (!value) continue
-      if (!isShown(node.parentElement)) continue
+      const parent = node.parentElement
+      if (!isShown(parent)) continue
+      if (before && parent && before !== parent && !before.contains(parent) && !parent.contains(before)) breaks.add(text.length)
+      before = parent
       segments.push({ node, start: text.length })
       text += value
     }
-    return { text, segments }
+    return { text, segments, breaks }
   }
 
   /* Which segment holds `at` in the collected string; `end` takes the one before a boundary. */
@@ -272,8 +281,8 @@ export function pageFind(onRecount: (count: FindCount) => void, options: PageFin
   const search = (direction: 'first' | 'recount'): void => {
     const was = current
     unmark()
-    const { text, segments } = collect()
-    const found = findMatches(text, query, opts)
+    const { text, segments, breaks } = collect()
+    const found = findMatches(text, query, opts, breaks)
     total = found.length
     if (!segments.length || !found.length) {
       current = -1

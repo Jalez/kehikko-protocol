@@ -57,8 +57,12 @@ export declare const findCountFields: {
  * An empty query matches nothing. Case folds with `toLowerCase` unless `caseSensitive`; a whole word
  * is one with no letter, digit or underscore on either side. Pure, so a page's own search (a
  * terminal's buffer, a document's model) can use the same rule as the client's.
+ *
+ * 2.69.1: `breaks`, the offsets where one piece of text ends and another begins with nothing
+ * between them in the string (two elements side by side: `<span>#12</span><span>Migrate</span>`).
+ * A whole word may begin or end at a break, as at a space; a match is not otherwise stopped by one.
  */
-export declare function findMatches(text: string, query: string, options?: Partial<FindOptions>): Array<[number, number]>;
+export declare function findMatches(text: string, query: string, options?: Partial<FindOptions>, breaks?: ReadonlySet<number>): Array<[number, number]>;
 /**
  * Which match is current after `direction`, 0-based, or -1 when there is none. `next` and `prev`
  * wrap; `first` takes `start` (the first match at or after what is on screen, 0 when the caller
