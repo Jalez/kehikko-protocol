@@ -4,3 +4,4 @@
  * Design notes: docs/find.md, "Adapters".
  */
 export { PDF_LAID_OUT_EVERY_MS, PDF_LAID_OUT_WITHIN_MS, PDF_TEXT_LAYER, pdfTextLayerFind, } from './find-pdf.js';
+export { xtermFind, xtermFindColours, findSlot, } from './find-xterm.js';

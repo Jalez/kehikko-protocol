@@ -100,6 +100,23 @@ const pdfFind = pdfTextLayerFind()
 useHost({ onFind: pdfFind.onFind })
 ```
 
+- **`xtermFind`** (2.74.0): a terminal. Its rows are drawn to a canvas and its scrollback is a buffer,
+  so it searches through `@xterm/addon-search`, read by structural types (no xterm dependency): the
+  screen and the scrollback, steps that wrap, case and whole words, every match and the current one
+  marked, the count (and a count new output changed, through `onCount`), and the marks and selection
+  cleared on `close`. Colours default to `xtermFindColours(theme)`; `decorations` gives the page's own.
+  A module that shows one of several terminals, or none yet, hands `useHost` a `findSlot()`'s steady
+  `onFind`, and the terminal on screen sets `slot.current` (an empty slot answers `unsupported`).
+
+```ts
+import { findSlot, xtermFind } from 'kehikot-module-protocol/client/find'
+const terminal = new Terminal({ allowProposedApi: true }) // the addon's marks are decorations
+const search = new SearchAddon()
+terminal.loadAddon(search)
+const find = xtermFind(search, terminal, { onCount: host.findResult, theme: () => host.theme })
+useHost(ID, { onFind: find })   // and find.dispose() when the terminal goes
+```
+
 An editor with its own find (CodeMirror) keeps it: mark it `data-kehikot-find-skip` and its key
 handler takes ⌘F first (see "Keeping ⌘F").
 
@@ -137,6 +154,12 @@ a host that hears no result within a moment says the module cannot be searched y
 
 - **`pageFind(onRecount, options)`**: `run(query, options, direction)` and `close()`. At most
   `FIND_MARK_MAX` matches are marked. `root`, `visible` and `highlights` are injectable for tests.
+
+### `client/find-xterm.ts` (`client/find`)
+
+- **`xtermFind(search, terminal, options)`**: `incremental` on `first`; another case or word rule
+  clears the marks first, since the addon keeps them while the query is the same.
+- **`findSlot()`**: `current` is a ref, so a React `useRef`-shaped slot can be handed down as one.
 
 ### `client/connect.ts`
 
