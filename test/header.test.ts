@@ -168,7 +168,7 @@ describe('connect: the header', () => {
     live.header([])
     expect(host.said.at(-1)).toEqual({ type: MESSAGE.HEADER, items: [] })
     deliver(hello(host))
-    expect(host.said.slice(-2)).toEqual([{ type: MESSAGE.READY, id: ID, protocol: PROTOCOL }, { type: MESSAGE.HEADER, items: [] }])
+    expect(host.said.slice(-2)).toEqual([{ type: MESSAGE.READY, id: ID, protocol: PROTOCOL, hold: true }, { type: MESSAGE.HEADER, items: [] }])
   })
 
   test('a page that never declares one sends none', () => {

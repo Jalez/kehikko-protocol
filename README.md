@@ -95,6 +95,7 @@ And behind subpaths, which are not shapes and say so:
 | `kehikot-module-protocol/client` | `connect`, `mailbox`, `HostRefused` — the module half of the wire, for a page that would rather not write it again. Browser code, kept out of the front door so a Bun process can import shapes without it. **A convenience: a module may hand-roll its wire and be perfectly conforming.** |
 | `kehikot-module-protocol/run`, `kehikot-module-protocol/build` | A module served from its built page (2.17.0): `run`, one Bun server with the same doors as the dev server, a WebSocket hook, a door of the module's own asked first (`before`, 2.18.0) and `cors` for a page on an opaque origin (2.18.0), and `buildModule`, which builds and stamps `dist/` with the commit so a stale build is never served. See [ready-built](docs/ready-built.md). |
 | `kehikot-module-protocol/client/react` | `useHost`, `Cover` and `coverFor`, and `useFocus` (0.34.0), the parts focus as one value. Optional; `react` is an optional peer dependency and `client` does not import it. |
+| `kehikot-module-protocol/client/mount` | `mountPage` (2.70.0): the page in `StrictMode` inside `ReportErrors`. Needs `react-dom`, an optional peer dependency. |
 
 ## Where the reasoning is
 
@@ -162,6 +163,34 @@ placeholder screen with a header switcher in the host's menu grammar
 here generates one against this checkout and runs its tests and typecheck, so
 the template cannot drift from the protocol silently.
 
+## Module consistency checklist
+
+Every container should behave the same, whichever module is in it. What a person expects everywhere
+comes from the client **by default**, so a module gets it by moving its pin; what only the module
+knows, it has to do itself.
+
+**Free at 2.70.0 or later** (each with an opt-out):
+
+| what | how it comes | opt out |
+|---|---|---|
+| The container's view kept: main scroll position, header switches and toggles | `useHost` / `hostStore` (`keepView`); needs `declares.uses: ['state:keep']`; an inner scroller is marked `data-kehikot-scroll` | `keepView: false`, or `{ except: [ids] }` |
+| The host's cover up until the page is drawn — no "Reading…" of the module's own | `connect` (`holdCover`), lifted by `ready()` or after `HOLD_COVER_MS` | `holdCover: false` |
+| Page errors said to the host | uncaught errors and rejections (since 2.59.0); renders through `mountPage` (`client/mount`) | `mountPage(…, { reportErrors: false })` |
+| A long press anywhere in the container reveals its rows | the page's window (since 2.49.0); a nested frame through `relayPointer` | `pointerTarget: false` |
+| ⌘F searches what the page shows | `connect` (since 2.69.0) | `findKeys: false`, `findIn: false` |
+| Header and footer placed by the rule | `rowsAdvice` on the console; `kehikot-check-rows` in CI | `rowsAdvice: false` |
+| Agents told what changed in the door | `kehikot-check-notes` in CI | — |
+
+**The module still does itself:**
+
+- **Help text**: the manifest's `help` (2.52.0), which the host offers as "How to use".
+- **An intro**: the manifest's `intro` slides (2.57.0), which the host shows in its own dialog.
+- **`onFind`** when the page's text is not in the DOM (a terminal, a canvas, a virtualised list).
+- **A footer for crucial state**: counts, status, where you are. A container folded to two rows shows
+  only the header and the footer.
+- **`ready()`** once what it shows is drawn, and **`relayPointer`** for each nested frame it owns.
+- **`kehikot.rows.json`** and **`notes/tools.json`** kept current, for the two checks.
+
 ## Versions
 
 `PROTOCOL` has been 2 throughout: every version below added something a module may ignore.
@@ -169,6 +198,7 @@ The same list with what each version exported is in [CHANGELOG.md](CHANGELOG.md)
 
 | version | date | what it added |
 |---|---|---|
+| 2.70.0 | 2026-11-10 | Additive. Every container behaves the same by default: the kept view (scroll and header switches/toggles, `keepView`), the host's cover held until `ready()` (`ready.hold`, `kehikot.drawn`, `holdCover`), `mountPage` (`client/mount`) inside `ReportErrors`, presses from nested frames (`relayPointer`, `pointerShim`), more `rowsAdvice`, and two CI checks, `kehikot-check-rows` and `kehikot-check-notes`. See [the client](docs/client.md) and the Module consistency checklist above. |
 | 2.69.1 | 2026-11-10 | Fix. Find's whole words begin and end where two elements' text meets side by side (`findMatches`' `breaks`). See [find](docs/find.md). |
 | 2.69.0 | 2026-11-10 | Additive. Find in every container: `kehikot.find`, `kehikot.find.result`, `kehikot.find.open`, `hello.find`; `findMatches`, `stepMatch`, `findSaid`; the client hears ⌘F and searches a page's visible text by itself (`pageFind`), and `onFind`/`findResult` serve a page whose text is not in the DOM. See [find](docs/find.md). |
 | 2.68.0 | 2026-11-10 | Additive. A switch's or go item's options can be grouped and carry a second line: `headerOptionSchema.group` and `detail`, `LIMITS.HEADER_OPTION_GROUP` and `HEADER_OPTION_DETAIL`, `optionSections`. See [header](docs/header.md). |

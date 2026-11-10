@@ -15,6 +15,17 @@ import {
   type HostFacts,
 } from './connect.js'
 import { reloadWhenStale } from './ask.js'
+import { headerItemsSchema, pressRefusal, type HeaderItem } from '../header.js'
+import {
+  KEEP_SCROLL_AFTER_MS,
+  KEEP_SCROLL_ATTRIBUTE,
+  RESTORE_SCROLL_WITHIN_MS,
+  headerValues,
+  unwrapKept,
+  wrapKept,
+  type KeptView,
+} from './kept-view.js'
+import type { PointerTarget } from './connect.js'
 import { applyTheme, pageTheme, systemTheme } from './theme.js'
 import { NOT_COVERED, type Covered } from '../reveal.js'
 
@@ -79,6 +90,37 @@ export interface HostStoreOptions<Kept = unknown> extends ConnectOptions {
    * the same passage. Per field; a field without a rule here is compared deeply. Read at mount.
    */
   same?: Steadiness
+  /**
+   * 2.70.0. Keep this container's view with the host by itself: the page's main scroll position and
+   * the value of each of its header's switches and toggles, given back on the next greeting (the
+   * scroll is restored; a switch or toggle that is not on its kept value is pressed, through
+   * `onPress`, as a person would). Kept in the same string as the page's own kept state, which it
+   * never touches (`kept-view.ts`). On by default; `false` keeps nothing, and an object narrows it.
+   * Written only to a host that answers `state.set` for this module (`declares.uses: ['state:keep']`).
+   */
+  keepView?: boolean | KeepViewOptions
+}
+
+/** 2.70.0. What the scroll position is read from and written to. An element, or the document's scroller. */
+export interface ScrollBox {
+  scrollTop: number
+  readonly scrollHeight: number
+  readonly clientHeight: number
+}
+
+/** 2.70.0. What of the view is kept, and where it is heard. */
+export interface KeepViewOptions {
+  /**
+   * The main scroller: `true` (the default) is the element marked `data-kehikot-scroll`, else the
+   * document's own scroller; a function names another. `false` keeps no scroll position.
+   */
+  scroll?: boolean | (() => ScrollBox | null)
+  /** `false` keeps no header values. Default `true`. */
+  header?: boolean
+  /** Header item ids whose value is not kept: a switch that follows something else, a toggle that starts a thing. */
+  except?: readonly string[]
+  /** Where a scroll, and the person's own wheel, key or press, is heard: `window` by default. For tests. */
+  events?: PointerTarget | null
 }
 
 /** The fields of a standing that keep their identity while they say the same thing. */
@@ -235,6 +277,10 @@ export interface HostActions<Kept = unknown> {
   activity: (items: ActivityItem[]) => void
   /** 2.69.0. Say what the open search comes to now (`kehikot.find.result`), from an `onFind`. See `Connection.findResult`. */
   findResult: (count: FindCount | 'unsupported') => void
+  /** 2.70.0. Say the page is drawn, so the host's cover comes off. See `Connection.ready` and `holdCover`. */
+  ready: () => void
+  /** 2.70.0. Hear presses on a nested window too, and tell the host of them. See `Connection.pointerFrom` and `relayPointer`. */
+  pointerFrom: (target: PointerTarget) => () => void
 }
 
 export interface HostStore<Kept = unknown> extends HostActions<Kept> {
@@ -306,8 +352,31 @@ export function hostStore<Kept = unknown>(
   events: HostEvents = {},
   options: HostStoreOptions<Kept> = {},
 ): HostStore<Kept> {
-  const { grace = GREETING_GRACE_MS, kept: given, applyTheme: themed = true, reloadWhenStale: reloads = true, same, ...connectOptions } = options
+  const { grace = GREETING_GRACE_MS, kept: given, applyTheme: themed = true, reloadWhenStale: reloads = true, same, keepView = true, ...connectOptions } = options
   const codec = given ?? (JSON_KEPT as KeptCodec<Kept>)
+
+  /* 2.70.0. The kept view: what is kept of it, the module's own string beside it, what is to be given back. */
+  const viewing: KeepViewOptions | null = keepView === false ? null : keepView === true ? {} : keepView
+  const keepHeader = viewing !== null && viewing.header !== false
+  const except = new Set(viewing?.except ?? [])
+  const scrollOf: (() => ScrollBox | null) | null =
+    viewing === null || viewing.scroll === false
+      ? null
+      : typeof viewing.scroll === 'function'
+        ? viewing.scroll
+        : () => {
+            if (typeof document === 'undefined') return null
+            return (document.querySelector(`[${KEEP_SCROLL_ATTRIBUTE}]`) as ScrollBox | null) ?? (document.scrollingElement as ScrollBox | null)
+          }
+  const heardOn: PointerTarget | null = viewing === null ? null : viewing.events !== undefined ? viewing.events : typeof window === 'undefined' ? null : (window as unknown as PointerTarget)
+  let ownRaw: string | null = null
+  let view: KeptView = {}
+  let keptRaw: string | null = null
+  let restoreHeader: Record<string, string | boolean> | null = null
+  let declaredHeader: HeaderItem[] = []
+  let headerWritten: unknown = null
+  const relays = new Set<PointerTarget>()
+  const relayStops = new Map<PointerTarget, () => void>()
 
   let standing: HostStanding<Kept> = { where: 'listening', context: null, ...hostFields(null), theme: pageTheme() ?? 'light', kept: null, answers: null, drawsHeader: null, drawsFooter: null, hostCarries: null, footerKinds: null, covered: NOT_COVERED, visible: true }
   const hearers = new Set<() => void>()
@@ -325,6 +394,7 @@ export function hostStore<Kept = unknown>(
     const write = waitingWrite
     waitingWrite = null
     if (!write || !live || !live.greeted()) return
+    keptRaw = write.state
     void live.request('state.set', write.kehikko === null ? { state: write.state } : { state: write.state, kehikko: write.kehikko }).catch(() => {
       /* Reported nowhere on purpose: the choice holds for this session. */
     })
@@ -334,6 +404,105 @@ export function hostStore<Kept = unknown>(
     standing = { ...standing, ...next }
     for (const heard of [...hearers]) heard()
   }
+
+  /* 2.70.0. What is written for this container: the page's own string, and the view around it. */
+  const keptString = (): string | null => (viewing === null ? ownRaw : wrapKept(view, ownRaw))
+  /* The view changed: written after a pause, and only to a host that keeps state for this module. */
+  const viewChanged = (after: number) => {
+    if (!live || !live.greeted() || keptOn === undefined) return
+    if (standing.answers !== null && !standing.answers.includes('state.set')) return
+    const state = keptString()
+    if (state === null || state === keptRaw) return
+    waitingWrite = { state, kehikko: keptOn ?? null }
+    if (writeTimer !== null) clearTimeout(writeTimer)
+    writeTimer = setTimeout(sendWrite, after)
+  }
+  /* A kept switch or toggle that the page's header is not on: pressed, as the person would. */
+  const giveBackHeader = (): Set<string> => {
+    const pressed = new Set<string>()
+    const onPress = events.onPress
+    if (!onPress) restoreHeader = null
+    if (!restoreHeader || !onPress) return pressed
+    for (const [item, want] of Object.entries(restoreHeader)) {
+      const declared = declaredHeader.find((one) => one.id === item)
+      if (!declared) continue
+      delete restoreHeader[item]
+      const now = declared.kind === 'switch' ? declared.value : declared.kind === 'toggle' ? declared.checked : undefined
+      if (now === undefined || now === want || pressRefusal(declaredHeader, { item, value: want }) !== null) continue
+      pressed.add(item)
+      try {
+        const said = onPress({ item, value: want })
+        if (said instanceof Promise) said.catch(() => {})
+      } catch {
+        /* A page that fails on its own press stays where it is. */
+      }
+    }
+    if (!Object.keys(restoreHeader).length) restoreHeader = null
+    return pressed
+  }
+  /* What the page's header is on now goes into the view, but for what is still to be given back. */
+  const heardHeader = (items: unknown, skip: ReadonlySet<string> = new Set()) => {
+    const parsed = headerItemsSchema.safeParse(items)
+    declaredHeader = parsed.success ? parsed.data : []
+    if (!keepHeader || keptOn === undefined) return
+    const pressed = giveBackHeader()
+    const values = headerValues(items, (id) => !except.has(id) && !pressed.has(id) && !skip.has(id) && !(restoreHeader && id in restoreHeader))
+    const next = { ...(view.header ?? {}), ...values }
+    for (const id of except) delete next[id]
+    if (JSON.stringify(next) === JSON.stringify(view.header ?? {})) return
+    view = { ...view, header: next }
+    viewChanged(KEEP_AFTER_MS)
+  }
+
+  /* 2.70.0. The scroll: kept after the person stops, given back while the page draws what it reaches. */
+  let restoring: { top: number; until: number; timer: ReturnType<typeof setTimeout> | null } | null = null
+  let scrollTimer: ReturnType<typeof setTimeout> | null = null
+  const stopRestoring = () => {
+    if (restoring?.timer) clearTimeout(restoring.timer)
+    restoring = null
+  }
+  const tryRestore = () => {
+    if (!restoring || stopped) return
+    const box = scrollOf?.()
+    if (box) {
+      box.scrollTop = restoring.top
+      if (Math.abs(box.scrollTop - restoring.top) <= 1) {
+        stopRestoring()
+        return
+      }
+    }
+    if (Date.now() >= restoring.until) {
+      stopRestoring()
+      return
+    }
+    restoring.timer = setTimeout(tryRestore, 100)
+  }
+  const restoreScroll = (top: number | undefined) => {
+    stopRestoring()
+    if (!scrollOf || top === undefined) return
+    restoring = { top, until: Date.now() + RESTORE_SCROLL_WITHIN_MS, timer: null }
+    tryRestore()
+  }
+  const scrolled = () => {
+    if (restoring || !scrollOf || keptOn === undefined) return
+    if (scrollTimer !== null) clearTimeout(scrollTimer)
+    scrollTimer = setTimeout(() => {
+      scrollTimer = null
+      const box = scrollOf()
+      if (!box || stopped) return
+      const top = Math.max(0, Math.round(box.scrollTop))
+      if ((view.scroll ?? 0) === top) return
+      view = { ...view, ...(top > 0 ? { scroll: top } : { scroll: undefined }) }
+      if (top === 0) delete view.scroll
+      viewChanged(0)
+    }, KEEP_SCROLL_AFTER_MS)
+  }
+  /* The person's own scroll wins over one still being given back. */
+  const tookOver = () => {
+    if (restoring) stopRestoring()
+  }
+  const listening: [string, () => void][] = [['scroll', scrolled], ['wheel', tookOver], ['touchstart', tookOver], ['keydown', tookOver], ['pointerdown', tookOver]]
+  let unlisten: (() => void) | null = null
 
   const arrived = (context: ModuleContext, state?: string | null, facts?: HostFacts) => {
     const theme: PageTheme = context.theme === 'dark' ? 'dark' : 'light'
@@ -349,13 +518,29 @@ export function hostStore<Kept = unknown>(
     let kept: string | null | undefined
     if (context.kept !== undefined && (greeting || on !== keptOn)) kept = context.kept
     else if (greeting) kept = state
+    let own: string | null | undefined
     if (kept !== undefined) {
       /* A write still waiting is about the kehikko it was made on: sent before the next one's value arrives. */
       if (waitingWrite && on !== keptOn) sendWrite()
       keptOn = on
+      /* 2.70.0. The module's own string out of the envelope, and the view to give back. */
+      const opened = unwrapKept(kept)
+      own = opened.state
+      ownRaw = opened.state
+      keptRaw = kept ?? null
+      view = viewing !== null && opened.view ? { ...opened.view } : {}
+      restoreHeader = keepHeader && view.header ? { ...view.header } : null
+      for (const id of except) if (restoreHeader) delete restoreHeader[id]
     }
+    /* The page never sees the envelope: its context carries its own string. */
+    const seen = context.kept !== undefined ? { ...context, kept: unwrapKept(context.kept).state } : context
     /* The kept state with the context, in one change, so the first hosted standing already has the remembered choice. */
-    change({ where: 'hosted', context, ...hostFields(context, standing, same), theme, ...(kept !== undefined ? { kept: codec.read(kept) } : {}), ...(facts ? { answers: facts.answers, drawsHeader: facts.header, drawsFooter: facts.footer ?? null, hostCarries: facts.carries ?? null, footerKinds: facts.footerKinds ?? null, covered: NOT_COVERED } : {}) })
+    change({ where: 'hosted', context: seen, ...hostFields(seen, standing, same), theme, ...(own !== undefined ? { kept: codec.read(own) } : {}), ...(facts ? { answers: facts.answers, drawsHeader: facts.header, drawsFooter: facts.footer ?? null, hostCarries: facts.carries ?? null, footerKinds: facts.footerKinds ?? null, covered: NOT_COVERED } : {}) })
+    if (own !== undefined && viewing !== null) {
+      heardHeader(headerWritten)
+      restoreScroll(view.scroll)
+    }
+    return seen
   }
 
   const store: HostStore<Kept> = {
@@ -374,13 +559,13 @@ export function hostStore<Kept = unknown>(
             /* A stopped store's answer must not overwrite the live one: `StrictMode` mounts twice,
                and the mailbox replays to every subscriber. */
             if (stopped) return
-            arrived(context, state, facts)
-            events.onHello?.(context, state, facts)
+            const seen = arrived(context, state, facts)
+            events.onHello?.(seen, unwrapKept(state).state, facts)
           },
           onContext: (context) => {
             if (stopped) return
-            arrived(context)
-            events.onContext?.(context)
+            const seen = arrived(context)
+            events.onContext?.(seen)
           },
           onGoto: (message, answer) => {
             /* Not guarded: the host is waiting on this one. Whoever hears it answers. */
@@ -418,6 +603,13 @@ export function hostStore<Kept = unknown>(
       )
       /* Stored BEFORE it listens: the mailbox replays synchronously inside `listen`. */
       live = connection
+      for (const target of relays) relayStops.set(target, connection.pointerFrom(target))
+      if (heardOn && scrollOf) {
+        for (const [type, fn] of listening) heardOn.addEventListener(type, fn, { capture: true, passive: true })
+        unlisten = () => {
+          for (const [type, fn] of listening) heardOn.removeEventListener(type, fn, { capture: true })
+        }
+      }
       connection.listen()
 
       if (grace > 0) {
@@ -440,6 +632,10 @@ export function hostStore<Kept = unknown>(
     stop() {
       sendWrite()
       stopped = true
+      stopRestoring()
+      if (scrollTimer !== null) clearTimeout(scrollTimer)
+      unlisten?.()
+      unlisten = null
       if (timer !== null) clearTimeout(timer)
       unwatch?.()
       live?.stop()
@@ -449,8 +645,9 @@ export function hostStore<Kept = unknown>(
 
     remember(next, after = 0) {
       change({ kept: next })
+      ownRaw = codec.write(next)
       if (!live || !live.greeted()) return
-      waitingWrite = { state: codec.write(next), kehikko: keptOn ?? null }
+      waitingWrite = { state: keptString() ?? ownRaw, kehikko: keptOn ?? null }
       if (after > 0) {
         if (writeTimer !== null) clearTimeout(writeTimer)
         writeTimer = setTimeout(sendWrite, after)
@@ -501,10 +698,24 @@ export function hostStore<Kept = unknown>(
     filters: (groups) => live?.filters(groups),
     clearable: (label) => live?.clearable(label),
     refreshable: (state) => live?.refreshable(state),
-    header: (items) => live?.header(items),
+    header: (items) => {
+      headerWritten = items
+      live?.header(items)
+      heardHeader(items)
+    },
     footer: (items) => live?.footer(items),
     activity: (items) => live?.activity(items),
     findResult: (count) => live?.findResult(count),
+    ready: () => live?.ready(),
+    pointerFrom(target) {
+      relays.add(target)
+      if (live && !relayStops.has(target)) relayStops.set(target, live.pointerFrom(target))
+      return () => {
+        relays.delete(target)
+        relayStops.get(target)?.()
+        relayStops.delete(target)
+      }
+    },
     connection: () => live,
   }
   return store

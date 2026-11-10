@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import type { ActivityItem, AddressIntent, CodeLocation, FilterGroup, FooterItemInput, HeaderItemInput, LocationIntent, Passage } from '../index.js'
-import { HostRefused, NOBODY_TO_ASK, type AskOptions, type Connection, type HostEvents } from './connect.js'
+import { HostRefused, NOBODY_TO_ASK, type AskOptions, type Connection, type HostEvents, type PointerTarget } from './connect.js'
 import type { FindCount } from '../find.js'
 import {
   JSON_KEPT,
@@ -53,6 +53,10 @@ export function useHost<Kept = unknown>(
   handlers.current = events
   const settings = useRef(options)
   settings.current = options
+  /* 2.70.0. Nested windows to hear presses on, kept across mounts: a child's effect runs before this one's. */
+  const relays = useRef(new Map<PointerTarget, (() => void) | null>())
+  /* And whether the page said it is drawn before the store was there to say it. */
+  const saidReady = useRef(false)
 
   useEffect(() => {
     const mounted = settings.current
@@ -84,9 +88,15 @@ export function useHost<Kept = unknown>(
     /* Stored BEFORE it starts: the mailbox replays synchronously inside `start`. */
     held.current = live
     live.subscribe(() => setStanding(live.get()))
+    for (const target of relays.current.keys()) relays.current.set(target, live.pointerFrom(target))
     live.start()
+    if (saidReady.current) live.ready()
 
     return () => {
+      for (const [target, stop] of relays.current) {
+        stop?.()
+        relays.current.set(target, null)
+      }
       live.stop()
       if (held.current === live) held.current = null
     }
@@ -125,11 +135,23 @@ export function useHost<Kept = unknown>(
   const activity = useCallback((items: ActivityItem[]) => held.current?.activity(items), [])
   const findResult = useCallback((count: FindCount | 'unsupported') => held.current?.findResult(count), [])
   const connection = useCallback(() => held.current?.connection() ?? null, [])
+  const ready = useCallback(() => {
+    saidReady.current = true
+    held.current?.ready()
+  }, [])
+  const pointerFrom = useCallback((target: PointerTarget) => {
+    const map = relays.current
+    if (!map.has(target)) map.set(target, held.current ? held.current.pointerFrom(target) : null)
+    return () => {
+      map.get(target)?.()
+      map.delete(target)
+    }
+  }, [])
   const read = useCallback(() => held.current?.get() ?? drawn.current, [])
 
   return useMemo(
-    () => ({ ...standing, remember, point, locate, openAddress, request, resize, filters, clearable, refreshable, header, footer, activity, findResult, connection, read }),
-    [standing, remember, point, locate, openAddress, request, resize, filters, clearable, refreshable, header, footer, activity, findResult, connection, read],
+    () => ({ ...standing, remember, point, locate, openAddress, request, resize, filters, clearable, refreshable, header, footer, activity, findResult, ready, pointerFrom, connection, read }),
+    [standing, remember, point, locate, openAddress, request, resize, filters, clearable, refreshable, header, footer, activity, findResult, ready, pointerFrom, connection, read],
   )
 }
 

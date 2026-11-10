@@ -150,7 +150,18 @@ export const MESSAGE = {
      * is a short one, to start the search with. Sent only to a host whose greeting said `find: true`.
      */
     FIND_OPEN: 'kehikot.find.open',
+    /**
+     * Module → host (2.70.0). "My page is drawn: take your cover off." Sent once per greeting, after a
+     * `kehikot.ready` that said `hold: true`, when the page calls `ready()` or the client's own
+     * `HOLD_COVER_MS` passes. A host before 2.70.0 lifts its cover on `ready` and drops this unread.
+     */
+    DRAWN: 'kehikot.drawn',
 };
+/**
+ * 2.70.0. The longest a page asks a host to keep its cover up after `kehikot.ready` with `hold: true`,
+ * in ms: the client says `kehikot.drawn` by itself when it passes. A host keeps its own bound too.
+ */
+export const HOLD_COVER_MS = 3000;
 /** The prefix every message type carries, so a listener can drop the rest cheaply. There is one spelling. */
 export const MESSAGE_PREFIX = 'kehikot.';
 /**
@@ -191,6 +202,7 @@ export const MODULE_MESSAGES = [
     MESSAGE.PAGE_ERROR,
     MESSAGE.FIND_RESULT,
     MESSAGE.FIND_OPEN,
+    MESSAGE.DRAWN,
 ];
 /**
  * How tall a frame may be asked to be, in pixels, bounded on both sides. `clampHeight` restates

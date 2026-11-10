@@ -14,6 +14,17 @@
  * `rowsAdvice` is advice and nothing else. It never refuses a list, and a host or a module that
  * ignores it loses nothing but the hint.
  */
+/** 2.70.0. What `rowsAdvice` may be told beside the lists. */
+export interface RowsAdviceOptions {
+    /**
+     * The module has live state worth knowing (a count, a status, a location) whether or not its header
+     * shows it. With no footer declared, that is said once: a container folded to two rows shows the
+     * footer, and only the footer carries state.
+     */
+    state?: boolean;
+    /** `false` when the host draws no footer (`hello.footer` not true): no footer is then not advised. */
+    footer?: boolean;
+}
 /**
  * The obvious misplacements in a module's header and footer, one sentence each; empty when there are
  * none. Takes the lists as a module writes them (before parsing), so it can name a `meter` in the
@@ -25,5 +36,12 @@
  *  - a `switch` or `toggle` in the footer with no `actsOn`: it changes how the module is set up,
  *    which is the header's, unless it acts on a readout beside it, which `actsOn` says;
  *  - `actsOn` naming no `text`, `meter` or `input` in the same footer.
+ *
+ * 2.70.0, the rest of the rule:
+ *  - a count in a header label (`Inbox (3)`, `12 open`): live state, the footer's;
+ *  - a `go` item that is not a jump: one place only, or options that read as acts (`New…`, `Clear`);
+ *  - the same pressable item in both rows, by id or by kind and label;
+ *  - live state (a readout, a count, a meter or a run's `result` in the header, or `options.state`)
+ *    and no footer declared at all (`null` or `undefined`; `[]` is a footer withdrawn on purpose).
  */
-export declare function rowsAdvice(header: unknown, footer: unknown): string[];
+export declare function rowsAdvice(header: unknown, footer: unknown, options?: RowsAdviceOptions): string[];

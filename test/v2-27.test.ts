@@ -24,7 +24,7 @@ const run = (over: Partial<RunResult> = {}): RunResult => ({
 
 describe('the version', () => {
   test('2.27.0, protocol 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.69.1')
+    expect(PACKAGE_VERSION).toBe('2.70.0')
     expect(PROTOCOL).toBe(2)
   })
 })

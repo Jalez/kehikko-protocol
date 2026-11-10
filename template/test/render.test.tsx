@@ -17,6 +17,7 @@ function host(over: Partial<Host> = {}): Host {
     theme: 'dark',
     request: () => Promise.resolve(null),
     header: () => {},
+    ready: () => {},
     ...over,
   }
 }

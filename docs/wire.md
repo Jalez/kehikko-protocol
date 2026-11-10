@@ -23,7 +23,8 @@ Ten messages, across a frame, by `postMessage`.
 
 | Module → host | |
 |---|---|
-| `kehikot.ready` | "I heard you." |
+| `kehikot.ready` | "I heard you." 2.70.0: `hold: true` asks the host to keep its cover up until `kehikot.drawn`. |
+| `kehikot.drawn` | (2.70.0) "My page is drawn: take your cover off." After a `ready` with `hold: true`, within `HOLD_COVER_MS`. |
 | `kehikot.request` | One question, with an id the answer carries back. |
 | `kehikot.resize` | How tall it would like to be. |
 | `kehikot.went` | Whether the `goto` found anything. |

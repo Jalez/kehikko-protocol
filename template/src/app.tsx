@@ -34,6 +34,12 @@ export function App() {
   /* Declared at mount and again whenever anything in it changes; replayed by the client on every greeting. */
   const { header } = host
   useEffect(() => header(items), [header, items])
+  /* The host keeps its cover up until this says the page is drawn: no "Reading…" of our own. Say it
+     once the page has what it shows; here, as soon as it is hosted. */
+  const { ready, where } = host
+  useEffect(() => {
+    if (where === 'hosted') ready()
+  }, [ready, where])
   return <Screen host={host} items={items} onPress={press} />
 }
 

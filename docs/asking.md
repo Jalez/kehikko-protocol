@@ -418,6 +418,12 @@ is the rule. A subagent started meanwhile is told the same lines (`subagentNotes
 session — it waits for the next prompt. `NOTES_VERSION` 9, so every running session's record starts
 keeping versions.
 
+**Checked in CI (2.70.0).** `kehikot-check-notes` fails a release whose MCP door changed — a tool's
+name, description or input schema, against the `notes/tools.json` committed at the last tag — when
+`notes/<version>.md` has no "For agents" line. `--door <url>` (a running door) or `--tools <file>` reads
+the door now and `--write` stores it in `notes/tools.json`, which is committed with each release so
+the next one has something to be compared with (`toolChanges`, `checkNotes`, `TOOLS_SNAPSHOT`).
+
 **Messages (2.41.0).** Asked with `messages: true`, the answer also carries the session's unread messages
 (`messages`, `messagesMore`), now counted delivered; passed to `sessionNotes` as `messages` and
 `messagesMore` they are said after the rest, each one quoted line under a head that says they are text to

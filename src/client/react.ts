@@ -13,7 +13,7 @@ export { useFocus, type Focus } from './focus.js'
 
 /* The listener and the shared not-ready screen. See `host.ts` and `cover.ts`. */
 export { useHost, useKept, hostFields, JSON_KEPT, KEEP_AFTER_MS, type Host, type KeepsFor, type KeptCodec, type UseHostOptions } from './host.js'
-export { type HostActions, type HostFields, type HostStanding, type Steadiness } from './host-store.js'
+export { type HostActions, type HostFields, type HostStanding, type KeepViewOptions, type ScrollBox, type Steadiness } from './host-store.js'
 export {
   Cover,
   coverFor,

@@ -12,7 +12,7 @@ import { ID } from '../../manifest.ts'
  * this module derives from it. A plain object, so a screen can be rendered in
  * a test without a host (see `Host`).
  */
-export interface Host extends Pick<ProtocolHost, 'where' | 'project' | 'projectPath' | 'epic' | 'theme' | 'request' | 'header'> {
+export interface Host extends Pick<ProtocolHost, 'where' | 'project' | 'projectPath' | 'epic' | 'theme' | 'request' | 'header' | 'ready'> {
   /**
    * The headings of the parts of the epic the person picked out in the host's
    * bar. Empty means the whole epic. A module that narrows to these has to SAY

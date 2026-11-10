@@ -77,7 +77,7 @@ describe('the greeting', () => {
     const host = speaker()
     attach({}, { source })
     deliver(hello(host))
-    expect(host.said).toEqual([{ type: MESSAGE.READY, id: ID, protocol: PROTOCOL }])
+    expect(host.said).toEqual([{ type: MESSAGE.READY, id: ID, protocol: PROTOCOL, hold: true }])
   })
 
   test('is answered on EVERY hello, not only the first', () => {
@@ -748,7 +748,7 @@ describe('the offer to clear what this page shows', () => {
 
     deliver(hello(host))
     expect(host.said).toEqual([
-      { type: MESSAGE.READY, id: ID, protocol: PROTOCOL },
+      { type: MESSAGE.READY, id: ID, protocol: PROTOCOL, hold: true },
       { type: MESSAGE.CLEARABLE, label: null },
     ])
   })
