@@ -60,6 +60,7 @@ export {
 } from './registry.js'
 
 export {
+  anyPort,
   claimOrLeave,
   preferred,
   registerBound,

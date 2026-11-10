@@ -13,7 +13,7 @@ export { beforeDoors, beforeHandler, beforeInfo, type Before, type BeforeInfo } 
  *     await run({ id: ID, prefer: PREFERRED_PORT, dir: import.meta.dirname, manifest: MANIFEST, answer, build: BUILD, ticket: TICKET })
  *
  * What it decides the way the dev server does, by the same functions: the port (`PORT`, else
- * `prefer`, then the drift rules of `claim`), loopback only, and the registration of the port it
+ * `prefer`, then the drift rules of `claim`; `PORT=0` is any free port, 2.65.0), loopback only, and the registration of the port it
  * actually bound. What it adds: it serves a build only when the build's stamp is the commit this
  * process started at, and otherwise answers the page with a 503 that says why — a stale page is
  * never served with a 200.

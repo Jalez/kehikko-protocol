@@ -51,6 +51,14 @@ export interface ServesPlugin {
     configureServer(server: DevServerLike): void;
 }
 /**
+ * Whether the host asked for ANY free port (2.65.0): `PORT=0`. A host that reaches modules at
+ * stable addresses of its own does not need a module on a port it knows in advance; it reads the
+ * port the module registers (`registerBound`). Then neither `claim` nor the drift rules run: the
+ * system picks a free port, the module binds it, and says so in its registration. Any other `PORT`
+ * (or none) is as before: `preferred`, then `claim`'s drift.
+ */
+export declare function anyPort(env?: Record<string, string | undefined>): boolean;
+/**
  * The port to prefer: `PORT` from the environment when it is an integer from 1 to 65535 — the host
  * passes it when it starts a module — and `prefer` otherwise.
  */

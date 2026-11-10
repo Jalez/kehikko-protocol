@@ -619,6 +619,17 @@ drifting away from the very place the host is about to look. So the
 environment is the preference when it says anything, and the constant beside
 the id is the preference when it does not.
 
+#### `anyPort` (2.65.0)
+
+`PORT=0` is any free port. A host that reaches its modules at stable
+addresses of its own (the module's frame and program addresses on the host's
+port) does not need to know a module's port in advance: it reads the port the
+module registers. So with `PORT=0`, `serves` asks Vite for port 0 and `run`
+binds port 0, neither claims nor drifts, and `registerBound` writes the port
+the system gave. `preferred` still reads 0 as "not a port": a module built
+before 2.65.0 that a host hands `PORT=0` takes its preference and the drift
+rules, as it always did. That is the fallback.
+
 #### Inside `serves.config`
 
 Exit 0, not 1. Nothing failed: the thing being asked for exists. A
