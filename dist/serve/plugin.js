@@ -1,6 +1,16 @@
 import { claim, sayClaim } from './ports.js';
 import { registerAt, takesOver } from './registry.js';
 /**
+ * Whether the host asked for ANY free port (2.63.0): `PORT=0`. A host that reaches modules at
+ * stable addresses of its own does not need a module on a port it knows in advance; it reads the
+ * port the module registers (`registerBound`). Then neither `claim` nor the drift rules run: the
+ * system picks a free port, the module binds it, and says so in its registration. Any other `PORT`
+ * (or none) is as before: `preferred`, then `claim`'s drift.
+ */
+export function anyPort(env = process.env) {
+    return env.PORT?.trim() === '0';
+}
+/**
  * The port to prefer: `PORT` from the environment when it is an integer from 1 to 65535 — the host
  * passes it when it starts a module — and `prefer` otherwise.
  */
@@ -14,6 +24,11 @@ export function serves({ id, prefer, dir, span, timeoutMs }) {
         name: 'kehikot-module-serves',
         apply: 'serve',
         async config(config) {
+            /* Any free port (2.63.0): the system picks it, and `configureServer` registers what was bound. */
+            if (anyPort()) {
+                const said = config?.server?.cors !== undefined;
+                return { server: { host: '127.0.0.1', port: 0, strictPort: false, ...(said ? {} : { cors: false }) } };
+            }
             claimed = await claimOrLeave({ id, prefer: preferred(prefer), span, timeoutMs });
             /* No cross-origin sharing unless the module wrote `server.cors` itself: a module's page asks
                its own origin, and Vite's own default answers other origins on this machine. */

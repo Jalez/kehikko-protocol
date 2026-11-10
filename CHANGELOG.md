@@ -7,6 +7,22 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.63.0 — 2026-11-10
+
+`PORT=0` is any free port. **Additive**; `PROTOCOL` is still 2. [docs/serving.md](docs/serving.md),
+"`anyPort` (2.63.0)".
+
+### Added
+
+- **`anyPort(env)`**: whether `PORT` is `0`. With it, `serves` asks Vite for port 0 and `run` binds
+  port 0: no `claim`, no drift, and the port the system gave is registered (`registerBound`). For a
+  host that reaches modules at stable addresses and reads the registered port.
+
+### Unchanged
+
+- `preferred` still reads `0` as no port. A module built before 2.63.0 handed `PORT=0` keeps its
+  preferred port and the drift rules.
+
 ## 2.62.0 — 2026-11-10
 
 A session that started before an update is told, once, what changed for agents, and a door tells a
