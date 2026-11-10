@@ -45,7 +45,7 @@ const items = (): FooterItem[] => footerSchema.parse({ type: MESSAGE.FOOTER, ite
 
 describe('the version', () => {
   test('is 2.38.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.60.0')
+    expect(PACKAGE_VERSION).toBe('2.61.0')
     expect(PROTOCOL).toBe(2)
   })
 

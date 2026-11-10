@@ -1034,6 +1034,9 @@ export declare const methodParams: {
             name: string;
             after?: string | null | undefined;
         } | undefined;
+        remove?: {
+            id: string;
+        } | undefined;
         rename?: {
             id: string;
             name: string;
@@ -1041,9 +1044,6 @@ export declare const methodParams: {
         move?: {
             id: string;
             after?: string | null | undefined;
-        } | undefined;
-        remove?: {
-            id: string;
         } | undefined;
     }, {
         epic: string;
@@ -1051,6 +1051,9 @@ export declare const methodParams: {
             name: string;
             after?: string | null | undefined;
         } | undefined;
+        remove?: {
+            id: string;
+        } | undefined;
         rename?: {
             id: string;
             name: string;
@@ -1058,9 +1061,6 @@ export declare const methodParams: {
         move?: {
             id: string;
             after?: string | null | undefined;
-        } | undefined;
-        remove?: {
-            id: string;
         } | undefined;
     }>, {
         epic: string;
@@ -1068,6 +1068,9 @@ export declare const methodParams: {
             name: string;
             after?: string | null | undefined;
         } | undefined;
+        remove?: {
+            id: string;
+        } | undefined;
         rename?: {
             id: string;
             name: string;
@@ -1075,9 +1078,6 @@ export declare const methodParams: {
         move?: {
             id: string;
             after?: string | null | undefined;
-        } | undefined;
-        remove?: {
-            id: string;
         } | undefined;
     }, {
         epic: string;
@@ -1085,6 +1085,9 @@ export declare const methodParams: {
             name: string;
             after?: string | null | undefined;
         } | undefined;
+        remove?: {
+            id: string;
+        } | undefined;
         rename?: {
             id: string;
             name: string;
@@ -1092,9 +1095,6 @@ export declare const methodParams: {
         move?: {
             id: string;
             after?: string | null | undefined;
-        } | undefined;
-        remove?: {
-            id: string;
         } | undefined;
     }>, {
         epic: string;
@@ -1102,6 +1102,9 @@ export declare const methodParams: {
             name: string;
             after?: string | null | undefined;
         } | undefined;
+        remove?: {
+            id: string;
+        } | undefined;
         rename?: {
             id: string;
             name: string;
@@ -1109,9 +1112,6 @@ export declare const methodParams: {
         move?: {
             id: string;
             after?: string | null | undefined;
-        } | undefined;
-        remove?: {
-            id: string;
         } | undefined;
     }, {
         epic: string;
@@ -1119,6 +1119,9 @@ export declare const methodParams: {
             name: string;
             after?: string | null | undefined;
         } | undefined;
+        remove?: {
+            id: string;
+        } | undefined;
         rename?: {
             id: string;
             name: string;
@@ -1126,9 +1129,6 @@ export declare const methodParams: {
         move?: {
             id: string;
             after?: string | null | undefined;
-        } | undefined;
-        remove?: {
-            id: string;
         } | undefined;
     }>;
     /**
@@ -1434,9 +1434,9 @@ export declare const methodParams: {
             reason: string | null;
             ok: boolean | null;
             ms: number | null;
+            cache?: "refused" | "hit" | "not-modified" | undefined;
             bytesIn?: number | undefined;
             bytesOut?: number | undefined;
-            cache?: "refused" | "hit" | "not-modified" | undefined;
         }, {
             at: number;
             path: string;
@@ -1444,11 +1444,11 @@ export declare const methodParams: {
             host: string;
             status?: number | null | undefined;
             reason?: string | null | undefined;
+            cache?: "refused" | "hit" | "not-modified" | undefined;
             ok?: boolean | null | undefined;
             ms?: number | null | undefined;
             bytesIn?: number | undefined;
             bytesOut?: number | undefined;
-            cache?: "refused" | "hit" | "not-modified" | undefined;
         }>, "many">;
     }, "strip", z.ZodTypeAny, {
         calls: {
@@ -1460,9 +1460,9 @@ export declare const methodParams: {
             reason: string | null;
             ok: boolean | null;
             ms: number | null;
+            cache?: "refused" | "hit" | "not-modified" | undefined;
             bytesIn?: number | undefined;
             bytesOut?: number | undefined;
-            cache?: "refused" | "hit" | "not-modified" | undefined;
         }[];
     }, {
         calls: {
@@ -1472,11 +1472,11 @@ export declare const methodParams: {
             host: string;
             status?: number | null | undefined;
             reason?: string | null | undefined;
+            cache?: "refused" | "hit" | "not-modified" | undefined;
             ok?: boolean | null | undefined;
             ms?: number | null | undefined;
             bytesIn?: number | undefined;
             bytesOut?: number | undefined;
-            cache?: "refused" | "hit" | "not-modified" | undefined;
         }[];
     }>;
     /**

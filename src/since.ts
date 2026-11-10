@@ -191,6 +191,8 @@ export const SESSION_FIELD_SINCE = {
   messagesMore: '2.41.0',
   /** The skills the person wrote for the session's kehikko, each with its SKILL.md (2.53.0). */
   kehikkoSkills: '2.53.0',
+  /** The guards of the modules placed on the session's kehikko (2.61.0), and the manifest field they come from. */
+  guards: '2.61.0',
 } as const
 export type SessionField = keyof typeof SESSION_FIELD_SINCE
 

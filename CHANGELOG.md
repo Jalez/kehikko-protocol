@@ -7,6 +7,37 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.61.0 — 2026-11-10
+
+Guards: a module placed on a kehikko can hold the shell commands of every agent session there —
+subagents included — to its rule, instead of only saying it. And a subagent is told what the modules
+around it say. **Additive**; `PROTOCOL` is still 2. [docs/asking.md](docs/asking.md), "Guards (2.61.0)".
+
+### Added
+
+- **`guards` in a manifest** (top-level, like `agentSays`; `guardSchema`, `guardsSchema`):
+  `[{ id, tool: 'shell', match: { commands, scripts? }, allow?, action: 'rewrite' | 'deny', rewrite?, why }]`.
+  `commands` are word patterns (`tsc`, `bun test`, `*` for any one word; the program by base name, a
+  prefix of the command); `scripts` are package.json script names (`bun run x`, `npm test`, `pnpm x`,
+  `yarn x`); `allow` lets a command past; a `rewrite` template names `{command}` once (`templateOk`). A
+  guard that does not parse is dropped and the rest kept. A host before 2.61.0 ignores the field.
+- **`guards` in the host's answer to `POST /host/place`** (`placeDoorsSchema.guards`,
+  `placedGuardSchema` `{ module, name, guard }`): only the modules PLACED on the session's kehikko.
+  `SESSION_FIELD_SINCE.guards`.
+- **`guardDecision(guards, command, { tool?, env? })`**, the one rule: `pass`, `rewrite` (the template
+  filled with the whole original command as one single-quoted word, `shellQuote` / `fillTemplate`) or
+  `deny`; a deny wins over a rewrite. `KEHIKOT_DIRECT` (`GUARD_ESCAPE_ENV`) set in front of a command, or
+  in the hook's environment, passes every guard. `guardSays(decision)` is what the agent is told.
+- The readers it uses, pure and exported: `shellCommands` (splits on `;` `&` `|` `&&` `||` newlines,
+  parentheses, `$(` and backticks; quotes, escapes, comments, redirections), `unwrapped` (`env`, `time`,
+  `nice`, `timeout`, `npx`, `bunx`, `bun x`, `pnpm exec` …), `commandsRun` (looks into `sh -c '…'`),
+  `patternMatches`, `scriptRun`, `guardMatches`, `escaped`. `GUARD_LIMITS`, `GUARD_ID`,
+  `GUARD_PATTERN`, `GUARD_SCRIPT`.
+- **`subagentNotes(input, guards)`**: what a subagent is told at its start (Claude Code's
+  `SubagentStart`) — the place, what each module on the kehikko says to agents, the absent lines, the
+  guards (`GUARDS_HEAD`, `guardLine`) and the kehikko's skills, in the session notes' own words. Not the
+  turn rules or messages. `NOTES_VERSION` is unchanged: a session's own notes did not change.
+
 ## 2.60.0 — 2026-11-10
 
 A module says back the start token the host that started it handed it, so a host can tell the

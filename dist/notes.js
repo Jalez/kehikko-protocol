@@ -333,3 +333,40 @@ function notesWithoutMessages(input, event, told) {
     const text = changeNotes(input, told);
     return { text, kind: text === null ? null : 'change', told: next };
 }
+/** 2.61.0. Over the guards of the modules on the kehikko, in a subagent's notes. */
+export const GUARDS_HEAD = 'Shell commands some modules on this kehikko guard — such a command is run through the module or refused; in quotes, why:';
+/** 2.61.0. One guard as a line of the notes: `- Test runs: tsc, bun test, script test — "Heavy runs go through the queue."` */
+export function guardLine(one) {
+    const what = [...one.guard.match.commands, ...(one.guard.match.scripts ?? []).map((s) => `script ${s}`)].slice(0, 12);
+    return `- ${oneLine(one.name, 80) || one.module}: ${oneLine(what.join(', '), 300)} — ${quoted(one.guard.why)}`;
+}
+/**
+ * 2.61.0. What a SUBAGENT is told when the session it works for starts one (Claude Code's
+ * `SubagentStart`): the place and what the modules on the kehikko say to agents, in the same words as
+ * the session's own notes, and the guards that hold its shell commands there. Not the session's turn
+ * rules or messages: those are the session's. A subagent starts with only its brief, so this is how a
+ * module's line reaches it. `guards` are the host's (`guards` in `placeDoorsSchema`); absent or null:
+ * none said.
+ */
+export function subagentNotes(input, guards) {
+    const place = input.place;
+    if (!place)
+        return null;
+    const host = input.hostDoor || 'kehikko';
+    const lines = [
+        `Kehikot: you are a subagent of a conversation that belongs to ${placeWords(place)}. The ${host} MCP server answers about it (my_place, read_canvas).`,
+        researchLine(input.self),
+    ];
+    if (place.kehikko) {
+        const modules = others(input.modules, input.self);
+        if (modules?.length)
+            lines.push(MODULES_HEAD, ...listed(modules, NOTES_MOST.modules, (one) => moduleLine(one, null, input.holds ?? null), 'read_canvas lists them all.'));
+        const absent = others(input.absent, input.self);
+        if (absent?.length)
+            lines.push(ABSENT_HEAD, ...listed(absent, NOTES_MOST.absent, absentLine, 'the person can add any of them to this kehikko.'));
+        if (guards?.length)
+            lines.push(GUARDS_HEAD, ...guards.slice(0, NOTES_MOST.modules).map(guardLine));
+        lines.push(...kehikkoSkillsStart(input, host));
+    }
+    return lines.join('\n');
+}

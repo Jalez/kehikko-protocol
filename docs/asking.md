@@ -518,3 +518,46 @@ The rules are the host's to keep:
   its tile (see "An agent module as a tile" in [client.md](client.md)).
 
 A host before 2.58.0 answers `unknown-method`.
+
+## Guards (2.61.0)
+
+A line a module says to agents (`agentSays`) reaches the session's own context, and nothing holds an
+agent to it: a subagent starts with only its brief, and a session that ignores it runs the command
+anyway. A **guard** is the held version. A module declares in its manifest which shell commands it is
+about and what becomes of them:
+
+```json
+"guards": [{
+  "id": "heavy",
+  "tool": "shell",
+  "match": { "commands": ["tsc", "vitest", "bun test", "playwright test"], "scripts": ["test", "typecheck"] },
+  "allow": ["tsc --version"],
+  "action": "rewrite",
+  "rewrite": "kehikot-queue run --kind verify -- sh -c {command}",
+  "why": "Heavy runs go through the queue so sessions do not overload the machine."
+}]
+```
+
+- **Active only where placed.** The host hands, in its answer to `POST /host/place`, the guards of the
+  modules on the session's kehikko (`guards`, each with its module's id and name). An installed module
+  that is not on the kehikko guards nothing.
+- **Held by the agent module**, in its CLI's own pre-tool hook (Claude Code's `PreToolUse` on Bash,
+  which also runs for subagents), with `guardDecision` — the one rule, so every agent CLI holds the
+  same command to the same guard. Where a CLI can change a tool call's input, a `rewrite` runs the
+  module's template instead; where it can only refuse, the agent module refuses with `guardSays`.
+- **Safe to fill.** The template names `{command}` once, on one line, with no other braces; it is
+  filled with the WHOLE original command as one single-quoted word. Nothing the agent wrote can leave
+  that word.
+- **Matching** reads the command as a shell would split it (`shellCommands`), looks through `env`,
+  `time`, `timeout`, `npx`, `bunx`, `pnpm exec` and into `sh -c '…'`, and matches each simple command's
+  words against the patterns, and `bun run <script>` / `npm test` / `pnpm <script>` against `scripts`.
+  A command matched by `allow` passes that guard. A deny wins over a rewrite.
+- **The escape.** `KEHIKOT_DIRECT=1` in front of a command (or in the hook's environment) passes every
+  guard. A denial says so, to use only when the person asks for the command to run directly.
+
+### What a subagent is told
+
+A subagent starts with its brief only, so a module's line to agents never reached it. An agent module
+whose CLI has a hook at a subagent's start (Claude Code's `SubagentStart`) gives it `subagentNotes`: the
+place, what each module on the kehikko says to agents, the guards there, and the kehikko's skills —
+in the same words as the session's own notes, without the session's turn rules and messages.

@@ -250,3 +250,26 @@ export declare function sessionNotes(input: NotesInput, event: NotesEvent, told:
     kind: 'start' | 'change' | null;
     told: NotesTold;
 };
+/** 2.61.0. Over the guards of the modules on the kehikko, in a subagent's notes. */
+export declare const GUARDS_HEAD = "Shell commands some modules on this kehikko guard \u2014 such a command is run through the module or refused; in quotes, why:";
+/** 2.61.0. One guard as a line of the notes: `- Test runs: tsc, bun test, script test — "Heavy runs go through the queue."` */
+export declare function guardLine(one: {
+    module: string;
+    name: string;
+    guard: {
+        match: {
+            commands: readonly string[];
+            scripts?: readonly string[];
+        };
+        why: string;
+    };
+}): string;
+/**
+ * 2.61.0. What a SUBAGENT is told when the session it works for starts one (Claude Code's
+ * `SubagentStart`): the place and what the modules on the kehikko say to agents, in the same words as
+ * the session's own notes, and the guards that hold its shell commands there. Not the session's turn
+ * rules or messages: those are the session's. A subagent starts with only its brief, so this is how a
+ * module's line reaches it. `guards` are the host's (`guards` in `placeDoorsSchema`); absent or null:
+ * none said.
+ */
+export declare function subagentNotes(input: Pick<NotesInput, 'place' | 'modules' | 'absent' | 'hostDoor' | 'self' | 'holds' | 'kehikkoSkills' | 'loadsKehikkoSkills'>, guards?: readonly Parameters<typeof guardLine>[0][] | null): string | null;

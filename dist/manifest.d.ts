@@ -431,6 +431,26 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
      */
     absentSays: z.ZodCatch<z.ZodOptional<z.ZodString>>;
     /**
+     * 2.61.0. The shell commands this module guards in agent sessions on a kehikko it is placed on
+     * (`guardSchema`): each one matched commands and scripts, and either run through the module's own
+     * command (`rewrite`) or refused (`deny`), with why. The host hands the placed modules' guards to the
+     * module that runs the session, which holds every command to them with `guardDecision`. Top-level,
+     * optional; a guard that does not parse is dropped and the rest kept, like `agentSays`. A host before
+     * 2.61.0 ignores it. See `guards.ts`.
+     */
+    guards: z.ZodCatch<z.ZodOptional<z.ZodEffects<z.ZodUnknown, {
+        id: string;
+        why: string;
+        tool: "shell";
+        match: {
+            commands: string[];
+            scripts?: string[] | undefined;
+        };
+        action: "rewrite" | "deny";
+        rewrite?: string | undefined;
+        allow?: string[] | undefined;
+    }[], unknown>>>;
+    /**
      * 2.52.0. How to use this module, for a person: a one-line `summary` and short `sections` of
      * points (`helpSchema`, bounded by `HELP_LIMITS`). Plain text only: a host draws every string as
      * text, never as markup or a link. A host that has it offers "How to use" for the module. Top-level,
@@ -1342,6 +1362,25 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         }[];
         as?: string | undefined;
     } | undefined;
+    help?: {
+        summary: string;
+        sections: {
+            title: string;
+            points: string[];
+        }[];
+    } | undefined;
+    guards?: {
+        id: string;
+        why: string;
+        tool: "shell";
+        match: {
+            commands: string[];
+            scripts?: string[] | undefined;
+        };
+        action: "rewrite" | "deny";
+        rewrite?: string | undefined;
+        allow?: string[] | undefined;
+    }[] | undefined;
     icon?: string | undefined;
     health?: string | undefined;
     partless?: string | undefined;
@@ -1354,13 +1393,6 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     reveal?: "push" | "over" | undefined;
     agentSays?: string | undefined;
     absentSays?: string | undefined;
-    help?: {
-        summary: string;
-        sections: {
-            title: string;
-            points: string[];
-        }[];
-    } | undefined;
     intro?: {
         slides: {
             body: string;
@@ -1485,6 +1517,8 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             release?: string | undefined;
         }[] | undefined;
     } | undefined;
+    help?: unknown;
+    guards?: unknown;
     icon?: string | undefined;
     dataVersion?: number | undefined;
     tags?: string[] | undefined;
@@ -1499,7 +1533,6 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     reveal?: unknown;
     agentSays?: unknown;
     absentSays?: unknown;
-    help?: unknown;
     intro?: unknown;
 }>, {
     id: string;
@@ -1578,6 +1611,25 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         }[];
         as?: string | undefined;
     } | undefined;
+    help?: {
+        summary: string;
+        sections: {
+            title: string;
+            points: string[];
+        }[];
+    } | undefined;
+    guards?: {
+        id: string;
+        why: string;
+        tool: "shell";
+        match: {
+            commands: string[];
+            scripts?: string[] | undefined;
+        };
+        action: "rewrite" | "deny";
+        rewrite?: string | undefined;
+        allow?: string[] | undefined;
+    }[] | undefined;
     icon?: string | undefined;
     health?: string | undefined;
     partless?: string | undefined;
@@ -1590,13 +1642,6 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     reveal?: "push" | "over" | undefined;
     agentSays?: string | undefined;
     absentSays?: string | undefined;
-    help?: {
-        summary: string;
-        sections: {
-            title: string;
-            points: string[];
-        }[];
-    } | undefined;
     intro?: {
         slides: {
             body: string;
@@ -1721,6 +1766,8 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             release?: string | undefined;
         }[] | undefined;
     } | undefined;
+    help?: unknown;
+    guards?: unknown;
     icon?: string | undefined;
     dataVersion?: number | undefined;
     tags?: string[] | undefined;
@@ -1735,7 +1782,6 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     reveal?: unknown;
     agentSays?: unknown;
     absentSays?: unknown;
-    help?: unknown;
     intro?: unknown;
 }>;
 export type Manifest = z.infer<typeof manifestSchema>;

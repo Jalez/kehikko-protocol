@@ -179,6 +179,8 @@ export declare const SESSION_FIELD_SINCE: {
     readonly messagesMore: "2.41.0";
     /** The skills the person wrote for the session's kehikko, each with its SKILL.md (2.53.0). */
     readonly kehikkoSkills: "2.53.0";
+    /** The guards of the modules placed on the session's kehikko (2.61.0), and the manifest field they come from. */
+    readonly guards: "2.61.0";
 };
 export type SessionField = keyof typeof SESSION_FIELD_SINCE;
 /**
@@ -338,6 +340,8 @@ export declare const SINCE: {
         readonly messagesMore: "2.41.0";
         /** The skills the person wrote for the session's kehikko, each with its SKILL.md (2.53.0). */
         readonly kehikkoSkills: "2.53.0";
+        /** The guards of the modules placed on the session's kehikko (2.61.0), and the manifest field they come from. */
+        readonly guards: "2.61.0";
     };
     readonly wire: {
         readonly 'kehikot.footer': "2.38.0";
