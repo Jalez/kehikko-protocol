@@ -204,6 +204,8 @@ export const WIRE_SINCE = {
     'press.text': '2.46.0',
     'hello.footerKinds': '2.46.0',
     'footer.actsOn': '2.47.0',
+    'ready.hold': '2.70.0',
+    'kehikot.drawn': '2.70.0',
 };
 /** Every table, in one place. Plain objects: read them with `sinceOf`, never by indexing with a stranger's string. */
 export const SINCE = {

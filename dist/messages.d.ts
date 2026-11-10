@@ -3660,6 +3660,12 @@ export declare const readySchema: z.ZodObject<{
         commit?: string | null | undefined;
         start?: unknown;
     }>>>;
+    /**
+     * 2.70.0. "Keep your cover up until I say `kehikot.drawn`": the page is still reading what it shows,
+     * and would otherwise draw a "Reading…" of its own. Absent or false: the page is ready now. A host
+     * before 2.70.0 strips it and lifts its cover on this message, as before.
+     */
+    hold: z.ZodOptional<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
     type: "kehikot.ready";
     id: string;
@@ -3671,12 +3677,26 @@ export declare const readySchema: z.ZodObject<{
         protocol: string;
         start?: string | undefined;
     } | undefined;
+    hold?: boolean | undefined;
 }, {
     type: "kehikot.ready";
     id: string;
     build?: unknown;
     protocol?: number | undefined;
+    hold?: boolean | undefined;
 }>;
+/**
+ * Module → host (2.70.0). The page that said `hold: true` in its `ready` is drawn: lift the cover.
+ * Nothing else is said; a host that was not holding drops it.
+ */
+export declare const drawnSchema: z.ZodObject<{
+    type: z.ZodLiteral<"kehikot.drawn">;
+}, "strip", z.ZodTypeAny, {
+    type: "kehikot.drawn";
+}, {
+    type: "kehikot.drawn";
+}>;
+export type Drawn = z.infer<typeof drawnSchema>;
 /** One question, with an id the answer will carry back. */
 export declare const requestSchema: z.ZodObject<{
     type: z.ZodLiteral<"kehikot.request">;
@@ -5852,6 +5872,12 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         commit?: string | null | undefined;
         start?: unknown;
     }>>>;
+    /**
+     * 2.70.0. "Keep your cover up until I say `kehikot.drawn`": the page is still reading what it shows,
+     * and would otherwise draw a "Reading…" of its own. Absent or false: the page is ready now. A host
+     * before 2.70.0 strips it and lifts its cover on this message, as before.
+     */
+    hold: z.ZodOptional<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
     type: "kehikot.ready";
     id: string;
@@ -5863,11 +5889,13 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         protocol: string;
         start?: string | undefined;
     } | undefined;
+    hold?: boolean | undefined;
 }, {
     type: "kehikot.ready";
     id: string;
     build?: unknown;
     protocol?: number | undefined;
+    hold?: boolean | undefined;
 }>, z.ZodObject<{
     type: z.ZodLiteral<"kehikot.request">;
     id: z.ZodString;
@@ -7702,6 +7730,12 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
     type: "kehikot.find.open";
     step?: "next" | "prev" | undefined;
     query?: string | undefined;
+}>, z.ZodObject<{
+    type: z.ZodLiteral<"kehikot.drawn">;
+}, "strip", z.ZodTypeAny, {
+    type: "kehikot.drawn";
+}, {
+    type: "kehikot.drawn";
 }>]>;
 export type ModuleMessage = z.infer<typeof moduleMessageSchema>;
 export type WireMessage = HostMessage | ModuleMessage;

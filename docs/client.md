@@ -968,3 +968,95 @@ visible text itself (`pageFind`): marked with `CSS.highlights`, the current matc
 searched again while the bar is open and the page changes. A page whose text is not in the DOM gives
 `onFind` and says later counts with `findResult`; an editor with its own find keeps ⌘F with
 `findKeys: false` or its own `preventDefault`. See [find.md](find.md).
+
+## What every container gets by default (2.70.0)
+
+A person expects every container to behave the same, whichever module is in it. From 2.70.0 what
+they expect everywhere comes from the client by default, so a module gets it by moving its pin; each
+default has a per-module opt-out. The README's "Module consistency checklist" is the short list of
+what is free and what a module still does itself.
+
+### The kept view (`kept-view.ts`, `hostStore`'s `keepView`)
+
+Per container — this module on this kehikko — `hostStore` (and so `useHost`) keeps the page's main
+scroll position and the value of each of its header's switches (`value`) and toggles (`checked`),
+and gives them back on the next greeting:
+
+- **The scroll** is read from the element marked `data-kehikot-scroll` (`KEEP_SCROLL_ATTRIBUTE`), else
+  the document's scroller, `KEEP_SCROLL_AFTER_MS` after the person stops. On a greeting it is set
+  again, and retried while the page is still drawing what it reaches, for up to
+  `RESTORE_SCROLL_WITHIN_MS`; the person's own wheel, key, touch or press ends the retry.
+- **The header** values are read from every declaration. On a greeting (or the first declaration
+  after it), a switch or toggle that is not on its kept value is pressed back through `onPress` —
+  exactly the press a person would make in the host's menu, judged by `pressRefusal` first — and the
+  module re-declares as it always does. The module still owns the state; nothing is drawn from the
+  kept value.
+
+Both go in the one string the host keeps for the container (`state.set`, `context.kept`, at most
+`LIMITS.MODULE_STATE`), as an envelope: `KEPT_VIEW_MARK` and then `{"view":…,"state":…}`, the
+module's own string as it wrote it under `state`. The module never sees the envelope: `kept`,
+`hello.state` handed to `onHello` and `context.kept` are its own string. While the view is empty the
+module's string is written bare, exactly as before. When both do not fit, the view gives way. A
+client before 2.70.0 that reads an envelope gets a string its codec does not recognise, and starts as
+a first run.
+
+The view is written only to a host that answers `state.set` for the module, so the manifest needs
+`declares.uses: ['state:keep']`. `keepView: false` keeps nothing; `{ scroll: false }`, `{ header:
+false }`, `{ except: ['follow'] }` (an item whose value follows something else, or a toggle that
+starts something) and `{ scroll: () => element }` narrow it.
+
+### The cover, held until the page is drawn (`holdCover`, `ready()`)
+
+A host covers a container until the page answers the greeting with `kehikot.ready` — which the client
+does at once, before the page has read what it shows, so modules drew a "Reading…" of their own.
+From 2.70.0 `connect` answers with `ready` and **`hold: true`**, and follows with **`kehikot.drawn`**
+when the page calls **`ready()`** (on the connection, the store or `useHost`'s value), or by itself
+after **`HOLD_COVER_MS`**. Each greeting holds again until the page has said `ready()` once; after
+that a greeting is answered without a hold. `holdCover: false` answers as before; a number is another
+wait.
+
+A host before 2.70.0 strips `hold`, lifts its cover on `ready` and drops `kehikot.drawn` unread, so a
+page may call `ready()` whatever host it is in. **For a host**: on `ready` with `hold: true`, keep the
+cover (as loading) until `kehikot.drawn` arrives from that frame or `HOLD_COVER_MS` passes, then show
+the page; a `ready` without it is ready, as before.
+
+### Mounting the page (`client/mount`, `mountPage`)
+
+`mountPage('root', <App />)` is a page's whole entry: `StrictMode`, and `ReportErrors` around the
+page, so a render that throws is said to the host and drawn as text. A root that does not exist is
+said as a page failure (`NO_ROOT`), not left blank. `{ reportErrors: false }` for a page with a
+boundary of its own, `{ strict: false }`, `fallback`. A separate subpath, because it imports
+`react-dom/client`; import the client itself first, as before, so the mailbox is installed.
+
+### Presses from nested frames (`relay.ts`)
+
+The client hears presses on the page's window (2.49.0), so a press inside an iframe the page owns —
+a PDF viewer, a preview — never reached the host, and a long press there revealed nothing.
+`relayPointer(host, frame)` hears it, through the connection's own pointer reporting
+(`Connection.pointerFrom`): told only to a host that asked, with the same slop and cancel rules.
+
+```ts
+useEffect(() => (frame.current ? relayPointer(host, frame.current) : undefined), [host.pointerFrom])
+```
+
+A frame on the page's own origin is listened on directly, and again after each load. A frame on
+another origin cannot be reached: its viewer runs `pointerShim({ origin: pageOrigin })` (bundled in)
+or `pointerShimScript(pageOrigin)` (one `<script>`), which posts each press as `RELAY_POINTER`, and
+`relayPointer(host, frame, { origin: viewerOrigin })` takes those messages from that frame's window
+and that origin only. `RELAY_POINTER` is not a `kehikot.` type: it is between a page and its own
+frame and never on the wire.
+
+### Rows advice, and two checks for CI
+
+`rowsAdvice(header, footer, options?)` gained the rest of the rule (docs/footer.md): a count in a
+header label, a Go item that is not a jump, an item in both rows, and live state with no footer.
+`connect` says each sentence once on the console; "no footer" waits `ROWS_ADVICE_AFTER_MS` after the
+last declaration and is said only to a host that draws a footer. `rowsAdvice: false` is quiet.
+
+- **`kehikot-check-rows`** runs it in CI over the rows a module states in `kehikot.rows.json` — one
+  `{ header, footer, state? }` or a list of them, one per view — or `--file` (JSON, or a module
+  exporting `rows`). Advice fails it, unless `--warn`.
+- **`kehikot-check-notes`** fails when the MCP door's tool names, descriptions or input schemas changed
+  since the last tag and `notes/<version>.md` has no "For agents" line (docs/asking.md). A tag's tools
+  are its committed `notes/tools.json`: `kehikot-check-notes --door <url> --write` (a running door) or
+  `--tools <file>` (a list the module's own script writes) stores the door's tools there.

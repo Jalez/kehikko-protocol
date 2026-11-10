@@ -323,6 +323,19 @@ export const readySchema = z.object({
     protocol: z.number().int().min(1).default(PROTOCOL),
     /** The build that served this page, as printed into it. A host compares it with the server's now. */
     build: buildSchema.optional().catch(undefined),
+    /**
+     * 2.70.0. "Keep your cover up until I say `kehikot.drawn`": the page is still reading what it shows,
+     * and would otherwise draw a "Reading…" of its own. Absent or false: the page is ready now. A host
+     * before 2.70.0 strips it and lifts its cover on this message, as before.
+     */
+    hold: z.boolean().optional(),
+});
+/**
+ * Module → host (2.70.0). The page that said `hold: true` in its `ready` is drawn: lift the cover.
+ * Nothing else is said; a host that was not holding drops it.
+ */
+export const drawnSchema = z.object({
+    type: messageType(MESSAGE.DRAWN),
 });
 /** One question, with an id the answer will carry back. */
 export const requestSchema = z.object({
@@ -525,6 +538,7 @@ export const moduleMessageSchema = z.union([
     pageErrorSchema,
     findResultSchema,
     findOpenSchema,
+    drawnSchema,
 ]);
 /**
  * Is this worth parsing at all? The cheap first filter: true when the value is an object whose

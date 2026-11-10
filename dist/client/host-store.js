@@ -3,6 +3,8 @@ import { readScope } from '../scope.js';
 import { addressOpenResult, locationSetResult } from '../methods.js';
 import { HostRefused, NOBODY_TO_ASK, connect, } from './connect.js';
 import { reloadWhenStale } from './ask.js';
+import { headerItemsSchema, pressRefusal } from '../header.js';
+import { KEEP_SCROLL_AFTER_MS, KEEP_SCROLL_ATTRIBUTE, RESTORE_SCROLL_WITHIN_MS, headerValues, unwrapKept, wrapKept, } from './kept-view.js';
 import { applyTheme, pageTheme, systemTheme } from './theme.js';
 import { NOT_COVERED } from '../reveal.js';
 /**
@@ -87,8 +89,30 @@ export function hostFields(context, was, same = {}) {
  * which matters for a greeting replayed before anything has rendered.
  */
 export function hostStore(id, events = {}, options = {}) {
-    const { grace = GREETING_GRACE_MS, kept: given, applyTheme: themed = true, reloadWhenStale: reloads = true, same, ...connectOptions } = options;
+    const { grace = GREETING_GRACE_MS, kept: given, applyTheme: themed = true, reloadWhenStale: reloads = true, same, keepView = true, ...connectOptions } = options;
     const codec = given ?? JSON_KEPT;
+    /* 2.70.0. The kept view: what is kept of it, the module's own string beside it, what is to be given back. */
+    const viewing = keepView === false ? null : keepView === true ? {} : keepView;
+    const keepHeader = viewing !== null && viewing.header !== false;
+    const except = new Set(viewing?.except ?? []);
+    const scrollOf = viewing === null || viewing.scroll === false
+        ? null
+        : typeof viewing.scroll === 'function'
+            ? viewing.scroll
+            : () => {
+                if (typeof document === 'undefined')
+                    return null;
+                return document.querySelector(`[${KEEP_SCROLL_ATTRIBUTE}]`) ?? document.scrollingElement;
+            };
+    const heardOn = viewing === null ? null : viewing.events !== undefined ? viewing.events : typeof window === 'undefined' ? null : window;
+    let ownRaw = null;
+    let view = {};
+    let keptRaw = null;
+    let restoreHeader = null;
+    let declaredHeader = [];
+    let headerWritten = null;
+    const relays = new Set();
+    const relayStops = new Map();
     let standing = { where: 'listening', context: null, ...hostFields(null), theme: pageTheme() ?? 'light', kept: null, answers: null, drawsHeader: null, drawsFooter: null, hostCarries: null, footerKinds: null, covered: NOT_COVERED, visible: true };
     const hearers = new Set();
     let live = null;
@@ -107,6 +131,7 @@ export function hostStore(id, events = {}, options = {}) {
         waitingWrite = null;
         if (!write || !live || !live.greeted())
             return;
+        keptRaw = write.state;
         void live.request('state.set', write.kehikko === null ? { state: write.state } : { state: write.state, kehikko: write.kehikko }).catch(() => {
             /* Reported nowhere on purpose: the choice holds for this session. */
         });
@@ -116,6 +141,126 @@ export function hostStore(id, events = {}, options = {}) {
         for (const heard of [...hearers])
             heard();
     };
+    /* 2.70.0. What is written for this container: the page's own string, and the view around it. */
+    const keptString = () => (viewing === null ? ownRaw : wrapKept(view, ownRaw));
+    /* The view changed: written after a pause, and only to a host that keeps state for this module. */
+    const viewChanged = (after) => {
+        if (!live || !live.greeted() || keptOn === undefined)
+            return;
+        if (standing.answers !== null && !standing.answers.includes('state.set'))
+            return;
+        const state = keptString();
+        if (state === null || state === keptRaw)
+            return;
+        waitingWrite = { state, kehikko: keptOn ?? null };
+        if (writeTimer !== null)
+            clearTimeout(writeTimer);
+        writeTimer = setTimeout(sendWrite, after);
+    };
+    /* A kept switch or toggle that the page's header is not on: pressed, as the person would. */
+    const giveBackHeader = () => {
+        const pressed = new Set();
+        const onPress = events.onPress;
+        if (!onPress)
+            restoreHeader = null;
+        if (!restoreHeader || !onPress)
+            return pressed;
+        for (const [item, want] of Object.entries(restoreHeader)) {
+            const declared = declaredHeader.find((one) => one.id === item);
+            if (!declared)
+                continue;
+            delete restoreHeader[item];
+            const now = declared.kind === 'switch' ? declared.value : declared.kind === 'toggle' ? declared.checked : undefined;
+            if (now === undefined || now === want || pressRefusal(declaredHeader, { item, value: want }) !== null)
+                continue;
+            pressed.add(item);
+            try {
+                const said = onPress({ item, value: want });
+                if (said instanceof Promise)
+                    said.catch(() => { });
+            }
+            catch {
+                /* A page that fails on its own press stays where it is. */
+            }
+        }
+        if (!Object.keys(restoreHeader).length)
+            restoreHeader = null;
+        return pressed;
+    };
+    /* What the page's header is on now goes into the view, but for what is still to be given back. */
+    const heardHeader = (items, skip = new Set()) => {
+        const parsed = headerItemsSchema.safeParse(items);
+        declaredHeader = parsed.success ? parsed.data : [];
+        if (!keepHeader || keptOn === undefined)
+            return;
+        const pressed = giveBackHeader();
+        const values = headerValues(items, (id) => !except.has(id) && !pressed.has(id) && !skip.has(id) && !(restoreHeader && id in restoreHeader));
+        const next = { ...(view.header ?? {}), ...values };
+        for (const id of except)
+            delete next[id];
+        if (JSON.stringify(next) === JSON.stringify(view.header ?? {}))
+            return;
+        view = { ...view, header: next };
+        viewChanged(KEEP_AFTER_MS);
+    };
+    /* 2.70.0. The scroll: kept after the person stops, given back while the page draws what it reaches. */
+    let restoring = null;
+    let scrollTimer = null;
+    const stopRestoring = () => {
+        if (restoring?.timer)
+            clearTimeout(restoring.timer);
+        restoring = null;
+    };
+    const tryRestore = () => {
+        if (!restoring || stopped)
+            return;
+        const box = scrollOf?.();
+        if (box) {
+            box.scrollTop = restoring.top;
+            if (Math.abs(box.scrollTop - restoring.top) <= 1) {
+                stopRestoring();
+                return;
+            }
+        }
+        if (Date.now() >= restoring.until) {
+            stopRestoring();
+            return;
+        }
+        restoring.timer = setTimeout(tryRestore, 100);
+    };
+    const restoreScroll = (top) => {
+        stopRestoring();
+        if (!scrollOf || top === undefined)
+            return;
+        restoring = { top, until: Date.now() + RESTORE_SCROLL_WITHIN_MS, timer: null };
+        tryRestore();
+    };
+    const scrolled = () => {
+        if (restoring || !scrollOf || keptOn === undefined)
+            return;
+        if (scrollTimer !== null)
+            clearTimeout(scrollTimer);
+        scrollTimer = setTimeout(() => {
+            scrollTimer = null;
+            const box = scrollOf();
+            if (!box || stopped)
+                return;
+            const top = Math.max(0, Math.round(box.scrollTop));
+            if ((view.scroll ?? 0) === top)
+                return;
+            view = { ...view, ...(top > 0 ? { scroll: top } : { scroll: undefined }) };
+            if (top === 0)
+                delete view.scroll;
+            viewChanged(0);
+        }, KEEP_SCROLL_AFTER_MS);
+    };
+    /* The person's own scroll wins over one still being given back. */
+    const tookOver = () => {
+        if (restoring)
+            stopRestoring();
+    };
+    const listening = [['scroll', scrolled], ['wheel', tookOver], ['touchstart', tookOver], ['keydown', tookOver], ['pointerdown', tookOver]];
+    let unlisten = null;
     const arrived = (context, state, facts) => {
         const theme = context.theme === 'dark' ? 'dark' : 'light';
         if (themed)
@@ -133,14 +278,32 @@ export function hostStore(id, events = {}, options = {}) {
             kept = context.kept;
         else if (greeting)
             kept = state;
+        let own;
         if (kept !== undefined) {
             /* A write still waiting is about the kehikko it was made on: sent before the next one's value arrives. */
             if (waitingWrite && on !== keptOn)
                 sendWrite();
             keptOn = on;
+            /* 2.70.0. The module's own string out of the envelope, and the view to give back. */
+            const opened = unwrapKept(kept);
+            own = opened.state;
+            ownRaw = opened.state;
+            keptRaw = kept ?? null;
+            view = viewing !== null && opened.view ? { ...opened.view } : {};
+            restoreHeader = keepHeader && view.header ? { ...view.header } : null;
+            for (const id of except)
+                if (restoreHeader)
+                    delete restoreHeader[id];
         }
+        /* The page never sees the envelope: its context carries its own string. */
+        const seen = context.kept !== undefined ? { ...context, kept: unwrapKept(context.kept).state } : context;
         /* The kept state with the context, in one change, so the first hosted standing already has the remembered choice. */
-        change({ where: 'hosted', context, ...hostFields(context, standing, same), theme, ...(kept !== undefined ? { kept: codec.read(kept) } : {}), ...(facts ? { answers: facts.answers, drawsHeader: facts.header, drawsFooter: facts.footer ?? null, hostCarries: facts.carries ?? null, footerKinds: facts.footerKinds ?? null, covered: NOT_COVERED } : {}) });
+        change({ where: 'hosted', context: seen, ...hostFields(seen, standing, same), theme, ...(own !== undefined ? { kept: codec.read(own) } : {}), ...(facts ? { answers: facts.answers, drawsHeader: facts.header, drawsFooter: facts.footer ?? null, hostCarries: facts.carries ?? null, footerKinds: facts.footerKinds ?? null, covered: NOT_COVERED } : {}) });
+        if (own !== undefined && viewing !== null) {
+            heardHeader(headerWritten);
+            restoreScroll(view.scroll);
+        }
+        return seen;
     };
     const store = {
         get: () => standing,
@@ -157,14 +320,14 @@ export function hostStore(id, events = {}, options = {}) {
                        and the mailbox replays to every subscriber. */
                     if (stopped)
                         return;
-                    arrived(context, state, facts);
-                    events.onHello?.(context, state, facts);
+                    const seen = arrived(context, state, facts);
+                    events.onHello?.(seen, unwrapKept(state).state, facts);
                 },
                 onContext: (context) => {
                     if (stopped)
                         return;
-                    arrived(context);
-                    events.onContext?.(context);
+                    const seen = arrived(context);
+                    events.onContext?.(seen);
                 },
                 onGoto: (message, answer) => {
                     /* Not guarded: the host is waiting on this one. Whoever hears it answers. */
@@ -210,6 +373,16 @@ export function hostStore(id, events = {}, options = {}) {
             }, connectOptions);
             /* Stored BEFORE it listens: the mailbox replays synchronously inside `listen`. */
             live = connection;
+            for (const target of relays)
+                relayStops.set(target, connection.pointerFrom(target));
+            if (heardOn && scrollOf) {
+                for (const [type, fn] of listening)
+                    heardOn.addEventListener(type, fn, { capture: true, passive: true });
+                unlisten = () => {
+                    for (const [type, fn] of listening)
+                        heardOn.removeEventListener(type, fn, { capture: true });
+                };
+            }
             connection.listen();
             if (grace > 0) {
                 timer = setTimeout(() => {
@@ -233,6 +406,11 @@ export function hostStore(id, events = {}, options = {}) {
         stop() {
             sendWrite();
             stopped = true;
+            stopRestoring();
+            if (scrollTimer !== null)
+                clearTimeout(scrollTimer);
+            unlisten?.();
+            unlisten = null;
             if (timer !== null)
                 clearTimeout(timer);
             unwatch?.();
@@ -242,9 +420,10 @@ export function hostStore(id, events = {}, options = {}) {
         },
         remember(next, after = 0) {
             change({ kept: next });
+            ownRaw = codec.write(next);
             if (!live || !live.greeted())
                 return;
-            waitingWrite = { state: codec.write(next), kehikko: keptOn ?? null };
+            waitingWrite = { state: keptString() ?? ownRaw, kehikko: keptOn ?? null };
             if (after > 0) {
                 if (writeTimer !== null)
                     clearTimeout(writeTimer);
@@ -298,10 +477,25 @@ export function hostStore(id, events = {}, options = {}) {
         filters: (groups) => live?.filters(groups),
         clearable: (label) => live?.clearable(label),
         refreshable: (state) => live?.refreshable(state),
-        header: (items) => live?.header(items),
+        header: (items) => {
+            headerWritten = items;
+            live?.header(items);
+            heardHeader(items);
+        },
         footer: (items) => live?.footer(items),
         activity: (items) => live?.activity(items),
         findResult: (count) => live?.findResult(count),
+        ready: () => live?.ready(),
+        pointerFrom(target) {
+            relays.add(target);
+            if (live && !relayStops.has(target))
+                relayStops.set(target, live.pointerFrom(target));
+            return () => {
+                relays.delete(target);
+                relayStops.get(target)?.();
+                relayStops.delete(target);
+            };
+        },
         connection: () => live,
     };
     return store;

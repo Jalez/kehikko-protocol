@@ -4,6 +4,7 @@ import type { FindCount } from '../find.js';
 import { type ContextScope } from '../context.js';
 import { type ModuleScope } from '../scope.js';
 import { type AskOptions, type ConnectOptions, type Connection, type HostEvents } from './connect.js';
+import type { PointerTarget } from './connect.js';
 import { type Covered } from '../reveal.js';
 /**
  * The host as one value outside React: everything `useHost` arranges — the grace before
@@ -50,6 +51,35 @@ export interface HostStoreOptions<Kept = unknown> extends ConnectOptions {
      * the same passage. Per field; a field without a rule here is compared deeply. Read at mount.
      */
     same?: Steadiness;
+    /**
+     * 2.70.0. Keep this container's view with the host by itself: the page's main scroll position and
+     * the value of each of its header's switches and toggles, given back on the next greeting (the
+     * scroll is restored; a switch or toggle that is not on its kept value is pressed, through
+     * `onPress`, as a person would). Kept in the same string as the page's own kept state, which it
+     * never touches (`kept-view.ts`). On by default; `false` keeps nothing, and an object narrows it.
+     * Written only to a host that answers `state.set` for this module (`declares.uses: ['state:keep']`).
+     */
+    keepView?: boolean | KeepViewOptions;
+}
+/** 2.70.0. What the scroll position is read from and written to. An element, or the document's scroller. */
+export interface ScrollBox {
+    scrollTop: number;
+    readonly scrollHeight: number;
+    readonly clientHeight: number;
+}
+/** 2.70.0. What of the view is kept, and where it is heard. */
+export interface KeepViewOptions {
+    /**
+     * The main scroller: `true` (the default) is the element marked `data-kehikot-scroll`, else the
+     * document's own scroller; a function names another. `false` keeps no scroll position.
+     */
+    scroll?: boolean | (() => ScrollBox | null);
+    /** `false` keeps no header values. Default `true`. */
+    header?: boolean;
+    /** Header item ids whose value is not kept: a switch that follows something else, a toggle that starts a thing. */
+    except?: readonly string[];
+    /** Where a scroll, and the person's own wheel, key or press, is heard: `window` by default. For tests. */
+    events?: PointerTarget | null;
 }
 /** The fields of a standing that keep their identity while they say the same thing. */
 export type SteadyField = 'passage' | 'location' | 'address' | 'containers' | 'parts' | 'selection' | 'chosen' | 'kehikko';
@@ -210,6 +240,10 @@ export interface HostActions<Kept = unknown> {
     activity: (items: ActivityItem[]) => void;
     /** 2.69.0. Say what the open search comes to now (`kehikot.find.result`), from an `onFind`. See `Connection.findResult`. */
     findResult: (count: FindCount | 'unsupported') => void;
+    /** 2.70.0. Say the page is drawn, so the host's cover comes off. See `Connection.ready` and `holdCover`. */
+    ready: () => void;
+    /** 2.70.0. Hear presses on a nested window too, and tell the host of them. See `Connection.pointerFrom` and `relayPointer`. */
+    pointerFrom: (target: PointerTarget) => () => void;
 }
 export interface HostStore<Kept = unknown> extends HostActions<Kept> {
     /** The standing now. The same object until something changes, so it is a `useSyncExternalStore` snapshot. */

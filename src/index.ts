@@ -19,6 +19,7 @@ export {
   MAX_HEIGHT,
   REFRESH_EVERY_MIN,
   REFRESH_EVERY_MAX,
+  HOLD_COVER_MS,
   clampHeight,
   type MessageType,
 } from './constants.js'
@@ -300,6 +301,8 @@ export {
   findSchema,
   findResultSchema,
   findOpenSchema,
+  drawnSchema,
+  type Drawn,
   FIND_STEPS,
   type FindStep,
   type FindMessage,
@@ -522,7 +525,7 @@ export {
 } from './abilities.js'
 
 /* What goes in the header and what in the footer, and the advice that points out a misplacement (2.47.0). */
-export { rowsAdvice } from './rows.js'
+export { rowsAdvice, type RowsAdviceOptions } from './rows.js'
 
 /* Find: the host's bar and the page's search, and the one matching rule (2.69.0). */
 export {

@@ -1,5 +1,6 @@
 import { pageBuild } from './build.js'
 import {
+  HOLD_COVER_MS,
   MESSAGE,
   PROTOCOL,
   clampHeight,
@@ -293,7 +294,22 @@ export interface ConnectOptions {
   findIn?: PageFindOptions | false
   /** 2.69.0. Whether ⌘ (true) or Ctrl (false) is the find key. Found from the platform by default. */
   mac?: boolean
+  /**
+   * 2.70.0. Keep the host's cover up until the page calls `ready()`: `ready` goes with `hold: true`, and
+   * `kehikot.drawn` follows when the page is drawn — or by itself after `HOLD_COVER_MS` (a number here
+   * is that wait instead). On by default, so a page draws no "Reading…" of its own; `false` says the
+   * page is ready the moment it is greeted, as before 2.70.0. A host before 2.70.0 ignores the hold.
+   */
+  holdCover?: boolean | number
+  /**
+   * 2.70.0. `false` keeps `rowsAdvice` off the console. On by default: each sentence once per page,
+   * when a header or footer is declared, and "no footer" a moment after the last declaration.
+   */
+  rowsAdvice?: boolean
 }
+
+/** 2.70.0. How long after the last header or footer declaration the client says a missing footer, in ms. */
+export const ROWS_ADVICE_AFTER_MS = 1500
 
 /** What `connect` reads of a press: which button, whether it is the primary pointer, and where (2.50.1). */
 export interface PointerEventLike {
@@ -385,6 +401,18 @@ export interface Connection {
    * whose count changed by itself (new output arrived). Dropped while no search is open.
    */
   findResult: (count: FindCount | 'unsupported') => void
+  /**
+   * 2.70.0. Say the page is drawn: the host's cover, held since the greeting (`holdCover`), comes off.
+   * Call it once what the page shows has been read and drawn; calling it again, or with `holdCover:
+   * false`, does nothing. A greeting after it is answered without a hold.
+   */
+  ready: () => void
+  /**
+   * 2.70.0. Hear presses on another window or element too — a nested frame the page owns — and tell
+   * the host of them as `kehikot.pointer`, as presses on the page itself are. Returns the function
+   * that stops hearing it. `relayPointer` is the way to call it for an iframe.
+   */
+  pointerFrom: (target: PointerTarget) => () => void
   /** Whether anything has greeted us yet. */
   greeted: () => boolean
   /** Stop listening. Every question still waiting is refused rather than left hanging. */
@@ -422,12 +450,38 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
   /* 2.47.0. What `rowsAdvice` has already said on the console about the header and footer, so each
      sentence is said once per page and never again for a re-declaration. Advice only: nothing is held back. */
   const advised = new Set<string>()
-  const advise = () => {
-    for (const line of rowsAdvice(heading, footing)) {
+  const advising = options.rowsAdvice !== false
+  /* 2.70.0. "No footer" waits for the declarations to settle, and only for a host that draws one. */
+  let footerDrawn = false
+  let adviseLater: ReturnType<typeof setTimeout> | null = null
+  const say = (lines: readonly string[]) => {
+    for (const line of lines) {
       if (advised.has(line)) continue
       advised.add(line)
       console.warn(`[kehikot] ${line}`)
     }
+  }
+  const advise = () => {
+    if (!advising) return
+    say(rowsAdvice(heading, footing, { footer: false }))
+    if (adviseLater !== null) clearTimeout(adviseLater)
+    adviseLater = setTimeout(() => {
+      adviseLater = null
+      if (live && footerDrawn) say(rowsAdvice(heading, footing))
+    }, ROWS_ADVICE_AFTER_MS)
+  }
+
+  /* 2.70.0. The cover: held from each greeting until the page says it is drawn, or the wait passes. */
+  const holdFor = options.holdCover === false ? 0 : typeof options.holdCover === 'number' ? Math.max(0, options.holdCover) : HOLD_COVER_MS
+  let drawn = holdFor === 0
+  let holding = false
+  let holdTimer: ReturnType<typeof setTimeout> | null = null
+  const release = () => {
+    if (holdTimer !== null) clearTimeout(holdTimer)
+    holdTimer = null
+    if (!holding) return
+    holding = false
+    send({ type: MESSAGE.DRAWN })
   }
   /* The last activity list, as written, and the text of the one the host last took (`null`: none yet on
      this greeting, so the next is sent). `answered` is the greeting's `answers`, `null` when it did not say. */
@@ -443,14 +497,17 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
   const pointerTarget: PointerTarget | null =
     options.pointerTarget === false ? null : (options.pointerTarget ?? (typeof window === 'undefined' ? null : (window as unknown as PointerTarget)))
   let pointing: (() => void) | null = null
+  /* 2.70.0. Other windows heard as well (`pointerFrom`), each with the function that stops hearing it while listened to. */
+  const nested = new Map<PointerTarget, (() => void) | null>()
+  let hearOn: ((target: PointerTarget) => () => void) | null = null
   const pointer = (want: boolean) => {
-    if (!want || !pointerTarget) {
+    if (!want) {
       pointing?.()
       pointing = null
       return
     }
     if (pointing) return
-    const target = pointerTarget
+    const targets = [...(pointerTarget ? [pointerTarget] : [])]
     /*
      * One press at a time: where it went down, whether the page's own browser took it away
      * (`pointercancel`) while it was held still, and whether it has been told as over.
@@ -510,9 +567,22 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
     ]
     /* On the window, in the capture phase: before any element of the page can stop it, and still
        heard while an element holds the pointer captured. */
-    for (const [type, listener] of listening) target.addEventListener(type, listener, { capture: true, passive: true })
+    const hear = (target: PointerTarget) => {
+      for (const [type, listener] of listening) target.addEventListener(type, listener, { capture: true, passive: true })
+      return () => {
+        for (const [type, listener] of listening) target.removeEventListener(type, listener, { capture: true })
+      }
+    }
+    const stops = targets.map(hear)
+    for (const target of nested.keys()) nested.set(target, hear(target))
+    hearOn = hear
     pointing = () => {
-      for (const [type, listener] of listening) target.removeEventListener(type, listener, { capture: true })
+      for (const stop of stops) stop()
+      for (const [target, stop] of nested) {
+        stop?.()
+        nested.set(target, null)
+      }
+      hearOn = null
       pressed = null
     }
   }
@@ -620,7 +690,13 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
       origin = ev.origin && ev.origin !== 'null' ? ev.origin : '*'
       /* With the build that served this page, when it printed one: a host compares it with the server's now. */
       const build = pageBuild()
-      send({ type: MESSAGE.READY, id, protocol: message.protocol ?? PROTOCOL, ...(build ? { build } : {}) })
+      /* 2.70.0. A page not drawn yet asks for the cover to stay, and the wait starts again with every greeting. */
+      if (holdTimer !== null) clearTimeout(holdTimer)
+      holdTimer = null
+      holding = !drawn
+      send({ type: MESSAGE.READY, id, protocol: message.protocol ?? PROTOCOL, ...(build ? { build } : {}), ...(holding ? { hold: true } : {}) })
+      if (holding) holdTimer = setTimeout(release, holdFor)
+      footerDrawn = message.footer === true
       /* After `ready` and before the page is told, so a handler that announces a NEW offer from
          `onHello` overwrites the replay rather than being overwritten by it. */
       if (offered !== null) send({ type: MESSAGE.FILTERS, groups: offered })
@@ -853,6 +929,20 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
       sayFound(count)
     },
 
+    ready() {
+      if (drawn) return
+      drawn = true
+      release()
+    },
+
+    pointerFrom(target) {
+      if (!nested.has(target)) nested.set(target, hearOn ? hearOn(target) : null)
+      return () => {
+        nested.get(target)?.()
+        nested.delete(target)
+      }
+    },
+
     listen() {
       if (listening || !live) return this
       listening = true
@@ -948,6 +1038,10 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
 
     stop() {
       live = false
+      if (holdTimer !== null) clearTimeout(holdTimer)
+      holdTimer = null
+      if (adviseLater !== null) clearTimeout(adviseLater)
+      adviseLater = null
       pointer(false)
       findKeys(false)
       closeFind()

@@ -233,7 +233,21 @@ export interface ConnectOptions {
     findIn?: PageFindOptions | false;
     /** 2.69.0. Whether ⌘ (true) or Ctrl (false) is the find key. Found from the platform by default. */
     mac?: boolean;
+    /**
+     * 2.70.0. Keep the host's cover up until the page calls `ready()`: `ready` goes with `hold: true`, and
+     * `kehikot.drawn` follows when the page is drawn — or by itself after `HOLD_COVER_MS` (a number here
+     * is that wait instead). On by default, so a page draws no "Reading…" of its own; `false` says the
+     * page is ready the moment it is greeted, as before 2.70.0. A host before 2.70.0 ignores the hold.
+     */
+    holdCover?: boolean | number;
+    /**
+     * 2.70.0. `false` keeps `rowsAdvice` off the console. On by default: each sentence once per page,
+     * when a header or footer is declared, and "no footer" a moment after the last declaration.
+     */
+    rowsAdvice?: boolean;
 }
+/** 2.70.0. How long after the last header or footer declaration the client says a missing footer, in ms. */
+export declare const ROWS_ADVICE_AFTER_MS = 1500;
 /** What `connect` reads of a press: which button, whether it is the primary pointer, and where (2.50.1). */
 export interface PointerEventLike {
     button?: number;
@@ -327,6 +341,18 @@ export interface Connection {
      * whose count changed by itself (new output arrived). Dropped while no search is open.
      */
     findResult: (count: FindCount | 'unsupported') => void;
+    /**
+     * 2.70.0. Say the page is drawn: the host's cover, held since the greeting (`holdCover`), comes off.
+     * Call it once what the page shows has been read and drawn; calling it again, or with `holdCover:
+     * false`, does nothing. A greeting after it is answered without a hold.
+     */
+    ready: () => void;
+    /**
+     * 2.70.0. Hear presses on another window or element too — a nested frame the page owns — and tell
+     * the host of them as `kehikot.pointer`, as presses on the page itself are. Returns the function
+     * that stops hearing it. `relayPointer` is the way to call it for an iframe.
+     */
+    pointerFrom: (target: PointerTarget) => () => void;
     /** Whether anything has greeted us yet. */
     greeted: () => boolean;
     /** Stop listening. Every question still waiting is refused rather than left hanging. */

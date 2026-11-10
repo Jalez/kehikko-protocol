@@ -21,6 +21,10 @@ export function useHost(id, events = {}, options = {}) {
     handlers.current = events;
     const settings = useRef(options);
     settings.current = options;
+    /* 2.70.0. Nested windows to hear presses on, kept across mounts: a child's effect runs before this one's. */
+    const relays = useRef(new Map());
+    /* And whether the page said it is drawn before the store was there to say it. */
+    const saidReady = useRef(false);
     useEffect(() => {
         const mounted = settings.current;
         const read = (mounted.kept ?? JSON_KEPT).read;
@@ -50,8 +54,16 @@ export function useHost(id, events = {}, options = {}) {
         /* Stored BEFORE it starts: the mailbox replays synchronously inside `start`. */
         held.current = live;
         live.subscribe(() => setStanding(live.get()));
+        for (const target of relays.current.keys())
+            relays.current.set(target, live.pointerFrom(target));
         live.start();
+        if (saidReady.current)
+            live.ready();
         return () => {
+            for (const [target, stop] of relays.current) {
+                stop?.();
+                relays.current.set(target, null);
+            }
             live.stop();
             if (held.current === live)
                 held.current = null;
@@ -82,8 +94,21 @@ export function useHost(id, events = {}, options = {}) {
     const activity = useCallback((items) => held.current?.activity(items), []);
     const findResult = useCallback((count) => held.current?.findResult(count), []);
     const connection = useCallback(() => held.current?.connection() ?? null, []);
+    const ready = useCallback(() => {
+        saidReady.current = true;
+        held.current?.ready();
+    }, []);
+    const pointerFrom = useCallback((target) => {
+        const map = relays.current;
+        if (!map.has(target))
+            map.set(target, held.current ? held.current.pointerFrom(target) : null);
+        return () => {
+            map.get(target)?.();
+            map.delete(target);
+        };
+    }, []);
     const read = useCallback(() => held.current?.get() ?? drawn.current, []);
-    return useMemo(() => ({ ...standing, remember, point, locate, openAddress, request, resize, filters, clearable, refreshable, header, footer, activity, findResult, connection, read }), [standing, remember, point, locate, openAddress, request, resize, filters, clearable, refreshable, header, footer, activity, findResult, connection, read]);
+    return useMemo(() => ({ ...standing, remember, point, locate, openAddress, request, resize, filters, clearable, refreshable, header, footer, activity, findResult, ready, pointerFrom, connection, read }), [standing, remember, point, locate, openAddress, request, resize, filters, clearable, refreshable, header, footer, activity, findResult, ready, pointerFrom, connection, read]);
 }
 /** Whether a kept value can stand for `initial`: the same kind of value (an array for an array). */
 function sameKind(initial, value) {

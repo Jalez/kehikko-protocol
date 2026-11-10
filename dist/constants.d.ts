@@ -150,7 +150,18 @@ export declare const MESSAGE: {
      * is a short one, to start the search with. Sent only to a host whose greeting said `find: true`.
      */
     readonly FIND_OPEN: "kehikot.find.open";
+    /**
+     * Module → host (2.70.0). "My page is drawn: take your cover off." Sent once per greeting, after a
+     * `kehikot.ready` that said `hold: true`, when the page calls `ready()` or the client's own
+     * `HOLD_COVER_MS` passes. A host before 2.70.0 lifts its cover on `ready` and drops this unread.
+     */
+    readonly DRAWN: "kehikot.drawn";
 };
+/**
+ * 2.70.0. The longest a page asks a host to keep its cover up after `kehikot.ready` with `hold: true`,
+ * in ms: the client says `kehikot.drawn` by itself when it passes. A host keeps its own bound too.
+ */
+export declare const HOLD_COVER_MS = 3000;
 export type MessageType = (typeof MESSAGE)[keyof typeof MESSAGE];
 /** The prefix every message type carries, so a listener can drop the rest cheaply. There is one spelling. */
 export declare const MESSAGE_PREFIX = "kehikot.";
@@ -164,7 +175,7 @@ export declare const MESSAGE_PREFIX = "kehikot.";
  */
 export declare const HOST_MESSAGES: readonly ["kehikot.hello", "kehikot.context", "kehikot.response", "kehikot.goto", "kehikot.event", "kehikot.clear", "kehikot.refresh", "kehikot.press", "kehikot.opened", "kehikot.covered", "kehikot.visible", "kehikot.find"];
 /** And what the module says. */
-export declare const MODULE_MESSAGES: readonly ["kehikot.ready", "kehikot.request", "kehikot.resize", "kehikot.went", "kehikot.filters", "kehikot.clearable", "kehikot.refreshable", "kehikot.header", "kehikot.pressed", "kehikot.footer", "kehikot.pointer", "kehikot.page.error", "kehikot.find.result", "kehikot.find.open"];
+export declare const MODULE_MESSAGES: readonly ["kehikot.ready", "kehikot.request", "kehikot.resize", "kehikot.went", "kehikot.filters", "kehikot.clearable", "kehikot.refreshable", "kehikot.header", "kehikot.pressed", "kehikot.footer", "kehikot.pointer", "kehikot.page.error", "kehikot.find.result", "kehikot.find.open", "kehikot.drawn"];
 /**
  * How tall a frame may be asked to be, in pixels, bounded on both sides. `clampHeight` restates
  * the host's answer so a module can do the arithmetic on its own side.

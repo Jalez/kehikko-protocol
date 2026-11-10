@@ -34,6 +34,8 @@ Four tests for each item:
 
 **Advice, never a refusal.** `rowsAdvice(header, footer)` returns one sentence per obvious misplacement: a `meter` in the header (which the header's schema refuses anyway, without saying where it belongs), a header label that reads as a readout (`41%`, `3 / 12`, `2 of 5`), a `switch` or `toggle` in the footer with no `actsOn`, and an `actsOn` that names no readout in the same footer. The client says each sentence once on the console when the page declares its rows; nothing is held back and nothing is refused.
 
+2.70.0 adds the rest of the rule: a count in a header label (`Inbox (3)`, `12 open`); a `go` item that is not a jump (one place only, or options that read as acts, `New…`, `Clear`: a run); the same pressable item in both rows, by id or by kind and label; and live state with no footer declared at all — a readout, count, meter or run `result` in the header, or `rowsAdvice(header, footer, { state: true })` — said only when the footer is `null`/`undefined` (`[]` is a footer withdrawn on purpose) and not when `{ footer: false }` says the host draws none. The client says that last one `ROWS_ADVICE_AFTER_MS` after the last declaration, to a host whose greeting said `footer: true`. In CI, `kehikot-check-rows` runs the same advice over the rows a module states in `kehikot.rows.json` (docs/client.md, "What every container gets by default").
+
 ## The messages
 
 | message | direction | carries | answered |

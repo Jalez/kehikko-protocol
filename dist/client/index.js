@@ -7,7 +7,7 @@
 export { mailbox, makeMailbox, KEEP } from './mailbox.js';
 /* When the page fails (2.59.0): every uncaught error, said to the host, and a way to say one yourself. */
 export { pageErrors, makePageErrors, reportPageError, describeError, trimStack, PAGE_ERRORS_MAX, PAGE_ERRORS_GLOBAL, STACK_LINES, NO_MESSAGE, } from './errors.js';
-export { connect, mayGreet, pageOrigins, HostRefused, ANSWER_WITHIN_MS, PERSON_ANSWERS_WITHIN_MS, GOTO_BACKSTOP_MS, PRESS_BACKSTOP_MS, NOBODY_TO_ASK, POINTER_SLOP_PX, } from './connect.js';
+export { connect, mayGreet, pageOrigins, HostRefused, ANSWER_WITHIN_MS, PERSON_ANSWERS_WITHIN_MS, GOTO_BACKSTOP_MS, PRESS_BACKSTOP_MS, NOBODY_TO_ASK, POINTER_SLOP_PX, ROWS_ADVICE_AFTER_MS, } from './connect.js';
 /* 2.69.0: the client's own search of a page's visible text, the default answer to the host's find bar. */
 export { pageFind, FIND_HIGHLIGHT, FIND_HIGHLIGHT_CURRENT, FIND_MARK_ATTRIBUTE, FIND_SKIP_ATTRIBUTE, FIND_STYLE_ID, FIND_RECOUNT_MS, FIND_MARK_MAX, FIND_CSS, } from './find.js';
 export { findMatches, stepMatch } from '../find.js';
@@ -27,3 +27,7 @@ export { hostTooOld, FIT_SAYS } from '../fit.js';
 export { held, heldDraft } from './held.js';
 /* The host as a store, for a page whose state lives outside React. `useHost` is this, bound to a component. */
 export { hostStore, hostFields, GREETING_GRACE_MS, JSON_KEPT, KEEP_AFTER_MS, } from './host-store.js';
+/* 2.70.0. What every container gets by default: its view kept (`hostStore`'s `keepView`), and presses from nested frames. */
+export { KEPT_VIEW_MARK, KEEP_SCROLL_ATTRIBUTE, KEEP_SCROLL_AFTER_MS, RESTORE_SCROLL_WITHIN_MS, unwrapKept, wrapKept, viewOf, headerValues, } from './kept-view.js';
+export { relayPointer, pointerShim, pointerShimScript, RELAY_POINTER, RELAYED_EVENTS, } from './relay.js';
+export { HOLD_COVER_MS } from '../constants.js';

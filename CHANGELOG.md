@@ -7,6 +7,66 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.70.0 — 2026-11-10
+
+Every container behaves the same by default: what a person expects everywhere comes from the client,
+and a module gets it by moving its pin. **Additive**; `PROTOCOL` is still 2. Each default has an
+opt-out. [docs/client.md](docs/client.md), "What every container gets by default (2.70.0)", and the
+README's "Module consistency checklist".
+
+### Added
+
+- **The kept view** (`hostStore`, `useHost`: `keepView`, on by default). Per container, the page's main
+  scroll position (the element marked `data-kehikot-scroll`, else the document's scroller) and the value
+  of each of its header's switches and toggles are kept with the host (`state.set`, per kehikko) and
+  given back on the next greeting: the scroll restored while the page draws what it reaches (stopped
+  by the person's own wheel, key or press), a switch or toggle not on its kept value pressed back
+  through `onPress`. Kept in the same string as the page's own kept state, inside an envelope
+  (`KEPT_VIEW_MARK`, `wrapKept`, `unwrapKept`): the page's `kept`, `hello.state` and `context.kept`
+  are its own string, never the envelope, and an empty view writes the page's string as before.
+  `keepView: false` keeps nothing; `{ scroll, header, except }` narrows it. Written only to a host that
+  answers `state.set` for the module (`declares.uses: ['state:keep']`). `KeptView`, `viewOf`,
+  `headerValues`, `KEEP_SCROLL_ATTRIBUTE`, `KEEP_SCROLL_AFTER_MS`, `RESTORE_SCROLL_WITHIN_MS`,
+  `KeepViewOptions`, `ScrollBox`.
+- **The cover held until the page is drawn** (`connect`'s `holdCover`, on by default).
+  `kehikot.ready` goes with **`hold: true`** (`readySchema.hold`) and **`kehikot.drawn`**
+  (`MESSAGE.DRAWN`, `drawnSchema`) follows when the page calls **`ready()`** (`Connection`,
+  `hostStore`, `useHost`), or by itself after **`HOLD_COVER_MS`** (3 s; a number for `holdCover` is
+  another wait). Every greeting holds again until the page has said it once. `holdCover: false` is
+  ready at once, as before. A host before 2.70.0 lifts its cover on `ready` and drops `drawn` unread;
+  `WIRE_SINCE['ready.hold']`, `WIRE_SINCE['kehikot.drawn']`.
+- **`mountPage(root, page, options?)`** (`kehikot-module-protocol/client/mount`, a new subpath
+  because it needs `react-dom`, now an optional peer): mounts the page in `StrictMode` inside
+  `ReportErrors`, so a render that throws is always said to the host; a missing root is reported as
+  a page failure (`NO_ROOT`). `{ strict: false }`, `{ reportErrors: false }`, `fallback`. The
+  template's entry is now `mountPage('root', <App />)`.
+- **Presses from nested frames**: **`relayPointer(sink, frame, { origin? })`** hears presses inside an
+  iframe the page owns and tells the host of them through the connection's own `kehikot.pointer`
+  (only to a host that asked). A same-origin frame is listened on directly, again after each load; a
+  frame on another origin runs **`pointerShim`** (bundled) or **`pointerShimScript(origin)`** (one
+  `<script>`), whose `RELAY_POINTER` messages are taken from that frame and origin alone.
+  **`Connection.pointerFrom(target)`**, `hostStore.pointerFrom`, `useHost().pointerFrom`;
+  `RELAYED_EVENTS`, `PointerSink`, `FrameLike`.
+- **`rowsAdvice`, the rest of the rule**: a count in a header label (`Inbox (3)`, `12 open`); a Go item
+  that is not a jump (one place, or options that read as acts); the same pressable item in both rows;
+  live state (a readout, count, meter or run `result` in the header, or `options.state`) and no footer
+  declared. **`RowsAdviceOptions`** (`state`, `footer`). `connect` says "no footer" once,
+  `ROWS_ADVICE_AFTER_MS` after the last declaration, and only to a host that draws a footer;
+  `rowsAdvice: false` keeps the console quiet.
+- **`kehikot-check-rows`** (`bun run check:rows`, `src/check/rows.ts`): `rowsAdvice` over the rows a
+  module states in `kehikot.rows.json` (or `--file`, JSON or a module exporting `rows`), one state or a
+  list; exits 1 on advice unless `--warn`.
+- **`kehikot-check-notes`** (`bun run check:notes`, `src/check/notes.ts`): when the MCP door's tool
+  names, descriptions or input schemas changed since the last tag (its committed `notes/tools.json`,
+  `TOOLS_SNAPSHOT`), `notes/<version>.md` must have a "For agents" line. `--door <url>` or
+  `--tools <file>` reads the door now, `--write` stores it. `toolChanges`, `snapshotOf`, `checkNotes`.
+
+### Changed
+
+- **A page that bumps to 2.70.0 and never calls `ready()`** is covered, by a host that honours the
+  hold, until `HOLD_COVER_MS` passes. Call `ready()` once what the page shows is drawn, or pass
+  `holdCover: false`.
+
 ## 2.69.1 — 2026-11-10
 
 Find's whole words begin and end where two pieces of text meet side by side. **A fix**; `PROTOCOL` is still 2.

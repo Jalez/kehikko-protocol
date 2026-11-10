@@ -1,7 +1,7 @@
 {
   "name": "kehikot-module-protocol",
-  "version": "2.69.1",
-  "description": "The shapes a Kehikot host and a module it frames agree on: the manifest, the wire, and the extension payloads. Shapes only — no I/O, no state, no decisions.",
+  "version": "2.70.0",
+  "description": "The shapes a Kehikot host and a module it frames agree on: the manifest, the wire, and the extension payloads. Shapes only \u2014 no I/O, no state, no decisions.",
   "keywords": [
     "kehikot",
     "kehikko",
@@ -34,6 +34,10 @@
       "types": "./dist/client/react.d.ts",
       "default": "./dist/client/react.js"
     },
+    "./client/mount": {
+      "types": "./dist/client/mount.d.ts",
+      "default": "./dist/client/mount.js"
+    },
     "./serve": {
       "types": "./dist/serve/index.d.ts",
       "default": "./dist/serve/index.js"
@@ -51,7 +55,9 @@
   "bin": {
     "kehikot-create": "./bin/create.ts",
     "kehikot-check-parts": "./bin/check-parts.ts",
-    "kehikot-check-door": "./bin/check-door.ts"
+    "kehikot-check-door": "./bin/check-door.ts",
+    "kehikot-check-rows": "./bin/check-rows.ts",
+    "kehikot-check-notes": "./bin/check-notes.ts"
   },
   "files": [
     "dist",
@@ -66,7 +72,9 @@
     "./dist/client/index.js",
     "./src/client/mailbox.ts",
     "./src/client/errors.ts",
-    "./src/client/index.ts"
+    "./src/client/index.ts",
+    "./dist/client/mount.js",
+    "./src/client/mount.ts"
   ],
   "engines": {
     "node": ">=18"
@@ -78,11 +86,14 @@
     "prepublishOnly": "bun run build",
     "create": "bun run bin/create.ts",
     "check:parts": "bun run bin/check-parts.ts",
-    "check:door": "bun run bin/check-door.ts"
+    "check:door": "bun run bin/check-door.ts",
+    "check:rows": "bun run bin/check-rows.ts",
+    "check:notes": "bun run bin/check-notes.ts"
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0",
-    "zod": "^3.23.8"
+    "zod": "^3.23.8",
+    "react-dom": "^18.0.0 || ^19.0.0"
   },
   "devDependencies": {
     "@happy-dom/global-registrator": "^20.12.0",
@@ -96,6 +107,9 @@
   },
   "peerDependenciesMeta": {
     "react": {
+      "optional": true
+    },
+    "react-dom": {
       "optional": true
     }
   }
