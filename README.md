@@ -96,6 +96,7 @@ And behind subpaths, which are not shapes and say so:
 | `kehikot-module-protocol/run`, `kehikot-module-protocol/build` | A module served from its built page (2.17.0): `run`, one Bun server with the same doors as the dev server, a WebSocket hook, a door of the module's own asked first (`before`, 2.18.0) and `cors` for a page on an opaque origin (2.18.0), and `buildModule`, which builds and stamps `dist/` with the commit so a stale build is never served. See [ready-built](docs/ready-built.md). |
 | `kehikot-module-protocol/client/react` | `useHost`, `Cover` and `coverFor`, and `useFocus` (0.34.0), the parts focus as one value. Optional; `react` is an optional peer dependency and `client` does not import it. |
 | `kehikot-module-protocol/client/mount` | `mountPage` (2.70.0): the page in `StrictMode` inside `ReportErrors`. Needs `react-dom`, an optional peer dependency. |
+| `kehikot-module-protocol/proposals`, `kehikot-module-protocol/proposals/store`, `kehikot-module-protocol/client/proposals` | Proposed changes to a text a module keeps (2.71.0): the model (`Proposal`, `file`, `measure`, `apply`, `decide`, `hunksOf`), a module's site (`fileProposal`, `decideProposal`, `withdrawProposal`) and the four MCP tools (`proposalTools`, `answerProposalTool`); the book in `<project>/.kehikot/<module>/proposals/` (`fileKeeper`, `textFiles`); and `ProposalView`, `ProposalList`, `useProposalWalk`, `proposalsFooter` for the page. See [proposals](docs/proposals.md). |
 
 ## Where the reasoning is
 
@@ -107,6 +108,7 @@ The source says what each field is and what it is bounded by, in a line or three
 | [The wire: context, passages and messages](docs/wire.md) | What a host and a module say to each other across the frame: the context a module is handed, the passage a reader is pointing at, and the messages themselves. |
 | [Filters, clearing and refreshing](docs/filters.md) | The three things a module offers and the host draws: filters to narrow by, a control that clears what is shown, and a control that reads the material again. Also the shared reference facets behind `/facets`. |
 | [Capabilities, methods and their answers](docs/methods.md) | The questions a module can ask the host, the capability each one needs, what a caller must construct, and which answers have a shape. |
+| [Proposed changes to a text](docs/proposals.md) | An agent proposes a change to a text a module keeps, the person accepts or declines it with a reason (2.71.0): the model, the five-minute adoption, the four tools, the book, and the footer. |
 | [The manifest](docs/manifest.md) | What a module says about itself at the well-known path: every field of `manifestSchema`, what a module says it reacts to, its tags, and how a protocol range is read. |
 | [Names and ids](docs/ids.md) | The patterns for a module id, a mode id and an epic slug, the one derivation of a slug from prose, and the lookup that does not fall through a prototype. |
 | [Limits](docs/limits.md) | Why every string and every list is bounded, and the reasoning behind each number in `LIMITS`. |
@@ -198,6 +200,7 @@ The same list with what each version exported is in [CHANGELOG.md](CHANGELOG.md)
 
 | version | date | what it added |
 |---|---|---|
+| 2.71.0 | 2026-11-10 | Additive. Proposed changes to a text (`/proposals`, `/proposals/store`, `/client/proposals`): an agent proposes, the person accepts (as proposed, edited, or in part by hunk) or declines with a reason the agent reads; the book under `.kehikot/<module>/proposals/`; the four tools `propose_change`, `list_proposals`, `read_proposal`, `withdraw_proposal`; `ProposalView` and the footer count with Previous and Next. See [proposals](docs/proposals.md). |
 | 2.70.0 | 2026-11-10 | Additive. Every container behaves the same by default: the kept view (scroll and header switches/toggles, `keepView`), the host's cover held until `ready()` (`ready.hold`, `kehikot.drawn`, `holdCover`), `mountPage` (`client/mount`) inside `ReportErrors`, presses from nested frames (`relayPointer`, `pointerShim`), more `rowsAdvice`, and two CI checks, `kehikot-check-rows` and `kehikot-check-notes`. See [the client](docs/client.md) and the Module consistency checklist above. |
 | 2.69.1 | 2026-11-10 | Fix. Find's whole words begin and end where two elements' text meets side by side (`findMatches`' `breaks`). See [find](docs/find.md). |
 | 2.69.0 | 2026-11-10 | Additive. Find in every container: `kehikot.find`, `kehikot.find.result`, `kehikot.find.open`, `hello.find`; `findMatches`, `stepMatch`, `findSaid`; the client hears ⌘F and searches a page's visible text by itself (`pageFind`), and `onFind`/`findResult` serve a page whose text is not in the DOM. See [find](docs/find.md). |
