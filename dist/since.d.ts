@@ -44,6 +44,7 @@ export declare const METHOD_SINCE: {
     readonly 'messages.notify': "2.54.0";
     readonly 'messages.tell': "2.75.0";
     readonly 'messages.say': "2.50.0";
+    readonly 'projects.mine': "2.76.0";
 };
 /** Each capability, and the version that added it: the oldest of its methods. */
 export declare const CAPABILITY_SINCE: {
@@ -75,6 +76,7 @@ export declare const CAPABILITY_SINCE: {
     readonly 'dispositions:read': "2.21.0";
     readonly 'agents:message': "2.41.0";
     readonly 'messages:as-person': "2.50.0";
+    readonly 'projects:read': "2.76.0";
 };
 /** Each method a module's server may ask (`SERVER_METHODS`), and the version a server could first ask it in. */
 export declare const SERVER_METHOD_SINCE: {
@@ -91,6 +93,7 @@ export declare const SERVER_METHOD_SINCE: {
     readonly 'messages.read': "2.41.0";
     readonly 'messages.notify': "2.54.0";
     readonly 'messages.tell': "2.75.0";
+    readonly 'projects.mine': "2.76.0";
 };
 /**
  * The manifest declarations a host has to know to do what the module asks, and the version that
@@ -250,6 +253,7 @@ export declare const SINCE: {
         readonly 'messages.notify': "2.54.0";
         readonly 'messages.tell': "2.75.0";
         readonly 'messages.say': "2.50.0";
+        readonly 'projects.mine': "2.76.0";
     };
     readonly capabilities: {
         readonly 'epics:read': "0.25.0";
@@ -280,6 +284,7 @@ export declare const SINCE: {
         readonly 'dispositions:read': "2.21.0";
         readonly 'agents:message': "2.41.0";
         readonly 'messages:as-person': "2.50.0";
+        readonly 'projects:read': "2.76.0";
     };
     readonly serverMethods: {
         readonly 'tracker.get': "2.19.0";
@@ -295,6 +300,7 @@ export declare const SINCE: {
         readonly 'messages.read': "2.41.0";
         readonly 'messages.notify': "2.54.0";
         readonly 'messages.tell': "2.75.0";
+        readonly 'projects.mine': "2.76.0";
     };
     readonly declarations: {
         readonly 'mcp.subjects': "1.1.0";
@@ -414,6 +420,7 @@ export declare const PIECE_SAID: {
         readonly 'dispositions:read': "marks for why references closed, from the host";
         readonly 'agents:message': "messages between agent sessions";
         readonly 'messages:as-person': "messages to agent sessions as the person";
+        readonly 'projects:read': "the projects it keeps something in";
     };
     readonly declarations: {
         readonly 'mcp.subjects': "door subjects";

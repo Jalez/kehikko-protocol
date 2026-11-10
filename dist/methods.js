@@ -165,6 +165,15 @@ export const CAPABILITIES = {
      * takes such a message as its person's instruction. Never asked by a module's server or an agent.
      */
     'messages:as-person': 'Send what you type or press in this module to agent sessions as your own instruction — only on your press, and only once you allow it in its settings.',
+    /**
+     * 2.76.0. Be told which of the person's projects this module already keeps a folder in
+     * (`projects.mine`): the projects it wrote `.kehikot/<module>/` into itself. Never the person's
+     * whole list, never a folder the module has not kept something in, so it learns nothing about the
+     * disk it did not already hold. What a module's SERVER asks at start, so that what it runs for a
+     * project (a conversation to deliver a message to) is picked up after a restart before anybody
+     * opens that project again.
+     */
+    'projects:read': 'Be told which of your projects this module already keeps something in, so it can pick up where it left off after a restart.',
 };
 export const CAPABILITY_NAMES = Object.keys(CAPABILITIES);
 /**
@@ -221,6 +230,8 @@ export const METHODS = {
     'messages.tell': 'agents:message',
     /** The person's own message, from a module's page on their press (2.50.0). */
     'messages.say': 'messages:as-person',
+    /** The projects in which the asking module keeps its own folder (2.76.0). */
+    'projects.mine': 'projects:read',
 };
 export const METHOD_NAMES = Object.keys(METHODS);
 /**
@@ -549,6 +560,12 @@ export const methodParams = {
      * answered with `messageSendResult`. See `messageSayParams` for every condition a host holds it to.
      */
     'messages.say': messageSayParams,
+    /**
+     * 2.76.0. The person's projects in which the ASKING module keeps its folder (`moduleDir`), answered
+     * with `projectsMineResult`. Takes nothing: which module asks is who the host vouched for. Asked by a
+     * module's server (`SERVER_METHODS`) or its page.
+     */
+    'projects.mine': z.object({}),
 };
 /* ------------------------------------------------------------------------ *
  * The answers that are outcomes rather than material
@@ -682,6 +699,15 @@ export const pickedProject = z.object({
     name: z.string().max(LIMITS.PROJECT).default(''),
     id: z.string().regex(PROJECT_ID).optional(),
 });
+/**
+ * 2.76.0. `projects.mine`'s answer: the person's projects, in the host's order, in which the asking
+ * module keeps its own folder (`<project>/.kehikot/<module>/` exists). Never a project whose folder is
+ * gone, never one the host only opened by itself (the unpicked home folder). Empty is a true answer:
+ * the module keeps nothing in any project the person has.
+ */
+export const projectsMineResult = z.object({
+    projects: z.array(pickedProject).max(LIMITS.PROJECTS_KNOWN).default([]),
+});
 export const projectPickResult = z.object({
     outcome: z.enum(PICK_OUTCOMES),
     /**
@@ -728,6 +754,7 @@ export const methodResults = {
     'messages.notify': messageSendResult,
     'messages.tell': messageSendResult,
     'messages.say': messageSendResult,
+    'projects.mine': projectsMineResult,
 };
 /** The schema for one method's answer, or nothing — which means unspecified. */
 export function resultSchemaFor(method) {

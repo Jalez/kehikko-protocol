@@ -7,6 +7,25 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.76.0 — 2026-11-11
+
+The projects a module keeps something in, asked from its server at start. **Additive**; `PROTOCOL` is
+still 2. [docs/server-ask.md](docs/server-ask.md), "The projects a module keeps something in".
+
+### Added
+
+- **`projects.mine`** under the new capability **`projects:read`**, in `METHODS` and `SERVER_METHODS`:
+  takes nothing, answered **`projectsMineResult`** (`{ projects: PickedProject[] }`, at most
+  `LIMITS.PROJECTS_KNOWN`): the person's projects in which the asking module's own folder
+  (`.kehikot/<module>/`) exists. Never the whole list. Names no project.
+- **`watchKnownProjects({ module, know, everyMs?, retryMs?, ask?, log? })`** (`/serve`): asks
+  `projects.mine` at once and on a slow clock (`KNOWN_PROJECTS_EVERY_MS`, 5 minutes;
+  `KNOWN_PROJECTS_RETRY_MS`, 15 s while no host answers) and hands each project to the module's
+  `know(path, project)` once. Stops asking a host that is too old or refuses the grant, so a module on
+  an older app goes on as before. `KnownProjects` (`tick`, `start`, `stop`, `known`),
+  `KnownProjectsTick`, `KnownProjectsOptions`. An agent module's asleep conversations in a project
+  nobody opened since a restart are listed for delivery again.
+
 ## 2.75.0 — 2026-11-11
 
 Typed messages are compact, and what their markers mean is said once; news to the sessions at a place;

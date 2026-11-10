@@ -14,7 +14,7 @@ import {
 } from '../server-ask.js'
 import type { TrackerColumns, TrackerReading } from '../tracker.js'
 import type { TrafficNoteResult, TrafficReadResult } from '../traffic.js'
-import type { DispositionsGetResult, EpicsListResult, PartsGetResult } from '../methods.js'
+import type { DispositionsGetResult, EpicsListResult, PartsGetResult, ProjectsMineResult } from '../methods.js'
 import type { StepsListResult } from '../plan.js'
 import type { MessageReadResult, MessageSendResult } from '../agent-messages.js'
 import type { Reply } from './doors.js'
@@ -102,6 +102,8 @@ export interface ServerAnswers {
   'messages.notify': MessageSendResult
   /** 2.75.0. What became of a module's news to the sessions at a place. */
   'messages.tell': MessageSendResult
+  /** 2.76.0. The person's projects in which this module keeps its own folder. */
+  'projects.mine': ProjectsMineResult
 }
 
 /**

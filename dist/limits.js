@@ -115,6 +115,11 @@ export const LIMITS = {
      */
     DISPOSITIONS: 256,
     /**
+     * 2.76.0. How many projects one `projects.mine` may list: far above anybody's, low enough to bound
+     * an answer.
+     */
+    PROJECTS_KNOWN: 200,
+    /**
      * How many parts one epic may have, and so how many one context may list. See `parts.ts`. 32 until
      * 1.2.0: a part may be one step of a journey, and journeys of more than thirty-two steps exist.
      */
