@@ -74,7 +74,7 @@ const manifest = (over: Record<string, unknown> = {}) => ({
 
 describe('the version', () => {
   test('is 2.36.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.66.0')
+    expect(PACKAGE_VERSION).toBe('2.67.0')
     expect(PROTOCOL).toBe(2)
   })
 })
