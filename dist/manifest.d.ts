@@ -511,7 +511,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     y: number;
                     w: number;
                     h: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                 }, {
@@ -520,7 +520,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     y: number;
                     w: number;
                     h: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                 }>, z.ZodObject<{
@@ -540,7 +540,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     y: number;
                     w: number;
                     h: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                     round?: number | undefined;
@@ -551,7 +551,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     y: number;
                     w: number;
                     h: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                     round?: number | undefined;
@@ -570,19 +570,19 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     x: number;
                     y: number;
                     widths: number[];
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    gap?: number | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
-                    gap?: number | undefined;
                 }, {
                     kind: "rows";
                     x: number;
                     y: number;
                     widths: number[];
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    gap?: number | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
-                    gap?: number | undefined;
                 }>, z.ZodObject<{
                     tone: z.ZodOptional<z.ZodEnum<["card", "muted", "faint", "text", "strong", "ok", "busy", "warn", "danger"]>>;
                     motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
@@ -596,7 +596,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     x: number;
                     y: number;
                     r: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                 }, {
@@ -604,7 +604,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     x: number;
                     y: number;
                     r: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                 }>, z.ZodObject<{
@@ -623,7 +623,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     y: number;
                     x2: number;
                     y2: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                     dashed?: boolean | undefined;
@@ -633,7 +633,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     y: number;
                     x2: number;
                     y2: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                     dashed?: boolean | undefined;
@@ -653,7 +653,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     text: string;
                     x: number;
                     y: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                     size?: number | undefined;
@@ -664,7 +664,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     text: string;
                     x: number;
                     y: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                     size?: number | undefined;
@@ -681,14 +681,14 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     kind: "pointer";
                     x: number;
                     y: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                 }, {
                     kind: "pointer";
                     x: number;
                     y: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                 }>]>, "many">;
@@ -700,7 +700,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     y: number;
                     w: number;
                     h: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                 } | {
@@ -709,7 +709,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     y: number;
                     w: number;
                     h: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                     round?: number | undefined;
@@ -719,16 +719,16 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     x: number;
                     y: number;
                     widths: number[];
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    gap?: number | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
-                    gap?: number | undefined;
                 } | {
                     kind: "dot";
                     x: number;
                     y: number;
                     r: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                 } | {
@@ -737,7 +737,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     y: number;
                     x2: number;
                     y2: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                     dashed?: boolean | undefined;
@@ -746,7 +746,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     text: string;
                     x: number;
                     y: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                     size?: number | undefined;
@@ -756,7 +756,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     kind: "pointer";
                     x: number;
                     y: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                 })[];
@@ -768,7 +768,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     y: number;
                     w: number;
                     h: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                 } | {
@@ -777,7 +777,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     y: number;
                     w: number;
                     h: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                     round?: number | undefined;
@@ -787,16 +787,16 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     x: number;
                     y: number;
                     widths: number[];
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    gap?: number | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
-                    gap?: number | undefined;
                 } | {
                     kind: "dot";
                     x: number;
                     y: number;
                     r: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                 } | {
@@ -805,7 +805,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     y: number;
                     x2: number;
                     y2: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                     dashed?: boolean | undefined;
@@ -814,7 +814,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     text: string;
                     x: number;
                     y: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                     size?: number | undefined;
@@ -824,7 +824,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     kind: "pointer";
                     x: number;
                     y: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                 })[];
@@ -840,7 +840,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     y: number;
                     w: number;
                     h: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                 } | {
@@ -849,7 +849,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     y: number;
                     w: number;
                     h: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                     round?: number | undefined;
@@ -859,16 +859,16 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     x: number;
                     y: number;
                     widths: number[];
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    gap?: number | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
-                    gap?: number | undefined;
                 } | {
                     kind: "dot";
                     x: number;
                     y: number;
                     r: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                 } | {
@@ -877,7 +877,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     y: number;
                     x2: number;
                     y2: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                     dashed?: boolean | undefined;
@@ -886,7 +886,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     text: string;
                     x: number;
                     y: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                     size?: number | undefined;
@@ -896,7 +896,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     kind: "pointer";
                     x: number;
                     y: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                 })[];
@@ -918,7 +918,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     y: number;
                     w: number;
                     h: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                 } | {
@@ -927,7 +927,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     y: number;
                     w: number;
                     h: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                     round?: number | undefined;
@@ -937,16 +937,16 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     x: number;
                     y: number;
                     widths: number[];
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    gap?: number | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
-                    gap?: number | undefined;
                 } | {
                     kind: "dot";
                     x: number;
                     y: number;
                     r: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                 } | {
@@ -955,7 +955,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     y: number;
                     x2: number;
                     y2: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                     dashed?: boolean | undefined;
@@ -964,7 +964,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     text: string;
                     x: number;
                     y: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                     size?: number | undefined;
@@ -974,7 +974,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     kind: "pointer";
                     x: number;
                     y: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                 })[];
@@ -1059,23 +1059,23 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             needs: z.ZodOptional<z.ZodEffects<z.ZodArray<z.ZodType<import("./skills.js").SkillNeed, z.ZodTypeDef, import("./skills.js").SkillNeed>, "many">, import("./skills.js").SkillNeed[], import("./skills.js").SkillNeed[]>>;
         }, "strip", z.ZodTypeAny, {
             name: string;
-            version: string;
             summary: string;
+            version: string;
             needs?: import("./skills.js").SkillNeed[] | undefined;
         }, {
             name: string;
-            version: string;
             summary: string;
+            version: string;
             needs?: import("./skills.js").SkillNeed[] | undefined;
         }>, "many">, {
             name: string;
-            version: string;
             summary: string;
+            version: string;
             needs?: import("./skills.js").SkillNeed[] | undefined;
         }[], {
             name: string;
-            version: string;
             summary: string;
+            version: string;
             needs?: import("./skills.js").SkillNeed[] | undefined;
         }[]>>;
         /**
@@ -1136,8 +1136,8 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             type: "string" | "number" | "boolean" | "choice" | "list";
             key: string;
             label: string;
-            scope: "project" | "machine";
             description: string;
+            scope: "project" | "machine";
             personOnly: boolean;
             choices?: {
                 value: string;
@@ -1152,16 +1152,16 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                 value: string;
                 label: string;
             }[] | undefined;
+            description?: string | undefined;
             default?: unknown;
             scope?: "project" | "machine" | undefined;
-            description?: string | undefined;
             personOnly?: boolean | undefined;
         }>, {
             type: "string" | "number" | "boolean" | "choice" | "list";
             key: string;
             label: string;
-            scope: "project" | "machine";
             description: string;
+            scope: "project" | "machine";
             personOnly: boolean;
             choices?: {
                 value: string;
@@ -1176,16 +1176,16 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                 value: string;
                 label: string;
             }[] | undefined;
+            description?: string | undefined;
             default?: unknown;
             scope?: "project" | "machine" | undefined;
-            description?: string | undefined;
             personOnly?: boolean | undefined;
         }>, "many">, {
             type: "string" | "number" | "boolean" | "choice" | "list";
             key: string;
             label: string;
-            scope: "project" | "machine";
             description: string;
+            scope: "project" | "machine";
             personOnly: boolean;
             choices?: {
                 value: string;
@@ -1200,9 +1200,9 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                 value: string;
                 label: string;
             }[] | undefined;
+            description?: string | undefined;
             default?: unknown;
             scope?: "project" | "machine" | undefined;
-            description?: string | undefined;
             personOnly?: boolean | undefined;
         }[]>>>;
         /**
@@ -1215,23 +1215,17 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
          */
         navigates: z.ZodCatch<z.ZodOptional<z.ZodEffects<z.ZodArray<z.ZodString, "many">, string[], string[]>>>;
     }, "strip", z.ZodTypeAny, {
-        protocol: string;
-        prompt: boolean;
         uses: string[];
+        prompt: boolean;
+        protocol: string;
         storage: boolean;
         provides?: string[] | undefined;
-        skills?: {
-            name: string;
-            version: string;
-            summary: string;
-            needs?: import("./skills.js").SkillNeed[] | undefined;
-        }[] | undefined;
         settings?: {
             type: "string" | "number" | "boolean" | "choice" | "list";
             key: string;
             label: string;
-            scope: "project" | "machine";
             description: string;
+            scope: "project" | "machine";
             personOnly: boolean;
             choices?: {
                 value: string;
@@ -1239,27 +1233,33 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             }[] | undefined;
             default?: unknown;
         }[] | undefined;
+        scopes?: ("epic" | "project")[] | undefined;
+        skills?: {
+            name: string;
+            summary: string;
+            version: string;
+            needs?: import("./skills.js").SkillNeed[] | undefined;
+        }[] | undefined;
         agentSessions?: {
             loadsSkills: boolean;
             installsSkills?: boolean | undefined;
         } | undefined;
-        scopes?: ("epic" | "project")[] | undefined;
         navigates?: string[] | undefined;
     }, {
-        protocol?: string | undefined;
-        prompt?: boolean | undefined;
         provides?: unknown;
         uses?: string[] | undefined;
+        prompt?: boolean | undefined;
+        protocol?: string | undefined;
+        settings?: unknown;
+        scopes?: ("epic" | "project")[] | undefined;
         skills?: {
             name: string;
-            version: string;
             summary: string;
+            version: string;
             needs?: import("./skills.js").SkillNeed[] | undefined;
         }[] | undefined;
-        settings?: unknown;
         storage?: boolean | undefined;
         agentSessions?: unknown;
-        scopes?: ("epic" | "project")[] | undefined;
         navigates?: unknown;
     }>>;
     /**
@@ -1289,27 +1289,18 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     id: string;
     name: string;
     kind: "kehikot.module";
-    version: string;
-    protocol: number;
-    summary: string;
     declares: {
-        protocol: string;
-        prompt: boolean;
         uses: string[];
+        prompt: boolean;
+        protocol: string;
         storage: boolean;
         provides?: string[] | undefined;
-        skills?: {
-            name: string;
-            version: string;
-            summary: string;
-            needs?: import("./skills.js").SkillNeed[] | undefined;
-        }[] | undefined;
         settings?: {
             type: "string" | "number" | "boolean" | "choice" | "list";
             key: string;
             label: string;
-            scope: "project" | "machine";
             description: string;
+            scope: "project" | "machine";
             personOnly: boolean;
             choices?: {
                 value: string;
@@ -1317,14 +1308,23 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             }[] | undefined;
             default?: unknown;
         }[] | undefined;
+        scopes?: ("epic" | "project")[] | undefined;
+        skills?: {
+            name: string;
+            summary: string;
+            version: string;
+            needs?: import("./skills.js").SkillNeed[] | undefined;
+        }[] | undefined;
         agentSessions?: {
             loadsSkills: boolean;
             installsSkills?: boolean | undefined;
         } | undefined;
-        scopes?: ("epic" | "project")[] | undefined;
         navigates?: string[] | undefined;
     };
     reacts: string[];
+    summary: string;
+    version: string;
+    protocol: number;
     dataVersion: number;
     tags: string[];
     guidance: string;
@@ -1341,14 +1341,6 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     }[];
     opens?: string[] | undefined;
     holds?: string[] | undefined;
-    build?: {
-        version: string;
-        commit: string | null;
-        started: string;
-        protocol: string;
-        start?: string | undefined;
-    } | undefined;
-    shows?: string[] | undefined;
     mcp?: {
         url: string;
         transport: "http" | "sse" | "stdio";
@@ -1362,6 +1354,15 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         }[];
         as?: string | undefined;
     } | undefined;
+    icon?: string | undefined;
+    shows?: string[] | undefined;
+    build?: {
+        version: string;
+        commit: string | null;
+        started: string;
+        protocol: string;
+        start?: string | undefined;
+    } | undefined;
     help?: {
         summary: string;
         sections: {
@@ -1369,6 +1370,8 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             points: string[];
         }[];
     } | undefined;
+    agentSays?: string | undefined;
+    absentSays?: string | undefined;
     guards?: {
         id: string;
         why: string;
@@ -1381,7 +1384,6 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         rewrite?: string | undefined;
         allow?: string[] | undefined;
     }[] | undefined;
-    icon?: string | undefined;
     health?: string | undefined;
     partless?: string | undefined;
     events?: {
@@ -1391,8 +1393,6 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         sound?: string | undefined;
     }[] | undefined;
     reveal?: "push" | "over" | undefined;
-    agentSays?: string | undefined;
-    absentSays?: string | undefined;
     intro?: {
         slides: {
             body: string;
@@ -1405,7 +1405,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     y: number;
                     w: number;
                     h: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                 } | {
@@ -1414,7 +1414,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     y: number;
                     w: number;
                     h: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                     round?: number | undefined;
@@ -1424,16 +1424,16 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     x: number;
                     y: number;
                     widths: number[];
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    gap?: number | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
-                    gap?: number | undefined;
                 } | {
                     kind: "dot";
                     x: number;
                     y: number;
                     r: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                 } | {
@@ -1442,7 +1442,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     y: number;
                     x2: number;
                     y2: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                     dashed?: boolean | undefined;
@@ -1451,7 +1451,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     text: string;
                     x: number;
                     y: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                     size?: number | undefined;
@@ -1461,7 +1461,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     kind: "pointer";
                     x: number;
                     y: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                 })[];
@@ -1482,25 +1482,21 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     }[];
     opens?: unknown;
     holds?: unknown;
-    build?: unknown;
-    version?: string | undefined;
-    summary?: string | undefined;
-    shows?: unknown;
     declares?: {
-        protocol?: string | undefined;
-        prompt?: boolean | undefined;
         provides?: unknown;
         uses?: string[] | undefined;
+        prompt?: boolean | undefined;
+        protocol?: string | undefined;
+        settings?: unknown;
+        scopes?: ("epic" | "project")[] | undefined;
         skills?: {
             name: string;
-            version: string;
             summary: string;
+            version: string;
             needs?: import("./skills.js").SkillNeed[] | undefined;
         }[] | undefined;
-        settings?: unknown;
         storage?: boolean | undefined;
         agentSessions?: unknown;
-        scopes?: ("epic" | "project")[] | undefined;
         navigates?: unknown;
     } | undefined;
     reacts?: string[] | undefined;
@@ -1517,9 +1513,15 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             release?: string | undefined;
         }[] | undefined;
     } | undefined;
-    help?: unknown;
-    guards?: unknown;
+    summary?: string | undefined;
+    version?: string | undefined;
     icon?: string | undefined;
+    shows?: unknown;
+    build?: unknown;
+    help?: unknown;
+    agentSays?: unknown;
+    absentSays?: unknown;
+    guards?: unknown;
     dataVersion?: number | undefined;
     tags?: string[] | undefined;
     guidance?: string | undefined;
@@ -1531,34 +1533,23 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     partless?: string | undefined;
     events?: unknown;
     reveal?: unknown;
-    agentSays?: unknown;
-    absentSays?: unknown;
     intro?: unknown;
 }>, {
     id: string;
     name: string;
     kind: "kehikot.module";
-    version: string;
-    protocol: number;
-    summary: string;
     declares: {
-        protocol: string;
-        prompt: boolean;
         uses: string[];
+        prompt: boolean;
+        protocol: string;
         storage: boolean;
         provides?: string[] | undefined;
-        skills?: {
-            name: string;
-            version: string;
-            summary: string;
-            needs?: import("./skills.js").SkillNeed[] | undefined;
-        }[] | undefined;
         settings?: {
             type: "string" | "number" | "boolean" | "choice" | "list";
             key: string;
             label: string;
-            scope: "project" | "machine";
             description: string;
+            scope: "project" | "machine";
             personOnly: boolean;
             choices?: {
                 value: string;
@@ -1566,14 +1557,23 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             }[] | undefined;
             default?: unknown;
         }[] | undefined;
+        scopes?: ("epic" | "project")[] | undefined;
+        skills?: {
+            name: string;
+            summary: string;
+            version: string;
+            needs?: import("./skills.js").SkillNeed[] | undefined;
+        }[] | undefined;
         agentSessions?: {
             loadsSkills: boolean;
             installsSkills?: boolean | undefined;
         } | undefined;
-        scopes?: ("epic" | "project")[] | undefined;
         navigates?: string[] | undefined;
     };
     reacts: string[];
+    summary: string;
+    version: string;
+    protocol: number;
     dataVersion: number;
     tags: string[];
     guidance: string;
@@ -1590,14 +1590,6 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     }[];
     opens?: string[] | undefined;
     holds?: string[] | undefined;
-    build?: {
-        version: string;
-        commit: string | null;
-        started: string;
-        protocol: string;
-        start?: string | undefined;
-    } | undefined;
-    shows?: string[] | undefined;
     mcp?: {
         url: string;
         transport: "http" | "sse" | "stdio";
@@ -1611,6 +1603,15 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         }[];
         as?: string | undefined;
     } | undefined;
+    icon?: string | undefined;
+    shows?: string[] | undefined;
+    build?: {
+        version: string;
+        commit: string | null;
+        started: string;
+        protocol: string;
+        start?: string | undefined;
+    } | undefined;
     help?: {
         summary: string;
         sections: {
@@ -1618,6 +1619,8 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             points: string[];
         }[];
     } | undefined;
+    agentSays?: string | undefined;
+    absentSays?: string | undefined;
     guards?: {
         id: string;
         why: string;
@@ -1630,7 +1633,6 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         rewrite?: string | undefined;
         allow?: string[] | undefined;
     }[] | undefined;
-    icon?: string | undefined;
     health?: string | undefined;
     partless?: string | undefined;
     events?: {
@@ -1640,8 +1642,6 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         sound?: string | undefined;
     }[] | undefined;
     reveal?: "push" | "over" | undefined;
-    agentSays?: string | undefined;
-    absentSays?: string | undefined;
     intro?: {
         slides: {
             body: string;
@@ -1654,7 +1654,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     y: number;
                     w: number;
                     h: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                 } | {
@@ -1663,7 +1663,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     y: number;
                     w: number;
                     h: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                     round?: number | undefined;
@@ -1673,16 +1673,16 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     x: number;
                     y: number;
                     widths: number[];
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    gap?: number | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
-                    gap?: number | undefined;
                 } | {
                     kind: "dot";
                     x: number;
                     y: number;
                     r: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                 } | {
@@ -1691,7 +1691,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     y: number;
                     x2: number;
                     y2: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                     dashed?: boolean | undefined;
@@ -1700,7 +1700,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     text: string;
                     x: number;
                     y: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                     size?: number | undefined;
@@ -1710,7 +1710,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
                     kind: "pointer";
                     x: number;
                     y: number;
-                    tone?: "busy" | "text" | "ok" | "warn" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
+                    tone?: "busy" | "text" | "warn" | "ok" | "card" | "muted" | "faint" | "strong" | "danger" | undefined;
                     motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                     delay?: number | undefined;
                 })[];
@@ -1731,25 +1731,21 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     }[];
     opens?: unknown;
     holds?: unknown;
-    build?: unknown;
-    version?: string | undefined;
-    summary?: string | undefined;
-    shows?: unknown;
     declares?: {
-        protocol?: string | undefined;
-        prompt?: boolean | undefined;
         provides?: unknown;
         uses?: string[] | undefined;
+        prompt?: boolean | undefined;
+        protocol?: string | undefined;
+        settings?: unknown;
+        scopes?: ("epic" | "project")[] | undefined;
         skills?: {
             name: string;
-            version: string;
             summary: string;
+            version: string;
             needs?: import("./skills.js").SkillNeed[] | undefined;
         }[] | undefined;
-        settings?: unknown;
         storage?: boolean | undefined;
         agentSessions?: unknown;
-        scopes?: ("epic" | "project")[] | undefined;
         navigates?: unknown;
     } | undefined;
     reacts?: string[] | undefined;
@@ -1766,9 +1762,15 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             release?: string | undefined;
         }[] | undefined;
     } | undefined;
-    help?: unknown;
-    guards?: unknown;
+    summary?: string | undefined;
+    version?: string | undefined;
     icon?: string | undefined;
+    shows?: unknown;
+    build?: unknown;
+    help?: unknown;
+    agentSays?: unknown;
+    absentSays?: unknown;
+    guards?: unknown;
     dataVersion?: number | undefined;
     tags?: string[] | undefined;
     guidance?: string | undefined;
@@ -1780,8 +1782,6 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     partless?: string | undefined;
     events?: unknown;
     reveal?: unknown;
-    agentSays?: unknown;
-    absentSays?: unknown;
     intro?: unknown;
 }>;
 export type Manifest = z.infer<typeof manifestSchema>;

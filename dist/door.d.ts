@@ -447,6 +447,11 @@ export declare const placeDoorsSchema: z.ZodObject<{
         says: z.ZodCatch<z.ZodOptional<z.ZodString>>;
         door: z.ZodCatch<z.ZodNullable<z.ZodString>>;
         skills: z.ZodCatch<z.ZodArray<z.ZodString, "many">>;
+        version: z.ZodCatch<z.ZodOptional<z.ZodEffects<z.ZodEffects<z.ZodString, string, string>, string, string>>>;
+        changes: z.ZodCatch<z.ZodOptional<z.ZodEffects<z.ZodArray<z.ZodUnknown, "many">, {
+            version: string;
+            lines: string[];
+        }[], unknown[]>>>;
     }, "strip", z.ZodTypeAny, {
         name: string;
         module: string;
@@ -454,11 +459,18 @@ export declare const placeDoorsSchema: z.ZodObject<{
         door: string | null;
         skills: string[];
         says?: string | undefined;
+        version?: string | undefined;
+        changes?: {
+            version: string;
+            lines: string[];
+        }[] | undefined;
     }, {
         name: string;
         module: string;
         says?: unknown;
         summary?: unknown;
+        version?: unknown;
+        changes?: unknown;
         door?: unknown;
         skills?: unknown;
     }>, "many">>>;
@@ -717,6 +729,28 @@ export declare const placeDoorsSchema: z.ZodObject<{
     } & {
         id: string;
     })[], unknown>>>;
+    /**
+     * 2.62.0. Kehikot's own changes for agents (`hostChangesSchema`): where it is in its sequence of
+     * them, and its recent ones, for the notes to say once to a session started before an update
+     * (`NotesInput.host`). Each module in `modules` carries its own (`version`, `changes`). Absent:
+     * the host did not say (before 2.62.0), and nothing is said about Kehikot.
+     */
+    host: z.ZodCatch<z.ZodOptional<z.ZodObject<{
+        version: z.ZodEffects<z.ZodEffects<z.ZodString, string, string>, string, string>;
+        changes: z.ZodCatch<z.ZodEffects<z.ZodArray<z.ZodUnknown, "many">, {
+            version: string;
+            lines: string[];
+        }[], unknown[]>>;
+    }, "strip", z.ZodTypeAny, {
+        version: string;
+        changes: {
+            version: string;
+            lines: string[];
+        }[];
+    }, {
+        version: string;
+        changes?: unknown;
+    }>>>;
 }, "strip", z.ZodTypeAny, {
     token: string;
     ok: true;
@@ -767,23 +801,35 @@ export declare const placeDoorsSchema: z.ZodObject<{
         door: string | null;
         skills: string[];
         says?: string | undefined;
+        version?: string | undefined;
+        changes?: {
+            version: string;
+            lines: string[];
+        }[] | undefined;
+    }[] | undefined;
+    host?: {
+        version: string;
+        changes: {
+            version: string;
+            lines: string[];
+        }[];
+    } | undefined;
+    everywhere?: {
+        name: string;
+        module: string;
+        version: string;
+        origin: string;
     }[] | undefined;
     absent?: {
         name: string;
         module: string;
         says: string;
     }[] | undefined;
+    messagesMore?: number | undefined;
     kehikkoSkills?: {
         name: string;
         text: string;
         description: string;
-    }[] | undefined;
-    messagesMore?: number | undefined;
-    everywhere?: {
-        name: string;
-        module: string;
-        version: string;
-        origin: string;
     }[] | undefined;
     guards?: ({
         name: string;
@@ -814,10 +860,11 @@ export declare const placeDoorsSchema: z.ZodObject<{
     }[];
     messages?: unknown;
     modules?: unknown;
-    absent?: unknown;
-    kehikkoSkills?: unknown;
-    messagesMore?: unknown;
+    host?: unknown;
     everywhere?: unknown;
+    absent?: unknown;
+    messagesMore?: unknown;
+    kehikkoSkills?: unknown;
     guards?: unknown;
 }>;
 export type PlaceDoors = z.infer<typeof placeDoorsSchema>;

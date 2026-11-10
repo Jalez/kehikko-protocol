@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { LIMITS } from './limits.js'
-import { absentModuleSchema, sessionModuleSchema } from './notes.js'
+import { absentModuleSchema, hostChangesSchema, sessionModuleSchema } from './notes.js'
 import { NOTES_MESSAGES_MOST, agentMessageSchema } from './agent-messages.js'
 import { EPIC_SLUG, KEHIKKO_KEY, MODULE_ID, PROJECT_ID, own } from './ids.js'
 import { skillNameSchema } from './skills.js'
@@ -238,6 +238,13 @@ export const placeDoorsSchema = z.object({
    * not parse is left out and the rest kept.
    */
   guards: placedGuardsSchema.optional().catch(undefined),
+  /**
+   * 2.62.0. Kehikot's own changes for agents (`hostChangesSchema`): where it is in its sequence of
+   * them, and its recent ones, for the notes to say once to a session started before an update
+   * (`NotesInput.host`). Each module in `modules` carries its own (`version`, `changes`). Absent:
+   * the host did not say (before 2.62.0), and nothing is said about Kehikot.
+   */
+  host: hostChangesSchema.optional().catch(undefined),
 })
 export type PlaceDoors = z.infer<typeof placeDoorsSchema>
 

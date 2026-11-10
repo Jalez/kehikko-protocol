@@ -52,3 +52,5 @@ export { trafficTarget, trafficPath, trafficCommand } from '../traffic.js';
 export { attach, eventFrame, events, publish, streams, watching, EVENTS_BAD_TOPIC, EVENTS_FULL, MAX_EVENT_STREAMS, MAX_TOPIC_LENGTH, } from './events.js';
 /* The environment for what a module starts on the person's behalf, without the host's own Bun. */
 export { personEnv, HOST_PATH_ENV } from './person.js';
+/* A door's tools changed: MCP's `notifications/tools/list_changed` on its listening stream (2.62.0). See `tools-changed.ts`. */
+export { MAX_TOOL_STREAMS, TOOLS_LIST_CHANGED, TOOLS_RETRY_MS, markOfEventId, mcpPathOf, sayingListChanged, toolsChanged, toolsMark, toolStream, wantsToolStream, } from './tools-changed.js';

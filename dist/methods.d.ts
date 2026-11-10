@@ -576,52 +576,52 @@ export declare const methodParams: {
             commit: z.ZodOptional<z.ZodString>;
         }, "strip", z.ZodTypeAny, {
             path: string;
-            line: number;
             change: string;
+            line: number;
             side: "new" | "old";
-            commit?: string | undefined;
             endLine?: number | undefined;
+            commit?: string | undefined;
         }, {
             path: string;
-            line: number;
             change: string;
+            line: number;
             side: "new" | "old";
-            commit?: string | undefined;
             endLine?: number | undefined;
+            commit?: string | undefined;
         }>, {
             path: string;
-            line: number;
             change: string;
+            line: number;
             side: "new" | "old";
-            commit?: string | undefined;
             endLine?: number | undefined;
+            commit?: string | undefined;
         }, {
             path: string;
-            line: number;
             change: string;
+            line: number;
             side: "new" | "old";
-            commit?: string | undefined;
             endLine?: number | undefined;
+            commit?: string | undefined;
         }>>;
         intent: z.ZodOptional<z.ZodEnum<["show", "comment"]>>;
     }, "strip", z.ZodTypeAny, {
         location: {
             path: string;
-            line: number;
             change: string;
+            line: number;
             side: "new" | "old";
-            commit?: string | undefined;
             endLine?: number | undefined;
+            commit?: string | undefined;
         } | null;
         intent?: "show" | "comment" | undefined;
     }, {
         location: {
             path: string;
-            line: number;
             change: string;
+            line: number;
             side: "new" | "old";
-            commit?: string | undefined;
             endLine?: number | undefined;
+            commit?: string | undefined;
         } | null;
         intent?: "show" | "comment" | undefined;
     }>;
@@ -836,10 +836,10 @@ export declare const methodParams: {
     }, "strip", z.ZodTypeAny, {
         note: string;
         ref: string;
-        stage: "working" | "blocked" | "in-review";
+        stage: "working" | "in-review" | "blocked";
     }, {
         ref: string;
-        stage: "working" | "blocked" | "in-review";
+        stage: "working" | "in-review" | "blocked";
         note?: string | undefined;
     }>;
     /**
@@ -1034,9 +1034,6 @@ export declare const methodParams: {
             name: string;
             after?: string | null | undefined;
         } | undefined;
-        remove?: {
-            id: string;
-        } | undefined;
         rename?: {
             id: string;
             name: string;
@@ -1044,6 +1041,9 @@ export declare const methodParams: {
         move?: {
             id: string;
             after?: string | null | undefined;
+        } | undefined;
+        remove?: {
+            id: string;
         } | undefined;
     }, {
         epic: string;
@@ -1051,9 +1051,6 @@ export declare const methodParams: {
             name: string;
             after?: string | null | undefined;
         } | undefined;
-        remove?: {
-            id: string;
-        } | undefined;
         rename?: {
             id: string;
             name: string;
@@ -1061,6 +1058,9 @@ export declare const methodParams: {
         move?: {
             id: string;
             after?: string | null | undefined;
+        } | undefined;
+        remove?: {
+            id: string;
         } | undefined;
     }>, {
         epic: string;
@@ -1068,9 +1068,6 @@ export declare const methodParams: {
             name: string;
             after?: string | null | undefined;
         } | undefined;
-        remove?: {
-            id: string;
-        } | undefined;
         rename?: {
             id: string;
             name: string;
@@ -1078,6 +1075,9 @@ export declare const methodParams: {
         move?: {
             id: string;
             after?: string | null | undefined;
+        } | undefined;
+        remove?: {
+            id: string;
         } | undefined;
     }, {
         epic: string;
@@ -1085,9 +1085,6 @@ export declare const methodParams: {
             name: string;
             after?: string | null | undefined;
         } | undefined;
-        remove?: {
-            id: string;
-        } | undefined;
         rename?: {
             id: string;
             name: string;
@@ -1095,6 +1092,9 @@ export declare const methodParams: {
         move?: {
             id: string;
             after?: string | null | undefined;
+        } | undefined;
+        remove?: {
+            id: string;
         } | undefined;
     }>, {
         epic: string;
@@ -1102,9 +1102,6 @@ export declare const methodParams: {
             name: string;
             after?: string | null | undefined;
         } | undefined;
-        remove?: {
-            id: string;
-        } | undefined;
         rename?: {
             id: string;
             name: string;
@@ -1112,6 +1109,9 @@ export declare const methodParams: {
         move?: {
             id: string;
             after?: string | null | undefined;
+        } | undefined;
+        remove?: {
+            id: string;
         } | undefined;
     }, {
         epic: string;
@@ -1119,9 +1119,6 @@ export declare const methodParams: {
             name: string;
             after?: string | null | undefined;
         } | undefined;
-        remove?: {
-            id: string;
-        } | undefined;
         rename?: {
             id: string;
             name: string;
@@ -1129,6 +1126,9 @@ export declare const methodParams: {
         move?: {
             id: string;
             after?: string | null | undefined;
+        } | undefined;
+        remove?: {
+            id: string;
         } | undefined;
     }>;
     /**
@@ -1434,9 +1434,9 @@ export declare const methodParams: {
             reason: string | null;
             ok: boolean | null;
             ms: number | null;
-            cache?: "refused" | "hit" | "not-modified" | undefined;
             bytesIn?: number | undefined;
             bytesOut?: number | undefined;
+            cache?: "hit" | "not-modified" | "refused" | undefined;
         }, {
             at: number;
             path: string;
@@ -1444,11 +1444,11 @@ export declare const methodParams: {
             host: string;
             status?: number | null | undefined;
             reason?: string | null | undefined;
-            cache?: "refused" | "hit" | "not-modified" | undefined;
             ok?: boolean | null | undefined;
             ms?: number | null | undefined;
             bytesIn?: number | undefined;
             bytesOut?: number | undefined;
+            cache?: "hit" | "not-modified" | "refused" | undefined;
         }>, "many">;
     }, "strip", z.ZodTypeAny, {
         calls: {
@@ -1460,9 +1460,9 @@ export declare const methodParams: {
             reason: string | null;
             ok: boolean | null;
             ms: number | null;
-            cache?: "refused" | "hit" | "not-modified" | undefined;
             bytesIn?: number | undefined;
             bytesOut?: number | undefined;
+            cache?: "hit" | "not-modified" | "refused" | undefined;
         }[];
     }, {
         calls: {
@@ -1472,11 +1472,11 @@ export declare const methodParams: {
             host: string;
             status?: number | null | undefined;
             reason?: string | null | undefined;
-            cache?: "refused" | "hit" | "not-modified" | undefined;
             ok?: boolean | null | undefined;
             ms?: number | null | undefined;
             bytesIn?: number | undefined;
             bytesOut?: number | undefined;
+            cache?: "hit" | "not-modified" | "refused" | undefined;
         }[];
     }>;
     /**
@@ -2286,15 +2286,15 @@ export declare const partsGetResult: z.ZodObject<{
         refs: string[];
         heading: string;
         picked: boolean;
-        files?: string[] | undefined;
         documents?: string[] | undefined;
+        files?: string[] | undefined;
     }, {
         id: string;
         refs?: string[] | undefined;
+        documents?: string[] | undefined;
         files?: string[] | undefined;
         heading?: string | undefined;
         picked?: boolean | undefined;
-        documents?: string[] | undefined;
     }>, "many">;
 }, "strip", z.ZodTypeAny, {
     parts: {
@@ -2302,17 +2302,17 @@ export declare const partsGetResult: z.ZodObject<{
         refs: string[];
         heading: string;
         picked: boolean;
-        files?: string[] | undefined;
         documents?: string[] | undefined;
+        files?: string[] | undefined;
     }[];
 }, {
     parts: {
         id: string;
         refs?: string[] | undefined;
+        documents?: string[] | undefined;
         files?: string[] | undefined;
         heading?: string | undefined;
         picked?: boolean | undefined;
-        documents?: string[] | undefined;
     }[];
 }>;
 export type PartsGetResult = z.infer<typeof partsGetResult>;

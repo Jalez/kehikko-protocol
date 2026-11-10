@@ -338,6 +338,27 @@ the manifest, it grants nothing, and no door checks a request against it.
 - **Exact first paint.** Append `theme=dark|light` (`THEME_PARAM`) to a module's entry address when framing it — see "What the host must send for an exact first paint".
 - A page that uses `useHost` or `Cover` reloads itself when it notices; a host need not reload the frame for that.
 
+## When a door’s tools change (2.62.0)
+
+An agent lists a door's tools once, when its conversation starts. When a module is updated its tools
+may change, and the agent would keep calling the old list. MCP's answer is
+`notifications/tools/list_changed`, which a server sends on its listening stream (Streamable HTTP: a
+`GET` of the door with `accept: text/event-stream`). The doors serve that stream for every module with
+an HTTP MCP door in its manifest — nothing to write (`serve/tools-changed.ts`):
+
+- `initialize`'s answer gets `capabilities.tools.listChanged: true`, which is what an agent reads to listen.
+- The stream opens with an event id and no data (`retry: 1000`), so an agent that loses it — the process
+  restarting for an update — reconnects saying the last id it had (`last-event-id`).
+- Each id starts with a mark of the tool list it was sent under (`toolsMark`, from the door's own
+  `tools/list`). A process whose tools have another mark tells a reconnecting agent at once.
+- A module whose tools change while it runs calls `toolsChanged()`; every open stream whose mark moved
+  is told, once.
+- At most `MAX_TOOL_STREAMS` open; past that, and for a door that lists no tools, a `GET` is answered
+  405 as before — "this server sends nothing on its own".
+
+Best effort: an agent that stopped reconnecting before the new process was up keeps its old list until
+its conversation restarts, which the session's notes say (`CHANGED_TOOLS_LINE`).
+
 ## Testing a module on the plumbing
 
 A test that sends a body through `doorsHandler` or `doorsFetch` says `content-type: application/json` on it, as `ask()` does; one that sends none of a browser's headers is read as a program and answered. A test that greets a page gives the greeting any origin it likes while the document carries no `origins` island (a test document does not); to test the refusal, pass `connect(id, events, { origins })` or add the island.

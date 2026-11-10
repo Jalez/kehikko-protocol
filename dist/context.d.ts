@@ -541,43 +541,43 @@ export declare const contextSchema: z.ZodObject<{
     }, "strip", z.ZodTypeAny, {
         path: string;
         intent: "show" | "comment";
-        line: number;
         change: string;
+        line: number;
         side: "new" | "old";
         at?: string | undefined;
         by?: string | undefined;
-        commit?: string | undefined;
         endLine?: number | undefined;
+        commit?: string | undefined;
     }, {
         path: string;
-        line: number;
         change: string;
+        line: number;
         side: "new" | "old";
         at?: string | undefined;
         intent?: unknown;
         by?: string | undefined;
-        commit?: string | undefined;
         endLine?: number | undefined;
+        commit?: string | undefined;
     }>, {
         path: string;
         intent: "show" | "comment";
-        line: number;
         change: string;
+        line: number;
         side: "new" | "old";
         at?: string | undefined;
         by?: string | undefined;
-        commit?: string | undefined;
         endLine?: number | undefined;
+        commit?: string | undefined;
     }, {
         path: string;
-        line: number;
         change: string;
+        line: number;
         side: "new" | "old";
         at?: string | undefined;
         intent?: unknown;
         by?: string | undefined;
-        commit?: string | undefined;
         endLine?: number | undefined;
+        commit?: string | undefined;
     }>>>;
     /**
      * 2.16.0. The last web address handed to this kehikko to be shown, or null; see `address.ts`. Set
@@ -945,15 +945,15 @@ export declare const contextSchema: z.ZodObject<{
         refs: string[];
         heading: string;
         picked: boolean;
-        files?: string[] | undefined;
         documents?: string[] | undefined;
+        files?: string[] | undefined;
     }, {
         id: string;
         refs?: string[] | undefined;
+        documents?: string[] | undefined;
         files?: string[] | undefined;
         heading?: string | undefined;
         picked?: boolean | undefined;
-        documents?: string[] | undefined;
     }>, "many">>;
 }, "strip", z.ZodTypeAny, {
     epic: string | null;
@@ -962,8 +962,8 @@ export declare const contextSchema: z.ZodObject<{
         refs: string[];
         heading: string;
         picked: boolean;
-        files?: string[] | undefined;
         documents?: string[] | undefined;
+        files?: string[] | undefined;
     }[];
     kehikko: {
         id: number;
@@ -978,6 +978,15 @@ export declare const contextSchema: z.ZodObject<{
         at?: string | undefined;
         by?: string | undefined;
     } | null;
+    address: {
+        url: string;
+        intent: "show";
+        at?: string | undefined;
+        title?: string | undefined;
+        by?: string | undefined;
+        agent?: true | undefined;
+    } | null;
+    pinned: boolean;
     tracker: {
         at: string | null;
         refreshing: boolean;
@@ -1000,23 +1009,14 @@ export declare const contextSchema: z.ZodObject<{
     location: {
         path: string;
         intent: "show" | "comment";
-        line: number;
         change: string;
+        line: number;
         side: "new" | "old";
         at?: string | undefined;
         by?: string | undefined;
-        commit?: string | undefined;
         endLine?: number | undefined;
+        commit?: string | undefined;
     } | null;
-    address: {
-        url: string;
-        intent: "show";
-        at?: string | undefined;
-        title?: string | undefined;
-        by?: string | undefined;
-        agent?: true | undefined;
-    } | null;
-    pinned: boolean;
     prompt: string | null;
     filters: Record<string, string | string[]>;
     containers: {
@@ -1059,10 +1059,10 @@ export declare const contextSchema: z.ZodObject<{
     parts?: {
         id: string;
         refs?: string[] | undefined;
+        documents?: string[] | undefined;
         files?: string[] | undefined;
         heading?: string | undefined;
         picked?: boolean | undefined;
-        documents?: string[] | undefined;
     }[] | undefined;
     kehikko?: {
         id: number;
@@ -1077,6 +1077,15 @@ export declare const contextSchema: z.ZodObject<{
         at?: string | undefined;
         by?: string | undefined;
     } | null | undefined;
+    address?: {
+        url: string;
+        at?: string | undefined;
+        title?: string | undefined;
+        intent?: unknown;
+        by?: string | undefined;
+        agent?: true | undefined;
+    } | null | undefined;
+    pinned?: boolean | undefined;
     tracker?: {
         at?: string | null | undefined;
         refreshing?: boolean | undefined;
@@ -1099,24 +1108,15 @@ export declare const contextSchema: z.ZodObject<{
     } | null | undefined;
     location?: {
         path: string;
-        line: number;
         change: string;
+        line: number;
         side: "new" | "old";
         at?: string | undefined;
         intent?: unknown;
         by?: string | undefined;
-        commit?: string | undefined;
         endLine?: number | undefined;
+        commit?: string | undefined;
     } | null | undefined;
-    address?: {
-        url: string;
-        at?: string | undefined;
-        title?: string | undefined;
-        intent?: unknown;
-        by?: string | undefined;
-        agent?: true | undefined;
-    } | null | undefined;
-    pinned?: boolean | undefined;
     prompt?: string | null | undefined;
     filters?: Record<string, string | string[]> | undefined;
     kept?: string | null | undefined;

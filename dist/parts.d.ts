@@ -69,15 +69,15 @@ export declare const partSchema: z.ZodObject<{
     refs: string[];
     heading: string;
     picked: boolean;
-    files?: string[] | undefined;
     documents?: string[] | undefined;
+    files?: string[] | undefined;
 }, {
     id: string;
     refs?: string[] | undefined;
+    documents?: string[] | undefined;
     files?: string[] | undefined;
     heading?: string | undefined;
     picked?: boolean | undefined;
-    documents?: string[] | undefined;
 }>;
 export type EpicPart = z.infer<typeof partSchema>;
 /**
@@ -110,15 +110,15 @@ export declare const partsSchema: z.ZodArray<z.ZodObject<{
     refs: string[];
     heading: string;
     picked: boolean;
-    files?: string[] | undefined;
     documents?: string[] | undefined;
+    files?: string[] | undefined;
 }, {
     id: string;
     refs?: string[] | undefined;
+    documents?: string[] | undefined;
     files?: string[] | undefined;
     heading?: string | undefined;
     picked?: boolean | undefined;
-    documents?: string[] | undefined;
 }>, "many">;
 /**
  * One part as the epic keeps it: an id and a name, and its place is its place in the list. `id` is made

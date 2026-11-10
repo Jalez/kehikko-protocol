@@ -7,6 +7,42 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.62.0 — 2026-11-10
+
+A session that started before an update is told, once, what changed for agents, and a door tells a
+connected agent that its tools changed. **Additive**; `PROTOCOL` is still 2.
+[docs/asking.md](docs/asking.md), "What changed since a session was told (2.62.0)", and
+[docs/module-plumbing.md](docs/module-plumbing.md), "When a door’s tools change (2.62.0)".
+
+### Added
+
+- **A "For agents" section in release notes** (`agent-changes.ts`): `## For agents` or a `For agents:`
+  line in `notes/<version>.md`, one or two plain lines on new tools, changed rules, new guards.
+  `forAgentsOf`, `withoutForAgents` (what people read), `notesVersion`, `agentChangesFrom` (what a host
+  hands: the releases up to the one it runs that say something to agents, newest first),
+  `AGENT_CHANGES_MOST`.
+- **`version` and `changes` on each module in the place answer** (`sessionModuleSchema`,
+  `agentChangeSchema`, `agentChangesSchema`) and **`host`** beside them (`hostChangesSchema`): Kehikot's
+  own, in their own sequence. In `SESSION_FIELD_SINCE`.
+- **`changedSince` and `CHANGED_SINCE_HEAD` / `CHANGED_TOOLS_LINE`**: at a prompt, the lines of the
+  releases between the version a session was told and the one running, for Kehikot and each module on
+  its kehikko, oldest first, once. `NotesInput.host`; `NotesTold.versions` and `NotesTold.host` keep what
+  was told. `changesBetween`. `subagentNotes` takes the session's record as a third argument and says
+  the same lines to a subagent started before the session's next prompt.
+- **A door's listening stream** (`serve/tools-changed.ts`, served by `doorsHandler` and `doorsFetch` for
+  every HTTP MCP door): `GET` with `accept: text/event-stream` opens it; event ids carry a mark of the
+  tool list (`toolsMark`, `markOfEventId`); an agent reconnecting with another mark, or any open stream
+  after `toolsChanged()` with a new list, gets `notifications/tools/list_changed` (`TOOLS_LIST_CHANGED`).
+  `initialize` is answered with `capabilities.tools.listChanged: true` (`sayingListChanged`).
+  `MAX_TOOL_STREAMS`, `TOOLS_RETRY_MS`.
+
+### Changed
+
+- **`NOTES_VERSION` is 9**: every running session is told the full notes once, so its record starts
+  keeping versions.
+- A `GET` of an MCP door that asks for an event stream is answered by the doors, not by the module's
+  `answer` (which answered 405).
+
 ## 2.61.0 — 2026-11-10
 
 Guards: a module placed on a kehikko can hold the shell commands of every agent session there —

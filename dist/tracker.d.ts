@@ -222,12 +222,12 @@ export declare const trackerActivitySchema: z.ZodObject<{
     mine: z.ZodOptional<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
     at: string;
-    kind: "state" | "commit" | "comment" | "review";
+    kind: "state" | "comment" | "commit" | "review";
     login: string;
     mine?: boolean | undefined;
 }, {
     at: string;
-    kind: "state" | "commit" | "comment" | "review";
+    kind: "state" | "comment" | "commit" | "review";
     login: string;
     mine?: boolean | undefined;
 }>;
@@ -502,12 +502,12 @@ export declare const trackerRowSchema: z.ZodObject<{
         mine: z.ZodOptional<z.ZodBoolean>;
     }, "strip", z.ZodTypeAny, {
         at: string;
-        kind: "state" | "commit" | "comment" | "review";
+        kind: "state" | "comment" | "commit" | "review";
         login: string;
         mine?: boolean | undefined;
     }, {
         at: string;
-        kind: "state" | "commit" | "comment" | "review";
+        kind: "state" | "comment" | "commit" | "review";
         login: string;
         mine?: boolean | undefined;
     }>>;
@@ -617,14 +617,14 @@ export declare const trackerRowSchema: z.ZodObject<{
     }>>;
 }, "strip", z.ZodTypeAny, {
     number: number;
-    kind: "issue" | "change";
-    state: "open" | "closed" | "merged";
+    kind: "change" | "issue";
+    state: "open" | "merged" | "closed";
     url: string;
     title: string;
-    host: string;
     ref: string;
     readAt: string;
     tracker: "github" | "gitlab";
+    host: string;
     repo: string;
     labels: string[];
     assignees: string[];
@@ -656,7 +656,7 @@ export declare const trackerRowSchema: z.ZodObject<{
     mergedAt?: string | null | undefined;
     contributes?: string[] | undefined;
     contributedBy?: string[] | undefined;
-    pipeline?: "success" | "failed" | "running" | "pending" | "canceled" | "skipped" | "manual" | undefined;
+    pipeline?: "failed" | "success" | "running" | "pending" | "canceled" | "skipped" | "manual" | undefined;
     pipelineUrl?: string | undefined;
     pipelineAt?: string | undefined;
     column?: {
@@ -690,7 +690,7 @@ export declare const trackerRowSchema: z.ZodObject<{
     } | undefined;
     lastActivity?: {
         at: string;
-        kind: "state" | "commit" | "comment" | "review";
+        kind: "state" | "comment" | "commit" | "review";
         login: string;
         mine?: boolean | undefined;
     } | undefined;
@@ -705,14 +705,14 @@ export declare const trackerRowSchema: z.ZodObject<{
     }[] | undefined;
 }, {
     number: number;
-    kind: "issue" | "change";
-    state: "open" | "closed" | "merged";
+    kind: "change" | "issue";
+    state: "open" | "merged" | "closed";
     url: string;
     title: string;
-    host: string;
     ref: string;
     readAt: string;
     tracker: "github" | "gitlab";
+    host: string;
     repo: string;
     detail?: {
         readAt: string;
@@ -744,7 +744,7 @@ export declare const trackerRowSchema: z.ZodObject<{
     }[] | undefined;
     contributes?: unknown;
     contributedBy?: unknown;
-    pipeline?: "success" | "failed" | "running" | "pending" | "canceled" | "skipped" | "manual" | undefined;
+    pipeline?: "failed" | "success" | "running" | "pending" | "canceled" | "skipped" | "manual" | undefined;
     pipelineUrl?: unknown;
     pipelineAt?: unknown;
     column?: {
@@ -778,7 +778,7 @@ export declare const trackerRowSchema: z.ZodObject<{
     } | undefined;
     lastActivity?: {
         at: string;
-        kind: "state" | "commit" | "comment" | "review";
+        kind: "state" | "comment" | "commit" | "review";
         login: string;
         mine?: boolean | undefined;
     } | undefined;
@@ -816,16 +816,16 @@ export declare const trackerSourceSchema: z.ZodObject<{
     refreshing: z.ZodDefault<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
     at: string | null;
-    host: string;
     tracker: "github" | "gitlab";
+    host: string;
     repo: string;
     default: boolean;
     listed: boolean;
     error: string | null;
     refreshing: boolean;
 }, {
-    host: string;
     tracker: "github" | "gitlab";
+    host: string;
     repo: string;
     at?: string | null | undefined;
     default?: boolean | undefined;
@@ -884,16 +884,16 @@ export declare const trackerReadingResult: z.ZodObject<{
         refreshing: z.ZodDefault<z.ZodBoolean>;
     }, "strip", z.ZodTypeAny, {
         at: string | null;
-        host: string;
         tracker: "github" | "gitlab";
+        host: string;
         repo: string;
         default: boolean;
         listed: boolean;
         error: string | null;
         refreshing: boolean;
     }, {
-        host: string;
         tracker: "github" | "gitlab";
+        host: string;
         repo: string;
         at?: string | null | undefined;
         default?: boolean | undefined;
@@ -1100,12 +1100,12 @@ export declare const trackerReadingResult: z.ZodObject<{
             mine: z.ZodOptional<z.ZodBoolean>;
         }, "strip", z.ZodTypeAny, {
             at: string;
-            kind: "state" | "commit" | "comment" | "review";
+            kind: "state" | "comment" | "commit" | "review";
             login: string;
             mine?: boolean | undefined;
         }, {
             at: string;
-            kind: "state" | "commit" | "comment" | "review";
+            kind: "state" | "comment" | "commit" | "review";
             login: string;
             mine?: boolean | undefined;
         }>>;
@@ -1215,14 +1215,14 @@ export declare const trackerReadingResult: z.ZodObject<{
         }>>;
     }, "strip", z.ZodTypeAny, {
         number: number;
-        kind: "issue" | "change";
-        state: "open" | "closed" | "merged";
+        kind: "change" | "issue";
+        state: "open" | "merged" | "closed";
         url: string;
         title: string;
-        host: string;
         ref: string;
         readAt: string;
         tracker: "github" | "gitlab";
+        host: string;
         repo: string;
         labels: string[];
         assignees: string[];
@@ -1254,7 +1254,7 @@ export declare const trackerReadingResult: z.ZodObject<{
         mergedAt?: string | null | undefined;
         contributes?: string[] | undefined;
         contributedBy?: string[] | undefined;
-        pipeline?: "success" | "failed" | "running" | "pending" | "canceled" | "skipped" | "manual" | undefined;
+        pipeline?: "failed" | "success" | "running" | "pending" | "canceled" | "skipped" | "manual" | undefined;
         pipelineUrl?: string | undefined;
         pipelineAt?: string | undefined;
         column?: {
@@ -1288,7 +1288,7 @@ export declare const trackerReadingResult: z.ZodObject<{
         } | undefined;
         lastActivity?: {
             at: string;
-            kind: "state" | "commit" | "comment" | "review";
+            kind: "state" | "comment" | "commit" | "review";
             login: string;
             mine?: boolean | undefined;
         } | undefined;
@@ -1303,14 +1303,14 @@ export declare const trackerReadingResult: z.ZodObject<{
         }[] | undefined;
     }, {
         number: number;
-        kind: "issue" | "change";
-        state: "open" | "closed" | "merged";
+        kind: "change" | "issue";
+        state: "open" | "merged" | "closed";
         url: string;
         title: string;
-        host: string;
         ref: string;
         readAt: string;
         tracker: "github" | "gitlab";
+        host: string;
         repo: string;
         detail?: {
             readAt: string;
@@ -1342,7 +1342,7 @@ export declare const trackerReadingResult: z.ZodObject<{
         }[] | undefined;
         contributes?: unknown;
         contributedBy?: unknown;
-        pipeline?: "success" | "failed" | "running" | "pending" | "canceled" | "skipped" | "manual" | undefined;
+        pipeline?: "failed" | "success" | "running" | "pending" | "canceled" | "skipped" | "manual" | undefined;
         pipelineUrl?: unknown;
         pipelineAt?: unknown;
         column?: {
@@ -1376,7 +1376,7 @@ export declare const trackerReadingResult: z.ZodObject<{
         } | undefined;
         lastActivity?: {
             at: string;
-            kind: "state" | "commit" | "comment" | "review";
+            kind: "state" | "comment" | "commit" | "review";
             login: string;
             mine?: boolean | undefined;
         } | undefined;
@@ -1405,8 +1405,8 @@ export declare const trackerReadingResult: z.ZodObject<{
     refreshing: boolean;
     sources: {
         at: string | null;
-        host: string;
         tracker: "github" | "gitlab";
+        host: string;
         repo: string;
         default: boolean;
         listed: boolean;
@@ -1415,14 +1415,14 @@ export declare const trackerReadingResult: z.ZodObject<{
     }[];
     rows: {
         number: number;
-        kind: "issue" | "change";
-        state: "open" | "closed" | "merged";
+        kind: "change" | "issue";
+        state: "open" | "merged" | "closed";
         url: string;
         title: string;
-        host: string;
         ref: string;
         readAt: string;
         tracker: "github" | "gitlab";
+        host: string;
         repo: string;
         labels: string[];
         assignees: string[];
@@ -1454,7 +1454,7 @@ export declare const trackerReadingResult: z.ZodObject<{
         mergedAt?: string | null | undefined;
         contributes?: string[] | undefined;
         contributedBy?: string[] | undefined;
-        pipeline?: "success" | "failed" | "running" | "pending" | "canceled" | "skipped" | "manual" | undefined;
+        pipeline?: "failed" | "success" | "running" | "pending" | "canceled" | "skipped" | "manual" | undefined;
         pipelineUrl?: string | undefined;
         pipelineAt?: string | undefined;
         column?: {
@@ -1488,7 +1488,7 @@ export declare const trackerReadingResult: z.ZodObject<{
         } | undefined;
         lastActivity?: {
             at: string;
-            kind: "state" | "commit" | "comment" | "review";
+            kind: "state" | "comment" | "commit" | "review";
             login: string;
             mine?: boolean | undefined;
         } | undefined;
@@ -1510,8 +1510,8 @@ export declare const trackerReadingResult: z.ZodObject<{
     at?: string | null | undefined;
     refreshing?: boolean | undefined;
     sources?: {
-        host: string;
         tracker: "github" | "gitlab";
+        host: string;
         repo: string;
         at?: string | null | undefined;
         default?: boolean | undefined;
@@ -1521,14 +1521,14 @@ export declare const trackerReadingResult: z.ZodObject<{
     }[] | undefined;
     rows?: {
         number: number;
-        kind: "issue" | "change";
-        state: "open" | "closed" | "merged";
+        kind: "change" | "issue";
+        state: "open" | "merged" | "closed";
         url: string;
         title: string;
-        host: string;
         ref: string;
         readAt: string;
         tracker: "github" | "gitlab";
+        host: string;
         repo: string;
         detail?: {
             readAt: string;
@@ -1560,7 +1560,7 @@ export declare const trackerReadingResult: z.ZodObject<{
         }[] | undefined;
         contributes?: unknown;
         contributedBy?: unknown;
-        pipeline?: "success" | "failed" | "running" | "pending" | "canceled" | "skipped" | "manual" | undefined;
+        pipeline?: "failed" | "success" | "running" | "pending" | "canceled" | "skipped" | "manual" | undefined;
         pipelineUrl?: unknown;
         pipelineAt?: unknown;
         column?: {
@@ -1594,7 +1594,7 @@ export declare const trackerReadingResult: z.ZodObject<{
         } | undefined;
         lastActivity?: {
             at: string;
-            kind: "state" | "commit" | "comment" | "review";
+            kind: "state" | "comment" | "commit" | "review";
             login: string;
             mine?: boolean | undefined;
         } | undefined;

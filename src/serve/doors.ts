@@ -8,6 +8,7 @@ import { ticketOf } from './ticket.js'
 import { serverPassReply } from './ask.js'
 import { SERVER_PASS_PATH } from '../server-ask.js'
 import { eventFrame } from './events.js'
+import { mcpPathOf, sayingListChanged, toolStream, wantsToolStream } from './tools-changed.js'
 
 /**
  * Every door a module answers on, served by the process that serves its page: a module is ONE
@@ -166,6 +167,8 @@ function standing(options: DoorsOptions) {
       'content-security-policy': frameAncestors(process.env, options.ancestors),
     }),
     open,
+    /** The MCP door's path, whose listening stream the doors serve (2.62.0, `tools-changed.ts`); null for none. */
+    mcpPath: mcpPathOf(options.manifest),
   }
 }
 
@@ -174,6 +177,14 @@ function marksOf(build: Build | undefined): Record<string, string> {
   if (!build) return {}
   return { [BUILD_HEADER]: buildStamp(build), ...(build.start ? { [START_HEADER]: build.start } : {}) }
 }
+
+/** The one value of a header, from node's headers. */
+const headerOf = (headers: Record<string, string | string[] | undefined>, name: string): string | null => {
+  const value = headers[name]
+  return Array.isArray(value) ? (value[0] ?? null) : (value ?? null)
+}
+
+const NO_TOOL_STREAM: Reply = { status: 405, body: { ok: false, error: 'This door sends nothing on its own just now; POST to it.' } }
 
 /**
  * A reply as headers and a payload. Nothing the doors send may be cached — an answer is this
@@ -223,7 +234,7 @@ export function doorsHandler(
   options: DoorsOptions,
   transform?: (html: string, url: string, originalUrl?: string) => Promise<string>,
 ): DoorHandler {
-  const { pages, ours, build, manifest, marks, document, pageHeaders, refusal, open } = standing(options)
+  const { pages, ours, build, manifest, marks, document, pageHeaders, refusal, open, mcpPath } = standing(options)
 
   return (request, response, next) => {
     const url = new URL(request.url ?? '/', 'http://127.0.0.1')
@@ -304,6 +315,37 @@ export function doorsHandler(
       }
     }
 
+    /* The MCP door's listening stream: where an agent hears that the door's tools changed (2.62.0). */
+    if (wantsToolStream(method, path, mcpPath, headerOf(request.headers, 'accept'))) {
+      void toolStream({ answer: options.answer, path, query: url.searchParams, ticket, lastEventId: headerOf(request.headers, 'last-event-id') })
+        .then((stream) => {
+          if (!stream) return send(NO_TOOL_STREAM)
+          response.statusCode = 200
+          for (const [name, value] of Object.entries(STREAM_HEADERS)) response.setHeader(name, value)
+          for (const [name, value] of Object.entries(marks)) response.setHeader(name, value)
+          try {
+            request.socket?.setNoDelay?.(true)
+          } catch {
+            /* A socket that is already gone. The close below says so. */
+          }
+          response.flushHeaders?.()
+          response.write(stream.first)
+          const stop = stream.keep((text) => response.write(text))
+          const beat = setInterval(() => response.write(': beat\n\n'), options.beatMs ?? 25_000)
+          let gone = false
+          const leave = () => {
+            if (gone) return
+            gone = true
+            clearInterval(beat)
+            stop()
+          }
+          request.on('close', leave)
+          request.on('error', leave)
+        })
+        .catch(next)
+      return
+    }
+
     /* Only these paths read a body. Vite has to keep seeing an unconsumed request for everything else. */
     void readJsonBody(request, { maxBytes: options.maxBodyBytes })
       .then(async (read) => {
@@ -312,7 +354,7 @@ export function doorsHandler(
         }
         const reply = await options.answer(method, path, url.searchParams, read.body, ticket)
         if (!reply) return next()
-        send(healthy(reply, path, build, open))
+        send(healthy(path === mcpPath ? sayingListChanged(read.body, reply) : reply, path, build, open))
       })
       .catch(next)
   }
@@ -328,7 +370,7 @@ export type DoorFetch = (request: Request) => Promise<Response | null>
  * in `doorsHandler`; a page built ahead of time is `page: () => fillPage(built, { ticket, build })`.
  */
 export function doorsFetch(options: DoorsOptions, transform?: (html: string, url: string) => Promise<string>): DoorFetch {
-  const { pages, ours, build, manifest, marks, document, pageHeaders, refusal, open } = standing(options)
+  const { pages, ours, build, manifest, marks, document, pageHeaders, refusal, open, mcpPath } = standing(options)
 
   const send = (reply: Reply): Response => {
     const { headers, payload } = wire(reply, marks)
@@ -399,10 +441,51 @@ export function doorsFetch(options: DoorsOptions, transform?: (html: string, url
       }
     }
 
+    /* The MCP door's listening stream: where an agent hears that the door's tools changed (2.62.0). */
+    if (wantsToolStream(method, path, mcpPath, request.headers.get('accept'))) {
+      const stream = await toolStream({ answer: options.answer, path, query: url.searchParams, ticket, lastEventId: request.headers.get('last-event-id') })
+      if (!stream) return send(NO_TOOL_STREAM)
+      const bytes = new TextEncoder()
+      let stop: (() => void) | null = null
+      let beat: ReturnType<typeof setInterval> | null = null
+      let pipe: ReadableStreamDefaultController<Uint8Array> | null = null
+      let gone = false
+      const write = (text: string) => {
+        try {
+          pipe?.enqueue(bytes.encode(text))
+        } catch {
+          /* The reader has gone; `leave` is on its way. */
+        }
+      }
+      const leave = () => {
+        if (gone) return
+        gone = true
+        if (beat !== null) clearInterval(beat)
+        stop?.()
+        try {
+          pipe?.close()
+        } catch {
+          /* Already closed by the reader. */
+        }
+      }
+      const body = new ReadableStream<Uint8Array>({
+        start(controller) {
+          pipe = controller
+          write(stream.first)
+          stop = stream.keep(write)
+          beat = setInterval(() => write(': beat\n\n'), options.beatMs ?? 25_000)
+          if (request.signal.aborted) leave()
+          else request.signal.addEventListener('abort', leave)
+        },
+        cancel: leave,
+      })
+      return new Response(body, { status: 200, headers: { ...STREAM_HEADERS, ...marks } })
+    }
+
     const read = await readJsonRequest(request, { maxBytes: options.maxBodyBytes })
     if (!read.ok) return send({ status: read.status, body: { ok: false, error: read.error }, headers: { connection: 'close' } })
     const reply = await options.answer(method, path, url.searchParams, read.body, ticket)
-    return reply ? send(healthy(reply, path, build, open)) : null
+    return reply ? send(healthy(path === mcpPath ? sayingListChanged(read.body, reply) : reply, path, build, open)) : null
   }
 }
 

@@ -46,32 +46,32 @@ export declare const codeLocationSchema: z.ZodEffects<z.ZodObject<{
     commit: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     path: string;
-    line: number;
     change: string;
+    line: number;
     side: "new" | "old";
-    commit?: string | undefined;
     endLine?: number | undefined;
+    commit?: string | undefined;
 }, {
     path: string;
-    line: number;
     change: string;
+    line: number;
     side: "new" | "old";
-    commit?: string | undefined;
     endLine?: number | undefined;
+    commit?: string | undefined;
 }>, {
     path: string;
-    line: number;
     change: string;
+    line: number;
     side: "new" | "old";
-    commit?: string | undefined;
     endLine?: number | undefined;
+    commit?: string | undefined;
 }, {
     path: string;
-    line: number;
     change: string;
+    line: number;
     side: "new" | "old";
-    commit?: string | undefined;
     endLine?: number | undefined;
+    commit?: string | undefined;
 }>;
 export type CodeLocation = z.infer<typeof codeLocationSchema>;
 /**
@@ -102,43 +102,43 @@ export declare const sharedLocationSchema: z.ZodEffects<z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     path: string;
     intent: "show" | "comment";
-    line: number;
     change: string;
+    line: number;
     side: "new" | "old";
     at?: string | undefined;
     by?: string | undefined;
-    commit?: string | undefined;
     endLine?: number | undefined;
+    commit?: string | undefined;
 }, {
     path: string;
-    line: number;
     change: string;
+    line: number;
     side: "new" | "old";
     at?: string | undefined;
     intent?: unknown;
     by?: string | undefined;
-    commit?: string | undefined;
     endLine?: number | undefined;
+    commit?: string | undefined;
 }>, {
     path: string;
     intent: "show" | "comment";
-    line: number;
     change: string;
+    line: number;
     side: "new" | "old";
     at?: string | undefined;
     by?: string | undefined;
-    commit?: string | undefined;
     endLine?: number | undefined;
+    commit?: string | undefined;
 }, {
     path: string;
-    line: number;
     change: string;
+    line: number;
     side: "new" | "old";
     at?: string | undefined;
     intent?: unknown;
     by?: string | undefined;
-    commit?: string | undefined;
     endLine?: number | undefined;
+    commit?: string | undefined;
 }>;
 export type SharedLocation = z.infer<typeof sharedLocationSchema>;
 /**

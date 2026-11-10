@@ -39,7 +39,7 @@ const goto = methodParams['view.goto']
 
 describe('the version', () => {
   test('2.28.0, protocol 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.61.0')
+    expect(PACKAGE_VERSION).toBe('2.62.0')
     expect(PROTOCOL).toBe(2)
   })
 })

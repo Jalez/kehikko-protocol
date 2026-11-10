@@ -180,6 +180,10 @@ export const SESSION_FIELD_SINCE = {
     kehikkoSkills: '2.53.0',
     /** The guards of the modules placed on the session's kehikko (2.61.0), and the manifest field they come from. */
     guards: '2.61.0',
+    /** Kehikot's own changes for agents, and each module's version and releases' lines for agents (2.62.0). */
+    host: '2.62.0',
+    version: '2.62.0',
+    changes: '2.62.0',
 };
 /**
  * Wire messages and message fields added after 2.37.0, and the version that added each (2.38.0): what a
