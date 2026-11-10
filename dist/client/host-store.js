@@ -205,6 +205,8 @@ export function hostStore(id, events = {}, options = {}) {
                 },
                 /* Only when the page takes presses: without a listener the connection answers for it. */
                 ...(events.onPress ? { onPress: (press) => (stopped ? false : events.onPress(press)) } : {}),
+                /* 2.69.0. Only when the page searches itself: without a listener the client searches the page. */
+                ...(events.onFind ? { onFind: (query, ask) => (stopped ? undefined : events.onFind(query, ask)) } : {}),
             }, connectOptions);
             /* Stored BEFORE it listens: the mailbox replays synchronously inside `listen`. */
             live = connection;
@@ -299,6 +301,7 @@ export function hostStore(id, events = {}, options = {}) {
         header: (items) => live?.header(items),
         footer: (items) => live?.footer(items),
         activity: (items) => live?.activity(items),
+        findResult: (count) => live?.findResult(count),
         connection: () => live,
     };
     return store;

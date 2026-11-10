@@ -959,3 +959,12 @@ client from its entry, as it already must.
 
 A host shows the message, as text, in place of "not answering" when the page did not answer the
 greeting, with the stack under "Show details". A host before 2.59.0 drops the message unread.
+
+## Find (2.69.0)
+
+When the greeting says `find: true`, `connect` hears ⌘F and ⌘G on the page's window and asks the host
+for its find bar (`kehikot.find.open`), and answers the bar's `kehikot.find` by searching the page's
+visible text itself (`pageFind`): marked with `CSS.highlights`, the current match scrolled into view,
+searched again while the bar is open and the page changes. A page whose text is not in the DOM gives
+`onFind` and says later counts with `findResult`; an editor with its own find keeps ⌘F with
+`findKeys: false` or its own `preventDefault`. See [find.md](find.md).

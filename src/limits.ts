@@ -274,6 +274,8 @@ export const LIMITS = {
   HEADER_OPTION_GROUP: 32,
   /** 2.68.0. An option's second line (`needs you · 5 min ago`). A host truncates anyway, with the full text in a `title`. */
   HEADER_OPTION_DETAIL: 64,
+  /** 2.69.0. A find query (`kehikot.find`): what a person types in a search box. */
+  FIND_QUERY: 256,
   /** What a run last came to, in a word or three: `1.2 s`, `failed`, `p. 3/12`. */
   HEADER_RESULT: 32,
   /** 2.40.0. The plain text a run asks the host to put on the clipboard (`copy.plain`): a few hundred references with their links. */

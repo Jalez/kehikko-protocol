@@ -31,6 +31,8 @@ import type { Covered } from '../reveal.js'
 import { mailbox, type MessageSource } from './mailbox.js'
 import { mayGreet, pageOrigins } from './greet.js'
 import { reportPageError } from './errors.js'
+import { pageFind, type PageFind, type PageFindOptions } from './find.js'
+import type { FindCount, FindDirection, FindOptions } from '../find.js'
 
 export { mayGreet, pageOrigins } from './greet.js'
 
@@ -135,6 +137,41 @@ export interface HostFacts {
    * the 2.38.0 kinds and no field. `footerDraws(facts, 'input')` is the rule.
    */
   footerKinds: readonly string[] | null
+  /**
+   * 2.69.0. Whether this host draws a find bar for this page, or `null` from a host before 2.69.0,
+   * which does not. When `true`, `connect` catches ⌘F inside the page and answers the bar.
+   */
+  find?: boolean | null
+}
+
+/**
+ * 2.69.0. What an `onFind` listener says: the count (`{ total, current }`, `current` 1-based and 0
+ * when there are none), `'unsupported'` for "this page cannot search what it shows", `'default'` to
+ * leave this search to the client's own (`pageFind`), or nothing when the page will say the count
+ * itself with `findResult` (a search that finishes later). A promise of any of them is waited for.
+ */
+export type FindAnswer = FindCount | 'unsupported' | 'default' | void
+
+/** 2.69.0. What an `onFind` listener is told beside the query. */
+export interface FindAsk extends FindOptions {
+  direction: FindDirection
+}
+
+/** 2.69.0. What `connect` reads of a key: enough to tell ⌘F and ⌘G, and to leave a key a page took. */
+export interface KeyEventLike {
+  key: string
+  metaKey?: boolean
+  ctrlKey?: boolean
+  altKey?: boolean
+  shiftKey?: boolean
+  defaultPrevented?: boolean
+  preventDefault: () => void
+}
+
+/** 2.69.0. Where `connect` hears ⌘F: a window, or anything shaped like one. */
+export interface KeyTarget {
+  addEventListener(type: 'keydown', listener: (event: KeyEventLike) => void): void
+  removeEventListener(type: 'keydown', listener: (event: KeyEventLike) => void): void
 }
 
 export interface HostEvents {
@@ -201,6 +238,16 @@ export interface HostEvents {
    * A host before 2.45.0 never calls it. `hostStore` and `useHost` also keep it as `visible`.
    */
   onVisible?: (visible: boolean) => void
+  /**
+   * 2.69.0. The host's find bar asks this page to search what it shows: `query`, with `ask`'s
+   * options and `direction` — `first` (search anew; go to the first match at or after what is on
+   * screen), `next`/`prev` (move, wrapping), or `close` (clear every mark; the answer is not read).
+   * Give it only when the page's text is not in the DOM — a terminal's buffer, a canvas, a
+   * virtualised list, an editor with its own search — and return the count (`FindAnswer`). Without
+   * it, the client searches the page's visible text itself (`pageFind`). When the count changes by
+   * itself (new output while the bar is open), say it with `findResult`.
+   */
+  onFind?: (query: string, ask: FindAsk) => FindAnswer | Promise<FindAnswer>
 }
 
 /**
@@ -231,6 +278,21 @@ export interface ConnectOptions {
    * this page's `window` by default; injectable so tests need no browser. `false` sends none.
    */
   pointerTarget?: PointerTarget | false
+  /**
+   * 2.69.0. Where ⌘F and ⌘G are heard, to open the host's find bar (`hello.find`): this page's
+   * `window` by default. `false` leaves the keys alone — for a page whose editor binds its own find;
+   * a page can equally take the key itself (`preventDefault` in its own handler: a key a page took
+   * is left alone). The bar still opens from the host and still reaches `onFind`.
+   */
+  findKeys?: KeyTarget | false
+  /**
+   * 2.69.0. The client's own search of the page's text (`pageFind`), used when there is no
+   * `onFind` or it answers `'default'`: where it searches and how. `false` has none, so a page with
+   * no `onFind` answers that it cannot be searched.
+   */
+  findIn?: PageFindOptions | false
+  /** 2.69.0. Whether ⌘ (true) or Ctrl (false) is the find key. Found from the platform by default. */
+  mac?: boolean
 }
 
 /** What `connect` reads of a press: which button, whether it is the primary pointer, and where (2.50.1). */
@@ -318,6 +380,11 @@ export interface Connection {
    * decides where the item and the host both have one, else the path; both fields are dropped then.
    */
   activity: (items: ActivityItem[]) => void
+  /**
+   * 2.69.0. Say what the open search comes to now, from an `onFind` that answered nothing at once or
+   * whose count changed by itself (new output arrived). Dropped while no search is open.
+   */
+  findResult: (count: FindCount | 'unsupported') => void
   /** Whether anything has greeted us yet. */
   greeted: () => boolean
   /** Stop listening. Every question still waiting is refused rather than left hanging. */
@@ -450,6 +517,65 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
     }
   }
 
+  /* 2.69.0. Find: the id of the search open now (`null`: the bar is closed), the client's own search
+     once one was needed, and the keys, heard while a host that draws the bar greeted us. */
+  let finding: string | null = null
+  let finder: PageFind | null = null
+  const finderOf = (): PageFind | null => {
+    if (options.findIn === false) return null
+    finder ??= pageFind((count) => sayFound(count), options.findIn ?? {})
+    return finder
+  }
+  const sayFound = (count: FindCount | 'unsupported') => {
+    if (finding === null) return
+    if (count === 'unsupported') {
+      send({ type: MESSAGE.FIND_RESULT, id: finding, total: 0, current: 0, unsupported: true })
+      return
+    }
+    const total = Math.max(0, Math.floor(count.total || 0))
+    const current = Math.min(Math.max(0, Math.floor(count.current || 0)), total)
+    send({ type: MESSAGE.FIND_RESULT, id: finding, total, current })
+  }
+  const keyTarget: KeyTarget | null =
+    options.findKeys === false ? null : (options.findKeys ?? (typeof window === 'undefined' ? null : (window as unknown as KeyTarget)))
+  const mac =
+    options.mac ?? (typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(`${(navigator as { platform?: string }).platform ?? ''} ${navigator.userAgent ?? ''}`))
+  let keying: (() => void) | null = null
+  const findKeys = (want: boolean) => {
+    if (!want || !keyTarget) {
+      keying?.()
+      keying = null
+      return
+    }
+    if (keying) return
+    const target = keyTarget
+    /* In the bubble phase, so an editor with its own find has taken ⌘F (and said so) before this hears it. */
+    const heard = (event: KeyEventLike) => {
+      if (event.defaultPrevented || event.altKey) return
+      if (mac ? !event.metaKey || event.ctrlKey : !event.ctrlKey || event.metaKey) return
+      const key = (event.key ?? '').toLowerCase()
+      if (key !== 'f' && key !== 'g') return
+      if (key === 'f' && event.shiftKey) return
+      event.preventDefault()
+      const step = key === 'g' ? (event.shiftKey ? 'prev' : 'next') : undefined
+      const query = key === 'f' ? selected() : undefined
+      send({ type: MESSAGE.FIND_OPEN, ...(query ? { query } : {}), ...(step ? { step } : {}) })
+    }
+    target.addEventListener('keydown', heard)
+    keying = () => target.removeEventListener('keydown', heard)
+  }
+  /* The page's selection, when it is a short one on one line: what ⌘F starts searching for. */
+  const selected = (): string | undefined => {
+    const text = typeof getSelection === 'function' ? (getSelection()?.toString() ?? '') : ''
+    const trimmed = text.trim()
+    if (!trimmed || trimmed.length > LIMITS.FIND_QUERY || /[\r\n]/.test(trimmed)) return undefined
+    return trimmed
+  }
+  const closeFind = () => {
+    finding = null
+    finder?.close()
+  }
+
   /** Correlation id -> the promise waiting on it. A `Map`, per the protocol's note on lookups. */
   const waiting = new Map<
     string,
@@ -509,10 +635,12 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
       projectIdNow = projectIdOf(message.context)
       sendActivity()
       pointer(message.pointer === true)
+      closeFind()
+      findKeys(message.find === true)
       /* 2.59.0. A greeting handler that throws is said to the host (`kehikot.page.error`, `greeting`),
          not left to break the mailbox's other listeners: `ready` has gone, and the page may be blank. */
       try {
-        events.onHello?.(message.context, message.state, { answers: message.answers ?? null, header: message.header ?? null, footer: message.footer ?? null, carries: message.carries ?? null, footerKinds: message.footerKinds ?? null })
+        events.onHello?.(message.context, message.state, { answers: message.answers ?? null, header: message.header ?? null, footer: message.footer ?? null, carries: message.carries ?? null, footerKinds: message.footerKinds ?? null, find: message.find ?? null })
       } catch (error) {
         console.error(error)
         reportPageError(error, 'greeting')
@@ -583,6 +711,42 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
 
     if (message.type === MESSAGE.VISIBLE) {
       events.onVisible?.(message.visible)
+      return
+    }
+
+    if (message.type === MESSAGE.FIND) {
+      const ask: FindAsk = { caseSensitive: message.caseSensitive, wholeWord: message.wholeWord, direction: message.direction }
+      if (message.direction === 'close') {
+        closeFind()
+        try {
+          void events.onFind?.(message.query, ask)
+        } catch {
+          /* A listener that throws on close has nothing to say. */
+        }
+        return
+      }
+      finding = message.id
+      const id = message.id
+      const own = (direction: Exclude<FindDirection, 'close'>) => {
+        const search = finderOf()
+        return search ? search.run(message.query, ask, direction) : ('unsupported' as const)
+      }
+      const said = (answer: FindAnswer) => {
+        if (finding !== id) return
+        if (answer === 'default') sayFound(own(message.direction as Exclude<FindDirection, 'close'>))
+        else if (answer !== undefined) sayFound(answer)
+      }
+      if (!events.onFind) {
+        said('default')
+        return
+      }
+      try {
+        const answer = events.onFind(message.query, ask)
+        if (answer instanceof Promise) answer.then(said, () => said('unsupported'))
+        else said(answer)
+      } catch {
+        said('unsupported')
+      }
       return
     }
 
@@ -685,6 +849,10 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
   }
 
   const connection: Connection = {
+    findResult(count) {
+      sayFound(count)
+    },
+
     listen() {
       if (listening || !live) return this
       listening = true
@@ -781,6 +949,8 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
     stop() {
       live = false
       pointer(false)
+      findKeys(false)
+      closeFind()
       if (listening) {
         listening = false
         source.removeEventListener('message', onMessage)

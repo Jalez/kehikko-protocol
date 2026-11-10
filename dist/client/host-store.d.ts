@@ -1,5 +1,6 @@
 import type { ActivityItem, AddressIntent, AddressOpenResult, CanvasContainer, CodeLocation, EpicPart, FilterChoice, FilterGroup, FooterItemInput, HeaderItemInput, LocationIntent, LocationSetResult, ModuleContext, Passage, SharedAddress, SharedLocation } from '../index.js';
 import type { PageTheme } from '../page.js';
+import type { FindCount } from '../find.js';
 import { type ContextScope } from '../context.js';
 import { type ModuleScope } from '../scope.js';
 import { type AskOptions, type ConnectOptions, type Connection, type HostEvents } from './connect.js';
@@ -207,6 +208,8 @@ export interface HostActions<Kept = unknown> {
     footer: (items: FooterItemInput[]) => void;
     /** Say what this page's things are doing, whole (`activity.set`, 1.5.0); `[]` for nothing. See `Connection.activity`. */
     activity: (items: ActivityItem[]) => void;
+    /** 2.69.0. Say what the open search comes to now (`kehikot.find.result`), from an `onFind`. See `Connection.findResult`. */
+    findResult: (count: FindCount | 'unsupported') => void;
 }
 export interface HostStore<Kept = unknown> extends HostActions<Kept> {
     /** The standing now. The same object until something changes, so it is a `useSyncExternalStore` snapshot. */
