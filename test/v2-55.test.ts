@@ -37,7 +37,7 @@ const SELF = { module: 'kehikot.claude', name: 'Claude', door: 'kehikko-claude' 
 
 describe('2.55.0', () => {
   test('is the package version, and the notes are told again', () => {
-    expect(PACKAGE_VERSION).toBe('2.74.0')
+    expect(PACKAGE_VERSION).toBe('2.75.0')
     expect(NOTES_VERSION).toBeGreaterThanOrEqual(8)
   })
 
@@ -149,7 +149,7 @@ describe('2.55.0', () => {
         body: 'Yes',
         answers: 'Force-push the [rebased] branch?',
       })
-      expect(typedFrame(message)).toBe('[Message from your person via Inbox, #15, answering “Force-push the rebased branch?”]')
+      expect(typedFrame(message)).toBe('⟦Your person via Inbox · #15 · answering “Force-push the rebased branch?”⟧')
       expect(messageLine(message)).toContain('answering "Force-push the [rebased] branch?"')
       expect(agentMessageSchema.parse({ ...message, answers: undefined }).answers).toBeNull()
     })

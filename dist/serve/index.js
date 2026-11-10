@@ -41,8 +41,8 @@ export { SETTINGS_PATH, SETTINGS_PASS_PATH } from '../settings.js';
 export { askHost, hostAskUrls, mintServerPass, serverPassReply, spendServerPass, NO_HOST_TO_ASK, } from './ask.js';
 export { SERVER_ASK_PATH, SERVER_PASS_PATH, SERVER_METHODS } from '../server-ask.js';
 /* The message tools every module that runs agent sessions puts on its MCP door (2.41.0): a thin adapter over `askHost`. */
-export { answerMessageTool, forgetMessageHosts, hostKeepsMessages, hostOnMessages, messageToolsFor, messageWaker, messageDelivery, DELIVERY_KEEP_MS, ASLEEP_EVERY_MS, WAKE_EVERY_MS, WAKE_SETTLE_MS, } from './messages.js';
-export { messageTools, isMessageTool, MESSAGE_TOOL_NAMES, ACT_ON_MESSAGES_SETTING, WAKE_ON_MESSAGES_SETTING, actsOnMessages, wakesOnMessages, typedMessages, pasted, deliveryFor, DELIVERY_STATES, RESUME_EVERY_MS, RESUME_MOST, } from '../agent-messages.js';
+export { answerMessageTool, forgetMessageHosts, hostKeepsMessages, hostOnMessages, messageToolsFor, messageWaker, messageDelivery, DELIVERY_KEEP_MS, ASLEEP_EVERY_MS, WAKE_EVERY_MS, WAKE_SETTLE_MS, placeTeller, tellDigest, TELL_EVERY_MS, } from './messages.js';
+export { messageTools, isMessageTool, MESSAGE_TOOL_NAMES, ACT_ON_MESSAGES_SETTING, WAKE_ON_MESSAGES_SETTING, actsOnMessages, wakesOnMessages, typedMessages, markersNote, shortPath, pasted, deliveryFor, DELIVERY_STATES, RESUME_EVERY_MS, RESUME_MOST, } from '../agent-messages.js';
 /* A question the host is too old for (2.22.0): read it off an `AskedHost`, show the one line. */
 export { hostTooOld, FIT_SAYS } from '../fit.js';
 /* A module's server noting its own calls, with their reasons, in the host's record of traffic (2.20.0). */
@@ -51,6 +51,6 @@ export { trafficTarget, trafficPath, trafficCommand } from '../traffic.js';
 /* A module telling its page something changed, over one held connection: a page never polls (2.32.0). */
 export { attach, eventFrame, events, publish, streams, watching, EVENTS_BAD_TOPIC, EVENTS_FULL, MAX_EVENT_STREAMS, MAX_TOPIC_LENGTH, } from './events.js';
 /* The environment for what a module starts on the person's behalf, without the host's own Bun. */
-export { personEnv, HOST_PATH_ENV } from './person.js';
+export { personEnv, utf8Locale, HOST_PATH_ENV } from './person.js';
 /* A door's tools changed: MCP's `notifications/tools/list_changed` on its listening stream (2.62.0). See `tools-changed.ts`. */
 export { MAX_TOOL_STREAMS, TOOLS_LIST_CHANGED, TOOLS_RETRY_MS, markOfEventId, mcpPathOf, sayingListChanged, toolsChanged, toolsMark, toolStream, wantsToolStream, } from './tools-changed.js';

@@ -59,7 +59,7 @@ const notice = (over: Record<string, unknown> = {}): AgentMessage =>
 
 describe('the version', () => {
   test('is 2.54.0, PROTOCOL is still 2, and the docs say it', () => {
-    expect(PACKAGE_VERSION).toBe('2.74.0')
+    expect(PACKAGE_VERSION).toBe('2.75.0')
     expect(PROTOCOL).toBe(2)
     expect(readFileSync(join(REPO, 'CHANGELOG.md'), 'utf8')).toContain('## 2.54.0')
     expect(readFileSync(join(REPO, 'docs/agent-messages.md'), 'utf8')).toContain('messages.notify')
@@ -114,20 +114,19 @@ describe('a notice, delivered', () => {
   })
   test('typed under the module’s name, and told as the module’s words', () => {
     const one = notice()
-    expect(typedFrame(one)).toBe(`[Kehikot message from Queue (epic methods on the kehikko writing), #${one.id}, a report]`)
-    const text = typedMessages([one])
-    expect(text).toContain('Run "kehikko main" passed (exit 0)')
-    expect(text).toContain('from a module on its own behalf, not from an agent session or your person')
-    expect(text).toContain(MODULE_MESSAGES_TYPED)
+    /* 2.75.0: the compact marker; what a module's notice is is said once, in the notes. */
+    expect(typedFrame(one)).toBe(`⟦Queue · report #${one.id} · epic methods, kehikko writing⟧`)
+    expect(typedFrame(one, YOU)).toBe(`⟦Queue · report #${one.id}⟧`)
+    const text = typedMessages([one], false, { you: YOU })
+    expect(text).toBe(`⟦Queue · report #${one.id}⟧ Run "kehikko main" passed (exit 0) in 4m 12s.`)
+    expect(text).not.toContain(MODULE_MESSAGES_TYPED)
     expect(text).not.toContain(MESSAGES_TYPED_READ_ONLY)
-    expect(text).not.toContain('Reply with send_message')
   })
   test('beside another session’s message, each is told for what it is', () => {
-    const text = typedMessages([message(), notice()])
-    expect(text).toContain('That message was typed in by Kehikot for this session: its sender’s words')
-    expect(text).toContain('The one from a module was typed in by Kehikot')
-    expect(text).toContain(MESSAGES_TYPED_READ_ONLY)
-    expect(text).toContain(MODULE_MESSAGES_TYPED)
+    const text = typedMessages([message(), notice()], false, { you: YOU })
+    const [a, b] = text.split('\n')
+    expect(a).toStartWith('⟦Codex session · #')
+    expect(b).toStartWith('⟦Queue · report #')
   })
   test('a session’s message alone is told exactly as before', () => {
     const text = typedMessages([message()])

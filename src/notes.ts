@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { LIMITS } from './limits.js'
-import { messagesNotes, messagingLine, type AgentMessage } from './agent-messages.js'
+import { messagesNotes, markersNote, messagingLine, type AgentMessage } from './agent-messages.js'
 import type { KehikkoSkill } from './kehikko-skills.js'
 import { versionParts } from './since.js'
 
@@ -225,9 +225,10 @@ export interface NotesInput {
  * module that changes its `agentSays` is told again at the next prompt. 7 (2.53.0): the kehikko's own
  * skills (`kehikkoSkills`). 8 (2.55.0): how to end a turn (`finishLine`). 9 (2.62.0): what changed for
  * agents since the session started (`changedSince`), which needs `versions` kept, so every running
- * session is told once and its record starts keeping them.
+ * session is told once and its record starts keeping them. 10 (2.75.0): what the markers typed
+ * messages come under mean (`markersNote`), said once instead of after every delivery.
  */
-export const NOTES_VERSION = 9
+export const NOTES_VERSION = 10
 
 /** What a session was last told: its place by key, and which modules (null when they could not be read). */
 export interface NotesTold {
@@ -434,7 +435,11 @@ export function startNotes(input: NotesInput, moved = false): string {
     researchLine(input.self),
     finishLine(input.self),
   ]
-  if (input.messaging) lines.push(messagingLine(input.self, input.messaging.session, Boolean(input.actOnMessages), input.messaging.listed !== false))
+  if (input.messaging) {
+    lines.push(messagingLine(input.self, input.messaging.session, Boolean(input.actOnMessages), input.messaging.listed !== false))
+    /* 2.75.0: what the markers messages are typed in under mean, said once here instead of after every delivery. */
+    lines.push(markersNote(Boolean(input.actOnMessages)))
+  }
   if (!place.kehikko) return lines.join('\n')
   const modules = others(input.modules, input.self)
   if (modules === null) lines.push('The modules on this kehikko could not be read just now (Kehikot did not say); read_canvas lists them.')

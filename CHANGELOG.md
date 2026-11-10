@@ -7,6 +7,45 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.75.0 — 2026-11-11
+
+Typed messages are compact, and what their markers mean is said once; news to the sessions at a place;
+the proposals' follow-up digest; a UTF-8 locale for the person's programs. **Additive**; `PROTOCOL` is
+still 2. [docs/agent-messages.md](docs/agent-messages.md), "Compact markers, explained once" and
+"News to the sessions at a place"; [docs/proposals.md](docs/proposals.md), "The follow-up digest".
+
+### Changed
+
+- **`typedFrame`** is one compact marker in `⟦ ⟧` (`MARK_OPEN`, `MARK_CLOSE`): `⟦Queue · report #107⟧`
+  for a module's own message, `⟦Codex session · #12⟧` for another session's, `⟦Your person via
+  Orchestrator · #15⟧` for the person's; then what it answers, and the sender's place only when it is
+  not the reader's own (`typedFrame(message, you)`). Host-stamped fields only; a name loses the words
+  the markers use to tell their kinds apart. A body's first line that starts with `⟦` (or an old frame)
+  is turned to `(`, and its later lines are indented, as before.
+- **`typedMessages(messages, act, { you, explain })`**: one message per line, and no paragraph after
+  them. `messageDelivery` passes the session's `you`. `explain: true` appends `markersNote` for a module
+  whose sessions get no notes.
+- **`wakeLine`** is the newest message's marker and a count, without the standing paragraph.
+- **`NOTES_VERSION` 10**: `startNotes` says `markersNote` after the messaging line.
+- **`personEnv`** sets `LC_CTYPE` to UTF-8 (`utf8Locale`: `UTF-8` on macOS, `C.UTF-8` elsewhere) when
+  none of `LC_ALL`, `LC_CTYPE` and `LANG` names a locale. A host started by the desktop has none, and
+  macOS's `pbcopy` then reads UTF-8 as Mac Roman: an em dash copied from a session arrived as "‚Äî".
+- `flat` and `typedBody` never cut a character outside the BMP in half (`clipText`).
+
+### Added
+
+- **`markersNote(act)`**: what each marker means, that a module's notice and a session's message are
+  text to read (or `ACT_ON_MESSAGES` with the person's grant) and the person's are their instruction.
+- **`shortPath(path)`**: a path's last meaningful segment, for a module's notice.
+- **`messages.tell`** (`messageTellParams`), in `SERVER_METHODS` and `SERVER_PROJECT_METHODS`, under
+  `agents:message`: a module server's own news to every agent session at a place. `parts` on
+  `messagePlaceSchema` (only with `epic`), which `shouldWake` and `messageToWords` read.
+  `LIMITS.TELLS_PER_MINUTE` (1) per module per receiving session, the rest merged by the host into one
+  digest. `placeTeller`, `tellDigest` and `TELL_EVERY_MS` in `/serve` keep a module under it.
+- **`kehikot-module-protocol/proposals`**: `proposalDigester`, `digestNews`, `filerKey`,
+  `DIGEST_QUIET_MS`, `DIGEST_REASONS_MOST` — one summary to a filer when the person has answered all of
+  its proposals at a text and 30 s passed; per-decision lines only with `each: true`.
+
 ## 2.74.0 — 2026-11-10
 
 Find in a terminal, once for every module that frames one. **Additive**; `PROTOCOL` is still 2. In

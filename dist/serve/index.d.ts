@@ -31,11 +31,11 @@ export { hostVouches, hostVouchUrls, settingsDoor, type HostVouchesOptions, type
 export { SETTINGS_PATH, SETTINGS_PASS_PATH } from '../settings.js';
 export { askHost, hostAskUrls, mintServerPass, serverPassReply, spendServerPass, NO_HOST_TO_ASK, type AskedHost, type AskHostOptions, type ServerAnswers, } from './ask.js';
 export { SERVER_ASK_PATH, SERVER_PASS_PATH, SERVER_METHODS, type ServerMethod } from '../server-ask.js';
-export { answerMessageTool, forgetMessageHosts, hostKeepsMessages, hostOnMessages, messageToolsFor, messageWaker, messageDelivery, DELIVERY_KEEP_MS, ASLEEP_EVERY_MS, WAKE_EVERY_MS, WAKE_SETTLE_MS, type MessageToolAnswer, type MessageToolOptions, type MessageWaker, type MessageWakerOptions, type WakeSession, type DeliverySession, type MessageDelivery, type MessageDeliveryOptions, } from './messages.js';
-export { messageTools, isMessageTool, MESSAGE_TOOL_NAMES, ACT_ON_MESSAGES_SETTING, WAKE_ON_MESSAGES_SETTING, actsOnMessages, wakesOnMessages, typedMessages, pasted, deliveryFor, DELIVERY_STATES, RESUME_EVERY_MS, RESUME_MOST, type DeliveryState, type MessageToolDefinition, } from '../agent-messages.js';
+export { answerMessageTool, forgetMessageHosts, hostKeepsMessages, hostOnMessages, messageToolsFor, messageWaker, messageDelivery, DELIVERY_KEEP_MS, ASLEEP_EVERY_MS, WAKE_EVERY_MS, WAKE_SETTLE_MS, type MessageToolAnswer, type MessageToolOptions, type MessageWaker, type MessageWakerOptions, type WakeSession, type DeliverySession, type MessageDelivery, type MessageDeliveryOptions, placeTeller, tellDigest, TELL_EVERY_MS, type PlaceTeller, type PlaceTellerOptions, } from './messages.js';
+export { messageTools, isMessageTool, MESSAGE_TOOL_NAMES, ACT_ON_MESSAGES_SETTING, WAKE_ON_MESSAGES_SETTING, actsOnMessages, wakesOnMessages, typedMessages, markersNote, shortPath, type TypedOptions, pasted, deliveryFor, DELIVERY_STATES, RESUME_EVERY_MS, RESUME_MOST, type DeliveryState, type MessageToolDefinition, } from '../agent-messages.js';
 export { hostTooOld, FIT_SAYS, type HostTooOld } from '../fit.js';
 export { trafficNotes, TRAFFIC_FLUSH_MS, TRAFFIC_PENDING, type TrafficNotes, type TrafficNotesOptions, type TrafficCallSaid, } from './traffic.js';
 export { trafficTarget, trafficPath, trafficCommand } from '../traffic.js';
 export { attach, eventFrame, events, publish, streams, watching, EVENTS_BAD_TOPIC, EVENTS_FULL, MAX_EVENT_STREAMS, MAX_TOPIC_LENGTH, type EventRoute, type Initial, } from './events.js';
-export { personEnv, HOST_PATH_ENV, type PersonEnvOptions } from './person.js';
+export { personEnv, utf8Locale, HOST_PATH_ENV, type PersonEnvOptions } from './person.js';
 export { MAX_TOOL_STREAMS, TOOLS_LIST_CHANGED, TOOLS_RETRY_MS, markOfEventId, mcpPathOf, sayingListChanged, toolsChanged, toolsMark, toolStream, wantsToolStream, } from './tools-changed.js';

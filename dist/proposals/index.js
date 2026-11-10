@@ -10,3 +10,4 @@ export { PROPOSAL_STATUSES, STALE_REASONS, ACCEPT_WAYS, PROPOSAL_MOST, BOOK_KEEP
 export { tokenize, diffBlocks, hunksOf, takeHunks, partOf } from './diff.js';
 export { openProposals, settledProposals, proposalOf, measured, fileProposal, decideProposal, withdrawProposal, memoryKeeper, } from './site.js';
 export { PROPOSAL_TOOL_NAMES, isProposalTool, proposalTools, answerProposalTool } from './door.js';
+export { DIGEST_QUIET_MS, DIGEST_REASONS_MOST, filerKey, digestNews, proposalDigester, } from './digest.js';

@@ -14,7 +14,7 @@ import { dispositionSchema } from './context.js';
 import { stepsListResult } from './plan.js';
 import { gotoProject, showAskSchema } from './show.js';
 import { trafficNoteResult, trafficNoteSchema, trafficReadResult } from './traffic.js';
-import { messageMineParams, messageMineResult, messageNotifyParams, messagePostParams, messageReadParams, messageReadResult, messageSayParams, messageSendParams, messageSendResult } from './agent-messages.js';
+import { messageMineParams, messageMineResult, messageNotifyParams, messagePostParams, messageReadParams, messageReadResult, messageSayParams, messageSendParams, messageSendResult, messageTellParams } from './agent-messages.js';
 /**
  * The questions a module can ask, by name and by shape: capabilities, methods, each method's
  * params, and a few result schemas. No answering is here: no dispatch table, no handlers. A
@@ -217,6 +217,8 @@ export const METHODS = {
     'messages.post': 'agents:message',
     /** A module's own notice to the one session whose place token asked it for something, from its server (2.54.0). */
     'messages.notify': 'agents:message',
+    /** A module's own news to every agent session at a place (an epic, its parts, a kehikko), from its server (2.75.0). */
+    'messages.tell': 'agents:message',
     /** The person's own message, from a module's page on their press (2.50.0). */
     'messages.say': 'messages:as-person',
 };
@@ -540,6 +542,8 @@ export const methodParams = {
     'messages.post': messagePostParams,
     /** 2.54.0. From a module's server: its notice to the session the `token` names; answered with `messageSendResult`. */
     'messages.notify': messageNotifyParams,
+    /** 2.75.0. From a module's server: its news to every session at a place; answered with `messageSendResult`. */
+    'messages.tell': messageTellParams,
     /**
      * 2.50.0. From a page only, on the person's press, under `messages:as-person`: the person's message;
      * answered with `messageSendResult`. See `messageSayParams` for every condition a host holds it to.
@@ -722,6 +726,7 @@ export const methodResults = {
     'messages.mine': messageMineResult,
     'messages.post': messageSendResult,
     'messages.notify': messageSendResult,
+    'messages.tell': messageSendResult,
     'messages.say': messageSendResult,
 };
 /** The schema for one method's answer, or nothing — which means unspecified. */

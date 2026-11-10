@@ -251,9 +251,10 @@ export interface NotesInput {
  * module that changes its `agentSays` is told again at the next prompt. 7 (2.53.0): the kehikko's own
  * skills (`kehikkoSkills`). 8 (2.55.0): how to end a turn (`finishLine`). 9 (2.62.0): what changed for
  * agents since the session started (`changedSince`), which needs `versions` kept, so every running
- * session is told once and its record starts keeping them.
+ * session is told once and its record starts keeping them. 10 (2.75.0): what the markers typed
+ * messages come under mean (`markersNote`), said once instead of after every delivery.
  */
-export declare const NOTES_VERSION = 9;
+export declare const NOTES_VERSION = 10;
 /** What a session was last told: its place by key, and which modules (null when they could not be read). */
 export interface NotesTold {
     key: string | null;

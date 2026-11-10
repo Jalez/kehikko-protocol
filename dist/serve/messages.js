@@ -159,7 +159,7 @@ export function messageWaker(options) {
                     continue;
                 let typed = false;
                 try {
-                    typed = await type(one.key, wakeLine(found, one.act));
+                    typed = await type(one.key, wakeLine(found, one.act, asked.data.you));
                 }
                 catch {
                     typed = false;
@@ -236,7 +236,7 @@ export function messageDelivery(options) {
                 const at = now();
                 let mem = memory.get(one.key);
                 if (!mem)
-                    memory.set(one.key, (mem = { idleSince: null, held: [], resumedAt: null, seenAt: at, peekedAt: Number.NEGATIVE_INFINITY }));
+                    memory.set(one.key, (mem = { idleSince: null, held: [], you: null, resumedAt: null, seenAt: at, peekedAt: Number.NEGATIVE_INFINITY }));
                 mem.seenAt = at;
                 if (one.state === 'idle')
                     mem.idleSince ??= at;
@@ -295,11 +295,13 @@ export function messageDelivery(options) {
                         continue;
                     const data = taken.data;
                     const you = data.you;
+                    mem.you = you;
                     mem.held = data.messages.filter((m) => !you || !(m.from.module === you.module && m.from.session !== null && m.from.session === you.session));
                     if (!mem.held.length)
                         continue;
                 }
-                const text = typedMessages(mem.held, one.act);
+                /* 2.75.0: compact markers; a sender at this session's own place is said without it. */
+                const text = typedMessages(mem.held, one.act, { you: mem.you });
                 const count = mem.held.length;
                 const newest = mem.held.at(-1).id;
                 let ok = false;
@@ -339,6 +341,103 @@ export function messageDelivery(options) {
             if (timer)
                 clearInterval(timer);
             timer = null;
+        },
+    };
+}
+/* ------------------------------------------------------------------------ *
+ * News to the agent sessions at a place (2.75.0)
+ * ------------------------------------------------------------------------ */
+/** 2.75.0. How long `placeTeller` holds a place after a message to it, in ms: one a minute (`LIMITS.TELLS_PER_MINUTE`). */
+export const TELL_EVERY_MS = 60_000;
+/** 2.75.0. Held news as one message: each on its own line, at most `LIMITS.MESSAGE_BODY` characters. One item is itself. */
+export function tellDigest(bodies) {
+    if (bodies.length <= 1)
+        return bodies[0] ?? '';
+    const head = `${bodies.length} updates:`;
+    let text = head;
+    let said = 0;
+    for (const one of bodies) {
+        const line = `\n- ${one.replace(/\s*\n\s*/g, ' ').trim()}`;
+        if (text.length + line.length > LIMITS.MESSAGE_BODY - 40)
+            break;
+        text += line;
+        said += 1;
+    }
+    return said < bodies.length ? `${text}\n- and ${bodies.length - said} more` : text;
+}
+/** A place's key: the same epic, parts (in any order) and kehikko are one place. */
+const placeKey = (place) => JSON.stringify([place.epic ?? null, [...(place.parts ?? [])].sort(), place.kehikko ?? null]);
+/**
+ * 2.75.0. A module's way to push news to the agent sessions working at a place — an epic, some of its
+ * parts, a kehikko — rather than only the session that asked (`messages.notify`): `messages.tell`
+ * through `askHost`, kept to one message per place a minute from this module, what comes faster merged
+ * into one digest (`tellDigest`). The host bounds it per receiving session too (`LIMITS.TELLS_PER_MINUTE`).
+ *
+ *     const teller = placeTeller({ module: ID, project })
+ *     await teller.tell({ epic: 'auth' }, 'The review of auth.ts finished: 3 comments.')
+ */
+export function placeTeller(options) {
+    const { project, everyMs = TELL_EVERY_MS, now = Date.now, setTimer = setTimeout, clearTimer = (t) => clearTimeout(t), log = () => { }, send: sendFor, ...ask } = options;
+    const send = sendFor ?? ((params) => askHost('messages.tell', params, { ...ask, project }));
+    const places = new Map();
+    async function post(place, body, kind, thread) {
+        try {
+            const asked = await send({ to: { place }, body, ...(kind ? { kind } : {}), ...(thread ? { thread } : {}) });
+            if (asked.ok && asked.data.outcome === 'sent')
+                return 'sent';
+            log(`news to ${placeKey(place)} not sent: ${asked.ok ? asked.data.why : asked.why}`);
+        }
+        catch (error) {
+            log(`news to ${placeKey(place)} not sent: ${error instanceof Error ? error.message : String(error)}`);
+        }
+        return 'declined';
+    }
+    async function release(key) {
+        const one = places.get(key);
+        if (!one)
+            return;
+        one.timer = null;
+        if (!one.held.length)
+            return;
+        const bodies = one.held.splice(0);
+        one.lastAt = now();
+        one.timer = setTimer(() => void release(key), everyMs);
+        await post(one.place, tellDigest(bodies), one.kind, one.thread);
+    }
+    return {
+        async tell(place, body, extra = {}) {
+            const text = body.trim();
+            if (!text)
+                return 'declined';
+            const key = placeKey(place);
+            const one = places.get(key);
+            if (one && now() - one.lastAt < everyMs) {
+                one.held.push(text);
+                one.kind = extra.kind ?? one.kind;
+                one.thread = extra.thread ?? one.thread;
+                one.timer ??= setTimer(() => void release(key), Math.max(0, everyMs - (now() - one.lastAt)));
+                return 'held';
+            }
+            places.set(key, { place, lastAt: now(), held: [], kind: extra.kind, thread: extra.thread, timer: null });
+            return post(place, text, extra.kind, extra.thread);
+        },
+        async flush() {
+            for (const one of places.values()) {
+                if (one.timer)
+                    clearTimer(one.timer);
+                one.timer = null;
+                if (one.held.length) {
+                    const bodies = one.held.splice(0);
+                    one.lastAt = now();
+                    await post(one.place, tellDigest(bodies), one.kind, one.thread);
+                }
+            }
+        },
+        stop() {
+            for (const one of places.values())
+                if (one.timer)
+                    clearTimer(one.timer);
+            places.clear();
         },
     };
 }

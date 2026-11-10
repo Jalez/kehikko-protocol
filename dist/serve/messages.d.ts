@@ -1,4 +1,4 @@
-import { type DeliveryState, type MessageToolDefinition } from '../agent-messages.js';
+import { type DeliveryState, type MessageToolDefinition, type MessagePlace } from '../agent-messages.js';
 import { type AskedHost, type AskHostOptions } from './ask.js';
 /**
  * 2.41.0. The thin adapter every module that runs agent sessions puts on its MCP door: `send_message`
@@ -188,3 +188,51 @@ export interface MessageDelivery {
  * elsewhere; never its own message. Never throws.
  */
 export declare function messageDelivery(options: MessageDeliveryOptions): MessageDelivery;
+/** 2.75.0. How long `placeTeller` holds a place after a message to it, in ms: one a minute (`LIMITS.TELLS_PER_MINUTE`). */
+export declare const TELL_EVERY_MS = 60000;
+export interface PlaceTellerOptions extends Omit<AskHostOptions, 'project'> {
+    /** The project the places are in: its absolute folder. */
+    project: string;
+    /** Default `TELL_EVERY_MS`. */
+    everyMs?: number;
+    now?: () => number;
+    /** Timers, injected by the tests. */
+    setTimer?: (run: () => void, ms: number) => unknown;
+    clearTimer?: (timer: unknown) => void;
+    /** Injected by the tests: `messages.tell`. Default `askHost`. */
+    send?: (params: {
+        to: {
+            place: MessagePlace;
+        };
+        body: string;
+        kind?: 'note' | 'report';
+        thread?: string;
+    }) => Promise<AskedHost<'messages.tell'>>;
+    log?: (line: string) => void;
+}
+export interface PlaceTeller {
+    /**
+     * Tell every agent session at `place` something. The first news to a place in a minute goes at once
+     * (`sent`); what follows within the minute is held (`held`) and goes as ONE digest when the minute is
+     * up — never more than one message from this module to a place a minute.
+     */
+    tell(place: MessagePlace, body: string, options?: {
+        kind?: 'note' | 'report';
+        thread?: string;
+    }): Promise<'sent' | 'held' | 'declined'>;
+    /** Send what is held now, whatever the minute says (a module shutting down). */
+    flush(): Promise<void>;
+    stop(): void;
+}
+/** 2.75.0. Held news as one message: each on its own line, at most `LIMITS.MESSAGE_BODY` characters. One item is itself. */
+export declare function tellDigest(bodies: readonly string[]): string;
+/**
+ * 2.75.0. A module's way to push news to the agent sessions working at a place — an epic, some of its
+ * parts, a kehikko — rather than only the session that asked (`messages.notify`): `messages.tell`
+ * through `askHost`, kept to one message per place a minute from this module, what comes faster merged
+ * into one digest (`tellDigest`). The host bounds it per receiving session too (`LIMITS.TELLS_PER_MINUTE`).
+ *
+ *     const teller = placeTeller({ module: ID, project })
+ *     await teller.tell({ epic: 'auth' }, 'The review of auth.ts finished: 3 comments.')
+ */
+export declare function placeTeller(options: PlaceTellerOptions): PlaceTeller;

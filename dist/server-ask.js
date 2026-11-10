@@ -42,6 +42,8 @@ export const SERVER_METHODS = [
     'messages.read',
     /* 2.54.0: a module's own notice to the session whose token asked it for something. The project is the token's. */
     'messages.notify',
+    /* 2.75.0: a module's own news to every session at a place. No token, so it names its project. */
+    'messages.tell',
 ];
 /**
  * The server methods that are about one project, and so name it. The traffic methods (2.20.0) are
@@ -57,6 +59,7 @@ export const SERVER_PROJECT_METHODS = [
     'steps.list',
     'parts.get',
     'dispositions.get',
+    'messages.tell',
 ];
 /** Whether a question with this method has to name its project. */
 export const needsProject = (method) => SERVER_PROJECT_METHODS.includes(method);
