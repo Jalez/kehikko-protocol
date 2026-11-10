@@ -7,6 +7,23 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.73.0 — 2026-11-10
+
+Find adapters: a page whose text the client's own search cannot reach by itself gets it in a few
+lines from a shared subpath, never code of its own. **Additive**; `PROTOCOL` is still 2.
+[docs/find.md](docs/find.md), "Adapters".
+
+### Added
+
+- **`kehikot-module-protocol/client/find`** (`src/client/find-adapters.ts`): where find adapters live,
+  structural only (none imports the library it adapts).
+- **`pdfTextLayerFind(options?)`** (`find-pdf.ts`): find in a PDF drawn with a text layer whose viewer
+  lays it only near the view. While the find bar is open `open()` is true (`subscribe` hears it, the
+  shape `useSyncExternalStore` takes) so the page lays every sheet's layer; `onFind` waits until every
+  sheet (`sheet`, default `.pdf-page`) has its layer (`layer`, default `PDF_TEXT_LAYER`) or `within`
+  passes, then answers `'default'` so the client's `pageFind` reads it. `laidOut`, `close`,
+  `PDF_LAID_OUT_WITHIN_MS`, `PDF_LAID_OUT_EVERY_MS`, `PdfTextLayerFind`, `PdfTextLayerFindOptions`.
+
 ## 2.72.0 — 2026-11-10
 
 The proposal components are shadcn/ui, vendored once for every module. **Additive**; `PROTOCOL` is
