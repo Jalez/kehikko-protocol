@@ -7,10 +7,10 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
-## 2.63.0 — 2026-11-10
+## 2.65.0 — 2026-11-10
 
 `PORT=0` is any free port. **Additive**; `PROTOCOL` is still 2. [docs/serving.md](docs/serving.md),
-"`anyPort` (2.63.0)".
+"`anyPort` (2.65.0)".
 
 ### Added
 
@@ -20,8 +20,21 @@ label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING
 
 ### Unchanged
 
-- `preferred` still reads `0` as no port. A module built before 2.63.0 handed `PORT=0` keeps its
+- `preferred` still reads `0` as no port. A module built before 2.65.0 handed `PORT=0` keeps its
   preferred port and the drift rules.
+
+## 2.63.0 — 2026-11-10
+
+An agent module's tile says why its Expand was not done. **Additive**; `PROTOCOL` is still 2.
+[docs/client.md](docs/client.md), "When the host declines (2.63.0)".
+
+### Added
+
+- **`expandDeclined(answer)`** (`tile.ts`): the host's `why` when `view.expand` was answered
+  `declined`, else null. **`TILE_NOTE_MS`**: how long the tile says it.
+- **`AgentTile`'s `onExpand` may return what the host answered** (`() => unknown`, was `() => void`):
+  a declined answer's `why` is drawn over the tile as a `role="status"` line (`.kehikot-tile-note`)
+  until the next press or `TILE_NOTE_MS`. An `onExpand` that returns nothing behaves as before.
 
 ## 2.62.0 — 2026-11-10
 

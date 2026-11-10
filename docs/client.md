@@ -896,7 +896,7 @@ if (size.tile) return (
   <AgentTile
     name="Claude" icon="brand:claude" title={title} size={size}
     item={tileItemOf(itemsForThisSession)}
-    onExpand={() => void host.request('view.expand', { expand: true })}
+    onExpand={() => host.request('view.expand', { expand: true })}
     onAnswer={(text) => typeIntoSession(text)}
     onCompact={compact} onClear={clear}
   />
@@ -918,6 +918,17 @@ if (size.tile) return (
   box resized around it does not flip.
 - **A host before 2.58.0** does not answer `view.expand` (`hello.answers` does not list it): offer no
   Expand, or show the large view in place on a press.
+
+### When the host declines (2.63.0)
+
+A host shows a container large only on the person's own press in its page, and answers `view.expand`
+`{ outcome: 'declined', why }` when it saw none (or when the container is not on the kehikko that is
+open, or a container is being moved). Return the request from `onExpand` — `() =>
+host.request('view.expand', { expand: true })`, not `void` it — and the tile says the `why` over its
+top for `TILE_NOTE_MS`, as a `role="status"` line, until the next press. `expandDeclined(answer)` is
+the rule: the sentence for a declined outcome, null for anything else. A press that is refused is
+then never silent. A rejected request says nothing on the tile; handle it where the module handles
+its other refusals.
 
 ## When the page fails (2.59.0)
 

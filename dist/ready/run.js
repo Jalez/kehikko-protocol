@@ -137,7 +137,7 @@ export async function run(options) {
             origins: frameOrigins(process.env, options.ancestors),
         }),
     });
-    /* `PORT=0` (2.63.0): any free port, bound below and registered as bound; otherwise the port rules. */
+    /* `PORT=0` (2.65.0): any free port, bound below and registered as bound; otherwise the port rules. */
     const claimed = anyPort() ? { port: 0 } : await claimOrLeave({ id, prefer: preferred(options.prefer), span: options.span, timeoutMs: options.timeoutMs });
     const sockets = options.sockets;
     const socketPaths = new Set(sockets?.paths ?? []);

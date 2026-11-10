@@ -37,7 +37,7 @@ export { FOR_AGENTS, forAgentsOf, withoutForAgents, notesVersion, agentChangesFr
 /* How an agent session's turn ended, one rule for every agent module (2.55.0), and the reminder after a stall (2.56.0). See `turns.ts`. */
 export { TURN_KINDS, TURN_EVENTS, RESEARCH_COMPLETE_EVENT, DECISION_EVENT, REFUSED_EVENT, STALLED_EVENT, TELL_FINISHED_TOOL, REFUSAL_CHOICES, turnQuestion, refusalEnd, tellFinishedTool, readTellFinished, toldReply, refusalOf, refusalWords, turnEnd, stopBlockReason, TURN_REMINDER, TURN_REMINDER_DELAY_MS, TURN_REMINDER_OWN_MS, REMIND_TURN_SETTING, remindsTurnEnd, shouldRemind, turnReminder, } from './turns.js';
 /* 2.58.0: an agent module drawn as a tile when its box is small. See `tile.ts`. */
-export { TILE_ACTIONS, TILE_BADGES, TILE_BELOW, TILE_LEAVE_PX, TILE_LOOKS, TILE_NEEDS_YOU, isTile, tileItemOf, tileRoom, tileStateOf, unreadWords, } from './tile.js';
+export { TILE_ACTIONS, TILE_BADGES, TILE_BELOW, TILE_LEAVE_PX, TILE_LOOKS, TILE_NEEDS_YOU, TILE_NOTE_MS, expandDeclined, isTile, tileItemOf, tileRoom, tileStateOf, unreadWords, } from './tile.js';
 /* A kehikko's own skills, written by the person for every agent session on it (2.53.0). See `kehikko-skills.ts`. */
 export { KEHIKKO_SKILL_LIMITS, kehikkoSkillDescription, kehikkoSkillText, kehikkoSkillIssue, kehikkoSkillSchema, kehikkoSkillsSchema, } from './kehikko-skills.js';
 /* Messages between agent sessions, kept by the host (2.41.0). See `agent-messages.ts`. */

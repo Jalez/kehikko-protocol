@@ -1,116 +1,84 @@
-import { afterAll, beforeAll, describe, expect, test } from 'bun:test'
-import { execFileSync } from 'node:child_process'
-import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs'
-import { createServer } from 'node:net'
-import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { describe, expect, test } from 'bun:test'
+import { readFileSync } from 'node:fs'
+import { dirname, join, resolve } from 'node:path'
+import { act, createElement } from 'react'
+import { createRoot } from 'react-dom/client'
 
-import { PACKAGE_VERSION, PROTOCOL } from '../src/index.js'
-import { STAMP_FILE } from '../src/ready/build.js'
-import { anyPort, preferred, readRegistration, registryDir, serves } from '../src/serve/index.js'
+import { PACKAGE_VERSION, TILE_NOTE_MS, expandDeclined } from '../src/index.js'
+import { AgentTile } from '../src/client/react.js'
 
-/** 2.63.0: `PORT=0` is any free port. The module binds what the system gives and registers it. */
+/**
+ * 2.63.0: an agent module's tile says why its Expand was not done. A host shows a container large
+ * only on the person's own press and answers `declined` with a sentence when it saw none; the tile
+ * used to drop that answer, so the press did nothing, silently.
+ */
+
+const REPO = resolve(dirname(new URL(import.meta.url).pathname), '..')
 
 describe('the version', () => {
-  test('is 2.63.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.63.0')
-    expect(PROTOCOL).toBe(2)
+  test('is 2.63.0', () => {
+    expect(PACKAGE_VERSION).toBe('2.65.0')
+    const pkg = JSON.parse(readFileSync(join(REPO, 'package.json'), 'utf8')) as { version: string }
+    expect(pkg.version).toBe('2.65.0')
+    expect(readFileSync(join(REPO, 'CHANGELOG.md'), 'utf8')).toContain('## 2.63.0')
+    expect(readFileSync(join(REPO, 'docs/client.md'), 'utf8')).toContain('When the host declines (2.63.0)')
   })
 })
 
-describe('anyPort', () => {
-  test('PORT=0, and only that', () => {
-    expect(anyPort({ PORT: '0' })).toBe(true)
-    expect(anyPort({ PORT: ' 0 ' })).toBe(true)
-    expect(anyPort({ PORT: '7920' })).toBe(false)
-    expect(anyPort({})).toBe(false)
-    /* What `preferred` always said of 0 is unchanged: not a port, so the preference. */
-    expect(preferred(7920, { PORT: '0' })).toBe(7920)
-  })
-
-  test("the dev server's plugin asks Vite for port 0 and claims nothing", async () => {
-    const before = process.env.PORT
-    process.env.PORT = '0'
-    try {
-      const said = await serves({ id: 'kehikot.anyport', prefer: 1 }).config()
-      expect(said.server.port).toBe(0)
-      expect(said.server.host).toBe('127.0.0.1')
-    } finally {
-      if (before === undefined) delete process.env.PORT
-      else process.env.PORT = before
-    }
+describe('expandDeclined', () => {
+  test('the why of a declined outcome, and nothing for anything else', () => {
+    expect(expandDeclined({ outcome: 'declined', why: ' Press again. ' })).toBe('Press again.')
+    expect(expandDeclined({ outcome: 'declined', why: '' })).toBe('The host did not show it large.')
+    expect(expandDeclined({ outcome: 'declined' })).toBe('The host did not show it large.')
+    expect(expandDeclined({ outcome: 'expanded', why: '' })).toBeNull()
+    expect(expandDeclined({ outcome: 'unchanged', why: 'x' })).toBeNull()
+    expect(expandDeclined(undefined)).toBeNull()
+    expect(expandDeclined(3)).toBeNull()
+    expect(TILE_NOTE_MS).toBeGreaterThan(1000)
   })
 })
 
-const git = (dir: string, ...args: string[]) => execFileSync('git', ['-C', dir, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim()
-
-function builtCheckout(): string {
-  const dir = mkdtempSync(join(tmpdir(), 'kehikot-anyport-'))
-  git(dir, 'init', '-q')
-  git(dir, 'config', 'user.email', 'test@example.invalid')
-  git(dir, 'config', 'user.name', 'Test')
-  writeFileSync(join(dir, '.gitignore'), 'dist\n')
-  writeFileSync(join(dir, 'source.ts'), 'export {}\n')
-  git(dir, 'add', '.')
-  git(dir, 'commit', '-q', '-m', 'one')
-  mkdirSync(join(dir, 'dist'), { recursive: true })
-  writeFileSync(join(dir, 'dist', 'index.html'), '<!doctype html><title>t</title>')
-  writeFileSync(join(dir, 'dist', STAMP_FILE), `${git(dir, 'rev-parse', 'HEAD')}\n`)
-  return dir
-}
-
-async function busyPort(): Promise<{ port: number; close: () => void }> {
-  return await new Promise((resolve) => {
-    const holder = createServer()
-    holder.listen(0, '127.0.0.1', () => {
-      const address = holder.address()
-      resolve({ port: typeof address === 'object' && address ? address.port : 0, close: () => holder.close() })
+describe('AgentTile, when the host declines', () => {
+  const mount = async (element: ReturnType<typeof createElement>) => {
+    const host = document.createElement('div')
+    document.body.appendChild(host)
+    const root = createRoot(host)
+    await act(async () => root.render(element))
+    return { host, unmount: () => act(() => root.unmount()) }
+  }
+  const press = async (element: Element | null) => {
+    expect(element).not.toBeNull()
+    await act(async () => {
+      ;(element as HTMLElement).click()
+      await new Promise((resolve) => setTimeout(resolve, 0))
     })
-  })
-}
+  }
 
-describe('run with PORT=0', () => {
-  let child: ReturnType<typeof Bun.spawn> | null = null
-  let said: { origin: string; port: number } = { origin: '', port: 0 }
-  let preferredPort: { port: number; close: () => void }
-  /* Its own registry: other tests run the same fixture, and their registrations are theirs. */
-  const registry = mkdtempSync(join(tmpdir(), 'kehikot-anyport-registry-'))
-
-  beforeAll(async () => {
-    /* The preferred port is held by something else: with PORT=0 nothing even looks at it. */
-    preferredPort = await busyPort()
-    child = Bun.spawn(['bun', join(import.meta.dirname, 'fixtures', 'ready', 'server.ts'), builtCheckout(), String(preferredPort.port)], {
-      env: { ...process.env, PORT: '0', KEHIKOT_MODULES_DIR: registry },
-      stdout: 'pipe',
-      stderr: 'pipe',
-    })
-    const reader = (child.stdout as ReadableStream<Uint8Array>).getReader()
-    const text = new TextDecoder()
-    let held = ''
-    for (;;) {
-      const { value, done } = await reader.read()
-      if (done) throw new Error(`the server ended before it was ready: ${held}`)
-      held += text.decode(value, { stream: true })
-      const ready = held.split('\n').find((line) => line.startsWith('READY '))
-      if (ready) {
-        said = JSON.parse(ready.slice(6)) as { origin: string; port: number }
-        break
-      }
-    }
-  })
-  afterAll(() => {
-    child?.kill()
-    preferredPort?.close()
+  test('a declined answer is said on the tile, as status, and goes on the next press', async () => {
+    const answers = [{ outcome: 'declined', why: 'Press again.' }, { outcome: 'expanded', why: '' }]
+    const { host, unmount } = await mount(
+      createElement(AgentTile, { name: 'Codex', size: { width: 200, height: 200 }, onExpand: () => Promise.resolve(answers.shift()) }),
+    )
+    expect(host.querySelector('.kehikot-tile-note')).toBeNull()
+    await press(host.querySelector('button.kehikot-tile-face'))
+    const note = host.querySelector('.kehikot-tile-note')
+    expect(note?.textContent).toBe('Press again.')
+    expect(note?.getAttribute('role')).toBe('status')
+    await press(host.querySelector('button[data-action=expand]'))
+    expect(host.querySelector('.kehikot-tile-note')).toBeNull()
+    await unmount()
   })
 
-  test('binds a port the system gave, not the preferred one, and answers there', async () => {
-    expect(said.port).toBeGreaterThan(0)
-    expect(said.port).not.toBe(preferredPort.port)
-    expect((await Bun.fetch(`${said.origin}/healthz`)).status).toBe(200)
-  })
-
-  test('registers the port it bound', () => {
-    const registration = readRegistration(join(registryDir({ KEHIKOT_MODULES_DIR: registry }), 'kehikot.readyexample.json'))
-    expect(registration?.url).toBe(said.origin)
+  test('an onExpand that returns nothing, or rejects, says nothing', async () => {
+    const { host, unmount } = await mount(
+      createElement(AgentTile, { name: 'Codex', size: { width: 200, height: 200 }, onExpand: () => Promise.reject(new Error('gone')) }),
+    )
+    await press(host.querySelector('button.kehikot-tile-face'))
+    expect(host.querySelector('.kehikot-tile-note')).toBeNull()
+    await unmount()
+    const quiet = await mount(createElement(AgentTile, { name: 'Codex', size: { width: 200, height: 200 }, onExpand: () => {} }))
+    await press(quiet.host.querySelector('button.kehikot-tile-face'))
+    expect(quiet.host.querySelector('.kehikot-tile-note')).toBeNull()
+    await quiet.unmount()
   })
 })

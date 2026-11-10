@@ -9,7 +9,7 @@ import {
   type ReactElement,
 } from 'react'
 
-import { TILE_ACTIONS, TILE_NEEDS_YOU, isTile, tileRoom, tileStateOf, type BoxSize, type TileItem } from '../tile.js'
+import { TILE_ACTIONS, TILE_NEEDS_YOU, TILE_NOTE_MS, expandDeclined, isTile, tileRoom, tileStateOf, type BoxSize, type TileItem } from '../tile.js'
 import { TILE_MARKS } from './marks.js'
 
 /**
@@ -22,7 +22,7 @@ import { TILE_MARKS } from './marks.js'
  * `view.expand`). Above it, where there is room (`tileRoom`), the quick actions: Answer when a
  * question waits (its choices and a reply field open over the tile, in place), Expand, and Compact
  * and Clear. Every button is reached by Tab; the tile's tooltip and accessible name are the whole
- * state in one sentence.
+ * state in one sentence. An Expand the host declined says why, over the foot of the tile (2.63.0).
  */
 
 /**
@@ -72,8 +72,13 @@ export interface AgentTileProps {
   unread?: number
   /** The page's size (`useTileSize`), for what fits. */
   size: BoxSize
-  /** Expand the container (`view.expand`). Absent: the tile is not a button, and there is no Expand. */
-  onExpand?: () => void
+  /**
+   * Expand the container (`view.expand`). Absent: the tile is not a button, and there is no Expand.
+   * 2.63.0: return what the host answered (`request('view.expand', { expand: true })` as it is) and a
+   * `declined` answer's `why` is said on the tile for a few seconds (`expandDeclined`), so a press the
+   * host refused is never silent.
+   */
+  onExpand?: () => unknown
   /** The word on the Expand action and the tile's own press, when the module does something else than ask the host. */
   expandWord?: string
   /** Answer the question that waits, as the person's reply to the session. Absent: no Answer. Resolve `false` to keep the panel open. */
@@ -122,6 +127,7 @@ export const TILE_CSS = `
 .kehikot-tile-actions button,.kehikot-tile-answer button{pointer-events:auto;font:inherit;font-size:11px;color:inherit;background:var(--background,transparent);border:1px solid var(--border,currentColor);border-radius:6px;padding:2px 7px;cursor:pointer;white-space:nowrap}
 .kehikot-tile-actions button:hover,.kehikot-tile-answer button:hover{background:var(--accent,transparent)}
 .kehikot-tile-actions button[data-action=answer]{border-color:var(--kt-attn);font-weight:600}
+.kehikot-tile-note{position:absolute;left:4px;right:4px;top:4px;z-index:2;margin:0;padding:3px 6px;border-radius:6px;font-size:10px;line-height:1.25;overflow-wrap:anywhere;color:var(--popover-foreground,inherit);background:var(--popover,var(--background,#fff));border:1px solid var(--kt-attn);pointer-events:none}
 .kehikot-tile-answer{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;gap:4px;padding:6px;background:var(--popover,var(--background,#fff));color:var(--popover-foreground,inherit)}
 .kehikot-tile-answer p{margin:0;flex:1 1 auto;min-height:0;overflow:auto;font-size:11px;overflow-wrap:anywhere}
 .kehikot-tile-choices{display:flex;flex-wrap:wrap;gap:4px;flex:none}
@@ -201,6 +207,31 @@ export function AgentTile({ name, icon, title, item, unread = 0, size, onExpand,
     }
   }
 
+  /* Why the last Expand was not done, said for a while (2.63.0). The answer of an older press does not
+     overwrite a newer one's. */
+  const [note, setNote] = useState<string | null>(null)
+  const pressSeq = useRef(0)
+  useEffect(() => {
+    if (!note) return
+    const timer = setTimeout(() => setNote(null), TILE_NOTE_MS)
+    return () => clearTimeout(timer)
+  }, [note])
+  const expand = onExpand
+    ? () => {
+        const seq = ++pressSeq.current
+        setNote(null)
+        const out = onExpand()
+        if (out && typeof (out as PromiseLike<unknown>).then === 'function') {
+          ;(out as PromiseLike<unknown>).then(
+            (answer) => {
+              if (seq === pressSeq.current) setNote(expandDeclined(answer))
+            },
+            () => {},
+          )
+        } else if (seq === pressSeq.current) setNote(expandDeclined(out))
+      }
+    : undefined
+
   const needs = TILE_NEEDS_YOU.has(state.look)
   const actions: ReactElement[] = []
   if (room.actions) {
@@ -213,7 +244,7 @@ export function AgentTile({ name, icon, title, item, unread = 0, size, onExpand,
         ),
       )
     }
-    if (onExpand) actions.push(createElement('button', { key: 'expand', type: 'button', 'data-action': 'expand', title: `${expandWord} ${name}`, onClick: onExpand }, expandWord))
+    if (expand) actions.push(createElement('button', { key: 'expand', type: 'button', 'data-action': 'expand', title: `${expandWord} ${name}`, onClick: expand }, expandWord))
     if (room.commands && onCompact) actions.push(createElement('button', { key: 'compact', type: 'button', 'data-action': 'compact', onClick: onCompact }, TILE_ACTIONS.compact))
     if (room.commands && onClear) actions.push(createElement('button', { key: 'clear', type: 'button', 'data-action': 'clear', onClick: onClear }, TILE_ACTIONS.clear))
   }
@@ -222,7 +253,7 @@ export function AgentTile({ name, icon, title, item, unread = 0, size, onExpand,
     onExpand ? 'button' : 'div',
     {
       className: 'kehikot-tile-face',
-      ...(onExpand ? { type: 'button', onClick: onExpand, 'data-press': 'true', 'aria-label': `${state.sentence} ${expandWord}.` } : { role: 'status' }),
+      ...(expand ? { type: 'button', onClick: expand, 'data-press': 'true', 'aria-label': `${state.sentence} ${expandWord}.` } : { role: 'status' }),
       title: state.sentence,
     },
     createElement(
@@ -289,6 +320,7 @@ export function AgentTile({ name, icon, title, item, unread = 0, size, onExpand,
     face,
     unread > 0 ? createElement('span', { className: 'kehikot-tile-unread', 'aria-hidden': true }) : null,
     actions.length ? createElement('div', { className: 'kehikot-tile-actions' }, actions) : null,
+    note ? createElement('p', { className: 'kehikot-tile-note', role: 'status', 'aria-live': 'polite' }, note) : null,
     answer,
   )
 }
