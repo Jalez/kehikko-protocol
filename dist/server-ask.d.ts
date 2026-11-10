@@ -52,25 +52,25 @@ export declare const serverAskSchema: z.ZodEffects<z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     params: Record<string, unknown>;
     module: string;
-    pass: string;
     method: "epics.list" | "epic.get" | "steps.list" | "tracker.get" | "tracker.columns" | "traffic.read" | "traffic.note" | "parts.get" | "dispositions.get" | "messages.send" | "messages.read" | "messages.notify";
+    pass: string;
     project?: string | undefined;
 }, {
     module: string;
-    pass: string;
     method: "epics.list" | "epic.get" | "steps.list" | "tracker.get" | "tracker.columns" | "traffic.read" | "traffic.note" | "parts.get" | "dispositions.get" | "messages.send" | "messages.read" | "messages.notify";
+    pass: string;
     params?: Record<string, unknown> | undefined;
     project?: string | undefined;
 }>, {
     params: Record<string, unknown>;
     module: string;
-    pass: string;
     method: "epics.list" | "epic.get" | "steps.list" | "tracker.get" | "tracker.columns" | "traffic.read" | "traffic.note" | "parts.get" | "dispositions.get" | "messages.send" | "messages.read" | "messages.notify";
+    pass: string;
     project?: string | undefined;
 }, {
     module: string;
-    pass: string;
     method: "epics.list" | "epic.get" | "steps.list" | "tracker.get" | "tracker.columns" | "traffic.read" | "traffic.note" | "parts.get" | "dispositions.get" | "messages.send" | "messages.read" | "messages.notify";
+    pass: string;
     params?: Record<string, unknown> | undefined;
     project?: string | undefined;
 }>;

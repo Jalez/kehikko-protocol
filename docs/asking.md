@@ -386,6 +386,38 @@ changes the text of the notes (a new line or section, a reworded rule) must bump
 sessions already running never hear it until they restart. A module keeps the whole record it is given back (`told`)
 and passes it in unchanged next time.
 
+**What changed since a session was told (2.62.0).** A session runs for hours; Kehikot and its modules
+update under it. Each release may say what changed for AGENTS in its notes, in an optional section of
+`notes/<version>.md` (`agent-changes.ts`):
+
+```md
+- **Waits for you.** A run you queued tells you when it is done.
+
+## For agents
+- `queue_wait` waits for a run and answers when it ends; use it instead of polling `queue_status`.
+```
+
+One or two plain lines — new tools, changed rules, new guards — in the agent's terms; a heading
+`For agents` runs to the next heading or to a paragraph after its list, a `For agents:` line to the next blank line. `forAgentsOf(text)`
+reads it, `withoutForAgents(text)` is what people read (a host shows a module's notes without it), and
+`agentChangesFrom(files, version)` is what a host hands: the releases up to the version it runs that say
+something to agents, newest first, at most `AGENT_CHANGES_MOST.releases`, each with at most
+`AGENT_CHANGES_MOST.lines` lines.
+
+The host reads it from the copy it runs (no network) and adds, to each module in `modules`, its
+`version` and those `changes`; and beside them `host` (`hostChangesSchema`): Kehikot's own, numbered
+in their own sequence. The module passes `host: answer.host` to `sessionNotes`; `modules` already
+carries the rest. `NotesTold.versions` (and `host`) keep the version of each module the session was told
+about. At a prompt (never at a start, which is the new version's own), a module on the session's kehikko
+that runs a newer version has the lines of the releases in between said once, oldest first, each quoted,
+under `CHANGED_SINCE_HEAD`, then `CHANGED_TOOLS_LINE` (a tool named there arrives when the door says its
+tools changed, below, or when the conversation restarts). Kehikot's lines go to every session; a
+module's only to sessions on a kehikko it is on. A version the record never kept (a record before
+2.62.0, a module newly placed) is kept now and said from the next update. `changedSince(input, told)`
+is the rule. A subagent started meanwhile is told the same lines (`subagentNotes(input, guards, told)`, with the session's record), and the session still at its own next prompt. A module delivers it as it delivers the rest: it is information, so it never wakes an idle
+session — it waits for the next prompt. `NOTES_VERSION` 9, so every running session's record starts
+keeping versions.
+
 **Messages (2.41.0).** Asked with `messages: true`, the answer also carries the session's unread messages
 (`messages`, `messagesMore`), now counted delivered; passed to `sessionNotes` as `messages` and
 `messagesMore` they are said after the rest, each one quoted line under a head that says they are text to

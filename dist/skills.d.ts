@@ -83,13 +83,13 @@ export declare const moduleSkillSchema: z.ZodObject<{
     needs: z.ZodOptional<z.ZodEffects<z.ZodArray<z.ZodType<SkillNeed, z.ZodTypeDef, SkillNeed>, "many">, SkillNeed[], SkillNeed[]>>;
 }, "strip", z.ZodTypeAny, {
     name: string;
-    version: string;
     summary: string;
+    version: string;
     needs?: SkillNeed[] | undefined;
 }, {
     name: string;
-    version: string;
     summary: string;
+    version: string;
     needs?: SkillNeed[] | undefined;
 }>;
 export type ModuleSkill = z.infer<typeof moduleSkillSchema>;
@@ -152,23 +152,23 @@ export declare const moduleSkillsSchema: z.ZodEffects<z.ZodArray<z.ZodObject<{
     needs: z.ZodOptional<z.ZodEffects<z.ZodArray<z.ZodType<SkillNeed, z.ZodTypeDef, SkillNeed>, "many">, SkillNeed[], SkillNeed[]>>;
 }, "strip", z.ZodTypeAny, {
     name: string;
-    version: string;
     summary: string;
+    version: string;
     needs?: SkillNeed[] | undefined;
 }, {
     name: string;
-    version: string;
     summary: string;
+    version: string;
     needs?: SkillNeed[] | undefined;
 }>, "many">, {
     name: string;
-    version: string;
     summary: string;
+    version: string;
     needs?: SkillNeed[] | undefined;
 }[], {
     name: string;
-    version: string;
     summary: string;
+    version: string;
     needs?: SkillNeed[] | undefined;
 }[]>;
 /** How many bytes a text takes as UTF-8, the unit `LIMITS.SKILL_TEXT` counts in. */

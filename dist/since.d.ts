@@ -181,6 +181,10 @@ export declare const SESSION_FIELD_SINCE: {
     readonly kehikkoSkills: "2.53.0";
     /** The guards of the modules placed on the session's kehikko (2.61.0), and the manifest field they come from. */
     readonly guards: "2.61.0";
+    /** Kehikot's own changes for agents, and each module's version and releases' lines for agents (2.62.0). */
+    readonly host: "2.62.0";
+    readonly version: "2.62.0";
+    readonly changes: "2.62.0";
 };
 export type SessionField = keyof typeof SESSION_FIELD_SINCE;
 /**
@@ -342,6 +346,10 @@ export declare const SINCE: {
         readonly kehikkoSkills: "2.53.0";
         /** The guards of the modules placed on the session's kehikko (2.61.0), and the manifest field they come from. */
         readonly guards: "2.61.0";
+        /** Kehikot's own changes for agents, and each module's version and releases' lines for agents (2.62.0). */
+        readonly host: "2.62.0";
+        readonly version: "2.62.0";
+        readonly changes: "2.62.0";
     };
     readonly wire: {
         readonly 'kehikot.footer': "2.38.0";

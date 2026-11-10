@@ -69,8 +69,8 @@ declare const fieldShape: z.ZodObject<{
     type: "string" | "number" | "boolean" | "choice" | "list";
     key: string;
     label: string;
-    scope: "project" | "machine";
     description: string;
+    scope: "project" | "machine";
     personOnly: boolean;
     choices?: {
         value: string;
@@ -85,9 +85,9 @@ declare const fieldShape: z.ZodObject<{
         value: string;
         label: string;
     }[] | undefined;
+    description?: string | undefined;
     default?: unknown;
     scope?: "project" | "machine" | undefined;
-    description?: string | undefined;
     personOnly?: boolean | undefined;
 }>;
 /** A setting's whole declaration. Checked: `choices` iff `choice`, choices unique, and `default` of the type. */
@@ -122,8 +122,8 @@ export declare const settingFieldSchema: z.ZodEffects<z.ZodObject<{
     type: "string" | "number" | "boolean" | "choice" | "list";
     key: string;
     label: string;
-    scope: "project" | "machine";
     description: string;
+    scope: "project" | "machine";
     personOnly: boolean;
     choices?: {
         value: string;
@@ -138,16 +138,16 @@ export declare const settingFieldSchema: z.ZodEffects<z.ZodObject<{
         value: string;
         label: string;
     }[] | undefined;
+    description?: string | undefined;
     default?: unknown;
     scope?: "project" | "machine" | undefined;
-    description?: string | undefined;
     personOnly?: boolean | undefined;
 }>, {
     type: "string" | "number" | "boolean" | "choice" | "list";
     key: string;
     label: string;
-    scope: "project" | "machine";
     description: string;
+    scope: "project" | "machine";
     personOnly: boolean;
     choices?: {
         value: string;
@@ -162,9 +162,9 @@ export declare const settingFieldSchema: z.ZodEffects<z.ZodObject<{
         value: string;
         label: string;
     }[] | undefined;
+    description?: string | undefined;
     default?: unknown;
     scope?: "project" | "machine" | undefined;
-    description?: string | undefined;
     personOnly?: boolean | undefined;
 }>;
 export type SettingField = z.infer<typeof fieldShape>;
@@ -201,8 +201,8 @@ export declare const settingsDeclarationSchema: z.ZodEffects<z.ZodArray<z.ZodEff
     type: "string" | "number" | "boolean" | "choice" | "list";
     key: string;
     label: string;
-    scope: "project" | "machine";
     description: string;
+    scope: "project" | "machine";
     personOnly: boolean;
     choices?: {
         value: string;
@@ -217,16 +217,16 @@ export declare const settingsDeclarationSchema: z.ZodEffects<z.ZodArray<z.ZodEff
         value: string;
         label: string;
     }[] | undefined;
+    description?: string | undefined;
     default?: unknown;
     scope?: "project" | "machine" | undefined;
-    description?: string | undefined;
     personOnly?: boolean | undefined;
 }>, {
     type: "string" | "number" | "boolean" | "choice" | "list";
     key: string;
     label: string;
-    scope: "project" | "machine";
     description: string;
+    scope: "project" | "machine";
     personOnly: boolean;
     choices?: {
         value: string;
@@ -241,16 +241,16 @@ export declare const settingsDeclarationSchema: z.ZodEffects<z.ZodArray<z.ZodEff
         value: string;
         label: string;
     }[] | undefined;
+    description?: string | undefined;
     default?: unknown;
     scope?: "project" | "machine" | undefined;
-    description?: string | undefined;
     personOnly?: boolean | undefined;
 }>, "many">, {
     type: "string" | "number" | "boolean" | "choice" | "list";
     key: string;
     label: string;
-    scope: "project" | "machine";
     description: string;
+    scope: "project" | "machine";
     personOnly: boolean;
     choices?: {
         value: string;
@@ -265,9 +265,9 @@ export declare const settingsDeclarationSchema: z.ZodEffects<z.ZodArray<z.ZodEff
         value: string;
         label: string;
     }[] | undefined;
+    description?: string | undefined;
     default?: unknown;
     scope?: "project" | "machine" | undefined;
-    description?: string | undefined;
     personOnly?: boolean | undefined;
 }[]>;
 export type SettingsDeclaration = z.infer<typeof settingsDeclarationSchema>;
@@ -367,11 +367,11 @@ export declare const settingsSetResult: z.ZodObject<{
     why: z.ZodDefault<z.ZodString>;
     values: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
 }, "strip", z.ZodTypeAny, {
-    outcome: "saved" | "refused";
+    outcome: "refused" | "saved";
     why: string;
     values?: Record<string, unknown> | undefined;
 }, {
-    outcome: "saved" | "refused";
+    outcome: "refused" | "saved";
     values?: Record<string, unknown> | undefined;
     why?: string | undefined;
 }>;
@@ -395,11 +395,11 @@ export declare const doorMethodResults: {
         why: z.ZodDefault<z.ZodString>;
         values: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
     }, "strip", z.ZodTypeAny, {
-        outcome: "saved" | "refused";
+        outcome: "refused" | "saved";
         why: string;
         values?: Record<string, unknown> | undefined;
     }, {
-        outcome: "saved" | "refused";
+        outcome: "refused" | "saved";
         values?: Record<string, unknown> | undefined;
         why?: string | undefined;
     }>;

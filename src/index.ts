@@ -597,6 +597,16 @@ export {
   subagentNotes,
   guardLine,
   GUARDS_HEAD,
+  AGENT_CHANGES_MOST,
+  agentChangeSchema,
+  agentChangesSchema,
+  hostChangesSchema,
+  changesBetween,
+  changedSince,
+  CHANGED_SINCE_HEAD,
+  CHANGED_TOOLS_LINE,
+  type AgentChange,
+  type HostChanges,
   type SessionModule,
   type AbsentModule,
   type NotesPlace,
@@ -605,6 +615,9 @@ export {
   type NotesTold,
   type NotesEvent,
 } from './notes.js'
+
+/* What a release changed for agents, read from its notes' "For agents" section (2.62.0). See `agent-changes.ts`. */
+export { FOR_AGENTS, forAgentsOf, withoutForAgents, notesVersion, agentChangesFrom } from './agent-changes.js'
 
 /* How an agent session's turn ended, one rule for every agent module (2.55.0), and the reminder after a stall (2.56.0). See `turns.ts`. */
 export {
