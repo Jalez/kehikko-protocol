@@ -46,6 +46,16 @@ host.header([
 
 Every item has `id`, `label`, and optionally `icon` (a name such as `file-text`; a host draws the ones it has), `shortcut` (a hint to show; the host binds no key), `group` (a heading inside its menu), `agents` and `tool` (below).
 
+**An option** of a switch or a go item has `id` and `label`, and since 2.68.0 optionally `group` and `detail`. `group` is the heading the option is drawn under inside its item: options are drawn in the order given and a heading starts wherever the group differs from the option before it (`optionSections` is the rule), so a chooser can say *This kehikko’s conversation* above one option and *Other conversations here* above the rest, then end with ungrouped options (*New conversation*) set apart by a rule. `detail` is a quieter second line under the label (`needs you · 5 min ago`). Both are text, never markup. A host before 2.68.0 strips both and draws the label alone, so the label has to say what the option is by itself; put what is secondary in `detail`.
+
+```ts
+{ kind: 'switch', id: 'conversation', label: 'Conversation: Fix login bug', value: 's1', options: [
+  { id: 's1', label: 'Fix login bug', group: 'This kehikko’s conversation', detail: 'needs you · 5 min ago' },
+  { id: 's2', label: 'Draft the results', group: 'Other conversations here', detail: 'idle · 2 h ago' },
+  { id: 'new', label: 'New conversation' },
+] }
+```
+
 **The kind fixes the menu** (`HEADER_MENUS`). A module cannot put a run under View or invent a fifth menu, so the header reads the same on every container: View, Go, Run, then the host's own Frame.
 
 **A toggle's press says the state wanted**, not "flip". A press that is delivered twice, or that an agent sends when the toggle is already on, then changes nothing.
@@ -61,6 +71,8 @@ Every item has `id`, `label`, and optionally `icon` (a name such as `file-text`;
 | `HEADER_ID` | 64 characters; `__proto__`, `constructor` and `prototype` are refused |
 | `HEADER_LABEL` | 48 characters, for an item and for an option |
 | `HEADER_GROUP` | 24 |
+| `HEADER_OPTION_GROUP` | 32, an option's group (2.68.0) |
+| `HEADER_OPTION_DETAIL` | 64, an option's detail (2.68.0) |
 | `HEADER_ICON` | 32 |
 | `PINNED_MAX` | 4 pinned runs drawn in the header (1.6.0) |
 | `HEADER_SHORTCUT` | 16 |

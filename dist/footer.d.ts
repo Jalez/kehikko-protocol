@@ -114,12 +114,18 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     options: z.ZodArray<z.ZodObject<{
         id: z.ZodEffects<z.ZodString, string, string>;
         label: z.ZodString;
+        group: z.ZodOptional<z.ZodString>;
+        detail: z.ZodOptional<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }, {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }>, "many">;
     value: z.ZodEffects<z.ZodString, string, string>;
     id: z.ZodEffects<z.ZodString, string, string>;
@@ -147,6 +153,8 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     options: {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }[];
     id: string;
     kind: "switch";
@@ -165,6 +173,8 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     options: {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }[];
     id: string;
     kind: "switch";
@@ -232,12 +242,18 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     options: z.ZodArray<z.ZodObject<{
         id: z.ZodEffects<z.ZodString, string, string>;
         label: z.ZodString;
+        group: z.ZodOptional<z.ZodString>;
+        detail: z.ZodOptional<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }, {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }>, "many">;
     id: z.ZodEffects<z.ZodString, string, string>;
     label: z.ZodString;
@@ -263,6 +279,8 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     options: {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }[];
     id: string;
     kind: "go";
@@ -280,6 +298,8 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     options: {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }[];
     id: string;
     kind: "go";
@@ -442,6 +462,8 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     options: {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }[];
     id: string;
     kind: "switch";
@@ -473,6 +495,8 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     options: {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }[];
     id: string;
     kind: "go";
@@ -542,6 +566,8 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     options: {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }[];
     id: string;
     kind: "switch";
@@ -573,6 +599,8 @@ export declare const footerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     options: {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }[];
     id: string;
     kind: "go";
@@ -706,12 +734,18 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     options: z.ZodArray<z.ZodObject<{
         id: z.ZodEffects<z.ZodString, string, string>;
         label: z.ZodString;
+        group: z.ZodOptional<z.ZodString>;
+        detail: z.ZodOptional<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }, {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }>, "many">;
     value: z.ZodEffects<z.ZodString, string, string>;
     id: z.ZodEffects<z.ZodString, string, string>;
@@ -739,6 +773,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     options: {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }[];
     id: string;
     kind: "switch";
@@ -757,6 +793,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     options: {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }[];
     id: string;
     kind: "switch";
@@ -824,12 +862,18 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     options: z.ZodArray<z.ZodObject<{
         id: z.ZodEffects<z.ZodString, string, string>;
         label: z.ZodString;
+        group: z.ZodOptional<z.ZodString>;
+        detail: z.ZodOptional<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }, {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }>, "many">;
     id: z.ZodEffects<z.ZodString, string, string>;
     label: z.ZodString;
@@ -855,6 +899,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     options: {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }[];
     id: string;
     kind: "go";
@@ -872,6 +918,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     options: {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }[];
     id: string;
     kind: "go";
@@ -1034,6 +1082,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     options: {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }[];
     id: string;
     kind: "switch";
@@ -1065,6 +1115,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     options: {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }[];
     id: string;
     kind: "go";
@@ -1134,6 +1186,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     options: {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }[];
     id: string;
     kind: "switch";
@@ -1165,6 +1219,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     options: {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }[];
     id: string;
     kind: "go";
@@ -1234,6 +1290,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     options: {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }[];
     id: string;
     kind: "switch";
@@ -1265,6 +1323,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     options: {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }[];
     id: string;
     kind: "go";
@@ -1334,6 +1394,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     options: {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }[];
     id: string;
     kind: "switch";
@@ -1365,6 +1427,8 @@ export declare const footerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     options: {
         id: string;
         label: string;
+        detail?: string | undefined;
+        group?: string | undefined;
     }[];
     id: string;
     kind: "go";

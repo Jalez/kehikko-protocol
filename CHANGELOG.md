@@ -7,6 +7,22 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.68.0 — 2026-11-10
+
+A switch's or go item's options can be grouped and carry a second line. **Additive**; `PROTOCOL` is still 2.
+[docs/header.md](docs/header.md), "An option".
+
+### Added
+
+- **`headerOptionSchema.group`** (at most `LIMITS.HEADER_OPTION_GROUP`, 32): the heading an option is
+  drawn under inside its item. A heading starts wherever the group differs from the option before it.
+- **`headerOptionSchema.detail`** (at most `LIMITS.HEADER_OPTION_DETAIL`, 64): a quieter second line
+  under the option's label.
+- **`optionSections(options)`**: the options as runs under their headings, the rule a host draws by.
+  The template's `header-menus.tsx` draws both.
+
+A host before 2.68.0 strips both fields and draws the label alone.
+
 ## 2.67.0 — 2026-11-10
 
 What a reviewer did and what the latest activity was. **Additive**; `PROTOCOL` is still 2.
