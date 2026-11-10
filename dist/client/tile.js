@@ -1,5 +1,5 @@
 import { createElement, useEffect, useInsertionEffect, useRef, useState, } from 'react';
-import { TILE_ACTIONS, TILE_NEEDS_YOU, isTile, tileRoom, tileStateOf } from '../tile.js';
+import { TILE_ACTIONS, TILE_NEEDS_YOU, TILE_NOTE_MS, expandDeclined, isTile, tileRoom, tileStateOf } from '../tile.js';
 import { TILE_MARKS } from './marks.js';
 /**
  * 2.58.0. An agent module's tile: what a module that runs agent sessions draws instead of its
@@ -11,7 +11,7 @@ import { TILE_MARKS } from './marks.js';
  * `view.expand`). Above it, where there is room (`tileRoom`), the quick actions: Answer when a
  * question waits (its choices and a reply field open over the tile, in place), Expand, and Compact
  * and Clear. Every button is reached by Tab; the tile's tooltip and accessible name are the whole
- * state in one sentence.
+ * state in one sentence. An Expand the host declined says why, over the foot of the tile (2.63.0).
  */
 /**
  * This page's own size, kept as it changes: the frame the host gives it, which IS the module's box.
@@ -83,6 +83,7 @@ export const TILE_CSS = `
 .kehikot-tile-actions button,.kehikot-tile-answer button{pointer-events:auto;font:inherit;font-size:11px;color:inherit;background:var(--background,transparent);border:1px solid var(--border,currentColor);border-radius:6px;padding:2px 7px;cursor:pointer;white-space:nowrap}
 .kehikot-tile-actions button:hover,.kehikot-tile-answer button:hover{background:var(--accent,transparent)}
 .kehikot-tile-actions button[data-action=answer]{border-color:var(--kt-attn);font-weight:600}
+.kehikot-tile-note{position:absolute;left:4px;right:4px;top:4px;z-index:2;margin:0;padding:3px 6px;border-radius:6px;font-size:10px;line-height:1.25;overflow-wrap:anywhere;color:var(--popover-foreground,inherit);background:var(--popover,var(--background,#fff));border:1px solid var(--kt-attn);pointer-events:none}
 .kehikot-tile-answer{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;gap:4px;padding:6px;background:var(--popover,var(--background,#fff));color:var(--popover-foreground,inherit)}
 .kehikot-tile-answer p{margin:0;flex:1 1 auto;min-height:0;overflow:auto;font-size:11px;overflow-wrap:anywhere}
 .kehikot-tile-choices{display:flex;flex-wrap:wrap;gap:4px;flex:none}
@@ -152,14 +153,40 @@ export function AgentTile({ name, icon, title, item, unread = 0, size, onExpand,
             setSending(false);
         }
     };
+    /* Why the last Expand was not done, said for a while (2.63.0). The answer of an older press does not
+       overwrite a newer one's. */
+    const [note, setNote] = useState(null);
+    const pressSeq = useRef(0);
+    useEffect(() => {
+        if (!note)
+            return;
+        const timer = setTimeout(() => setNote(null), TILE_NOTE_MS);
+        return () => clearTimeout(timer);
+    }, [note]);
+    const expand = onExpand
+        ? () => {
+            const seq = ++pressSeq.current;
+            setNote(null);
+            const out = onExpand();
+            if (out && typeof out.then === 'function') {
+                ;
+                out.then((answer) => {
+                    if (seq === pressSeq.current)
+                        setNote(expandDeclined(answer));
+                }, () => { });
+            }
+            else if (seq === pressSeq.current)
+                setNote(expandDeclined(out));
+        }
+        : undefined;
     const needs = TILE_NEEDS_YOU.has(state.look);
     const actions = [];
     if (room.actions) {
         if (canAnswer) {
             actions.push(createElement('button', { key: 'answer', ref: answerButton, type: 'button', 'data-action': 'answer', title: state.question?.text, 'aria-haspopup': 'dialog', 'aria-expanded': answering, onClick: () => setAnswering(true) }, TILE_ACTIONS.answer));
         }
-        if (onExpand)
-            actions.push(createElement('button', { key: 'expand', type: 'button', 'data-action': 'expand', title: `${expandWord} ${name}`, onClick: onExpand }, expandWord));
+        if (expand)
+            actions.push(createElement('button', { key: 'expand', type: 'button', 'data-action': 'expand', title: `${expandWord} ${name}`, onClick: expand }, expandWord));
         if (room.commands && onCompact)
             actions.push(createElement('button', { key: 'compact', type: 'button', 'data-action': 'compact', onClick: onCompact }, TILE_ACTIONS.compact));
         if (room.commands && onClear)
@@ -167,7 +194,7 @@ export function AgentTile({ name, icon, title, item, unread = 0, size, onExpand,
     }
     const face = createElement(onExpand ? 'button' : 'div', {
         className: 'kehikot-tile-face',
-        ...(onExpand ? { type: 'button', onClick: onExpand, 'data-press': 'true', 'aria-label': `${state.sentence} ${expandWord}.` } : { role: 'status' }),
+        ...(expand ? { type: 'button', onClick: expand, 'data-press': 'true', 'aria-label': `${state.sentence} ${expandWord}.` } : { role: 'status' }),
         title: state.sentence,
     }, createElement('span', { className: 'kehikot-tile-icon', style: { width: room.icon, height: room.icon, ['--kt-icon']: `${room.icon}px` } }, ring(), mark(icon), state.badge ? createElement('span', { className: 'kehikot-tile-badge', 'aria-hidden': true }, state.badge) : null), room.title ? createElement('span', { className: 'kehikot-tile-title' }, (title ?? '').trim() || name) : null, room.title && state.look !== 'idle' ? createElement('span', { className: 'kehikot-tile-word', 'aria-hidden': true }, state.word) : null);
     const answer = answering && state.question
@@ -197,5 +224,5 @@ export function AgentTile({ name, icon, title, item, unread = 0, size, onExpand,
         'data-look': state.look,
         'data-needs': needs ? 'true' : 'false',
         'data-actions': actions.length ? 'true' : 'false',
-    }, face, unread > 0 ? createElement('span', { className: 'kehikot-tile-unread', 'aria-hidden': true }) : null, actions.length ? createElement('div', { className: 'kehikot-tile-actions' }, actions) : null, answer);
+    }, face, unread > 0 ? createElement('span', { className: 'kehikot-tile-unread', 'aria-hidden': true }) : null, actions.length ? createElement('div', { className: 'kehikot-tile-actions' }, actions) : null, note ? createElement('p', { className: 'kehikot-tile-note', role: 'status', 'aria-live': 'polite' }, note) : null, answer);
 }
