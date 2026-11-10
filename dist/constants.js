@@ -122,6 +122,15 @@ export const MESSAGE = {
      * page's own clock (`performance.now()`), for the length of a press; nothing else. No answer.
      */
     POINTER: 'kehikot.pointer',
+    /**
+     * Module → host (2.59.0). "My page failed": `{ message, where, stack }`, one uncaught error or
+     * unhandled rejection on the page, an error a React boundary caught, or a greeting handler that
+     * threw. Sent by the client by itself, rate-limited, to the window that greeted the page — and by
+     * the page document's own blocking script when the page's scripts never ran at all, so a page that
+     * cannot answer the greeting still says why. No answer. A host shows it in place of "not
+     * answering"; a host before 2.59.0 drops it unread. See docs/client.md, "When the page fails".
+     */
+    PAGE_ERROR: 'kehikot.page.error',
 };
 /** The prefix every message type carries, so a listener can drop the rest cheaply. There is one spelling. */
 export const MESSAGE_PREFIX = 'kehikot.';
@@ -159,6 +168,7 @@ export const MODULE_MESSAGES = [
     MESSAGE.PRESSED,
     MESSAGE.FOOTER,
     MESSAGE.POINTER,
+    MESSAGE.PAGE_ERROR,
 ];
 /**
  * How tall a frame may be asked to be, in pixels, bounded on both sides. `clampHeight` restates

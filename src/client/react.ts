@@ -29,3 +29,6 @@ export {
 /* 2.58.0: an agent module's tile, for a page too small for its terminal. See `tile.ts`. */
 export { AgentTile, useTileSize, TILE_CSS, TILE_STYLE_ID, type AgentTileProps } from './tile.js'
 export { TILE_MARKS } from './marks.js'
+
+/* 2.59.0: a boundary that says a render that threw to the host and draws the error. See `boundary.ts`. */
+export { ReportErrors, PAGE_FAILED, type ReportErrorsProps } from './boundary.js'

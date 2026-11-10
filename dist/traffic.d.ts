@@ -189,9 +189,9 @@ export declare const trafficCallSchema: z.ZodObject<{
     side: "out" | "in" | "seen";
     ok: boolean | null;
     ms: number | null;
+    reported: "module" | "host" | "sampled";
     seq: number;
     via: "page" | "server" | "process";
-    reported: "module" | "host" | "sampled";
     bytesIn?: number | undefined;
     bytesOut?: number | undefined;
     cache?: "refused" | "hit" | "not-modified" | undefined;
@@ -211,9 +211,9 @@ export declare const trafficCallSchema: z.ZodObject<{
     by: string;
     host: string;
     side: "out" | "in" | "seen";
+    reported: "module" | "host" | "sampled";
     seq: number;
     via: "page" | "server" | "process";
-    reported: "module" | "host" | "sampled";
     status?: number | null | undefined;
     reason?: string | null | undefined;
     ok?: boolean | null | undefined;
@@ -1234,9 +1234,9 @@ export declare const trafficReadResult: z.ZodObject<{
         side: "out" | "in" | "seen";
         ok: boolean | null;
         ms: number | null;
+        reported: "module" | "host" | "sampled";
         seq: number;
         via: "page" | "server" | "process";
-        reported: "module" | "host" | "sampled";
         bytesIn?: number | undefined;
         bytesOut?: number | undefined;
         cache?: "refused" | "hit" | "not-modified" | undefined;
@@ -1256,9 +1256,9 @@ export declare const trafficReadResult: z.ZodObject<{
         by: string;
         host: string;
         side: "out" | "in" | "seen";
+        reported: "module" | "host" | "sampled";
         seq: number;
         via: "page" | "server" | "process";
-        reported: "module" | "host" | "sampled";
         status?: number | null | undefined;
         reason?: string | null | undefined;
         ok?: boolean | null | undefined;
@@ -1973,9 +1973,9 @@ export declare const trafficReadResult: z.ZodObject<{
         side: "out" | "in" | "seen";
         ok: boolean | null;
         ms: number | null;
+        reported: "module" | "host" | "sampled";
         seq: number;
         via: "page" | "server" | "process";
-        reported: "module" | "host" | "sampled";
         bytesIn?: number | undefined;
         bytesOut?: number | undefined;
         cache?: "refused" | "hit" | "not-modified" | undefined;
@@ -2099,9 +2099,9 @@ export declare const trafficReadResult: z.ZodObject<{
         by: string;
         host: string;
         side: "out" | "in" | "seen";
+        reported: "module" | "host" | "sampled";
         seq: number;
         via: "page" | "server" | "process";
-        reported: "module" | "host" | "sampled";
         status?: number | null | undefined;
         reason?: string | null | undefined;
         ok?: boolean | null | undefined;

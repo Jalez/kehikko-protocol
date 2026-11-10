@@ -7,6 +7,22 @@
 
 export { mailbox, makeMailbox, KEEP, type MessageSource } from './mailbox.js'
 
+/* When the page fails (2.59.0): every uncaught error, said to the host, and a way to say one yourself. */
+export {
+  pageErrors,
+  makePageErrors,
+  reportPageError,
+  describeError,
+  trimStack,
+  PAGE_ERRORS_MAX,
+  PAGE_ERRORS_GLOBAL,
+  STACK_LINES,
+  NO_MESSAGE,
+  type PageError,
+  type PageErrors,
+  type ErrorTarget,
+} from './errors.js'
+
 export {
   connect,
   mayGreet,

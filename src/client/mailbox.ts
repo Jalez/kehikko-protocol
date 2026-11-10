@@ -5,6 +5,8 @@
  * Design notes: docs/client.md.
  */
 
+import { pageErrors } from './errors.js'
+
 /** Just enough of a window to listen to. `connect` takes one of these. */
 export interface MessageSource {
   addEventListener(type: 'message', fn: (ev: MessageEvent) => void): void
@@ -28,11 +30,16 @@ interface Listenable {
  * Build a mailbox over one window, listening immediately. Exported for tests; nothing in a page
  * should call it — a second mailbox over the same window answers the same greeting twice.
  */
-export function makeMailbox(target: Listenable | undefined): MessageSource {
+export function makeMailbox(
+  target: Listenable | undefined,
+  /** Told of every message first (2.59.0): the page's error reporter, which learns from a greeting who to tell. */
+  heard?: (ev: MessageEvent) => void,
+): MessageSource {
   const backlog: MessageEvent[] = []
   const listeners = new Set<(ev: MessageEvent) => void>()
 
   target?.addEventListener('message', (ev: MessageEvent) => {
+    heard?.(ev)
     backlog.push(ev)
     if (backlog.length > KEEP) backlog.shift()
     for (const listener of listeners) listener(ev)
@@ -63,4 +70,6 @@ export function makeMailbox(target: Listenable | undefined): MessageSource {
  */
 export const mailbox: MessageSource = makeMailbox(
   typeof window === 'undefined' ? undefined : (window as unknown as Listenable),
+  /* 2.59.0: and the page's failures, said to whoever greets it (`errors.ts`). */
+  (ev) => pageErrors.heard(ev),
 )

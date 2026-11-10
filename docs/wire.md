@@ -599,6 +599,29 @@ up, heard as `pointerup`, `mouseup` or `dragend`, whichever the browser still
 sends. A touch or pen cancelled is the browser's scroll starting, and is a
 `cancel` as before.
 
+#### `pageErrorSchema` (2.59.0)
+
+Module → host: `{ message, where, stack }`, the page failed. Not asked for and
+not answered. `message` is the error's own words (`TypeError: x is
+undefined`), `where` how it was caught (`PAGE_ERROR_WHERE`: `error`,
+`rejection`, `render`, `greeting`, `reported`; the field is text, so a word a
+host does not know is kept), `stack` its first lines. Long text is cut to
+`LIMITS.PAGE_ERROR_*`, never refused.
+
+A host that greets a page and hears nothing could, until this, only fetch the
+page and its scripts and say "it is loading and choosing not to answer" when
+they all came back — true, and of no use to a person. This is the page saying
+why. The client sends it by itself (docs/client.md, "When the page fails"):
+every uncaught error and unhandled rejection, a render the boundary caught, a
+greeting handler that threw — kept until a greeting when it came first, at
+most `PAGE_ERRORS_MAX` different ones, each once. The page document's blocking
+script (`errorsScript`) does the same for a page whose scripts never ran.
+
+A host shows it as text in place of "not answering" when the page has not
+answered the greeting. After `ready` it means less: the page answered, and a
+rejection somewhere is the module's to show. A host before 2.59.0 drops it
+unread (`MODULE_MESSAGES`).
+
 #### `hostMessageSchema`
 
 Not a `discriminatedUnion`, because `responseSchema` is itself a union on a

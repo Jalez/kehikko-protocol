@@ -7,6 +7,35 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.59.0 — 2026-11-10
+
+A module's page that fails says why, so a host can show the error instead of "not answering".
+**Additive**; `PROTOCOL` is still 2. [docs/client.md](docs/client.md), "When the page fails
+(2.59.0)", and [docs/wire.md](docs/wire.md), `pageErrorSchema`.
+
+### Added
+
+- **`kehikot.page.error` `{ message, where, stack }`** (`MESSAGE.PAGE_ERROR`, `pageErrorSchema`,
+  `PAGE_ERROR_WHERE`, `LIMITS.PAGE_ERROR_MESSAGE` / `PAGE_ERROR_WHERE` / `PAGE_ERROR_STACK`), module →
+  host, in `MODULE_MESSAGES`. Long text is cut, never refused. A host before 2.59.0 drops it unread.
+- **The client says it by itself** (`pageErrors`, `makePageErrors`, `reportPageError`,
+  `describeError`, `trimStack`, `PAGE_ERRORS_MAX`, `STACK_LINES`, `PAGE_ERRORS_GLOBAL`): every uncaught
+  error and unhandled rejection on the page, installed with the mailbox; kept until a greeting the page
+  may take and said to its window, at most `PAGE_ERRORS_MAX` (5) different ones, each once.
+  `makeMailbox(target, heard?)` tells `heard` of every message first.
+- **A greeting handler that throws** (`onHello`) is said as `greeting` and logged, after `ready`,
+  instead of propagating into the mailbox.
+- **`ReportErrors`** (`./client/react`, with `PAGE_FAILED`): a boundary that says a render that threw
+  as `render` and draws the error as text with Try again; `fallback(error, retry)` for your own.
+- **`errorsScript()`** (`./serve`), a blocking script `pageDocument` puts ahead of everything else: it
+  keeps errors from the first moment and answers the frame parent's greeting with them, so a page whose
+  scripts never ran (an import that does not link) still says why. The client takes it over.
+
+### Changed
+
+- `mayGreet` and `pageOrigins` live in `client/greet.ts`; `connect.ts` re-exports them as before.
+- The template's `main.tsx` wraps the page in `ReportErrors`.
+
 ## 2.58.0 — 2026-11-09
 
 An agent module that is small on the canvas is drawn as a tile, and a container can be shown large

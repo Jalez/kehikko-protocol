@@ -83,7 +83,8 @@ describe('a page built ahead of its server', () => {
     const nasty = '</script><script>alert(1)</script>$&$1'
     const filled = fillPage(pageDocument({ title: 'Example', ticket: '' }), { ticket: nasty })
     expect(read(filled, 'ticket')).toBe(nasty)
-    expect(filled.match(/<script/g)?.length).toBe(3)
+    /* The errors script, the theme script, the ticket's island and the module (2.59.0: the errors script). */
+    expect(filled.match(/<script/g)?.length).toBe(4)
   })
 })
 

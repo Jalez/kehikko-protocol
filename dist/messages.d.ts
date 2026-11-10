@@ -3734,6 +3734,44 @@ export declare const pointerSchema: z.ZodObject<{
 }>;
 export type PointerMessage = z.infer<typeof pointerSchema>;
 /**
+ * 2.59.0. Where a page's failure was caught: an uncaught `error` on the window (a script that threw,
+ * or failed to load or link), an unhandled promise `rejection`, a React `render` caught by the
+ * client's boundary (`ReportErrors`), a `greeting` handler that threw (`onHello`), or one the page
+ * `reported` itself (`reportPageError`). Words a host does not know are kept: the field is text.
+ */
+export declare const PAGE_ERROR_WHERE: readonly ["error", "rejection", "render", "greeting", "reported"];
+export type PageErrorWhere = (typeof PAGE_ERROR_WHERE)[number];
+/**
+ * Module → host (2.59.0). The page failed: an uncaught error or unhandled rejection, a render a
+ * boundary caught, or a greeting handler that threw. `message` is the error's own (`TypeError: x is
+ * undefined`), `where` says how it was caught (`PAGE_ERROR_WHERE`), `stack` its first lines, trimmed
+ * (`trimStack`). Sent by the client without being asked, rate-limited, to the window that greeted
+ * the page; buffered until a greeting when it came first. The page document's blocking script
+ * (`errorsScript`) sends it for a page whose scripts never ran, so a page that cannot answer the
+ * greeting still says why. Fire and forget.
+ *
+ * A host shows it as the module's own words, as text, never markup: it is the reason a page did not
+ * answer, in place of "not answering". A host before 2.59.0 drops it unread (`MODULE_MESSAGES`).
+ * Long text is cut, never refused.
+ */
+export declare const pageErrorSchema: z.ZodObject<{
+    type: z.ZodLiteral<"kehikot.page.error">;
+    message: z.ZodPipeline<z.ZodEffects<z.ZodString, string, string>, z.ZodString>;
+    where: z.ZodDefault<z.ZodEffects<z.ZodString, string, string>>;
+    stack: z.ZodDefault<z.ZodEffects<z.ZodString, string, string>>;
+}, "strip", z.ZodTypeAny, {
+    message: string;
+    type: "kehikot.page.error";
+    stack: string;
+    where: string;
+}, {
+    message: string;
+    type: "kehikot.page.error";
+    stack?: string | undefined;
+    where?: string | undefined;
+}>;
+export type PageErrorMessage = z.infer<typeof pageErrorSchema>;
+/**
  * Every message a host sends. A plain union, not a `discriminatedUnion`, because `responseSchema`
  * is itself a union on a different key and cannot be an option of one.
  */
@@ -7287,6 +7325,21 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
     at: number;
     type: "kehikot.pointer";
     phase: "down" | "up" | "cancel";
+}>, z.ZodObject<{
+    type: z.ZodLiteral<"kehikot.page.error">;
+    message: z.ZodPipeline<z.ZodEffects<z.ZodString, string, string>, z.ZodString>;
+    where: z.ZodDefault<z.ZodEffects<z.ZodString, string, string>>;
+    stack: z.ZodDefault<z.ZodEffects<z.ZodString, string, string>>;
+}, "strip", z.ZodTypeAny, {
+    message: string;
+    type: "kehikot.page.error";
+    stack: string;
+    where: string;
+}, {
+    message: string;
+    type: "kehikot.page.error";
+    stack?: string | undefined;
+    where?: string | undefined;
 }>]>;
 export type ModuleMessage = z.infer<typeof moduleMessageSchema>;
 export type WireMessage = HostMessage | ModuleMessage;

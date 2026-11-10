@@ -11,3 +11,4 @@ export { type HostActions, type HostFields, type HostStanding, type Steadiness }
 export { Cover, coverFor, useServerStanding, COVER_CSS, COVER_STYLE_ID, COVER_WORDS, TRY_AGAIN, type CoverProps, type CoverState, } from './cover.js';
 export { AgentTile, useTileSize, TILE_CSS, TILE_STYLE_ID, type AgentTileProps } from './tile.js';
 export { TILE_MARKS } from './marks.js';
+export { ReportErrors, PAGE_FAILED, type ReportErrorsProps } from './boundary.js';

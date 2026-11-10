@@ -918,3 +918,33 @@ if (size.tile) return (
   box resized around it does not flip.
 - **A host before 2.58.0** does not answer `view.expand` (`hello.answers` does not list it): offer no
   Expand, or show the large view in place on a press.
+
+## When the page fails (2.59.0)
+
+A page that throws before `connect` is greeted and says nothing, and the host can only say the page
+is "choosing not to answer". From 2.59.0 the page says why, as `kehikot.page.error` `{ message,
+where, stack }` (docs/wire.md, `pageErrorSchema`), with nothing for a module to do but import the
+client from its entry, as it already must.
+
+- **`errors.ts`** installs with the mailbox: listeners for the window's `error` (a script that threw,
+  or did not link) and `unhandledrejection`. Each failure is kept as the error's name and message, how
+  it was caught, and the first `STACK_LINES` lines of its stack; at most `PAGE_ERRORS_MAX` different
+  ones per document, each once. Nothing is sent before a greeting: the mailbox hands every message to
+  `pageErrors.heard` first, and a greeting the page may take (`mayGreet`) names the window to tell —
+  everything kept goes to it at once, ahead of `ready`, and what fails later goes as it fails.
+- **A greeting handler that throws** (`onHello`, through `connect`, `hostStore` or `useHost`) is said
+  as `greeting` and logged, instead of breaking the mailbox's other listeners. `ready` has already gone.
+- **`reportPageError(error, where?)`** says a failure the page caught itself and cannot recover from.
+- **`ReportErrors`** (`./client/react`) is a boundary for the page's root: a render that throws is
+  said as `render`, with the component stack under the error's, and drawn as text with Try again.
+  React catches a render error, so without a boundary that says it nothing does. Wrap the root:
+  `<ReportErrors><App /></ReportErrors>`. `fallback(error, retry)` draws your own.
+- **The page document** (`pageDocument`, so every page served by `doors()` or `run`, and every build
+  made by `buildModule`) carries `errorsScript()`, a blocking script ahead of everything else that does
+  the same from the first moment: it is the only thing that can speak for a page whose scripts never
+  ran — an import naming an export the installed package does not have fails before any module runs.
+  It answers the frame's parent only. When the client loads it takes over what the script kept
+  (`PAGE_ERRORS_GLOBAL`) and switches it off.
+
+A host shows the message, as text, in place of "not answering" when the page did not answer the
+greeting, with the stack under "Show details". A host before 2.59.0 drops the message unread.

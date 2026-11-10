@@ -429,4 +429,10 @@ export declare const LIMITS: {
     readonly PROVIDES: 8;
     /** One word of `declares.provides`, and the value of a skill's `{ provides }` need, in characters. */
     readonly PROVIDES_WORD: 32;
+    /** The error's message, in characters. Longer is cut, never refused. */
+    readonly PAGE_ERROR_MESSAGE: 500;
+    /** Where it was caught (`PAGE_ERROR_WHERE`), in characters. */
+    readonly PAGE_ERROR_WHERE: 32;
+    /** The trimmed stack, in characters: its first lines, enough to name the file and the line. */
+    readonly PAGE_ERROR_STACK: 2000;
 };

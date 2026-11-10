@@ -24,7 +24,9 @@ interface Listenable {
  * Build a mailbox over one window, listening immediately. Exported for tests; nothing in a page
  * should call it — a second mailbox over the same window answers the same greeting twice.
  */
-export declare function makeMailbox(target: Listenable | undefined): MessageSource;
+export declare function makeMailbox(target: Listenable | undefined, 
+/** Told of every message first (2.59.0): the page's error reporter, which learns from a greeting who to tell. */
+heard?: (ev: MessageEvent) => void): MessageSource;
 /**
  * The page's inbox: the two listener methods of `window`, except that subscribing replays
  * everything that has already arrived. Outside a browser nothing ever posts to it; it does not crash.

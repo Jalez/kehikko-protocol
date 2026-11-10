@@ -411,6 +411,34 @@ export const pointerSchema = z.object({
     at: z.number().finite().min(0),
 });
 /**
+ * 2.59.0. Where a page's failure was caught: an uncaught `error` on the window (a script that threw,
+ * or failed to load or link), an unhandled promise `rejection`, a React `render` caught by the
+ * client's boundary (`ReportErrors`), a `greeting` handler that threw (`onHello`), or one the page
+ * `reported` itself (`reportPageError`). Words a host does not know are kept: the field is text.
+ */
+export const PAGE_ERROR_WHERE = ['error', 'rejection', 'render', 'greeting', 'reported'];
+/** Text cut to a length rather than refused for it: a failure is said even when it is long. */
+const cut = (most) => z.string().transform((text) => text.slice(0, most));
+/**
+ * Module → host (2.59.0). The page failed: an uncaught error or unhandled rejection, a render a
+ * boundary caught, or a greeting handler that threw. `message` is the error's own (`TypeError: x is
+ * undefined`), `where` says how it was caught (`PAGE_ERROR_WHERE`), `stack` its first lines, trimmed
+ * (`trimStack`). Sent by the client without being asked, rate-limited, to the window that greeted
+ * the page; buffered until a greeting when it came first. The page document's blocking script
+ * (`errorsScript`) sends it for a page whose scripts never ran, so a page that cannot answer the
+ * greeting still says why. Fire and forget.
+ *
+ * A host shows it as the module's own words, as text, never markup: it is the reason a page did not
+ * answer, in place of "not answering". A host before 2.59.0 drops it unread (`MODULE_MESSAGES`).
+ * Long text is cut, never refused.
+ */
+export const pageErrorSchema = z.object({
+    type: messageType(MESSAGE.PAGE_ERROR),
+    message: cut(LIMITS.PAGE_ERROR_MESSAGE).pipe(z.string().min(1)),
+    where: cut(LIMITS.PAGE_ERROR_WHERE).default('error'),
+    stack: cut(LIMITS.PAGE_ERROR_STACK).default(''),
+});
+/**
  * Every message a host sends. A plain union, not a `discriminatedUnion`, because `responseSchema`
  * is itself a union on a different key and cannot be an option of one.
  */
@@ -439,6 +467,7 @@ export const moduleMessageSchema = z.union([
     pressedSchema,
     footerSchema,
     pointerSchema,
+    pageErrorSchema,
 ]);
 /**
  * Is this worth parsing at all? The cheap first filter: true when the value is an object whose
