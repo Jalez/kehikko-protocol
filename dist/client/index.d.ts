@@ -5,6 +5,7 @@
  * Design notes: docs/client.md.
  */
 export { mailbox, makeMailbox, KEEP, type MessageSource } from './mailbox.js';
+export { pageErrors, makePageErrors, reportPageError, describeError, trimStack, PAGE_ERRORS_MAX, PAGE_ERRORS_GLOBAL, STACK_LINES, NO_MESSAGE, type PageError, type PageErrors, type ErrorTarget, } from './errors.js';
 export { connect, mayGreet, pageOrigins, HostRefused, ANSWER_WITHIN_MS, PERSON_ANSWERS_WITHIN_MS, GOTO_BACKSTOP_MS, PRESS_BACKSTOP_MS, NOBODY_TO_ASK, POINTER_SLOP_PX, type AskOptions, type Connection, type ConnectOptions, type HostEvents, type HostFacts, type PointerEventLike, type PointerTarget, type PressAnswer, type Refusal, } from './connect.js';
 export { ask, answered, replied, probeServer, watchServer, ticket, AskFailed, onServerStanding, serverStanding, resetServerStanding, reloadStalePage, reloadWhenStale, STALE_RELOAD_MS, PAGE_STALE, PAGE_OLD, NOT_A_REPLY, CANCELLED, WATCH_SERVER_MS, KEEPALIVE_BYTES, SERVER_DOWN, type AskFailure, type Asked, type AskOptions as AskServerOptions, type ServerStanding, } from './ask.js';
 export { follow, type Attachment, type FollowOptions } from './stream.js';

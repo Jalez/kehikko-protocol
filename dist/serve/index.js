@@ -25,7 +25,7 @@ export { HOLDINGS_FILE, HOLDING_KINDS } from '../holdings.js';
 export { readRuns, writeRuns } from './runs.js';
 export { RUNS_FILE, RUNS_VERSION, RUN_RESULT_STATES, RUN_RESULT_KINDS, runEnded, runResultSchema, runsIn, latestRuns } from '../runs.js';
 /* The shared plumbing of a module's server: its page, its ticket, its doors. */
-export { fillPage, pageDocument, themeScript, FRAMED_DEFAULT_THEME } from './page.js';
+export { errorsScript, fillPage, pageDocument, themeScript, FRAMED_DEFAULT_THEME } from './page.js';
 export { mintTicket, refuseTicket, sameTicket, ticketOf, TICKET_REFUSAL } from './ticket.js';
 export { readJsonBody, readJsonRequest, saysJson, BODY_METHODS, BODY_NOT_JSON, BODY_TOO_LARGE, MAX_BODY_BYTES } from './body.js';
 export { admits, asker, ELSEWHERE_REFUSAL } from './gate.js';

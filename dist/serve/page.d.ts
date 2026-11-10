@@ -39,6 +39,16 @@ export declare const FRAMED_DEFAULT_THEME: PageTheme;
 /** The blocking script. It cannot import, so the names it needs are written into it; nothing in it throws. */
 export declare function themeScript(): string;
 /**
+ * The page's first word about failing (2.59.0), as one blocking script ahead of everything else: it
+ * keeps every uncaught error and unhandled rejection (at most `PAGE_ERRORS_MAX` different ones, as
+ * `kehikot.page.error`), and when the frame's parent greets the page it says them — so a page whose
+ * own scripts never ran (an import that does not link, a bundle that threw before the client was
+ * imported) still tells its host why it is not answering. The client takes over when it loads
+ * (`errors.ts`): it reads `list` and sets `off`. It cannot import, so the names it needs are written
+ * into it; nothing in it throws.
+ */
+export declare function errorsScript(): string;
+/**
  * Put this process's ticket and build, and the origins that may frame it, into a page that was
  * built ahead of it (`vite build` over a `pageDocument` written without them): each island is
  * replaced where the built page has one and added before `</body>` where it has none. No

@@ -450,4 +450,11 @@ export const LIMITS = {
     PROVIDES: 8,
     /** One word of `declares.provides`, and the value of a skill's `{ provides }` need, in characters. */
     PROVIDES_WORD: 32,
+    /* A page's failure, said to the host (2.59.0). See `pageErrorSchema`. */
+    /** The error's message, in characters. Longer is cut, never refused. */
+    PAGE_ERROR_MESSAGE: 500,
+    /** Where it was caught (`PAGE_ERROR_WHERE`), in characters. */
+    PAGE_ERROR_WHERE: 32,
+    /** The trimmed stack, in characters: its first lines, enough to name the file and the line. */
+    PAGE_ERROR_STACK: 2000,
 };

@@ -42,3 +42,14 @@ export declare const ORIGINS_ELEMENT = "origins";
  * not an address (`null`, the empty string) is among nothing but `*`.
  */
 export declare function originAmong(origin: string, sources: readonly string[]): boolean;
+/** How many different failures one document says, at most. Each is said once; the rest are dropped. */
+export declare const PAGE_ERRORS_MAX = 5;
+/** How many lines of a stack are sent: the message's and the frames nearest the throw. */
+export declare const STACK_LINES = 12;
+/**
+ * The window property the page document's blocking script keeps what it caught in (`errorsScript`):
+ * `{ list, off }`. The client reads `list` and sets `off` when it installs.
+ */
+export declare const PAGE_ERRORS_GLOBAL = "__kehikotPageErrors";
+/** What is said for a failure that carries no words at all (`throw undefined`, a bare rejection). */
+export declare const NO_MESSAGE = "An error with no message.";

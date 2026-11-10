@@ -68,3 +68,15 @@ export function originAmong(origin, sources) {
         return at === '*' || port(asked) === (at ?? port({ protocol: asked.protocol, port: '' }));
     });
 }
+/* When the page fails (2.59.0): what the page document's blocking script (`errorsScript`) and the client (`client/errors.ts`) agree on. */
+/** How many different failures one document says, at most. Each is said once; the rest are dropped. */
+export const PAGE_ERRORS_MAX = 5;
+/** How many lines of a stack are sent: the message's and the frames nearest the throw. */
+export const STACK_LINES = 12;
+/**
+ * The window property the page document's blocking script keeps what it caught in (`errorsScript`):
+ * `{ list, off }`. The client reads `list` and sets `off` when it installs.
+ */
+export const PAGE_ERRORS_GLOBAL = '__kehikotPageErrors';
+/** What is said for a failure that carries no words at all (`throw undefined`, a bare rejection). */
+export const NO_MESSAGE = 'An error with no message.';

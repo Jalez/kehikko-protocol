@@ -295,6 +295,10 @@ export {
   POINTER_PHASES,
   type PointerPhase,
   type PointerMessage,
+  pageErrorSchema,
+  PAGE_ERROR_WHERE,
+  type PageErrorWhere,
+  type PageErrorMessage,
   footerSchema,
   footerItemSchema,
   footerItemsSchema,
@@ -918,6 +922,8 @@ export {
   TICKET_HEADER,
   originAmong,
   TICKET_REFUSED,
+  PAGE_ERRORS_MAX,
+  STACK_LINES,
   type PageTheme,
 } from './page.js'
 

@@ -4,16 +4,20 @@
  * message is recorded in the backlog and then delivered, so a re-subscriber answers a greeting twice.
  * Design notes: docs/client.md.
  */
+import { pageErrors } from './errors.js';
 /** How many messages the backlog keeps. Oldest go first. */
 export const KEEP = 64;
 /**
  * Build a mailbox over one window, listening immediately. Exported for tests; nothing in a page
  * should call it — a second mailbox over the same window answers the same greeting twice.
  */
-export function makeMailbox(target) {
+export function makeMailbox(target, 
+/** Told of every message first (2.59.0): the page's error reporter, which learns from a greeting who to tell. */
+heard) {
     const backlog = [];
     const listeners = new Set();
     target?.addEventListener('message', (ev) => {
+        heard?.(ev);
         backlog.push(ev);
         if (backlog.length > KEEP)
             backlog.shift();
@@ -43,4 +47,6 @@ export function makeMailbox(target) {
  * The page's inbox: the two listener methods of `window`, except that subscribing replays
  * everything that has already arrived. Outside a browser nothing ever posts to it; it does not crash.
  */
-export const mailbox = makeMailbox(typeof window === 'undefined' ? undefined : window);
+export const mailbox = makeMailbox(typeof window === 'undefined' ? undefined : window, 
+/* 2.59.0: and the page's failures, said to whoever greets it (`errors.ts`). */
+(ev) => pageErrors.heard(ev));

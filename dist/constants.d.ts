@@ -122,6 +122,15 @@ export declare const MESSAGE: {
      * page's own clock (`performance.now()`), for the length of a press; nothing else. No answer.
      */
     readonly POINTER: "kehikot.pointer";
+    /**
+     * Module → host (2.59.0). "My page failed": `{ message, where, stack }`, one uncaught error or
+     * unhandled rejection on the page, an error a React boundary caught, or a greeting handler that
+     * threw. Sent by the client by itself, rate-limited, to the window that greeted the page — and by
+     * the page document's own blocking script when the page's scripts never ran at all, so a page that
+     * cannot answer the greeting still says why. No answer. A host shows it in place of "not
+     * answering"; a host before 2.59.0 drops it unread. See docs/client.md, "When the page fails".
+     */
+    readonly PAGE_ERROR: "kehikot.page.error";
 };
 export type MessageType = (typeof MESSAGE)[keyof typeof MESSAGE];
 /** The prefix every message type carries, so a listener can drop the rest cheaply. There is one spelling. */
@@ -136,7 +145,7 @@ export declare const MESSAGE_PREFIX = "kehikot.";
  */
 export declare const HOST_MESSAGES: readonly ["kehikot.hello", "kehikot.context", "kehikot.response", "kehikot.goto", "kehikot.event", "kehikot.clear", "kehikot.refresh", "kehikot.press", "kehikot.opened", "kehikot.covered", "kehikot.visible"];
 /** And what the module says. */
-export declare const MODULE_MESSAGES: readonly ["kehikot.ready", "kehikot.request", "kehikot.resize", "kehikot.went", "kehikot.filters", "kehikot.clearable", "kehikot.refreshable", "kehikot.header", "kehikot.pressed", "kehikot.footer", "kehikot.pointer"];
+export declare const MODULE_MESSAGES: readonly ["kehikot.ready", "kehikot.request", "kehikot.resize", "kehikot.went", "kehikot.filters", "kehikot.clearable", "kehikot.refreshable", "kehikot.header", "kehikot.pressed", "kehikot.footer", "kehikot.pointer", "kehikot.page.error"];
 /**
  * How tall a frame may be asked to be, in pixels, bounded on both sides. `clampHeight` restates
  * the host's answer so a module can do the arithmetic on its own side.

@@ -5,6 +5,8 @@
  * Design notes: docs/client.md.
  */
 export { mailbox, makeMailbox, KEEP } from './mailbox.js';
+/* When the page fails (2.59.0): every uncaught error, said to the host, and a way to say one yourself. */
+export { pageErrors, makePageErrors, reportPageError, describeError, trimStack, PAGE_ERRORS_MAX, PAGE_ERRORS_GLOBAL, STACK_LINES, NO_MESSAGE, } from './errors.js';
 export { connect, mayGreet, pageOrigins, HostRefused, ANSWER_WITHIN_MS, PERSON_ANSWERS_WITHIN_MS, GOTO_BACKSTOP_MS, PRESS_BACKSTOP_MS, NOBODY_TO_ASK, POINTER_SLOP_PX, } from './connect.js';
 /* A page asking its own server: the ticket, one fetch helper, one stream helper, the theme. */
 export { ask, answered, replied, probeServer, watchServer, ticket, AskFailed, onServerStanding, serverStanding, resetServerStanding, reloadStalePage, reloadWhenStale, STALE_RELOAD_MS, PAGE_STALE, PAGE_OLD, NOT_A_REPLY, CANCELLED, WATCH_SERVER_MS, KEEPALIVE_BYTES, SERVER_DOWN, } from './ask.js';
