@@ -7,6 +7,29 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.72.0 — 2026-11-10
+
+The proposal components are shadcn/ui, vendored once for every module. **Additive**; `PROTOCOL` is
+still 2. [docs/proposals.md](docs/proposals.md), "The page".
+
+### Added
+
+- **`kehikot-module-protocol/client/ui`**: shadcn/ui's `Button`, `Badge`, `Textarea`, `Tooltip`,
+  `ScrollArea`, `Separator` and `Collapsible`, and `cn`, as shadcn ships them (new-york, Tailwind v4,
+  on their Radix primitives), so one copy serves every module and a protocol component looks like the
+  module's own. Their packages are optional peer dependencies (`@radix-ui/react-slot`,
+  `@radix-ui/react-tooltip`, `@radix-ui/react-scroll-area`, `@radix-ui/react-separator`,
+  `@radix-ui/react-collapsible`, `class-variance-authority`, `clsx`, `tailwind-merge`, `lucide-react`).
+  A module's Tailwind reads this package's `dist/client` as a source (`@source`).
+
+### Changed
+
+- **`kehikot-module-protocol/client/proposals`** is built from those: `ProposalView`'s answers are
+  shadcn Buttons with lucide icons, the outcome a Badge, the edit a Textarea, "Decline with reason"
+  carries a Tooltip, a settled proposal's change folds (Collapsible); `ProposalList` is a ScrollArea
+  with Separators. The props are the same. `PROPOSALS_CSS` and `PROPOSALS_STYLE_ID` are gone: the
+  classes are Tailwind's, drawn by the module's build; `className` on the view and the list.
+
 ## 2.71.0 — 2026-11-10
 
 Proposed changes to a text a module keeps: an agent proposes, the person accepts or declines with a

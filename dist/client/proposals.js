@@ -1,64 +1,27 @@
-import { createElement, useCallback, useEffect, useInsertionEffect, useMemo, useState } from 'react';
+import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
+import { Check, ChevronDown, ChevronRight, Pencil, X } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { countSaid, outcomeSaid, proposalHunks } from '../proposals/core.js';
+import { Badge } from './ui/badge.js';
+import { Button } from './ui/button.js';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './ui/collapsible.js';
+import { ScrollArea } from './ui/scroll-area.js';
+import { Separator } from './ui/separator.js';
+import { Textarea } from './ui/textarea.js';
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip.js';
+import { cn } from './ui/utils.js';
 /**
- * The React half of proposals (2.71.0): a proposed change drawn inline as a
- * diff with the person's answers under it, the list of what is waiting, a walk
- * through them, and the footer line that says how many there are with Previous
- * and Next beside it. Theme-aware through the same tokens as `Cover`
- * (`--foreground`, `--muted-foreground`, `--border`, `--accent`, `--ring`, with
- * `.dark` on `<html>`), keyboard reachable throughout, and every string a
- * module or an agent wrote is rendered as text. Design notes: docs/proposals.md.
+ * The React half of proposals (2.71.0; shadcn from 2.72.0): a proposed change
+ * drawn inline as a diff with the person's answers under it, the list of what
+ * is waiting, a walk through them, and the footer line that says how many there
+ * are with Previous and Next beside it. Built from the shadcn/ui components in
+ * `./ui` — Button, Textarea, Tooltip, Badge, ScrollArea, Separator, Collapsible
+ * — so a proposal looks like the rest of the module: the same class names, the
+ * module's own theme tokens (`--primary`, `--border`, `--ring`, `.dark`), its
+ * Tailwind build reading this package's `dist/client` as a source. Keyboard
+ * reachable throughout; every string a module or an agent wrote is rendered as
+ * text. Design notes: docs/proposals.md.
  */
-export const PROPOSALS_STYLE_ID = 'kehikot-proposals-style';
-export const PROPOSALS_CSS = `
-.kehikot-proposal{box-sizing:border-box;margin:8px 0;border:1px solid var(--border,currentColor);border-left:3px solid var(--kehikot-proposal-edge,oklch(0.7 0.15 250));border-radius:6px;padding:8px 10px;font:400 13px/1.5 ui-sans-serif,system-ui,sans-serif;color:var(--foreground,inherit);background:var(--card,transparent)}
-.kehikot-proposal[data-current=true]{outline:2px solid var(--ring,currentColor);outline-offset:1px}
-.kehikot-proposal[data-status=stale]{border-left-color:var(--kehikot-proposal-stale,oklch(0.75 0.15 70))}
-.kehikot-proposal[data-status=accepted]{border-left-color:var(--kehikot-proposal-ok,oklch(0.65 0.17 150))}
-.kehikot-proposal[data-status=declined],.kehikot-proposal[data-status=withdrawn]{border-left-color:var(--muted-foreground,currentColor);opacity:.8}
-.kehikot-proposal header{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline;margin:0 0 6px}
-.kehikot-proposal header b{font-weight:600}
-.kehikot-proposal header span{color:var(--muted-foreground,inherit);font-size:.92em}
-.kehikot-proposal p{margin:0 0 6px;overflow-wrap:anywhere}
-.kehikot-proposal p[data-stale]{color:var(--kehikot-proposal-stale,oklch(0.6 0.15 70))}
-.kehikot-proposal .kehikot-diff{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px}
-.kehikot-proposal .kehikot-diff li{display:grid;grid-template-columns:auto 1fr;gap:2px 8px;align-items:start}
-.kehikot-proposal .kehikot-diff li[data-whole=true]{grid-template-columns:1fr}
-.kehikot-proposal .kehikot-diff input{margin:4px 0 0}
-.kehikot-proposal .kehikot-diff pre{margin:0;padding:4px 6px;border-radius:4px;white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace}
-.kehikot-proposal .kehikot-diff del{display:block;text-decoration:none;background:var(--kehikot-proposal-old,oklch(0.93 0.05 25));color:var(--kehikot-proposal-old-text,oklch(0.4 0.15 25))}
-.kehikot-proposal .kehikot-diff ins{display:block;text-decoration:none;background:var(--kehikot-proposal-new,oklch(0.93 0.06 150));color:var(--kehikot-proposal-new-text,oklch(0.35 0.12 150))}
-.dark .kehikot-proposal .kehikot-diff del{background:var(--kehikot-proposal-old,oklch(0.3 0.08 25));color:var(--kehikot-proposal-old-text,oklch(0.85 0.08 25))}
-.dark .kehikot-proposal .kehikot-diff ins{background:var(--kehikot-proposal-new,oklch(0.3 0.08 150));color:var(--kehikot-proposal-new-text,oklch(0.85 0.08 150))}
-.kehikot-proposal .kehikot-diff del:empty::before,.kehikot-proposal .kehikot-diff ins:empty::before{content:"(nothing)";opacity:.6;font-style:italic}
-.kehikot-proposal .kehikot-diff li[data-skipped=true] ins{opacity:.45}
-.kehikot-proposal textarea{box-sizing:border-box;width:100%;min-height:5em;margin:6px 0;padding:6px;border:1px solid var(--border,currentColor);border-radius:4px;font:12px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;color:inherit;background:var(--background,transparent)}
-.kehikot-proposal input[type=text]{box-sizing:border-box;flex:1 1 12em;min-width:0;padding:3px 6px;border:1px solid var(--border,currentColor);border-radius:4px;font:inherit;color:inherit;background:var(--background,transparent)}
-.kehikot-proposal .kehikot-acts{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}
-.kehikot-proposal button{font:inherit;color:var(--foreground,inherit);background:transparent;border:1px solid var(--border,currentColor);border-radius:6px;padding:3px 10px;cursor:pointer}
-.kehikot-proposal button[data-primary=true]{border-color:var(--primary,currentColor);background:var(--primary,transparent);color:var(--primary-foreground,inherit)}
-.kehikot-proposal button:hover{background:var(--accent,transparent)}
-.kehikot-proposal button[data-primary=true]:hover{opacity:.9}
-.kehikot-proposal button:disabled{opacity:.5;cursor:default}
-.kehikot-proposal button:focus-visible,.kehikot-proposal input:focus-visible,.kehikot-proposal textarea:focus-visible{outline:2px solid var(--ring,currentColor);outline-offset:2px}
-.kehikot-proposal .kehikot-said{color:var(--muted-foreground,inherit);font-size:.92em;margin:6px 0 0}
-.kehikot-proposals{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:2px;font:400 13px/1.4 ui-sans-serif,system-ui,sans-serif}
-.kehikot-proposals li button{display:flex;gap:8px;align-items:baseline;width:100%;text-align:left;font:inherit;color:var(--foreground,inherit);background:transparent;border:1px solid transparent;border-radius:6px;padding:4px 8px;cursor:pointer}
-.kehikot-proposals li button:hover{background:var(--accent,transparent)}
-.kehikot-proposals li button[aria-current=true]{border-color:var(--ring,currentColor)}
-.kehikot-proposals li button:focus-visible{outline:2px solid var(--ring,currentColor);outline-offset:1px}
-.kehikot-proposals li b{font-weight:600;white-space:nowrap}
-.kehikot-proposals li span{color:var(--muted-foreground,inherit);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
-.kehikot-proposals li em{color:var(--muted-foreground,inherit);font-style:normal;font-size:.92em;white-space:nowrap;margin-left:auto}
-`;
-function style() {
-    if (typeof document === 'undefined' || document.getElementById(PROPOSALS_STYLE_ID))
-        return;
-    const sheet = document.createElement('style');
-    sheet.id = PROPOSALS_STYLE_ID;
-    sheet.textContent = PROPOSALS_CSS;
-    document.head.appendChild(sheet);
-}
 /** The words on the buttons and labels, in one place, for a module that mirrors them in a header or a tooltip. */
 export const PROPOSAL_WORDS = {
     accept: 'Accept',
@@ -75,28 +38,42 @@ export const PROPOSAL_WORDS = {
     proposedBy: (name) => `proposed by ${name}`,
     revised: (n) => `revised ${n}×`,
     whole: 'The whole text is rewritten.',
+    change: 'The change',
+    answer: 'Answer',
+};
+/** The diff's two colours: what leaves and what arrives, in both themes. Overridable through `className` on the view. */
+const OLD = 'block bg-red-500/15 text-red-800 dark:bg-red-500/20 dark:text-red-200 no-underline';
+const NEW = 'block bg-emerald-500/15 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-200 no-underline';
+const STATUS_BADGE = {
+    pending: 'default',
+    stale: 'destructive',
+    accepted: 'secondary',
+    declined: 'outline',
+    withdrawn: 'outline',
 };
 /**
  * One proposal, inline: who proposes what and why, the change as hunks (red
  * leaves, green arrives; with `allowPartial`, a checkbox per hunk), and the
  * answers. A settled proposal is drawn with its outcome and no buttons. A stale
- * one says why and offers Decline only.
+ * one says why and offers Decline only. The diff folds (Collapsible) once a
+ * proposal is settled, so a list of outcomes stays short.
  */
-export function ProposalView({ proposal, onAccept, onDecline, allowEdit = true, allowPartial = true, busy = false, current = false, said = null, bare = false, children }) {
-    useInsertionEffect(style, []);
+export function ProposalView({ proposal, onAccept, onDecline, allowEdit = true, allowPartial = true, busy = false, current = false, said = null, bare = false, className, children }) {
     const hunks = useMemo(() => proposalHunks(proposal), [proposal.find, proposal.replace]);
     const [mode, setMode] = useState('answer');
     const [reason, setReason] = useState('');
     const [draft, setDraft] = useState(proposal.replace);
     const [skipped, setSkipped] = useState(() => new Set());
+    const open = proposal.status === 'pending';
+    const stale = proposal.status === 'stale';
+    const settled = !open && !stale;
+    const [unfolded, setUnfolded] = useState(!settled);
     useEffect(() => {
         setMode('answer');
         setReason('');
         setDraft(proposal.replace);
         setSkipped(new Set());
     }, [proposal.id, proposal.revisedAt]);
-    const open = proposal.status === 'pending';
-    const stale = proposal.status === 'stale';
     const whole = proposal.scope === 'file';
     const chosen = useMemo(() => hunks.map((_, i) => i).filter((i) => !skipped.has(i)), [hunks, skipped]);
     const partial = allowPartial && !whole && hunks.length > 1;
@@ -122,61 +99,41 @@ export function ProposalView({ proposal, onAccept, onDecline, allowEdit = true, 
             next.add(i);
         return next;
     });
-    const head = bare
-        ? null
-        : createElement('header', null, createElement('b', null, proposal.file), createElement('span', null, PROPOSAL_WORDS.proposedBy(proposal.by.name)), proposal.revisions ? createElement('span', null, PROPOSAL_WORDS.revised(proposal.revisions)) : null, !open && !stale ? createElement('span', { 'data-outcome': proposal.status }, outcomeSaid(proposal)) : null);
-    const why = bare ? null : createElement('p', null, proposal.why);
-    const held = stale && proposal.stale ? createElement('p', { 'data-stale': '', role: 'status' }, proposal.stale.said) : null;
-    const diff = mode === 'edit'
-        ? createElement('label', null, createElement('span', { className: 'kehikot-said' }, PROPOSAL_WORDS.editLabel), createElement('textarea', { value: draft, onChange: (event) => setDraft(event.target.value), disabled: busy, 'aria-label': PROPOSAL_WORDS.editLabel }))
-        : createElement('ul', { className: 'kehikot-diff', 'aria-label': whole ? PROPOSAL_WORDS.whole : 'The change' }, ...(whole
-            ? [createElement('li', { key: 'whole', 'data-whole': 'true' }, createElement('pre', null, createElement('del', null, proposal.find), createElement('ins', null, proposal.replace)))]
-            : (hunks.length ? hunks : [{ oldFrom: 0, oldTo: 0, newFrom: 0, newTo: 0, oldText: proposal.find, newText: proposal.replace }]).map((one, i) => createElement('li', { key: i, 'data-skipped': skipped.has(i) ? 'true' : 'false', ...(partial ? {} : { 'data-whole': 'true' }) }, partial && open
-                ? createElement('input', { type: 'checkbox', checked: !skipped.has(i), onChange: () => toggle(i), disabled: busy, 'aria-label': PROPOSAL_WORDS.hunkLabel(i + 1) })
-                : null, createElement('pre', null, createElement('del', null, one.oldText), createElement('ins', null, one.newText))))));
+    const shownHunks = hunks.length ? hunks : [{ oldFrom: 0, oldTo: 0, newFrom: 0, newTo: 0, oldText: proposal.find, newText: proposal.replace }];
+    const diff = mode === 'edit' ? (_jsxs("label", { className: "block", children: [_jsx("span", { className: "text-muted-foreground mb-1 block text-xs", children: PROPOSAL_WORDS.editLabel }), _jsx(Textarea, { value: draft, onChange: (event) => setDraft(event.target.value), disabled: busy, "aria-label": PROPOSAL_WORDS.editLabel, className: "min-h-24 font-mono text-xs" })] })) : (_jsx("ul", { className: "m-0 flex list-none flex-col gap-1 p-0", "aria-label": whole ? PROPOSAL_WORDS.whole : PROPOSAL_WORDS.change, children: whole ? (_jsx("li", { "data-whole": "true", children: _jsxs("pre", { className: "m-0 whitespace-pre-wrap rounded-md px-1.5 py-1 font-mono text-xs leading-relaxed [overflow-wrap:anywhere]", children: [_jsx("del", { className: OLD, children: proposal.find }), _jsx("ins", { className: NEW, children: proposal.replace })] }) })) : (shownHunks.map((one, i) => (_jsxs("li", { "data-skipped": skipped.has(i) ? 'true' : 'false', className: cn('grid items-start gap-x-2', partial && open ? 'grid-cols-[auto_1fr]' : 'grid-cols-1'), children: [partial && open ? (_jsx("input", { type: "checkbox", className: "accent-primary mt-1.5", checked: !skipped.has(i), onChange: () => toggle(i), disabled: busy, "aria-label": PROPOSAL_WORDS.hunkLabel(i + 1) })) : null, _jsxs("pre", { className: cn('m-0 whitespace-pre-wrap rounded-md px-1.5 py-1 font-mono text-xs leading-relaxed [overflow-wrap:anywhere]', skipped.has(i) && '[&_ins]:opacity-40'), children: [_jsx("del", { className: OLD, children: one.oldText || '(nothing)' }), _jsx("ins", { className: NEW, children: one.newText || '(nothing)' })] })] }, i)))) }));
     const acts = [];
     if (open && onAccept) {
         const label = mode === 'edit' ? PROPOSAL_WORDS.acceptEdited : partial && chosen.length !== hunks.length ? PROPOSAL_WORDS.acceptChosen : PROPOSAL_WORDS.accept;
-        acts.push(createElement('button', { key: 'accept', type: 'button', 'data-primary': 'true', onClick: accept, disabled: busy || (partial && chosen.length === 0) }, label));
+        acts.push(_jsxs(Button, { size: "sm", onClick: accept, disabled: busy || (partial && chosen.length === 0), children: [_jsx(Check, { "aria-hidden": "true" }), label] }, "accept"));
     }
     if ((open || stale) && onDecline) {
         if (mode === 'reason') {
-            acts.push(createElement('input', {
-                key: 'reason',
-                type: 'text',
-                value: reason,
-                placeholder: PROPOSAL_WORDS.reasonPlaceholder,
-                'aria-label': PROPOSAL_WORDS.reasonLabel,
-                autoFocus: true,
-                disabled: busy,
-                onChange: (event) => setReason(event.target.value),
-                onKeyDown: (event) => {
+            acts.push(_jsx("input", { type: "text", value: reason, placeholder: PROPOSAL_WORDS.reasonPlaceholder, "aria-label": PROPOSAL_WORDS.reasonLabel, autoFocus: true, disabled: busy, onChange: (event) => setReason(event.target.value), onKeyDown: (event) => {
                     if (event.key === 'Enter') {
                         event.preventDefault();
                         decline();
                     }
-                },
-            }), createElement('button', { key: 'decline', type: 'button', onClick: decline, disabled: busy }, PROPOSAL_WORDS.decline));
+                }, className: "border-input focus-visible:border-ring focus-visible:ring-ring/50 h-8 min-w-0 flex-1 basis-48 rounded-md border bg-transparent px-2 text-sm outline-none focus-visible:ring-[3px] disabled:opacity-50" }, "reason"), _jsxs(Button, { size: "sm", variant: "outline", onClick: decline, disabled: busy, children: [_jsx(X, { "aria-hidden": "true" }), PROPOSAL_WORDS.decline] }, "decline"));
         }
         else {
-            acts.push(createElement('button', { key: 'decline', type: 'button', onClick: decline, disabled: busy }, PROPOSAL_WORDS.decline));
-            acts.push(createElement('button', { key: 'reason', type: 'button', onClick: () => setMode('reason'), disabled: busy }, PROPOSAL_WORDS.declineWithReason));
+            acts.push(_jsxs(Button, { size: "sm", variant: "outline", onClick: decline, disabled: busy, children: [_jsx(X, { "aria-hidden": "true" }), PROPOSAL_WORDS.decline] }, "decline"), _jsxs(Tooltip, { children: [_jsx(TooltipTrigger, { asChild: true, children: _jsx(Button, { size: "sm", variant: "ghost", onClick: () => setMode('reason'), disabled: busy, children: PROPOSAL_WORDS.declineWithReason }) }), _jsx(TooltipContent, { children: PROPOSAL_WORDS.reasonPlaceholder })] }, "reason"));
         }
     }
-    if (open && onAccept && allowEdit && mode !== 'edit' && mode !== 'reason') {
-        acts.push(createElement('button', { key: 'edit', type: 'button', onClick: () => setMode('edit'), disabled: busy }, PROPOSAL_WORDS.edit));
+    if (open && onAccept && allowEdit && mode === 'answer') {
+        acts.push(_jsxs(Button, { size: "sm", variant: "ghost", onClick: () => setMode('edit'), disabled: busy, children: [_jsx(Pencil, { "aria-hidden": "true" }), PROPOSAL_WORDS.edit] }, "edit"));
     }
     if (mode !== 'answer') {
-        acts.push(createElement('button', { key: 'cancel', type: 'button', onClick: () => setMode('answer'), disabled: busy }, PROPOSAL_WORDS.cancel));
+        acts.push(_jsx(Button, { size: "sm", variant: "ghost", onClick: () => setMode('answer'), disabled: busy, children: PROPOSAL_WORDS.cancel }, "cancel"));
     }
-    return createElement('section', { className: 'kehikot-proposal', 'data-proposal': proposal.id, 'data-status': proposal.status, 'data-current': current ? 'true' : 'false', 'aria-label': `Proposal on ${proposal.file}`, tabIndex: -1 }, head, why, held, diff, acts.length ? createElement('div', { className: 'kehikot-acts', role: 'group', 'aria-label': 'Answer' }, ...acts) : null, said ? createElement('p', { className: 'kehikot-said', role: 'status' }, said) : null, children);
+    const body = (_jsxs(_Fragment, { children: [stale && proposal.stale ? (_jsx("p", { "data-stale": "", role: "status", className: "text-destructive mb-1.5 text-xs", children: proposal.stale.said })) : null, diff, acts.length ? (_jsx("div", { role: "group", "aria-label": PROPOSAL_WORDS.answer, className: "mt-2 flex flex-wrap items-center gap-1.5", children: acts })) : null, said ? (_jsx("p", { role: "status", className: "text-muted-foreground mt-1.5 text-xs", children: said })) : null, children] }));
+    return (_jsxs("section", { "data-proposal": proposal.id, "data-status": proposal.status, "data-current": current ? 'true' : 'false', "aria-label": `Proposal on ${proposal.file}`, tabIndex: -1, className: cn('bg-card text-card-foreground my-2 rounded-md border px-2.5 py-2 text-sm outline-none', current && 'ring-ring ring-2 ring-offset-1', settled && 'opacity-80', className), children: [bare ? null : (_jsxs("header", { className: "mb-1.5 flex flex-wrap items-baseline gap-x-2.5 gap-y-1", children: [_jsx("b", { className: "font-semibold", children: proposal.file }), _jsx("span", { className: "text-muted-foreground text-xs", children: PROPOSAL_WORDS.proposedBy(proposal.by.name) }), proposal.revisions ? _jsx("span", { className: "text-muted-foreground text-xs", children: PROPOSAL_WORDS.revised(proposal.revisions) }) : null, settled || stale ? (_jsx(Badge, { variant: STATUS_BADGE[proposal.status], "data-outcome": proposal.status, className: "ml-auto", children: outcomeSaid(proposal) })) : null] })), bare ? null : _jsx("p", { className: "mb-1.5 [overflow-wrap:anywhere]", children: proposal.why }), settled ? (_jsxs(Collapsible, { open: unfolded, onOpenChange: setUnfolded, children: [_jsx(CollapsibleTrigger, { asChild: true, children: _jsxs(Button, { variant: "ghost", size: "sm", className: "mb-1 -ml-2 h-7 px-2 text-xs", children: [unfolded ? _jsx(ChevronDown, { "aria-hidden": "true" }) : _jsx(ChevronRight, { "aria-hidden": "true" }), PROPOSAL_WORDS.change] }) }), _jsx(CollapsibleContent, { children: body })] })) : (body)] }));
 }
-/** What is waiting, one line each: the file, the reason, the state; the current one marked. */
-export function ProposalList({ proposals, current = null, onPick, empty = countSaid(0) }) {
-    useInsertionEffect(style, []);
-    if (!proposals.length)
-        return createElement('p', { className: 'kehikot-said', role: 'status' }, empty ?? '');
-    return createElement('ul', { className: 'kehikot-proposals', 'aria-label': countSaid(proposals.length) }, ...proposals.map((one) => createElement('li', { key: one.id }, createElement('button', { type: 'button', onClick: () => onPick?.(one.id), 'aria-current': one.id === current ? 'true' : undefined, 'data-status': one.status }, createElement('b', null, one.file), createElement('span', null, one.why), createElement('em', null, one.status === 'pending' ? one.by.name : outcomeSaid(one))))));
+/** What is waiting, one line each: the file, the reason, the state; the current one marked; separators between. */
+export function ProposalList({ proposals, current = null, onPick, empty = countSaid(0), className }) {
+    if (!proposals.length) {
+        return (_jsx("p", { role: "status", className: "text-muted-foreground text-xs", children: empty ?? '' }));
+    }
+    return (_jsx(ScrollArea, { className: className, children: _jsx("ul", { className: "m-0 flex list-none flex-col p-0 text-sm", "aria-label": countSaid(proposals.length), children: proposals.map((one, i) => (_jsxs("li", { children: [i ? _jsx(Separator, {}) : null, _jsxs(Button, { variant: "ghost", size: "sm", onClick: () => onPick?.(one.id), "aria-current": one.id === current ? 'true' : undefined, "data-status": one.status, className: cn('h-auto w-full justify-start gap-2 whitespace-normal py-1.5 text-left', one.id === current && 'ring-ring ring-1'), children: [_jsx("b", { className: "shrink-0 font-semibold", children: one.file }), _jsx("span", { className: "text-muted-foreground min-w-0 flex-1 truncate", children: one.why }), _jsx(Badge, { variant: one.status === 'pending' ? 'secondary' : STATUS_BADGE[one.status], className: "ml-auto shrink-0", children: one.status === 'pending' ? one.by.name : outcomeSaid(one) })] })] }, one.id))) }) }));
 }
 /* ------------------------------------------------------------------------ *
  * Walking them, and the footer

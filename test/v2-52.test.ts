@@ -30,7 +30,7 @@ const good = {
 
 describe('the version', () => {
   test('is 2.52.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.71.0')
+    expect(PACKAGE_VERSION).toBe('2.72.0')
     expect(PROTOCOL).toBe(2)
     const changelog = readFileSync(join(REPO, 'CHANGELOG.md'), 'utf8')
     expect(changelog).toContain('## 2.52.0')
