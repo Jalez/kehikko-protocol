@@ -7,6 +7,38 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.71.0 — 2026-11-10
+
+Proposed changes to a text a module keeps: an agent proposes, the person accepts or declines with a
+reason the agent reads. **Additive**; `PROTOCOL` is still 2. Three new subpaths; nothing on the wire
+changes. [docs/proposals.md](docs/proposals.md).
+
+### Added
+
+- **`kehikot-module-protocol/proposals`** (pure): the model — `Proposal` with `file`, `scope`
+  (`file` or `range`), `find`, `replace`, `baseHash`, `why`, `by`, `status` (`pending`, `stale`,
+  `accepted`, `declined`, `withdrawn`), `stale` (`changed`, `ambiguous`, `gone`), `decidedBy`,
+  `decidedAt`, `declinedReason`, `acceptedAs`, `final`; `file` (quotes the text exactly once),
+  `measure`/`measureAll` (rebase or mark stale, never drop), `apply` (refuses a hash that does not
+  match), `decide` (accept as proposed, edited, or in part by hunk; decline with a reason; withdraw);
+  the diff, `hunksOf`, `takeHunks`, `partOf`, lifted from Paper; the book (`ProposalBook`,
+  `withProposal`, `openOf`, `settledOf`, `BOOK_KEEPS_SETTLED`); the filer's token (`mintToken`,
+  `tokenFits`, `shown`); a module's site (`ProposalSite`, `ProposalKeeper`, `fileProposal`,
+  `decideProposal`, `withdrawProposal`, `openProposals`, `settledProposals`, `memoryKeeper`); the
+  sentences (`outcomeSaid`, `decisionNews`, `proposalLine`, `countSaid`); and the four MCP tools
+  a module mounts — `propose_change`, `list_proposals` (with outcomes and reasons), `read_proposal`,
+  `withdraw_proposal` — as `proposalTools(options)` and `answerProposalTool(site, options, name, args)` (synchronous unless `project` resolves asynchronously),
+  whose descriptions tell an agent to read a declined reason before proposing again.
+- **`kehikot-module-protocol/proposals/store`** (node): `fileKeeper(moduleId, { name? })`, the book at
+  `<project>/.kehikot/<module>/proposals/<name>.json` through `moduleDir`, written atomically and
+  removed when empty; `textFiles({ dir, name? })`, `text` and `write` for a site over text files
+  confined to a folder; `bookPath`, `PROPOSALS_FOLDER`.
+- **`kehikot-module-protocol/client/proposals`** (React, optional peer): `ProposalView` — the inline
+  diff with Accept, Decline, Decline with reason, Edit then accept and a checkbox per hunk;
+  `ProposalList`; `useProposalWalk` (current, position, Previous/Next); `proposalsFooter` — the
+  footer count (`3 proposed changes`, `Proposal 2 of 3`) with Previous and Next beside it (`actsOn`);
+  `PROPOSAL_FOOT`, `PROPOSAL_WORDS`, `PROPOSALS_CSS`, `stepWalk`, `proposalsFooterPress`.
+
 ## 2.70.0 — 2026-11-10
 
 Every container behaves the same by default: what a person expects everywhere comes from the client,
