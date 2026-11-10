@@ -58,6 +58,7 @@ export interface ProposalDoorOptions {
 export declare function proposalTools(options: ProposalDoorOptions): ProposalToolDefinition[];
 /**
  * Answer one of the four tools, as text for the agent; `null` for a name that is not one of them,
- * so a module asks here first and falls through to its own tools.
+ * so a module asks here first and falls through to its own tools. Synchronous unless the module's
+ * `project` resolution is a promise, so a door that answers synchronously can stay that way.
  */
-export declare function answerProposalTool(site: ProposalSite, options: ProposalDoorOptions, name: string, args: Record<string, unknown>): Promise<string | null>;
+export declare function answerProposalTool(site: ProposalSite, options: ProposalDoorOptions, name: string, args: Record<string, unknown>): string | null | Promise<string | null>;

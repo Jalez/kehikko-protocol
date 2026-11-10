@@ -96,19 +96,24 @@ export function proposalTools(options) {
 const str = (value, most) => (typeof value === 'string' ? value.trim().slice(0, most) : '');
 /**
  * Answer one of the four tools, as text for the agent; `null` for a name that is not one of them,
- * so a module asks here first and falls through to its own tools.
+ * so a module asks here first and falls through to its own tools. Synchronous unless the module's
+ * `project` resolution is a promise, so a door that answers synchronously can stay that way.
  */
-export async function answerProposalTool(site, options, name, args) {
+export function answerProposalTool(site, options, name, args) {
     if (!isProposalTool(name))
         return null;
+    const named = options.project
+        ? options.project(args)
+        : (() => {
+            const path = str(args[DOOR_ARGUMENTS.project], 4096);
+            return path ? { ok: true, path } : { ok: false, why: 'Name the project: `project` is its absolute folder.' };
+        })();
+    if (named instanceof Promise)
+        return named.then((resolved) => (resolved.ok ? answerResolved(site, options, name, args, resolved.path) : resolved.why));
+    return named.ok ? answerResolved(site, options, name, args, named.path) : named.why;
+}
+function answerResolved(site, options, name, args, project) {
     const fileName = options.file?.name ?? 'file';
-    const named = options.project ? await options.project(args) : (() => {
-        const path = str(args[DOOR_ARGUMENTS.project], 4096);
-        return path ? { ok: true, path } : { ok: false, why: 'Name the project: `project` is its absolute folder.' };
-    })();
-    if (!named.ok)
-        return named.why;
-    const project = named.path;
     const anonymous = options.anonymous ?? 'an agent';
     if (name === 'propose_change') {
         const file = str(args[fileName], PROPOSAL_MOST.file);

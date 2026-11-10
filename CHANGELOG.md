@@ -27,7 +27,7 @@ changes. [docs/proposals.md](docs/proposals.md).
   `decideProposal`, `withdrawProposal`, `openProposals`, `settledProposals`, `memoryKeeper`); the
   sentences (`outcomeSaid`, `decisionNews`, `proposalLine`, `countSaid`); and the four MCP tools
   a module mounts — `propose_change`, `list_proposals` (with outcomes and reasons), `read_proposal`,
-  `withdraw_proposal` — as `proposalTools(options)` and `answerProposalTool(site, options, name, args)`,
+  `withdraw_proposal` — as `proposalTools(options)` and `answerProposalTool(site, options, name, args)` (synchronous unless `project` resolves asynchronously),
   whose descriptions tell an agent to read a declined reason before proposing again.
 - **`kehikot-module-protocol/proposals/store`** (node): `fileKeeper(moduleId, { name? })`, the book at
   `<project>/.kehikot/<module>/proposals/<name>.json` through `moduleDir`, written atomically and

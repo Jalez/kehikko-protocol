@@ -132,17 +132,23 @@ const str = (value: unknown, most: number): string => (typeof value === 'string'
 
 /**
  * Answer one of the four tools, as text for the agent; `null` for a name that is not one of them,
- * so a module asks here first and falls through to its own tools.
+ * so a module asks here first and falls through to its own tools. Synchronous unless the module's
+ * `project` resolution is a promise, so a door that answers synchronously can stay that way.
  */
-export async function answerProposalTool(site: ProposalSite, options: ProposalDoorOptions, name: string, args: Record<string, unknown>): Promise<string | null> {
+export function answerProposalTool(site: ProposalSite, options: ProposalDoorOptions, name: string, args: Record<string, unknown>): string | null | Promise<string | null> {
   if (!isProposalTool(name)) return null
+  const named = options.project
+    ? options.project(args)
+    : (() => {
+        const path = str(args[DOOR_ARGUMENTS.project], 4096)
+        return path ? { ok: true as const, path } : { ok: false as const, why: 'Name the project: `project` is its absolute folder.' }
+      })()
+  if (named instanceof Promise) return named.then((resolved) => (resolved.ok ? answerResolved(site, options, name, args, resolved.path) : resolved.why))
+  return named.ok ? answerResolved(site, options, name, args, named.path) : named.why
+}
+
+function answerResolved(site: ProposalSite, options: ProposalDoorOptions, name: ProposalToolName, args: Record<string, unknown>, project: string): string {
   const fileName = options.file?.name ?? 'file'
-  const named = options.project ? await options.project(args) : (() => {
-    const path = str(args[DOOR_ARGUMENTS.project], 4096)
-    return path ? { ok: true as const, path } : { ok: false as const, why: 'Name the project: `project` is its absolute folder.' }
-  })()
-  if (!named.ok) return named.why
-  const project = named.path
   const anonymous = options.anonymous ?? 'an agent'
 
   if (name === 'propose_change') {
