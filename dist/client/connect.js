@@ -8,6 +8,7 @@ import { rowsAdvice } from '../rows.js';
 import { mailbox } from './mailbox.js';
 import { mayGreet, pageOrigins } from './greet.js';
 import { reportPageError } from './errors.js';
+import { pageFind } from './find.js';
 export { mayGreet, pageOrigins } from './greet.js';
 /** The project folder a greeting or a context names, or null. */
 function projectOf(context) {
@@ -190,6 +191,70 @@ export function connect(id, events = {}, options = {}) {
             pressed = null;
         };
     };
+    /* 2.69.0. Find: the id of the search open now (`null`: the bar is closed), the client's own search
+       once one was needed, and the keys, heard while a host that draws the bar greeted us. */
+    let finding = null;
+    let finder = null;
+    const finderOf = () => {
+        if (options.findIn === false)
+            return null;
+        finder ??= pageFind((count) => sayFound(count), options.findIn ?? {});
+        return finder;
+    };
+    const sayFound = (count) => {
+        if (finding === null)
+            return;
+        if (count === 'unsupported') {
+            send({ type: MESSAGE.FIND_RESULT, id: finding, total: 0, current: 0, unsupported: true });
+            return;
+        }
+        const total = Math.max(0, Math.floor(count.total || 0));
+        const current = Math.min(Math.max(0, Math.floor(count.current || 0)), total);
+        send({ type: MESSAGE.FIND_RESULT, id: finding, total, current });
+    };
+    const keyTarget = options.findKeys === false ? null : (options.findKeys ?? (typeof window === 'undefined' ? null : window));
+    const mac = options.mac ?? (typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(`${navigator.platform ?? ''} ${navigator.userAgent ?? ''}`));
+    let keying = null;
+    const findKeys = (want) => {
+        if (!want || !keyTarget) {
+            keying?.();
+            keying = null;
+            return;
+        }
+        if (keying)
+            return;
+        const target = keyTarget;
+        /* In the bubble phase, so an editor with its own find has taken ⌘F (and said so) before this hears it. */
+        const heard = (event) => {
+            if (event.defaultPrevented || event.altKey)
+                return;
+            if (mac ? !event.metaKey || event.ctrlKey : !event.ctrlKey || event.metaKey)
+                return;
+            const key = (event.key ?? '').toLowerCase();
+            if (key !== 'f' && key !== 'g')
+                return;
+            if (key === 'f' && event.shiftKey)
+                return;
+            event.preventDefault();
+            const step = key === 'g' ? (event.shiftKey ? 'prev' : 'next') : undefined;
+            const query = key === 'f' ? selected() : undefined;
+            send({ type: MESSAGE.FIND_OPEN, ...(query ? { query } : {}), ...(step ? { step } : {}) });
+        };
+        target.addEventListener('keydown', heard);
+        keying = () => target.removeEventListener('keydown', heard);
+    };
+    /* The page's selection, when it is a short one on one line: what ⌘F starts searching for. */
+    const selected = () => {
+        const text = typeof getSelection === 'function' ? (getSelection()?.toString() ?? '') : '';
+        const trimmed = text.trim();
+        if (!trimmed || trimmed.length > LIMITS.FIND_QUERY || /[\r\n]/.test(trimmed))
+            return undefined;
+        return trimmed;
+    };
+    const closeFind = () => {
+        finding = null;
+        finder?.close();
+    };
     /** Correlation id -> the promise waiting on it. A `Map`, per the protocol's note on lookups. */
     const waiting = new Map();
     let counter = 0;
@@ -252,10 +317,12 @@ export function connect(id, events = {}, options = {}) {
             projectIdNow = projectIdOf(message.context);
             sendActivity();
             pointer(message.pointer === true);
+            closeFind();
+            findKeys(message.find === true);
             /* 2.59.0. A greeting handler that throws is said to the host (`kehikot.page.error`, `greeting`),
                not left to break the mailbox's other listeners: `ready` has gone, and the page may be blank. */
             try {
-                events.onHello?.(message.context, message.state, { answers: message.answers ?? null, header: message.header ?? null, footer: message.footer ?? null, carries: message.carries ?? null, footerKinds: message.footerKinds ?? null });
+                events.onHello?.(message.context, message.state, { answers: message.answers ?? null, header: message.header ?? null, footer: message.footer ?? null, carries: message.carries ?? null, footerKinds: message.footerKinds ?? null, find: message.find ?? null });
             }
             catch (error) {
                 console.error(error);
@@ -321,6 +388,48 @@ export function connect(id, events = {}, options = {}) {
         }
         if (message.type === MESSAGE.VISIBLE) {
             events.onVisible?.(message.visible);
+            return;
+        }
+        if (message.type === MESSAGE.FIND) {
+            const ask = { caseSensitive: message.caseSensitive, wholeWord: message.wholeWord, direction: message.direction };
+            if (message.direction === 'close') {
+                closeFind();
+                try {
+                    void events.onFind?.(message.query, ask);
+                }
+                catch {
+                    /* A listener that throws on close has nothing to say. */
+                }
+                return;
+            }
+            finding = message.id;
+            const id = message.id;
+            const own = (direction) => {
+                const search = finderOf();
+                return search ? search.run(message.query, ask, direction) : 'unsupported';
+            };
+            const said = (answer) => {
+                if (finding !== id)
+                    return;
+                if (answer === 'default')
+                    sayFound(own(message.direction));
+                else if (answer !== undefined)
+                    sayFound(answer);
+            };
+            if (!events.onFind) {
+                said('default');
+                return;
+            }
+            try {
+                const answer = events.onFind(message.query, ask);
+                if (answer instanceof Promise)
+                    answer.then(said, () => said('unsupported'));
+                else
+                    said(answer);
+            }
+            catch {
+                said('unsupported');
+            }
             return;
         }
         if (message.type === MESSAGE.PRESS) {
@@ -432,6 +541,9 @@ export function connect(id, events = {}, options = {}) {
             .map(({ project: _project, projectId: _projectId, ...item }) => item);
     }
     const connection = {
+        findResult(count) {
+            sayFound(count);
+        },
         listen() {
             if (listening || !live)
                 return this;
@@ -517,6 +629,8 @@ export function connect(id, events = {}, options = {}) {
         stop() {
             live = false;
             pointer(false);
+            findKeys(false);
+            closeFind();
             if (listening) {
                 listening = false;
                 source.removeEventListener('message', onMessage);

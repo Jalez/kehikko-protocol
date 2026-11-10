@@ -9,6 +9,7 @@ import { footerItemsSchema } from './footer.js';
 import { RUN_CARRIES, headerItemsSchema, pressValueSchema } from './header.js';
 import { gotoRef, kehikkoSchema, stepNumber } from './fragments.js';
 import { coveredFields } from './reveal.js';
+import { FIND_DIRECTIONS, findCountFields, findOptionsFields, findQuerySchema } from './find.js';
 /**
  * Everything the two sides say to each other: the schema of every `postMessage` between a host and
  * a framed, cross-origin module. Parse both directions: a module validates what the host sends too.
@@ -201,6 +202,12 @@ export const helloSchema = z.object({
      * page by itself when this is `true`; a hand-rolled page may.
      */
     pointer: z.boolean().optional(),
+    /**
+     * 2.69.0. Whether this host draws a find bar for this module (`kehikot.find`). Absent from a host
+     * before 2.69.0: it does not, so a page leaves ⌘F alone (a browser's own find may answer it).
+     * `connect` catches ⌘F and ⌘G inside the page, and searches it, only when this is `true`.
+     */
+    find: z.boolean().optional(),
 });
 /**
  * Host → module. Which epic is open now: the `contextSchema` fields flat, not wrapped in `context`.
@@ -438,6 +445,53 @@ export const pageErrorSchema = z.object({
     where: cut(LIMITS.PAGE_ERROR_WHERE).default('error'),
     stack: cut(LIMITS.PAGE_ERROR_STACK).default(''),
 });
+/* ------------------------------------------------------------------------ *
+ * Find (2.69.0): the host's bar, the page's search
+ * ------------------------------------------------------------------------ */
+/**
+ * Host → module (2.69.0). Search what this page shows. `direction` says what to do: `first` (the
+ * query or an option changed: search anew, go to the first match at or after what is on screen),
+ * `next` and `prev` (move, wrapping), or `close` (the bar closed: clear every mark). `id` pairs it
+ * with its `kehikot.find.result`; a host draws only the result for its latest `id`. An empty query
+ * matches nothing and clears the marks. A module before 2.69.0 drops it unread (`HOST_MESSAGES`), so
+ * a host that hears nothing back says the module cannot be searched. See `find.ts`.
+ */
+export const findSchema = z.object({
+    type: messageType(MESSAGE.FIND),
+    protocol: z.number().int().min(1),
+    id: correlation,
+    query: findQuerySchema.default(''),
+    ...findOptionsFields,
+    direction: z.enum(FIND_DIRECTIONS),
+});
+/**
+ * Module → host (2.69.0). What a search came to: `total` matches and the `current` one (1-based, 0
+ * when there are none), or `unsupported: true` from a page that cannot search what it shows. `id`
+ * is the `kehikot.find` it answers; a page that re-counts by itself (what it shows changed while the
+ * bar is open) sends the id of the last one again. No answer to a `close`.
+ */
+export const findResultSchema = z
+    .object({
+    type: messageType(MESSAGE.FIND_RESULT),
+    id: correlation,
+    ...findCountFields,
+    unsupported: z.boolean().default(false),
+})
+    .refine((r) => r.current <= r.total, { message: 'the current match cannot be past the total' });
+/** 2.69.0. What ⌘G and ⇧⌘G ask the host's bar for, beside opening it. */
+export const FIND_STEPS = ['next', 'prev'];
+/**
+ * Module → host (2.69.0). The person pressed ⌘F inside the page: open the find bar for this
+ * container, and put focus in it. `query` is the page's selected text when there is a short one on
+ * one line, to search for; absent otherwise (the host keeps what the bar last held). `step` is ⌘G
+ * (`next`) or ⇧⌘G (`prev`): open the bar if it is closed and move. Sent only to a host whose greeting
+ * said `find: true`; a host before 2.69.0 drops it unread.
+ */
+export const findOpenSchema = z.object({
+    type: messageType(MESSAGE.FIND_OPEN),
+    query: findQuerySchema.optional(),
+    step: z.enum(FIND_STEPS).optional(),
+});
 /**
  * Every message a host sends. A plain union, not a `discriminatedUnion`, because `responseSchema`
  * is itself a union on a different key and cannot be an option of one.
@@ -454,6 +508,7 @@ export const hostMessageSchema = z.union([
     openedSchema,
     coveredSchema,
     visibleSchema,
+    findSchema,
 ]);
 export const moduleMessageSchema = z.union([
     readySchema,
@@ -468,6 +523,8 @@ export const moduleMessageSchema = z.union([
     footerSchema,
     pointerSchema,
     pageErrorSchema,
+    findResultSchema,
+    findOpenSchema,
 ]);
 /**
  * Is this worth parsing at all? The cheap first filter: true when the value is an object whose

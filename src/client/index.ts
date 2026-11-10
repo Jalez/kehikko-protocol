@@ -43,7 +43,28 @@ export {
   type PointerTarget,
   type PressAnswer,
   type Refusal,
+  type FindAnswer,
+  type FindAsk,
+  type KeyEventLike,
+  type KeyTarget,
 } from './connect.js'
+
+/* 2.69.0: the client's own search of a page's visible text, the default answer to the host's find bar. */
+export {
+  pageFind,
+  FIND_HIGHLIGHT,
+  FIND_HIGHLIGHT_CURRENT,
+  FIND_MARK_ATTRIBUTE,
+  FIND_SKIP_ATTRIBUTE,
+  FIND_STYLE_ID,
+  FIND_RECOUNT_MS,
+  FIND_MARK_MAX,
+  FIND_CSS,
+  type PageFind,
+  type PageFindOptions,
+  type HighlightApi,
+} from './find.js'
+export { findMatches, stepMatch, type FindCount, type FindOptions, type FindDirection } from '../find.js'
 
 /* A page asking its own server: the ticket, one fetch helper, one stream helper, the theme. */
 export {

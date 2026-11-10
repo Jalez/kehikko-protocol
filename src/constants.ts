@@ -135,6 +135,25 @@ export const MESSAGE = {
    * answering"; a host before 2.59.0 drops it unread. See docs/client.md, "When the page fails".
    */
   PAGE_ERROR: 'kehikot.page.error',
+  /**
+   * Host → module (2.69.0). "Search what you show": `{ id, query, caseSensitive, wholeWord,
+   * direction }`, sent while the host's find bar is open — for every change of the query or an
+   * option (`first`), for previous and next, and once with `close` when the bar closes. Answered by
+   * `kehikot.find.result` carrying the same `id`. See `find.ts` and docs/find.md.
+   */
+  FIND: 'kehikot.find',
+  /**
+   * Module → host (2.69.0). "This is what that search came to": `{ id, total, current }`, or
+   * `{ id, unsupported: true }` from a page that cannot search. Sent for each `kehikot.find`, and
+   * again by itself when what the page shows changes while the bar is open (the count moved).
+   */
+  FIND_RESULT: 'kehikot.find.result',
+  /**
+   * Module → host (2.69.0). "Open your find bar for me": the person pressed ⌘F (or ⌘G, `step`)
+   * inside the page, where the host cannot hear a key. Carries the page's selected text, when there
+   * is a short one, to start the search with. Sent only to a host whose greeting said `find: true`.
+   */
+  FIND_OPEN: 'kehikot.find.open',
 } as const
 
 export type MessageType = (typeof MESSAGE)[keyof typeof MESSAGE]
@@ -162,6 +181,7 @@ export const HOST_MESSAGES = [
   MESSAGE.OPENED,
   MESSAGE.COVERED,
   MESSAGE.VISIBLE,
+  MESSAGE.FIND,
 ] as const
 
 /** And what the module says. */
@@ -178,6 +198,8 @@ export const MODULE_MESSAGES = [
   MESSAGE.FOOTER,
   MESSAGE.POINTER,
   MESSAGE.PAGE_ERROR,
+  MESSAGE.FIND_RESULT,
+  MESSAGE.FIND_OPEN,
 ] as const
 
 /**

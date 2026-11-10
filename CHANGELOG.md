@@ -7,6 +7,30 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.69.0 — 2026-11-10
+
+Find: ⌘F in every container, with one bar the host draws and the page searching what it shows.
+**Additive**; `PROTOCOL` is still 2. [docs/find.md](docs/find.md).
+
+### Added
+
+- **`kehikot.find`** (host → module, `findSchema`): `id`, `query` (at most `LIMITS.FIND_QUERY`, 256),
+  `caseSensitive`, `wholeWord`, and `direction` (`FIND_DIRECTIONS`: `first`, `next`, `prev`, `close`).
+- **`kehikot.find.result`** (module → host, `findResultSchema`): `id`, `total`, `current` (1-based, 0
+  for none), or `unsupported: true`.
+- **`kehikot.find.open`** (module → host, `findOpenSchema`): the person pressed ⌘F (or ⌘G, `step`)
+  inside the page; carries a short selection as `query`.
+- **`helloSchema.find`**, **`HostFacts.find`**: whether the host draws the bar.
+- **`findMatches`**, **`stepMatch`**, **`findSaid`**: the matching rule, the step, the words.
+- **`/client`**: `connect` hears ⌘F/⌘G and answers `kehikot.find` by searching the page's visible
+  text by itself (`pageFind`: `CSS.highlights`, else `<mark data-kehikot-find>`; scrolls the current
+  match into view; searches again when the page changes). `HostEvents.onFind` for a page whose text
+  is not in the DOM, `Connection.findResult` (and on `hostStore` and `useHost`) to say a count later,
+  `ConnectOptions.findKeys`, `findIn` and `mac`.
+
+A host before 2.69.0 sends no `find: true`, so the client leaves ⌘F alone; a module before it drops
+`kehikot.find` unread and the host says it cannot be searched.
+
 ## 2.68.0 — 2026-11-10
 
 A switch's or go item's options can be grouped and carry a second line. **Additive**; `PROTOCOL` is still 2.

@@ -297,6 +297,14 @@ export {
   type PointerPhase,
   type PointerMessage,
   pageErrorSchema,
+  findSchema,
+  findResultSchema,
+  findOpenSchema,
+  FIND_STEPS,
+  type FindStep,
+  type FindMessage,
+  type FindResultMessage,
+  type FindOpenMessage,
   PAGE_ERROR_WHERE,
   type PageErrorWhere,
   type PageErrorMessage,
@@ -515,6 +523,20 @@ export {
 
 /* What goes in the header and what in the footer, and the advice that points out a misplacement (2.47.0). */
 export { rowsAdvice } from './rows.js'
+
+/* Find: the host's bar and the page's search, and the one matching rule (2.69.0). */
+export {
+  FIND_DIRECTIONS,
+  findOptionsFields,
+  findCountFields,
+  findQuerySchema,
+  findMatches,
+  stepMatch,
+  findSaid,
+  type FindDirection,
+  type FindOptions,
+  type FindCount,
+} from './find.js'
 
 /* How the host's revealed header and footer meet a module's page: push, or over and `kehikot.covered` (2.42.0). */
 export {

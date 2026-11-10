@@ -169,6 +169,7 @@ The same list with what each version exported is in [CHANGELOG.md](CHANGELOG.md)
 
 | version | date | what it added |
 |---|---|---|
+| 2.69.0 | 2026-11-10 | Additive. Find in every container: `kehikot.find`, `kehikot.find.result`, `kehikot.find.open`, `hello.find`; `findMatches`, `stepMatch`, `findSaid`; the client hears ⌘F and searches a page's visible text by itself (`pageFind`), and `onFind`/`findResult` serve a page whose text is not in the DOM. See [find](docs/find.md). |
 | 2.68.0 | 2026-11-10 | Additive. A switch's or go item's options can be grouped and carry a second line: `headerOptionSchema.group` and `detail`, `LIMITS.HEADER_OPTION_GROUP` and `HEADER_OPTION_DETAIL`, `optionSections`. See [header](docs/header.md). |
 | 2.67.0 | 2026-11-10 | Additive. What a reviewer did and what the latest activity was: `TrackerReviewer.reviewedAt`, `activeAt` and `openThreads`; `TrackerActivity.commits`, `path`, `line` and `verdict`. See [tracker](docs/tracker.md). |
 | 2.66.0 | 2026-11-10 | Additive. A session's notes and its door agree about messaging: `messageToolsFor` lists the tools for every door with a token unless the host never can (`hostOnMessages`), and `NotesInput.messaging.listed` false says the door has none and how to get them (`messagingUnlistedLine`, `doorCarriesPlace`). See [messages between agent sessions](docs/agent-messages.md). |

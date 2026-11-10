@@ -1,5 +1,6 @@
 import type { ActivityItem, AddressIntent, AddressOpenResult, CanvasContainer, CodeLocation, EpicPart, FilterChoice, FilterGroup, FooterItemInput, HeaderItemInput, LocationIntent, LocationSetResult, ModuleContext, Passage, SharedAddress, SharedLocation } from '../index.js'
 import type { PageTheme } from '../page.js'
+import type { FindCount } from '../find.js'
 import { scopeOf, type ContextScope } from '../context.js'
 import { readScope, type ModuleScope } from '../scope.js'
 import { addressOpenResult, locationSetResult } from '../methods.js'
@@ -232,6 +233,8 @@ export interface HostActions<Kept = unknown> {
   footer: (items: FooterItemInput[]) => void
   /** Say what this page's things are doing, whole (`activity.set`, 1.5.0); `[]` for nothing. See `Connection.activity`. */
   activity: (items: ActivityItem[]) => void
+  /** 2.69.0. Say what the open search comes to now (`kehikot.find.result`), from an `onFind`. See `Connection.findResult`. */
+  findResult: (count: FindCount | 'unsupported') => void
 }
 
 export interface HostStore<Kept = unknown> extends HostActions<Kept> {
@@ -408,6 +411,8 @@ export function hostStore<Kept = unknown>(
           },
           /* Only when the page takes presses: without a listener the connection answers for it. */
           ...(events.onPress ? { onPress: (press) => (stopped ? false : events.onPress!(press)) } : {}),
+          /* 2.69.0. Only when the page searches itself: without a listener the client searches the page. */
+          ...(events.onFind ? { onFind: (query, ask) => (stopped ? undefined : events.onFind!(query, ask)) } : {}),
         },
         connectOptions,
       )
@@ -499,6 +504,7 @@ export function hostStore<Kept = unknown>(
     header: (items) => live?.header(items),
     footer: (items) => live?.footer(items),
     activity: (items) => live?.activity(items),
+    findResult: (count) => live?.findResult(count),
     connection: () => live,
   }
   return store

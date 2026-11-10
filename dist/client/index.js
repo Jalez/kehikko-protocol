@@ -8,6 +8,9 @@ export { mailbox, makeMailbox, KEEP } from './mailbox.js';
 /* When the page fails (2.59.0): every uncaught error, said to the host, and a way to say one yourself. */
 export { pageErrors, makePageErrors, reportPageError, describeError, trimStack, PAGE_ERRORS_MAX, PAGE_ERRORS_GLOBAL, STACK_LINES, NO_MESSAGE, } from './errors.js';
 export { connect, mayGreet, pageOrigins, HostRefused, ANSWER_WITHIN_MS, PERSON_ANSWERS_WITHIN_MS, GOTO_BACKSTOP_MS, PRESS_BACKSTOP_MS, NOBODY_TO_ASK, POINTER_SLOP_PX, } from './connect.js';
+/* 2.69.0: the client's own search of a page's visible text, the default answer to the host's find bar. */
+export { pageFind, FIND_HIGHLIGHT, FIND_HIGHLIGHT_CURRENT, FIND_MARK_ATTRIBUTE, FIND_SKIP_ATTRIBUTE, FIND_STYLE_ID, FIND_RECOUNT_MS, FIND_MARK_MAX, FIND_CSS, } from './find.js';
+export { findMatches, stepMatch } from '../find.js';
 /* A page asking its own server: the ticket, one fetch helper, one stream helper, the theme. */
 export { ask, answered, replied, probeServer, watchServer, ticket, AskFailed, onServerStanding, serverStanding, resetServerStanding, reloadStalePage, reloadWhenStale, STALE_RELOAD_MS, PAGE_STALE, PAGE_OLD, NOT_A_REPLY, CANCELLED, WATCH_SERVER_MS, KEEPALIVE_BYTES, SERVER_DOWN, } from './ask.js';
 export { follow } from './stream.js';

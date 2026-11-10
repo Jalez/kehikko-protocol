@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import type { ActivityItem, AddressIntent, CodeLocation, FilterGroup, FooterItemInput, HeaderItemInput, LocationIntent, Passage } from '../index.js'
 import { HostRefused, NOBODY_TO_ASK, type AskOptions, type Connection, type HostEvents } from './connect.js'
+import type { FindCount } from '../find.js'
 import {
   JSON_KEPT,
   KEEP_AFTER_MS,
@@ -74,6 +75,8 @@ export function useHost<Kept = unknown>(
         onVisible: (visible) => handlers.current.onVisible?.(visible),
         /* Always given, and read through the ref: a handler added on a later render is heard. */
         onPress: (press) => (handlers.current.onPress ? handlers.current.onPress(press) : 'This app declared that item and does not take presses.'),
+        /* 2.69.0. Always given, through the ref; without a handler the client's own search answers. */
+        onFind: (query, ask) => (handlers.current.onFind ? handlers.current.onFind(query, ask) : 'default'),
       },
       /* The codec is read at mount and written through whichever one is current. */
       { ...mounted, kept: { read, write: (kept) => (settings.current.kept ?? (JSON_KEPT as KeptCodec<Kept>)).write(kept) } },
@@ -120,12 +123,13 @@ export function useHost<Kept = unknown>(
   const header = useCallback((items: HeaderItemInput[]) => held.current?.header(items), [])
   const footer = useCallback((items: FooterItemInput[]) => held.current?.footer(items), [])
   const activity = useCallback((items: ActivityItem[]) => held.current?.activity(items), [])
+  const findResult = useCallback((count: FindCount | 'unsupported') => held.current?.findResult(count), [])
   const connection = useCallback(() => held.current?.connection() ?? null, [])
   const read = useCallback(() => held.current?.get() ?? drawn.current, [])
 
   return useMemo(
-    () => ({ ...standing, remember, point, locate, openAddress, request, resize, filters, clearable, refreshable, header, footer, activity, connection, read }),
-    [standing, remember, point, locate, openAddress, request, resize, filters, clearable, refreshable, header, footer, activity, connection, read],
+    () => ({ ...standing, remember, point, locate, openAddress, request, resize, filters, clearable, refreshable, header, footer, activity, findResult, connection, read }),
+    [standing, remember, point, locate, openAddress, request, resize, filters, clearable, refreshable, header, footer, activity, findResult, connection, read],
   )
 }
 

@@ -42,6 +42,8 @@ export function useHost(id, events = {}, options = {}) {
             onVisible: (visible) => handlers.current.onVisible?.(visible),
             /* Always given, and read through the ref: a handler added on a later render is heard. */
             onPress: (press) => (handlers.current.onPress ? handlers.current.onPress(press) : 'This app declared that item and does not take presses.'),
+            /* 2.69.0. Always given, through the ref; without a handler the client's own search answers. */
+            onFind: (query, ask) => (handlers.current.onFind ? handlers.current.onFind(query, ask) : 'default'),
         }, 
         /* The codec is read at mount and written through whichever one is current. */
         { ...mounted, kept: { read, write: (kept) => (settings.current.kept ?? JSON_KEPT).write(kept) } });
@@ -78,9 +80,10 @@ export function useHost(id, events = {}, options = {}) {
     const header = useCallback((items) => held.current?.header(items), []);
     const footer = useCallback((items) => held.current?.footer(items), []);
     const activity = useCallback((items) => held.current?.activity(items), []);
+    const findResult = useCallback((count) => held.current?.findResult(count), []);
     const connection = useCallback(() => held.current?.connection() ?? null, []);
     const read = useCallback(() => held.current?.get() ?? drawn.current, []);
-    return useMemo(() => ({ ...standing, remember, point, locate, openAddress, request, resize, filters, clearable, refreshable, header, footer, activity, connection, read }), [standing, remember, point, locate, openAddress, request, resize, filters, clearable, refreshable, header, footer, activity, connection, read]);
+    return useMemo(() => ({ ...standing, remember, point, locate, openAddress, request, resize, filters, clearable, refreshable, header, footer, activity, findResult, connection, read }), [standing, remember, point, locate, openAddress, request, resize, filters, clearable, refreshable, header, footer, activity, findResult, connection, read]);
 }
 /** Whether a kept value can stand for `initial`: the same kind of value (an array for an array). */
 function sameKind(initial, value) {

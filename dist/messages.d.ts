@@ -2557,6 +2557,12 @@ export declare const helloSchema: z.ZodObject<{
      * page by itself when this is `true`; a hand-rolled page may.
      */
     pointer: z.ZodOptional<z.ZodBoolean>;
+    /**
+     * 2.69.0. Whether this host draws a find bar for this module (`kehikot.find`). Absent from a host
+     * before 2.69.0: it does not, so a page leaves ⌘F alone (a browser's own find may answer it).
+     * `connect` catches ⌘F and ⌘G inside the page, and searches it, only when this is `true`.
+     */
+    find: z.ZodOptional<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
     type: "kehikot.hello";
     session: string;
@@ -2662,6 +2668,7 @@ export declare const helloSchema: z.ZodObject<{
         scope?: "epic" | "kehikko" | "project" | "machine" | "part" | undefined;
         kept?: string | null | undefined;
     };
+    find?: boolean | undefined;
     answers?: string[] | undefined;
     header?: boolean | undefined;
     footer?: boolean | undefined;
@@ -2772,6 +2779,7 @@ export declare const helloSchema: z.ZodObject<{
             epic?: string | null | undefined;
         }[] | undefined;
     };
+    find?: boolean | undefined;
     answers?: string[] | undefined;
     state?: string | null | undefined;
     header?: boolean | undefined;
@@ -3864,6 +3872,102 @@ export declare const pageErrorSchema: z.ZodObject<{
 }>;
 export type PageErrorMessage = z.infer<typeof pageErrorSchema>;
 /**
+ * Host → module (2.69.0). Search what this page shows. `direction` says what to do: `first` (the
+ * query or an option changed: search anew, go to the first match at or after what is on screen),
+ * `next` and `prev` (move, wrapping), or `close` (the bar closed: clear every mark). `id` pairs it
+ * with its `kehikot.find.result`; a host draws only the result for its latest `id`. An empty query
+ * matches nothing and clears the marks. A module before 2.69.0 drops it unread (`HOST_MESSAGES`), so
+ * a host that hears nothing back says the module cannot be searched. See `find.ts`.
+ */
+export declare const findSchema: z.ZodObject<{
+    direction: z.ZodEnum<["first", "next", "prev", "close"]>;
+    caseSensitive: z.ZodDefault<z.ZodBoolean>;
+    wholeWord: z.ZodDefault<z.ZodBoolean>;
+    type: z.ZodLiteral<"kehikot.find">;
+    protocol: z.ZodNumber;
+    id: z.ZodString;
+    query: z.ZodDefault<z.ZodString>;
+}, "strip", z.ZodTypeAny, {
+    type: "kehikot.find";
+    id: string;
+    protocol: number;
+    caseSensitive: boolean;
+    wholeWord: boolean;
+    query: string;
+    direction: "first" | "next" | "prev" | "close";
+}, {
+    type: "kehikot.find";
+    id: string;
+    protocol: number;
+    direction: "first" | "next" | "prev" | "close";
+    caseSensitive?: boolean | undefined;
+    wholeWord?: boolean | undefined;
+    query?: string | undefined;
+}>;
+export type FindMessage = z.infer<typeof findSchema>;
+/**
+ * Module → host (2.69.0). What a search came to: `total` matches and the `current` one (1-based, 0
+ * when there are none), or `unsupported: true` from a page that cannot search what it shows. `id`
+ * is the `kehikot.find` it answers; a page that re-counts by itself (what it shows changed while the
+ * bar is open) sends the id of the last one again. No answer to a `close`.
+ */
+export declare const findResultSchema: z.ZodEffects<z.ZodObject<{
+    unsupported: z.ZodDefault<z.ZodBoolean>;
+    total: z.ZodNumber;
+    current: z.ZodNumber;
+    type: z.ZodLiteral<"kehikot.find.result">;
+    id: z.ZodString;
+}, "strip", z.ZodTypeAny, {
+    type: "kehikot.find.result";
+    id: string;
+    total: number;
+    unsupported: boolean;
+    current: number;
+}, {
+    type: "kehikot.find.result";
+    id: string;
+    total: number;
+    current: number;
+    unsupported?: boolean | undefined;
+}>, {
+    type: "kehikot.find.result";
+    id: string;
+    total: number;
+    unsupported: boolean;
+    current: number;
+}, {
+    type: "kehikot.find.result";
+    id: string;
+    total: number;
+    current: number;
+    unsupported?: boolean | undefined;
+}>;
+export type FindResultMessage = z.infer<typeof findResultSchema>;
+/** 2.69.0. What ⌘G and ⇧⌘G ask the host's bar for, beside opening it. */
+export declare const FIND_STEPS: readonly ["next", "prev"];
+export type FindStep = (typeof FIND_STEPS)[number];
+/**
+ * Module → host (2.69.0). The person pressed ⌘F inside the page: open the find bar for this
+ * container, and put focus in it. `query` is the page's selected text when there is a short one on
+ * one line, to search for; absent otherwise (the host keeps what the bar last held). `step` is ⌘G
+ * (`next`) or ⇧⌘G (`prev`): open the bar if it is closed and move. Sent only to a host whose greeting
+ * said `find: true`; a host before 2.69.0 drops it unread.
+ */
+export declare const findOpenSchema: z.ZodObject<{
+    type: z.ZodLiteral<"kehikot.find.open">;
+    query: z.ZodOptional<z.ZodString>;
+    step: z.ZodOptional<z.ZodEnum<["next", "prev"]>>;
+}, "strip", z.ZodTypeAny, {
+    type: "kehikot.find.open";
+    step?: "next" | "prev" | undefined;
+    query?: string | undefined;
+}, {
+    type: "kehikot.find.open";
+    step?: "next" | "prev" | undefined;
+    query?: string | undefined;
+}>;
+export type FindOpenMessage = z.infer<typeof findOpenSchema>;
+/**
  * Every message a host sends. A plain union, not a `discriminatedUnion`, because `responseSchema`
  * is itself a union on a different key and cannot be an option of one.
  */
@@ -4573,6 +4677,12 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
      * page by itself when this is `true`; a hand-rolled page may.
      */
     pointer: z.ZodOptional<z.ZodBoolean>;
+    /**
+     * 2.69.0. Whether this host draws a find bar for this module (`kehikot.find`). Absent from a host
+     * before 2.69.0: it does not, so a page leaves ⌘F alone (a browser's own find may answer it).
+     * `connect` catches ⌘F and ⌘G inside the page, and searches it, only when this is `true`.
+     */
+    find: z.ZodOptional<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
     type: "kehikot.hello";
     session: string;
@@ -4678,6 +4788,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         scope?: "epic" | "kehikko" | "project" | "machine" | "part" | undefined;
         kept?: string | null | undefined;
     };
+    find?: boolean | undefined;
     answers?: string[] | undefined;
     header?: boolean | undefined;
     footer?: boolean | undefined;
@@ -4788,6 +4899,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             epic?: string | null | undefined;
         }[] | undefined;
     };
+    find?: boolean | undefined;
     answers?: string[] | undefined;
     state?: string | null | undefined;
     header?: boolean | undefined;
@@ -5690,6 +5802,30 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     type: "kehikot.visible";
     protocol: number;
     visible: boolean;
+}>, z.ZodObject<{
+    direction: z.ZodEnum<["first", "next", "prev", "close"]>;
+    caseSensitive: z.ZodDefault<z.ZodBoolean>;
+    wholeWord: z.ZodDefault<z.ZodBoolean>;
+    type: z.ZodLiteral<"kehikot.find">;
+    protocol: z.ZodNumber;
+    id: z.ZodString;
+    query: z.ZodDefault<z.ZodString>;
+}, "strip", z.ZodTypeAny, {
+    type: "kehikot.find";
+    id: string;
+    protocol: number;
+    caseSensitive: boolean;
+    wholeWord: boolean;
+    query: string;
+    direction: "first" | "next" | "prev" | "close";
+}, {
+    type: "kehikot.find";
+    id: string;
+    protocol: number;
+    direction: "first" | "next" | "prev" | "close";
+    caseSensitive?: boolean | undefined;
+    wholeWord?: boolean | undefined;
+    query?: string | undefined;
 }>]>;
 export type HostMessage = z.infer<typeof hostMessageSchema>;
 export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
@@ -7524,6 +7660,48 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
     type: "kehikot.page.error";
     stack?: string | undefined;
     where?: string | undefined;
+}>, z.ZodEffects<z.ZodObject<{
+    unsupported: z.ZodDefault<z.ZodBoolean>;
+    total: z.ZodNumber;
+    current: z.ZodNumber;
+    type: z.ZodLiteral<"kehikot.find.result">;
+    id: z.ZodString;
+}, "strip", z.ZodTypeAny, {
+    type: "kehikot.find.result";
+    id: string;
+    total: number;
+    unsupported: boolean;
+    current: number;
+}, {
+    type: "kehikot.find.result";
+    id: string;
+    total: number;
+    current: number;
+    unsupported?: boolean | undefined;
+}>, {
+    type: "kehikot.find.result";
+    id: string;
+    total: number;
+    unsupported: boolean;
+    current: number;
+}, {
+    type: "kehikot.find.result";
+    id: string;
+    total: number;
+    current: number;
+    unsupported?: boolean | undefined;
+}>, z.ZodObject<{
+    type: z.ZodLiteral<"kehikot.find.open">;
+    query: z.ZodOptional<z.ZodString>;
+    step: z.ZodOptional<z.ZodEnum<["next", "prev"]>>;
+}, "strip", z.ZodTypeAny, {
+    type: "kehikot.find.open";
+    step?: "next" | "prev" | undefined;
+    query?: string | undefined;
+}, {
+    type: "kehikot.find.open";
+    step?: "next" | "prev" | undefined;
+    query?: string | undefined;
 }>]>;
 export type ModuleMessage = z.infer<typeof moduleMessageSchema>;
 export type WireMessage = HostMessage | ModuleMessage;
