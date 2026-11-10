@@ -58,9 +58,9 @@ export declare const trafficNoteSchema: z.ZodObject<{
     reason: string | null;
     ok: boolean | null;
     ms: number | null;
+    cache?: "refused" | "hit" | "not-modified" | undefined;
     bytesIn?: number | undefined;
     bytesOut?: number | undefined;
-    cache?: "refused" | "hit" | "not-modified" | undefined;
 }, {
     at: number;
     path: string;
@@ -68,11 +68,11 @@ export declare const trafficNoteSchema: z.ZodObject<{
     host: string;
     status?: number | null | undefined;
     reason?: string | null | undefined;
+    cache?: "refused" | "hit" | "not-modified" | undefined;
     ok?: boolean | null | undefined;
     ms?: number | null | undefined;
     bytesIn?: number | undefined;
     bytesOut?: number | undefined;
-    cache?: "refused" | "hit" | "not-modified" | undefined;
 }>;
 export type TrafficNote = z.infer<typeof trafficNoteSchema>;
 export type TrafficNoteInput = z.input<typeof trafficNoteSchema>;
@@ -192,9 +192,9 @@ export declare const trafficCallSchema: z.ZodObject<{
     reported: "module" | "host" | "sampled";
     seq: number;
     via: "page" | "server" | "process";
+    cache?: "refused" | "hit" | "not-modified" | undefined;
     bytesIn?: number | undefined;
     bytesOut?: number | undefined;
-    cache?: "refused" | "hit" | "not-modified" | undefined;
     caller?: {
         name: string;
         kind: "module" | "session" | "host" | "program" | "remote" | "gone";
@@ -216,11 +216,11 @@ export declare const trafficCallSchema: z.ZodObject<{
     via: "page" | "server" | "process";
     status?: number | null | undefined;
     reason?: string | null | undefined;
+    cache?: "refused" | "hit" | "not-modified" | undefined;
     ok?: boolean | null | undefined;
     ms?: number | null | undefined;
     bytesIn?: number | undefined;
     bytesOut?: number | undefined;
-    cache?: "refused" | "hit" | "not-modified" | undefined;
     caller?: unknown;
 }>;
 export type TrafficCall = z.infer<typeof trafficCallSchema>;
@@ -1237,9 +1237,9 @@ export declare const trafficReadResult: z.ZodObject<{
         reported: "module" | "host" | "sampled";
         seq: number;
         via: "page" | "server" | "process";
+        cache?: "refused" | "hit" | "not-modified" | undefined;
         bytesIn?: number | undefined;
         bytesOut?: number | undefined;
-        cache?: "refused" | "hit" | "not-modified" | undefined;
         caller?: {
             name: string;
             kind: "module" | "session" | "host" | "program" | "remote" | "gone";
@@ -1261,11 +1261,11 @@ export declare const trafficReadResult: z.ZodObject<{
         via: "page" | "server" | "process";
         status?: number | null | undefined;
         reason?: string | null | undefined;
+        cache?: "refused" | "hit" | "not-modified" | undefined;
         ok?: boolean | null | undefined;
         ms?: number | null | undefined;
         bytesIn?: number | undefined;
         bytesOut?: number | undefined;
-        cache?: "refused" | "hit" | "not-modified" | undefined;
         caller?: unknown;
     }>, "many">;
     newest: z.ZodNumber;
@@ -1976,9 +1976,9 @@ export declare const trafficReadResult: z.ZodObject<{
         reported: "module" | "host" | "sampled";
         seq: number;
         via: "page" | "server" | "process";
+        cache?: "refused" | "hit" | "not-modified" | undefined;
         bytesIn?: number | undefined;
         bytesOut?: number | undefined;
-        cache?: "refused" | "hit" | "not-modified" | undefined;
         caller?: {
             name: string;
             kind: "module" | "session" | "host" | "program" | "remote" | "gone";
@@ -2104,11 +2104,11 @@ export declare const trafficReadResult: z.ZodObject<{
         via: "page" | "server" | "process";
         status?: number | null | undefined;
         reason?: string | null | undefined;
+        cache?: "refused" | "hit" | "not-modified" | undefined;
         ok?: boolean | null | undefined;
         ms?: number | null | undefined;
         bytesIn?: number | undefined;
         bytesOut?: number | undefined;
-        cache?: "refused" | "hit" | "not-modified" | undefined;
         caller?: unknown;
     }[];
     newest: number;

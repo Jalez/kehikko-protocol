@@ -5,6 +5,7 @@ import { NOTES_MESSAGES_MOST, agentMessageSchema } from './agent-messages.js';
 import { EPIC_SLUG, KEHIKKO_KEY, MODULE_ID, PROJECT_ID, own } from './ids.js';
 import { skillNameSchema } from './skills.js';
 import { kehikkoSkillsSchema } from './kehikko-skills.js';
+import { placedGuardsSchema } from './guards.js';
 /**
  * What a module's MCP door agrees with every other module's: how its tools spell the two context
  * arguments, how a tool says whether it only reads, and the shape of the two answers a caller acts
@@ -204,6 +205,15 @@ export const placeDoorsSchema = z.object({
      * left out and the rest kept (`kehikkoSkillsSchema`).
      */
     kehikkoSkills: kehikkoSkillsSchema.optional().catch(undefined),
+    /**
+     * 2.61.0. The guards of the modules PLACED on the session's kehikko (`placedGuardSchema`), in the
+     * order the canvas is read, each with its module's id and name: what the module that runs the session
+     * holds every shell command to (`guardDecision`), in its CLI's pre-tool hook, for the session and its
+     * subagents. Only placed modules: an installed module that is not on the kehikko guards nothing.
+     * Absent: the host did not say (before 2.61.0) — guard nothing. Present and empty: none. One that does
+     * not parse is left out and the rest kept.
+     */
+    guards: placedGuardsSchema.optional().catch(undefined),
 });
 /**
  * Where a module that issues tokens answers for one, asked by the host:

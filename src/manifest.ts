@@ -12,6 +12,7 @@ import { holdsSchema, opensSchema } from './abilities.js'
 import { revealModeSchema } from './reveal.js'
 import { agentSaysSchema } from './notes.js'
 import { helpSchema } from './help.js'
+import { guardsSchema } from './guards.js'
 import { introSchema } from './intro.js'
 import { navigatesSchema, showsSchema } from './show.js'
 import { modeScopeSchema, scopeSaysSchema, supportedScopes } from './scope.js'
@@ -331,6 +332,15 @@ const manifestFields = z.object({
    * parse, like `agentSays`.
    */
   absentSays: agentSaysSchema.optional().catch(undefined),
+  /**
+   * 2.61.0. The shell commands this module guards in agent sessions on a kehikko it is placed on
+   * (`guardSchema`): each one matched commands and scripts, and either run through the module's own
+   * command (`rewrite`) or refused (`deny`), with why. The host hands the placed modules' guards to the
+   * module that runs the session, which holds every command to them with `guardDecision`. Top-level,
+   * optional; a guard that does not parse is dropped and the rest kept, like `agentSays`. A host before
+   * 2.61.0 ignores it. See `guards.ts`.
+   */
+  guards: guardsSchema.optional().catch(undefined),
   /**
    * 2.52.0. How to use this module, for a person: a one-line `summary` and short `sections` of
    * points (`helpSchema`, bounded by `HELP_LIMITS`). Plain text only: a host draws every string as

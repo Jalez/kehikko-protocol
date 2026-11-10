@@ -691,6 +691,32 @@ export declare const placeDoorsSchema: z.ZodObject<{
         text: string;
         description: string;
     }[], unknown[]>>>;
+    /**
+     * 2.61.0. The guards of the modules PLACED on the session's kehikko (`placedGuardSchema`), in the
+     * order the canvas is read, each with its module's id and name: what the module that runs the session
+     * holds every shell command to (`guardDecision`), in its CLI's pre-tool hook, for the session and its
+     * subagents. Only placed modules: an installed module that is not on the kehikko guards nothing.
+     * Absent: the host did not say (before 2.61.0) — guard nothing. Present and empty: none. One that does
+     * not parse is left out and the rest kept.
+     */
+    guards: z.ZodCatch<z.ZodOptional<z.ZodEffects<z.ZodUnknown, ({
+        name: string;
+        module: string;
+        guard: {
+            id: string;
+            why: string;
+            tool: "shell";
+            match: {
+                commands: string[];
+                scripts?: string[] | undefined;
+            };
+            action: "rewrite" | "deny";
+            rewrite?: string | undefined;
+            allow?: string[] | undefined;
+        };
+    } & {
+        id: string;
+    })[], unknown>>>;
 }, "strip", z.ZodTypeAny, {
     token: string;
     ok: true;
@@ -742,23 +768,41 @@ export declare const placeDoorsSchema: z.ZodObject<{
         skills: string[];
         says?: string | undefined;
     }[] | undefined;
+    absent?: {
+        name: string;
+        module: string;
+        says: string;
+    }[] | undefined;
+    kehikkoSkills?: {
+        name: string;
+        text: string;
+        description: string;
+    }[] | undefined;
+    messagesMore?: number | undefined;
     everywhere?: {
         name: string;
         module: string;
         version: string;
         origin: string;
     }[] | undefined;
-    absent?: {
+    guards?: ({
         name: string;
         module: string;
-        says: string;
-    }[] | undefined;
-    messagesMore?: number | undefined;
-    kehikkoSkills?: {
-        name: string;
-        text: string;
-        description: string;
-    }[] | undefined;
+        guard: {
+            id: string;
+            why: string;
+            tool: "shell";
+            match: {
+                commands: string[];
+                scripts?: string[] | undefined;
+            };
+            action: "rewrite" | "deny";
+            rewrite?: string | undefined;
+            allow?: string[] | undefined;
+        };
+    } & {
+        id: string;
+    })[] | undefined;
 }, {
     token: string;
     ok: true;
@@ -770,10 +814,11 @@ export declare const placeDoorsSchema: z.ZodObject<{
     }[];
     messages?: unknown;
     modules?: unknown;
-    everywhere?: unknown;
     absent?: unknown;
-    messagesMore?: unknown;
     kehikkoSkills?: unknown;
+    messagesMore?: unknown;
+    everywhere?: unknown;
+    guards?: unknown;
 }>;
 export type PlaceDoors = z.infer<typeof placeDoorsSchema>;
 /**
