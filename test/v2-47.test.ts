@@ -20,7 +20,7 @@ import { connect, type MessageSource } from '../src/client/index.js'
 
 describe('the version', () => {
   test('is 2.47.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.73.0')
+    expect(PACKAGE_VERSION).toBe('2.74.0')
     expect(PROTOCOL).toBe(2)
     expect(sinceOf('wire', 'footer.actsOn')).toBe('2.47.0')
   })

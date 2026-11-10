@@ -188,7 +188,8 @@ knows, it has to do itself.
 
 - **Help text**: the manifest's `help` (2.52.0), which the host offers as "How to use".
 - **An intro**: the manifest's `intro` slides (2.57.0), which the host shows in its own dialog.
-- **`onFind`** when the page's text is not in the DOM (a terminal, a canvas, a virtualised list).
+- **`onFind`** when the page's text is not in the DOM (a canvas, a virtualised list); a terminal passes
+  `xtermFind` (`client/find`, 2.74.0).
 - **A footer for crucial state**: counts, status, where you are. A container folded to two rows shows
   only the header and the footer.
 - **`ready()`** once what it shows is drawn, and **`relayPointer`** for each nested frame it owns.
@@ -201,6 +202,7 @@ The same list with what each version exported is in [CHANGELOG.md](CHANGELOG.md)
 
 | version | date | what it added |
 |---|---|---|
+| 2.74.0 | 2026-11-10 | Additive. Find in a terminal, once for every module: `xtermFind(search, terminal, options?)` over `@xterm/addon-search` by structural types, `xtermFindColours`, and `findSlot` for whichever search is on screen, in `client/find`. See [find](docs/find.md). |
 | 2.73.0 | 2026-11-10 | Additive. Find adapters under `kehikot-module-protocol/client/find`, structural only: `pdfTextLayerFind` lays every sheet's text layer while the find bar is open and waits for it before the client's own search reads the PDF. See [find](docs/find.md). |
 | 2.72.0 | 2026-11-10 | Additive. The proposal components are shadcn/ui: `ProposalView`, `ProposalList` and the walk built from Button, Textarea, Tooltip, Badge, ScrollArea, Separator and Collapsible, vendored once as `kehikot-module-protocol/client/ui`; a module's Tailwind reads `dist/client` as a source. See [proposals](docs/proposals.md). |
 | 2.71.0 | 2026-11-10 | Additive. Proposed changes to a text (`/proposals`, `/proposals/store`, `/client/proposals`): an agent proposes, the person accepts (as proposed, edited, or in part by hunk) or declines with a reason the agent reads; the book under `.kehikot/<module>/proposals/`; the four tools `propose_change`, `list_proposals`, `read_proposal`, `withdraw_proposal`; `ProposalView` and the footer count with Previous and Next. See [proposals](docs/proposals.md). |

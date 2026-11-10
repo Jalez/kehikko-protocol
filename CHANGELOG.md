@@ -7,6 +7,26 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.74.0 — 2026-11-10
+
+Find in a terminal, once for every module that frames one. **Additive**; `PROTOCOL` is still 2. In
+`kehikot-module-protocol/client/find` beside `pdfTextLayerFind`. [docs/find.md](docs/find.md), "Adapters".
+
+### Added
+
+- **`xtermFind(search, terminal, options?)`** (`client/find`): the `onFind` for an xterm.js emulator,
+  over `@xterm/addon-search`'s `SearchAddon` and the `Terminal`, read through structural types only
+  (`XtermSearch`, `XtermSelectable`, `XtermSearchOptions`, `XtermFindDecorations`), so the protocol
+  takes no xterm dependency. The screen and the scrollback; `first` incremental, `next`/`prev` wrap;
+  case and whole words; every match and the current one marked with decorations; the count from
+  `onDidChangeResults`, a count that changes by itself under an open search (new output) said through
+  `onCount` (pass `findResult`) and never twice; `close` or an empty query clears every mark and the
+  selection. The returned `XtermFind` is the listener, with `dispose()`. `XtermFindOptions`: `onCount`,
+  `theme`, `decorations`.
+- **`xtermFindColours(theme)`**: the marks' default colours, light and dark.
+- **`findSlot()`** (`FindSlot`): a ref-shaped place for whichever search is on screen now, with a
+  steady `onFind` for `useHost` that answers `unsupported` while it is empty and nothing to a close.
+
 ## 2.73.0 — 2026-11-10
 
 Find adapters: a page whose text the client's own search cannot reach by itself gets it in a few
