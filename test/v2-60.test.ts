@@ -21,7 +21,7 @@ import {
   type Manifest,
 } from '../src/index.js'
 import { STAMP_FILE } from '../src/ready/build.js'
-import { doorsFetch, doorsHandler, establishBuild } from '../src/serve/index.js'
+import { doorsFetch, doorsHandler, establishBuild, personEnv } from '../src/serve/index.js'
 
 /** 2.60.0: the start token a host hands a module it starts, and the module saying it back. */
 
@@ -71,6 +71,14 @@ describe('the token', () => {
     expect(startVerdict(null, TOKEN)).toBe('unsaid')
     expect(startVerdict(TOKEN, 'malformed')).toBe('unsaid')
     expect(startVerdict(undefined, undefined)).toBe('unsaid')
+  })
+})
+
+describe('personEnv', () => {
+  test('drops the token: what the person starts from a module is not the module', () => {
+    const env = personEnv({ KEHIKOT_START_TOKEN: TOKEN, HOME: '/home/x', PATH: '/usr/bin' }, { execPath: '/usr/bin/bun' })
+    expect(env.KEHIKOT_START_TOKEN).toBeUndefined()
+    expect(env.HOME).toBe('/home/x')
   })
 })
 

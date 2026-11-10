@@ -1,5 +1,6 @@
 import { realpathSync } from 'node:fs';
 import { basename, delimiter, join } from 'node:path';
+import { START_TOKEN_ENV } from '../build.js';
 /**
  * The variable a host names, joined by the path delimiter, the folders it put first on a module's
  * `PATH` for the module's own process (a `bun` that is the host itself, say). `personEnv` takes
@@ -33,7 +34,8 @@ function pathKey(env) {
  * - a folder on `PATH` whose `bun` or `node` is this process's own runtime goes too, when that
  *   runtime is a compiled host rather than Bun or Node, and so does a `bun-node-*` or
  *   `kehikot-bun-*` folder whose `bun` or `node` is this runtime, whatever it is;
- * - `BUN_BE_BUN` and `KEHIKOT_HOST_PATH` are dropped.
+ * - `BUN_BE_BUN` and `KEHIKOT_HOST_PATH` are dropped, and so is `KEHIKOT_START_TOKEN` (2.60.0): it
+ *   names the module's process, and a module the person starts from a shell here is another one.
  *
  * Everything else is kept as it was. Unset values are left out.
  */
@@ -56,7 +58,7 @@ export function personEnv(env = process.env, options = {}) {
     }
     const out = {};
     for (const [name, value] of Object.entries(env)) {
-        if (value === undefined || name === BE_BUN || name === HOST_PATH_ENV)
+        if (value === undefined || name === BE_BUN || name === HOST_PATH_ENV || name === START_TOKEN_ENV)
             continue;
         out[name] = name === key ? kept.join(delimiter) : value;
     }

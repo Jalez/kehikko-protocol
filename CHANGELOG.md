@@ -24,6 +24,8 @@ process it started from anything else answering on that port. **Additive**; `PRO
   door, refusals, 404s), when the process was handed a token. The open health check exposes it.
 - **`startVerdict(expected, said)`**: `same`, `other` (refuse: another process), or `unsaid` (one
   side has none: fall back to the manifest's id).
+- `personEnv` drops `KEHIKOT_START_TOKEN`: a module the person starts from a module's shell is not
+  the module whose token it is.
 
 ### Unchanged
 
