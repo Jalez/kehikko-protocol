@@ -46,6 +46,7 @@ export const METHOD_SINCE = {
     'messages.notify': '2.54.0',
     'messages.tell': '2.75.0',
     'messages.say': '2.50.0',
+    'projects.mine': '2.76.0',
 };
 /** Each capability, and the version that added it: the oldest of its methods. */
 export const CAPABILITY_SINCE = {
@@ -77,6 +78,7 @@ export const CAPABILITY_SINCE = {
     'dispositions:read': '2.21.0',
     'agents:message': '2.41.0',
     'messages:as-person': '2.50.0',
+    'projects:read': '2.76.0',
 };
 /** Each method a module's server may ask (`SERVER_METHODS`), and the version a server could first ask it in. */
 export const SERVER_METHOD_SINCE = {
@@ -93,6 +95,7 @@ export const SERVER_METHOD_SINCE = {
     'messages.read': '2.41.0',
     'messages.notify': '2.54.0',
     'messages.tell': '2.75.0',
+    'projects.mine': '2.76.0',
 };
 /**
  * The manifest declarations a host has to know to do what the module asks, and the version that
@@ -272,6 +275,7 @@ export const PIECE_SAID = {
         'dispositions:read': 'marks for why references closed, from the host',
         'agents:message': 'messages between agent sessions',
         'messages:as-person': 'messages to agent sessions as the person',
+        'projects:read': 'the projects it keeps something in',
     },
     declarations: {
         'mcp.subjects': 'door subjects',

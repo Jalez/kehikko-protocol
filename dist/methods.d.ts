@@ -148,6 +148,15 @@ export declare const CAPABILITIES: {
      * takes such a message as its person's instruction. Never asked by a module's server or an agent.
      */
     readonly 'messages:as-person': "Send what you type or press in this module to agent sessions as your own instruction — only on your press, and only once you allow it in its settings.";
+    /**
+     * 2.76.0. Be told which of the person's projects this module already keeps a folder in
+     * (`projects.mine`): the projects it wrote `.kehikot/<module>/` into itself. Never the person's
+     * whole list, never a folder the module has not kept something in, so it learns nothing about the
+     * disk it did not already hold. What a module's SERVER asks at start, so that what it runs for a
+     * project (a conversation to deliver a message to) is picked up after a restart before anybody
+     * opens that project again.
+     */
+    readonly 'projects:read': "Be told which of your projects this module already keeps something in, so it can pick up where it left off after a restart.";
 };
 export type Capability = keyof typeof CAPABILITIES;
 export declare const CAPABILITY_NAMES: Capability[];
@@ -205,6 +214,8 @@ export declare const METHODS: {
     readonly 'messages.tell': "agents:message";
     /** The person's own message, from a module's page on their press (2.50.0). */
     readonly 'messages.say': "messages:as-person";
+    /** The projects in which the asking module keeps its own folder (2.76.0). */
+    readonly 'projects.mine': "projects:read";
 };
 export type Method = keyof typeof METHODS;
 export declare const METHOD_NAMES: Method[];
@@ -2155,6 +2166,12 @@ export declare const methodParams: {
         kind?: "question" | "report" | "note" | undefined;
         replyTo?: number | undefined;
     }>;
+    /**
+     * 2.76.0. The person's projects in which the ASKING module keeps its folder (`moduleDir`), answered
+     * with `projectsMineResult`. Takes nothing: which module asks is who the host vouched for. Asked by a
+     * module's server (`SERVER_METHODS`) or its page.
+     */
+    readonly 'projects.mine': z.ZodObject<{}, "strip", z.ZodTypeAny, {}, {}>;
 };
 /** The params one method takes, as a caller must construct them. */
 export type MethodParams<M extends Method> = z.input<(typeof methodParams)[M]>;
@@ -2522,6 +2539,40 @@ export declare const pickedProject: z.ZodObject<{
     name?: string | undefined;
 }>;
 export type PickedProject = z.infer<typeof pickedProject>;
+/**
+ * 2.76.0. `projects.mine`'s answer: the person's projects, in the host's order, in which the asking
+ * module keeps its own folder (`<project>/.kehikot/<module>/` exists). Never a project whose folder is
+ * gone, never one the host only opened by itself (the unpicked home folder). Empty is a true answer:
+ * the module keeps nothing in any project the person has.
+ */
+export declare const projectsMineResult: z.ZodObject<{
+    projects: z.ZodDefault<z.ZodArray<z.ZodObject<{
+        path: z.ZodString;
+        name: z.ZodDefault<z.ZodString>;
+        id: z.ZodOptional<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        path: string;
+        name: string;
+        id?: string | undefined;
+    }, {
+        path: string;
+        id?: string | undefined;
+        name?: string | undefined;
+    }>, "many">>;
+}, "strip", z.ZodTypeAny, {
+    projects: {
+        path: string;
+        name: string;
+        id?: string | undefined;
+    }[];
+}, {
+    projects?: {
+        path: string;
+        id?: string | undefined;
+        name?: string | undefined;
+    }[] | undefined;
+}>;
+export type ProjectsMineResult = z.infer<typeof projectsMineResult>;
 export declare const projectPickResult: z.ZodObject<{
     outcome: z.ZodEnum<["picked", "cancelled", "declined"]>;
     /**

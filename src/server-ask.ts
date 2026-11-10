@@ -49,6 +49,8 @@ export const SERVER_METHODS = [
   'messages.notify',
   /* 2.75.0: a module's own news to every session at a place. No token, so it names its project. */
   'messages.tell',
+  /* 2.76.0: the projects this module keeps its folder in, asked at start. About the person's projects, so it names none. */
+  'projects.mine',
 ] as const
 export type ServerMethod = (typeof SERVER_METHODS)[number]
 

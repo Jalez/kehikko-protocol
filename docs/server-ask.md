@@ -18,7 +18,7 @@ if (read.ok) read.data.rows        // TrackerRow[], exactly what the page's trac
 else read.why                      // a sentence; read.refused says when it was who asked or about what
 ```
 
-- **Which methods.** `SERVER_METHODS`: `tracker.get` and `tracker.columns`, reads of the host's material that need no frame; since 2.20.0 also `traffic.read` and `traffic.note` ([traffic](traffic.md)), which are about this computer and name no project; since 2.21.0 the epic's own material — `epics.list`, `epic.get`, `steps.list`, `parts.get` and `dispositions.get` (below); since 2.41.0 `messages.send` and `messages.read` ([agent messages](agent-messages.md)), which take the project from the session's token and name none; since 2.54.0 `messages.notify`, a module's notice to the session whose token asked it for something. A method that writes into a canvas or waits on a person is the page's to ask. The list grows by an entry.
+- **Which methods.** `SERVER_METHODS`: `tracker.get` and `tracker.columns`, reads of the host's material that need no frame; since 2.20.0 also `traffic.read` and `traffic.note` ([traffic](traffic.md)), which are about this computer and name no project; since 2.21.0 the epic's own material — `epics.list`, `epic.get`, `steps.list`, `parts.get` and `dispositions.get` (below); since 2.41.0 `messages.send` and `messages.read` ([agent messages](agent-messages.md)), which take the project from the session's token and name none; since 2.54.0 `messages.notify`, a module's notice to the session whose token asked it for something; since 2.76.0 `projects.mine`, the projects the module keeps its folder in, which names no project (below). A method that writes into a canvas or waits on a person is the page's to ask. The list grows by an entry.
 - **Which project.** `project` is the absolute folder the question is about — what a door is handed (`resolveDoorProject`, `resolveDoorPlace`). A host that holds no project there refuses it (`refused: 'project'`) and `askHost` asks the next origin.
 - **The same grant.** The host holds the call to the module's manifest exactly as it holds a page's: a method is answered only when `declares.uses` lists the capability `METHODS` files it under. A module that did not declare `trackers:read` gets `refused: 'grant'` and no rows.
 - **The same reading.** The answer is the host's stored reading, at once. A server's question costs no tracker request a page's question would not: a ref the host has not read comes back `pending`, as for a page.
@@ -58,6 +58,37 @@ What this replaces, module by module:
 - **Factory**'s vision of an epic (its title, lede, callout, parts, and Journeys' goal, measure, appetite, rabbit holes and no-gos) — `epic.get` and `parts.get`, instead of the host's epic files and `readJourney`. Which epic holds a change's ref — `epics.list`, then `steps.list` and `parts.get` per epic.
 - **Screenplay**'s epics and their steps — `epics.list`, `epic.get` and `steps.list`, instead of the host's files and `journeys.json`.
 - **Flows**' tree — `steps.list` (phases, `under`, `after`, gates), instead of `readJourney` and the untyped fields.
+
+## The projects a module keeps something in (2.76.0)
+
+A module that runs things for a project learns of the project when a page framed in it asks, or when
+something it runs reports in. After a restart of Kehikot or of the module, nobody has asked yet, so
+what it runs in a project nobody has opened since waits: an agent module's asleep conversation there
+is not listed for delivery (`messageDelivery`), and a message to it is not typed until the person
+opens that project. `projects.mine` closes the gap with nothing new kept anywhere:
+
+```ts
+import { watchKnownProjects } from 'kehikot-module-protocol/serve'
+
+watchKnownProjects({ module: ID, know: (path) => runs.know(path) }).start()
+```
+
+| method | capability | answered with |
+|---|---|---|
+| `projects.mine` | `projects:read` | `projectsMineResult`: `{ projects: PickedProject[] }` (names no project) |
+
+The host answers from the person's own list of projects, keeping only those in which the ASKING
+module's folder exists (`moduleDir(project, module)`): projects the module wrote into itself. Never
+the whole list, never a folder the module has kept nothing in, never the unpicked home folder, so a
+module learns nothing about the disk it did not already hold — the reason `projects.pick` has no
+listing beside it still stands.
+
+`watchKnownProjects({ module, know, everyMs?, retryMs?, log? })` asks at once, and then
+`KNOWN_PROJECTS_EVERY_MS` (5 minutes) after each answer, or `KNOWN_PROJECTS_RETRY_MS` (15 s) while no
+host answers (Kehikot is still starting). It hands each project to `know(path, project)` once per
+process. A host older than 2.76.0, or one that refuses the grant (the manifest does not declare
+`projects:read`), is asked no more, and the module goes on as before 2.76.0. `tick()` asks once and
+says what it added; `known()` lists what it has handed over. Never throws.
 
 ## Who is asking: the pass
 

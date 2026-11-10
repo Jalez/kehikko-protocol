@@ -44,6 +44,8 @@ export const SERVER_METHODS = [
     'messages.notify',
     /* 2.75.0: a module's own news to every session at a place. No token, so it names its project. */
     'messages.tell',
+    /* 2.76.0: the projects this module keeps its folder in, asked at start. About the person's projects, so it names none. */
+    'projects.mine',
 ];
 /**
  * The server methods that are about one project, and so name it. The traffic methods (2.20.0) are

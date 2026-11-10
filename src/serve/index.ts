@@ -201,6 +201,15 @@ export {
   type DeliveryState,
   type MessageToolDefinition,
 } from '../agent-messages.js'
+/* The projects this module keeps something in, asked at start and on a slow clock, each handed to its own `know` (2.76.0). */
+export {
+  watchKnownProjects,
+  KNOWN_PROJECTS_EVERY_MS,
+  KNOWN_PROJECTS_RETRY_MS,
+  type KnownProjects,
+  type KnownProjectsOptions,
+  type KnownProjectsTick,
+} from './known-projects.js'
 /* A question the host is too old for (2.22.0): read it off an `AskedHost`, show the one line. */
 export { hostTooOld, FIT_SAYS, type HostTooOld } from '../fit.js'
 
