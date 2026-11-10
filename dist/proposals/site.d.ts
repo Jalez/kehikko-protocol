@@ -24,8 +24,8 @@ export interface ProposalSite {
     };
     /** A proposal was answered or withdrawn: tell the filer where there is a way to (`decisionNews`), and the page. */
     onSettled?(project: string, proposal: Proposal): void;
-    /** The book changed in any way: a page that subscribes is told. */
-    onChanged?(project: string): void;
+    /** The book changed: a page that subscribes is told. `file` names the text concerned where one call concerned one. */
+    onChanged?(project: string, file?: string): void;
     now?(): number;
 }
 /** Every open proposal, measured against the texts as they are now (and the book moved on when that changed anything). */

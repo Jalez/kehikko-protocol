@@ -261,8 +261,9 @@ function site(texts: Record<string, string>, extra: Partial<ProposalSite> = {}):
 }
 
 describe('a module’s site', () => {
-  test('files, lists measured, decides and writes', () => {
-    const s = site({ 'a.md': BASE })
+  test('files, lists measured, decides and writes, and says which text changed', () => {
+    const changed: (string | undefined)[] = []
+    const s = site({ 'a.md': BASE }, { onChanged: (_project, file) => void changed.push(file) })
     const made = fileProposal(s, '/p', { file: 'a.md', scope: 'range', find: 'lazy dog', replace: 'sleeping dog', why: 'Dogs sleep.', by })
     if (!made.ok) throw new Error(made.why)
     expect(made.token).toMatch(/^[0-9a-f]{36}$/)
@@ -274,6 +275,7 @@ describe('a module’s site', () => {
     expect(openProposals(s, '/p')).toHaveLength(0)
     expect(settledProposals(s, '/p')[0]?.status).toBe('accepted')
     expect(s.settled).toHaveLength(1)
+    expect(changed).toEqual(['a.md', 'a.md'])
   })
   test('the text moving under a proposal is seen on the next read, and accept refuses a stale one with nothing written', () => {
     const s = site({ 'a.md': BASE })

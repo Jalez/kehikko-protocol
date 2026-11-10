@@ -46,7 +46,7 @@ export function fileProposal(site, project, filing) {
         return made;
     const proposal = own ? { ...made.proposal, revisedAt: now, revisions: (own.revisions ?? 0) + 1 } : made.proposal;
     site.keeper.write(project, withProposal(book, proposal));
-    site.onChanged?.(project);
+    site.onChanged?.(project, filing.file);
     return { ok: true, proposal: shown(proposal), token: minted?.token ?? null, revised: own !== undefined };
 }
 /**
@@ -76,7 +76,7 @@ export function decideProposal(site, project, id, decision) {
     }
     site.keeper.write(project, withProposal(site.keeper.read(project), settled.proposal));
     site.onSettled?.(project, settled.proposal);
-    site.onChanged?.(project);
+    site.onChanged?.(project, one.file);
     return { ok: true, proposal: shown(settled.proposal), stale: false };
 }
 /** The filer takes it back, proving itself with the token it was handed. */
@@ -94,7 +94,7 @@ export function withdrawProposal(site, project, id, token) {
         return settled;
     site.keeper.write(project, withProposal(book, settled.proposal));
     site.onSettled?.(project, settled.proposal);
-    site.onChanged?.(project);
+    site.onChanged?.(project, one.file);
     return { ok: true, proposal: shown(settled.proposal) };
 }
 /** A keeper over a map, for tests and for a module that keeps its book elsewhere. */

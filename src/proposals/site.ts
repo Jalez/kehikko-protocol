@@ -39,8 +39,8 @@ export interface ProposalSite {
   write?(project: string, file: string, text: string, proposal: Proposal): { ok: true } | { ok: false; why: string }
   /** A proposal was answered or withdrawn: tell the filer where there is a way to (`decisionNews`), and the page. */
   onSettled?(project: string, proposal: Proposal): void
-  /** The book changed in any way: a page that subscribes is told. */
-  onChanged?(project: string): void
+  /** The book changed: a page that subscribes is told. `file` names the text concerned where one call concerned one. */
+  onChanged?(project: string, file?: string): void
   now?(): number
 }
 
@@ -98,7 +98,7 @@ export function fileProposal(
   if (!made.ok) return made
   const proposal: Proposal = own ? { ...made.proposal, revisedAt: now, revisions: (own.revisions ?? 0) + 1 } : made.proposal
   site.keeper.write(project, withProposal(book, proposal))
-  site.onChanged?.(project)
+  site.onChanged?.(project, filing.file)
   return { ok: true, proposal: shown(proposal), token: minted?.token ?? null, revised: own !== undefined }
 }
 
@@ -129,7 +129,7 @@ export function decideProposal(
   }
   site.keeper.write(project, withProposal(site.keeper.read(project), settled.proposal))
   site.onSettled?.(project, settled.proposal)
-  site.onChanged?.(project)
+  site.onChanged?.(project, one.file)
   return { ok: true, proposal: shown(settled.proposal), stale: false }
 }
 
@@ -144,7 +144,7 @@ export function withdrawProposal(site: ProposalSite, project: string, id: string
   if (!settled.ok) return settled
   site.keeper.write(project, withProposal(book, settled.proposal))
   site.onSettled?.(project, settled.proposal)
-  site.onChanged?.(project)
+  site.onChanged?.(project, one.file)
   return { ok: true, proposal: shown(settled.proposal) }
 }
 
