@@ -11,6 +11,28 @@ After 2.78.0, every entry's first line under its heading is its kind, and the ve
 (semver; CI checks it): `Kind: breaking` → next major, `Kind: feature` → next minor, `Kind: fix` →
 next patch.
 
+## 2.85.0 — 2026-11-11
+
+Kind: feature
+
+Three more services, a structured checklist answer, skills that need a service, and the place a session
+is filed under. **Additive**; `PROTOCOL` is still 2.
+
+- `page.viewer` (`pageViewerSchema`, `PAGE_VIEWER`): `{ name, tool }`, the tool opening `{ url }`.
+- `cue.targets` (`cueTargetsSchema`, `cueTargetSchema`, `CUE_TARGETS`): `{ name, cues: [{ tool, says,
+  args, reader?, stop }] }`, the tools a narrated walk-through may cue.
+- `module.folders` (`moduleFoldersSchema`, `ownedFolderSchema`, `KEHIKOT_FOLDER`, `MODULE_FOLDERS`,
+  `foldersOwned`): `{ name, folders: [{ folder, says, derived }] }`, the folders a module owns under
+  `.kehikot/`.
+- `checklist.holder` takes `formats: ['json']`: `list` with `format: 'json'` answers `checklistJson` or
+  `checklistListsJson` (`CHECKLIST_JSON`, `checklistItemJson`, `holderTakesJson`, `checklistJsonIn`).
+- A skill need `{ service: '<name>' }` (`NEED_KINDS.service`), met by a manifest's `services`;
+  `ProvidingManifest.services`; `skills.needs.service` in `DECLARATION_SINCE`.
+- `sessions.placeOf { session }` under `sessions:place`, a server method (`SERVER_METHODS`) about one project:
+  `{ place: { epic, parts, kehikko } | null }` (`sessionsPlaceOfParams`, `sessionsPlaceOfResult`).
+
+See [services](docs/services.md).
+
 ## 2.84.0 — 2026-11-11
 
 Kind: feature

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { LIMITS } from './limits.js';
-import { MODULE_ID } from './ids.js';
+import { EPIC_SLUG, KEHIKKO_KEY, MODULE_ID } from './ids.js';
 /**
  * 2.81.0. SERVICES: one module provides a service, others consume it, and neither names the other.
  *
@@ -144,7 +144,47 @@ export const reviewDraftsSchema = z.object({
 export const checklistHolderSchema = z.object({
     name: oneLine(LIMITS.TITLE),
     tools: z.object({ list: serviceTool, create: serviceTool, add: serviceTool, hold: serviceTool, check: serviceTool }),
+    /**
+     * 2.85.0. `json`: its `list` tool also takes `format: 'json'` and then answers JSON instead of the
+     * print — `{ lists: [{ id, name, held }] }` with no `checklist`, `{ id, name, held, items }` with one
+     * (`checklistListsJson`, `checklistJson`; read with `checklistJsonIn`). Absent: the print only.
+     */
+    formats: z.array(z.enum(['json'])).max(1).optional(),
 });
+/** What `format: 'json'` asks a `checklist.holder`'s `list` tool for (2.85.0). */
+export const CHECKLIST_JSON = 'json';
+/** One item as `format: 'json'` answers it: `state` null when unanswered; `by` who answered and `byPerson` whether it was the person's own tick. */
+export const checklistItemJson = z.object({
+    id: z.string().min(1).max(80),
+    text: z.string().max(LIMITS.SERVICE_LINE * 5),
+    state: z.enum(['passed', 'failed', 'na']).nullable(),
+    byPerson: z.boolean().default(false),
+    by: z.string().max(LIMITS.TITLE).optional(),
+    note: z.string().max(LIMITS.SERVICE_LINE * 5).optional(),
+});
+/** One list with `checklist` (and its items as answered for `ref` when one was given). `held`: the refs it is held against. */
+export const checklistJson = z.object({
+    id: z.string().min(1).max(80),
+    name: z.string().max(LIMITS.TITLE),
+    held: z.array(z.string().max(LIMITS.SERVICE_LINE)).default([]),
+    items: z.array(checklistItemJson).default([]),
+});
+/** Every list, with no `checklist`. */
+export const checklistListsJson = z.object({
+    lists: z.array(z.object({ id: z.string().min(1).max(80), name: z.string().max(LIMITS.TITLE), held: z.array(z.string().max(LIMITS.SERVICE_LINE)).default([]) })),
+});
+/** Whether a holder's `list` answers JSON when asked (`formats` has `json`). */
+export const holderTakesJson = (holder) => holder.formats?.includes('json') === true;
+/** A `format: 'json'` answer read with one of the two shapes; null when it is not JSON or does not parse. */
+export function checklistJsonIn(shape, text) {
+    try {
+        const parsed = shape.safeParse(JSON.parse(text));
+        return parsed.success ? parsed.data : null;
+    }
+    catch {
+        return null;
+    }
+}
 /**
  * `work.status` (2.83.0): a module that runs work per issue and says where each piece is.
  *
@@ -198,6 +238,85 @@ export const diagramWriterSchema = z.object({
  */
 export const SERVICE_CALLER_HEADER = 'x-kehikot-caller';
 export const SERVICE_PASS_HEADER = 'x-kehikot-pass';
+/* ---------------------------------------------------------------- 2.85.0 */
+/**
+ * `page.viewer` (2.85.0): a module that shows web pages on the kehikko, and opens an address an agent
+ * hands it.
+ *
+ * - `name`: what it is called where it is told about. A consumer that would say "open it in the page
+ *   viewer" says "open it in <name>", and with no provider says nothing of the kind.
+ * - `tool`: the MCP tool on its door that opens an address, called with `{ url }` (an `http:` or
+ *   `https:` address). A page opens one through the host's `address.open` instead; this is for an agent.
+ */
+export const pageViewerSchema = z.object({
+    name: oneLine(LIMITS.TITLE),
+    tool: serviceTool,
+});
+/** An argument's name in a cue: a word an agent writes as `name=value`. */
+const cueArgName = z.string().regex(/^[a-z][a-z0-9_]{0,31}$/, 'an argument name is a lowercase word');
+/**
+ * One tool a cue may call: the tool, what it shows, the arguments it takes and what each one is, and
+ * the read-only tool that lists what can be cued (the values that hold), so a cue can be checked
+ * before it is written. `stop`: calling the tool with no arguments takes down what the cues put up.
+ */
+export const cueTargetSchema = z.object({
+    tool: serviceTool,
+    says: oneLine(LIMITS.SERVICE_LINE),
+    args: z.record(cueArgName, oneLine(LIMITS.SERVICE_LINE)).refine((args) => Object.keys(args).length <= 8, { message: 'at most 8 arguments' }).default({}),
+    reader: serviceTool.optional(),
+    stop: z.boolean().default(false),
+});
+/**
+ * `cue.targets` (2.85.0): a module whose tools a narrated walk-through may cue, so that its page
+ * shows what a line is about. A module that writes walk-throughs finds every provider placed on a
+ * kehikko and tells its agent the cues each one takes, never naming one of its own accord.
+ *
+ * - `name`: what it is called where it is told about.
+ * - `cues`: the tools that can be cued (`cueTargetSchema`), at least one, at most 8. A cue calls one as
+ *   `<module id>.<tool>(<arg>=<value>, …)`, the module id being the one `services.find` answered.
+ */
+export const cueTargetsSchema = z.object({
+    name: oneLine(LIMITS.TITLE),
+    cues: z.array(cueTargetSchema).min(1).max(8),
+});
+/** A folder's name directly under `.kehikot/`: one path segment. */
+export const KEHIKOT_FOLDER = /^[a-z0-9][a-z0-9._-]{0,62}$/;
+/**
+ * One folder a module owns: its name directly under `.kehikot/`, what is in it in one line, and whether
+ * it is DERIVED (a cache rebuilt from elsewhere, which a data history leaves out) rather than authored.
+ */
+export const ownedFolderSchema = z.object({
+    folder: z.string().regex(KEHIKOT_FOLDER, 'one folder name directly under .kehikot/').refine((name) => name !== '.' && name !== '..', { message: 'a folder name' }),
+    says: oneLine(LIMITS.SERVICE_LINE),
+    derived: z.boolean().default(false),
+});
+/**
+ * `module.folders` (2.85.0): the folders a module owns under `<project>/.kehikot/`, each with what is
+ * in it. The module is that folder's only writer. A module that shows or records the project's files
+ * (an editor, a data history) reads every provider to say whose a file is and what it holds, instead of
+ * a table of other modules' folders.
+ *
+ * - `name`: what the owner is called where it is told about ("This file belongs to <name>").
+ * - `folders`: one to 8 (`ownedFolderSchema`).
+ */
+export const moduleFoldersSchema = z.object({
+    name: oneLine(LIMITS.TITLE),
+    folders: z.array(ownedFolderSchema).min(1).max(8),
+});
+/** Each folder name with its owner and what it says, from `module.folders` providers; the first provider to claim a folder keeps it. */
+export function foldersOwned(providers) {
+    const out = new Map();
+    for (const one of providers ?? []) {
+        const descriptor = serviceDescriptor(MODULE_FOLDERS, one.descriptor);
+        if (!descriptor)
+            continue;
+        for (const folder of descriptor.folders) {
+            if (!out.has(folder.folder))
+                out.set(folder.folder, { module: one.module, name: descriptor.name, says: folder.says, derived: folder.derived });
+        }
+    }
+    return out;
+}
 /* ---------------------------------------------------------------- the registry */
 /**
  * Every service this protocol gives a descriptor's shape to, with what it means. Grows by an entry.
@@ -228,6 +347,18 @@ export const SERVICES = {
         says: 'Draws diagrams an agent writes, per epic, with one tool.',
         schema: diagramWriterSchema,
     },
+    'page.viewer': {
+        says: 'Shows web pages on the kehikko, and opens an address an agent hands it.',
+        schema: pageViewerSchema,
+    },
+    'cue.targets': {
+        says: 'Has tools a narrated walk-through can cue, so its page shows what a line is about.',
+        schema: cueTargetsSchema,
+    },
+    'module.folders': {
+        says: 'Owns folders under the project\'s .kehikot/, and says what is in each.',
+        schema: moduleFoldersSchema,
+    },
 };
 export const SERVICE_NAMES = Object.keys(SERVICES);
 /** The first service: a module that runs heavy work in turn. */
@@ -242,6 +373,12 @@ export const CHECKLIST_HOLDER = 'checklist.holder';
 export const WORK_STATUS = 'work.status';
 /** 2.83.0. Diagrams an agent writes. */
 export const DIAGRAM_WRITER = 'diagram.writer';
+/** 2.85.0. A module that shows web pages and opens an address for an agent. */
+export const PAGE_VIEWER = 'page.viewer';
+/** 2.85.0. The tools a narrated walk-through may cue. */
+export const CUE_TARGETS = 'cue.targets';
+/** 2.85.0. The folders a module owns under `.kehikot/`. */
+export const MODULE_FOLDERS = 'module.folders';
 /**
  * `services` in a manifest: each service this module provides, by name, and its descriptor. A known
  * service's descriptor must parse with its schema, or the whole field is dropped (the manifest still
@@ -325,3 +462,21 @@ export function documentRoot(document, epic) {
 export function documentsFolder(document) {
     return document.root.slice(0, document.root.indexOf(SERVICE_EPIC)).replace(/\/+$/, '');
 }
+/* ---------------------------------------------------------------- sessions.placeOf (2.85.0) */
+/**
+ * `sessions.placeOf`'s params, from a module's server about one project: the place an agent session is
+ * filed under, by the session's own id (an agent's conversation id, as the module that runs it records
+ * it). The host answers from the records it already reads for its door (`RECORDED_PLACE_PATH` on the
+ * modules that issued place tokens in that project), so no module reads another's folder for it.
+ */
+export const sessionsPlaceOfParams = z.object({ session: z.string().trim().min(1).max(128) });
+/** The place: the epic, the parts and the kehikko key, as the record says it now; `null` when no record names that session. */
+export const sessionsPlaceOfResult = z.object({
+    place: z
+        .object({
+        epic: z.string().regex(EPIC_SLUG).nullable(),
+        parts: z.array(z.string().regex(EPIC_SLUG)).max(LIMITS.PARTS).default([]),
+        kehikko: z.string().regex(KEHIKKO_KEY).nullable(),
+    })
+        .nullable(),
+});

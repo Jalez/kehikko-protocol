@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { MODULE_ID } from './ids.js';
 import { LIMITS } from './limits.js';
+import { SERVICES } from './services.js';
 /**
  * Agent skills a module offers (2.5.0): instructions an agent session loads, one SKILL.md each. A
  * module lists them in `declares.skills` and serves each one's text at `skillPath(name)` on its own
@@ -48,6 +49,8 @@ export const NEED_KINDS = {
     reacts: 'a module that reacts to it (reacts)',
     /** `{ uses: 'trackers:read' }`: some module asks for this capability (`declares.uses`). */
     uses: 'a module that asks for it (declares.uses)',
+    /** 2.85.0. `{ service: 'review.drafts' }`: some module on the kehikko provides this service (`services`). */
+    service: 'a module that provides this service (services)',
 };
 /** A need's one key and word, or null for a module id. A key this version does not know is returned as is. */
 export function needParts(need) {
@@ -58,7 +61,7 @@ export function needParts(need) {
 }
 const needObject = z
     .record(z.string().min(1).max(LIMITS.CAPABILITY), z.string().trim().min(1).max(LIMITS.CAPABILITY))
-    .refine((need) => Object.keys(need).length === 1, { message: 'a need names one thing: provides, subject, reacts or uses' });
+    .refine((need) => Object.keys(need).length === 1, { message: 'a need names one thing: provides, subject, reacts, uses or service' });
 /** One need, as a manifest writes it. */
 export const skillNeedSchema = z.union([z.string().regex(MODULE_ID, 'a module id'), needObject]);
 /** The same need spelled the same way, for telling two apart. */
@@ -112,6 +115,8 @@ export function meetsNeed(need, module) {
             return (manifest.reacts ?? []).includes(parts.word);
         case 'uses':
             return (manifest.declares?.uses ?? []).includes(parts.word);
+        case 'service':
+            return !!manifest.services && typeof manifest.services === 'object' && Object.hasOwn(manifest.services, parts.word);
         default:
             return false;
     }
@@ -161,7 +166,9 @@ const NEED_SAID = {
     subject: (word) => `a module that can show a ${word}`,
     reacts: (word) => (word === 'address' ? 'a module that shows pages' : `a module that follows ${word}`),
     uses: (word) => `a module that asks for ${word}`,
+    service: (word) => (Object.hasOwn(SERVICES, word) ? `a module that ${lower(SERVICES[word].says)}` : `a module that provides ${word}`),
 };
+const lower = (said) => (said.charAt(0).toLowerCase() + said.slice(1)).replace(/\.$/, '');
 /**
  * One need in words a person reads (2.21.0): a module id as `nameOf` names it (the id's last part,
  * capitalised, by default), a capability need as what kind of module would meet it.

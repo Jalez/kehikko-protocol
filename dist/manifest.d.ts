@@ -480,11 +480,11 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             points: string[];
         }>, "many">>;
     }, "strip", z.ZodTypeAny, {
-        summary: string;
         sections: {
             title: string;
             points: string[];
         }[];
+        summary: string;
     }, {
         summary: string;
         sections?: {
@@ -1143,7 +1143,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             scope: z.ZodDefault<z.ZodEnum<["project", "machine"]>>;
             personOnly: z.ZodDefault<z.ZodBoolean>;
         }, "strip", z.ZodTypeAny, {
-            type: "string" | "number" | "boolean" | "choice" | "list";
+            type: "string" | "number" | "boolean" | "list" | "choice";
             key: string;
             label: string;
             description: string;
@@ -1155,7 +1155,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             }[] | undefined;
             default?: unknown;
         }, {
-            type: "string" | "number" | "boolean" | "choice" | "list";
+            type: "string" | "number" | "boolean" | "list" | "choice";
             key: string;
             label: string;
             choices?: {
@@ -1167,7 +1167,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             scope?: "project" | "machine" | undefined;
             personOnly?: boolean | undefined;
         }>, {
-            type: "string" | "number" | "boolean" | "choice" | "list";
+            type: "string" | "number" | "boolean" | "list" | "choice";
             key: string;
             label: string;
             description: string;
@@ -1179,7 +1179,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             }[] | undefined;
             default?: unknown;
         }, {
-            type: "string" | "number" | "boolean" | "choice" | "list";
+            type: "string" | "number" | "boolean" | "list" | "choice";
             key: string;
             label: string;
             choices?: {
@@ -1191,7 +1191,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             scope?: "project" | "machine" | undefined;
             personOnly?: boolean | undefined;
         }>, "many">, {
-            type: "string" | "number" | "boolean" | "choice" | "list";
+            type: "string" | "number" | "boolean" | "list" | "choice";
             key: string;
             label: string;
             description: string;
@@ -1203,7 +1203,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             }[] | undefined;
             default?: unknown;
         }[], {
-            type: "string" | "number" | "boolean" | "choice" | "list";
+            type: "string" | "number" | "boolean" | "list" | "choice";
             key: string;
             label: string;
             choices?: {
@@ -1231,7 +1231,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         storage: boolean;
         provides?: string[] | undefined;
         settings?: {
-            type: "string" | "number" | "boolean" | "choice" | "list";
+            type: "string" | "number" | "boolean" | "list" | "choice";
             key: string;
             label: string;
             description: string;
@@ -1306,7 +1306,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         storage: boolean;
         provides?: string[] | undefined;
         settings?: {
-            type: "string" | "number" | "boolean" | "choice" | "list";
+            type: "string" | "number" | "boolean" | "list" | "choice";
             key: string;
             label: string;
             description: string;
@@ -1364,8 +1364,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         }[];
         as?: string | undefined;
     } | undefined;
-    icon?: string | undefined;
-    shows?: string[] | undefined;
+    services?: Record<string, unknown> | undefined;
     build?: {
         version: string;
         commit: string | null;
@@ -1373,12 +1372,14 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         started: string;
         start?: string | undefined;
     } | undefined;
+    icon?: string | undefined;
+    shows?: string[] | undefined;
     help?: {
-        summary: string;
         sections: {
             title: string;
             points: string[];
         }[];
+        summary: string;
     } | undefined;
     agentSays?: string | undefined;
     absentSays?: string | undefined;
@@ -1405,7 +1406,6 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         state: "working" | "attention" | "done";
         sound?: string | undefined;
     }[] | undefined;
-    services?: Record<string, unknown> | undefined;
     reveal?: "push" | "over" | undefined;
     intro?: {
         slides: {
@@ -1527,11 +1527,12 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             release?: string | undefined;
         }[] | undefined;
     } | undefined;
+    services?: unknown;
+    build?: unknown;
     summary?: string | undefined;
     version?: string | undefined;
     icon?: string | undefined;
     shows?: unknown;
-    build?: unknown;
     help?: unknown;
     agentSays?: unknown;
     absentSays?: unknown;
@@ -1546,7 +1547,6 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     } | undefined;
     partless?: string | undefined;
     events?: unknown;
-    services?: unknown;
     reveal?: unknown;
     intro?: unknown;
 }>, {
@@ -1560,7 +1560,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         storage: boolean;
         provides?: string[] | undefined;
         settings?: {
-            type: "string" | "number" | "boolean" | "choice" | "list";
+            type: "string" | "number" | "boolean" | "list" | "choice";
             key: string;
             label: string;
             description: string;
@@ -1618,8 +1618,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         }[];
         as?: string | undefined;
     } | undefined;
-    icon?: string | undefined;
-    shows?: string[] | undefined;
+    services?: Record<string, unknown> | undefined;
     build?: {
         version: string;
         commit: string | null;
@@ -1627,12 +1626,14 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         started: string;
         start?: string | undefined;
     } | undefined;
+    icon?: string | undefined;
+    shows?: string[] | undefined;
     help?: {
-        summary: string;
         sections: {
             title: string;
             points: string[];
         }[];
+        summary: string;
     } | undefined;
     agentSays?: string | undefined;
     absentSays?: string | undefined;
@@ -1659,7 +1660,6 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         state: "working" | "attention" | "done";
         sound?: string | undefined;
     }[] | undefined;
-    services?: Record<string, unknown> | undefined;
     reveal?: "push" | "over" | undefined;
     intro?: {
         slides: {
@@ -1781,11 +1781,12 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
             release?: string | undefined;
         }[] | undefined;
     } | undefined;
+    services?: unknown;
+    build?: unknown;
     summary?: string | undefined;
     version?: string | undefined;
     icon?: string | undefined;
     shows?: unknown;
-    build?: unknown;
     help?: unknown;
     agentSays?: unknown;
     absentSays?: unknown;
@@ -1800,7 +1801,6 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     } | undefined;
     partless?: string | undefined;
     events?: unknown;
-    services?: unknown;
     reveal?: unknown;
     intro?: unknown;
 }>;

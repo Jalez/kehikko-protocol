@@ -66,7 +66,7 @@ declare const fieldShape: z.ZodObject<{
      */
     personOnly: z.ZodDefault<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
-    type: "string" | "number" | "boolean" | "choice" | "list";
+    type: "string" | "number" | "boolean" | "list" | "choice";
     key: string;
     label: string;
     description: string;
@@ -78,7 +78,7 @@ declare const fieldShape: z.ZodObject<{
     }[] | undefined;
     default?: unknown;
 }, {
-    type: "string" | "number" | "boolean" | "choice" | "list";
+    type: "string" | "number" | "boolean" | "list" | "choice";
     key: string;
     label: string;
     choices?: {
@@ -119,7 +119,7 @@ export declare const settingFieldSchema: z.ZodEffects<z.ZodObject<{
      */
     personOnly: z.ZodDefault<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
-    type: "string" | "number" | "boolean" | "choice" | "list";
+    type: "string" | "number" | "boolean" | "list" | "choice";
     key: string;
     label: string;
     description: string;
@@ -131,7 +131,7 @@ export declare const settingFieldSchema: z.ZodEffects<z.ZodObject<{
     }[] | undefined;
     default?: unknown;
 }, {
-    type: "string" | "number" | "boolean" | "choice" | "list";
+    type: "string" | "number" | "boolean" | "list" | "choice";
     key: string;
     label: string;
     choices?: {
@@ -143,7 +143,7 @@ export declare const settingFieldSchema: z.ZodEffects<z.ZodObject<{
     scope?: "project" | "machine" | undefined;
     personOnly?: boolean | undefined;
 }>, {
-    type: "string" | "number" | "boolean" | "choice" | "list";
+    type: "string" | "number" | "boolean" | "list" | "choice";
     key: string;
     label: string;
     description: string;
@@ -155,7 +155,7 @@ export declare const settingFieldSchema: z.ZodEffects<z.ZodObject<{
     }[] | undefined;
     default?: unknown;
 }, {
-    type: "string" | "number" | "boolean" | "choice" | "list";
+    type: "string" | "number" | "boolean" | "list" | "choice";
     key: string;
     label: string;
     choices?: {
@@ -198,7 +198,7 @@ export declare const settingsDeclarationSchema: z.ZodEffects<z.ZodArray<z.ZodEff
      */
     personOnly: z.ZodDefault<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
-    type: "string" | "number" | "boolean" | "choice" | "list";
+    type: "string" | "number" | "boolean" | "list" | "choice";
     key: string;
     label: string;
     description: string;
@@ -210,7 +210,7 @@ export declare const settingsDeclarationSchema: z.ZodEffects<z.ZodArray<z.ZodEff
     }[] | undefined;
     default?: unknown;
 }, {
-    type: "string" | "number" | "boolean" | "choice" | "list";
+    type: "string" | "number" | "boolean" | "list" | "choice";
     key: string;
     label: string;
     choices?: {
@@ -222,7 +222,7 @@ export declare const settingsDeclarationSchema: z.ZodEffects<z.ZodArray<z.ZodEff
     scope?: "project" | "machine" | undefined;
     personOnly?: boolean | undefined;
 }>, {
-    type: "string" | "number" | "boolean" | "choice" | "list";
+    type: "string" | "number" | "boolean" | "list" | "choice";
     key: string;
     label: string;
     description: string;
@@ -234,7 +234,7 @@ export declare const settingsDeclarationSchema: z.ZodEffects<z.ZodArray<z.ZodEff
     }[] | undefined;
     default?: unknown;
 }, {
-    type: "string" | "number" | "boolean" | "choice" | "list";
+    type: "string" | "number" | "boolean" | "list" | "choice";
     key: string;
     label: string;
     choices?: {
@@ -246,7 +246,7 @@ export declare const settingsDeclarationSchema: z.ZodEffects<z.ZodArray<z.ZodEff
     scope?: "project" | "machine" | undefined;
     personOnly?: boolean | undefined;
 }>, "many">, {
-    type: "string" | "number" | "boolean" | "choice" | "list";
+    type: "string" | "number" | "boolean" | "list" | "choice";
     key: string;
     label: string;
     description: string;
@@ -258,7 +258,7 @@ export declare const settingsDeclarationSchema: z.ZodEffects<z.ZodArray<z.ZodEff
     }[] | undefined;
     default?: unknown;
 }[], {
-    type: "string" | "number" | "boolean" | "choice" | "list";
+    type: "string" | "number" | "boolean" | "list" | "choice";
     key: string;
     label: string;
     choices?: {

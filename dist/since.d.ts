@@ -47,6 +47,7 @@ export declare const METHOD_SINCE: {
     readonly 'projects.mine': "2.76.0";
     readonly 'messages.notifySession': "2.81.0";
     readonly 'services.find': "2.81.0";
+    readonly 'sessions.placeOf': "2.85.0";
     readonly 'inbox.read': "2.79.0";
     readonly 'inbox.log': "2.79.0";
     readonly 'inbox.act': "2.79.0";
@@ -87,6 +88,7 @@ export declare const CAPABILITY_SINCE: {
     readonly 'inbox:person': "2.79.0";
     readonly 'sessions:observe': "2.81.0";
     readonly 'services:read': "2.81.0";
+    readonly 'sessions:place': "2.85.0";
 };
 /** Each method a module's server may ask (`SERVER_METHODS`), and the version a server could first ask it in. */
 export declare const SERVER_METHOD_SINCE: {
@@ -106,6 +108,7 @@ export declare const SERVER_METHOD_SINCE: {
     readonly 'projects.mine': "2.76.0";
     readonly 'messages.notifySession': "2.81.0";
     readonly 'services.find': "2.81.0";
+    readonly 'sessions.placeOf': "2.85.0";
 };
 /**
  * The manifest declarations a host has to know to do what the module asks, and the version that
@@ -124,6 +127,7 @@ export declare const DECLARATION_SINCE: {
     readonly 'declares.provides': "2.21.0";
     readonly 'declares.agentSessions': "2.21.0";
     readonly 'skills.needs.object': "2.21.0";
+    readonly 'skills.needs.service': "2.85.0";
     readonly 'agentSessions.installsSkills': "2.23.0";
     readonly 'declares.navigates': "2.28.0";
     readonly 'modes.scope': "2.29.0";
@@ -271,6 +275,7 @@ export declare const SINCE: {
         readonly 'projects.mine': "2.76.0";
         readonly 'messages.notifySession': "2.81.0";
         readonly 'services.find': "2.81.0";
+        readonly 'sessions.placeOf': "2.85.0";
         readonly 'inbox.read': "2.79.0";
         readonly 'inbox.log': "2.79.0";
         readonly 'inbox.act': "2.79.0";
@@ -310,6 +315,7 @@ export declare const SINCE: {
         readonly 'inbox:person': "2.79.0";
         readonly 'sessions:observe': "2.81.0";
         readonly 'services:read': "2.81.0";
+        readonly 'sessions:place': "2.85.0";
     };
     readonly serverMethods: {
         readonly 'tracker.get': "2.19.0";
@@ -328,6 +334,7 @@ export declare const SINCE: {
         readonly 'projects.mine': "2.76.0";
         readonly 'messages.notifySession': "2.81.0";
         readonly 'services.find': "2.81.0";
+        readonly 'sessions.placeOf': "2.85.0";
     };
     readonly declarations: {
         readonly 'mcp.subjects': "1.1.0";
@@ -339,6 +346,7 @@ export declare const SINCE: {
         readonly 'declares.provides': "2.21.0";
         readonly 'declares.agentSessions': "2.21.0";
         readonly 'skills.needs.object': "2.21.0";
+        readonly 'skills.needs.service': "2.85.0";
         readonly 'agentSessions.installsSkills': "2.23.0";
         readonly 'declares.navigates': "2.28.0";
         readonly 'modes.scope': "2.29.0";
@@ -453,6 +461,7 @@ export declare const PIECE_SAID: {
         readonly 'inbox:person': "your Inbox, shown and acted on for you";
         readonly 'sessions:observe': "notices to agent sessions it sees working on this computer";
         readonly 'services:read': "which modules here provide a service to other modules";
+        readonly 'sessions:place': "which epic, parts and kehikko an agent session is on";
     };
     readonly declarations: {
         readonly 'mcp.subjects': "door subjects";
@@ -464,6 +473,7 @@ export declare const PIECE_SAID: {
         readonly 'declares.provides': "material it publishes for other modules";
         readonly 'declares.agentSessions': "agent sessions";
         readonly 'skills.needs.object': "skills that need what other modules provide";
+        readonly 'skills.needs.service': "skills that need a service another module provides";
         readonly 'agentSessions.installsSkills': "skills it installs for its own agent";
         readonly 'declares.navigates': "jumps to other projects and to what other modules show";
         readonly 'modes.scope': "scopes";

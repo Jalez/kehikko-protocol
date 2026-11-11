@@ -17,7 +17,7 @@ import type { TrafficNoteResult, TrafficReadResult } from '../traffic.js'
 import type { DispositionsGetResult, EpicsListResult, PartsGetResult, ProjectsMineResult } from '../methods.js'
 import type { StepsListResult } from '../plan.js'
 import type { MessageReadResult, MessageSendResult } from '../agent-messages.js'
-import type { ServicesFindResult } from '../services.js'
+import type { ServicesFindResult, SessionsPlaceOfResult } from '../services.js'
 import type { Reply } from './doors.js'
 import { frameOrigins } from './origins.js'
 
@@ -109,6 +109,8 @@ export interface ServerAnswers {
   'messages.notifySession': MessageSendResult
   /** 2.81.0. Who provides a service here, with each one's descriptor. */
   'services.find': ServicesFindResult
+  /** 2.85.0. The place an agent session is filed under in a project, by its own id. */
+  'sessions.placeOf': SessionsPlaceOfResult
 }
 
 /**

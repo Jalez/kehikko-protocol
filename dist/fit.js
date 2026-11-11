@@ -26,6 +26,8 @@ function declarations(manifest) {
         out.push('skills.needs');
     if (needs.some((need) => asObject(need) !== null))
         out.push('skills.needs.object');
+    if (needs.some((need) => typeof asObject(need)?.service === 'string'))
+        out.push('skills.needs.service');
     if (listed(declares.settings).length)
         out.push('declares.settings');
     if (listed(declares.provides).length)

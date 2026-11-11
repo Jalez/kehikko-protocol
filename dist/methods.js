@@ -15,7 +15,7 @@ import { stepsListResult } from './plan.js';
 import { gotoProject, showAskSchema } from './show.js';
 import { trafficNoteResult, trafficNoteSchema, trafficReadResult } from './traffic.js';
 import { inboxActParams, inboxActResult, inboxAnswerParams, inboxAnswerResult, inboxLogParams, inboxLogResult, inboxOpenParams, inboxOpenResult, inboxReadParams, inboxReadResult, inboxUseParams, inboxUseResult } from './inbox.js';
-import { servicesFindParams, servicesFindResult } from './services.js';
+import { servicesFindParams, servicesFindResult, sessionsPlaceOfParams, sessionsPlaceOfResult } from './services.js';
 import { messageMineParams, messageMineResult, messageNotifyParams, messageNotifySessionParams, messagePostParams, messageReadParams, messageReadResult, messageSayParams, messageSendParams, messageSendResult, messageTellParams } from './agent-messages.js';
 /**
  * The questions a module can ask, by name and by shape: capabilities, methods, each method's
@@ -185,6 +185,12 @@ export const CAPABILITIES = {
      * `services.ts`): how a consumer finds a service without naming the module that provides it.
      */
     'services:read': 'See which modules here provide a service to other modules, and how to use it.',
+    /**
+     * 2.85.0. Ask which place — epic, parts, kehikko — an agent session is filed under in a project, by
+     * the session's own id (`sessions.placeOf`, `services.ts`): for a module whose work is started from a
+     * session and belongs where that session does. Only from a module's server.
+     */
+    'sessions:place': 'See which epic, parts and kehikko an agent session is working on, by its session id.',
     'inbox:person': 'Show your Inbox — what modules need, are doing and have said — and, on your press, mark it seen, dismiss, forget, answer or go to it.',
 };
 export const CAPABILITY_NAMES = Object.keys(CAPABILITIES);
@@ -253,6 +259,8 @@ export const METHODS = {
     'messages.notifySession': 'sessions:observe',
     /** Who provides a service here, with each one's descriptor (2.81.0). */
     'services.find': 'services:read',
+    /** Which place a session is filed under, by its own id (2.85.0). */
+    'sessions.placeOf': 'sessions:place',
     /** The person's Inbox, read by a module's page (2.79.0). */
     'inbox.read': 'inbox:person',
     /** Earlier: the Inbox's log, a page of it (2.79.0). */
@@ -603,6 +611,8 @@ export const methodParams = {
     'messages.notifySession': messageNotifySessionParams,
     /** 2.81.0. From a module's server or page: who provides a service here; answered with `servicesFindResult`. See `services.ts`. */
     'services.find': servicesFindParams,
+    /** 2.85.0. From a module's server about one project: the place a session is filed under; answered with `sessionsPlaceOfResult`. */
+    'sessions.placeOf': sessionsPlaceOfParams,
     /** 2.79.0. From a page only: the person's Inbox; answered with `inboxReadResult`. See `inbox.ts`. */
     'inbox.read': inboxReadParams,
     /** 2.79.0. From a page only: a page of Earlier; answered with `inboxLogResult`. */
@@ -806,6 +816,7 @@ export const methodResults = {
     'projects.mine': projectsMineResult,
     'messages.notifySession': messageSendResult,
     'services.find': servicesFindResult,
+    'sessions.placeOf': sessionsPlaceOfResult,
     'inbox.read': inboxReadResult,
     'inbox.log': inboxLogResult,
     'inbox.act': inboxActResult,

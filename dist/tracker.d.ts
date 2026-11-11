@@ -743,13 +743,18 @@ export declare const trackerRowSchema: z.ZodObject<{
         headSha?: string | null | undefined;
         approvedBy?: string[] | undefined;
     } | undefined;
+    column?: {
+        name: string;
+        board: string;
+        boardUrl?: string | undefined;
+    } | undefined;
+    updatedAt?: string | null | undefined;
     author?: string | null | undefined;
     review?: "required" | "approved" | "changes-requested" | undefined;
     stateReason?: string | null | undefined;
     closedByMerge?: boolean | undefined;
     draft?: boolean | undefined;
     createdAt?: string | null | undefined;
-    updatedAt?: string | null | undefined;
     closedAt?: string | null | undefined;
     mergedAt?: string | null | undefined;
     contributes?: string[] | undefined;
@@ -757,11 +762,6 @@ export declare const trackerRowSchema: z.ZodObject<{
     pipeline?: "failed" | "success" | "running" | "pending" | "canceled" | "skipped" | "manual" | undefined;
     pipelineUrl?: string | undefined;
     pipelineAt?: string | undefined;
-    column?: {
-        name: string;
-        board: string;
-        boardUrl?: string | undefined;
-    } | undefined;
     columns?: {
         name: string;
         board: string;
@@ -832,6 +832,12 @@ export declare const trackerRowSchema: z.ZodObject<{
         headSha?: string | null | undefined;
         approvedBy?: string[] | undefined;
     } | undefined;
+    column?: {
+        name: string;
+        board: string;
+        boardUrl?: string | undefined;
+    } | undefined;
+    updatedAt?: string | null | undefined;
     author?: string | null | undefined;
     review?: "required" | "approved" | "changes-requested" | undefined;
     stateReason?: string | null | undefined;
@@ -840,7 +846,6 @@ export declare const trackerRowSchema: z.ZodObject<{
     labels?: string[] | undefined;
     assignees?: string[] | undefined;
     createdAt?: string | null | undefined;
-    updatedAt?: string | null | undefined;
     closedAt?: string | null | undefined;
     mergedAt?: string | null | undefined;
     links?: {
@@ -852,11 +857,6 @@ export declare const trackerRowSchema: z.ZodObject<{
     pipeline?: "failed" | "success" | "running" | "pending" | "canceled" | "skipped" | "manual" | undefined;
     pipelineUrl?: unknown;
     pipelineAt?: unknown;
-    column?: {
-        name: string;
-        board: string;
-        boardUrl?: string | undefined;
-    } | undefined;
     columns?: {
         name: string;
         board: string;
@@ -1404,13 +1404,18 @@ export declare const trackerReadingResult: z.ZodObject<{
             headSha?: string | null | undefined;
             approvedBy?: string[] | undefined;
         } | undefined;
+        column?: {
+            name: string;
+            board: string;
+            boardUrl?: string | undefined;
+        } | undefined;
+        updatedAt?: string | null | undefined;
         author?: string | null | undefined;
         review?: "required" | "approved" | "changes-requested" | undefined;
         stateReason?: string | null | undefined;
         closedByMerge?: boolean | undefined;
         draft?: boolean | undefined;
         createdAt?: string | null | undefined;
-        updatedAt?: string | null | undefined;
         closedAt?: string | null | undefined;
         mergedAt?: string | null | undefined;
         contributes?: string[] | undefined;
@@ -1418,11 +1423,6 @@ export declare const trackerReadingResult: z.ZodObject<{
         pipeline?: "failed" | "success" | "running" | "pending" | "canceled" | "skipped" | "manual" | undefined;
         pipelineUrl?: string | undefined;
         pipelineAt?: string | undefined;
-        column?: {
-            name: string;
-            board: string;
-            boardUrl?: string | undefined;
-        } | undefined;
         columns?: {
             name: string;
             board: string;
@@ -1493,6 +1493,12 @@ export declare const trackerReadingResult: z.ZodObject<{
             headSha?: string | null | undefined;
             approvedBy?: string[] | undefined;
         } | undefined;
+        column?: {
+            name: string;
+            board: string;
+            boardUrl?: string | undefined;
+        } | undefined;
+        updatedAt?: string | null | undefined;
         author?: string | null | undefined;
         review?: "required" | "approved" | "changes-requested" | undefined;
         stateReason?: string | null | undefined;
@@ -1501,7 +1507,6 @@ export declare const trackerReadingResult: z.ZodObject<{
         labels?: string[] | undefined;
         assignees?: string[] | undefined;
         createdAt?: string | null | undefined;
-        updatedAt?: string | null | undefined;
         closedAt?: string | null | undefined;
         mergedAt?: string | null | undefined;
         links?: {
@@ -1513,11 +1518,6 @@ export declare const trackerReadingResult: z.ZodObject<{
         pipeline?: "failed" | "success" | "running" | "pending" | "canceled" | "skipped" | "manual" | undefined;
         pipelineUrl?: unknown;
         pipelineAt?: unknown;
-        column?: {
-            name: string;
-            board: string;
-            boardUrl?: string | undefined;
-        } | undefined;
         columns?: {
             name: string;
             board: string;
@@ -1618,13 +1618,18 @@ export declare const trackerReadingResult: z.ZodObject<{
             headSha?: string | null | undefined;
             approvedBy?: string[] | undefined;
         } | undefined;
+        column?: {
+            name: string;
+            board: string;
+            boardUrl?: string | undefined;
+        } | undefined;
+        updatedAt?: string | null | undefined;
         author?: string | null | undefined;
         review?: "required" | "approved" | "changes-requested" | undefined;
         stateReason?: string | null | undefined;
         closedByMerge?: boolean | undefined;
         draft?: boolean | undefined;
         createdAt?: string | null | undefined;
-        updatedAt?: string | null | undefined;
         closedAt?: string | null | undefined;
         mergedAt?: string | null | undefined;
         contributes?: string[] | undefined;
@@ -1632,11 +1637,6 @@ export declare const trackerReadingResult: z.ZodObject<{
         pipeline?: "failed" | "success" | "running" | "pending" | "canceled" | "skipped" | "manual" | undefined;
         pipelineUrl?: string | undefined;
         pipelineAt?: string | undefined;
-        column?: {
-            name: string;
-            board: string;
-            boardUrl?: string | undefined;
-        } | undefined;
         columns?: {
             name: string;
             board: string;
@@ -1725,6 +1725,12 @@ export declare const trackerReadingResult: z.ZodObject<{
             headSha?: string | null | undefined;
             approvedBy?: string[] | undefined;
         } | undefined;
+        column?: {
+            name: string;
+            board: string;
+            boardUrl?: string | undefined;
+        } | undefined;
+        updatedAt?: string | null | undefined;
         author?: string | null | undefined;
         review?: "required" | "approved" | "changes-requested" | undefined;
         stateReason?: string | null | undefined;
@@ -1733,7 +1739,6 @@ export declare const trackerReadingResult: z.ZodObject<{
         labels?: string[] | undefined;
         assignees?: string[] | undefined;
         createdAt?: string | null | undefined;
-        updatedAt?: string | null | undefined;
         closedAt?: string | null | undefined;
         mergedAt?: string | null | undefined;
         links?: {
@@ -1745,11 +1750,6 @@ export declare const trackerReadingResult: z.ZodObject<{
         pipeline?: "failed" | "success" | "running" | "pending" | "canceled" | "skipped" | "manual" | undefined;
         pipelineUrl?: unknown;
         pipelineAt?: unknown;
-        column?: {
-            name: string;
-            board: string;
-            boardUrl?: string | undefined;
-        } | undefined;
         columns?: {
             name: string;
             board: string;

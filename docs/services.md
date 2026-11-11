@@ -1,4 +1,4 @@
-# Services (2.81.0, 2.83.0)
+# Services (2.81.0, 2.83.0, 2.85.0)
 
 One module PROVIDES a service; others CONSUME it; neither names the other. A consumer never hard-codes
 a provider's id, name, program path or tool names, and a provider never knows who consumes it. What
@@ -66,6 +66,9 @@ Every word the consumer says about the provider comes from that descriptor.
 | `checklist.holder` | `checklistHolderSchema` | The person's checklists, held against work; takes an answer to an item (2.83.0). |
 | `work.status` | `workStatusSchema` | The stage of work, by its issue (2.83.0). |
 | `diagram.writer` | `diagramWriterSchema` | Diagrams an agent writes, per epic, with one tool (2.83.0). |
+| `page.viewer` | `pageViewerSchema` | Shows web pages on the kehikko; opens an address an agent hands it (2.85.0). |
+| `cue.targets` | `cueTargetsSchema` | Tools a narrated walk-through may cue, with what each takes and the tool that checks a cue (2.85.0). |
+| `module.folders` | `moduleFoldersSchema` | The folders a module owns under `.kehikot/`, each with what is in it (2.85.0). |
 
 ### `work.queue`
 
@@ -127,6 +130,40 @@ needs to know which module that is. `review.drafts`'s `send` is such a route.
 - `work.status`: `name`; `jobs`, `GET <jobs>?ref=<ref>&projectPath=<abs>` → `{ jobs }` (`workJobsIn`).
   A consumer says "<name>: <stage>".
 - `diagram.writer`: `name`; `tool`, what an agent calls to write one; `kinds` (`sequence`, `graph`).
+
+### The 2.85.0 services
+
+- `page.viewer`: `name`; `tool`, called with `{ url }`, opens that address. A consumer that would tell an
+  agent "open it in the page viewer" says "open it in <name>" and, with no provider, says nothing of the
+  kind. A page opens an address through the host (`address.open`), not through this.
+- `cue.targets`: `name`; `cues`, each `{ tool, says, args, reader?, stop }` — the tool a cue calls, what
+  it shows, each argument's name and what it takes, the read-only tool that lists the values that hold,
+  and whether calling it with no arguments takes down what the cues put up. A cue calls one as
+  `<module>.<tool>(<arg>=<value>, …)`, `<module>` being the id `services.find` answered. The module that
+  writes walk-throughs finds the providers placed on a kehikko and hands its agent what they take.
+- `module.folders`: `name`; `folders`, each `{ folder, says, derived }` — one name directly under
+  `.kehikot/` (`KEHIKOT_FOLDER`), what is in it, and whether it is a cache rebuilt from elsewhere (a data
+  history leaves it out). The provider is that folder's only writer. `foldersOwned(providers)` maps
+  each folder to its owner. A module that shows the project's files names a file's owner from this, and
+  says "the <folder> module" for a folder nobody in use declares.
+- `checklist.holder` gains `formats: ['json']`: its `list` tool then also takes `format: 'json'` and
+  answers `checklistListsJson` (no `checklist`) or `checklistJson` (with one); read either with
+  `checklistJsonIn(shape, text)`. A consumer asks for JSON only when `holderTakesJson(descriptor)`.
+
+### A skill that needs a service (2.85.0)
+
+A skill's `needs` takes `{ service: '<name>' }`: met by a module on the kehikko whose manifest provides
+that service (`services`). `meetsNeed` reads `ProvidingManifest.services`; `needSaid` says it from the
+service's `says`. A host before 2.85.0 carries the need and never meets it, so the skill does not load
+there (`skills.needs.service` in `DECLARATION_SINCE`).
+
+### Where a session is filed: `sessions.placeOf` (2.85.0)
+
+Not a service but a host method, under **`sessions:place`**, from a module's server about one project
+(`SERVER_PROJECT_METHODS`): `sessions.placeOf { session }` answers `{ place: { epic, parts, kehikko } |
+null }` for the agent session with that id, from the records the host already reads for its door (the
+modules that issued place tokens in the project, at `RECORDED_PLACE_PATH`). A module whose work is
+started from a session uses it instead of reading the agent module's own folder.
 
 ## Adding a service
 

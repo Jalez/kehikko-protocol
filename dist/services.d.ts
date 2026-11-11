@@ -40,25 +40,25 @@ export declare const WORK_COMMAND = "{command}";
  */
 export declare const workQueueSchema: z.ZodObject<{
     name: z.ZodEffects<z.ZodString, string, string>;
-    run: z.ZodEffects<z.ZodObject<Record<"build" | "test" | "typecheck" | "install", z.ZodOptional<z.ZodEffects<z.ZodEffects<z.ZodString, string, string>, string, string>>>, "strip", z.ZodTypeAny, {
-        build?: string | undefined;
+    run: z.ZodEffects<z.ZodObject<Record<"test" | "typecheck" | "build" | "install", z.ZodOptional<z.ZodEffects<z.ZodEffects<z.ZodString, string, string>, string, string>>>, "strip", z.ZodTypeAny, {
         test?: string | undefined;
         typecheck?: string | undefined;
+        build?: string | undefined;
         install?: string | undefined;
     }, {
-        build?: string | undefined;
         test?: string | undefined;
         typecheck?: string | undefined;
+        build?: string | undefined;
         install?: string | undefined;
     }>, {
-        build?: string | undefined;
         test?: string | undefined;
         typecheck?: string | undefined;
+        build?: string | undefined;
         install?: string | undefined;
     }, {
-        build?: string | undefined;
         test?: string | undefined;
         typecheck?: string | undefined;
+        build?: string | undefined;
         install?: string | undefined;
     }>;
     cli: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
@@ -68,25 +68,25 @@ export declare const workQueueSchema: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     name: string;
     run: {
-        build?: string | undefined;
         test?: string | undefined;
         typecheck?: string | undefined;
+        build?: string | undefined;
         install?: string | undefined;
     };
     marks: string[];
-    tool?: string | undefined;
     cli?: string | undefined;
+    tool?: string | undefined;
     direct?: string | undefined;
 }, {
     name: string;
     run: {
-        build?: string | undefined;
         test?: string | undefined;
         typecheck?: string | undefined;
+        build?: string | undefined;
         install?: string | undefined;
     };
-    tool?: string | undefined;
     cli?: string | undefined;
+    tool?: string | undefined;
     direct?: string | undefined;
     marks?: string[] | undefined;
 }>;
@@ -130,13 +130,13 @@ export declare const documentProposalsSchema: z.ZodObject<{
         propose: z.ZodString;
         proposals: z.ZodString;
     }, "strip", z.ZodTypeAny, {
-        source: string;
         sections: string;
+        source: string;
         propose: string;
         proposals: string;
     }, {
-        source: string;
         sections: string;
+        source: string;
         propose: string;
         proposals: string;
     }>;
@@ -145,8 +145,8 @@ export declare const documentProposalsSchema: z.ZodObject<{
     root: string;
     main: string;
     tools: {
-        source: string;
         sections: string;
+        source: string;
         propose: string;
         proposals: string;
     };
@@ -155,8 +155,8 @@ export declare const documentProposalsSchema: z.ZodObject<{
     root: string;
     main: string;
     tools: {
-        source: string;
         sections: string;
+        source: string;
         propose: string;
         proposals: string;
     };
@@ -186,28 +186,28 @@ export declare const reviewDraftsSchema: z.ZodObject<{
         propose: z.ZodString;
         drop: z.ZodString;
     }, "strip", z.ZodTypeAny, {
-        comment: string;
         propose: string;
+        comment: string;
         drop: string;
     }, {
-        comment: string;
         propose: string;
+        comment: string;
         drop: string;
     }>;
     send: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
 }, "strip", z.ZodTypeAny, {
     name: string;
     tools: {
-        comment: string;
         propose: string;
+        comment: string;
         drop: string;
     };
     send?: string | undefined;
 }, {
     name: string;
     tools: {
-        comment: string;
         propose: string;
+        comment: string;
         drop: string;
     };
     send?: string | undefined;
@@ -236,38 +236,158 @@ export declare const checklistHolderSchema: z.ZodObject<{
         hold: z.ZodString;
         check: z.ZodString;
     }, "strip", z.ZodTypeAny, {
-        check: string;
-        hold: string;
         list: string;
         create: string;
         add: string;
+        hold: string;
+        check: string;
     }, {
-        check: string;
-        hold: string;
         list: string;
         create: string;
         add: string;
+        hold: string;
+        check: string;
     }>;
+    /**
+     * 2.85.0. `json`: its `list` tool also takes `format: 'json'` and then answers JSON instead of the
+     * print — `{ lists: [{ id, name, held }] }` with no `checklist`, `{ id, name, held, items }` with one
+     * (`checklistListsJson`, `checklistJson`; read with `checklistJsonIn`). Absent: the print only.
+     */
+    formats: z.ZodOptional<z.ZodArray<z.ZodEnum<["json"]>, "many">>;
 }, "strip", z.ZodTypeAny, {
     name: string;
     tools: {
-        check: string;
-        hold: string;
         list: string;
         create: string;
         add: string;
+        hold: string;
+        check: string;
     };
+    formats?: "json"[] | undefined;
 }, {
     name: string;
     tools: {
-        check: string;
-        hold: string;
         list: string;
         create: string;
         add: string;
+        hold: string;
+        check: string;
     };
+    formats?: "json"[] | undefined;
 }>;
 export type ChecklistHolder = z.infer<typeof checklistHolderSchema>;
+/** What `format: 'json'` asks a `checklist.holder`'s `list` tool for (2.85.0). */
+export declare const CHECKLIST_JSON = "json";
+/** One item as `format: 'json'` answers it: `state` null when unanswered; `by` who answered and `byPerson` whether it was the person's own tick. */
+export declare const checklistItemJson: z.ZodObject<{
+    id: z.ZodString;
+    text: z.ZodString;
+    state: z.ZodNullable<z.ZodEnum<["passed", "failed", "na"]>>;
+    byPerson: z.ZodDefault<z.ZodBoolean>;
+    by: z.ZodOptional<z.ZodString>;
+    note: z.ZodOptional<z.ZodString>;
+}, "strip", z.ZodTypeAny, {
+    id: string;
+    text: string;
+    state: "passed" | "failed" | "na" | null;
+    byPerson: boolean;
+    note?: string | undefined;
+    by?: string | undefined;
+}, {
+    id: string;
+    text: string;
+    state: "passed" | "failed" | "na" | null;
+    note?: string | undefined;
+    by?: string | undefined;
+    byPerson?: boolean | undefined;
+}>;
+export type ChecklistItemJson = z.infer<typeof checklistItemJson>;
+/** One list with `checklist` (and its items as answered for `ref` when one was given). `held`: the refs it is held against. */
+export declare const checklistJson: z.ZodObject<{
+    id: z.ZodString;
+    name: z.ZodString;
+    held: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
+    items: z.ZodDefault<z.ZodArray<z.ZodObject<{
+        id: z.ZodString;
+        text: z.ZodString;
+        state: z.ZodNullable<z.ZodEnum<["passed", "failed", "na"]>>;
+        byPerson: z.ZodDefault<z.ZodBoolean>;
+        by: z.ZodOptional<z.ZodString>;
+        note: z.ZodOptional<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        id: string;
+        text: string;
+        state: "passed" | "failed" | "na" | null;
+        byPerson: boolean;
+        note?: string | undefined;
+        by?: string | undefined;
+    }, {
+        id: string;
+        text: string;
+        state: "passed" | "failed" | "na" | null;
+        note?: string | undefined;
+        by?: string | undefined;
+        byPerson?: boolean | undefined;
+    }>, "many">>;
+}, "strip", z.ZodTypeAny, {
+    id: string;
+    name: string;
+    held: string[];
+    items: {
+        id: string;
+        text: string;
+        state: "passed" | "failed" | "na" | null;
+        byPerson: boolean;
+        note?: string | undefined;
+        by?: string | undefined;
+    }[];
+}, {
+    id: string;
+    name: string;
+    held?: string[] | undefined;
+    items?: {
+        id: string;
+        text: string;
+        state: "passed" | "failed" | "na" | null;
+        note?: string | undefined;
+        by?: string | undefined;
+        byPerson?: boolean | undefined;
+    }[] | undefined;
+}>;
+export type ChecklistJson = z.infer<typeof checklistJson>;
+/** Every list, with no `checklist`. */
+export declare const checklistListsJson: z.ZodObject<{
+    lists: z.ZodArray<z.ZodObject<{
+        id: z.ZodString;
+        name: z.ZodString;
+        held: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
+    }, "strip", z.ZodTypeAny, {
+        id: string;
+        name: string;
+        held: string[];
+    }, {
+        id: string;
+        name: string;
+        held?: string[] | undefined;
+    }>, "many">;
+}, "strip", z.ZodTypeAny, {
+    lists: {
+        id: string;
+        name: string;
+        held: string[];
+    }[];
+}, {
+    lists: {
+        id: string;
+        name: string;
+        held?: string[] | undefined;
+    }[];
+}>;
+export type ChecklistListsJson = z.infer<typeof checklistListsJson>;
+/** Whether a holder's `list` answers JSON when asked (`formats` has `json`). */
+export declare const holderTakesJson: (holder: Pick<ChecklistHolder, "formats">) => boolean;
+/** A `format: 'json'` answer read with one of the two shapes; null when it is not JSON or does not parse. */
+export declare function checklistJsonIn<T extends z.ZodTypeAny>(shape: T, text: string): z.infer<T> | null;
 /**
  * `work.status` (2.83.0): a module that runs work per issue and says where each piece is.
  *
@@ -299,15 +419,15 @@ export declare const workJobSchema: z.ZodObject<{
     ref: string | null;
     stage: string;
     title?: string | undefined;
-    updatedAt?: string | undefined;
     column?: string | null | undefined;
+    updatedAt?: string | undefined;
 }, {
     id: string;
     stage: string;
     title?: unknown;
     ref?: unknown;
-    updatedAt?: unknown;
     column?: unknown;
+    updatedAt?: unknown;
 }>;
 export type WorkJob = z.infer<typeof workJobSchema>;
 /** The jobs in a `work.status` answer, each that parses; `[]` for anything else. */
@@ -344,6 +464,168 @@ export type DiagramWriter = z.infer<typeof diagramWriterSchema>;
 export declare const SERVICE_CALLER_HEADER = "x-kehikot-caller";
 export declare const SERVICE_PASS_HEADER = "x-kehikot-pass";
 /**
+ * `page.viewer` (2.85.0): a module that shows web pages on the kehikko, and opens an address an agent
+ * hands it.
+ *
+ * - `name`: what it is called where it is told about. A consumer that would say "open it in the page
+ *   viewer" says "open it in <name>", and with no provider says nothing of the kind.
+ * - `tool`: the MCP tool on its door that opens an address, called with `{ url }` (an `http:` or
+ *   `https:` address). A page opens one through the host's `address.open` instead; this is for an agent.
+ */
+export declare const pageViewerSchema: z.ZodObject<{
+    name: z.ZodEffects<z.ZodString, string, string>;
+    tool: z.ZodString;
+}, "strip", z.ZodTypeAny, {
+    name: string;
+    tool: string;
+}, {
+    name: string;
+    tool: string;
+}>;
+export type PageViewer = z.infer<typeof pageViewerSchema>;
+/**
+ * One tool a cue may call: the tool, what it shows, the arguments it takes and what each one is, and
+ * the read-only tool that lists what can be cued (the values that hold), so a cue can be checked
+ * before it is written. `stop`: calling the tool with no arguments takes down what the cues put up.
+ */
+export declare const cueTargetSchema: z.ZodObject<{
+    tool: z.ZodString;
+    says: z.ZodEffects<z.ZodString, string, string>;
+    args: z.ZodDefault<z.ZodEffects<z.ZodRecord<z.ZodString, z.ZodEffects<z.ZodString, string, string>>, Record<string, string>, Record<string, string>>>;
+    reader: z.ZodOptional<z.ZodString>;
+    stop: z.ZodDefault<z.ZodBoolean>;
+}, "strip", z.ZodTypeAny, {
+    says: string;
+    tool: string;
+    args: Record<string, string>;
+    stop: boolean;
+    reader?: string | undefined;
+}, {
+    says: string;
+    tool: string;
+    args?: Record<string, string> | undefined;
+    reader?: string | undefined;
+    stop?: boolean | undefined;
+}>;
+export type CueTarget = z.infer<typeof cueTargetSchema>;
+/**
+ * `cue.targets` (2.85.0): a module whose tools a narrated walk-through may cue, so that its page
+ * shows what a line is about. A module that writes walk-throughs finds every provider placed on a
+ * kehikko and tells its agent the cues each one takes, never naming one of its own accord.
+ *
+ * - `name`: what it is called where it is told about.
+ * - `cues`: the tools that can be cued (`cueTargetSchema`), at least one, at most 8. A cue calls one as
+ *   `<module id>.<tool>(<arg>=<value>, …)`, the module id being the one `services.find` answered.
+ */
+export declare const cueTargetsSchema: z.ZodObject<{
+    name: z.ZodEffects<z.ZodString, string, string>;
+    cues: z.ZodArray<z.ZodObject<{
+        tool: z.ZodString;
+        says: z.ZodEffects<z.ZodString, string, string>;
+        args: z.ZodDefault<z.ZodEffects<z.ZodRecord<z.ZodString, z.ZodEffects<z.ZodString, string, string>>, Record<string, string>, Record<string, string>>>;
+        reader: z.ZodOptional<z.ZodString>;
+        stop: z.ZodDefault<z.ZodBoolean>;
+    }, "strip", z.ZodTypeAny, {
+        says: string;
+        tool: string;
+        args: Record<string, string>;
+        stop: boolean;
+        reader?: string | undefined;
+    }, {
+        says: string;
+        tool: string;
+        args?: Record<string, string> | undefined;
+        reader?: string | undefined;
+        stop?: boolean | undefined;
+    }>, "many">;
+}, "strip", z.ZodTypeAny, {
+    name: string;
+    cues: {
+        says: string;
+        tool: string;
+        args: Record<string, string>;
+        stop: boolean;
+        reader?: string | undefined;
+    }[];
+}, {
+    name: string;
+    cues: {
+        says: string;
+        tool: string;
+        args?: Record<string, string> | undefined;
+        reader?: string | undefined;
+        stop?: boolean | undefined;
+    }[];
+}>;
+export type CueTargets = z.infer<typeof cueTargetsSchema>;
+/** A folder's name directly under `.kehikot/`: one path segment. */
+export declare const KEHIKOT_FOLDER: RegExp;
+/**
+ * One folder a module owns: its name directly under `.kehikot/`, what is in it in one line, and whether
+ * it is DERIVED (a cache rebuilt from elsewhere, which a data history leaves out) rather than authored.
+ */
+export declare const ownedFolderSchema: z.ZodObject<{
+    folder: z.ZodEffects<z.ZodString, string, string>;
+    says: z.ZodEffects<z.ZodString, string, string>;
+    derived: z.ZodDefault<z.ZodBoolean>;
+}, "strip", z.ZodTypeAny, {
+    says: string;
+    folder: string;
+    derived: boolean;
+}, {
+    says: string;
+    folder: string;
+    derived?: boolean | undefined;
+}>;
+export type OwnedFolder = z.infer<typeof ownedFolderSchema>;
+/**
+ * `module.folders` (2.85.0): the folders a module owns under `<project>/.kehikot/`, each with what is
+ * in it. The module is that folder's only writer. A module that shows or records the project's files
+ * (an editor, a data history) reads every provider to say whose a file is and what it holds, instead of
+ * a table of other modules' folders.
+ *
+ * - `name`: what the owner is called where it is told about ("This file belongs to <name>").
+ * - `folders`: one to 8 (`ownedFolderSchema`).
+ */
+export declare const moduleFoldersSchema: z.ZodObject<{
+    name: z.ZodEffects<z.ZodString, string, string>;
+    folders: z.ZodArray<z.ZodObject<{
+        folder: z.ZodEffects<z.ZodString, string, string>;
+        says: z.ZodEffects<z.ZodString, string, string>;
+        derived: z.ZodDefault<z.ZodBoolean>;
+    }, "strip", z.ZodTypeAny, {
+        says: string;
+        folder: string;
+        derived: boolean;
+    }, {
+        says: string;
+        folder: string;
+        derived?: boolean | undefined;
+    }>, "many">;
+}, "strip", z.ZodTypeAny, {
+    name: string;
+    folders: {
+        says: string;
+        folder: string;
+        derived: boolean;
+    }[];
+}, {
+    name: string;
+    folders: {
+        says: string;
+        folder: string;
+        derived?: boolean | undefined;
+    }[];
+}>;
+export type ModuleFolders = z.infer<typeof moduleFoldersSchema>;
+/** Each folder name with its owner and what it says, from `module.folders` providers; the first provider to claim a folder keeps it. */
+export declare function foldersOwned(providers: readonly ServiceProvider[] | null | undefined): Map<string, {
+    module: string;
+    name: string;
+    says: string;
+    derived: boolean;
+}>;
+/**
  * Every service this protocol gives a descriptor's shape to, with what it means. Grows by an entry.
  * Names a module may say but this package does not know are carried as they came (`servicesSchema`).
  */
@@ -352,25 +634,25 @@ export declare const SERVICES: {
         readonly says: "Runs heavy work — test suites, typechecks, builds, big installs — in turn, so sessions on this computer do not collide.";
         readonly schema: z.ZodObject<{
             name: z.ZodEffects<z.ZodString, string, string>;
-            run: z.ZodEffects<z.ZodObject<Record<"build" | "test" | "typecheck" | "install", z.ZodOptional<z.ZodEffects<z.ZodEffects<z.ZodString, string, string>, string, string>>>, "strip", z.ZodTypeAny, {
-                build?: string | undefined;
+            run: z.ZodEffects<z.ZodObject<Record<"test" | "typecheck" | "build" | "install", z.ZodOptional<z.ZodEffects<z.ZodEffects<z.ZodString, string, string>, string, string>>>, "strip", z.ZodTypeAny, {
                 test?: string | undefined;
                 typecheck?: string | undefined;
+                build?: string | undefined;
                 install?: string | undefined;
             }, {
-                build?: string | undefined;
                 test?: string | undefined;
                 typecheck?: string | undefined;
+                build?: string | undefined;
                 install?: string | undefined;
             }>, {
-                build?: string | undefined;
                 test?: string | undefined;
                 typecheck?: string | undefined;
+                build?: string | undefined;
                 install?: string | undefined;
             }, {
-                build?: string | undefined;
                 test?: string | undefined;
                 typecheck?: string | undefined;
+                build?: string | undefined;
                 install?: string | undefined;
             }>;
             cli: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
@@ -380,25 +662,25 @@ export declare const SERVICES: {
         }, "strip", z.ZodTypeAny, {
             name: string;
             run: {
-                build?: string | undefined;
                 test?: string | undefined;
                 typecheck?: string | undefined;
+                build?: string | undefined;
                 install?: string | undefined;
             };
             marks: string[];
-            tool?: string | undefined;
             cli?: string | undefined;
+            tool?: string | undefined;
             direct?: string | undefined;
         }, {
             name: string;
             run: {
-                build?: string | undefined;
                 test?: string | undefined;
                 typecheck?: string | undefined;
+                build?: string | undefined;
                 install?: string | undefined;
             };
-            tool?: string | undefined;
             cli?: string | undefined;
+            tool?: string | undefined;
             direct?: string | undefined;
             marks?: string[] | undefined;
         }>;
@@ -415,13 +697,13 @@ export declare const SERVICES: {
                 propose: z.ZodString;
                 proposals: z.ZodString;
             }, "strip", z.ZodTypeAny, {
-                source: string;
                 sections: string;
+                source: string;
                 propose: string;
                 proposals: string;
             }, {
-                source: string;
                 sections: string;
+                source: string;
                 propose: string;
                 proposals: string;
             }>;
@@ -430,8 +712,8 @@ export declare const SERVICES: {
             root: string;
             main: string;
             tools: {
-                source: string;
                 sections: string;
+                source: string;
                 propose: string;
                 proposals: string;
             };
@@ -440,8 +722,8 @@ export declare const SERVICES: {
             root: string;
             main: string;
             tools: {
-                source: string;
                 sections: string;
+                source: string;
                 propose: string;
                 proposals: string;
             };
@@ -456,28 +738,28 @@ export declare const SERVICES: {
                 propose: z.ZodString;
                 drop: z.ZodString;
             }, "strip", z.ZodTypeAny, {
-                comment: string;
                 propose: string;
+                comment: string;
                 drop: string;
             }, {
-                comment: string;
                 propose: string;
+                comment: string;
                 drop: string;
             }>;
             send: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
         }, "strip", z.ZodTypeAny, {
             name: string;
             tools: {
-                comment: string;
                 propose: string;
+                comment: string;
                 drop: string;
             };
             send?: string | undefined;
         }, {
             name: string;
             tools: {
-                comment: string;
                 propose: string;
+                comment: string;
                 drop: string;
             };
             send?: string | undefined;
@@ -494,36 +776,44 @@ export declare const SERVICES: {
                 hold: z.ZodString;
                 check: z.ZodString;
             }, "strip", z.ZodTypeAny, {
-                check: string;
-                hold: string;
                 list: string;
                 create: string;
                 add: string;
+                hold: string;
+                check: string;
             }, {
-                check: string;
-                hold: string;
                 list: string;
                 create: string;
                 add: string;
+                hold: string;
+                check: string;
             }>;
+            /**
+             * 2.85.0. `json`: its `list` tool also takes `format: 'json'` and then answers JSON instead of the
+             * print — `{ lists: [{ id, name, held }] }` with no `checklist`, `{ id, name, held, items }` with one
+             * (`checklistListsJson`, `checklistJson`; read with `checklistJsonIn`). Absent: the print only.
+             */
+            formats: z.ZodOptional<z.ZodArray<z.ZodEnum<["json"]>, "many">>;
         }, "strip", z.ZodTypeAny, {
             name: string;
             tools: {
-                check: string;
-                hold: string;
                 list: string;
                 create: string;
                 add: string;
+                hold: string;
+                check: string;
             };
+            formats?: "json"[] | undefined;
         }, {
             name: string;
             tools: {
-                check: string;
-                hold: string;
                 list: string;
                 create: string;
                 add: string;
+                hold: string;
+                check: string;
             };
+            formats?: "json"[] | undefined;
         }>;
     };
     readonly 'work.status': {
@@ -555,6 +845,95 @@ export declare const SERVICES: {
             kinds: ("sequence" | "graph")[];
         }>;
     };
+    readonly 'page.viewer': {
+        readonly says: "Shows web pages on the kehikko, and opens an address an agent hands it.";
+        readonly schema: z.ZodObject<{
+            name: z.ZodEffects<z.ZodString, string, string>;
+            tool: z.ZodString;
+        }, "strip", z.ZodTypeAny, {
+            name: string;
+            tool: string;
+        }, {
+            name: string;
+            tool: string;
+        }>;
+    };
+    readonly 'cue.targets': {
+        readonly says: "Has tools a narrated walk-through can cue, so its page shows what a line is about.";
+        readonly schema: z.ZodObject<{
+            name: z.ZodEffects<z.ZodString, string, string>;
+            cues: z.ZodArray<z.ZodObject<{
+                tool: z.ZodString;
+                says: z.ZodEffects<z.ZodString, string, string>;
+                args: z.ZodDefault<z.ZodEffects<z.ZodRecord<z.ZodString, z.ZodEffects<z.ZodString, string, string>>, Record<string, string>, Record<string, string>>>;
+                reader: z.ZodOptional<z.ZodString>;
+                stop: z.ZodDefault<z.ZodBoolean>;
+            }, "strip", z.ZodTypeAny, {
+                says: string;
+                tool: string;
+                args: Record<string, string>;
+                stop: boolean;
+                reader?: string | undefined;
+            }, {
+                says: string;
+                tool: string;
+                args?: Record<string, string> | undefined;
+                reader?: string | undefined;
+                stop?: boolean | undefined;
+            }>, "many">;
+        }, "strip", z.ZodTypeAny, {
+            name: string;
+            cues: {
+                says: string;
+                tool: string;
+                args: Record<string, string>;
+                stop: boolean;
+                reader?: string | undefined;
+            }[];
+        }, {
+            name: string;
+            cues: {
+                says: string;
+                tool: string;
+                args?: Record<string, string> | undefined;
+                reader?: string | undefined;
+                stop?: boolean | undefined;
+            }[];
+        }>;
+    };
+    readonly 'module.folders': {
+        readonly says: "Owns folders under the project's .kehikot/, and says what is in each.";
+        readonly schema: z.ZodObject<{
+            name: z.ZodEffects<z.ZodString, string, string>;
+            folders: z.ZodArray<z.ZodObject<{
+                folder: z.ZodEffects<z.ZodString, string, string>;
+                says: z.ZodEffects<z.ZodString, string, string>;
+                derived: z.ZodDefault<z.ZodBoolean>;
+            }, "strip", z.ZodTypeAny, {
+                says: string;
+                folder: string;
+                derived: boolean;
+            }, {
+                says: string;
+                folder: string;
+                derived?: boolean | undefined;
+            }>, "many">;
+        }, "strip", z.ZodTypeAny, {
+            name: string;
+            folders: {
+                says: string;
+                folder: string;
+                derived: boolean;
+            }[];
+        }, {
+            name: string;
+            folders: {
+                says: string;
+                folder: string;
+                derived?: boolean | undefined;
+            }[];
+        }>;
+    };
 };
 export type Service = keyof typeof SERVICES;
 export declare const SERVICE_NAMES: Service[];
@@ -572,6 +951,12 @@ export declare const CHECKLIST_HOLDER = "checklist.holder";
 export declare const WORK_STATUS = "work.status";
 /** 2.83.0. Diagrams an agent writes. */
 export declare const DIAGRAM_WRITER = "diagram.writer";
+/** 2.85.0. A module that shows web pages and opens an address for an agent. */
+export declare const PAGE_VIEWER = "page.viewer";
+/** 2.85.0. The tools a narrated walk-through may cue. */
+export declare const CUE_TARGETS = "cue.targets";
+/** 2.85.0. The folders a module owns under `.kehikot/`. */
+export declare const MODULE_FOLDERS = "module.folders";
 /**
  * `services` in a manifest: each service this module provides, by name, and its descriptor. A known
  * service's descriptor must parse with its schema, or the whole field is dropped (the manifest still
@@ -675,3 +1060,45 @@ export declare function workQueueSaid(queue: WorkQueue, kind: WorkKind, command:
 export declare function documentRoot(document: Pick<DocumentProposals, 'root'>, epic: string): string;
 /** The folder every epic's document is under, relative to the project: `root` up to the first `{epic}`, without the trailing `/`. */
 export declare function documentsFolder(document: Pick<DocumentProposals, 'root'>): string;
+/**
+ * `sessions.placeOf`'s params, from a module's server about one project: the place an agent session is
+ * filed under, by the session's own id (an agent's conversation id, as the module that runs it records
+ * it). The host answers from the records it already reads for its door (`RECORDED_PLACE_PATH` on the
+ * modules that issued place tokens in that project), so no module reads another's folder for it.
+ */
+export declare const sessionsPlaceOfParams: z.ZodObject<{
+    session: z.ZodString;
+}, "strip", z.ZodTypeAny, {
+    session: string;
+}, {
+    session: string;
+}>;
+/** The place: the epic, the parts and the kehikko key, as the record says it now; `null` when no record names that session. */
+export declare const sessionsPlaceOfResult: z.ZodObject<{
+    place: z.ZodNullable<z.ZodObject<{
+        epic: z.ZodNullable<z.ZodString>;
+        parts: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
+        kehikko: z.ZodNullable<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        epic: string | null;
+        parts: string[];
+        kehikko: string | null;
+    }, {
+        epic: string | null;
+        kehikko: string | null;
+        parts?: string[] | undefined;
+    }>>;
+}, "strip", z.ZodTypeAny, {
+    place: {
+        epic: string | null;
+        parts: string[];
+        kehikko: string | null;
+    } | null;
+}, {
+    place: {
+        epic: string | null;
+        kehikko: string | null;
+        parts?: string[] | undefined;
+    } | null;
+}>;
+export type SessionsPlaceOfResult = z.infer<typeof sessionsPlaceOfResult>;

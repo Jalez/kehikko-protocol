@@ -61,11 +61,11 @@ export declare const helpSchema: z.ZodObject<{
         points: string[];
     }>, "many">>;
 }, "strip", z.ZodTypeAny, {
-    summary: string;
     sections: {
         title: string;
         points: string[];
     }[];
+    summary: string;
 }, {
     summary: string;
     sections?: {
