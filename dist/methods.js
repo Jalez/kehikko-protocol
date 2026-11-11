@@ -15,7 +15,8 @@ import { stepsListResult } from './plan.js';
 import { gotoProject, showAskSchema } from './show.js';
 import { trafficNoteResult, trafficNoteSchema, trafficReadResult } from './traffic.js';
 import { inboxActParams, inboxActResult, inboxAnswerParams, inboxAnswerResult, inboxLogParams, inboxLogResult, inboxOpenParams, inboxOpenResult, inboxReadParams, inboxReadResult, inboxUseParams, inboxUseResult } from './inbox.js';
-import { messageMineParams, messageMineResult, messageNotifyParams, messagePostParams, messageReadParams, messageReadResult, messageSayParams, messageSendParams, messageSendResult, messageTellParams } from './agent-messages.js';
+import { servicesFindParams, servicesFindResult } from './services.js';
+import { messageMineParams, messageMineResult, messageNotifyParams, messageNotifySessionParams, messagePostParams, messageReadParams, messageReadResult, messageSayParams, messageSendParams, messageSendResult, messageTellParams } from './agent-messages.js';
 /**
  * The questions a module can ask, by name and by shape: capabilities, methods, each method's
  * params, and a few result schemas. No answering is here: no dispatch table, no handlers. A
@@ -172,6 +173,18 @@ export const CAPABILITIES = {
      * showing a module (`inbox.*`, `inbox.ts`). Only from this module's PAGE, every act but `seen` only
      * on the person's press there; never asked by a module's server or an agent.
      */
+    /**
+     * 2.81.0. Tell an agent session something it did not ask about, found by the session's own id
+     * (`messages.notifySession`): for a module that watches this computer's processes and sees what a
+     * session started. Only modules that observe sessions declare it; the module asks for
+     * `agents:message` too, and the person's mute of its messages holds.
+     */
+    'sessions:observe': 'Tell an agent session about work it started on this computer, found by its own session id.',
+    /**
+     * 2.81.0. Ask which modules provide a service here, with each one's descriptor (`services.find`,
+     * `services.ts`): how a consumer finds a service without naming the module that provides it.
+     */
+    'services:read': 'See which modules here provide a service to other modules, and how to use it.',
     'inbox:person': 'Show your Inbox — what modules need, are doing and have said — and, on your press, mark it seen, dismiss, forget, answer or go to it.',
 };
 export const CAPABILITY_NAMES = Object.keys(CAPABILITIES);
@@ -236,6 +249,10 @@ export const METHODS = {
      * capability it does not know.
      */
     'projects.mine': 'agents:message',
+    /** A module's own notice to one agent session found by its own id, from its server (2.81.0). */
+    'messages.notifySession': 'sessions:observe',
+    /** Who provides a service here, with each one's descriptor (2.81.0). */
+    'services.find': 'services:read',
     /** The person's Inbox, read by a module's page (2.79.0). */
     'inbox.read': 'inbox:person',
     /** Earlier: the Inbox's log, a page of it (2.79.0). */
@@ -582,6 +599,10 @@ export const methodParams = {
      * module's server (`SERVER_METHODS`) or its page.
      */
     'projects.mine': z.object({}),
+    /** 2.81.0. From a module's server: a notice to one session by its own id; answered with `messageSendResult`. */
+    'messages.notifySession': messageNotifySessionParams,
+    /** 2.81.0. From a module's server or page: who provides a service here; answered with `servicesFindResult`. See `services.ts`. */
+    'services.find': servicesFindParams,
     /** 2.79.0. From a page only: the person's Inbox; answered with `inboxReadResult`. See `inbox.ts`. */
     'inbox.read': inboxReadParams,
     /** 2.79.0. From a page only: a page of Earlier; answered with `inboxLogResult`. */
@@ -783,6 +804,8 @@ export const methodResults = {
     'messages.tell': messageSendResult,
     'messages.say': messageSendResult,
     'projects.mine': projectsMineResult,
+    'messages.notifySession': messageSendResult,
+    'services.find': servicesFindResult,
     'inbox.read': inboxReadResult,
     'inbox.log': inboxLogResult,
     'inbox.act': inboxActResult,

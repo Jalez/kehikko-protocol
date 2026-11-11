@@ -235,6 +235,25 @@ export const messageNotifyParams = z.object({
 })
 
 /**
+ * 2.81.0. `messages.notifySession`'s params: a module's OWN notice to ONE agent session it did not hear
+ * from, named by the session's own id — the id its agent CLI puts in the environment of what it starts,
+ * as a module that watches this computer's processes reads it. From the module's SERVER
+ * (`SERVER_METHODS`), under `sessions:observe` (and the module must ask for `agents:message` too). The
+ * host finds the agent module that runs a session by that id — only a session it has seen lately, through
+ * that module's place token — and sends it there, in that session's project, as `messages.notify` does:
+ * stamped `from: { module, name, session: null, place: <the session's place>, person: false }`,
+ * `to: { session }`, delivered like any message, declined while the person muted the module there. A
+ * session the host does not know is declined, never guessed. Bounded per sending module and receiving
+ * session to `LIMITS.OBSERVED_PER_HOUR`, on top of the notice bounds. Answered with `messageSendResult`.
+ */
+export const messageNotifySessionParams = z.object({
+  session: z.string().regex(/^[A-Za-z0-9_.:-]{8,128}$/, 'a session id, as its agent CLI names it'),
+  body: z.string().trim().min(1, 'a notice says something').max(LIMITS.MESSAGE_BODY),
+  kind: z.enum(['note', 'report']).optional(),
+  thread: z.string().regex(MESSAGE_THREAD).optional(),
+})
+
+/**
  * 2.75.0. `messages.tell`'s params: a module's OWN news to every agent session at a PLACE — an epic, some
  * of its parts, a kehikko — from the module's SERVER (`SERVER_METHODS`, naming its project), under
  * `agents:message`: for news the sessions working there should hear without having asked (a review

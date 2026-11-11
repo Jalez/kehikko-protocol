@@ -11,6 +11,35 @@ After 2.78.0, every entry's first line under its heading is its kind, and the ve
 (semver; CI checks it): `Kind: breaking` → next major, `Kind: feature` → next minor, `Kind: fix` →
 next patch.
 
+## 2.81.0 — 2026-11-11
+
+Kind: feature
+
+Services: one module provides a service and others consume it, and neither names the other; the first
+service is `work.queue`. And a module that watches this computer can tell one agent session, found by
+its own id, about work it started. **Additive**; `PROTOCOL` is still 2.
+[docs/services.md](docs/services.md); [docs/agent-messages.md](docs/agent-messages.md), "A notice to a
+session that did not ask".
+
+### Added
+
+- **`services`**, a top-level manifest field: the services a module provides, each with a descriptor
+  in its service's shape (`servicesSchema`, `SERVICES`, `serviceDescriptor`, `servicesOf`). A known
+  service's descriptor that does not parse drops the field, not the manifest; an unknown service is
+  carried as it came. A host before 2.81.0 ignores it.
+- **`work.queue`** (`WORK_QUEUE`, `workQueueSchema`): `name`, `run` (a shell line with `{command}` per
+  kind of work it takes, `WORK_KINDS`: test, typecheck, build, install), `cli`, `tool`, `direct`,
+  `marks`. `workRunLine` and `workQueueSaid` say it from the descriptor only.
+- **`services.find { service, kehikko? }`** under the new **`services:read`**, from a module's server
+  or page: the providers in use here (registered and answering), each with its registered name, its
+  descriptor and whether it is placed on the kehikko asked about (`servicesFindResult`, `providerOf`).
+- **`messages.notifySession { session, body, kind?, thread? }`** under the new **`sessions:observe`**,
+  from a module's server (`SERVER_METHODS`, naming no project): a notice to the one session whose agent
+  CLI names itself by that id. The host finds the agent module that runs it and its project; a session
+  it does not know is declined. Stamped and delivered as `messages.notify`; the module must ask for
+  `agents:message` too, and the person's mute holds. `LIMITS.OBSERVED_PER_HOUR` (6) per module and
+  session, on top of the notice bounds.
+
 ## 2.80.0 — 2026-11-11
 
 Kind: feature

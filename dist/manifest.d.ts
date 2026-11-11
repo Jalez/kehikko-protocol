@@ -407,6 +407,13 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
      */
     holds: z.ZodCatch<z.ZodOptional<z.ZodEffects<z.ZodArray<z.ZodString, "many">, string[], string[]>>>;
     /**
+     * 2.81.0. The services this module provides to other modules (`SERVICES`), each with its descriptor
+     * in the shape that service's schema gives (`services.ts`): `services['work.queue']` is how to hand
+     * heavy work to it. A consumer finds a provider through `services.find` and never names it. Top-level,
+     * optional, dropped when it does not parse, like `opens`, so a host before 2.81.0 runs the module.
+     */
+    services: z.ZodCatch<z.ZodOptional<z.ZodEffects<z.ZodEffects<z.ZodRecord<z.ZodString, z.ZodUnknown>, Record<string, unknown>, Record<string, unknown>>, Record<string, unknown>, Record<string, unknown>>>>;
+    /**
      * 2.42.0. How the host's revealed header and footer meet this module's page (`REVEAL_MODES`):
      * `push` (the default) shrinks the frame to make room; `over` keeps the frame's size and draws the
      * rows over its top and bottom, saying how much they cover in `kehikot.covered`. For a page a resize
@@ -1398,6 +1405,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         state: "working" | "attention" | "done";
         sound?: string | undefined;
     }[] | undefined;
+    services?: Record<string, unknown> | undefined;
     reveal?: "push" | "over" | undefined;
     intro?: {
         slides: {
@@ -1538,6 +1546,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     } | undefined;
     partless?: string | undefined;
     events?: unknown;
+    services?: unknown;
     reveal?: unknown;
     intro?: unknown;
 }>, {
@@ -1650,6 +1659,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
         state: "working" | "attention" | "done";
         sound?: string | undefined;
     }[] | undefined;
+    services?: Record<string, unknown> | undefined;
     reveal?: "push" | "over" | undefined;
     intro?: {
         slides: {
@@ -1790,6 +1800,7 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     } | undefined;
     partless?: string | undefined;
     events?: unknown;
+    services?: unknown;
     reveal?: unknown;
     intro?: unknown;
 }>;

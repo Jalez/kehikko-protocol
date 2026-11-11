@@ -426,6 +426,11 @@ export const LIMITS = {
    * (2.75.0): more within the minute are merged by the host into one digest at its end.
    */
   TELLS_PER_MINUTE: 1,
+  /**
+   * How many notices one module may send to one session that did not ask it through
+   * `messages.notifySession` (2.81.0) in an hour; the notice bounds hold too.
+   */
+  OBSERVED_PER_HOUR: 6,
   /** How many messages the person may send through one module in a minute (2.50.0, `messages.say`). */
   PERSON_MESSAGES_PER_MINUTE: 20,
   /* Traffic (2.20.0). See `traffic.ts`. */
@@ -466,6 +471,14 @@ export const LIMITS = {
   PROVIDES: 8,
   /** One word of `declares.provides`, and the value of a skill's `{ provides }` need, in characters. */
   PROVIDES_WORD: 32,
+  /** How many services one manifest may provide (2.81.0, `services`). */
+  SERVICES: 16,
+  /** One line of a service's descriptor — a `work.queue` run line, program or mark — in characters (2.81.0). */
+  SERVICE_LINE: 400,
+  /** How many marks one `work.queue` descriptor may list (2.81.0). */
+  SERVICE_MARKS: 4,
+  /** How many providers one `services.find` answers with (2.81.0). */
+  SERVICE_PROVIDERS: 16,
   /* A page's failure, said to the host (2.59.0). See `pageErrorSchema`. */
   /** The error's message, in characters. Longer is cut, never refused. */
   PAGE_ERROR_MESSAGE: 500,

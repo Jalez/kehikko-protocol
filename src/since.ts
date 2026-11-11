@@ -51,6 +51,8 @@ export const METHOD_SINCE = {
   'messages.tell': '2.75.0',
   'messages.say': '2.50.0',
   'projects.mine': '2.76.0',
+  'messages.notifySession': '2.81.0',
+  'services.find': '2.81.0',
   'inbox.read': '2.79.0',
   'inbox.log': '2.79.0',
   'inbox.act': '2.79.0',
@@ -90,6 +92,8 @@ export const CAPABILITY_SINCE = {
   'agents:message': '2.41.0',
   'messages:as-person': '2.50.0',
   'inbox:person': '2.79.0',
+  'sessions:observe': '2.81.0',
+  'services:read': '2.81.0',
 } as const satisfies Record<Capability, string>
 
 /** Each method a module's server may ask (`SERVER_METHODS`), and the version a server could first ask it in. */
@@ -108,6 +112,8 @@ export const SERVER_METHOD_SINCE = {
   'messages.notify': '2.54.0',
   'messages.tell': '2.75.0',
   'projects.mine': '2.76.0',
+  'messages.notifySession': '2.81.0',
+  'services.find': '2.81.0',
 } as const satisfies Record<ServerMethod, string>
 
 /**
@@ -306,6 +312,8 @@ export const PIECE_SAID = {
     'agents:message': 'messages between agent sessions',
     'messages:as-person': 'messages to agent sessions as the person',
     'inbox:person': 'your Inbox, shown and acted on for you',
+    'sessions:observe': 'notices to agent sessions it sees working on this computer',
+    'services:read': 'which modules here provide a service to other modules',
   } as const satisfies Record<Capability, string>,
   declarations: {
     'mcp.subjects': 'door subjects',

@@ -344,6 +344,8 @@ and a module that declares none gets none of the methods below.
 | `messages.post` | `agents:message` |
 | `messages.notify` | `agents:message` |
 | `messages.tell` | `agents:message` |
+| `messages.notifySession` | `sessions:observe` |
+| `services.find` | `services:read` |
 | `messages.say` | `messages:as-person` |
 | `projects.mine` | `agents:message` |
 | `inbox.read` | `inbox:person` |

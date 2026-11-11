@@ -504,3 +504,26 @@ await teller.tell({ epic, parts }, `${shortPath(file)}: 3 comments from the revi
 ```
 
 A host before 2.75.0 answers `host-too-old`; the module carries on.
+
+## A notice to a session that did not ask (2.81.0)
+
+`messages.notify` needs the token a session handed the module. A module that WATCHES this computer — its
+processes, say — sees what a session started without ever being called by it, and has only the session's
+own id: the one its agent CLI puts in the environment of what it starts. `messages.notifySession
+{ session, body, kind?, thread? }` is for that:
+
+- From the module's SERVER, under **`sessions:observe`**, a capability only observer modules declare; the
+  module asks for `agents:message` too. It names no project.
+- **The host finds the session**: the agent module that runs a session by that id, and its project and
+  place, from the sessions it has seen lately through their place tokens. One it does not know is
+  declined (`outcome: 'declined'`, with why), never guessed — so a person's own terminal, which no agent
+  module runs, is never reached.
+- Then it is a notice like `messages.notify`: stamped `from: { module, name, session: null, place: <the
+  session's place>, person: false }`, `to: { session }`, delivered by the module that runs the session,
+  declined while the person muted the module's messages in that project.
+- **Bounded**: `LIMITS.OBSERVED_PER_HOUR` (6) per sending module and receiving session, on top of
+  `NOTICES_PER_MINUTE` and `NOTICES_PER_HOUR`. A module should send far less: once per thing it saw.
+
+What it says is one line from the module's own fields — no text read from a process but what the session
+itself typed — and how to do better, built from a provider's offer when it is about another module's
+service (`workQueueSaid`).

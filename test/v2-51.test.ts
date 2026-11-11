@@ -19,7 +19,7 @@ const ID = 'kehikot.example'
 
 describe('the version', () => {
   test('is 2.51.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.80.0')
+    expect(PACKAGE_VERSION).toBe('2.81.0')
     expect(PROTOCOL).toBe(2)
     expect(readFileSync(join(REPO, 'CHANGELOG.md'), 'utf8')).toContain('## 2.51.0')
   })

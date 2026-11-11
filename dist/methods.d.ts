@@ -154,6 +154,18 @@ export declare const CAPABILITIES: {
      * showing a module (`inbox.*`, `inbox.ts`). Only from this module's PAGE, every act but `seen` only
      * on the person's press there; never asked by a module's server or an agent.
      */
+    /**
+     * 2.81.0. Tell an agent session something it did not ask about, found by the session's own id
+     * (`messages.notifySession`): for a module that watches this computer's processes and sees what a
+     * session started. Only modules that observe sessions declare it; the module asks for
+     * `agents:message` too, and the person's mute of its messages holds.
+     */
+    readonly 'sessions:observe': "Tell an agent session about work it started on this computer, found by its own session id.";
+    /**
+     * 2.81.0. Ask which modules provide a service here, with each one's descriptor (`services.find`,
+     * `services.ts`): how a consumer finds a service without naming the module that provides it.
+     */
+    readonly 'services:read': "See which modules here provide a service to other modules, and how to use it.";
     readonly 'inbox:person': "Show your Inbox — what modules need, are doing and have said — and, on your press, mark it seen, dismiss, forget, answer or go to it.";
 };
 export type Capability = keyof typeof CAPABILITIES;
@@ -219,6 +231,10 @@ export declare const METHODS: {
      * capability it does not know.
      */
     readonly 'projects.mine': "agents:message";
+    /** A module's own notice to one agent session found by its own id, from its server (2.81.0). */
+    readonly 'messages.notifySession': "sessions:observe";
+    /** Who provides a service here, with each one's descriptor (2.81.0). */
+    readonly 'services.find': "services:read";
     /** The person's Inbox, read by a module's page (2.79.0). */
     readonly 'inbox.read': "inbox:person";
     /** Earlier: the Inbox's log, a page of it (2.79.0). */
@@ -2187,6 +2203,34 @@ export declare const methodParams: {
      * module's server (`SERVER_METHODS`) or its page.
      */
     readonly 'projects.mine': z.ZodObject<{}, "strip", z.ZodTypeAny, {}, {}>;
+    /** 2.81.0. From a module's server: a notice to one session by its own id; answered with `messageSendResult`. */
+    readonly 'messages.notifySession': z.ZodObject<{
+        session: z.ZodString;
+        body: z.ZodString;
+        kind: z.ZodOptional<z.ZodEnum<["note", "report"]>>;
+        thread: z.ZodOptional<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        session: string;
+        body: string;
+        thread?: string | undefined;
+        kind?: "report" | "note" | undefined;
+    }, {
+        session: string;
+        body: string;
+        thread?: string | undefined;
+        kind?: "report" | "note" | undefined;
+    }>;
+    /** 2.81.0. From a module's server or page: who provides a service here; answered with `servicesFindResult`. See `services.ts`. */
+    readonly 'services.find': z.ZodObject<{
+        service: z.ZodString;
+        kehikko: z.ZodOptional<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        service: string;
+        kehikko?: string | undefined;
+    }, {
+        service: string;
+        kehikko?: string | undefined;
+    }>;
     /** 2.79.0. From a page only: the person's Inbox; answered with `inboxReadResult`. See `inbox.ts`. */
     readonly 'inbox.read': z.ZodObject<{}, "strip", z.ZodTypeAny, {}, {}>;
     /** 2.79.0. From a page only: a page of Earlier; answered with `inboxLogResult`. */

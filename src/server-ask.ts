@@ -51,6 +51,9 @@ export const SERVER_METHODS = [
   'messages.tell',
   /* 2.76.0: the projects this module keeps its folder in, asked at start. About the person's projects, so it names none. */
   'projects.mine',
+  /* 2.81.0: a notice to one session found by its own id (the host finds its project), and who provides a service here. Name no project. */
+  'messages.notifySession',
+  'services.find',
 ] as const
 export type ServerMethod = (typeof SERVER_METHODS)[number]
 

@@ -17,6 +17,7 @@ import type { TrafficNoteResult, TrafficReadResult } from '../traffic.js'
 import type { DispositionsGetResult, EpicsListResult, PartsGetResult, ProjectsMineResult } from '../methods.js'
 import type { StepsListResult } from '../plan.js'
 import type { MessageReadResult, MessageSendResult } from '../agent-messages.js'
+import type { ServicesFindResult } from '../services.js'
 import type { Reply } from './doors.js'
 import { frameOrigins } from './origins.js'
 
@@ -104,6 +105,10 @@ export interface ServerAnswers {
   'messages.tell': MessageSendResult
   /** 2.76.0. The person's projects in which this module keeps its own folder. */
   'projects.mine': ProjectsMineResult
+  /** 2.81.0. What became of a module's notice to one session found by its own id. */
+  'messages.notifySession': MessageSendResult
+  /** 2.81.0. Who provides a service here, with each one's descriptor. */
+  'services.find': ServicesFindResult
 }
 
 /**

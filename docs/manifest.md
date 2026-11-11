@@ -290,6 +290,13 @@ It grants nothing and is checked against nothing: a module that says it provides
 steps and publishes none provides none. Optional; one that does not parse is
 dropped, not fatal. `providesOf(manifest)` reads it, `[]` when absent.
 
+### Services it provides (2.81.0)
+
+`services` (top level) names the services this module provides to other modules,
+each with a descriptor in the shape the protocol gives that service — the first is
+`work.queue`. Consumers find a provider through the host and never name it. Optional;
+dropped, not fatal, when it does not parse. See [services](services.md).
+
 ### Agent sessions (2.21.0)
 
 `declares.agentSessions` says a module runs agent sessions — conversations with
