@@ -45,7 +45,7 @@ const input = (extra: Partial<NotesInput> = {}): NotesInput => ({
 
 describe('the version', () => {
   test('is 2.53.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.76.0')
+    expect(PACKAGE_VERSION).toBe('2.77.0')
     expect(PROTOCOL).toBe(2)
     expect(readFileSync(join(REPO, 'CHANGELOG.md'), 'utf8')).toContain('## 2.53.0')
     expect(readFileSync(join(REPO, 'docs/asking.md'), 'utf8')).toContain("**A kehikko's own skills (2.53.0).**")

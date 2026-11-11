@@ -76,7 +76,6 @@ export declare const CAPABILITY_SINCE: {
     readonly 'dispositions:read': "2.21.0";
     readonly 'agents:message': "2.41.0";
     readonly 'messages:as-person': "2.50.0";
-    readonly 'projects:read': "2.76.0";
 };
 /** Each method a module's server may ask (`SERVER_METHODS`), and the version a server could first ask it in. */
 export declare const SERVER_METHOD_SINCE: {
@@ -284,7 +283,6 @@ export declare const SINCE: {
         readonly 'dispositions:read': "2.21.0";
         readonly 'agents:message': "2.41.0";
         readonly 'messages:as-person': "2.50.0";
-        readonly 'projects:read': "2.76.0";
     };
     readonly serverMethods: {
         readonly 'tracker.get': "2.19.0";
@@ -420,7 +418,6 @@ export declare const PIECE_SAID: {
         readonly 'dispositions:read': "marks for why references closed, from the host";
         readonly 'agents:message': "messages between agent sessions";
         readonly 'messages:as-person': "messages to agent sessions as the person";
-        readonly 'projects:read': "the projects it keeps something in";
     };
     readonly declarations: {
         readonly 'mcp.subjects': "door subjects";

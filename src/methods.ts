@@ -172,15 +172,6 @@ export const CAPABILITIES = {
    * takes such a message as its person's instruction. Never asked by a module's server or an agent.
    */
   'messages:as-person': 'Send what you type or press in this module to agent sessions as your own instruction — only on your press, and only once you allow it in its settings.',
-  /**
-   * 2.76.0. Be told which of the person's projects this module already keeps a folder in
-   * (`projects.mine`): the projects it wrote `.kehikot/<module>/` into itself. Never the person's
-   * whole list, never a folder the module has not kept something in, so it learns nothing about the
-   * disk it did not already hold. What a module's SERVER asks at start, so that what it runs for a
-   * project (a conversation to deliver a message to) is picked up after a restart before anybody
-   * opens that project again.
-   */
-  'projects:read': 'Be told which of your projects this module already keeps something in, so it can pick up where it left off after a restart.',
 } as const
 
 export type Capability = keyof typeof CAPABILITIES
@@ -240,8 +231,13 @@ export const METHODS = {
   'messages.tell': 'agents:message',
   /** The person's own message, from a module's page on their press (2.50.0). */
   'messages.say': 'messages:as-person',
-  /** The projects in which the asking module keeps its own folder (2.76.0). */
-  'projects.mine': 'projects:read',
+  /**
+   * The projects in which the asking module keeps its own folder (2.76.0). Under `agents:message`
+   * since 2.77.0: it exists so that messages reach a module's asleep sessions after a restart, and a
+   * module that runs agent sessions already declares it, so an older host is not asked for a
+   * capability it does not know.
+   */
+  'projects.mine': 'agents:message',
 } as const satisfies Record<string, Capability>
 
 export type Method = keyof typeof METHODS
