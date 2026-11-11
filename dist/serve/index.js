@@ -14,6 +14,8 @@ export { neighbourPorts, portOf, readRegistration, registerAt, takesOver, regist
 export { anyPort, claimOrLeave, preferred, registerBound, serves, } from './plugin.js';
 /* Another module, as this one can learn of it: its manifest and the tools at its door. */
 export { doorOf, listTools, readNeighbour, readNeighbours, NEIGHBOUR_TIMEOUT_MS, } from './neighbours.js';
+/* 2.83.0. Using a service from a module's server, and proving who calls one. */
+export { findService, callServiceTool, fetchService, callerHeaders, vouchCaller, } from './services.js';
 export { readJourney, readJourneys } from './journeys.js';
 /* An epic's plan as a module publishes it (2.21.0): `steps.json` in its own folder, and every module's read. */
 export { readPlans, readPlansFor, writePlan } from './plans.js';

@@ -97,7 +97,7 @@ export type IntroMotion = keyof typeof INTRO_MOTIONS;
 /** A container the way a host draws one: a rounded box with a header strip. */
 export declare const introPaneSchema: z.ZodObject<{
     tone: z.ZodOptional<z.ZodEnum<["card", "muted", "faint", "text", "strong", "ok", "busy", "warn", "danger"]>>;
-    motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
+    motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
     /** Seconds after the slide shows before its motion starts. */
     delay: z.ZodOptional<z.ZodNumber>;
     kind: z.ZodLiteral<"pane">;
@@ -112,7 +112,7 @@ export declare const introPaneSchema: z.ZodObject<{
     w: number;
     h: number;
     tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+    motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
 }, {
     kind: "pane";
@@ -121,13 +121,13 @@ export declare const introPaneSchema: z.ZodObject<{
     w: number;
     h: number;
     tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+    motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
 }>;
 /** A rounded box: a button, a card, a chip. `round` is the corner radius. */
 export declare const introBoxSchema: z.ZodObject<{
     tone: z.ZodOptional<z.ZodEnum<["card", "muted", "faint", "text", "strong", "ok", "busy", "warn", "danger"]>>;
-    motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
+    motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
     /** Seconds after the slide shows before its motion starts. */
     delay: z.ZodOptional<z.ZodNumber>;
     kind: z.ZodLiteral<"box">;
@@ -144,7 +144,7 @@ export declare const introBoxSchema: z.ZodObject<{
     w: number;
     h: number;
     tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+    motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
     round?: number | undefined;
     dashed?: boolean | undefined;
@@ -155,7 +155,7 @@ export declare const introBoxSchema: z.ZodObject<{
     w: number;
     h: number;
     tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+    motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
     round?: number | undefined;
     dashed?: boolean | undefined;
@@ -163,7 +163,7 @@ export declare const introBoxSchema: z.ZodObject<{
 /** Lines of text, drawn as bars: one bar per width, `gap` apart, top to bottom. */
 export declare const introRowsSchema: z.ZodObject<{
     tone: z.ZodOptional<z.ZodEnum<["card", "muted", "faint", "text", "strong", "ok", "busy", "warn", "danger"]>>;
-    motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
+    motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
     /** Seconds after the slide shows before its motion starts. */
     delay: z.ZodOptional<z.ZodNumber>;
     kind: z.ZodLiteral<"rows">;
@@ -178,7 +178,7 @@ export declare const introRowsSchema: z.ZodObject<{
     widths: number[];
     gap?: number | undefined;
     tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+    motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
 }, {
     kind: "rows";
@@ -187,13 +187,13 @@ export declare const introRowsSchema: z.ZodObject<{
     widths: number[];
     gap?: number | undefined;
     tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+    motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
 }>;
 /** A dot: a status light, a badge. */
 export declare const introDotSchema: z.ZodObject<{
     tone: z.ZodOptional<z.ZodEnum<["card", "muted", "faint", "text", "strong", "ok", "busy", "warn", "danger"]>>;
-    motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
+    motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
     /** Seconds after the slide shows before its motion starts. */
     delay: z.ZodOptional<z.ZodNumber>;
     kind: z.ZodLiteral<"dot">;
@@ -206,7 +206,7 @@ export declare const introDotSchema: z.ZodObject<{
     y: number;
     r: number;
     tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+    motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
 }, {
     kind: "dot";
@@ -214,13 +214,13 @@ export declare const introDotSchema: z.ZodObject<{
     y: number;
     r: number;
     tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+    motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
 }>;
 /** A straight line: a link between two things, a divider. */
 export declare const introLineSchema: z.ZodObject<{
     tone: z.ZodOptional<z.ZodEnum<["card", "muted", "faint", "text", "strong", "ok", "busy", "warn", "danger"]>>;
-    motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
+    motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
     /** Seconds after the slide shows before its motion starts. */
     delay: z.ZodOptional<z.ZodNumber>;
     kind: z.ZodLiteral<"line">;
@@ -236,7 +236,7 @@ export declare const introLineSchema: z.ZodObject<{
     x2: number;
     y2: number;
     tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+    motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
     dashed?: boolean | undefined;
 }, {
@@ -246,14 +246,14 @@ export declare const introLineSchema: z.ZodObject<{
     x2: number;
     y2: number;
     tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+    motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
     dashed?: boolean | undefined;
 }>;
 /** A word or two on the drawing, plain text. `x` is where it starts, or its middle with `middle`. */
 export declare const introTextSchema: z.ZodObject<{
     tone: z.ZodOptional<z.ZodEnum<["card", "muted", "faint", "text", "strong", "ok", "busy", "warn", "danger"]>>;
-    motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
+    motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
     /** Seconds after the slide shows before its motion starts. */
     delay: z.ZodOptional<z.ZodNumber>;
     kind: z.ZodLiteral<"text">;
@@ -269,7 +269,7 @@ export declare const introTextSchema: z.ZodObject<{
     x: number;
     y: number;
     tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+    motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
     size?: number | undefined;
     middle?: boolean | undefined;
@@ -280,7 +280,7 @@ export declare const introTextSchema: z.ZodObject<{
     x: number;
     y: number;
     tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+    motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
     size?: number | undefined;
     middle?: boolean | undefined;
@@ -289,7 +289,7 @@ export declare const introTextSchema: z.ZodObject<{
 /** A mouse pointer, its tip at (`x`, `y`): where a person would press. */
 export declare const introPointerSchema: z.ZodObject<{
     tone: z.ZodOptional<z.ZodEnum<["card", "muted", "faint", "text", "strong", "ok", "busy", "warn", "danger"]>>;
-    motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
+    motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
     /** Seconds after the slide shows before its motion starts. */
     delay: z.ZodOptional<z.ZodNumber>;
     kind: z.ZodLiteral<"pointer">;
@@ -300,19 +300,19 @@ export declare const introPointerSchema: z.ZodObject<{
     x: number;
     y: number;
     tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+    motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
 }, {
     kind: "pointer";
     x: number;
     y: number;
     tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+    motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
 }>;
 export declare const introShapeSchema: z.ZodDiscriminatedUnion<"kind", [z.ZodObject<{
     tone: z.ZodOptional<z.ZodEnum<["card", "muted", "faint", "text", "strong", "ok", "busy", "warn", "danger"]>>;
-    motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
+    motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
     /** Seconds after the slide shows before its motion starts. */
     delay: z.ZodOptional<z.ZodNumber>;
     kind: z.ZodLiteral<"pane">;
@@ -327,7 +327,7 @@ export declare const introShapeSchema: z.ZodDiscriminatedUnion<"kind", [z.ZodObj
     w: number;
     h: number;
     tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+    motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
 }, {
     kind: "pane";
@@ -336,11 +336,11 @@ export declare const introShapeSchema: z.ZodDiscriminatedUnion<"kind", [z.ZodObj
     w: number;
     h: number;
     tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+    motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
 }>, z.ZodObject<{
     tone: z.ZodOptional<z.ZodEnum<["card", "muted", "faint", "text", "strong", "ok", "busy", "warn", "danger"]>>;
-    motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
+    motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
     /** Seconds after the slide shows before its motion starts. */
     delay: z.ZodOptional<z.ZodNumber>;
     kind: z.ZodLiteral<"box">;
@@ -357,7 +357,7 @@ export declare const introShapeSchema: z.ZodDiscriminatedUnion<"kind", [z.ZodObj
     w: number;
     h: number;
     tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+    motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
     round?: number | undefined;
     dashed?: boolean | undefined;
@@ -368,13 +368,13 @@ export declare const introShapeSchema: z.ZodDiscriminatedUnion<"kind", [z.ZodObj
     w: number;
     h: number;
     tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+    motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
     round?: number | undefined;
     dashed?: boolean | undefined;
 }>, z.ZodObject<{
     tone: z.ZodOptional<z.ZodEnum<["card", "muted", "faint", "text", "strong", "ok", "busy", "warn", "danger"]>>;
-    motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
+    motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
     /** Seconds after the slide shows before its motion starts. */
     delay: z.ZodOptional<z.ZodNumber>;
     kind: z.ZodLiteral<"rows">;
@@ -389,7 +389,7 @@ export declare const introShapeSchema: z.ZodDiscriminatedUnion<"kind", [z.ZodObj
     widths: number[];
     gap?: number | undefined;
     tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+    motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
 }, {
     kind: "rows";
@@ -398,11 +398,11 @@ export declare const introShapeSchema: z.ZodDiscriminatedUnion<"kind", [z.ZodObj
     widths: number[];
     gap?: number | undefined;
     tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+    motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
 }>, z.ZodObject<{
     tone: z.ZodOptional<z.ZodEnum<["card", "muted", "faint", "text", "strong", "ok", "busy", "warn", "danger"]>>;
-    motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
+    motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
     /** Seconds after the slide shows before its motion starts. */
     delay: z.ZodOptional<z.ZodNumber>;
     kind: z.ZodLiteral<"dot">;
@@ -415,7 +415,7 @@ export declare const introShapeSchema: z.ZodDiscriminatedUnion<"kind", [z.ZodObj
     y: number;
     r: number;
     tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+    motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
 }, {
     kind: "dot";
@@ -423,11 +423,11 @@ export declare const introShapeSchema: z.ZodDiscriminatedUnion<"kind", [z.ZodObj
     y: number;
     r: number;
     tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+    motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
 }>, z.ZodObject<{
     tone: z.ZodOptional<z.ZodEnum<["card", "muted", "faint", "text", "strong", "ok", "busy", "warn", "danger"]>>;
-    motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
+    motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
     /** Seconds after the slide shows before its motion starts. */
     delay: z.ZodOptional<z.ZodNumber>;
     kind: z.ZodLiteral<"line">;
@@ -443,7 +443,7 @@ export declare const introShapeSchema: z.ZodDiscriminatedUnion<"kind", [z.ZodObj
     x2: number;
     y2: number;
     tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+    motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
     dashed?: boolean | undefined;
 }, {
@@ -453,12 +453,12 @@ export declare const introShapeSchema: z.ZodDiscriminatedUnion<"kind", [z.ZodObj
     x2: number;
     y2: number;
     tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+    motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
     dashed?: boolean | undefined;
 }>, z.ZodObject<{
     tone: z.ZodOptional<z.ZodEnum<["card", "muted", "faint", "text", "strong", "ok", "busy", "warn", "danger"]>>;
-    motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
+    motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
     /** Seconds after the slide shows before its motion starts. */
     delay: z.ZodOptional<z.ZodNumber>;
     kind: z.ZodLiteral<"text">;
@@ -474,7 +474,7 @@ export declare const introShapeSchema: z.ZodDiscriminatedUnion<"kind", [z.ZodObj
     x: number;
     y: number;
     tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+    motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
     size?: number | undefined;
     middle?: boolean | undefined;
@@ -485,14 +485,14 @@ export declare const introShapeSchema: z.ZodDiscriminatedUnion<"kind", [z.ZodObj
     x: number;
     y: number;
     tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+    motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
     size?: number | undefined;
     middle?: boolean | undefined;
     mono?: boolean | undefined;
 }>, z.ZodObject<{
     tone: z.ZodOptional<z.ZodEnum<["card", "muted", "faint", "text", "strong", "ok", "busy", "warn", "danger"]>>;
-    motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
+    motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
     /** Seconds after the slide shows before its motion starts. */
     delay: z.ZodOptional<z.ZodNumber>;
     kind: z.ZodLiteral<"pointer">;
@@ -503,14 +503,14 @@ export declare const introShapeSchema: z.ZodDiscriminatedUnion<"kind", [z.ZodObj
     x: number;
     y: number;
     tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+    motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
 }, {
     kind: "pointer";
     x: number;
     y: number;
     tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-    motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+    motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
 }>]>;
 export type IntroShape = z.infer<typeof introShapeSchema>;
@@ -520,7 +520,7 @@ export declare const introArtSchema: z.ZodObject<{
     label: z.ZodString;
     shapes: z.ZodArray<z.ZodDiscriminatedUnion<"kind", [z.ZodObject<{
         tone: z.ZodOptional<z.ZodEnum<["card", "muted", "faint", "text", "strong", "ok", "busy", "warn", "danger"]>>;
-        motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
+        motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
         /** Seconds after the slide shows before its motion starts. */
         delay: z.ZodOptional<z.ZodNumber>;
         kind: z.ZodLiteral<"pane">;
@@ -535,7 +535,7 @@ export declare const introArtSchema: z.ZodObject<{
         w: number;
         h: number;
         tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-        motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+        motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
     }, {
         kind: "pane";
@@ -544,11 +544,11 @@ export declare const introArtSchema: z.ZodObject<{
         w: number;
         h: number;
         tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-        motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+        motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
     }>, z.ZodObject<{
         tone: z.ZodOptional<z.ZodEnum<["card", "muted", "faint", "text", "strong", "ok", "busy", "warn", "danger"]>>;
-        motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
+        motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
         /** Seconds after the slide shows before its motion starts. */
         delay: z.ZodOptional<z.ZodNumber>;
         kind: z.ZodLiteral<"box">;
@@ -565,7 +565,7 @@ export declare const introArtSchema: z.ZodObject<{
         w: number;
         h: number;
         tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-        motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+        motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
         round?: number | undefined;
         dashed?: boolean | undefined;
@@ -576,13 +576,13 @@ export declare const introArtSchema: z.ZodObject<{
         w: number;
         h: number;
         tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-        motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+        motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
         round?: number | undefined;
         dashed?: boolean | undefined;
     }>, z.ZodObject<{
         tone: z.ZodOptional<z.ZodEnum<["card", "muted", "faint", "text", "strong", "ok", "busy", "warn", "danger"]>>;
-        motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
+        motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
         /** Seconds after the slide shows before its motion starts. */
         delay: z.ZodOptional<z.ZodNumber>;
         kind: z.ZodLiteral<"rows">;
@@ -597,7 +597,7 @@ export declare const introArtSchema: z.ZodObject<{
         widths: number[];
         gap?: number | undefined;
         tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-        motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+        motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
     }, {
         kind: "rows";
@@ -606,11 +606,11 @@ export declare const introArtSchema: z.ZodObject<{
         widths: number[];
         gap?: number | undefined;
         tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-        motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+        motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
     }>, z.ZodObject<{
         tone: z.ZodOptional<z.ZodEnum<["card", "muted", "faint", "text", "strong", "ok", "busy", "warn", "danger"]>>;
-        motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
+        motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
         /** Seconds after the slide shows before its motion starts. */
         delay: z.ZodOptional<z.ZodNumber>;
         kind: z.ZodLiteral<"dot">;
@@ -623,7 +623,7 @@ export declare const introArtSchema: z.ZodObject<{
         y: number;
         r: number;
         tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-        motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+        motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
     }, {
         kind: "dot";
@@ -631,11 +631,11 @@ export declare const introArtSchema: z.ZodObject<{
         y: number;
         r: number;
         tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-        motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+        motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
     }>, z.ZodObject<{
         tone: z.ZodOptional<z.ZodEnum<["card", "muted", "faint", "text", "strong", "ok", "busy", "warn", "danger"]>>;
-        motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
+        motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
         /** Seconds after the slide shows before its motion starts. */
         delay: z.ZodOptional<z.ZodNumber>;
         kind: z.ZodLiteral<"line">;
@@ -651,7 +651,7 @@ export declare const introArtSchema: z.ZodObject<{
         x2: number;
         y2: number;
         tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-        motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+        motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
         dashed?: boolean | undefined;
     }, {
@@ -661,12 +661,12 @@ export declare const introArtSchema: z.ZodObject<{
         x2: number;
         y2: number;
         tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-        motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+        motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
         dashed?: boolean | undefined;
     }>, z.ZodObject<{
         tone: z.ZodOptional<z.ZodEnum<["card", "muted", "faint", "text", "strong", "ok", "busy", "warn", "danger"]>>;
-        motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
+        motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
         /** Seconds after the slide shows before its motion starts. */
         delay: z.ZodOptional<z.ZodNumber>;
         kind: z.ZodLiteral<"text">;
@@ -682,7 +682,7 @@ export declare const introArtSchema: z.ZodObject<{
         x: number;
         y: number;
         tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-        motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+        motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
         size?: number | undefined;
         middle?: boolean | undefined;
@@ -693,14 +693,14 @@ export declare const introArtSchema: z.ZodObject<{
         x: number;
         y: number;
         tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-        motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+        motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
         size?: number | undefined;
         middle?: boolean | undefined;
         mono?: boolean | undefined;
     }>, z.ZodObject<{
         tone: z.ZodOptional<z.ZodEnum<["card", "muted", "faint", "text", "strong", "ok", "busy", "warn", "danger"]>>;
-        motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
+        motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
         /** Seconds after the slide shows before its motion starts. */
         delay: z.ZodOptional<z.ZodNumber>;
         kind: z.ZodLiteral<"pointer">;
@@ -711,14 +711,14 @@ export declare const introArtSchema: z.ZodObject<{
         x: number;
         y: number;
         tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-        motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+        motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
     }, {
         kind: "pointer";
         x: number;
         y: number;
         tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-        motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+        motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
     }>]>, "many">;
 }, "strip", z.ZodTypeAny, {
@@ -730,7 +730,7 @@ export declare const introArtSchema: z.ZodObject<{
         w: number;
         h: number;
         tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-        motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+        motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
     } | {
         kind: "box";
@@ -739,7 +739,7 @@ export declare const introArtSchema: z.ZodObject<{
         w: number;
         h: number;
         tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-        motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+        motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
         round?: number | undefined;
         dashed?: boolean | undefined;
@@ -750,7 +750,7 @@ export declare const introArtSchema: z.ZodObject<{
         widths: number[];
         gap?: number | undefined;
         tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-        motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+        motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
     } | {
         kind: "dot";
@@ -758,7 +758,7 @@ export declare const introArtSchema: z.ZodObject<{
         y: number;
         r: number;
         tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-        motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+        motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
     } | {
         kind: "line";
@@ -767,7 +767,7 @@ export declare const introArtSchema: z.ZodObject<{
         x2: number;
         y2: number;
         tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-        motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+        motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
         dashed?: boolean | undefined;
     } | {
@@ -776,7 +776,7 @@ export declare const introArtSchema: z.ZodObject<{
         x: number;
         y: number;
         tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-        motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+        motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
         size?: number | undefined;
         middle?: boolean | undefined;
@@ -786,7 +786,7 @@ export declare const introArtSchema: z.ZodObject<{
         x: number;
         y: number;
         tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-        motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+        motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
     })[];
 }, {
@@ -798,7 +798,7 @@ export declare const introArtSchema: z.ZodObject<{
         w: number;
         h: number;
         tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-        motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+        motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
     } | {
         kind: "box";
@@ -807,7 +807,7 @@ export declare const introArtSchema: z.ZodObject<{
         w: number;
         h: number;
         tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-        motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+        motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
         round?: number | undefined;
         dashed?: boolean | undefined;
@@ -818,7 +818,7 @@ export declare const introArtSchema: z.ZodObject<{
         widths: number[];
         gap?: number | undefined;
         tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-        motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+        motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
     } | {
         kind: "dot";
@@ -826,7 +826,7 @@ export declare const introArtSchema: z.ZodObject<{
         y: number;
         r: number;
         tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-        motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+        motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
     } | {
         kind: "line";
@@ -835,7 +835,7 @@ export declare const introArtSchema: z.ZodObject<{
         x2: number;
         y2: number;
         tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-        motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+        motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
         dashed?: boolean | undefined;
     } | {
@@ -844,7 +844,7 @@ export declare const introArtSchema: z.ZodObject<{
         x: number;
         y: number;
         tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-        motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+        motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
         size?: number | undefined;
         middle?: boolean | undefined;
@@ -854,7 +854,7 @@ export declare const introArtSchema: z.ZodObject<{
         x: number;
         y: number;
         tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-        motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+        motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
     })[];
 }>;
@@ -867,7 +867,7 @@ export declare const introSlideSchema: z.ZodObject<{
         label: z.ZodString;
         shapes: z.ZodArray<z.ZodDiscriminatedUnion<"kind", [z.ZodObject<{
             tone: z.ZodOptional<z.ZodEnum<["card", "muted", "faint", "text", "strong", "ok", "busy", "warn", "danger"]>>;
-            motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
+            motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
             /** Seconds after the slide shows before its motion starts. */
             delay: z.ZodOptional<z.ZodNumber>;
             kind: z.ZodLiteral<"pane">;
@@ -882,7 +882,7 @@ export declare const introSlideSchema: z.ZodObject<{
             w: number;
             h: number;
             tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-            motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+            motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
         }, {
             kind: "pane";
@@ -891,11 +891,11 @@ export declare const introSlideSchema: z.ZodObject<{
             w: number;
             h: number;
             tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-            motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+            motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
         }>, z.ZodObject<{
             tone: z.ZodOptional<z.ZodEnum<["card", "muted", "faint", "text", "strong", "ok", "busy", "warn", "danger"]>>;
-            motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
+            motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
             /** Seconds after the slide shows before its motion starts. */
             delay: z.ZodOptional<z.ZodNumber>;
             kind: z.ZodLiteral<"box">;
@@ -912,7 +912,7 @@ export declare const introSlideSchema: z.ZodObject<{
             w: number;
             h: number;
             tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-            motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+            motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
             round?: number | undefined;
             dashed?: boolean | undefined;
@@ -923,13 +923,13 @@ export declare const introSlideSchema: z.ZodObject<{
             w: number;
             h: number;
             tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-            motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+            motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
             round?: number | undefined;
             dashed?: boolean | undefined;
         }>, z.ZodObject<{
             tone: z.ZodOptional<z.ZodEnum<["card", "muted", "faint", "text", "strong", "ok", "busy", "warn", "danger"]>>;
-            motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
+            motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
             /** Seconds after the slide shows before its motion starts. */
             delay: z.ZodOptional<z.ZodNumber>;
             kind: z.ZodLiteral<"rows">;
@@ -944,7 +944,7 @@ export declare const introSlideSchema: z.ZodObject<{
             widths: number[];
             gap?: number | undefined;
             tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-            motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+            motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
         }, {
             kind: "rows";
@@ -953,11 +953,11 @@ export declare const introSlideSchema: z.ZodObject<{
             widths: number[];
             gap?: number | undefined;
             tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-            motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+            motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
         }>, z.ZodObject<{
             tone: z.ZodOptional<z.ZodEnum<["card", "muted", "faint", "text", "strong", "ok", "busy", "warn", "danger"]>>;
-            motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
+            motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
             /** Seconds after the slide shows before its motion starts. */
             delay: z.ZodOptional<z.ZodNumber>;
             kind: z.ZodLiteral<"dot">;
@@ -970,7 +970,7 @@ export declare const introSlideSchema: z.ZodObject<{
             y: number;
             r: number;
             tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-            motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+            motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
         }, {
             kind: "dot";
@@ -978,11 +978,11 @@ export declare const introSlideSchema: z.ZodObject<{
             y: number;
             r: number;
             tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-            motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+            motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
         }>, z.ZodObject<{
             tone: z.ZodOptional<z.ZodEnum<["card", "muted", "faint", "text", "strong", "ok", "busy", "warn", "danger"]>>;
-            motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
+            motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
             /** Seconds after the slide shows before its motion starts. */
             delay: z.ZodOptional<z.ZodNumber>;
             kind: z.ZodLiteral<"line">;
@@ -998,7 +998,7 @@ export declare const introSlideSchema: z.ZodObject<{
             x2: number;
             y2: number;
             tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-            motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+            motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
             dashed?: boolean | undefined;
         }, {
@@ -1008,12 +1008,12 @@ export declare const introSlideSchema: z.ZodObject<{
             x2: number;
             y2: number;
             tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-            motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+            motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
             dashed?: boolean | undefined;
         }>, z.ZodObject<{
             tone: z.ZodOptional<z.ZodEnum<["card", "muted", "faint", "text", "strong", "ok", "busy", "warn", "danger"]>>;
-            motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
+            motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
             /** Seconds after the slide shows before its motion starts. */
             delay: z.ZodOptional<z.ZodNumber>;
             kind: z.ZodLiteral<"text">;
@@ -1029,7 +1029,7 @@ export declare const introSlideSchema: z.ZodObject<{
             x: number;
             y: number;
             tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-            motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+            motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
             size?: number | undefined;
             middle?: boolean | undefined;
@@ -1040,14 +1040,14 @@ export declare const introSlideSchema: z.ZodObject<{
             x: number;
             y: number;
             tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-            motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+            motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
             size?: number | undefined;
             middle?: boolean | undefined;
             mono?: boolean | undefined;
         }>, z.ZodObject<{
             tone: z.ZodOptional<z.ZodEnum<["card", "muted", "faint", "text", "strong", "ok", "busy", "warn", "danger"]>>;
-            motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
+            motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
             /** Seconds after the slide shows before its motion starts. */
             delay: z.ZodOptional<z.ZodNumber>;
             kind: z.ZodLiteral<"pointer">;
@@ -1058,14 +1058,14 @@ export declare const introSlideSchema: z.ZodObject<{
             x: number;
             y: number;
             tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-            motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+            motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
         }, {
             kind: "pointer";
             x: number;
             y: number;
             tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-            motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+            motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
         }>]>, "many">;
     }, "strip", z.ZodTypeAny, {
@@ -1077,7 +1077,7 @@ export declare const introSlideSchema: z.ZodObject<{
             w: number;
             h: number;
             tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-            motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+            motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
         } | {
             kind: "box";
@@ -1086,7 +1086,7 @@ export declare const introSlideSchema: z.ZodObject<{
             w: number;
             h: number;
             tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-            motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+            motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
             round?: number | undefined;
             dashed?: boolean | undefined;
@@ -1097,7 +1097,7 @@ export declare const introSlideSchema: z.ZodObject<{
             widths: number[];
             gap?: number | undefined;
             tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-            motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+            motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
         } | {
             kind: "dot";
@@ -1105,7 +1105,7 @@ export declare const introSlideSchema: z.ZodObject<{
             y: number;
             r: number;
             tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-            motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+            motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
         } | {
             kind: "line";
@@ -1114,7 +1114,7 @@ export declare const introSlideSchema: z.ZodObject<{
             x2: number;
             y2: number;
             tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-            motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+            motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
             dashed?: boolean | undefined;
         } | {
@@ -1123,7 +1123,7 @@ export declare const introSlideSchema: z.ZodObject<{
             x: number;
             y: number;
             tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-            motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+            motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
             size?: number | undefined;
             middle?: boolean | undefined;
@@ -1133,7 +1133,7 @@ export declare const introSlideSchema: z.ZodObject<{
             x: number;
             y: number;
             tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-            motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+            motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
         })[];
     }, {
@@ -1145,7 +1145,7 @@ export declare const introSlideSchema: z.ZodObject<{
             w: number;
             h: number;
             tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-            motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+            motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
         } | {
             kind: "box";
@@ -1154,7 +1154,7 @@ export declare const introSlideSchema: z.ZodObject<{
             w: number;
             h: number;
             tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-            motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+            motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
             round?: number | undefined;
             dashed?: boolean | undefined;
@@ -1165,7 +1165,7 @@ export declare const introSlideSchema: z.ZodObject<{
             widths: number[];
             gap?: number | undefined;
             tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-            motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+            motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
         } | {
             kind: "dot";
@@ -1173,7 +1173,7 @@ export declare const introSlideSchema: z.ZodObject<{
             y: number;
             r: number;
             tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-            motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+            motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
         } | {
             kind: "line";
@@ -1182,7 +1182,7 @@ export declare const introSlideSchema: z.ZodObject<{
             x2: number;
             y2: number;
             tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-            motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+            motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
             dashed?: boolean | undefined;
         } | {
@@ -1191,7 +1191,7 @@ export declare const introSlideSchema: z.ZodObject<{
             x: number;
             y: number;
             tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-            motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+            motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
             size?: number | undefined;
             middle?: boolean | undefined;
@@ -1201,7 +1201,7 @@ export declare const introSlideSchema: z.ZodObject<{
             x: number;
             y: number;
             tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-            motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+            motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
         })[];
     }>>>;
@@ -1217,7 +1217,7 @@ export declare const introSlideSchema: z.ZodObject<{
             w: number;
             h: number;
             tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-            motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+            motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
         } | {
             kind: "box";
@@ -1226,7 +1226,7 @@ export declare const introSlideSchema: z.ZodObject<{
             w: number;
             h: number;
             tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-            motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+            motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
             round?: number | undefined;
             dashed?: boolean | undefined;
@@ -1237,7 +1237,7 @@ export declare const introSlideSchema: z.ZodObject<{
             widths: number[];
             gap?: number | undefined;
             tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-            motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+            motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
         } | {
             kind: "dot";
@@ -1245,7 +1245,7 @@ export declare const introSlideSchema: z.ZodObject<{
             y: number;
             r: number;
             tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-            motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+            motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
         } | {
             kind: "line";
@@ -1254,7 +1254,7 @@ export declare const introSlideSchema: z.ZodObject<{
             x2: number;
             y2: number;
             tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-            motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+            motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
             dashed?: boolean | undefined;
         } | {
@@ -1263,7 +1263,7 @@ export declare const introSlideSchema: z.ZodObject<{
             x: number;
             y: number;
             tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-            motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+            motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
             size?: number | undefined;
             middle?: boolean | undefined;
@@ -1273,7 +1273,7 @@ export declare const introSlideSchema: z.ZodObject<{
             x: number;
             y: number;
             tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-            motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+            motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
         })[];
     } | undefined;
@@ -1292,7 +1292,7 @@ export declare const introSchema: z.ZodObject<{
             label: z.ZodString;
             shapes: z.ZodArray<z.ZodDiscriminatedUnion<"kind", [z.ZodObject<{
                 tone: z.ZodOptional<z.ZodEnum<["card", "muted", "faint", "text", "strong", "ok", "busy", "warn", "danger"]>>;
-                motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
+                motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
                 /** Seconds after the slide shows before its motion starts. */
                 delay: z.ZodOptional<z.ZodNumber>;
                 kind: z.ZodLiteral<"pane">;
@@ -1307,7 +1307,7 @@ export declare const introSchema: z.ZodObject<{
                 w: number;
                 h: number;
                 tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-                motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             }, {
                 kind: "pane";
@@ -1316,11 +1316,11 @@ export declare const introSchema: z.ZodObject<{
                 w: number;
                 h: number;
                 tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-                motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             }>, z.ZodObject<{
                 tone: z.ZodOptional<z.ZodEnum<["card", "muted", "faint", "text", "strong", "ok", "busy", "warn", "danger"]>>;
-                motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
+                motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
                 /** Seconds after the slide shows before its motion starts. */
                 delay: z.ZodOptional<z.ZodNumber>;
                 kind: z.ZodLiteral<"box">;
@@ -1337,7 +1337,7 @@ export declare const introSchema: z.ZodObject<{
                 w: number;
                 h: number;
                 tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-                motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
                 round?: number | undefined;
                 dashed?: boolean | undefined;
@@ -1348,13 +1348,13 @@ export declare const introSchema: z.ZodObject<{
                 w: number;
                 h: number;
                 tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-                motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
                 round?: number | undefined;
                 dashed?: boolean | undefined;
             }>, z.ZodObject<{
                 tone: z.ZodOptional<z.ZodEnum<["card", "muted", "faint", "text", "strong", "ok", "busy", "warn", "danger"]>>;
-                motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
+                motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
                 /** Seconds after the slide shows before its motion starts. */
                 delay: z.ZodOptional<z.ZodNumber>;
                 kind: z.ZodLiteral<"rows">;
@@ -1369,7 +1369,7 @@ export declare const introSchema: z.ZodObject<{
                 widths: number[];
                 gap?: number | undefined;
                 tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-                motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             }, {
                 kind: "rows";
@@ -1378,11 +1378,11 @@ export declare const introSchema: z.ZodObject<{
                 widths: number[];
                 gap?: number | undefined;
                 tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-                motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             }>, z.ZodObject<{
                 tone: z.ZodOptional<z.ZodEnum<["card", "muted", "faint", "text", "strong", "ok", "busy", "warn", "danger"]>>;
-                motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
+                motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
                 /** Seconds after the slide shows before its motion starts. */
                 delay: z.ZodOptional<z.ZodNumber>;
                 kind: z.ZodLiteral<"dot">;
@@ -1395,7 +1395,7 @@ export declare const introSchema: z.ZodObject<{
                 y: number;
                 r: number;
                 tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-                motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             }, {
                 kind: "dot";
@@ -1403,11 +1403,11 @@ export declare const introSchema: z.ZodObject<{
                 y: number;
                 r: number;
                 tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-                motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             }>, z.ZodObject<{
                 tone: z.ZodOptional<z.ZodEnum<["card", "muted", "faint", "text", "strong", "ok", "busy", "warn", "danger"]>>;
-                motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
+                motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
                 /** Seconds after the slide shows before its motion starts. */
                 delay: z.ZodOptional<z.ZodNumber>;
                 kind: z.ZodLiteral<"line">;
@@ -1423,7 +1423,7 @@ export declare const introSchema: z.ZodObject<{
                 x2: number;
                 y2: number;
                 tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-                motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
                 dashed?: boolean | undefined;
             }, {
@@ -1433,12 +1433,12 @@ export declare const introSchema: z.ZodObject<{
                 x2: number;
                 y2: number;
                 tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-                motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
                 dashed?: boolean | undefined;
             }>, z.ZodObject<{
                 tone: z.ZodOptional<z.ZodEnum<["card", "muted", "faint", "text", "strong", "ok", "busy", "warn", "danger"]>>;
-                motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
+                motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
                 /** Seconds after the slide shows before its motion starts. */
                 delay: z.ZodOptional<z.ZodNumber>;
                 kind: z.ZodLiteral<"text">;
@@ -1454,7 +1454,7 @@ export declare const introSchema: z.ZodObject<{
                 x: number;
                 y: number;
                 tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-                motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
                 size?: number | undefined;
                 middle?: boolean | undefined;
@@ -1465,14 +1465,14 @@ export declare const introSchema: z.ZodObject<{
                 x: number;
                 y: number;
                 tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-                motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
                 size?: number | undefined;
                 middle?: boolean | undefined;
                 mono?: boolean | undefined;
             }>, z.ZodObject<{
                 tone: z.ZodOptional<z.ZodEnum<["card", "muted", "faint", "text", "strong", "ok", "busy", "warn", "danger"]>>;
-                motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
+                motion: z.ZodOptional<z.ZodEnum<["pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin", ...("pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin")[]]>>;
                 /** Seconds after the slide shows before its motion starts. */
                 delay: z.ZodOptional<z.ZodNumber>;
                 kind: z.ZodLiteral<"pointer">;
@@ -1483,14 +1483,14 @@ export declare const introSchema: z.ZodObject<{
                 x: number;
                 y: number;
                 tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-                motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             }, {
                 kind: "pointer";
                 x: number;
                 y: number;
                 tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-                motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             }>]>, "many">;
         }, "strip", z.ZodTypeAny, {
@@ -1502,7 +1502,7 @@ export declare const introSchema: z.ZodObject<{
                 w: number;
                 h: number;
                 tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-                motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             } | {
                 kind: "box";
@@ -1511,7 +1511,7 @@ export declare const introSchema: z.ZodObject<{
                 w: number;
                 h: number;
                 tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-                motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
                 round?: number | undefined;
                 dashed?: boolean | undefined;
@@ -1522,7 +1522,7 @@ export declare const introSchema: z.ZodObject<{
                 widths: number[];
                 gap?: number | undefined;
                 tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-                motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             } | {
                 kind: "dot";
@@ -1530,7 +1530,7 @@ export declare const introSchema: z.ZodObject<{
                 y: number;
                 r: number;
                 tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-                motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             } | {
                 kind: "line";
@@ -1539,7 +1539,7 @@ export declare const introSchema: z.ZodObject<{
                 x2: number;
                 y2: number;
                 tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-                motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
                 dashed?: boolean | undefined;
             } | {
@@ -1548,7 +1548,7 @@ export declare const introSchema: z.ZodObject<{
                 x: number;
                 y: number;
                 tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-                motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
                 size?: number | undefined;
                 middle?: boolean | undefined;
@@ -1558,7 +1558,7 @@ export declare const introSchema: z.ZodObject<{
                 x: number;
                 y: number;
                 tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-                motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             })[];
         }, {
@@ -1570,7 +1570,7 @@ export declare const introSchema: z.ZodObject<{
                 w: number;
                 h: number;
                 tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-                motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             } | {
                 kind: "box";
@@ -1579,7 +1579,7 @@ export declare const introSchema: z.ZodObject<{
                 w: number;
                 h: number;
                 tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-                motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
                 round?: number | undefined;
                 dashed?: boolean | undefined;
@@ -1590,7 +1590,7 @@ export declare const introSchema: z.ZodObject<{
                 widths: number[];
                 gap?: number | undefined;
                 tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-                motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             } | {
                 kind: "dot";
@@ -1598,7 +1598,7 @@ export declare const introSchema: z.ZodObject<{
                 y: number;
                 r: number;
                 tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-                motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             } | {
                 kind: "line";
@@ -1607,7 +1607,7 @@ export declare const introSchema: z.ZodObject<{
                 x2: number;
                 y2: number;
                 tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-                motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
                 dashed?: boolean | undefined;
             } | {
@@ -1616,7 +1616,7 @@ export declare const introSchema: z.ZodObject<{
                 x: number;
                 y: number;
                 tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-                motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
                 size?: number | undefined;
                 middle?: boolean | undefined;
@@ -1626,7 +1626,7 @@ export declare const introSchema: z.ZodObject<{
                 x: number;
                 y: number;
                 tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-                motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             })[];
         }>>>;
@@ -1642,7 +1642,7 @@ export declare const introSchema: z.ZodObject<{
                 w: number;
                 h: number;
                 tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-                motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             } | {
                 kind: "box";
@@ -1651,7 +1651,7 @@ export declare const introSchema: z.ZodObject<{
                 w: number;
                 h: number;
                 tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-                motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
                 round?: number | undefined;
                 dashed?: boolean | undefined;
@@ -1662,7 +1662,7 @@ export declare const introSchema: z.ZodObject<{
                 widths: number[];
                 gap?: number | undefined;
                 tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-                motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             } | {
                 kind: "dot";
@@ -1670,7 +1670,7 @@ export declare const introSchema: z.ZodObject<{
                 y: number;
                 r: number;
                 tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-                motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             } | {
                 kind: "line";
@@ -1679,7 +1679,7 @@ export declare const introSchema: z.ZodObject<{
                 x2: number;
                 y2: number;
                 tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-                motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
                 dashed?: boolean | undefined;
             } | {
@@ -1688,7 +1688,7 @@ export declare const introSchema: z.ZodObject<{
                 x: number;
                 y: number;
                 tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-                motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
                 size?: number | undefined;
                 middle?: boolean | undefined;
@@ -1698,7 +1698,7 @@ export declare const introSchema: z.ZodObject<{
                 x: number;
                 y: number;
                 tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-                motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             })[];
         } | undefined;
@@ -1720,7 +1720,7 @@ export declare const introSchema: z.ZodObject<{
                 w: number;
                 h: number;
                 tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-                motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             } | {
                 kind: "box";
@@ -1729,7 +1729,7 @@ export declare const introSchema: z.ZodObject<{
                 w: number;
                 h: number;
                 tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-                motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
                 round?: number | undefined;
                 dashed?: boolean | undefined;
@@ -1740,7 +1740,7 @@ export declare const introSchema: z.ZodObject<{
                 widths: number[];
                 gap?: number | undefined;
                 tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-                motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             } | {
                 kind: "dot";
@@ -1748,7 +1748,7 @@ export declare const introSchema: z.ZodObject<{
                 y: number;
                 r: number;
                 tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-                motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             } | {
                 kind: "line";
@@ -1757,7 +1757,7 @@ export declare const introSchema: z.ZodObject<{
                 x2: number;
                 y2: number;
                 tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-                motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
                 dashed?: boolean | undefined;
             } | {
@@ -1766,7 +1766,7 @@ export declare const introSchema: z.ZodObject<{
                 x: number;
                 y: number;
                 tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-                motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
                 size?: number | undefined;
                 middle?: boolean | undefined;
@@ -1776,7 +1776,7 @@ export declare const introSchema: z.ZodObject<{
                 x: number;
                 y: number;
                 tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
-                motion?: "pop" | "fill" | "rise" | "draw" | "drop" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
+                motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             })[];
         } | undefined;

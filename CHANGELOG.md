@@ -11,6 +11,34 @@ After 2.78.0, every entry's first line under its heading is its kind, and the ve
 (semver; CI checks it): `Kind: breaking` → next major, `Kind: feature` → next minor, `Kind: fix` →
 next patch.
 
+## 2.83.0 — 2026-11-11
+
+Kind: feature
+
+Five services a consumer CALLS, so modules that cooperate never name each other, and a way for one
+module's server to prove to another that it sent a request. **Additive**; `PROTOCOL` is still 2.
+
+- `document.proposals` (`documentProposalsSchema`): a document per epic that takes edits only as
+  proposals — `name`, `root` (the folder, `{epic}` in it; `documentRoot`, `documentsFolder`), `main`,
+  and `tools` `{ sections, source, propose, proposals }`.
+- `review.drafts` (`reviewDraftsSchema`): the person's draft review of a change — `name`, `tools`
+  `{ comment, propose, drop }`, and `send?`, a route that sends a run's review without the person,
+  taken only from a module's server that proves who it is.
+- `checklist.holder` (`checklistHolderSchema`): the person's checklists — `name`, `tools`
+  `{ list, create, add, hold, check }`.
+- `work.status` (`workStatusSchema`): the stage of work by its issue — `name`, `jobs` (a route answering
+  `{ jobs }`, `workJobSchema` each; `workJobsIn`).
+- `diagram.writer` (`diagramWriterSchema`): diagrams an agent writes — `name`, `tool`, `kinds`
+  (`DIAGRAM_KINDS`).
+- `serviceTool`, `servicePath`, `SERVICE_EPIC`, and the names `DOCUMENT_PROPOSALS`, `REVIEW_DRAFTS`,
+  `CHECKLIST_HOLDER`, `WORK_STATUS`, `DIAGRAM_WRITER`.
+- `SERVICE_CALLER_HEADER` and `SERVICE_PASS_HEADER`: who calls, and a pass it minted.
+- `/serve`: `findService(service, { module, project?, kehikko? })` (the first provider whose descriptor
+  parses, or why there is none), `callServiceTool(module, tool, args, { from })` (a tool on the
+  provider's MCP door, found by the id the host answered), `fetchService(module, path, init, { from })`
+  (a route on its origin), `callerHeaders(from)`, and `vouchCaller(headers)`, which asks the caller at
+  its registered origin whether it minted the pass — the proof a host already takes.
+
 ## 2.82.0 — 2026-11-11
 
 Kind: feature

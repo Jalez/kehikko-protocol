@@ -82,6 +82,19 @@ export {
   type NeighbourOptions,
 } from './neighbours.js'
 
+/* 2.83.0. Using a service from a module's server, and proving who calls one. */
+export {
+  findService,
+  callServiceTool,
+  fetchService,
+  callerHeaders,
+  vouchCaller,
+  type FoundService,
+  type FindServiceOptions,
+  type CallServiceOptions,
+  type VouchOptions,
+} from './services.js'
+
 export { readJourney, readJourneys } from './journeys.js'
 /* An epic's plan as a module publishes it (2.21.0): `steps.json` in its own folder, and every module's read. */
 export { readPlans, readPlansFor, writePlan, type PublishedPlans, type PlanWritten } from './plans.js'
