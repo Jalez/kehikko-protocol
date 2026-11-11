@@ -763,6 +763,7 @@ export {
   messageSayParams,
   messagePostParams,
   messageNotifyParams,
+  messageNotifySessionParams,
   messageMineParams,
   messageMineResult,
   isPersonMessage,
@@ -928,6 +929,34 @@ export {
   type AgentSessions,
   type ProvidingManifest,
 } from './provides.js'
+
+/* Services: one module provides, others consume, neither names the other (2.81.0). See `services.ts`, docs/services.md. */
+export {
+  SERVICES,
+  SERVICE_NAMES,
+  SERVICE_NAME,
+  serviceName,
+  servicesSchema,
+  serviceDescriptor,
+  servicesOf,
+  servicesFindParams,
+  servicesFindResult,
+  serviceProviderSchema,
+  providerOf,
+  WORK_QUEUE,
+  WORK_KINDS,
+  WORK_COMMAND,
+  workQueueSchema,
+  workRunLine,
+  workQueueSaid,
+  type Service,
+  type ServiceDescriptor,
+  type Services,
+  type ServiceProvider,
+  type ServicesFindResult,
+  type WorkKind,
+  type WorkQueue,
+} from './services.js'
 
 export {
   CONTENT_HOST,

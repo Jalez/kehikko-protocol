@@ -45,6 +45,8 @@ export declare const METHOD_SINCE: {
     readonly 'messages.tell': "2.75.0";
     readonly 'messages.say': "2.50.0";
     readonly 'projects.mine': "2.76.0";
+    readonly 'messages.notifySession': "2.81.0";
+    readonly 'services.find': "2.81.0";
     readonly 'inbox.read': "2.79.0";
     readonly 'inbox.log': "2.79.0";
     readonly 'inbox.act': "2.79.0";
@@ -83,6 +85,8 @@ export declare const CAPABILITY_SINCE: {
     readonly 'agents:message': "2.41.0";
     readonly 'messages:as-person': "2.50.0";
     readonly 'inbox:person': "2.79.0";
+    readonly 'sessions:observe': "2.81.0";
+    readonly 'services:read': "2.81.0";
 };
 /** Each method a module's server may ask (`SERVER_METHODS`), and the version a server could first ask it in. */
 export declare const SERVER_METHOD_SINCE: {
@@ -100,6 +104,8 @@ export declare const SERVER_METHOD_SINCE: {
     readonly 'messages.notify': "2.54.0";
     readonly 'messages.tell': "2.75.0";
     readonly 'projects.mine': "2.76.0";
+    readonly 'messages.notifySession': "2.81.0";
+    readonly 'services.find': "2.81.0";
 };
 /**
  * The manifest declarations a host has to know to do what the module asks, and the version that
@@ -261,6 +267,8 @@ export declare const SINCE: {
         readonly 'messages.tell': "2.75.0";
         readonly 'messages.say': "2.50.0";
         readonly 'projects.mine': "2.76.0";
+        readonly 'messages.notifySession': "2.81.0";
+        readonly 'services.find': "2.81.0";
         readonly 'inbox.read': "2.79.0";
         readonly 'inbox.log': "2.79.0";
         readonly 'inbox.act': "2.79.0";
@@ -298,6 +306,8 @@ export declare const SINCE: {
         readonly 'agents:message': "2.41.0";
         readonly 'messages:as-person': "2.50.0";
         readonly 'inbox:person': "2.79.0";
+        readonly 'sessions:observe': "2.81.0";
+        readonly 'services:read': "2.81.0";
     };
     readonly serverMethods: {
         readonly 'tracker.get': "2.19.0";
@@ -314,6 +324,8 @@ export declare const SINCE: {
         readonly 'messages.notify': "2.54.0";
         readonly 'messages.tell': "2.75.0";
         readonly 'projects.mine': "2.76.0";
+        readonly 'messages.notifySession': "2.81.0";
+        readonly 'services.find': "2.81.0";
     };
     readonly declarations: {
         readonly 'mcp.subjects': "1.1.0";
@@ -435,6 +447,8 @@ export declare const PIECE_SAID: {
         readonly 'agents:message': "messages between agent sessions";
         readonly 'messages:as-person': "messages to agent sessions as the person";
         readonly 'inbox:person': "your Inbox, shown and acted on for you";
+        readonly 'sessions:observe': "notices to agent sessions it sees working on this computer";
+        readonly 'services:read': "which modules here provide a service to other modules";
     };
     readonly declarations: {
         readonly 'mcp.subjects': "door subjects";

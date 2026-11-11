@@ -407,6 +407,11 @@ export declare const LIMITS: {
      * (2.75.0): more within the minute are merged by the host into one digest at its end.
      */
     readonly TELLS_PER_MINUTE: 1;
+    /**
+     * How many notices one module may send to one session that did not ask it through
+     * `messages.notifySession` (2.81.0) in an hour; the notice bounds hold too.
+     */
+    readonly OBSERVED_PER_HOUR: 6;
     /** How many messages the person may send through one module in a minute (2.50.0, `messages.say`). */
     readonly PERSON_MESSAGES_PER_MINUTE: 20;
     /** How many rows of traffic a host keeps, and the most one `traffic.read` returns. */
@@ -445,6 +450,14 @@ export declare const LIMITS: {
     readonly PROVIDES: 8;
     /** One word of `declares.provides`, and the value of a skill's `{ provides }` need, in characters. */
     readonly PROVIDES_WORD: 32;
+    /** How many services one manifest may provide (2.81.0, `services`). */
+    readonly SERVICES: 16;
+    /** One line of a service's descriptor — a `work.queue` run line, program or mark — in characters (2.81.0). */
+    readonly SERVICE_LINE: 400;
+    /** How many marks one `work.queue` descriptor may list (2.81.0). */
+    readonly SERVICE_MARKS: 4;
+    /** How many providers one `services.find` answers with (2.81.0). */
+    readonly SERVICE_PROVIDERS: 16;
     /** The error's message, in characters. Longer is cut, never refused. */
     readonly PAGE_ERROR_MESSAGE: 500;
     /** Where it was caught (`PAGE_ERROR_WHERE`), in characters. */

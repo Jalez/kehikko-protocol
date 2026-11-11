@@ -8,6 +8,7 @@ import { moduleSkillsSchema } from './skills.js'
 import { CONTEXT_SCOPES, type ContextScope } from './context.js'
 import { settingsDeclarationSchema } from './settings.js'
 import { agentSessionsSchema, providesSchema } from './provides.js'
+import { servicesSchema } from './services.js'
 import { holdsSchema, opensSchema } from './abilities.js'
 import { revealModeSchema } from './reveal.js'
 import { agentSaysSchema } from './notes.js'
@@ -308,6 +309,13 @@ const manifestFields = z.object({
    * optional, dropped when it does not parse, like `opens`.
    */
   holds: holdsSchema.optional().catch(undefined),
+  /**
+   * 2.81.0. The services this module provides to other modules (`SERVICES`), each with its descriptor
+   * in the shape that service's schema gives (`services.ts`): `services['work.queue']` is how to hand
+   * heavy work to it. A consumer finds a provider through `services.find` and never names it. Top-level,
+   * optional, dropped when it does not parse, like `opens`, so a host before 2.81.0 runs the module.
+   */
+  services: servicesSchema.optional().catch(undefined),
   /**
    * 2.42.0. How the host's revealed header and footer meet this module's page (`REVEAL_MODES`):
    * `push` (the default) shrinks the frame to make room; `over` keeps the frame's size and draws the

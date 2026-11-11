@@ -995,6 +995,34 @@ export declare const messageNotifyParams: z.ZodObject<{
     kind?: "report" | "note" | undefined;
 }>;
 /**
+ * 2.81.0. `messages.notifySession`'s params: a module's OWN notice to ONE agent session it did not hear
+ * from, named by the session's own id — the id its agent CLI puts in the environment of what it starts,
+ * as a module that watches this computer's processes reads it. From the module's SERVER
+ * (`SERVER_METHODS`), under `sessions:observe` (and the module must ask for `agents:message` too). The
+ * host finds the agent module that runs a session by that id — only a session it has seen lately, through
+ * that module's place token — and sends it there, in that session's project, as `messages.notify` does:
+ * stamped `from: { module, name, session: null, place: <the session's place>, person: false }`,
+ * `to: { session }`, delivered like any message, declined while the person muted the module there. A
+ * session the host does not know is declined, never guessed. Bounded per sending module and receiving
+ * session to `LIMITS.OBSERVED_PER_HOUR`, on top of the notice bounds. Answered with `messageSendResult`.
+ */
+export declare const messageNotifySessionParams: z.ZodObject<{
+    session: z.ZodString;
+    body: z.ZodString;
+    kind: z.ZodOptional<z.ZodEnum<["note", "report"]>>;
+    thread: z.ZodOptional<z.ZodString>;
+}, "strip", z.ZodTypeAny, {
+    session: string;
+    body: string;
+    thread?: string | undefined;
+    kind?: "report" | "note" | undefined;
+}, {
+    session: string;
+    body: string;
+    thread?: string | undefined;
+    kind?: "report" | "note" | undefined;
+}>;
+/**
  * 2.75.0. `messages.tell`'s params: a module's OWN news to every agent session at a PLACE — an epic, some
  * of its parts, a kehikko — from the module's SERVER (`SERVER_METHODS`, naming its project), under
  * `agents:message`: for news the sessions working there should hear without having asked (a review
