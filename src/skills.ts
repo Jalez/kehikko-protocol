@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { MODULE_ID } from './ids.js'
 import { LIMITS } from './limits.js'
 import type { ProvidingManifest } from './provides.js'
+import { SERVICES } from './services.js'
 
 /**
  * Agent skills a module offers (2.5.0): instructions an agent session loads, one SKILL.md each. A
@@ -55,11 +56,13 @@ export const NEED_KINDS = {
   reacts: 'a module that reacts to it (reacts)',
   /** `{ uses: 'trackers:read' }`: some module asks for this capability (`declares.uses`). */
   uses: 'a module that asks for it (declares.uses)',
+  /** 2.85.0. `{ service: 'review.drafts' }`: some module on the kehikko provides this service (`services`). */
+  service: 'a module that provides this service (services)',
 } as const
 export type NeedKind = keyof typeof NEED_KINDS
 
 /** A need by what a module provides, says, or asks for, rather than by its id: one key, one word. */
-export type CapabilityNeed = { provides: string } | { subject: string } | { reacts: string } | { uses: string }
+export type CapabilityNeed = { provides: string } | { subject: string } | { reacts: string } | { uses: string } | { service: string }
 
 /** One thing a skill needs: a module id, or a `CapabilityNeed`. */
 export type SkillNeed = string | CapabilityNeed
@@ -73,7 +76,7 @@ export function needParts(need: SkillNeed): { kind: string; word: string } | nul
 
 const needObject = z
   .record(z.string().min(1).max(LIMITS.CAPABILITY), z.string().trim().min(1).max(LIMITS.CAPABILITY))
-  .refine((need) => Object.keys(need).length === 1, { message: 'a need names one thing: provides, subject, reacts or uses' })
+  .refine((need) => Object.keys(need).length === 1, { message: 'a need names one thing: provides, subject, reacts, uses or service' })
 
 /** One need, as a manifest writes it. */
 export const skillNeedSchema = z.union([z.string().regex(MODULE_ID, 'a module id'), needObject]) as unknown as z.ZodType<SkillNeed>
@@ -133,6 +136,8 @@ export function meetsNeed(need: SkillNeed, module: string | ProvidingManifest): 
     return (manifest.reacts ?? []).includes(parts.word)
   case 'uses':
     return (manifest.declares?.uses ?? []).includes(parts.word)
+  case 'service':
+    return !!manifest.services && typeof manifest.services === 'object' && Object.hasOwn(manifest.services, parts.word)
   default:
     return false
   }
@@ -196,7 +201,10 @@ const NEED_SAID: Record<NeedKind, (word: string) => string> = {
   subject: (word) => `a module that can show a ${word}`,
   reacts: (word) => (word === 'address' ? 'a module that shows pages' : `a module that follows ${word}`),
   uses: (word) => `a module that asks for ${word}`,
+  service: (word) => (Object.hasOwn(SERVICES, word) ? `a module that ${lower(SERVICES[word as keyof typeof SERVICES].says)}` : `a module that provides ${word}`),
 }
+
+const lower = (said: string): string => (said.charAt(0).toLowerCase() + said.slice(1)).replace(/\.$/, '')
 
 /**
  * One need in words a person reads (2.21.0): a module id as `nameOf` names it (the id's last part,

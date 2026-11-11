@@ -51,7 +51,7 @@ export declare const runResultSchema: z.ZodObject<{
     id: string;
     epic: string | null;
     kind: "push" | "review" | "other" | "verify";
-    state: "failed" | "running" | "cancelled" | "queued" | "passed";
+    state: "passed" | "failed" | "running" | "cancelled" | "queued";
     label: string;
     refs: string[];
     queuedAt: number;
@@ -60,7 +60,7 @@ export declare const runResultSchema: z.ZodObject<{
     exit: number | null;
 }, {
     id: string;
-    state: "failed" | "running" | "cancelled" | "queued" | "passed";
+    state: "passed" | "failed" | "running" | "cancelled" | "queued";
     label: string;
     queuedAt: number;
     epic?: unknown;

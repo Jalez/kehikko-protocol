@@ -38,6 +38,8 @@ export declare const NEED_KINDS: {
     readonly reacts: "a module that reacts to it (reacts)";
     /** `{ uses: 'trackers:read' }`: some module asks for this capability (`declares.uses`). */
     readonly uses: "a module that asks for it (declares.uses)";
+    /** 2.85.0. `{ service: 'review.drafts' }`: some module on the kehikko provides this service (`services`). */
+    readonly service: "a module that provides this service (services)";
 };
 export type NeedKind = keyof typeof NEED_KINDS;
 /** A need by what a module provides, says, or asks for, rather than by its id: one key, one word. */
@@ -49,6 +51,8 @@ export type CapabilityNeed = {
     reacts: string;
 } | {
     uses: string;
+} | {
+    service: string;
 };
 /** One thing a skill needs: a module id, or a `CapabilityNeed`. */
 export type SkillNeed = string | CapabilityNeed;

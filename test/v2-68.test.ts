@@ -4,7 +4,7 @@ import { LIMITS, PACKAGE_VERSION, PROTOCOL, headerItemSchema, headerOptionSchema
 
 describe('the version', () => {
   test('is 2.68.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.84.0')
+    expect(PACKAGE_VERSION).toBe('2.85.0')
     expect(PROTOCOL).toBe(2)
   })
 })

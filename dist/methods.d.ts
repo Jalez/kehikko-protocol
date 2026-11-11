@@ -166,6 +166,12 @@ export declare const CAPABILITIES: {
      * `services.ts`): how a consumer finds a service without naming the module that provides it.
      */
     readonly 'services:read': "See which modules here provide a service to other modules, and how to use it.";
+    /**
+     * 2.85.0. Ask which place — epic, parts, kehikko — an agent session is filed under in a project, by
+     * the session's own id (`sessions.placeOf`, `services.ts`): for a module whose work is started from a
+     * session and belongs where that session does. Only from a module's server.
+     */
+    readonly 'sessions:place': "See which epic, parts and kehikko an agent session is working on, by its session id.";
     readonly 'inbox:person': "Show your Inbox — what modules need, are doing and have said — and, on your press, mark it seen, dismiss, forget, answer or go to it.";
 };
 export type Capability = keyof typeof CAPABILITIES;
@@ -235,6 +241,8 @@ export declare const METHODS: {
     readonly 'messages.notifySession': "sessions:observe";
     /** Who provides a service here, with each one's descriptor (2.81.0). */
     readonly 'services.find': "services:read";
+    /** Which place a session is filed under, by its own id (2.85.0). */
+    readonly 'sessions.placeOf': "sessions:place";
     /** The person's Inbox, read by a module's page (2.79.0). */
     readonly 'inbox.read': "inbox:person";
     /** Earlier: the Inbox's log, a page of it (2.79.0). */
@@ -2230,6 +2238,14 @@ export declare const methodParams: {
     }, {
         service: string;
         kehikko?: string | undefined;
+    }>;
+    /** 2.85.0. From a module's server about one project: the place a session is filed under; answered with `sessionsPlaceOfResult`. */
+    readonly 'sessions.placeOf': z.ZodObject<{
+        session: z.ZodString;
+    }, "strip", z.ZodTypeAny, {
+        session: string;
+    }, {
+        session: string;
     }>;
     /** 2.79.0. From a page only: the person's Inbox; answered with `inboxReadResult`. See `inbox.ts`. */
     readonly 'inbox.read': z.ZodObject<{}, "strip", z.ZodTypeAny, {}, {}>;

@@ -374,11 +374,6 @@ export declare const inboxReadResult: z.ZodObject<{
         name: string;
     }>, "many">>;
 }, "strip", z.ZodTypeAny, {
-    next: {
-        id: string;
-        module: string;
-    } | null;
-    rev: number;
     items: {
         id: string;
         module: string;
@@ -400,6 +395,11 @@ export declare const inboxReadResult: z.ZodObject<{
         says?: string | undefined;
         detail?: string | undefined;
     }[];
+    next: {
+        id: string;
+        module: string;
+    } | null;
+    rev: number;
     elsewhere: {
         project: {
             id: number;
@@ -433,7 +433,6 @@ export declare const inboxReadResult: z.ZodObject<{
         name: string;
     }[];
 }, {
-    rev: number;
     items: {
         id: string;
         module: string;
@@ -455,6 +454,7 @@ export declare const inboxReadResult: z.ZodObject<{
         seen?: boolean | undefined;
         mutable?: boolean | undefined;
     }[];
+    rev: number;
     next?: {
         id: string;
         module: string;

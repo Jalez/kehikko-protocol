@@ -58,6 +58,8 @@ export interface ProvidingManifest {
     agentSessions?: { loadsSkills?: boolean; installsSkills?: boolean } | null
   } | null
   mcp?: { subjects?: readonly { kind: string }[] } | null
+  /** 2.85.0. The services it provides, by name (`services` in a manifest): what a `{ service }` skill need reads. */
+  services?: Record<string, unknown> | null
 }
 
 /** What a module says it provides: `declares.provides` as written, `[]` when it says nothing. */

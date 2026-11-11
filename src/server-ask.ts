@@ -54,6 +54,8 @@ export const SERVER_METHODS = [
   /* 2.81.0: a notice to one session found by its own id (the host finds its project), and who provides a service here. Name no project. */
   'messages.notifySession',
   'services.find',
+  /* 2.85.0: the place a session is filed under in a project, by its own id. Names its project. */
+  'sessions.placeOf',
 ] as const
 export type ServerMethod = (typeof SERVER_METHODS)[number]
 
@@ -72,6 +74,7 @@ export const SERVER_PROJECT_METHODS: readonly ServerMethod[] = [
   'parts.get',
   'dispositions.get',
   'messages.tell',
+  'sessions.placeOf',
 ]
 
 /** Whether a question with this method has to name its project. */

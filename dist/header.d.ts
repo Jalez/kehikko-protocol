@@ -126,9 +126,9 @@ export declare const HEADER_ITEM_SHAPES: {
         label: string;
         agents: boolean;
         group?: string | undefined;
+        tool?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        tool?: string | undefined;
     }, {
         value: string;
         options: {
@@ -141,10 +141,10 @@ export declare const HEADER_ITEM_SHAPES: {
         kind: "switch";
         label: string;
         group?: string | undefined;
+        tool?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         agents?: boolean | undefined;
-        tool?: string | undefined;
     }>;
     readonly toggle: z.ZodObject<{
         checked: z.ZodBoolean;
@@ -175,19 +175,19 @@ export declare const HEADER_ITEM_SHAPES: {
         agents: boolean;
         checked: boolean;
         group?: string | undefined;
+        tool?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        tool?: string | undefined;
     }, {
         id: string;
         kind: "toggle";
         label: string;
         checked: boolean;
         group?: string | undefined;
+        tool?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         agents?: boolean | undefined;
-        tool?: string | undefined;
     }>;
     readonly go: z.ZodObject<{
         options: z.ZodArray<z.ZodObject<{
@@ -238,9 +238,9 @@ export declare const HEADER_ITEM_SHAPES: {
         label: string;
         agents: boolean;
         group?: string | undefined;
+        tool?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        tool?: string | undefined;
     }, {
         options: {
             id: string;
@@ -252,10 +252,10 @@ export declare const HEADER_ITEM_SHAPES: {
         kind: "go";
         label: string;
         group?: string | undefined;
+        tool?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
         agents?: boolean | undefined;
-        tool?: string | undefined;
     }>;
     readonly run: z.ZodObject<{
         state: z.ZodDefault<z.ZodEnum<["idle", "busy", "failed"]>>;
@@ -324,6 +324,7 @@ export declare const HEADER_ITEM_SHAPES: {
         disabled: string | null;
         confirm: boolean;
         group?: string | undefined;
+        tool?: string | undefined;
         copy?: {
             plain: string;
             html?: string | undefined;
@@ -331,7 +332,6 @@ export declare const HEADER_ITEM_SHAPES: {
         open?: string | undefined;
         icon?: string | undefined;
         shortcut?: string | undefined;
-        tool?: string | undefined;
         surface?: "fullscreen" | undefined;
         pinned?: boolean | undefined;
     }, {
@@ -340,6 +340,7 @@ export declare const HEADER_ITEM_SHAPES: {
         label: string;
         state?: "idle" | "busy" | "failed" | undefined;
         group?: string | undefined;
+        tool?: string | undefined;
         copy?: {
             plain: string;
             html?: string | undefined;
@@ -348,7 +349,6 @@ export declare const HEADER_ITEM_SHAPES: {
         icon?: string | undefined;
         shortcut?: string | undefined;
         agents?: boolean | undefined;
-        tool?: string | undefined;
         result?: string | null | undefined;
         disabled?: string | null | undefined;
         confirm?: boolean | undefined;
@@ -431,9 +431,9 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     label: string;
     agents: boolean;
     group?: string | undefined;
+    tool?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
-    tool?: string | undefined;
 }, {
     value: string;
     options: {
@@ -446,10 +446,10 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     kind: "switch";
     label: string;
     group?: string | undefined;
+    tool?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     agents?: boolean | undefined;
-    tool?: string | undefined;
 }>, z.ZodObject<{
     checked: z.ZodBoolean;
     id: z.ZodEffects<z.ZodString, string, string>;
@@ -479,19 +479,19 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     agents: boolean;
     checked: boolean;
     group?: string | undefined;
+    tool?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
-    tool?: string | undefined;
 }, {
     id: string;
     kind: "toggle";
     label: string;
     checked: boolean;
     group?: string | undefined;
+    tool?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     agents?: boolean | undefined;
-    tool?: string | undefined;
 }>, z.ZodObject<{
     options: z.ZodArray<z.ZodObject<{
         id: z.ZodEffects<z.ZodString, string, string>;
@@ -541,9 +541,9 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     label: string;
     agents: boolean;
     group?: string | undefined;
+    tool?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
-    tool?: string | undefined;
 }, {
     options: {
         id: string;
@@ -555,10 +555,10 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     kind: "go";
     label: string;
     group?: string | undefined;
+    tool?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     agents?: boolean | undefined;
-    tool?: string | undefined;
 }>, z.ZodObject<{
     state: z.ZodDefault<z.ZodEnum<["idle", "busy", "failed"]>>;
     /** What the last run came to, in a word or three, or null. Shown beside the label. */
@@ -626,6 +626,7 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     disabled: string | null;
     confirm: boolean;
     group?: string | undefined;
+    tool?: string | undefined;
     copy?: {
         plain: string;
         html?: string | undefined;
@@ -633,7 +634,6 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     open?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
-    tool?: string | undefined;
     surface?: "fullscreen" | undefined;
     pinned?: boolean | undefined;
 }, {
@@ -642,6 +642,7 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     label: string;
     state?: "idle" | "busy" | "failed" | undefined;
     group?: string | undefined;
+    tool?: string | undefined;
     copy?: {
         plain: string;
         html?: string | undefined;
@@ -650,7 +651,6 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     icon?: string | undefined;
     shortcut?: string | undefined;
     agents?: boolean | undefined;
-    tool?: string | undefined;
     result?: string | null | undefined;
     disabled?: string | null | undefined;
     confirm?: boolean | undefined;
@@ -669,9 +669,9 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     label: string;
     agents: boolean;
     group?: string | undefined;
+    tool?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
-    tool?: string | undefined;
 } | {
     id: string;
     kind: "toggle";
@@ -679,9 +679,9 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     agents: boolean;
     checked: boolean;
     group?: string | undefined;
+    tool?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
-    tool?: string | undefined;
 } | {
     options: {
         id: string;
@@ -694,9 +694,9 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     label: string;
     agents: boolean;
     group?: string | undefined;
+    tool?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
-    tool?: string | undefined;
 } | {
     id: string;
     kind: "run";
@@ -707,6 +707,7 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     disabled: string | null;
     confirm: boolean;
     group?: string | undefined;
+    tool?: string | undefined;
     copy?: {
         plain: string;
         html?: string | undefined;
@@ -714,7 +715,6 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     open?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
-    tool?: string | undefined;
     surface?: "fullscreen" | undefined;
     pinned?: boolean | undefined;
 }, {
@@ -729,20 +729,20 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     kind: "switch";
     label: string;
     group?: string | undefined;
+    tool?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     agents?: boolean | undefined;
-    tool?: string | undefined;
 } | {
     id: string;
     kind: "toggle";
     label: string;
     checked: boolean;
     group?: string | undefined;
+    tool?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     agents?: boolean | undefined;
-    tool?: string | undefined;
 } | {
     options: {
         id: string;
@@ -754,16 +754,17 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     kind: "go";
     label: string;
     group?: string | undefined;
+    tool?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     agents?: boolean | undefined;
-    tool?: string | undefined;
 } | {
     id: string;
     kind: "run";
     label: string;
     state?: "idle" | "busy" | "failed" | undefined;
     group?: string | undefined;
+    tool?: string | undefined;
     copy?: {
         plain: string;
         html?: string | undefined;
@@ -772,7 +773,6 @@ export declare const headerItemSchema: z.ZodEffects<z.ZodDiscriminatedUnion<"kin
     icon?: string | undefined;
     shortcut?: string | undefined;
     agents?: boolean | undefined;
-    tool?: string | undefined;
     result?: string | null | undefined;
     disabled?: string | null | undefined;
     confirm?: boolean | undefined;
@@ -835,9 +835,9 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     label: string;
     agents: boolean;
     group?: string | undefined;
+    tool?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
-    tool?: string | undefined;
 }, {
     value: string;
     options: {
@@ -850,10 +850,10 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     kind: "switch";
     label: string;
     group?: string | undefined;
+    tool?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     agents?: boolean | undefined;
-    tool?: string | undefined;
 }>, z.ZodObject<{
     checked: z.ZodBoolean;
     id: z.ZodEffects<z.ZodString, string, string>;
@@ -883,19 +883,19 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     agents: boolean;
     checked: boolean;
     group?: string | undefined;
+    tool?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
-    tool?: string | undefined;
 }, {
     id: string;
     kind: "toggle";
     label: string;
     checked: boolean;
     group?: string | undefined;
+    tool?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     agents?: boolean | undefined;
-    tool?: string | undefined;
 }>, z.ZodObject<{
     options: z.ZodArray<z.ZodObject<{
         id: z.ZodEffects<z.ZodString, string, string>;
@@ -945,9 +945,9 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     label: string;
     agents: boolean;
     group?: string | undefined;
+    tool?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
-    tool?: string | undefined;
 }, {
     options: {
         id: string;
@@ -959,10 +959,10 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     kind: "go";
     label: string;
     group?: string | undefined;
+    tool?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     agents?: boolean | undefined;
-    tool?: string | undefined;
 }>, z.ZodObject<{
     state: z.ZodDefault<z.ZodEnum<["idle", "busy", "failed"]>>;
     /** What the last run came to, in a word or three, or null. Shown beside the label. */
@@ -1030,6 +1030,7 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     disabled: string | null;
     confirm: boolean;
     group?: string | undefined;
+    tool?: string | undefined;
     copy?: {
         plain: string;
         html?: string | undefined;
@@ -1037,7 +1038,6 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     open?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
-    tool?: string | undefined;
     surface?: "fullscreen" | undefined;
     pinned?: boolean | undefined;
 }, {
@@ -1046,6 +1046,7 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     label: string;
     state?: "idle" | "busy" | "failed" | undefined;
     group?: string | undefined;
+    tool?: string | undefined;
     copy?: {
         plain: string;
         html?: string | undefined;
@@ -1054,7 +1055,6 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     icon?: string | undefined;
     shortcut?: string | undefined;
     agents?: boolean | undefined;
-    tool?: string | undefined;
     result?: string | null | undefined;
     disabled?: string | null | undefined;
     confirm?: boolean | undefined;
@@ -1073,9 +1073,9 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     label: string;
     agents: boolean;
     group?: string | undefined;
+    tool?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
-    tool?: string | undefined;
 } | {
     id: string;
     kind: "toggle";
@@ -1083,9 +1083,9 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     agents: boolean;
     checked: boolean;
     group?: string | undefined;
+    tool?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
-    tool?: string | undefined;
 } | {
     options: {
         id: string;
@@ -1098,9 +1098,9 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     label: string;
     agents: boolean;
     group?: string | undefined;
+    tool?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
-    tool?: string | undefined;
 } | {
     id: string;
     kind: "run";
@@ -1111,6 +1111,7 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     disabled: string | null;
     confirm: boolean;
     group?: string | undefined;
+    tool?: string | undefined;
     copy?: {
         plain: string;
         html?: string | undefined;
@@ -1118,7 +1119,6 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     open?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
-    tool?: string | undefined;
     surface?: "fullscreen" | undefined;
     pinned?: boolean | undefined;
 }, {
@@ -1133,20 +1133,20 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     kind: "switch";
     label: string;
     group?: string | undefined;
+    tool?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     agents?: boolean | undefined;
-    tool?: string | undefined;
 } | {
     id: string;
     kind: "toggle";
     label: string;
     checked: boolean;
     group?: string | undefined;
+    tool?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     agents?: boolean | undefined;
-    tool?: string | undefined;
 } | {
     options: {
         id: string;
@@ -1158,16 +1158,17 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     kind: "go";
     label: string;
     group?: string | undefined;
+    tool?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     agents?: boolean | undefined;
-    tool?: string | undefined;
 } | {
     id: string;
     kind: "run";
     label: string;
     state?: "idle" | "busy" | "failed" | undefined;
     group?: string | undefined;
+    tool?: string | undefined;
     copy?: {
         plain: string;
         html?: string | undefined;
@@ -1176,7 +1177,6 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     icon?: string | undefined;
     shortcut?: string | undefined;
     agents?: boolean | undefined;
-    tool?: string | undefined;
     result?: string | null | undefined;
     disabled?: string | null | undefined;
     confirm?: boolean | undefined;
@@ -1195,9 +1195,9 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     label: string;
     agents: boolean;
     group?: string | undefined;
+    tool?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
-    tool?: string | undefined;
 } | {
     id: string;
     kind: "toggle";
@@ -1205,9 +1205,9 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     agents: boolean;
     checked: boolean;
     group?: string | undefined;
+    tool?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
-    tool?: string | undefined;
 } | {
     options: {
         id: string;
@@ -1220,9 +1220,9 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     label: string;
     agents: boolean;
     group?: string | undefined;
+    tool?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
-    tool?: string | undefined;
 } | {
     id: string;
     kind: "run";
@@ -1233,6 +1233,7 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     disabled: string | null;
     confirm: boolean;
     group?: string | undefined;
+    tool?: string | undefined;
     copy?: {
         plain: string;
         html?: string | undefined;
@@ -1240,7 +1241,6 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     open?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
-    tool?: string | undefined;
     surface?: "fullscreen" | undefined;
     pinned?: boolean | undefined;
 })[], ({
@@ -1255,20 +1255,20 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     kind: "switch";
     label: string;
     group?: string | undefined;
+    tool?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     agents?: boolean | undefined;
-    tool?: string | undefined;
 } | {
     id: string;
     kind: "toggle";
     label: string;
     checked: boolean;
     group?: string | undefined;
+    tool?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     agents?: boolean | undefined;
-    tool?: string | undefined;
 } | {
     options: {
         id: string;
@@ -1280,16 +1280,17 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     kind: "go";
     label: string;
     group?: string | undefined;
+    tool?: string | undefined;
     icon?: string | undefined;
     shortcut?: string | undefined;
     agents?: boolean | undefined;
-    tool?: string | undefined;
 } | {
     id: string;
     kind: "run";
     label: string;
     state?: "idle" | "busy" | "failed" | undefined;
     group?: string | undefined;
+    tool?: string | undefined;
     copy?: {
         plain: string;
         html?: string | undefined;
@@ -1298,7 +1299,6 @@ export declare const headerItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z.Z
     icon?: string | undefined;
     shortcut?: string | undefined;
     agents?: boolean | undefined;
-    tool?: string | undefined;
     result?: string | null | undefined;
     disabled?: string | null | undefined;
     confirm?: boolean | undefined;

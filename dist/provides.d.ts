@@ -61,6 +61,8 @@ export interface ProvidingManifest {
             kind: string;
         }[];
     } | null;
+    /** 2.85.0. The services it provides, by name (`services` in a manifest): what a `{ service }` skill need reads. */
+    services?: Record<string, unknown> | null;
 }
 /** What a module says it provides: `declares.provides` as written, `[]` when it says nothing. */
 export declare function providesOf(manifest: Pick<ProvidingManifest, 'declares'> | null | undefined): readonly string[];

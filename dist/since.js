@@ -49,6 +49,7 @@ export const METHOD_SINCE = {
     'projects.mine': '2.76.0',
     'messages.notifySession': '2.81.0',
     'services.find': '2.81.0',
+    'sessions.placeOf': '2.85.0',
     'inbox.read': '2.79.0',
     'inbox.log': '2.79.0',
     'inbox.act': '2.79.0',
@@ -89,6 +90,7 @@ export const CAPABILITY_SINCE = {
     'inbox:person': '2.79.0',
     'sessions:observe': '2.81.0',
     'services:read': '2.81.0',
+    'sessions:place': '2.85.0',
 };
 /** Each method a module's server may ask (`SERVER_METHODS`), and the version a server could first ask it in. */
 export const SERVER_METHOD_SINCE = {
@@ -108,6 +110,7 @@ export const SERVER_METHOD_SINCE = {
     'projects.mine': '2.76.0',
     'messages.notifySession': '2.81.0',
     'services.find': '2.81.0',
+    'sessions.placeOf': '2.85.0',
 };
 /**
  * The manifest declarations a host has to know to do what the module asks, and the version that
@@ -126,6 +129,7 @@ export const DECLARATION_SINCE = {
     'declares.provides': '2.21.0',
     'declares.agentSessions': '2.21.0',
     'skills.needs.object': '2.21.0',
+    'skills.needs.service': '2.85.0',
     'agentSessions.installsSkills': '2.23.0',
     'declares.navigates': '2.28.0',
     'modes.scope': '2.29.0',
@@ -293,6 +297,7 @@ export const PIECE_SAID = {
         'inbox:person': 'your Inbox, shown and acted on for you',
         'sessions:observe': 'notices to agent sessions it sees working on this computer',
         'services:read': 'which modules here provide a service to other modules',
+        'sessions:place': 'which epic, parts and kehikko an agent session is on',
     },
     declarations: {
         'mcp.subjects': 'door subjects',
@@ -304,6 +309,7 @@ export const PIECE_SAID = {
         'declares.provides': 'material it publishes for other modules',
         'declares.agentSessions': 'agent sessions',
         'skills.needs.object': 'skills that need what other modules provide',
+        'skills.needs.service': 'skills that need a service another module provides',
         'agentSessions.installsSkills': 'skills it installs for its own agent',
         'declares.navigates': 'jumps to other projects and to what other modules show',
         'modes.scope': 'scopes',
