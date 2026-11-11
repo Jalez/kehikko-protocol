@@ -11,6 +11,31 @@ After 2.78.0, every entry's first line under its heading is its kind, and the ve
 (semver; CI checks it): `Kind: breaking` → next major, `Kind: feature` → next minor, `Kind: fix` →
 next patch.
 
+## 2.80.0 — 2026-11-11
+
+Kind: feature
+
+One entry for every tool call: an agent module asks `checkToolCall` (`/serve`) about ANY call its CLI
+is about to make, and every kind of guard the modules on the kehikko declare is applied — shell and
+edit today, any kind added later on a pin bump. The protocol owns the table of each agent CLI's tools.
+**Additive**; `PROTOCOL` is still 2. [docs/asking.md](docs/asking.md), "Every tool call (2.80.0)".
+
+### Added
+
+- **`checkToolCall(call, guards, facts?)`** (`/serve`): `{ cli, tool, input, cwd }` in, `pass`, `deny`
+  (say it with `guardSays`) or, for a shell command, `rewrite` with the input key the new command goes
+  in (`field`). Fills in the home folder and `checkoutOf`; `facts.env` carries `KEHIKOT_DIRECT`.
+- **`toolCallDecision(guards, call, facts)`**: the same, pure. `guardDecision` for a shell tool (with
+  the tool's own `env` where it takes one), `editDecision` for each file an edit tool edits (a relative
+  path read against `cwd`); a tool not in the table passes.
+- **`CLI_TOOLS`**, **`AGENT_CLIS`**, **`toolReading`**, `ToolReading`, `ToolCall`, `ToolFacts`,
+  `ToolCallDecision`: each CLI's tools by the name its hook is given — Claude Code (`Bash`; `Edit`,
+  `Write`, `MultiEdit`, `NotebookEdit`), Codex (`Bash`; `apply_patch`), Vibe (`file_system.bash`,
+  `process.start`; `file_system.write_file`, `file_system.edit`, `file_system.search_replace`),
+  Antigravity (`run_command`; `write_to_file`, `replace_file_content`, `multi_replace_file_content`),
+  OpenCode (`bash`; `edit`, `write`, `multiedit`, `patch`, `apply_patch`).
+- **`patchPaths(text)`**: the files a `*** Begin Patch` patch adds, updates, deletes or moves to.
+
 ## 2.79.0 — 2026-11-11
 
 Kind: feature

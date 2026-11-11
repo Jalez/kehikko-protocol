@@ -196,6 +196,18 @@ knows, it has to do itself.
 - **`ready()`** once what it shows is drawn, and **`relayPointer`** for each nested frame it owns.
 - **`kehikot.rows.json`** and **`notes/tools.json`** kept current, for the two checks.
 
+## Agent modules: every tool call goes through `checkToolCall`
+
+An agent module (one that runs agent sessions) **MUST** route **every** tool call its CLI is about to
+make — from its pre-tool hook or plugin, the session's own and its subagents', whatever the tool —
+through `checkToolCall` in `kehikot-module-protocol/serve`, with the guards the host handed for the
+session's kehikko, and do what it answers: `pass` runs the call, `deny` refuses it with `guardSays`,
+`rewrite` runs the new command (in the input's `field`). Do not pick tools or guard kinds yourself: the
+protocol's table (`CLI_TOOLS`) says which of your CLI's tools each guard kind holds, so a guard kind
+added later, or a tool added to your CLI, is held by moving your pin. Hook every tool your CLI lets a
+hook see; where it cannot see a kind of tool, say so in your notes. See "Every tool call (2.80.0)" in
+[docs/asking.md](docs/asking.md).
+
 ## Versions
 
 `PROTOCOL` has been 2 throughout: every version below added something a module may ignore.
@@ -203,6 +215,7 @@ The same list with what each version exported is in [CHANGELOG.md](CHANGELOG.md)
 
 | version | date | what it added |
 |---|---|---|
+| 2.80.0 | 2026-11-11 | Additive. One entry for every tool call: `checkToolCall` in `/serve` (pure: `toolCallDecision`) applies every guard kind to any call of an agent CLI, read through the protocol's table of each CLI's tools (`CLI_TOOLS`: Claude Code, Codex, Vibe, Antigravity, OpenCode); `patchPaths`. Every agent module routes every pre-tool call through it. See [asking](docs/asking.md). |
 | 2.79.0 | 2026-11-11 | Additive. The person's Inbox, shown by a module's page: `inbox:person` with `inbox.read`, `inbox.log`, `inbox.act`, `inbox.answer`, `inbox.open` and `inbox.use` — page-only (`PERSON_METHODS`, never a server method), every act but reading and `seen` on the person's press (`actNeedsPress`) — and `kehikot.inbox` (`changed`, `next`) with `onInbox`. See [inbox](docs/inbox.md). |
 | 2.78.0 | 2026-11-11 | Additive. Edit guards: `tool: 'edit'` with `match.paths` (`~/` or absolute, `*` and `**`), `match.checkouts: ['main']` (a repository's main checkout, not a linked worktree) and `allowPaths`, deny only; `editDecision`, `pathMatches`, `editedPaths`, and `checkoutOf` in `/serve`. shadcn's chart in `client/ui/chart`, with one tooltip at a time (`useTip`). See [asking](docs/asking.md). |
 | 2.77.0 | 2026-11-11 | `projects.mine` is asked under `agents:message`, which every agent module already declares; `projects:read` is gone, so a module asking it still runs on an older host. See [server ask](docs/server-ask.md). |

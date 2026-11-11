@@ -614,3 +614,127 @@ export function editedPaths(tool, input) {
     }
     return out;
 }
+/* ------------------------------------------------------------------------ *
+ * Every tool call, every guard kind (2.80.0)
+ * ------------------------------------------------------------------------ */
+/**
+ * 2.80.0. The agent CLIs whose tool names this protocol knows (`CLI_TOOLS`). An agent module names its
+ * own when it asks `toolCallDecision` (or `checkToolCall` in `/serve`) about a call.
+ */
+export const AGENT_CLIS = ['claude', 'codex', 'vibe', 'antigravity', 'opencode'];
+const shell = (command = 'command', env) => (env ? { kind: 'shell', command, env } : { kind: 'shell', command });
+const files = (...paths) => ({ kind: 'edit', paths });
+const patch = (key) => ({ kind: 'edit', patch: key });
+/**
+ * THE TABLE (2.80.0): each agent CLI's tools, by the name its pre-tool hook (or plugin) is given, and
+ * what kind of guard holds them. A tool not here is held by no guard. A new tool, or a new CLI, is a
+ * row here and a protocol release: every agent module that routes its calls through
+ * `toolCallDecision` holds it on its next pin.
+ */
+export const CLI_TOOLS = {
+    /* Claude Code: PreToolUse `tool_name` / `tool_input`. */
+    claude: {
+        Bash: shell(),
+        Edit: files('file_path'),
+        Write: files('file_path'),
+        MultiEdit: files('file_path'),
+        NotebookEdit: files('notebook_path'),
+    },
+    /* Codex: PreToolUse names its shell tools `Bash` and its file edits `apply_patch`, both with the text in `tool_input.command`. */
+    codex: {
+        Bash: shell(),
+        apply_patch: patch('command'),
+    },
+    /* Mistral Vibe: `pre_tool` with qualified names; `process.start` takes its own `env`. */
+    vibe: {
+        'file_system.bash': shell(),
+        'process.start': shell('command', 'env'),
+        'file_system.write_file': files('file_path', 'path'),
+        'file_system.edit': files('file_path', 'path'),
+        'file_system.search_replace': files('file_path', 'path'),
+    },
+    /* Antigravity (`agy`): PreToolUse `toolCall: { name, args }`. */
+    antigravity: {
+        run_command: shell('CommandLine'),
+        write_to_file: files('TargetFile'),
+        replace_file_content: files('TargetFile'),
+        multi_replace_file_content: files('TargetFile'),
+    },
+    /* OpenCode: a plugin's `tool.execute.before` (`tool`, `args`); `path` in newer releases, `filePath` before. */
+    opencode: {
+        bash: shell(),
+        edit: files('filePath', 'path'),
+        write: files('filePath', 'path'),
+        multiedit: files('filePath', 'path'),
+        patch: patch('patchText'),
+        apply_patch: patch('patchText'),
+    },
+};
+/** How a CLI's tool is read (`CLI_TOOLS`), or null for a CLI or tool this protocol does not know. */
+export function toolReading(cli, tool) {
+    if (typeof cli !== 'string' || typeof tool !== 'string' || !Object.hasOwn(CLI_TOOLS, cli))
+        return null;
+    const tools = CLI_TOOLS[cli];
+    return Object.hasOwn(tools, tool) ? tools[tool] : null;
+}
+const PATCH_FILE = /^\*\*\* (?:(?:Add|Update|Delete) File|Move to): (.+?)\s*$/;
+/** The files a patch in Codex's (and OpenCode's) `*** Begin Patch` format adds, updates, deletes or moves to, in order, each once. */
+export function patchPaths(text) {
+    if (typeof text !== 'string')
+        return [];
+    const out = [];
+    for (const line of text.split(/\r?\n/)) {
+        const hit = PATCH_FILE.exec(line);
+        if (hit && hit[1] && !out.includes(hit[1]))
+            out.push(hit[1]);
+    }
+    return out;
+}
+const record = (value) => (value && typeof value === 'object' && !Array.isArray(value) ? value : null);
+/**
+ * THE ONE ENTRY (2.80.0): what becomes of ANY tool call an agent session makes, under every kind of
+ * guard the modules placed on its kehikko declare. Every agent module routes every pre-tool call
+ * through this (or `checkToolCall` in `/serve`, which tells it the computer's facts), so a guard kind
+ * added later is held everywhere on a pin bump. Pure.
+ *
+ * - The tool is read by the CLI's table (`CLI_TOOLS`); a tool not there passes.
+ * - A shell tool: `guardDecision` on its command (with its own `env`, if it takes one, and the hook's).
+ *   A rewrite names the input key the new command goes in (`field`).
+ * - An edit tool: `editDecision` on each file it edits, a relative path read against `cwd` (none: that
+ *   file is not looked into); the first refusal wins.
+ */
+export function toolCallDecision(guards, call, facts = {}) {
+    const reading = toolReading(call?.cli, call?.tool);
+    const input = record(call?.input);
+    if (!reading || !input)
+        return { action: 'pass' };
+    if (reading.kind === 'shell') {
+        const command = input[reading.command];
+        if (typeof command !== 'string')
+            return { action: 'pass' };
+        const env = {};
+        const own = reading.env ? record(input[reading.env]) : null;
+        if (own)
+            for (const [name, value] of Object.entries(own))
+                if (typeof value === 'string')
+                    env[name] = value;
+        Object.assign(env, facts.env ?? {});
+        const decision = guardDecision(guards, command, { tool: 'shell', env });
+        if (decision.action === 'rewrite')
+            return { ...decision, field: reading.command };
+        return decision;
+    }
+    if (!guards.some((one) => one.guard.tool === 'edit'))
+        return { action: 'pass' };
+    const raws = 'patch' in reading ? patchPaths(input[reading.patch]) : reading.paths.map((key) => input[key]).filter((v) => typeof v === 'string' && v !== '');
+    const cwd = typeof call.cwd === 'string' ? plainPath(call.cwd) : null;
+    for (const raw of raws) {
+        const path = raw.startsWith('/') ? plainPath(raw) : cwd ? plainPath(`${cwd}/${raw}`) : null;
+        if (!path)
+            continue;
+        const decision = editDecision(guards, path, { home: facts.home ?? null, checkout: facts.checkoutOf ? facts.checkoutOf(path) : null, env: facts.env });
+        if (decision.action === 'deny')
+            return decision;
+    }
+    return { action: 'pass' };
+}

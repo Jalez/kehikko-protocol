@@ -681,3 +681,76 @@ export declare function editDecision(guards: readonly PlacedGuard[], path: strin
 export declare const EDIT_TOOL_PATHS: Readonly<Record<string, readonly string[]>>;
 /** The files a tool call edits, from its name and input (`EDIT_TOOL_PATHS`); empty for any other tool. */
 export declare function editedPaths(tool: unknown, input: unknown): string[];
+/**
+ * 2.80.0. The agent CLIs whose tool names this protocol knows (`CLI_TOOLS`). An agent module names its
+ * own when it asks `toolCallDecision` (or `checkToolCall` in `/serve`) about a call.
+ */
+export declare const AGENT_CLIS: readonly ["claude", "codex", "vibe", "antigravity", "opencode"];
+export type AgentCli = (typeof AGENT_CLIS)[number];
+/**
+ * How one tool of a CLI is read for its guards: a `shell` tool's command is the input's `command` key
+ * (and `env`, when the tool takes one, its own environment); an `edit` tool's files are the input's
+ * `paths` keys, or the files a patch in its `patch` key adds, updates, deletes or moves to
+ * (`patchPaths`).
+ */
+export type ToolReading = {
+    kind: 'shell';
+    command: string;
+    env?: string;
+} | {
+    kind: 'edit';
+    paths: readonly string[];
+} | {
+    kind: 'edit';
+    patch: string;
+};
+/**
+ * THE TABLE (2.80.0): each agent CLI's tools, by the name its pre-tool hook (or plugin) is given, and
+ * what kind of guard holds them. A tool not here is held by no guard. A new tool, or a new CLI, is a
+ * row here and a protocol release: every agent module that routes its calls through
+ * `toolCallDecision` holds it on its next pin.
+ */
+export declare const CLI_TOOLS: Readonly<Record<AgentCli, Readonly<Record<string, ToolReading>>>>;
+/** How a CLI's tool is read (`CLI_TOOLS`), or null for a CLI or tool this protocol does not know. */
+export declare function toolReading(cli: unknown, tool: unknown): ToolReading | null;
+/** The files a patch in Codex's (and OpenCode's) `*** Begin Patch` format adds, updates, deletes or moves to, in order, each once. */
+export declare function patchPaths(text: unknown): string[];
+/** One tool call as an agent module's hook is given it. `cwd`: the session's folder, against which a relative path is read. */
+export interface ToolCall {
+    cli: AgentCli | string;
+    tool: unknown;
+    input: unknown;
+    cwd?: string | null;
+}
+/** What the agent module knows from its own computer, for `toolCallDecision`. */
+export interface ToolFacts {
+    /** The person's home folder, for `~/` path patterns. */
+    home?: string | null;
+    /** The kind of checkout a file is in (`checkoutOf` in `/serve`). Asked only when an edit guard is placed. */
+    checkoutOf?: (path: string) => GuardCheckout | 'linked' | null;
+    /** The hook's environment: `KEHIKOT_DIRECT` there passes every guard. */
+    env?: Record<string, string | undefined>;
+}
+/** What becomes of a tool call: as it is, refused, or (a shell command) run as `command` instead, written into the input's `field`. */
+export type ToolCallDecision = {
+    action: 'pass';
+} | Extract<GuardDecision, {
+    action: 'deny';
+}> | (Extract<GuardDecision, {
+    action: 'rewrite';
+}> & {
+    field: string;
+});
+/**
+ * THE ONE ENTRY (2.80.0): what becomes of ANY tool call an agent session makes, under every kind of
+ * guard the modules placed on its kehikko declare. Every agent module routes every pre-tool call
+ * through this (or `checkToolCall` in `/serve`, which tells it the computer's facts), so a guard kind
+ * added later is held everywhere on a pin bump. Pure.
+ *
+ * - The tool is read by the CLI's table (`CLI_TOOLS`); a tool not there passes.
+ * - A shell tool: `guardDecision` on its command (with its own `env`, if it takes one, and the hook's).
+ *   A rewrite names the input key the new command goes in (`field`).
+ * - An edit tool: `editDecision` on each file it edits, a relative path read against `cwd` (none: that
+ *   file is not looked into); the first refusal wins.
+ */
+export declare function toolCallDecision(guards: readonly PlacedGuard[], call: ToolCall, facts?: ToolFacts): ToolCallDecision;

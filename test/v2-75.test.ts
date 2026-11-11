@@ -53,7 +53,7 @@ const notice = (over: Partial<AgentMessage> = {}) => message({ ...over, from: { 
 
 describe('the version', () => {
   test('is 2.75.0, and the changelog and docs say it', () => {
-    expect(PACKAGE_VERSION).toBe('2.79.0')
+    expect(PACKAGE_VERSION).toBe('2.80.0')
     const changelog = readFileSync(join(REPO, 'CHANGELOG.md'), 'utf8')
     expect(changelog).toContain('## 2.75.0')
     expect(readFileSync(join(REPO, 'docs/agent-messages.md'), 'utf8')).toContain('markersNote')
