@@ -10,6 +10,7 @@ import { RUN_CARRIES, headerItemsSchema, pressValueSchema } from './header.js'
 import { gotoRef, kehikkoSchema, stepNumber } from './fragments.js'
 import { coveredFields } from './reveal.js'
 import { FIND_DIRECTIONS, findCountFields, findOptionsFields, findQuerySchema } from './find.js'
+import { INBOX_SIGNALS, inboxKeySchema } from './inbox.js'
 
 /**
  * Everything the two sides say to each other: the schema of every `postMessage` between a host and
@@ -466,6 +467,21 @@ export const visibleSchema = z.object({
 })
 export type VisibleMessage = z.infer<typeof visibleSchema>
 
+/**
+ * Host → module (2.79.0). The person's Inbox: `changed` (read it again with `inbox.read`; `rev` is the
+ * record's newest), or `next` — the person pressed the host's shortcut for the next thing that needs
+ * them, and `next` names it (null: nothing does). Sent only to a frame whose manifest declares
+ * `inbox:person`; a module before 2.79.0 could not have, and drops it unread. See `inbox.ts`.
+ */
+export const inboxMessageSchema = z.object({
+  type: messageType(MESSAGE.INBOX),
+  protocol: z.number().int().min(1),
+  kind: z.enum(INBOX_SIGNALS),
+  rev: z.number().int().min(0),
+  next: inboxKeySchema.nullable().optional(),
+})
+export type InboxMessage = z.infer<typeof inboxMessageSchema>
+
 /** 2.49.0. What a `kehikot.pointer` says happened: a press began, ended, or was taken away (`cancel`). */
 export const POINTER_PHASES = ['down', 'up', 'cancel'] as const
 export type PointerPhase = (typeof POINTER_PHASES)[number]
@@ -592,6 +608,7 @@ export const hostMessageSchema = z.union([
   coveredSchema,
   visibleSchema,
   findSchema,
+  inboxMessageSchema,
 ])
 export type HostMessage = z.infer<typeof hostMessageSchema>
 

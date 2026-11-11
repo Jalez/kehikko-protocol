@@ -148,6 +148,13 @@ export declare const CAPABILITIES: {
      * takes such a message as its person's instruction. Never asked by a module's server or an agent.
      */
     readonly 'messages:as-person': "Send what you type or press in this module to agent sessions as your own instruction — only on your press, and only once you allow it in its settings.";
+    /**
+     * 2.79.0. Show the person's Inbox — the host's one record of what modules need, are doing and have
+     * said — and act on it for them: mark seen, dismiss, forget, answer a question, go to an item, stop
+     * showing a module (`inbox.*`, `inbox.ts`). Only from this module's PAGE, every act but `seen` only
+     * on the person's press there; never asked by a module's server or an agent.
+     */
+    readonly 'inbox:person': "Show your Inbox — what modules need, are doing and have said — and, on your press, mark it seen, dismiss, forget, answer or go to it.";
 };
 export type Capability = keyof typeof CAPABILITIES;
 export declare const CAPABILITY_NAMES: Capability[];
@@ -212,6 +219,18 @@ export declare const METHODS: {
      * capability it does not know.
      */
     readonly 'projects.mine': "agents:message";
+    /** The person's Inbox, read by a module's page (2.79.0). */
+    readonly 'inbox.read': "inbox:person";
+    /** Earlier: the Inbox's log, a page of it (2.79.0). */
+    readonly 'inbox.log': "inbox:person";
+    /** Seen, dismiss, forget, seen-all: the person's acts on Inbox items, from a page (2.79.0). */
+    readonly 'inbox.act': "inbox:person";
+    /** The person's answer to an item's question, from a page on their press (2.79.0). */
+    readonly 'inbox.answer': "inbox:person";
+    /** Go to where an item happened, from a page on the person's press (2.79.0). */
+    readonly 'inbox.open': "inbox:person";
+    /** The person's "Use inbox" for one module, from a page on their press (2.79.0). */
+    readonly 'inbox.use': "inbox:person";
 };
 export type Method = keyof typeof METHODS;
 export declare const METHOD_NAMES: Method[];
@@ -2168,6 +2187,127 @@ export declare const methodParams: {
      * module's server (`SERVER_METHODS`) or its page.
      */
     readonly 'projects.mine': z.ZodObject<{}, "strip", z.ZodTypeAny, {}, {}>;
+    /** 2.79.0. From a page only: the person's Inbox; answered with `inboxReadResult`. See `inbox.ts`. */
+    readonly 'inbox.read': z.ZodObject<{}, "strip", z.ZodTypeAny, {}, {}>;
+    /** 2.79.0. From a page only: a page of Earlier; answered with `inboxLogResult`. */
+    readonly 'inbox.log': z.ZodObject<{
+        scope: z.ZodDefault<z.ZodEnum<["here", "everywhere"]>>;
+        offset: z.ZodDefault<z.ZodNumber>;
+        limit: z.ZodDefault<z.ZodNumber>;
+    }, "strip", z.ZodTypeAny, {
+        limit: number;
+        offset: number;
+        scope: "here" | "everywhere";
+    }, {
+        limit?: number | undefined;
+        offset?: number | undefined;
+        scope?: "here" | "everywhere" | undefined;
+    }>;
+    /** 2.79.0. From a page only, on the person's press but for `seen`: answered with `inboxActResult`. */
+    readonly 'inbox.act': z.ZodEffects<z.ZodObject<{
+        do: z.ZodEnum<["seen", "dismiss", "forget", "seen-all"]>;
+        keys: z.ZodOptional<z.ZodArray<z.ZodObject<{
+            module: z.ZodString;
+            id: z.ZodString;
+        }, "strip", z.ZodTypeAny, {
+            id: string;
+            module: string;
+        }, {
+            id: string;
+            module: string;
+        }>, "many">>;
+        scope: z.ZodDefault<z.ZodEnum<["here", "everywhere"]>>;
+        project: z.ZodOptional<z.ZodNumber>;
+    }, "strip", z.ZodTypeAny, {
+        scope: "here" | "everywhere";
+        do: "seen" | "dismiss" | "forget" | "seen-all";
+        keys?: {
+            id: string;
+            module: string;
+        }[] | undefined;
+        project?: number | undefined;
+    }, {
+        do: "seen" | "dismiss" | "forget" | "seen-all";
+        keys?: {
+            id: string;
+            module: string;
+        }[] | undefined;
+        project?: number | undefined;
+        scope?: "here" | "everywhere" | undefined;
+    }>, {
+        scope: "here" | "everywhere";
+        do: "seen" | "dismiss" | "forget" | "seen-all";
+        keys?: {
+            id: string;
+            module: string;
+        }[] | undefined;
+        project?: number | undefined;
+    }, {
+        do: "seen" | "dismiss" | "forget" | "seen-all";
+        keys?: {
+            id: string;
+            module: string;
+        }[] | undefined;
+        project?: number | undefined;
+        scope?: "here" | "everywhere" | undefined;
+    }>;
+    /** 2.79.0. From a page only, on the person's press: answered with `inboxAnswerResult`. */
+    readonly 'inbox.answer': z.ZodEffects<z.ZodObject<{
+        module: z.ZodString;
+        id: z.ZodString;
+        choice: z.ZodOptional<z.ZodString>;
+        answer: z.ZodOptional<z.ZodString>;
+        project: z.ZodOptional<z.ZodNumber>;
+    }, "strip", z.ZodTypeAny, {
+        id: string;
+        module: string;
+        project?: number | undefined;
+        choice?: string | undefined;
+        answer?: string | undefined;
+    }, {
+        id: string;
+        module: string;
+        project?: number | undefined;
+        choice?: string | undefined;
+        answer?: string | undefined;
+    }>, {
+        id: string;
+        module: string;
+        project?: number | undefined;
+        choice?: string | undefined;
+        answer?: string | undefined;
+    }, {
+        id: string;
+        module: string;
+        project?: number | undefined;
+        choice?: string | undefined;
+        answer?: string | undefined;
+    }>;
+    /** 2.79.0. From a page only, on the person's press (or a host's `next`): answered with `inboxOpenResult`. */
+    readonly 'inbox.open': z.ZodObject<{
+        module: z.ZodString;
+        id: z.ZodString;
+        project: z.ZodOptional<z.ZodNumber>;
+    }, "strip", z.ZodTypeAny, {
+        id: string;
+        module: string;
+        project?: number | undefined;
+    }, {
+        id: string;
+        module: string;
+        project?: number | undefined;
+    }>;
+    /** 2.79.0. From a page only, on the person's press: answered with `inboxUseResult`. */
+    readonly 'inbox.use': z.ZodObject<{
+        module: z.ZodString;
+        use: z.ZodBoolean;
+    }, "strip", z.ZodTypeAny, {
+        module: string;
+        use: boolean;
+    }, {
+        module: string;
+        use: boolean;
+    }>;
 };
 /** The params one method takes, as a caller must construct them. */
 export type MethodParams<M extends Method> = z.input<(typeof methodParams)[M]>;

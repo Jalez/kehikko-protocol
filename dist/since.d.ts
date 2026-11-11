@@ -45,6 +45,12 @@ export declare const METHOD_SINCE: {
     readonly 'messages.tell': "2.75.0";
     readonly 'messages.say': "2.50.0";
     readonly 'projects.mine': "2.76.0";
+    readonly 'inbox.read': "2.79.0";
+    readonly 'inbox.log': "2.79.0";
+    readonly 'inbox.act': "2.79.0";
+    readonly 'inbox.answer': "2.79.0";
+    readonly 'inbox.open': "2.79.0";
+    readonly 'inbox.use': "2.79.0";
 };
 /** Each capability, and the version that added it: the oldest of its methods. */
 export declare const CAPABILITY_SINCE: {
@@ -76,6 +82,7 @@ export declare const CAPABILITY_SINCE: {
     readonly 'dispositions:read': "2.21.0";
     readonly 'agents:message': "2.41.0";
     readonly 'messages:as-person': "2.50.0";
+    readonly 'inbox:person': "2.79.0";
 };
 /** Each method a module's server may ask (`SERVER_METHODS`), and the version a server could first ask it in. */
 export declare const SERVER_METHOD_SINCE: {
@@ -212,6 +219,7 @@ export declare const WIRE_SINCE: {
     readonly 'footer.actsOn': "2.47.0";
     readonly 'ready.hold': "2.70.0";
     readonly 'kehikot.drawn': "2.70.0";
+    readonly 'kehikot.inbox': "2.79.0";
 };
 export type WirePiece = keyof typeof WIRE_SINCE;
 /** Every table, in one place. Plain objects: read them with `sinceOf`, never by indexing with a stranger's string. */
@@ -253,6 +261,12 @@ export declare const SINCE: {
         readonly 'messages.tell': "2.75.0";
         readonly 'messages.say': "2.50.0";
         readonly 'projects.mine': "2.76.0";
+        readonly 'inbox.read': "2.79.0";
+        readonly 'inbox.log': "2.79.0";
+        readonly 'inbox.act': "2.79.0";
+        readonly 'inbox.answer': "2.79.0";
+        readonly 'inbox.open': "2.79.0";
+        readonly 'inbox.use': "2.79.0";
     };
     readonly capabilities: {
         readonly 'epics:read': "0.25.0";
@@ -283,6 +297,7 @@ export declare const SINCE: {
         readonly 'dispositions:read': "2.21.0";
         readonly 'agents:message': "2.41.0";
         readonly 'messages:as-person': "2.50.0";
+        readonly 'inbox:person': "2.79.0";
     };
     readonly serverMethods: {
         readonly 'tracker.get': "2.19.0";
@@ -375,6 +390,7 @@ export declare const SINCE: {
         readonly 'footer.actsOn': "2.47.0";
         readonly 'ready.hold': "2.70.0";
         readonly 'kehikot.drawn': "2.70.0";
+        readonly 'kehikot.inbox': "2.79.0";
     };
 };
 /** The kinds of piece the tables know. */
@@ -418,6 +434,7 @@ export declare const PIECE_SAID: {
         readonly 'dispositions:read': "marks for why references closed, from the host";
         readonly 'agents:message': "messages between agent sessions";
         readonly 'messages:as-person': "messages to agent sessions as the person";
+        readonly 'inbox:person': "your Inbox, shown and acted on for you";
     };
     readonly declarations: {
         readonly 'mcp.subjects': "door subjects";

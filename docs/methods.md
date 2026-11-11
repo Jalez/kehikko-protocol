@@ -346,6 +346,12 @@ and a module that declares none gets none of the methods below.
 | `messages.tell` | `agents:message` |
 | `messages.say` | `messages:as-person` |
 | `projects.mine` | `agents:message` |
+| `inbox.read` | `inbox:person` |
+| `inbox.log` | `inbox:person` |
+| `inbox.act` | `inbox:person` |
+| `inbox.answer` | `inbox:person` |
+| `inbox.open` | `inbox:person` |
+| `inbox.use` | `inbox:person` |
 
 The host's table is the protocol's `METHODS`, read by its `capabilityOf`
 (`src/host/grants.ts`): there is no second list to keep in step. A host keeps a

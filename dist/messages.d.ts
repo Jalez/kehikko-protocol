@@ -3827,6 +3827,47 @@ export declare const visibleSchema: z.ZodObject<{
     visible: boolean;
 }>;
 export type VisibleMessage = z.infer<typeof visibleSchema>;
+/**
+ * Host → module (2.79.0). The person's Inbox: `changed` (read it again with `inbox.read`; `rev` is the
+ * record's newest), or `next` — the person pressed the host's shortcut for the next thing that needs
+ * them, and `next` names it (null: nothing does). Sent only to a frame whose manifest declares
+ * `inbox:person`; a module before 2.79.0 could not have, and drops it unread. See `inbox.ts`.
+ */
+export declare const inboxMessageSchema: z.ZodObject<{
+    type: z.ZodLiteral<"kehikot.inbox">;
+    protocol: z.ZodNumber;
+    kind: z.ZodEnum<["changed", "next"]>;
+    rev: z.ZodNumber;
+    next: z.ZodOptional<z.ZodNullable<z.ZodObject<{
+        module: z.ZodString;
+        id: z.ZodString;
+    }, "strip", z.ZodTypeAny, {
+        id: string;
+        module: string;
+    }, {
+        id: string;
+        module: string;
+    }>>>;
+}, "strip", z.ZodTypeAny, {
+    type: "kehikot.inbox";
+    kind: "changed" | "next";
+    protocol: number;
+    rev: number;
+    next?: {
+        id: string;
+        module: string;
+    } | null | undefined;
+}, {
+    type: "kehikot.inbox";
+    kind: "changed" | "next";
+    protocol: number;
+    rev: number;
+    next?: {
+        id: string;
+        module: string;
+    } | null | undefined;
+}>;
+export type InboxMessage = z.infer<typeof inboxMessageSchema>;
 /** 2.49.0. What a `kehikot.pointer` says happened: a press began, ended, or was taken away (`cancel`). */
 export declare const POINTER_PHASES: readonly ["down", "up", "cancel"];
 export type PointerPhase = (typeof POINTER_PHASES)[number];
@@ -5846,6 +5887,39 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     caseSensitive?: boolean | undefined;
     wholeWord?: boolean | undefined;
     query?: string | undefined;
+}>, z.ZodObject<{
+    type: z.ZodLiteral<"kehikot.inbox">;
+    protocol: z.ZodNumber;
+    kind: z.ZodEnum<["changed", "next"]>;
+    rev: z.ZodNumber;
+    next: z.ZodOptional<z.ZodNullable<z.ZodObject<{
+        module: z.ZodString;
+        id: z.ZodString;
+    }, "strip", z.ZodTypeAny, {
+        id: string;
+        module: string;
+    }, {
+        id: string;
+        module: string;
+    }>>>;
+}, "strip", z.ZodTypeAny, {
+    type: "kehikot.inbox";
+    kind: "changed" | "next";
+    protocol: number;
+    rev: number;
+    next?: {
+        id: string;
+        module: string;
+    } | null | undefined;
+}, {
+    type: "kehikot.inbox";
+    kind: "changed" | "next";
+    protocol: number;
+    rev: number;
+    next?: {
+        id: string;
+        module: string;
+    } | null | undefined;
 }>]>;
 export type HostMessage = z.infer<typeof hostMessageSchema>;
 export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{

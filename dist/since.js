@@ -47,6 +47,12 @@ export const METHOD_SINCE = {
     'messages.tell': '2.75.0',
     'messages.say': '2.50.0',
     'projects.mine': '2.76.0',
+    'inbox.read': '2.79.0',
+    'inbox.log': '2.79.0',
+    'inbox.act': '2.79.0',
+    'inbox.answer': '2.79.0',
+    'inbox.open': '2.79.0',
+    'inbox.use': '2.79.0',
 };
 /** Each capability, and the version that added it: the oldest of its methods. */
 export const CAPABILITY_SINCE = {
@@ -78,6 +84,7 @@ export const CAPABILITY_SINCE = {
     'dispositions:read': '2.21.0',
     'agents:message': '2.41.0',
     'messages:as-person': '2.50.0',
+    'inbox:person': '2.79.0',
 };
 /** Each method a module's server may ask (`SERVER_METHODS`), and the version a server could first ask it in. */
 export const SERVER_METHOD_SINCE = {
@@ -210,6 +217,7 @@ export const WIRE_SINCE = {
     'footer.actsOn': '2.47.0',
     'ready.hold': '2.70.0',
     'kehikot.drawn': '2.70.0',
+    'kehikot.inbox': '2.79.0',
 };
 /** Every table, in one place. Plain objects: read them with `sinceOf`, never by indexing with a stranger's string. */
 export const SINCE = {
@@ -274,6 +282,7 @@ export const PIECE_SAID = {
         'dispositions:read': 'marks for why references closed, from the host',
         'agents:message': 'messages between agent sessions',
         'messages:as-person': 'messages to agent sessions as the person',
+        'inbox:person': 'your Inbox, shown and acted on for you',
     },
     declarations: {
         'mcp.subjects': 'door subjects',

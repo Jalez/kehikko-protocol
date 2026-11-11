@@ -156,6 +156,12 @@ export const MESSAGE = {
      * `HOLD_COVER_MS` passes. A host before 2.70.0 lifts its cover on `ready` and drops this unread.
      */
     DRAWN: 'kehikot.drawn',
+    /**
+     * Host → module (2.79.0). "The person's Inbox changed: read it again", or "they asked for the next
+     * thing that needs them: go to it". Sent only to a frame whose manifest declares `inbox:person`.
+     * No answer. See `inbox.ts` and docs/inbox.md.
+     */
+    INBOX: 'kehikot.inbox',
 };
 /**
  * 2.70.0. The longest a page asks a host to keep its cover up after `kehikot.ready` with `hold: true`,
@@ -185,6 +191,7 @@ export const HOST_MESSAGES = [
     MESSAGE.COVERED,
     MESSAGE.VISIBLE,
     MESSAGE.FIND,
+    MESSAGE.INBOX,
 ];
 /** And what the module says. */
 export const MODULE_MESSAGES = [

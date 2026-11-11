@@ -240,6 +240,13 @@ export interface HostEvents {
    */
   onVisible?: (visible: boolean) => void
   /**
+   * 2.79.0. The person's Inbox, for a module whose manifest declares `inbox:person`: `changed` — read
+   * it again (`inbox.read`); `next` — the person pressed the host's shortcut for the next thing that
+   * needs them, `next` names it (null: nothing does) and the page goes to it with `inbox.open`.
+   * A host before 2.79.0 never calls it.
+   */
+  onInbox?: (signal: { kind: 'changed' | 'next'; rev: number; next: { module: string; id: string } | null }) => void
+  /**
    * 2.69.0. The host's find bar asks this page to search what it shows: `query`, with `ask`'s
    * options and `direction` — `first` (search anew; go to the first match at or after what is on
    * screen), `next`/`prev` (move, wrapping), or `close` (clear every mark; the answer is not read).
@@ -787,6 +794,11 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
 
     if (message.type === MESSAGE.VISIBLE) {
       events.onVisible?.(message.visible)
+      return
+    }
+
+    if (message.type === MESSAGE.INBOX) {
+      events.onInbox?.({ kind: message.kind, rev: message.rev, next: message.next ?? null })
       return
     }
 

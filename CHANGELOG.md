@@ -11,6 +11,31 @@ After 2.78.0, every entry's first line under its heading is its kind, and the ve
 (semver; CI checks it): `Kind: breaking` → next major, `Kind: feature` → next minor, `Kind: fix` →
 next patch.
 
+## 2.79.0 — 2026-11-11
+
+Kind: feature
+
+The person's Inbox, shown by a module's page. The host keeps the one record of what modules need, are
+doing and have said; a page that declares `inbox:person` reads it and acts on it for the person.
+**Additive**; `PROTOCOL` is still 2. [docs/inbox.md](docs/inbox.md).
+
+### Added
+
+- **`inbox:person`**, a capability, and six page methods under it: `inbox.read` (`inboxReadResult`:
+  `rev`, `items`, `next`, `elsewhere`, `earlier`, `muted`), `inbox.log` (Earlier, `inboxLogResult`),
+  `inbox.act` (`seen`, `dismiss`, `forget`, `seen-all`), `inbox.answer` (a choice or the person's own
+  words), `inbox.open` (go to where an item happened) and `inbox.use` (stop or start showing a module).
+  `inboxItemSchema`, `inboxKeySchema`, `inboxQuestionSchema`, `inboxLogRowSchema`, `INBOX_SCOPES`,
+  `INBOX_ACTS`, `INBOX_ITEMS_MAX`.
+- **Only the person's.** `PERSON_METHODS` lists them; none is in `SERVER_METHODS`, so `serverAskSchema`
+  refuses each. `actNeedsPress` and `PRESSED_METHODS`: every act but reading and `seen` is taken only on
+  the person's fresh press in the frame, or, for `inbox.open` of the item a `next` named, within
+  `INBOX_NEXT_MS` of it.
+- **`kehikot.inbox`** (`MESSAGE.INBOX`, `inboxMessageSchema`), host → module: `changed` (read again) or
+  `next` (the person pressed the host's shortcut for the next thing that needs them; `next` names it).
+  Sent only to a frame whose manifest declares `inbox:person`. `onInbox` on `connect`, `hostStore` and
+  `useHost`.
+
 ## 2.78.0 — 2026-11-11
 
 Edit guards: a module placed on a kehikko can refuse an agent's file edits under paths it names, or in

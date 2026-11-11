@@ -448,6 +448,10 @@ export function connect(id, events = {}, options = {}) {
             events.onVisible?.(message.visible);
             return;
         }
+        if (message.type === MESSAGE.INBOX) {
+            events.onInbox?.({ kind: message.kind, rev: message.rev, next: message.next ?? null });
+            return;
+        }
         if (message.type === MESSAGE.FIND) {
             const ask = { caseSensitive: message.caseSensitive, wholeWord: message.wholeWord, direction: message.direction };
             if (message.direction === 'close') {

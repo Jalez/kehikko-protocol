@@ -77,6 +77,7 @@ export function useHost<Kept = unknown>(
         onOpened: (opened) => handlers.current.onOpened?.(opened),
         onCovered: (covered) => handlers.current.onCovered?.(covered),
         onVisible: (visible) => handlers.current.onVisible?.(visible),
+        onInbox: (signal) => handlers.current.onInbox?.(signal),
         /* Always given, and read through the ref: a handler added on a later render is heard. */
         onPress: (press) => (handlers.current.onPress ? handlers.current.onPress(press) : 'This app declared that item and does not take presses.'),
         /* 2.69.0. Always given, through the ref; without a handler the client's own search answers. */
