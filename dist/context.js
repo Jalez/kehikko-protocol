@@ -11,6 +11,7 @@ import { sharedShowSchema } from './show.js';
 import { filterChoiceSchema } from './filters.js';
 import { kehikkoSchema, ref } from './fragments.js';
 import { MODULE_SCOPES } from './scope.js';
+import { PAGE_BACKGROUNDS } from './page.js';
 /* ------------------------------------------------------------------------ *
  * Dispositions: why a reference closed, in a person's words
  * ------------------------------------------------------------------------ */
@@ -109,6 +110,15 @@ export const contextSchema = z.object({
      */
     projectId: z.string().regex(PROJECT_ID).nullable().default(null),
     theme: z.enum(['light', 'dark']).default('light'),
+    /**
+     * 2.82.0. How the host draws the container around this module's page, as the person set it in its
+     * Appearance settings: `background` is `card` when the container has its own surface behind the
+     * page, `none` when the canvas shows through. Sent in the greeting and in every context, so a
+     * change arrives like a change of theme. The client applies it by default (`BACKGROUND_ATTR` on
+     * `<html>`, `BACKGROUND_CSS`); read it with `backgroundOf`. Optional, not defaulted: absent from a
+     * host before 2.82.0, which means `card`; a word this package does not know reads as `card`.
+     */
+    appearance: z.object({ background: z.enum(PAGE_BACKGROUNDS).catch('card') }).optional().catch(undefined),
     /**
      * The refs the person has picked out; `[]` when nothing is selected. A module asks the host to set
      * it with `selection.set` and the host tells everyone. Refs only: what kind each is does not travel.

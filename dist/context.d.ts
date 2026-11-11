@@ -412,6 +412,21 @@ export declare const contextSchema: z.ZodObject<{
     projectId: z.ZodDefault<z.ZodNullable<z.ZodString>>;
     theme: z.ZodDefault<z.ZodEnum<["light", "dark"]>>;
     /**
+     * 2.82.0. How the host draws the container around this module's page, as the person set it in its
+     * Appearance settings: `background` is `card` when the container has its own surface behind the
+     * page, `none` when the canvas shows through. Sent in the greeting and in every context, so a
+     * change arrives like a change of theme. The client applies it by default (`BACKGROUND_ATTR` on
+     * `<html>`, `BACKGROUND_CSS`); read it with `backgroundOf`. Optional, not defaulted: absent from a
+     * host before 2.82.0, which means `card`; a word this package does not know reads as `card`.
+     */
+    appearance: z.ZodCatch<z.ZodOptional<z.ZodObject<{
+        background: z.ZodCatch<z.ZodEnum<["card", "none"]>>;
+    }, "strip", z.ZodTypeAny, {
+        background: "card" | "none";
+    }, {
+        background?: unknown;
+    }>>>;
+    /**
      * The refs the person has picked out; `[]` when nothing is selected. A module asks the host to set
      * it with `selection.set` and the host tells everyone. Refs only: what kind each is does not travel.
      */
@@ -1053,6 +1068,9 @@ export declare const contextSchema: z.ZodObject<{
         source: string;
     }[];
     scope?: "epic" | "kehikko" | "project" | "machine" | "part" | undefined;
+    appearance?: {
+        background: "card" | "none";
+    } | undefined;
     kept?: string | null | undefined;
 }, {
     epic?: string | null | undefined;
@@ -1091,8 +1109,9 @@ export declare const contextSchema: z.ZodObject<{
         refreshing?: boolean | undefined;
     } | undefined;
     projectPath?: string | null | undefined;
-    scope?: unknown;
     theme?: "light" | "dark" | undefined;
+    scope?: unknown;
+    appearance?: unknown;
     selection?: string[] | undefined;
     passage?: {
         path: string;

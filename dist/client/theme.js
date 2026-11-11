@@ -1,4 +1,4 @@
-import { THEME_KEY } from '../page.js';
+import { BACKGROUND_ATTR, BACKGROUND_CSS, BACKGROUND_KEY, BACKGROUND_STYLE_ID, THEME_KEY } from '../page.js';
 /** The theme on `<html>`, as the page document's blocking script left it and as the host then says it. */
 /** What is on `<html>` now, or `null` when nothing has decided yet. */
 export function pageTheme() {
@@ -26,6 +26,9 @@ export function applyTheme(theme, options = {}) {
     const list = document.documentElement.classList;
     list.toggle('dark', theme === 'dark');
     list.toggle('light', theme === 'light');
+    /* 2.82.0. Said on `<html>` itself too, so a transparent page and the frame around it agree (a browser
+       paints an opaque backdrop behind a frame whose color-scheme differs from its embedder's). */
+    document.documentElement.style.colorScheme = theme;
     if (!options.remember)
         return;
     try {
@@ -33,5 +36,41 @@ export function applyTheme(theme, options = {}) {
     }
     catch {
         /* No storage here. The next load asks the host, as this one did. */
+    }
+}
+/** What background is on `<html>` now (`BACKGROUND_ATTR`), or `null` when nothing has said one. */
+export function pageBackground() {
+    if (typeof document === 'undefined')
+        return null;
+    const said = document.documentElement.getAttribute(BACKGROUND_ATTR);
+    return said === 'none' ? 'none' : said === 'card' ? 'card' : null;
+}
+/**
+ * 2.82.0. Put the container's background on `<html>` as `BACKGROUND_ATTR`, with the style that makes
+ * `html`, `body`, `#root` and the element marked `PAGE_MARK` transparent when it is `none`
+ * (`BACKGROUND_CSS`, added once). `theme`, when given, is said as `color-scheme` on `<html>`.
+ * `remember` keeps it for the next load's first paint, quietly where there is no storage.
+ * `connect` calls this on every greeting and context unless told `appearance: false`.
+ */
+export function applyBackground(background, options = {}) {
+    if (typeof document === 'undefined')
+        return;
+    const html = document.documentElement;
+    if (!document.getElementById(BACKGROUND_STYLE_ID)) {
+        const style = document.createElement('style');
+        style.id = BACKGROUND_STYLE_ID;
+        style.textContent = BACKGROUND_CSS;
+        (document.head ?? html).appendChild(style);
+    }
+    html.setAttribute(BACKGROUND_ATTR, background);
+    if (options.theme)
+        html.style.colorScheme = options.theme;
+    if (!options.remember)
+        return;
+    try {
+        localStorage.setItem(BACKGROUND_KEY, background);
+    }
+    catch {
+        /* No storage here. The next load paints the card until the host says otherwise. */
     }
 }

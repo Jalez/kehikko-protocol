@@ -2,7 +2,7 @@ import type { Build } from '../build.js'
 import { BUILD_ELEMENT } from '../build.js'
 import { MESSAGE } from '../constants.js'
 import { LIMITS } from '../limits.js'
-import { NO_MESSAGE, PAGE_ERRORS_GLOBAL, PAGE_ERRORS_MAX, STACK_LINES, ORIGINS_ELEMENT, PAGE_BACKGROUND, ROOT_ELEMENT, THEME_KEY, THEME_PARAM, TICKET_ELEMENT, type PageTheme } from '../page.js'
+import { BACKGROUND_ATTR, BACKGROUND_CSS, BACKGROUND_KEY, BACKGROUND_PARAM, NO_MESSAGE, PAGE_ERRORS_GLOBAL, PAGE_ERRORS_MAX, STACK_LINES, ORIGINS_ELEMENT, PAGE_BACKGROUND, ROOT_ELEMENT, THEME_KEY, THEME_PARAM, TICKET_ELEMENT, type PageTheme } from '../page.js'
 
 /**
  * The document a module serves at `/app`, built per process so the write ticket and the build can
@@ -11,7 +11,9 @@ import { NO_MESSAGE, PAGE_ERRORS_GLOBAL, PAGE_ERRORS_MAX, STACK_LINES, ORIGINS_E
  * It paints a themed background before any script of the module's has run: two colours inline and
  * one blocking script that decides the theme — `?theme=` on the address, else what the host said
  * last time (`THEME_KEY`), else the system's when nothing frames the page and `FRAMED_DEFAULT_THEME`
- * when something does. See docs/module-plumbing.md.
+ * when something does. With the container's background off (2.82.0) the same blocking script puts
+ * `data-kehikot-background="none"` on `<html>` and the inline style leaves the page transparent.
+ * See docs/module-plumbing.md.
  */
 export interface PageOptions {
   /** The document title. */
@@ -61,6 +63,12 @@ export function themeScript(): string {
     + `if(!t){var framed=true;try{framed=window.parent!==window}catch(e){}t=${island(FRAMED_DEFAULT_THEME)};`
     + 'if(!framed)try{t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}catch(e){t="light"}}'
     + 'if(t){d.classList.remove(t==="dark"?"light":"dark");d.classList.add(t)}'
+    /* 2.82.0. The container's background: `?background=`, else what the host said last time — only
+       in a frame, since a page opened on its own has no canvas to show through. */
+    + `var b=null;try{var p=new URLSearchParams(location.search).get(${island(BACKGROUND_PARAM)});if(p==="none"||p==="card")b=p}catch(e){}`
+    + `if(!b)try{if(window.parent!==window){var r=localStorage.getItem(${island(BACKGROUND_KEY)});if(r==="none"||r==="card")b=r}}catch(e){}`
+    + `if(b)d.setAttribute(${island(BACKGROUND_ATTR)},b);`
+    + 'if(t)d.style.colorScheme=t;'
     + '})()'
   )
 }
@@ -136,7 +144,7 @@ export function pageDocument(options: PageOptions): string {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${escapeHtml(options.title)}</title>
-<style>html.light{background:${light};color-scheme:light}html.dark{background:${dark};color-scheme:dark}</style>
+<style>html.light{background:${light};color-scheme:light}html.dark{background:${dark};color-scheme:dark}${BACKGROUND_CSS}</style>
 <script>${errorsScript()}</script>
 <script>${themeScript()}</script>
 ${options.head ? `${options.head}\n` : ''}</head>

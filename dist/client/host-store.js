@@ -374,7 +374,7 @@ export function hostStore(id, events = {}, options = {}) {
                 ...(events.onPress ? { onPress: (press) => (stopped ? false : events.onPress(press)) } : {}),
                 /* 2.69.0. Only when the page searches itself: without a listener the client searches the page. */
                 ...(events.onFind ? { onFind: (query, ask) => (stopped ? undefined : events.onFind(query, ask)) } : {}),
-            }, connectOptions);
+            }, { ...connectOptions, appearance: connectOptions.appearance ?? themed });
             /* Stored BEFORE it listens: the mailbox replays synchronously inside `listen`. */
             live = connection;
             for (const target of relays)

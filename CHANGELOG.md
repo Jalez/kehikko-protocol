@@ -11,6 +11,33 @@ After 2.78.0, every entry's first line under its heading is its kind, and the ve
 (semver; CI checks it): `Kind: breaking` → next major, `Kind: feature` → next minor, `Kind: fix` →
 next patch.
 
+## 2.82.0 — 2026-11-11
+
+Kind: feature
+
+The container's background: with the host's "Container background" off, a module's page is
+transparent by default, through the client, instead of every module painting its own surface over the
+canvas. **Additive**; `PROTOCOL` is still 2. [docs/client.md](docs/client.md), "The container's
+background (2.82.0)".
+
+### Added
+
+- **`context.appearance`** `{ background: 'card' | 'none' }`, in the greeting and every context
+  (optional; absent from an older host, read as `card`; an unknown word reads as `card`).
+  `backgroundOf(context)`, `PAGE_BACKGROUNDS`, `PageBackground`.
+- **`applyBackground(background, { theme?, remember? })`** and `pageBackground()` in `/client`: put
+  `data-kehikot-background` (`BACKGROUND_ATTR`) on `<html>`, add the style `BACKGROUND_CSS` once (id
+  `BACKGROUND_STYLE_ID`) that makes `html`, `body`, `#root` and any element marked `data-kehikot-page`
+  (`PAGE_MARK`) transparent under `none`, and say `color-scheme`. `connect` calls it on every greeting
+  and context unless told **`appearance: false`**; `hostStore`/`useHost` pass `applyTheme`'s choice
+  unless `appearance` is given.
+- `applyTheme` says `color-scheme` on `<html>` too, so a transparent page and its frame agree.
+- The page document (`pageDocument`) carries `BACKGROUND_CSS`, and its blocking script (`themeScript`)
+  puts the remembered background (`BACKGROUND_KEY`, in a frame only) or `?background=`
+  (`BACKGROUND_PARAM`) on `<html>` before the first paint.
+- The template marks its outermost element with `data-kehikot-page`. README's Module consistency
+  checklist says to.
+
 ## 2.81.0 — 2026-11-11
 
 Kind: feature

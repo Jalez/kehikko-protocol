@@ -7,7 +7,9 @@ import { type PageTheme } from '../page.js';
  * It paints a themed background before any script of the module's has run: two colours inline and
  * one blocking script that decides the theme — `?theme=` on the address, else what the host said
  * last time (`THEME_KEY`), else the system's when nothing frames the page and `FRAMED_DEFAULT_THEME`
- * when something does. See docs/module-plumbing.md.
+ * when something does. With the container's background off (2.82.0) the same blocking script puts
+ * `data-kehikot-background="none"` on `<html>` and the inline style leaves the page transparent.
+ * See docs/module-plumbing.md.
  */
 export interface PageOptions {
     /** The document title. */

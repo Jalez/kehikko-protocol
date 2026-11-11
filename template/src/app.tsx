@@ -67,7 +67,7 @@ export function Screen({
   const cover = server === 'stale' ? 'stale' : (coverFor(host, { project: true }) ?? (server === 'down' ? 'down' : null))
 
   return (
-    <div className="flex h-screen flex-col text-sm">
+    <div data-kehikot-page className="flex h-screen flex-col text-sm">
       <Header host={host} menus={items} onPress={onPress} />
       <main className="flex min-h-0 flex-1 flex-col gap-4 overflow-auto p-3">
         {cover ? <Cover state={cover} name="__MODULE_NAME__" onRetry={() => setAgain((n) => n + 1)} /> : details ? <Context host={host} /> : null}

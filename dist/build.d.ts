@@ -1,6 +1,6 @@
 import { z } from 'zod';
 /** This package's own version. A test holds it to `package.json`. */
-export declare const PACKAGE_VERSION = "2.81.0";
+export declare const PACKAGE_VERSION = "2.82.0";
 /** The response header a module's doors carry the build stamp in, on every answer. */
 export declare const BUILD_HEADER = "x-module-build";
 /**
@@ -40,13 +40,13 @@ export declare const buildSchema: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     version: string;
     commit: string | null;
-    started: string;
     protocol: string;
+    started: string;
     start?: string | undefined;
 }, {
     version: string;
-    started: string;
     protocol: string;
+    started: string;
     commit?: string | null | undefined;
     start?: unknown;
 }>;

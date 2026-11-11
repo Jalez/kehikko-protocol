@@ -38,7 +38,7 @@ export interface HostStoreOptions<Kept = unknown> extends ConnectOptions {
     grace?: number;
     /** How the kept state is read and written. Default `JSON_KEPT`. Read at mount. */
     kept?: KeptCodec<Kept>;
-    /** `false` leaves `<html>` alone. Default `true`: the host's theme is put on it. */
+    /** `false` leaves `<html>` alone. Default `true`: the host's theme is put on it, and (2.82.0) the container's background unless `appearance: false`. */
     applyTheme?: boolean;
     /**
      * `false` leaves a page that is older than its own server as it is. Default `true`: it reloads,

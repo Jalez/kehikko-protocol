@@ -74,7 +74,7 @@ const fromPerson = (over: Record<string, unknown> = {}): AgentMessage =>
 
 describe('the version', () => {
   test('is 2.50.0, PROTOCOL is still 2, and the docs say it', () => {
-    expect(PACKAGE_VERSION).toBe('2.81.0')
+    expect(PACKAGE_VERSION).toBe('2.82.0')
     expect(PROTOCOL).toBe(2)
     expect(readFileSync(join(REPO, 'CHANGELOG.md'), 'utf8')).toContain('## 2.50.0')
     const docs = readFileSync(join(REPO, 'docs/agent-messages.md'), 'utf8')

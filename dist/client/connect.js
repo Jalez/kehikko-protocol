@@ -8,6 +8,8 @@ import { rowsAdvice } from '../rows.js';
 import { mailbox } from './mailbox.js';
 import { mayGreet, pageOrigins } from './greet.js';
 import { reportPageError } from './errors.js';
+import { applyBackground } from './theme.js';
+import { backgroundOf } from '../page.js';
 import { pageFind } from './find.js';
 export { mayGreet, pageOrigins } from './greet.js';
 /** The project folder a greeting or a context names, or null. */
@@ -68,6 +70,7 @@ export function connect(id, events = {}, options = {}) {
     const answerWithin = options.answerWithin ?? ANSWER_WITHIN_MS;
     const gotoBackstop = options.gotoBackstop ?? GOTO_BACKSTOP_MS;
     const pressBackstop = options.pressBackstop ?? PRESS_BACKSTOP_MS;
+    const appearing = options.appearance !== false;
     let host = null;
     let origin = '*';
     let live = true;
@@ -375,6 +378,8 @@ export function connect(id, events = {}, options = {}) {
             projectIdNow = projectIdOf(message.context);
             sendActivity();
             pointer(message.pointer === true);
+            if (appearing)
+                applyBackground(backgroundOf(message.context), { theme: message.context.theme === 'dark' ? 'dark' : 'light', remember: true });
             closeFind();
             findKeys(message.find === true);
             /* 2.59.0. A greeting handler that throws is said to the host (`kehikot.page.error`, `greeting`),
@@ -405,6 +410,8 @@ export function connect(id, events = {}, options = {}) {
                 if (!byProject)
                     sendActivity();
             }
+            if (appearing)
+                applyBackground(backgroundOf(context), { theme: context.theme === 'dark' ? 'dark' : 'light', remember: true });
             events.onContext?.(context);
             return;
         }

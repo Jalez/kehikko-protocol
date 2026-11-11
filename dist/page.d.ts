@@ -53,3 +53,38 @@ export declare const STACK_LINES = 12;
 export declare const PAGE_ERRORS_GLOBAL = "__kehikotPageErrors";
 /** What is said for a failure that carries no words at all (`throw undefined`, a bare rejection). */
 export declare const NO_MESSAGE = "An error with no message.";
+/**
+ * What the host draws behind a module's page, as Settings › Appearance › "Container background"
+ * says: `card`, the container's own surface, or `none`, the canvas showing through. A host tells it
+ * in `context.appearance.background`; absent means `card`.
+ */
+export declare const PAGE_BACKGROUNDS: readonly ["card", "none"];
+export type PageBackground = (typeof PAGE_BACKGROUNDS)[number];
+/** The attribute the client puts on the page's `<html>`: `data-kehikot-background="card" | "none"`. */
+export declare const BACKGROUND_ATTR = "data-kehikot-background";
+/**
+ * The attribute a module puts on its outermost page element (`<div data-kehikot-page>`): it is made
+ * transparent with `html`, `body` and `#root` when the background is `none`. Cards, popovers and
+ * dialogs inside keep their own surfaces.
+ */
+export declare const PAGE_MARK = "data-kehikot-page";
+/** Where a page remembers the background its host last said, beside the theme (`THEME_KEY`), for its next first paint. */
+export declare const BACKGROUND_KEY = "kehikot.background";
+/** A page address may say the background outright: `/app?background=none`. */
+export declare const BACKGROUND_PARAM = "background";
+/** The id of the style element the client adds once, holding `BACKGROUND_CSS`. */
+export declare const BACKGROUND_STYLE_ID = "kehikot-background";
+/**
+ * What makes a page transparent when its host draws no background: `html`, `body`, `#root` and the
+ * element marked `PAGE_MARK`, and nothing inside them. Unlayered and `!important`, so a page-level
+ * utility class (`bg-background` on `body`, in a Tailwind layer) or an inline style does not paint
+ * over it. A module that needs an opaque surface for legibility keeps one under
+ * `html[data-kehikot-background="card"]` (or on an element inside the marked one).
+ */
+export declare const BACKGROUND_CSS: string;
+/** The background a context says, `card` when it says none (a host before 2.82.0) or one this package does not know. */
+export declare function backgroundOf(context: {
+    appearance?: {
+        background?: string;
+    } | null;
+} | null | undefined): PageBackground;

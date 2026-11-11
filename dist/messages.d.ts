@@ -1862,6 +1862,13 @@ export declare const helloSchema: z.ZodObject<{
         projectPath: z.ZodDefault<z.ZodNullable<z.ZodString>>;
         projectId: z.ZodDefault<z.ZodNullable<z.ZodString>>;
         theme: z.ZodDefault<z.ZodEnum<["light", "dark"]>>;
+        appearance: z.ZodCatch<z.ZodOptional<z.ZodObject<{
+            background: z.ZodCatch<z.ZodEnum<["card", "none"]>>;
+        }, "strip", z.ZodTypeAny, {
+            background: "card" | "none";
+        }, {
+            background?: unknown;
+        }>>>;
         selection: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
         passage: z.ZodDefault<z.ZodNullable<z.ZodEffects<z.ZodEffects<z.ZodObject<{
             path: z.ZodString;
@@ -2413,6 +2420,9 @@ export declare const helloSchema: z.ZodObject<{
             source: string;
         }[];
         scope?: "epic" | "kehikko" | "project" | "machine" | "part" | undefined;
+        appearance?: {
+            background: "card" | "none";
+        } | undefined;
         kept?: string | null | undefined;
     }, {
         epic?: string | null | undefined;
@@ -2451,8 +2461,9 @@ export declare const helloSchema: z.ZodObject<{
             refreshing?: boolean | undefined;
         } | undefined;
         projectPath?: string | null | undefined;
-        scope?: unknown;
         theme?: "light" | "dark" | undefined;
+        scope?: unknown;
+        appearance?: unknown;
         selection?: string[] | undefined;
         passage?: {
             path: string;
@@ -2666,6 +2677,9 @@ export declare const helloSchema: z.ZodObject<{
             source: string;
         }[];
         scope?: "epic" | "kehikko" | "project" | "machine" | "part" | undefined;
+        appearance?: {
+            background: "card" | "none";
+        } | undefined;
         kept?: string | null | undefined;
     };
     find?: boolean | undefined;
@@ -2716,8 +2730,9 @@ export declare const helloSchema: z.ZodObject<{
             refreshing?: boolean | undefined;
         } | undefined;
         projectPath?: string | null | undefined;
-        scope?: unknown;
         theme?: "light" | "dark" | undefined;
+        scope?: unknown;
+        appearance?: unknown;
         selection?: string[] | undefined;
         passage?: {
             path: string;
@@ -2800,6 +2815,13 @@ export declare const contextMessageSchema: z.ZodObject<{
     projectPath: z.ZodDefault<z.ZodNullable<z.ZodString>>;
     projectId: z.ZodDefault<z.ZodNullable<z.ZodString>>;
     theme: z.ZodDefault<z.ZodEnum<["light", "dark"]>>;
+    appearance: z.ZodCatch<z.ZodOptional<z.ZodObject<{
+        background: z.ZodCatch<z.ZodEnum<["card", "none"]>>;
+    }, "strip", z.ZodTypeAny, {
+        background: "card" | "none";
+    }, {
+        background?: unknown;
+    }>>>;
     selection: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
     passage: z.ZodDefault<z.ZodNullable<z.ZodEffects<z.ZodEffects<z.ZodObject<{
         path: z.ZodString;
@@ -3295,6 +3317,7 @@ export declare const contextMessageSchema: z.ZodObject<{
     };
     projectPath: string | null;
     theme: "light" | "dark";
+    protocol: number;
     selection: string[];
     passage: {
         path: string;
@@ -3354,8 +3377,10 @@ export declare const contextMessageSchema: z.ZodObject<{
         epic: string | null;
         source: string;
     }[];
-    protocol: number;
     scope?: "epic" | "kehikko" | "project" | "machine" | "part" | undefined;
+    appearance?: {
+        background: "card" | "none";
+    } | undefined;
     kept?: string | null | undefined;
 }, {
     type: "kehikot.context";
@@ -3396,8 +3421,9 @@ export declare const contextMessageSchema: z.ZodObject<{
         refreshing?: boolean | undefined;
     } | undefined;
     projectPath?: string | null | undefined;
-    scope?: unknown;
     theme?: "light" | "dark" | undefined;
+    scope?: unknown;
+    appearance?: unknown;
     selection?: string[] | undefined;
     passage?: {
         path: string;
@@ -3650,13 +3676,13 @@ export declare const readySchema: z.ZodObject<{
     }, "strip", z.ZodTypeAny, {
         version: string;
         commit: string | null;
-        started: string;
         protocol: string;
+        started: string;
         start?: string | undefined;
     }, {
         version: string;
-        started: string;
         protocol: string;
+        started: string;
         commit?: string | null | undefined;
         start?: unknown;
     }>>>;
@@ -3673,16 +3699,16 @@ export declare const readySchema: z.ZodObject<{
     build?: {
         version: string;
         commit: string | null;
-        started: string;
         protocol: string;
+        started: string;
         start?: string | undefined;
     } | undefined;
     hold?: boolean | undefined;
 }, {
     type: "kehikot.ready";
     id: string;
-    build?: unknown;
     protocol?: number | undefined;
+    build?: unknown;
     hold?: boolean | undefined;
 }>;
 /**
@@ -4043,6 +4069,13 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         projectPath: z.ZodDefault<z.ZodNullable<z.ZodString>>;
         projectId: z.ZodDefault<z.ZodNullable<z.ZodString>>;
         theme: z.ZodDefault<z.ZodEnum<["light", "dark"]>>;
+        appearance: z.ZodCatch<z.ZodOptional<z.ZodObject<{
+            background: z.ZodCatch<z.ZodEnum<["card", "none"]>>;
+        }, "strip", z.ZodTypeAny, {
+            background: "card" | "none";
+        }, {
+            background?: unknown;
+        }>>>;
         selection: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
         passage: z.ZodDefault<z.ZodNullable<z.ZodEffects<z.ZodEffects<z.ZodObject<{
             path: z.ZodString;
@@ -4594,6 +4627,9 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             source: string;
         }[];
         scope?: "epic" | "kehikko" | "project" | "machine" | "part" | undefined;
+        appearance?: {
+            background: "card" | "none";
+        } | undefined;
         kept?: string | null | undefined;
     }, {
         epic?: string | null | undefined;
@@ -4632,8 +4668,9 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             refreshing?: boolean | undefined;
         } | undefined;
         projectPath?: string | null | undefined;
-        scope?: unknown;
         theme?: "light" | "dark" | undefined;
+        scope?: unknown;
+        appearance?: unknown;
         selection?: string[] | undefined;
         passage?: {
             path: string;
@@ -4847,6 +4884,9 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             source: string;
         }[];
         scope?: "epic" | "kehikko" | "project" | "machine" | "part" | undefined;
+        appearance?: {
+            background: "card" | "none";
+        } | undefined;
         kept?: string | null | undefined;
     };
     find?: boolean | undefined;
@@ -4897,8 +4937,9 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             refreshing?: boolean | undefined;
         } | undefined;
         projectPath?: string | null | undefined;
-        scope?: unknown;
         theme?: "light" | "dark" | undefined;
+        scope?: unknown;
+        appearance?: unknown;
         selection?: string[] | undefined;
         passage?: {
             path: string;
@@ -4975,6 +5016,13 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     projectPath: z.ZodDefault<z.ZodNullable<z.ZodString>>;
     projectId: z.ZodDefault<z.ZodNullable<z.ZodString>>;
     theme: z.ZodDefault<z.ZodEnum<["light", "dark"]>>;
+    appearance: z.ZodCatch<z.ZodOptional<z.ZodObject<{
+        background: z.ZodCatch<z.ZodEnum<["card", "none"]>>;
+    }, "strip", z.ZodTypeAny, {
+        background: "card" | "none";
+    }, {
+        background?: unknown;
+    }>>>;
     selection: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
     passage: z.ZodDefault<z.ZodNullable<z.ZodEffects<z.ZodEffects<z.ZodObject<{
         path: z.ZodString;
@@ -5470,6 +5518,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     };
     projectPath: string | null;
     theme: "light" | "dark";
+    protocol: number;
     selection: string[];
     passage: {
         path: string;
@@ -5529,8 +5578,10 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         epic: string | null;
         source: string;
     }[];
-    protocol: number;
     scope?: "epic" | "kehikko" | "project" | "machine" | "part" | undefined;
+    appearance?: {
+        background: "card" | "none";
+    } | undefined;
     kept?: string | null | undefined;
 }, {
     type: "kehikot.context";
@@ -5571,8 +5622,9 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         refreshing?: boolean | undefined;
     } | undefined;
     projectPath?: string | null | undefined;
-    scope?: unknown;
     theme?: "light" | "dark" | undefined;
+    scope?: unknown;
+    appearance?: unknown;
     selection?: string[] | undefined;
     passage?: {
         path: string;
@@ -5936,13 +5988,13 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
     }, "strip", z.ZodTypeAny, {
         version: string;
         commit: string | null;
-        started: string;
         protocol: string;
+        started: string;
         start?: string | undefined;
     }, {
         version: string;
-        started: string;
         protocol: string;
+        started: string;
         commit?: string | null | undefined;
         start?: unknown;
     }>>>;
@@ -5959,16 +6011,16 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
     build?: {
         version: string;
         commit: string | null;
-        started: string;
         protocol: string;
+        started: string;
         start?: string | undefined;
     } | undefined;
     hold?: boolean | undefined;
 }, {
     type: "kehikot.ready";
     id: string;
-    build?: unknown;
     protocol?: number | undefined;
+    build?: unknown;
     hold?: boolean | undefined;
 }>, z.ZodObject<{
     type: z.ZodLiteral<"kehikot.request">;

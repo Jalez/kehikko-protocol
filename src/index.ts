@@ -1012,6 +1012,15 @@ export {
   TICKET_REFUSED,
   PAGE_ERRORS_MAX,
   STACK_LINES,
+  PAGE_BACKGROUNDS,
+  BACKGROUND_ATTR,
+  BACKGROUND_CSS,
+  BACKGROUND_KEY,
+  BACKGROUND_PARAM,
+  BACKGROUND_STYLE_ID,
+  PAGE_MARK,
+  backgroundOf,
+  type PageBackground,
   type PageTheme,
 } from './page.js'
 
