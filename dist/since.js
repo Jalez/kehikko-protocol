@@ -224,6 +224,8 @@ export const WIRE_SINCE = {
     'ready.hold': '2.70.0',
     'kehikot.drawn': '2.70.0',
     'kehikot.inbox': '2.79.0',
+    'kehikot.loading': '2.84.0',
+    'ready.label': '2.84.0',
 };
 /** Every table, in one place. Plain objects: read them with `sinceOf`, never by indexing with a stranger's string. */
 export const SINCE = {

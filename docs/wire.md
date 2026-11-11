@@ -23,8 +23,9 @@ Ten messages, across a frame, by `postMessage`.
 
 | Module → host | |
 |---|---|
-| `kehikot.ready` | "I heard you." 2.70.0: `hold: true` asks the host to keep its cover up until `kehikot.drawn`. |
-| `kehikot.drawn` | (2.70.0) "My page is drawn: take your cover off." After a `ready` with `hold: true`, within `HOLD_COVER_MS`. |
+| `kehikot.ready` | "I heard you." 2.70.0: `hold: true` asks the host to keep its cover up until `kehikot.drawn`. 2.84.0: `label`, what that cover says. |
+| `kehikot.drawn` | (2.70.0) "My page is drawn: take your cover off." After a `ready` with `hold: true`, within `HOLD_COVER_MS`. 2.84.0: also after `kehikot.loading`. |
+| `kehikot.loading` | (2.84.0) "I am drawing what your new context asks for." `label?` is what the cover says. After a `kehikot.context`; the host covers only if `kehikot.drawn` has not followed within `LOADING_COVER_AFTER_MS`, until it does or `HOLD_COVER_MS`. Inside a greeting's hold it only gives the cover its words. |
 | `kehikot.request` | One question, with an id the answer carries back. |
 | `kehikot.resize` | How tall it would like to be. |
 | `kehikot.went` | Whether the `goto` found anything. |

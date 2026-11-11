@@ -39,6 +39,8 @@ export declare const LIMITS: {
     readonly PATH: 4096;
     /** The name of one conversation with one frame. */
     readonly SESSION: 128;
+    /** 2.84.0. What a host's loading cover says for a page (`kehikot.loading`, `ready.label`): "Loading the journey…". */
+    readonly LOADING_LABEL: 80;
     /** The id correlating a request with its response, or a goto with its answer. */
     readonly CORRELATION: 64;
     /** A method name on the wire. */

@@ -490,6 +490,7 @@ export function hostStore(id, events = {}, options = {}) {
         activity: (items) => live?.activity(items),
         findResult: (count) => live?.findResult(count),
         ready: () => live?.ready(),
+        loading: (label) => live?.loading(label),
         pointerFrom(target) {
             relays.add(target);
             if (live && !relayStops.has(target))

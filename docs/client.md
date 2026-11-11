@@ -1020,6 +1020,31 @@ page may call `ready()` whatever host it is in. **For a host**: on `ready` with 
 cover (as loading) until `kehikot.drawn` arrives from that frame or `HOLD_COVER_MS` passes, then show
 the page; a `ready` without it is ready, as before.
 
+### A cover after a context change (`loading(label)`, `useDrawn`, 2.84.0)
+
+The same cover, after a greeting: when the person switches epic, project, parts or kehikko, a page
+that redraws at once needs nothing — it is never covered. A page whose redraw waits on something (its
+own server, a file) calls **`loading(label?)`** when it starts and **`ready()`** when it is drawn
+(the connection, the store or `useHost`'s value). The client sends **`kehikot.loading`** with the
+words, and `kehikot.drawn` on `ready()` or by itself after `HOLD_COVER_MS`. `loading()` is taken only
+within `HOLD_COVER_MS` of a `kehikot.context` the page has not said `ready()` for; at any other time it
+is the page's own business and nothing is sent. Before the greeting, or while its hold is up, it only
+gives that cover its words (sent as `ready.label`, or as a `kehikot.loading` during the hold).
+
+For a React page, **`useDrawn(host, drawn, label?)`** is the whole of it: pass the page's own "is what
+I show read and drawn?", false while it reads what a new context asks for.
+
+```tsx
+const host = useHost('kehikot.journeys', events)
+useDrawn(host, journey !== null || nothingToRead, 'Loading the journey…')
+```
+
+The words are one line of plain text ("Loading the journey…", "Loading content…"), at most
+`LIMITS.LOADING_LABEL`; without them the host says "Loading <module>…". **For a host**: on
+`kehikot.loading` from a page that is not held, wait `LOADING_COVER_AFTER_MS`; if `kehikot.drawn` has
+not come, cover the container (the module's own icon and the words) until it does or `HOLD_COVER_MS`
+passes. A quick redraw is never covered. A host before 2.84.0 drops the message and the field unread.
+
 ### Mounting the page (`client/mount`, `mountPage`)
 
 `mountPage('root', <App />)` is a page's whole entry: `StrictMode`, and `ReportErrors` around the
