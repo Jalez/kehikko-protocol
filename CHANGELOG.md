@@ -7,6 +7,10 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+After 2.78.0, every entry's first line under its heading is its kind, and the version follows it
+(semver; CI checks it): `Kind: breaking` → next major, `Kind: feature` → next minor, `Kind: fix` →
+next patch.
+
 ## 2.78.0 — 2026-11-11
 
 Edit guards: a module placed on a kehikko can refuse an agent's file edits under paths it names, or in

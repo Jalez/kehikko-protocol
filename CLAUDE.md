@@ -11,7 +11,11 @@ A version is an annotated `vX.Y.Z` tag on `main`; consumers install the tag
 
 1. In the PR: bump `version` in `package.json`, add the `## X.Y.Z — <date>`
    entry at the top of CHANGELOG.md (and the row in README.md's table),
-   rebuild `dist/`.
+   rebuild `dist/`. The entry's first line is its kind, and the version
+   follows it (semver; CI's `version-kind` step fails a mismatch):
+   `Kind: breaking` (something removed or changed incompatibly; `PROTOCOL`
+   moves) → next major; `Kind: feature` (additive) → next minor;
+   `Kind: fix` → next patch. A CI- or docs-only change bumps nothing.
 2. Merge. On the push to `main`, `.github/workflows/ci.yml` runs its checks and
    then the `tag` job (`Jalez/kehikko-desktop/.github/actions/tag-on-merge`,
    with `changelog: CHANGELOG.md`): when the version is newer than every `v*`
