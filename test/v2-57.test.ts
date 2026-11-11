@@ -58,10 +58,10 @@ const good = {
 
 describe('the version', () => {
   test('is 2.57.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.77.0')
+    expect(PACKAGE_VERSION).toBe('2.78.0')
     expect(PROTOCOL).toBe(2)
     const pkg = JSON.parse(readFileSync(join(REPO, 'package.json'), 'utf8')) as { version: string }
-    expect(pkg.version).toBe('2.77.0')
+    expect(pkg.version).toBe('2.78.0')
     expect(readFileSync(join(REPO, 'CHANGELOG.md'), 'utf8')).toContain('## 2.57.0')
     expect(readFileSync(join(REPO, 'docs/manifest.md'), 'utf8')).toContain("### A module's introduction (2.57.0)")
   })

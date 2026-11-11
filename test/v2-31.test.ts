@@ -64,7 +64,7 @@ const item = (more: Record<string, unknown> = {}) => ({ id: 's1', state: 'done',
 
 describe('the version', () => {
   test('is 2.31.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.77.0')
+    expect(PACKAGE_VERSION).toBe('2.78.0')
     expect(PROTOCOL).toBe(2)
   })
 })

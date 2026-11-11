@@ -356,15 +356,21 @@ export declare function changesBetween(changes: readonly AgentChange[], from: st
  */
 export declare function changedSince(input: NotesInput, told: NotesTold): string | null;
 /** 2.61.0. Over the guards of the modules on the kehikko, in a subagent's notes. */
-export declare const GUARDS_HEAD = "Shell commands some modules on this kehikko guard \u2014 such a command is run through the module or refused; in quotes, why:";
-/** 2.61.0. One guard as a line of the notes: `- Test runs: tsc, bun test, script test — "Heavy runs go through the queue."` */
+export declare const GUARDS_HEAD = "Shell commands and file edits some modules on this kehikko guard \u2014 such a command is run through the module or refused, such an edit refused; in quotes, why:";
+/**
+ * 2.61.0. One guard as a line of the notes: `- Test runs: tsc, bun test, script test — "Heavy runs go through the queue."`
+ * (2.78.0) An `edit` guard says what it holds: `- Worktrees: edits in a main checkout, ~/Library/… — "…"`.
+ */
 export declare function guardLine(one: {
     module: string;
     name: string;
     guard: {
+        tool?: string;
         match: {
             commands: readonly string[];
             scripts?: readonly string[];
+            paths?: readonly string[];
+            checkouts?: readonly string[];
         };
         why: string;
     };

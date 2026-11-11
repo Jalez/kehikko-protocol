@@ -27,8 +27,13 @@ import { MODULE_ID } from './ids.js';
  * an assignment in front of any of its commands, or in the hook's own environment — passes every
  * guard. A denial says so, for when the person asks for a command to be run directly.
  */
-/** The tools a guard can be about. `shell`: an agent's shell tool (Claude Code's Bash, Codex's shell). */
-export const GUARD_TOOLS = ['shell'];
+/**
+ * The tools a guard can be about. `shell`: an agent's shell tool (Claude Code's Bash, Codex's shell).
+ * `edit` (2.78.0): an agent's file-editing tools (Claude Code's Edit, Write, MultiEdit and
+ * NotebookEdit; Codex's apply_patch), decided on the file's path with `editDecision`. A host or agent
+ * module before 2.78.0 drops an `edit` guard unread, and the module's other guards are kept.
+ */
+export const GUARD_TOOLS = ['shell', 'edit'];
 /** What a guard does with a command it matches. */
 export const GUARD_ACTIONS = ['rewrite', 'deny'];
 /** The variable that lets a command past every guard when set (not empty, not `0`). */
@@ -52,6 +57,10 @@ export const GUARD_LIMITS = {
     DEPTH: 3,
     /** Guards in the host's answer for one session. */
     PLACED: 64,
+    /** (2.78.0) A path pattern, in characters. */
+    PATH: 240,
+    /** (2.78.0) A path an edit guard decides on, in characters; a longer one is not looked into and passes. */
+    EDIT_PATH: 4096,
 };
 /** A guard's id within its module: lowercase words joined by dashes. */
 export const GUARD_ID = /^[a-z0-9][a-z0-9-]{0,39}$/;
@@ -66,6 +75,28 @@ export const GUARD_PATTERN = /^[A-Za-z0-9_@./:=+,%*-]+(?: [A-Za-z0-9_@./:=+,%*-]
 export const GUARD_SCRIPT = /^[A-Za-z0-9_@./:+-]{1,64}$/;
 const pattern = z.string().max(GUARD_LIMITS.PATTERN).regex(GUARD_PATTERN);
 const patterns = z.array(pattern).max(GUARD_LIMITS.PATTERNS);
+/**
+ * 2.78.0. A path pattern for an `edit` guard: absolute (`/`) or under the home folder (`~/`), segments
+ * separated by `/`. A segment `*` is any one name, `**` any number of them (none included), and `*`
+ * inside a segment any run of characters but `/`. Spaces are kept (`~/Library/Application Support/…`).
+ * No `..`, no `.` segments, no backslashes, no control characters, nothing else in braces or brackets.
+ */
+export const GUARD_PATH = /^(?:~\/|\/)(?:[^\u0000-\u001f\u007f\\/{}\[\]?]+(?:\/[^\u0000-\u001f\u007f\\/{}\[\]?]+)*)?\/?$/;
+/** Whether a path pattern is one this protocol reads: `GUARD_PATH`, and no `.` or `..` segment. */
+export function pathPatternOk(text) {
+    if (text.length === 0 || text.length > GUARD_LIMITS.PATH || !GUARD_PATH.test(text))
+        return false;
+    return !text.split('/').some((segment) => segment === '.' || segment === '..');
+}
+const pathPattern = z.string().refine(pathPatternOk, 'a path pattern is absolute or starts with ~/, with no . or .. segments');
+const pathPatterns = z.array(pathPattern).max(GUARD_LIMITS.PATTERNS);
+/**
+ * 2.78.0. The kinds of checkout an `edit` guard can name in `match.checkouts`. `main`: a file inside a
+ * git repository's main checkout — the nearest `.git` above it is a directory — as opposed to a linked
+ * worktree (`.git` is a file), where an agent's work belongs. Told by the agent module on its own
+ * computer (`checkoutOf` in `/serve`); the rule is handed the answer.
+ */
+export const GUARD_CHECKOUTS = ['main'];
 /** Whether a rewrite template is one this protocol fills: one line, `{command}` once, no other braces. */
 export function templateOk(template) {
     if (template.length === 0 || template.length > GUARD_LIMITS.TEMPLATE)
@@ -82,22 +113,29 @@ export const guardSchema = z
     .object({
     id: z.string().regex(GUARD_ID),
     tool: z.enum(GUARD_TOOLS),
-    match: z
-        .object({
-        /** Command patterns (`GUARD_PATTERN`): `tsc`, `bun test`, `npx playwright`. */
+    match: z.object({
+        /** Command patterns (`GUARD_PATTERN`): `tsc`, `bun test`, `npx playwright`. A `shell` guard's. */
         commands: patterns.default([]),
-        /** package.json script names, matched as `bun run <name>`, `npm run <name>`, `npm test`, `pnpm <name>`, `yarn <name>`. */
+        /** package.json script names, matched as `bun run <name>`, `npm run <name>`, `npm test`, `pnpm <name>`, `yarn <name>`. A `shell` guard's. */
         scripts: z.array(z.string().regex(GUARD_SCRIPT)).max(GUARD_LIMITS.PATTERNS).optional(),
-    })
-        .refine((m) => m.commands.length > 0 || (m.scripts?.length ?? 0) > 0, 'a guard matches at least one command or script'),
-    /** Command patterns that pass this guard even when `match` names them: `tsc --version`, `bun test --help`. */
+        /** (2.78.0) Path patterns (`GUARD_PATH`) of the files it is about. An `edit` guard's. */
+        paths: pathPatterns.optional(),
+        /** (2.78.0) Kinds of checkout (`GUARD_CHECKOUTS`) whose files it is about: `main`. An `edit` guard's. */
+        checkouts: z.array(z.enum(GUARD_CHECKOUTS)).max(GUARD_CHECKOUTS.length).optional(),
+    }),
+    /** Command patterns that pass this guard even when `match` names them: `tsc --version`, `bun test --help`. A `shell` guard's. */
     allow: patterns.optional(),
+    /** (2.78.0) Path patterns that pass this guard even when `match` names them. An `edit` guard's. */
+    allowPaths: pathPatterns.optional(),
     action: z.enum(GUARD_ACTIONS),
     /** For `rewrite`: the command to run instead, naming `{command}` once (`templateOk`). */
     rewrite: z.string().optional(),
     /** Why, in plain text, said to the agent whenever the guard acts. */
     why: z.string().trim().min(1).max(GUARD_LIMITS.WHY),
 })
+    .refine((g) => g.tool !== 'shell' || g.match.commands.length > 0 || (g.match.scripts?.length ?? 0) > 0, 'a shell guard matches at least one command or script')
+    .refine((g) => g.tool !== 'edit' || (g.match.paths?.length ?? 0) > 0 || (g.match.checkouts?.length ?? 0) > 0, 'an edit guard matches at least one path or kind of checkout')
+    .refine((g) => g.tool !== 'edit' || g.action === 'deny', 'an edit guard denies; there is nothing to rewrite a file edit into')
     .refine((g) => g.action !== 'rewrite' || (typeof g.rewrite === 'string' && templateOk(g.rewrite)), 'a rewrite names {command} once, on one line, with no other braces')
     .refine((g) => g.action !== 'deny' || g.rewrite === undefined, 'a deny guard has no rewrite');
 /** Keep the guards that parse, first of each id, at most `most`. A list that is not one is none. */
@@ -392,7 +430,7 @@ export function scriptRun(words) {
 }
 /** Whether one simple command is what a guard is about, and not something its `allow` lets past. */
 export function guardMatches(guard, command) {
-    if (!command.words.length)
+    if (guard.tool !== 'shell' || !command.words.length)
         return false;
     const allowed = (guard.allow ?? []).some((p) => patternMatches(p, command.words));
     if (allowed)
@@ -458,8 +496,121 @@ const flat = (text, max = 300) => {
 export function guardSays(decision) {
     const who = `${flat(decision.name, 80)} (a module on this kehikko)`;
     const why = JSON.stringify(flat(decision.why));
+    if (decision.action === 'deny' && decision.guard.tool === 'edit') {
+        return `Refused by ${who}, guard ${decision.guard.id}: ${why}. Only if the person asks for this file to be edited here directly, they can start the session with ${GUARD_ESCAPE_ENV}=1.`;
+    }
     if (decision.action === 'deny') {
         return `Refused by ${who}, guard ${decision.guard.id}: ${why}. Use that module instead. Only if the person asks for this command to run directly, put ${GUARD_ESCAPE_ENV}=1 in front of it.`;
     }
     return `${who} ran this command through its own instead (guard ${decision.guard.id}): ${why}. The command run was: ${flat(decision.command, 600)}`;
+}
+/* ------------------------------------------------------------------------ *
+ * Edits (2.78.0)
+ * ------------------------------------------------------------------------ */
+/** A path made plain for matching: repeated and trailing slashes go, `.` segments go, `..` steps up. Absolute in, absolute out; anything else is null. */
+export function plainPath(path) {
+    if (typeof path !== 'string' || !path.startsWith('/') || path.length > GUARD_LIMITS.EDIT_PATH)
+        return null;
+    if (/[\u0000]/.test(path))
+        return null;
+    const out = [];
+    for (const segment of path.split('/')) {
+        if (segment === '' || segment === '.')
+            continue;
+        if (segment === '..')
+            out.pop();
+        else
+            out.push(segment);
+    }
+    return `/${out.join('/')}`;
+}
+/** One segment of a path pattern as a regular expression: `*` is any run of characters but `/`. */
+const REGEX_SPECIAL = /[.*+?^$()|[\]\\{}]/g;
+const segmentRe = (segment) => {
+    const pieces = segment.split('*').map((piece) => piece.replace(REGEX_SPECIAL, (c) => `\\${c}`));
+    return new RegExp(`^${pieces.join('[^/]*')}$`);
+};
+/**
+ * Whether a path pattern (`GUARD_PATH`) matches an absolute path. `~/` is `home`; a pattern ending in
+ * `/` or `/**` matches everything under that folder (the folder itself included). Pure.
+ */
+export function pathMatches(pattern, path, home) {
+    if (!pathPatternOk(pattern))
+        return false;
+    const plain = plainPath(path);
+    if (plain === null)
+        return false;
+    let absolute = pattern;
+    if (pattern.startsWith('~/')) {
+        const root = home === null ? null : plainPath(home);
+        if (root === null)
+            return false;
+        absolute = `${root === '/' ? '' : root}/${pattern.slice(2)}`;
+    }
+    if (absolute.endsWith('/'))
+        absolute = `${absolute}**`;
+    const want = absolute.split('/').filter(Boolean);
+    const have = plain.split('/').filter(Boolean);
+    const walk = (w, h) => {
+        if (w === want.length)
+            return h === have.length;
+        if (want[w] === '**') {
+            for (let at = h; at <= have.length; at++)
+                if (walk(w + 1, at))
+                    return true;
+            return false;
+        }
+        return h < have.length && segmentRe(want[w]).test(have[h]) && walk(w + 1, h + 1);
+    };
+    return walk(0, 0);
+}
+/** Whether an `edit` guard is about a file, and its `allowPaths` do not let it past. Pure. */
+export function editGuardMatches(guard, path, facts = {}) {
+    if (guard.tool !== 'edit')
+        return false;
+    const home = facts.home ?? null;
+    if ((guard.allowPaths ?? []).some((p) => pathMatches(p, path, home)))
+        return false;
+    if ((guard.match.paths ?? []).some((p) => pathMatches(p, path, home)))
+        return true;
+    return facts.checkout === 'main' && (guard.match.checkouts ?? []).includes('main');
+}
+/**
+ * THE RULE for edits (2.78.0): what becomes of a file edit at `path` (absolute: the agent module
+ * resolves a relative one against the session's folder first) under the `edit` guards of the modules
+ * placed on the session's kehikko. `pass` or `deny`, the first matching guard in order; never a
+ * rewrite. An empty, relative or overlong path, or `KEHIKOT_DIRECT` in the hook's environment, passes.
+ * Pure: the file's checkout is told in `facts`.
+ */
+export function editDecision(guards, path, facts = {}) {
+    if (plainPath(path) === null)
+        return { action: 'pass' };
+    if (escapes(facts.env?.[GUARD_ESCAPE_ENV]))
+        return { action: 'pass' };
+    const hit = guards.find((one) => one.guard.tool === 'edit' && one.guard.action === 'deny' && editGuardMatches(one.guard, path, facts));
+    if (!hit)
+        return { action: 'pass' };
+    return { action: 'deny', module: hit.module, name: hit.name || hit.module, guard: hit.guard, why: hit.guard.why };
+}
+/** The tool names of the agent CLIs whose calls edit a file, and where each says which file. */
+export const EDIT_TOOL_PATHS = {
+    /* Claude Code */
+    Edit: ['file_path'],
+    Write: ['file_path'],
+    MultiEdit: ['file_path'],
+    NotebookEdit: ['notebook_path'],
+};
+/** The files a tool call edits, from its name and input (`EDIT_TOOL_PATHS`); empty for any other tool. */
+export function editedPaths(tool, input) {
+    if (typeof tool !== 'string' || !Object.hasOwn(EDIT_TOOL_PATHS, tool))
+        return [];
+    if (typeof input !== 'object' || input === null)
+        return [];
+    const out = [];
+    for (const key of EDIT_TOOL_PATHS[tool]) {
+        const value = input[key];
+        if (typeof value === 'string' && value)
+            out.push(value);
+    }
+    return out;
 }

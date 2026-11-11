@@ -593,6 +593,31 @@ about and what becomes of them:
 - **The escape.** `KEHIKOT_DIRECT=1` in front of a command (or in the hook's environment) passes every
   guard. A denial says so, to use only when the person asks for the command to run directly.
 
+### Edit guards (2.78.0)
+
+A shell guard cannot keep an agent from editing a file with its editor tools. An **edit guard** can:
+
+```json
+"guards": [{
+  "id": "main-checkout",
+  "tool": "edit",
+  "match": { "checkouts": ["main"], "paths": ["~/Library/Application Support/Kehikot/installed/**"] },
+  "allowPaths": ["~/Projects/app/.kehikot/**"],
+  "action": "deny",
+  "why": "Work in a worktree: git worktree add ../<repo>-worktrees/<branch> -b <branch> origin/main"
+}]
+```
+
+- `match.paths` are path patterns: absolute or `~/`, `*` for one name (or part of one), `**` for any
+  depth, a trailing `/` for everything under a folder. `match.checkouts: ["main"]` is any file in a
+  repository's main checkout — the nearest `.git` above it is a directory — and not a linked worktree
+  (`.git` is a file). `allowPaths` lets files past.
+- Deny only. The agent module's pre-tool hook on its edit tools reads the file from the call
+  (`editedPaths`), resolves it against the session's folder, tells its checkout (`checkoutOf`), and
+  decides with `editDecision`; a refusal says `guardSays`. `KEHIKOT_DIRECT=1` in the session's own
+  environment passes.
+- A shell command that writes a file (`sed -i`, `>`) is not an edit: only a shell guard can hold it.
+
 ### What a subagent is told
 
 A subagent starts with its brief only, so a module's line to agents never reached it. An agent module

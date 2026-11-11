@@ -56,3 +56,5 @@ export { attach, eventFrame, events, publish, streams, watching, EVENTS_BAD_TOPI
 export { personEnv, utf8Locale, HOST_PATH_ENV } from './person.js';
 /* A door's tools changed: MCP's `notifications/tools/list_changed` on its listening stream (2.62.0). See `tools-changed.ts`. */
 export { MAX_TOOL_STREAMS, TOOLS_LIST_CHANGED, TOOLS_RETRY_MS, markOfEventId, mcpPathOf, sayingListChanged, toolsChanged, toolsMark, toolStream, wantsToolStream, } from './tools-changed.js';
+/* Which kind of git checkout a file is in, for an edit guard (2.78.0). See `checkout.ts`. */
+export { checkoutOf } from './checkout.js';

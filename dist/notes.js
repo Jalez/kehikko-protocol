@@ -450,10 +450,15 @@ function notesWithoutMessages(input, event, told) {
     return { text, kind: text === null ? null : 'change', told: next };
 }
 /** 2.61.0. Over the guards of the modules on the kehikko, in a subagent's notes. */
-export const GUARDS_HEAD = 'Shell commands some modules on this kehikko guard — such a command is run through the module or refused; in quotes, why:';
-/** 2.61.0. One guard as a line of the notes: `- Test runs: tsc, bun test, script test — "Heavy runs go through the queue."` */
+export const GUARDS_HEAD = 'Shell commands and file edits some modules on this kehikko guard — such a command is run through the module or refused, such an edit refused; in quotes, why:';
+/**
+ * 2.61.0. One guard as a line of the notes: `- Test runs: tsc, bun test, script test — "Heavy runs go through the queue."`
+ * (2.78.0) An `edit` guard says what it holds: `- Worktrees: edits in a main checkout, ~/Library/… — "…"`.
+ */
 export function guardLine(one) {
-    const what = [...one.guard.match.commands, ...(one.guard.match.scripts ?? []).map((s) => `script ${s}`)].slice(0, 12);
+    const what = one.guard.tool === 'edit'
+        ? [...(one.guard.match.checkouts ?? []).map((c) => `edits in a ${c} checkout`), ...(one.guard.match.paths ?? []).map((p) => `edits under ${p}`)].slice(0, 12)
+        : [...one.guard.match.commands, ...(one.guard.match.scripts ?? []).map((s) => `script ${s}`)].slice(0, 12);
     return `- ${oneLine(one.name, 80) || one.module}: ${oneLine(what.join(', '), 300)} — ${quoted(one.guard.why)}`;
 }
 /**
