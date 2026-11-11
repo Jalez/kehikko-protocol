@@ -1,5 +1,7 @@
-# Every push to main and every pull request: build, prove the committed dist/
-# is what the source builds, typecheck, test. Then, on a push to main only, tag
+# Every push to main and every pull request: on a pull request, check that a
+# version bump matches the Kind its CHANGELOG entry declares (semver,
+# Jalez/kehikko-desktop/.github/actions/version-kind); build, prove the
+# committed dist/ is what the source builds, typecheck, test. Then, on a push to main only, tag
 # the release: when package.json's version is newer than every vX.Y.Z tag and
 # CHANGELOG.md has its "## X.Y.Z" entry, the annotated tag vX.Y.Z is created on
 # the pushed commit (Jalez/kehikko-desktop/.github/actions/tag-on-merge).
@@ -31,6 +33,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      # Semver: a version bump's CHANGELOG entry starts with
+      # `Kind: breaking | feature | fix`, and the version is the one that kind
+      # asks for after the latest tag (breaking → major, feature → minor,
+      # fix → patch). Pull requests only; main is checked by its PR.
+      - name: The version matches its kind
+        if: github.event_name == 'pull_request'
+        uses: Jalez/kehikko-desktop/.github/actions/version-kind@main
+        with:
+          changelog: CHANGELOG.md
 
       - uses: oven-sh/setup-bun@v2
 
