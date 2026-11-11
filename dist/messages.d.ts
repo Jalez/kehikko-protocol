@@ -3692,10 +3692,16 @@ export declare const readySchema: z.ZodObject<{
      * before 2.70.0 strips it and lifts its cover on this message, as before.
      */
     hold: z.ZodOptional<z.ZodBoolean>;
+    /**
+     * 2.84.0. What the held cover says while it is up: "Loading the journey…". Plain text, one line.
+     * Absent: the host's own words ("Loading <module>…"). Out of shape: dropped, not the message.
+     */
+    label: z.ZodCatch<z.ZodOptional<z.ZodString>>;
 }, "strip", z.ZodTypeAny, {
     type: "kehikot.ready";
     id: string;
     protocol: number;
+    label?: string | undefined;
     build?: {
         version: string;
         commit: string | null;
@@ -3707,6 +3713,7 @@ export declare const readySchema: z.ZodObject<{
 }, {
     type: "kehikot.ready";
     id: string;
+    label?: unknown;
     protocol?: number | undefined;
     build?: unknown;
     hold?: boolean | undefined;
@@ -3723,6 +3730,23 @@ export declare const drawnSchema: z.ZodObject<{
     type: "kehikot.drawn";
 }>;
 export type Drawn = z.infer<typeof drawnSchema>;
+/**
+ * Module → host (2.84.0). After a `kehikot.context`: the page is drawing what it asks for, and that
+ * waits on something. Cover the container if `kehikot.drawn` has not followed within
+ * `LOADING_COVER_AFTER_MS`, saying `label`, until it does or `HOLD_COVER_MS` passes. Sent while a
+ * greeting's hold is up, it only gives that cover its label. Plain text, one line.
+ */
+export declare const loadingSchema: z.ZodObject<{
+    type: z.ZodLiteral<"kehikot.loading">;
+    label: z.ZodCatch<z.ZodOptional<z.ZodString>>;
+}, "strip", z.ZodTypeAny, {
+    type: "kehikot.loading";
+    label?: string | undefined;
+}, {
+    type: "kehikot.loading";
+    label?: unknown;
+}>;
+export type Loading = z.infer<typeof loadingSchema>;
 /** One question, with an id the answer will carry back. */
 export declare const requestSchema: z.ZodObject<{
     type: z.ZodLiteral<"kehikot.request">;
@@ -6004,10 +6028,16 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
      * before 2.70.0 strips it and lifts its cover on this message, as before.
      */
     hold: z.ZodOptional<z.ZodBoolean>;
+    /**
+     * 2.84.0. What the held cover says while it is up: "Loading the journey…". Plain text, one line.
+     * Absent: the host's own words ("Loading <module>…"). Out of shape: dropped, not the message.
+     */
+    label: z.ZodCatch<z.ZodOptional<z.ZodString>>;
 }, "strip", z.ZodTypeAny, {
     type: "kehikot.ready";
     id: string;
     protocol: number;
+    label?: string | undefined;
     build?: {
         version: string;
         commit: string | null;
@@ -6019,6 +6049,7 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
 }, {
     type: "kehikot.ready";
     id: string;
+    label?: unknown;
     protocol?: number | undefined;
     build?: unknown;
     hold?: boolean | undefined;
@@ -7862,6 +7893,15 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
     type: "kehikot.drawn";
 }, {
     type: "kehikot.drawn";
+}>, z.ZodObject<{
+    type: z.ZodLiteral<"kehikot.loading">;
+    label: z.ZodCatch<z.ZodOptional<z.ZodString>>;
+}, "strip", z.ZodTypeAny, {
+    type: "kehikot.loading";
+    label?: string | undefined;
+}, {
+    type: "kehikot.loading";
+    label?: unknown;
 }>]>;
 export type ModuleMessage = z.infer<typeof moduleMessageSchema>;
 export type WireMessage = HostMessage | ModuleMessage;

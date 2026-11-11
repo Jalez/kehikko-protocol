@@ -157,6 +157,15 @@ export declare const MESSAGE: {
      */
     readonly DRAWN: "kehikot.drawn";
     /**
+     * Module → host (2.84.0). "I am drawing what your new context asks for": sent after a
+     * `kehikot.context`, by a page whose redraw waits on something (a read of its own server, a file).
+     * A host covers the container only if `kehikot.drawn` has not followed within
+     * `LOADING_COVER_AFTER_MS`, saying `label` (or "Loading <module>…"), until `kehikot.drawn` or
+     * `HOLD_COVER_MS`. Inside a greeting's hold it only gives that cover its label. A page that redraws
+     * at once sends nothing. A host before 2.84.0 drops it unread.
+     */
+    readonly LOADING: "kehikot.loading";
+    /**
      * Host → module (2.79.0). "The person's Inbox changed: read it again", or "they asked for the next
      * thing that needs them: go to it". Sent only to a frame whose manifest declares `inbox:person`.
      * No answer. See `inbox.ts` and docs/inbox.md.
@@ -168,6 +177,11 @@ export declare const MESSAGE: {
  * in ms: the client says `kehikot.drawn` by itself when it passes. A host keeps its own bound too.
  */
 export declare const HOLD_COVER_MS = 3000;
+/**
+ * 2.84.0. How long after `kehikot.loading` a host waits for `kehikot.drawn` before it covers the
+ * container, in ms: a redraw quicker than this is never covered, so a quick one does not flash.
+ */
+export declare const LOADING_COVER_AFTER_MS = 150;
 export type MessageType = (typeof MESSAGE)[keyof typeof MESSAGE];
 /** The prefix every message type carries, so a listener can drop the rest cheaply. There is one spelling. */
 export declare const MESSAGE_PREFIX = "kehikot.";
@@ -181,7 +195,7 @@ export declare const MESSAGE_PREFIX = "kehikot.";
  */
 export declare const HOST_MESSAGES: readonly ["kehikot.hello", "kehikot.context", "kehikot.response", "kehikot.goto", "kehikot.event", "kehikot.clear", "kehikot.refresh", "kehikot.press", "kehikot.opened", "kehikot.covered", "kehikot.visible", "kehikot.find", "kehikot.inbox"];
 /** And what the module says. */
-export declare const MODULE_MESSAGES: readonly ["kehikot.ready", "kehikot.request", "kehikot.resize", "kehikot.went", "kehikot.filters", "kehikot.clearable", "kehikot.refreshable", "kehikot.header", "kehikot.pressed", "kehikot.footer", "kehikot.pointer", "kehikot.page.error", "kehikot.find.result", "kehikot.find.open", "kehikot.drawn"];
+export declare const MODULE_MESSAGES: readonly ["kehikot.ready", "kehikot.request", "kehikot.resize", "kehikot.went", "kehikot.filters", "kehikot.clearable", "kehikot.refreshable", "kehikot.header", "kehikot.pressed", "kehikot.footer", "kehikot.pointer", "kehikot.page.error", "kehikot.find.result", "kehikot.find.open", "kehikot.drawn", "kehikot.loading"];
 /**
  * How tall a frame may be asked to be, in pixels, bounded on both sides. `clampHeight` restates
  * the host's answer so a module can do the arithmetic on its own side.

@@ -30,4 +30,4 @@ export { hostStore, hostFields, GREETING_GRACE_MS, JSON_KEPT, KEEP_AFTER_MS, } f
 /* 2.70.0. What every container gets by default: its view kept (`hostStore`'s `keepView`), and presses from nested frames. */
 export { KEPT_VIEW_MARK, KEEP_SCROLL_ATTRIBUTE, KEEP_SCROLL_AFTER_MS, RESTORE_SCROLL_WITHIN_MS, unwrapKept, wrapKept, viewOf, headerValues, } from './kept-view.js';
 export { relayPointer, pointerShim, pointerShimScript, RELAY_POINTER, RELAYED_EVENTS, } from './relay.js';
-export { HOLD_COVER_MS } from '../constants.js';
+export { HOLD_COVER_MS, LOADING_COVER_AFTER_MS } from '../constants.js';

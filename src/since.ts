@@ -239,6 +239,8 @@ export const WIRE_SINCE = {
   'ready.hold': '2.70.0',
   'kehikot.drawn': '2.70.0',
   'kehikot.inbox': '2.79.0',
+  'kehikot.loading': '2.84.0',
+  'ready.label': '2.84.0',
 } as const
 export type WirePiece = keyof typeof WIRE_SINCE
 

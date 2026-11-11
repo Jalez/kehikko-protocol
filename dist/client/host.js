@@ -23,8 +23,9 @@ export function useHost(id, events = {}, options = {}) {
     settings.current = options;
     /* 2.70.0. Nested windows to hear presses on, kept across mounts: a child's effect runs before this one's. */
     const relays = useRef(new Map());
-    /* And whether the page said it is drawn before the store was there to say it. */
+    /* And whether the page said it is drawn before the store was there to say it — or, 2.84.0, what it said it is loading. */
     const saidReady = useRef(false);
+    const saidLoading = useRef(null);
     useEffect(() => {
         const mounted = settings.current;
         const read = (mounted.kept ?? JSON_KEPT).read;
@@ -60,6 +61,8 @@ export function useHost(id, events = {}, options = {}) {
         live.start();
         if (saidReady.current)
             live.ready();
+        else if (saidLoading.current)
+            live.loading(saidLoading.current.label);
         return () => {
             for (const [target, stop] of relays.current) {
                 stop?.();
@@ -97,7 +100,13 @@ export function useHost(id, events = {}, options = {}) {
     const connection = useCallback(() => held.current?.connection() ?? null, []);
     const ready = useCallback(() => {
         saidReady.current = true;
+        saidLoading.current = null;
         held.current?.ready();
+    }, []);
+    const loading = useCallback((label) => {
+        saidReady.current = false;
+        saidLoading.current = { label: label ?? null };
+        held.current?.loading(label);
     }, []);
     const pointerFrom = useCallback((target) => {
         const map = relays.current;
@@ -109,7 +118,24 @@ export function useHost(id, events = {}, options = {}) {
         };
     }, []);
     const read = useCallback(() => held.current?.get() ?? drawn.current, []);
-    return useMemo(() => ({ ...standing, remember, point, locate, openAddress, request, resize, filters, clearable, refreshable, header, footer, activity, findResult, ready, pointerFrom, connection, read }), [standing, remember, point, locate, openAddress, request, resize, filters, clearable, refreshable, header, footer, activity, findResult, ready, pointerFrom, connection, read]);
+    return useMemo(() => ({ ...standing, remember, point, locate, openAddress, request, resize, filters, clearable, refreshable, header, footer, activity, findResult, ready, loading, pointerFrom, connection, read }), [standing, remember, point, locate, openAddress, request, resize, filters, clearable, refreshable, header, footer, activity, findResult, ready, loading, pointerFrom, connection, read]);
+}
+/**
+ * 2.84.0. Tell the host whether the page shows what it is for: `drawn` true says `ready()`, false says
+ * `loading(label)`. Pass the page's own "is what I show read and drawn?" — false while it reads what
+ * a new epic, project or set of parts asks for. The host covers the container, with the module's icon
+ * and `label` ("Loading the journey…"), only when a context came and the page did not draw it within
+ * `LOADING_COVER_AFTER_MS`; a page that stays drawn through a context is never covered. On the first
+ * greeting `label` is what the held cover says.
+ */
+export function useDrawn(host, drawn, label) {
+    const { ready, loading } = host;
+    useEffect(() => {
+        if (drawn)
+            ready();
+        else
+            loading(label);
+    }, [drawn, label, ready, loading]);
 }
 /** Whether a kept value can stand for `initial`: the same kind of value (an array for an array). */
 function sameKind(initial, value) {

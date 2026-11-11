@@ -21,6 +21,18 @@ export interface Host<Kept = unknown> extends HostStanding<Kept>, HostActions<Ke
  * render — it is read through a ref — so `onGoto` needs no memoising.
  */
 export declare function useHost<Kept = unknown>(id: string, events?: HostEvents, options?: UseHostOptions<Kept>): Host<Kept>;
+/**
+ * 2.84.0. Tell the host whether the page shows what it is for: `drawn` true says `ready()`, false says
+ * `loading(label)`. Pass the page's own "is what I show read and drawn?" — false while it reads what
+ * a new epic, project or set of parts asks for. The host covers the container, with the module's icon
+ * and `label` ("Loading the journey…"), only when a context came and the page did not draw it within
+ * `LOADING_COVER_AFTER_MS`; a page that stays drawn through a context is never covered. On the first
+ * greeting `label` is what the held cover says.
+ */
+export declare function useDrawn(host: {
+    ready: () => void;
+    loading: (label?: string | null) => void;
+}, drawn: boolean, label?: string | null): void;
 /** What `useKept` needs of a host: `useHost`'s value, or anything with the same three members. */
 export interface KeepsFor {
     kept: unknown;

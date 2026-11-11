@@ -330,6 +330,11 @@ export const readySchema = z.object({
      * before 2.70.0 strips it and lifts its cover on this message, as before.
      */
     hold: z.boolean().optional(),
+    /**
+     * 2.84.0. What the held cover says while it is up: "Loading the journey…". Plain text, one line.
+     * Absent: the host's own words ("Loading <module>…"). Out of shape: dropped, not the message.
+     */
+    label: z.string().trim().min(1).max(LIMITS.LOADING_LABEL).optional().catch(undefined),
 });
 /**
  * Module → host (2.70.0). The page that said `hold: true` in its `ready` is drawn: lift the cover.
@@ -337,6 +342,16 @@ export const readySchema = z.object({
  */
 export const drawnSchema = z.object({
     type: messageType(MESSAGE.DRAWN),
+});
+/**
+ * Module → host (2.84.0). After a `kehikot.context`: the page is drawing what it asks for, and that
+ * waits on something. Cover the container if `kehikot.drawn` has not followed within
+ * `LOADING_COVER_AFTER_MS`, saying `label`, until it does or `HOLD_COVER_MS` passes. Sent while a
+ * greeting's hold is up, it only gives that cover its label. Plain text, one line.
+ */
+export const loadingSchema = z.object({
+    type: messageType(MESSAGE.LOADING),
+    label: z.string().trim().min(1).max(LIMITS.LOADING_LABEL).optional().catch(undefined),
 });
 /** One question, with an id the answer will carry back. */
 export const requestSchema = z.object({
@@ -554,6 +569,7 @@ export const moduleMessageSchema = z.union([
     findResultSchema,
     findOpenSchema,
     drawnSchema,
+    loadingSchema,
 ]);
 /**
  * Is this worth parsing at all? The cheap first filter: true when the value is an object whose

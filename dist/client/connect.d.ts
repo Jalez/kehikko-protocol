@@ -369,6 +369,16 @@ export interface Connection {
      */
     ready: () => void;
     /**
+     * 2.84.0. Say the page is drawing what a new context asks for, and that it waits on something: the
+     * host covers the container, saying `label` ("Loading the journey…"; without one, "Loading
+     * <module>…"), if `ready()` has not followed within `LOADING_COVER_AFTER_MS`, and until it does or
+     * `HOLD_COVER_MS` passes. Taken only within `HOLD_COVER_MS` of a `kehikot.context` the page has not
+     * yet said `ready()` for; otherwise it is the page's own business and nothing is sent. Before the
+     * greeting, or while its hold is up, it only gives that cover its label. A page that redraws at
+     * once never calls it. Does nothing with `holdCover: false`. `useDrawn` calls both for a page.
+     */
+    loading: (label?: string | null) => void;
+    /**
      * 2.70.0. Hear presses on another window or element too — a nested frame the page owns — and tell
      * the host of them as `kehikot.pointer`, as presses on the page itself are. Returns the function
      * that stops hearing it. `relayPointer` is the way to call it for an iframe.

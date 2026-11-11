@@ -242,6 +242,8 @@ export interface HostActions<Kept = unknown> {
     findResult: (count: FindCount | 'unsupported') => void;
     /** 2.70.0. Say the page is drawn, so the host's cover comes off. See `Connection.ready` and `holdCover`. */
     ready: () => void;
+    /** 2.84.0. Say the page is drawing what a new context asks for, so the host may cover it saying `label`. See `Connection.loading`. */
+    loading: (label?: string | null) => void;
     /** 2.70.0. Hear presses on a nested window too, and tell the host of them. See `Connection.pointerFrom` and `relayPointer`. */
     pointerFrom: (target: PointerTarget) => () => void;
 }

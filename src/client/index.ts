@@ -151,4 +151,4 @@ export {
   type RelayMessages,
   type RelayOptions,
 } from './relay.js'
-export { HOLD_COVER_MS } from '../constants.js'
+export { HOLD_COVER_MS, LOADING_COVER_AFTER_MS } from '../constants.js'

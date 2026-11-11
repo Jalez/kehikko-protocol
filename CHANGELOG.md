@@ -11,6 +11,28 @@ After 2.78.0, every entry's first line under its heading is its kind, and the ve
 (semver; CI checks it): `Kind: breaking` → next major, `Kind: feature` → next minor, `Kind: fix` →
 next patch.
 
+## 2.84.0 — 2026-11-11
+
+Kind: feature
+
+A loading cover after a context change, in the module's own words. A page that redraws for a new
+epic, project, parts or kehikko and waits on something says so; the host covers its container only if
+it is not drawn within 150 ms, so a quick redraw never flashes. **Additive**; `PROTOCOL` is still 2.
+[docs/client.md](docs/client.md), "A cover after a context change".
+
+### Added
+
+- **`kehikot.loading { label? }`** (`MESSAGE.LOADING`, `loadingSchema`, `Loading`), module → host: after
+  a `kehikot.context`, "I am drawing what it asks for". The host covers only if `kehikot.drawn` has not
+  followed within **`LOADING_COVER_AFTER_MS`** (150), until it does or `HOLD_COVER_MS`. Inside a
+  greeting's hold it only gives that cover its words.
+- **`ready.label`**: what the first greeting's held cover says. Out of shape: dropped, not the message.
+- **`loading(label?)`** on the connection, `hostStore` and `useHost`'s value: sent only within
+  `HOLD_COVER_MS` of a context the page has not said `ready()` for; before the greeting it becomes
+  `ready.label`. `ready()` follows it with `kehikot.drawn`. Nothing with `holdCover: false`.
+- **`useDrawn(host, drawn, label?)`** (`client/react`): `ready()` while `drawn`, `loading(label)` while not.
+- `LIMITS.LOADING_LABEL` (80). `WIRE_SINCE`: `kehikot.loading`, `ready.label`.
+
 ## 2.83.0 — 2026-11-11
 
 Kind: feature

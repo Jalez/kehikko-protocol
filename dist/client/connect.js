@@ -121,6 +121,10 @@ export function connect(id, events = {}, options = {}) {
     let drawn = holdFor === 0;
     let holding = false;
     let holdTimer = null;
+    /* 2.84.0. What the cover says, as the page last gave it (`loading`), and when the last context came
+       that the page has not said `ready()` for: a `loading()` is taken only within `holdFor` of it. */
+    let coverLabel = null;
+    let contextAt = null;
     const release = () => {
         if (holdTimer !== null)
             clearTimeout(holdTimer);
@@ -355,7 +359,13 @@ export function connect(id, events = {}, options = {}) {
                 clearTimeout(holdTimer);
             holdTimer = null;
             holding = !drawn;
-            send({ type: MESSAGE.READY, id, protocol: message.protocol ?? PROTOCOL, ...(build ? { build } : {}), ...(holding ? { hold: true } : {}) });
+            send({
+                type: MESSAGE.READY,
+                id,
+                protocol: message.protocol ?? PROTOCOL,
+                ...(build ? { build } : {}),
+                ...(holding ? { hold: true, ...(coverLabel ? { label: coverLabel } : {}) } : {}),
+            });
             if (holding)
                 holdTimer = setTimeout(release, holdFor);
             footerDrawn = message.footer === true;
@@ -401,6 +411,8 @@ export function connect(id, events = {}, options = {}) {
             /* Handed on whole, with only the envelope (`type`, `protocol`) removed, so every field the
                protocol grows arrives without being listed here. */
             const { type: _envelope, protocol: _spoken, ...context } = message;
+            /* 2.84.0. From now until `ready()`, a `loading()` says the page is drawing THIS. */
+            contextAt = Date.now();
             const project = projectOf(context);
             const projectId = projectIdOf(context);
             /* Another project open: a host that does not file by project is sent THAT project's things now. */
@@ -614,10 +626,32 @@ export function connect(id, events = {}, options = {}) {
             sayFound(count);
         },
         ready() {
+            contextAt = null;
             if (drawn)
                 return;
             drawn = true;
             release();
+        },
+        loading(label) {
+            if (holdFor === 0)
+                return;
+            const said = typeof label === 'string' ? label.trim().slice(0, LIMITS.LOADING_LABEL) : '';
+            coverLabel = said || null;
+            /* Not greeted yet: the greeting's hold carries it. Held now: the cover is up, and only its words change. */
+            if (!host)
+                return;
+            if (holding) {
+                send({ type: MESSAGE.LOADING, ...(coverLabel ? { label: coverLabel } : {}) });
+                return;
+            }
+            /* Only for a context the page has not said it drew: anything else is the page's own to show. */
+            if (contextAt === null || Date.now() - contextAt > holdFor)
+                return;
+            contextAt = null;
+            drawn = false;
+            holding = true;
+            send({ type: MESSAGE.LOADING, ...(coverLabel ? { label: coverLabel } : {}) });
+            holdTimer = setTimeout(release, holdFor);
         },
         pointerFrom(target) {
             if (!nested.has(target))

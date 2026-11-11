@@ -9,7 +9,7 @@ export { GREETING_GRACE_MS } from './host-store.js';
 /* The parts focus: a hook that needs no connection. See `focus.ts`. */
 export { useFocus } from './focus.js';
 /* The listener and the shared not-ready screen. See `host.ts` and `cover.ts`. */
-export { useHost, useKept, hostFields, JSON_KEPT, KEEP_AFTER_MS } from './host.js';
+export { useHost, useKept, useDrawn, hostFields, JSON_KEPT, KEEP_AFTER_MS } from './host.js';
 export {} from './host-store.js';
 export { Cover, coverFor, useServerStanding, COVER_CSS, COVER_STYLE_ID, COVER_WORDS, TRY_AGAIN, } from './cover.js';
 /* 2.58.0: an agent module's tile, for a page too small for its terminal. See `tile.ts`. */

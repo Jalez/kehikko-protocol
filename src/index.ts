@@ -20,6 +20,7 @@ export {
   REFRESH_EVERY_MIN,
   REFRESH_EVERY_MAX,
   HOLD_COVER_MS,
+  LOADING_COVER_AFTER_MS,
   clampHeight,
   type MessageType,
 } from './constants.js'
@@ -307,6 +308,8 @@ export {
   findOpenSchema,
   drawnSchema,
   type Drawn,
+  loadingSchema,
+  type Loading,
   FIND_STEPS,
   type FindStep,
   type FindMessage,

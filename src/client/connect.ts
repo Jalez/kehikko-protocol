@@ -424,6 +424,16 @@ export interface Connection {
    */
   ready: () => void
   /**
+   * 2.84.0. Say the page is drawing what a new context asks for, and that it waits on something: the
+   * host covers the container, saying `label` ("Loading the journey…"; without one, "Loading
+   * <module>…"), if `ready()` has not followed within `LOADING_COVER_AFTER_MS`, and until it does or
+   * `HOLD_COVER_MS` passes. Taken only within `HOLD_COVER_MS` of a `kehikot.context` the page has not
+   * yet said `ready()` for; otherwise it is the page's own business and nothing is sent. Before the
+   * greeting, or while its hold is up, it only gives that cover its label. A page that redraws at
+   * once never calls it. Does nothing with `holdCover: false`. `useDrawn` calls both for a page.
+   */
+  loading: (label?: string | null) => void
+  /**
    * 2.70.0. Hear presses on another window or element too — a nested frame the page owns — and tell
    * the host of them as `kehikot.pointer`, as presses on the page itself are. Returns the function
    * that stops hearing it. `relayPointer` is the way to call it for an iframe.
@@ -493,6 +503,10 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
   let drawn = holdFor === 0
   let holding = false
   let holdTimer: ReturnType<typeof setTimeout> | null = null
+  /* 2.84.0. What the cover says, as the page last gave it (`loading`), and when the last context came
+     that the page has not said `ready()` for: a `loading()` is taken only within `holdFor` of it. */
+  let coverLabel: string | null = null
+  let contextAt: number | null = null
   const release = () => {
     if (holdTimer !== null) clearTimeout(holdTimer)
     holdTimer = null
@@ -711,7 +725,13 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
       if (holdTimer !== null) clearTimeout(holdTimer)
       holdTimer = null
       holding = !drawn
-      send({ type: MESSAGE.READY, id, protocol: message.protocol ?? PROTOCOL, ...(build ? { build } : {}), ...(holding ? { hold: true } : {}) })
+      send({
+        type: MESSAGE.READY,
+        id,
+        protocol: message.protocol ?? PROTOCOL,
+        ...(build ? { build } : {}),
+        ...(holding ? { hold: true, ...(coverLabel ? { label: coverLabel } : {}) } : {}),
+      })
       if (holding) holdTimer = setTimeout(release, holdFor)
       footerDrawn = message.footer === true
       /* After `ready` and before the page is told, so a handler that announces a NEW offer from
@@ -750,6 +770,8 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
       /* Handed on whole, with only the envelope (`type`, `protocol`) removed, so every field the
          protocol grows arrives without being listed here. */
       const { type: _envelope, protocol: _spoken, ...context } = message
+      /* 2.84.0. From now until `ready()`, a `loading()` says the page is drawing THIS. */
+      contextAt = Date.now()
       const project = projectOf(context)
       const projectId = projectIdOf(context)
       /* Another project open: a host that does not file by project is sent THAT project's things now. */
@@ -954,9 +976,29 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
     },
 
     ready() {
+      contextAt = null
       if (drawn) return
       drawn = true
       release()
+    },
+
+    loading(label) {
+      if (holdFor === 0) return
+      const said = typeof label === 'string' ? label.trim().slice(0, LIMITS.LOADING_LABEL) : ''
+      coverLabel = said || null
+      /* Not greeted yet: the greeting's hold carries it. Held now: the cover is up, and only its words change. */
+      if (!host) return
+      if (holding) {
+        send({ type: MESSAGE.LOADING, ...(coverLabel ? { label: coverLabel } : {}) })
+        return
+      }
+      /* Only for a context the page has not said it drew: anything else is the page's own to show. */
+      if (contextAt === null || Date.now() - contextAt > holdFor) return
+      contextAt = null
+      drawn = false
+      holding = true
+      send({ type: MESSAGE.LOADING, ...(coverLabel ? { label: coverLabel } : {}) })
+      holdTimer = setTimeout(release, holdFor)
     },
 
     pointerFrom(target) {

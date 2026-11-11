@@ -21,4 +21,4 @@ export { held, heldDraft, type Draft, type Held, type HeldAt, type HeldReader } 
 export { hostStore, hostFields, GREETING_GRACE_MS, JSON_KEPT, KEEP_AFTER_MS, type HostActions, type HostFields, type HostStanding, type HostStore, type HostStoreOptions, type KeptCodec, type KeepViewOptions, type ScrollBox, type SteadyField, type Steadiness, type Where, } from './host-store.js';
 export { KEPT_VIEW_MARK, KEEP_SCROLL_ATTRIBUTE, KEEP_SCROLL_AFTER_MS, RESTORE_SCROLL_WITHIN_MS, unwrapKept, wrapKept, viewOf, headerValues, type KeptView, } from './kept-view.js';
 export { relayPointer, pointerShim, pointerShimScript, RELAY_POINTER, RELAYED_EVENTS, type PointerSink, type FrameLike, type RelayMessages, type RelayOptions, } from './relay.js';
-export { HOLD_COVER_MS } from '../constants.js';
+export { HOLD_COVER_MS, LOADING_COVER_AFTER_MS } from '../constants.js';
