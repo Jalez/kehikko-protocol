@@ -17,9 +17,9 @@ const REPO = resolve(dirname(new URL(import.meta.url).pathname), '..')
 
 describe('the version', () => {
   test('is 2.63.0', () => {
-    expect(PACKAGE_VERSION).toBe('2.77.0')
+    expect(PACKAGE_VERSION).toBe('2.78.0')
     const pkg = JSON.parse(readFileSync(join(REPO, 'package.json'), 'utf8')) as { version: string }
-    expect(pkg.version).toBe('2.77.0')
+    expect(pkg.version).toBe('2.78.0')
     expect(readFileSync(join(REPO, 'CHANGELOG.md'), 'utf8')).toContain('## 2.63.0')
     expect(readFileSync(join(REPO, 'docs/client.md'), 'utf8')).toContain('When the host declines (2.63.0)')
   })

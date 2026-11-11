@@ -7,6 +7,37 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.78.0 — 2026-11-11
+
+Edit guards: a module placed on a kehikko can refuse an agent's file edits under paths it names, or in
+a repository's main checkout, as it already could a shell command. And shadcn's chart, vendored once.
+**Additive**; `PROTOCOL` is still 2. [docs/asking.md](docs/asking.md), "Edit guards (2.78.0)".
+
+### Added
+
+- **`tool: 'edit'`** in `GUARD_TOOLS`: a guard on an agent's file-editing tools (Claude Code's Edit,
+  Write, MultiEdit, NotebookEdit). `match.paths` (`GUARD_PATH`, `pathPatternOk`: absolute or `~/`,
+  `*` one name, `**` any depth, a trailing `/` everything under), `match.checkouts` (`GUARD_CHECKOUTS`:
+  `main`, a file whose nearest `.git` is a directory) and `allowPaths`. An edit guard denies; a
+  rewrite is refused. A shell guard still needs a command or script. A host or agent module before
+  2.78.0 drops an edit guard and keeps the module's others.
+- **`editDecision(guards, path, { home, checkout, env })`**, the rule for edits: `pass` or `deny` (the
+  first matching guard), pure; `KEHIKOT_DIRECT` in the hook's environment passes. `editGuardMatches`,
+  `pathMatches`, `plainPath`, `EditFacts`. `guardSays` words an edit refusal of its own.
+- **`editedPaths(tool, input)`** and **`EDIT_TOOL_PATHS`**: the files a tool call edits.
+- **`checkoutOf(path, cwd?)`** (`/serve`): `main`, `linked` or null, by the nearest `.git` at or above
+  the file (which need not exist yet).
+- **`kehikot-module-protocol/client/ui/chart`**: shadcn/ui's `chart` (`ChartContainer`, `ChartTooltip`,
+  `ChartTooltipContent`, `ChartLegend`, `ChartLegendContent`, `ChartStyle`, `ChartConfig`) on Recharts 3,
+  an optional peer dependency (`recharts`) needed only by this path; and `useTip`, `showTip`,
+  `hideTip`, `fromKeyboard`, `resetTips`, `TOUCH_MS`: one chart tooltip on the page at a time, hidden
+  when the pointer leaves the frame, the window blurs, the page scrolls or resizes, or Escape.
+
+### Changed
+
+- **`GUARDS_HEAD`** and **`guardLine`** in a subagent's notes say edit guards too ("edits in a main
+  checkout", "edits under …"). `NOTES_VERSION` is unchanged.
+
 ## 2.77.0 — 2026-11-11
 
 `projects.mine` is asked under `agents:message`. `PROTOCOL` is still 2.

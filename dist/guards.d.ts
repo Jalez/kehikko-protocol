@@ -26,8 +26,13 @@ import { z } from 'zod';
  * an assignment in front of any of its commands, or in the hook's own environment — passes every
  * guard. A denial says so, for when the person asks for a command to be run directly.
  */
-/** The tools a guard can be about. `shell`: an agent's shell tool (Claude Code's Bash, Codex's shell). */
-export declare const GUARD_TOOLS: readonly ["shell"];
+/**
+ * The tools a guard can be about. `shell`: an agent's shell tool (Claude Code's Bash, Codex's shell).
+ * `edit` (2.78.0): an agent's file-editing tools (Claude Code's Edit, Write, MultiEdit and
+ * NotebookEdit; Codex's apply_patch), decided on the file's path with `editDecision`. A host or agent
+ * module before 2.78.0 drops an `edit` guard unread, and the module's other guards are kept.
+ */
+export declare const GUARD_TOOLS: readonly ["shell", "edit"];
 export type GuardTool = (typeof GUARD_TOOLS)[number];
 /** What a guard does with a command it matches. */
 export declare const GUARD_ACTIONS: readonly ["rewrite", "deny"];
@@ -53,6 +58,10 @@ export declare const GUARD_LIMITS: {
     readonly DEPTH: 3;
     /** Guards in the host's answer for one session. */
     readonly PLACED: 64;
+    /** (2.78.0) A path pattern, in characters. */
+    readonly PATH: 240;
+    /** (2.78.0) A path an edit guard decides on, in characters; a longer one is not looked into and passes. */
+    readonly EDIT_PATH: 4096;
 };
 /** A guard's id within its module: lowercase words joined by dashes. */
 export declare const GUARD_ID: RegExp;
@@ -65,32 +74,53 @@ export declare const GUARD_ID: RegExp;
 export declare const GUARD_PATTERN: RegExp;
 /** A package.json script name, as `match.scripts` names one. */
 export declare const GUARD_SCRIPT: RegExp;
+/**
+ * 2.78.0. A path pattern for an `edit` guard: absolute (`/`) or under the home folder (`~/`), segments
+ * separated by `/`. A segment `*` is any one name, `**` any number of them (none included), and `*`
+ * inside a segment any run of characters but `/`. Spaces are kept (`~/Library/Application Support/…`).
+ * No `..`, no `.` segments, no backslashes, no control characters, nothing else in braces or brackets.
+ */
+export declare const GUARD_PATH: RegExp;
+/** Whether a path pattern is one this protocol reads: `GUARD_PATH`, and no `.` or `..` segment. */
+export declare function pathPatternOk(text: string): boolean;
+/**
+ * 2.78.0. The kinds of checkout an `edit` guard can name in `match.checkouts`. `main`: a file inside a
+ * git repository's main checkout — the nearest `.git` above it is a directory — as opposed to a linked
+ * worktree (`.git` is a file), where an agent's work belongs. Told by the agent module on its own
+ * computer (`checkoutOf` in `/serve`); the rule is handed the answer.
+ */
+export declare const GUARD_CHECKOUTS: readonly ["main"];
+export type GuardCheckout = (typeof GUARD_CHECKOUTS)[number];
 /** Whether a rewrite template is one this protocol fills: one line, `{command}` once, no other braces. */
 export declare function templateOk(template: string): boolean;
 /** One guard, as a manifest declares it. */
-export declare const guardSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
+export declare const guardSchema: z.ZodEffects<z.ZodEffects<z.ZodEffects<z.ZodEffects<z.ZodEffects<z.ZodObject<{
     id: z.ZodString;
-    tool: z.ZodEnum<["shell"]>;
-    match: z.ZodEffects<z.ZodObject<{
-        /** Command patterns (`GUARD_PATTERN`): `tsc`, `bun test`, `npx playwright`. */
+    tool: z.ZodEnum<["shell", "edit"]>;
+    match: z.ZodObject<{
+        /** Command patterns (`GUARD_PATTERN`): `tsc`, `bun test`, `npx playwright`. A `shell` guard's. */
         commands: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
-        /** package.json script names, matched as `bun run <name>`, `npm run <name>`, `npm test`, `pnpm <name>`, `yarn <name>`. */
+        /** package.json script names, matched as `bun run <name>`, `npm run <name>`, `npm test`, `pnpm <name>`, `yarn <name>`. A `shell` guard's. */
         scripts: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        /** (2.78.0) Path patterns (`GUARD_PATH`) of the files it is about. An `edit` guard's. */
+        paths: z.ZodOptional<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">>;
+        /** (2.78.0) Kinds of checkout (`GUARD_CHECKOUTS`) whose files it is about: `main`. An `edit` guard's. */
+        checkouts: z.ZodOptional<z.ZodArray<z.ZodEnum<["main"]>, "many">>;
     }, "strip", z.ZodTypeAny, {
         commands: string[];
         scripts?: string[] | undefined;
+        paths?: string[] | undefined;
+        checkouts?: "main"[] | undefined;
     }, {
         commands?: string[] | undefined;
         scripts?: string[] | undefined;
-    }>, {
-        commands: string[];
-        scripts?: string[] | undefined;
-    }, {
-        commands?: string[] | undefined;
-        scripts?: string[] | undefined;
+        paths?: string[] | undefined;
+        checkouts?: "main"[] | undefined;
     }>;
-    /** Command patterns that pass this guard even when `match` names them: `tsc --version`, `bun test --help`. */
+    /** Command patterns that pass this guard even when `match` names them: `tsc --version`, `bun test --help`. A `shell` guard's. */
     allow: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+    /** (2.78.0) Path patterns that pass this guard even when `match` names them. An `edit` guard's. */
+    allowPaths: z.ZodOptional<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">>;
     action: z.ZodEnum<["rewrite", "deny"]>;
     /** For `rewrite`: the command to run instead, naming `{command}` once (`templateOk`). */
     rewrite: z.ZodOptional<z.ZodString>;
@@ -99,69 +129,171 @@ export declare const guardSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     id: string;
     why: string;
-    tool: "shell";
+    tool: "edit" | "shell";
     match: {
         commands: string[];
         scripts?: string[] | undefined;
+        paths?: string[] | undefined;
+        checkouts?: "main"[] | undefined;
     };
     action: "rewrite" | "deny";
     rewrite?: string | undefined;
     allow?: string[] | undefined;
+    allowPaths?: string[] | undefined;
 }, {
     id: string;
     why: string;
-    tool: "shell";
+    tool: "edit" | "shell";
     match: {
         commands?: string[] | undefined;
         scripts?: string[] | undefined;
+        paths?: string[] | undefined;
+        checkouts?: "main"[] | undefined;
     };
     action: "rewrite" | "deny";
     rewrite?: string | undefined;
     allow?: string[] | undefined;
+    allowPaths?: string[] | undefined;
 }>, {
     id: string;
     why: string;
-    tool: "shell";
+    tool: "edit" | "shell";
     match: {
         commands: string[];
         scripts?: string[] | undefined;
+        paths?: string[] | undefined;
+        checkouts?: "main"[] | undefined;
     };
     action: "rewrite" | "deny";
     rewrite?: string | undefined;
     allow?: string[] | undefined;
+    allowPaths?: string[] | undefined;
 }, {
     id: string;
     why: string;
-    tool: "shell";
+    tool: "edit" | "shell";
     match: {
         commands?: string[] | undefined;
         scripts?: string[] | undefined;
+        paths?: string[] | undefined;
+        checkouts?: "main"[] | undefined;
     };
     action: "rewrite" | "deny";
     rewrite?: string | undefined;
     allow?: string[] | undefined;
+    allowPaths?: string[] | undefined;
 }>, {
     id: string;
     why: string;
-    tool: "shell";
+    tool: "edit" | "shell";
     match: {
         commands: string[];
         scripts?: string[] | undefined;
+        paths?: string[] | undefined;
+        checkouts?: "main"[] | undefined;
     };
     action: "rewrite" | "deny";
     rewrite?: string | undefined;
     allow?: string[] | undefined;
+    allowPaths?: string[] | undefined;
 }, {
     id: string;
     why: string;
-    tool: "shell";
+    tool: "edit" | "shell";
     match: {
         commands?: string[] | undefined;
         scripts?: string[] | undefined;
+        paths?: string[] | undefined;
+        checkouts?: "main"[] | undefined;
     };
     action: "rewrite" | "deny";
     rewrite?: string | undefined;
     allow?: string[] | undefined;
+    allowPaths?: string[] | undefined;
+}>, {
+    id: string;
+    why: string;
+    tool: "edit" | "shell";
+    match: {
+        commands: string[];
+        scripts?: string[] | undefined;
+        paths?: string[] | undefined;
+        checkouts?: "main"[] | undefined;
+    };
+    action: "rewrite" | "deny";
+    rewrite?: string | undefined;
+    allow?: string[] | undefined;
+    allowPaths?: string[] | undefined;
+}, {
+    id: string;
+    why: string;
+    tool: "edit" | "shell";
+    match: {
+        commands?: string[] | undefined;
+        scripts?: string[] | undefined;
+        paths?: string[] | undefined;
+        checkouts?: "main"[] | undefined;
+    };
+    action: "rewrite" | "deny";
+    rewrite?: string | undefined;
+    allow?: string[] | undefined;
+    allowPaths?: string[] | undefined;
+}>, {
+    id: string;
+    why: string;
+    tool: "edit" | "shell";
+    match: {
+        commands: string[];
+        scripts?: string[] | undefined;
+        paths?: string[] | undefined;
+        checkouts?: "main"[] | undefined;
+    };
+    action: "rewrite" | "deny";
+    rewrite?: string | undefined;
+    allow?: string[] | undefined;
+    allowPaths?: string[] | undefined;
+}, {
+    id: string;
+    why: string;
+    tool: "edit" | "shell";
+    match: {
+        commands?: string[] | undefined;
+        scripts?: string[] | undefined;
+        paths?: string[] | undefined;
+        checkouts?: "main"[] | undefined;
+    };
+    action: "rewrite" | "deny";
+    rewrite?: string | undefined;
+    allow?: string[] | undefined;
+    allowPaths?: string[] | undefined;
+}>, {
+    id: string;
+    why: string;
+    tool: "edit" | "shell";
+    match: {
+        commands: string[];
+        scripts?: string[] | undefined;
+        paths?: string[] | undefined;
+        checkouts?: "main"[] | undefined;
+    };
+    action: "rewrite" | "deny";
+    rewrite?: string | undefined;
+    allow?: string[] | undefined;
+    allowPaths?: string[] | undefined;
+}, {
+    id: string;
+    why: string;
+    tool: "edit" | "shell";
+    match: {
+        commands?: string[] | undefined;
+        scripts?: string[] | undefined;
+        paths?: string[] | undefined;
+        checkouts?: "main"[] | undefined;
+    };
+    action: "rewrite" | "deny";
+    rewrite?: string | undefined;
+    allow?: string[] | undefined;
+    allowPaths?: string[] | undefined;
 }>;
 export type Guard = z.infer<typeof guardSchema>;
 /**
@@ -171,42 +303,49 @@ export type Guard = z.infer<typeof guardSchema>;
 export declare const guardsSchema: z.ZodEffects<z.ZodUnknown, {
     id: string;
     why: string;
-    tool: "shell";
+    tool: "edit" | "shell";
     match: {
         commands: string[];
         scripts?: string[] | undefined;
+        paths?: string[] | undefined;
+        checkouts?: "main"[] | undefined;
     };
     action: "rewrite" | "deny";
     rewrite?: string | undefined;
     allow?: string[] | undefined;
+    allowPaths?: string[] | undefined;
 }[], unknown>;
 /** A guard as the host hands it for a session: the guard, and which placed module it is from. */
 export declare const placedGuardSchema: z.ZodObject<{
     module: z.ZodString;
     name: z.ZodCatch<z.ZodString>;
-    guard: z.ZodEffects<z.ZodEffects<z.ZodObject<{
+    guard: z.ZodEffects<z.ZodEffects<z.ZodEffects<z.ZodEffects<z.ZodEffects<z.ZodObject<{
         id: z.ZodString;
-        tool: z.ZodEnum<["shell"]>;
-        match: z.ZodEffects<z.ZodObject<{
-            /** Command patterns (`GUARD_PATTERN`): `tsc`, `bun test`, `npx playwright`. */
+        tool: z.ZodEnum<["shell", "edit"]>;
+        match: z.ZodObject<{
+            /** Command patterns (`GUARD_PATTERN`): `tsc`, `bun test`, `npx playwright`. A `shell` guard's. */
             commands: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
-            /** package.json script names, matched as `bun run <name>`, `npm run <name>`, `npm test`, `pnpm <name>`, `yarn <name>`. */
+            /** package.json script names, matched as `bun run <name>`, `npm run <name>`, `npm test`, `pnpm <name>`, `yarn <name>`. A `shell` guard's. */
             scripts: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+            /** (2.78.0) Path patterns (`GUARD_PATH`) of the files it is about. An `edit` guard's. */
+            paths: z.ZodOptional<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">>;
+            /** (2.78.0) Kinds of checkout (`GUARD_CHECKOUTS`) whose files it is about: `main`. An `edit` guard's. */
+            checkouts: z.ZodOptional<z.ZodArray<z.ZodEnum<["main"]>, "many">>;
         }, "strip", z.ZodTypeAny, {
             commands: string[];
             scripts?: string[] | undefined;
+            paths?: string[] | undefined;
+            checkouts?: "main"[] | undefined;
         }, {
             commands?: string[] | undefined;
             scripts?: string[] | undefined;
-        }>, {
-            commands: string[];
-            scripts?: string[] | undefined;
-        }, {
-            commands?: string[] | undefined;
-            scripts?: string[] | undefined;
+            paths?: string[] | undefined;
+            checkouts?: "main"[] | undefined;
         }>;
-        /** Command patterns that pass this guard even when `match` names them: `tsc --version`, `bun test --help`. */
+        /** Command patterns that pass this guard even when `match` names them: `tsc --version`, `bun test --help`. A `shell` guard's. */
         allow: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        /** (2.78.0) Path patterns that pass this guard even when `match` names them. An `edit` guard's. */
+        allowPaths: z.ZodOptional<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">>;
         action: z.ZodEnum<["rewrite", "deny"]>;
         /** For `rewrite`: the command to run instead, naming `{command}` once (`templateOk`). */
         rewrite: z.ZodOptional<z.ZodString>;
@@ -215,69 +354,171 @@ export declare const placedGuardSchema: z.ZodObject<{
     }, "strip", z.ZodTypeAny, {
         id: string;
         why: string;
-        tool: "shell";
+        tool: "edit" | "shell";
         match: {
             commands: string[];
             scripts?: string[] | undefined;
+            paths?: string[] | undefined;
+            checkouts?: "main"[] | undefined;
         };
         action: "rewrite" | "deny";
         rewrite?: string | undefined;
         allow?: string[] | undefined;
+        allowPaths?: string[] | undefined;
     }, {
         id: string;
         why: string;
-        tool: "shell";
+        tool: "edit" | "shell";
         match: {
             commands?: string[] | undefined;
             scripts?: string[] | undefined;
+            paths?: string[] | undefined;
+            checkouts?: "main"[] | undefined;
         };
         action: "rewrite" | "deny";
         rewrite?: string | undefined;
         allow?: string[] | undefined;
+        allowPaths?: string[] | undefined;
     }>, {
         id: string;
         why: string;
-        tool: "shell";
+        tool: "edit" | "shell";
         match: {
             commands: string[];
             scripts?: string[] | undefined;
+            paths?: string[] | undefined;
+            checkouts?: "main"[] | undefined;
         };
         action: "rewrite" | "deny";
         rewrite?: string | undefined;
         allow?: string[] | undefined;
+        allowPaths?: string[] | undefined;
     }, {
         id: string;
         why: string;
-        tool: "shell";
+        tool: "edit" | "shell";
         match: {
             commands?: string[] | undefined;
             scripts?: string[] | undefined;
+            paths?: string[] | undefined;
+            checkouts?: "main"[] | undefined;
         };
         action: "rewrite" | "deny";
         rewrite?: string | undefined;
         allow?: string[] | undefined;
+        allowPaths?: string[] | undefined;
     }>, {
         id: string;
         why: string;
-        tool: "shell";
+        tool: "edit" | "shell";
         match: {
             commands: string[];
             scripts?: string[] | undefined;
+            paths?: string[] | undefined;
+            checkouts?: "main"[] | undefined;
         };
         action: "rewrite" | "deny";
         rewrite?: string | undefined;
         allow?: string[] | undefined;
+        allowPaths?: string[] | undefined;
     }, {
         id: string;
         why: string;
-        tool: "shell";
+        tool: "edit" | "shell";
         match: {
             commands?: string[] | undefined;
             scripts?: string[] | undefined;
+            paths?: string[] | undefined;
+            checkouts?: "main"[] | undefined;
         };
         action: "rewrite" | "deny";
         rewrite?: string | undefined;
         allow?: string[] | undefined;
+        allowPaths?: string[] | undefined;
+    }>, {
+        id: string;
+        why: string;
+        tool: "edit" | "shell";
+        match: {
+            commands: string[];
+            scripts?: string[] | undefined;
+            paths?: string[] | undefined;
+            checkouts?: "main"[] | undefined;
+        };
+        action: "rewrite" | "deny";
+        rewrite?: string | undefined;
+        allow?: string[] | undefined;
+        allowPaths?: string[] | undefined;
+    }, {
+        id: string;
+        why: string;
+        tool: "edit" | "shell";
+        match: {
+            commands?: string[] | undefined;
+            scripts?: string[] | undefined;
+            paths?: string[] | undefined;
+            checkouts?: "main"[] | undefined;
+        };
+        action: "rewrite" | "deny";
+        rewrite?: string | undefined;
+        allow?: string[] | undefined;
+        allowPaths?: string[] | undefined;
+    }>, {
+        id: string;
+        why: string;
+        tool: "edit" | "shell";
+        match: {
+            commands: string[];
+            scripts?: string[] | undefined;
+            paths?: string[] | undefined;
+            checkouts?: "main"[] | undefined;
+        };
+        action: "rewrite" | "deny";
+        rewrite?: string | undefined;
+        allow?: string[] | undefined;
+        allowPaths?: string[] | undefined;
+    }, {
+        id: string;
+        why: string;
+        tool: "edit" | "shell";
+        match: {
+            commands?: string[] | undefined;
+            scripts?: string[] | undefined;
+            paths?: string[] | undefined;
+            checkouts?: "main"[] | undefined;
+        };
+        action: "rewrite" | "deny";
+        rewrite?: string | undefined;
+        allow?: string[] | undefined;
+        allowPaths?: string[] | undefined;
+    }>, {
+        id: string;
+        why: string;
+        tool: "edit" | "shell";
+        match: {
+            commands: string[];
+            scripts?: string[] | undefined;
+            paths?: string[] | undefined;
+            checkouts?: "main"[] | undefined;
+        };
+        action: "rewrite" | "deny";
+        rewrite?: string | undefined;
+        allow?: string[] | undefined;
+        allowPaths?: string[] | undefined;
+    }, {
+        id: string;
+        why: string;
+        tool: "edit" | "shell";
+        match: {
+            commands?: string[] | undefined;
+            scripts?: string[] | undefined;
+            paths?: string[] | undefined;
+            checkouts?: "main"[] | undefined;
+        };
+        action: "rewrite" | "deny";
+        rewrite?: string | undefined;
+        allow?: string[] | undefined;
+        allowPaths?: string[] | undefined;
     }>;
 }, "strip", z.ZodTypeAny, {
     name: string;
@@ -285,28 +526,34 @@ export declare const placedGuardSchema: z.ZodObject<{
     guard: {
         id: string;
         why: string;
-        tool: "shell";
+        tool: "edit" | "shell";
         match: {
             commands: string[];
             scripts?: string[] | undefined;
+            paths?: string[] | undefined;
+            checkouts?: "main"[] | undefined;
         };
         action: "rewrite" | "deny";
         rewrite?: string | undefined;
         allow?: string[] | undefined;
+        allowPaths?: string[] | undefined;
     };
 }, {
     module: string;
     guard: {
         id: string;
         why: string;
-        tool: "shell";
+        tool: "edit" | "shell";
         match: {
             commands?: string[] | undefined;
             scripts?: string[] | undefined;
+            paths?: string[] | undefined;
+            checkouts?: "main"[] | undefined;
         };
         action: "rewrite" | "deny";
         rewrite?: string | undefined;
         allow?: string[] | undefined;
+        allowPaths?: string[] | undefined;
     };
     name?: unknown;
 }>;
@@ -318,14 +565,17 @@ export declare const placedGuardsSchema: z.ZodEffects<z.ZodUnknown, ({
     guard: {
         id: string;
         why: string;
-        tool: "shell";
+        tool: "edit" | "shell";
         match: {
             commands: string[];
             scripts?: string[] | undefined;
+            paths?: string[] | undefined;
+            checkouts?: "main"[] | undefined;
         };
         action: "rewrite" | "deny";
         rewrite?: string | undefined;
         allow?: string[] | undefined;
+        allowPaths?: string[] | undefined;
     };
 } & {
     id: string;
@@ -401,3 +651,33 @@ export declare function guardDecision(guards: readonly PlacedGuard[], command: s
 export declare function guardSays(decision: Exclude<GuardDecision, {
     action: 'pass';
 }>): string;
+/** A path made plain for matching: repeated and trailing slashes go, `.` segments go, `..` steps up. Absolute in, absolute out; anything else is null. */
+export declare function plainPath(path: string): string | null;
+/**
+ * Whether a path pattern (`GUARD_PATH`) matches an absolute path. `~/` is `home`; a pattern ending in
+ * `/` or `/**` matches everything under that folder (the folder itself included). Pure.
+ */
+export declare function pathMatches(pattern: string, path: string, home: string | null): boolean;
+/** What the agent module knows about the file an edit is for, from its own computer. */
+export interface EditFacts {
+    /** The person's home folder, for `~/` patterns. Null: such patterns match nothing. */
+    home?: string | null;
+    /** The kind of checkout the file is in (`checkoutOf` in `/serve`): `main`, `linked`, or null for none. */
+    checkout?: GuardCheckout | 'linked' | null;
+    /** The hook's environment: `KEHIKOT_DIRECT` there passes every guard. */
+    env?: Record<string, string | undefined>;
+}
+/** Whether an `edit` guard is about a file, and its `allowPaths` do not let it past. Pure. */
+export declare function editGuardMatches(guard: Guard, path: string, facts?: EditFacts): boolean;
+/**
+ * THE RULE for edits (2.78.0): what becomes of a file edit at `path` (absolute: the agent module
+ * resolves a relative one against the session's folder first) under the `edit` guards of the modules
+ * placed on the session's kehikko. `pass` or `deny`, the first matching guard in order; never a
+ * rewrite. An empty, relative or overlong path, or `KEHIKOT_DIRECT` in the hook's environment, passes.
+ * Pure: the file's checkout is told in `facts`.
+ */
+export declare function editDecision(guards: readonly PlacedGuard[], path: string, facts?: EditFacts): GuardDecision;
+/** The tool names of the agent CLIs whose calls edit a file, and where each says which file. */
+export declare const EDIT_TOOL_PATHS: Readonly<Record<string, readonly string[]>>;
+/** The files a tool call edits, from its name and input (`EDIT_TOOL_PATHS`); empty for any other tool. */
+export declare function editedPaths(tool: unknown, input: unknown): string[];

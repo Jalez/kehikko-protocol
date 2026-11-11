@@ -1,6 +1,6 @@
 {
   "name": "kehikot-module-protocol",
-  "version": "2.77.0",
+  "version": "2.78.0",
   "description": "The shapes a Kehikot host and a module it frames agree on: the manifest, the wire, and the extension payloads. Shapes only — no I/O, no state, no decisions.",
   "keywords": [
     "kehikot",
@@ -57,6 +57,10 @@
     "./client/ui": {
       "types": "./dist/client/ui/index.d.ts",
       "default": "./dist/client/ui/index.js"
+    },
+    "./client/ui/chart": {
+      "types": "./dist/client/ui/chart-index.d.ts",
+      "default": "./dist/client/ui/chart-index.js"
     },
     "./serve": {
       "types": "./dist/serve/index.d.ts",
@@ -121,6 +125,7 @@
     "lucide-react": "^1.33.0",
     "react": "^18.0.0 || ^19.0.0",
     "react-dom": "^18.0.0 || ^19.0.0",
+    "recharts": "^3.8.0",
     "tailwind-merge": "^3.6.0",
     "zod": "^3.23.8"
   },
@@ -141,6 +146,7 @@
     "lucide-react": "^1.33.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
+    "recharts": "3.8.0",
     "tailwind-merge": "^3.6.0",
     "typescript": "^5.7.0",
     "zod": "^3.25.76"
@@ -177,6 +183,9 @@
       "optional": true
     },
     "tailwind-merge": {
+      "optional": true
+    },
+    "recharts": {
       "optional": true
     }
   }

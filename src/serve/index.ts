@@ -256,3 +256,6 @@ export {
   toolStream,
   wantsToolStream,
 } from './tools-changed.js'
+
+/* Which kind of git checkout a file is in, for an edit guard (2.78.0). See `checkout.ts`. */
+export { checkoutOf } from './checkout.js'

@@ -736,14 +736,17 @@ export declare const placeDoorsSchema: z.ZodObject<{
         guard: {
             id: string;
             why: string;
-            tool: "shell";
+            tool: "edit" | "shell";
             match: {
                 commands: string[];
                 scripts?: string[] | undefined;
+                paths?: string[] | undefined;
+                checkouts?: "main"[] | undefined;
             };
             action: "rewrite" | "deny";
             rewrite?: string | undefined;
             allow?: string[] | undefined;
+            allowPaths?: string[] | undefined;
         };
     } & {
         id: string;
@@ -857,14 +860,17 @@ export declare const placeDoorsSchema: z.ZodObject<{
         guard: {
             id: string;
             why: string;
-            tool: "shell";
+            tool: "edit" | "shell";
             match: {
                 commands: string[];
                 scripts?: string[] | undefined;
+                paths?: string[] | undefined;
+                checkouts?: "main"[] | undefined;
             };
             action: "rewrite" | "deny";
             rewrite?: string | undefined;
             allow?: string[] | undefined;
+            allowPaths?: string[] | undefined;
         };
     } & {
         id: string;

@@ -31,7 +31,7 @@ const journeys: ProvidingManifest = { id: 'kehikot.journeys', declares: { provid
 
 describe('the version', () => {
   test('is 2.44.0, PROTOCOL is still 2, and the notes moved to 5', () => {
-    expect(PACKAGE_VERSION).toBe('2.77.0')
+    expect(PACKAGE_VERSION).toBe('2.78.0')
     expect(PROTOCOL).toBe(2)
     expect(NOTES_VERSION).toBeGreaterThanOrEqual(5)
     expect(readFileSync(join(REPO, 'CHANGELOG.md'), 'utf8')).toContain('## 2.44.0')

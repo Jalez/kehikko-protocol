@@ -1205,7 +1205,7 @@ export {
   type HostTooOld,
 } from './fit.js'
 
-/* Guards: the shell commands a placed module holds agent sessions to, and the one rule that decides (2.61.0). See `guards.ts`. */
+/* Guards: the shell commands (2.61.0) and file edits (2.78.0) a placed module holds agent sessions to, and the rules that decide. See `guards.ts`. */
 export {
   GUARD_TOOLS,
   GUARD_ACTIONS,
@@ -1231,6 +1231,17 @@ export {
   fillTemplate,
   guardDecision,
   guardSays,
+  GUARD_PATH,
+  GUARD_CHECKOUTS,
+  EDIT_TOOL_PATHS,
+  pathPatternOk,
+  plainPath,
+  pathMatches,
+  editGuardMatches,
+  editDecision,
+  editedPaths,
+  type EditFacts,
+  type GuardCheckout,
   type Guard,
   type GuardTool,
   type GuardAction,

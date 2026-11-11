@@ -441,14 +441,17 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     guards: z.ZodCatch<z.ZodOptional<z.ZodEffects<z.ZodUnknown, {
         id: string;
         why: string;
-        tool: "shell";
+        tool: "edit" | "shell";
         match: {
             commands: string[];
             scripts?: string[] | undefined;
+            paths?: string[] | undefined;
+            checkouts?: "main"[] | undefined;
         };
         action: "rewrite" | "deny";
         rewrite?: string | undefined;
         allow?: string[] | undefined;
+        allowPaths?: string[] | undefined;
     }[], unknown>>>;
     /**
      * 2.52.0. How to use this module, for a person: a one-line `summary` and short `sections` of
@@ -1375,14 +1378,17 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     guards?: {
         id: string;
         why: string;
-        tool: "shell";
+        tool: "edit" | "shell";
         match: {
             commands: string[];
             scripts?: string[] | undefined;
+            paths?: string[] | undefined;
+            checkouts?: "main"[] | undefined;
         };
         action: "rewrite" | "deny";
         rewrite?: string | undefined;
         allow?: string[] | undefined;
+        allowPaths?: string[] | undefined;
     }[] | undefined;
     health?: string | undefined;
     partless?: string | undefined;
@@ -1624,14 +1630,17 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     guards?: {
         id: string;
         why: string;
-        tool: "shell";
+        tool: "edit" | "shell";
         match: {
             commands: string[];
             scripts?: string[] | undefined;
+            paths?: string[] | undefined;
+            checkouts?: "main"[] | undefined;
         };
         action: "rewrite" | "deny";
         rewrite?: string | undefined;
         allow?: string[] | undefined;
+        allowPaths?: string[] | undefined;
     }[] | undefined;
     health?: string | undefined;
     partless?: string | undefined;
