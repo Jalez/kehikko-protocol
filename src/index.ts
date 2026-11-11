@@ -1013,6 +1013,15 @@ export {
   sessionsPlaceOfParams,
   sessionsPlaceOfResult,
   type SessionsPlaceOfResult,
+  /* 2.86.0 */
+  workWantSchema,
+  WORK_WANT_DEFAULTS,
+  workWant,
+  wholeSuite,
+  wantsQueued,
+  type WorkWantRule,
+  type WorkWant,
+  type SeenRun,
 } from './services.js'
 
 export {

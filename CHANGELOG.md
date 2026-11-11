@@ -11,6 +11,24 @@ After 2.78.0, every entry's first line under its heading is its kind, and the ve
 (semver; CI checks it): `Kind: breaking` → next major, `Kind: feature` → next minor, `Kind: fix` →
 next patch.
 
+## 2.86.0 — 2026-11-12
+
+Kind: feature
+
+What a work queue wants queued. **Additive**; `PROTOCOL` is still 2.
+
+- `work.queue` takes an optional `wants`: per kind of work, `{ minCpu?, sustainedSeconds?, wholeSuiteOnly? }`
+  (`workWantSchema`). A consumer that watches processes flags a run started outside the queue only when
+  the run held `minCpu` (percent of one core) for `sustainedSeconds`, and, for tests under
+  `wholeSuiteOnly`, runs the whole suite. A kind left out of `wants` is not flagged; with no `wants`,
+  every kind in `run` is flagged under the defaults (`WORK_WANT_DEFAULTS`: 80% for 20 s, tests as whole
+  suites only).
+- `workWant(queue, kind)` (the rule with defaults filled in, or null), `wholeSuite(command)` (no file
+  arguments, only folders, no name filter) and `wantsQueued(queue, { kind, command, cpu, seconds })`
+  (`SeenRun`).
+
+See [services](docs/services.md).
+
 ## 2.85.0 — 2026-11-11
 
 Kind: feature

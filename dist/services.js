@@ -34,6 +34,25 @@ const oneLine = (max) => z
 /** A run line: a shell line that hands a command to the provider, with `{command}` where the command goes. */
 const runLine = oneLine(LIMITS.SERVICE_LINE).refine((line) => line.includes(WORK_COMMAND), { message: 'a run line says where the command goes: {command}' });
 /**
+ * 2.86.0. What a work queue wants handed to it, for one kind of work: a consumer that watches processes
+ * flags a run of that kind started outside the queue only when the rule holds (`wantsQueued`).
+ *
+ * - `minCpu`: CPU, in percent of one core (so above 100 on several cores), the run has to use…
+ * - `sustainedSeconds`: …for at least this long without dropping below it. A short spike is not flagged.
+ * - `wholeSuiteOnly`: for tests, flag only a run of the whole suite — a test command with no file
+ *   arguments, or only folders (`bun test`, `vitest run`, `bun test test/`), not `bun test a.test.ts`
+ *   or one filtered by name (`wholeSuite`). Ignored for other kinds.
+ *
+ * A field left out takes its default (`WORK_WANT_DEFAULTS`).
+ */
+export const workWantSchema = z.object({
+    minCpu: z.number().min(0).max(6400).optional(),
+    sustainedSeconds: z.number().min(0).max(3600).optional(),
+    wholeSuiteOnly: z.boolean().optional(),
+});
+/** What a field of a `wants` rule is when the provider leaves it out: 80% of a core for 20 s; tests only as whole suites. */
+export const WORK_WANT_DEFAULTS = { minCpu: 80, sustainedSeconds: 20, wholeSuiteOnly: true };
+/**
  * `work.queue`: a module that runs heavy work — test suites, typechecks, builds, big installs — in turn,
  * so that sessions on this computer do not collide.
  *
@@ -47,6 +66,10 @@ const runLine = oneLine(LIMITS.SERVICE_LINE).refine((line) => line.includes(WORK
  *   guard's words.
  * - `marks`: text an ancestor's command line contains when a process is one of its own runs (its runner's
  *   wrapper line, its program's name), so a consumer that watches processes does not flag work in turn.
+ * - `wants` (2.86.0): which work started outside it the provider wants handed to it, per kind of work
+ *   (`workWantSchema`). A kind not listed is not wanted: a consumer does not flag it. With no `wants` at
+ *   all, every kind in `run` is wanted under the defaults (`WORK_WANT_DEFAULTS`). Read it with
+ *   `workWant` and judge a run with `wantsQueued`; never by your own numbers.
  */
 export const workQueueSchema = z.object({
     name: oneLine(LIMITS.TITLE),
@@ -57,6 +80,7 @@ export const workQueueSchema = z.object({
     tool: z.string().regex(/^[A-Za-z0-9_.-]{1,64}$/).optional(),
     direct: oneLine(80).optional(),
     marks: z.array(z.string().min(3).max(LIMITS.SERVICE_LINE)).max(LIMITS.SERVICE_MARKS).default([]),
+    wants: z.object(Object.fromEntries(WORK_KINDS.map((kind) => [kind, workWantSchema.optional()]))).optional(),
 });
 /* ---------------------------------------------------------------- services a consumer CALLS (2.83.0) */
 /**
@@ -452,6 +476,94 @@ export function workQueueSaid(queue, kind, command) {
     if (!line)
         return null;
     return `Run it through ${queue.name}: \`${line}\` from the same folder${queue.tool ? `, or with the ${queue.tool} tool` : ''}.`;
+}
+/* ---------------------------------------------------------------- work.queue, wanted (2.86.0) */
+/**
+ * The provider's rule for one kind of work, every field filled in (`WORK_WANT_DEFAULTS`); null when it
+ * does not want that kind flagged: it does not take it (`run`), or it says `wants` and leaves the kind out.
+ * `wholeSuiteOnly` is false for every kind but `test`.
+ */
+export function workWant(queue, kind) {
+    if (!queue.run[kind])
+        return null;
+    const rule = queue.wants ? queue.wants[kind] : {};
+    if (!rule)
+        return null;
+    return {
+        minCpu: rule.minCpu ?? WORK_WANT_DEFAULTS.minCpu,
+        sustainedSeconds: rule.sustainedSeconds ?? WORK_WANT_DEFAULTS.sustainedSeconds,
+        wholeSuiteOnly: kind === 'test' && (rule.wholeSuiteOnly ?? WORK_WANT_DEFAULTS.wholeSuiteOnly),
+    };
+}
+/** Test runners' options that take the next word as their value, so that word is not a path. */
+const VALUE_FLAGS = new Set([
+    '--timeout', '--reporter', '--config', '-c', '--project', '--preload', '--root', '-r', '--dir', '--shard', '--rerun-each',
+    '--coverage-dir', '--coverage-reporter', '--environment', '--pool', '--workers', '-j', '--retries', '--max-workers',
+    '--outputFile', '--output-file', '--seed', '--browser', '--grep-invert', '--testTimeout', '--test-timeout',
+]);
+/** Options that pick tests by name: a run that has one is not the whole suite. */
+const NAME_FLAGS = new Set(['-t', '--test-name-pattern', '--testNamePattern', '-g', '--grep', '--only', '--changed', '--related', '--findRelatedTests', '--onlyChanged', '-o']);
+/** Folder names a bare word may be, as opposed to a name filter. */
+const SUITE_FOLDERS = new Set(['.', 'test', 'tests', 'spec', 'specs', 'src', 'e2e', '__tests__', 'packages', 'apps', 'lib']);
+/** Package managers whose `test` script, or `run test`, runs whatever suite the project says. */
+const SCRIPT_RUNNERS = new Set(['npm', 'pnpm', 'yarn', 'bun']);
+const wordBase = (word) => (word.split('/').pop() ?? '').replace(/\.(m?js|cjs|ts)$/, '');
+/**
+ * Whether a test command runs the whole suite: after the runner (`bun test`, `vitest [run]`, `jest`,
+ * `playwright test`, `npm test`, `bun run test`), no file argument (a word with an extension such as
+ * `a.test.tsx`), no bare word that is not a usual folder name (a runner reads it as a name filter), and
+ * no option that picks tests by name (`-t`). Folders (`test/`, `src/unit`) keep it whole. A command whose
+ * runner it cannot find counts as whole.
+ */
+export function wholeSuite(command) {
+    const words = command.trim().split(/\s+/).filter(Boolean);
+    let at = -1;
+    for (let i = 0; i < words.length && at < 0; i++) {
+        const name = wordBase(words[i]);
+        const next = words[i + 1] ?? '';
+        if (name === 'vitest' || name === 'jest')
+            at = next === 'run' || next === 'watch' ? i + 2 : i + 1;
+        else if ((name === 'bun' || name === 'playwright' || name === 'cli' || SCRIPT_RUNNERS.has(name)) && next === 'test')
+            at = i + 2;
+        else if (SCRIPT_RUNNERS.has(name) && next === 'run' && /^test(:|$)/.test(words[i + 2] ?? ''))
+            return true;
+    }
+    if (at < 0)
+        return true;
+    for (let i = at; i < words.length; i++) {
+        const word = words[i].replace(/^['"]|['"]$/g, '');
+        if (word === '--')
+            continue;
+        if (word.startsWith('-')) {
+            const flag = word.split('=')[0];
+            if (NAME_FLAGS.has(flag))
+                return false;
+            if (VALUE_FLAGS.has(flag) && !word.includes('='))
+                i++;
+            continue;
+        }
+        if (/^\d+$/.test(word))
+            continue;
+        if (/\.[A-Za-z0-9]{1,6}$/.test(word.replace(/\/+$/, '')))
+            return false;
+        if (word.includes('/') || SUITE_FOLDERS.has(word))
+            continue;
+        return false;
+    }
+    return true;
+}
+/**
+ * Whether the work queue wants this run handed to it, so a consumer flags it: it wants the kind
+ * (`workWant`), the run held at least `minCpu` for at least `sustainedSeconds`, and, for a test run under
+ * `wholeSuiteOnly`, it runs the whole suite (`wholeSuite`). False otherwise — never flag on your own rule.
+ */
+export function wantsQueued(queue, run) {
+    const want = workWant(queue, run.kind);
+    if (!want)
+        return false;
+    if (run.cpu < want.minCpu || run.seconds < want.sustainedSeconds)
+        return false;
+    return !want.wholeSuiteOnly || wholeSuite(run.command);
 }
 /* ---------------------------------------------------------------- document.proposals, read */
 /** The document's folder for an epic, relative to the project (`root` with the epic in it). */
