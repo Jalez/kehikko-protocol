@@ -32,6 +32,8 @@ import type { Covered } from '../reveal.js'
 import { mailbox, type MessageSource } from './mailbox.js'
 import { mayGreet, pageOrigins } from './greet.js'
 import { reportPageError } from './errors.js'
+import { applyBackground } from './theme.js'
+import { backgroundOf } from '../page.js'
 import { pageFind, type PageFind, type PageFindOptions } from './find.js'
 import type { FindCount, FindDirection, FindOptions } from '../find.js'
 
@@ -313,6 +315,13 @@ export interface ConnectOptions {
    * when a header or footer is declared, and "no footer" a moment after the last declaration.
    */
   rowsAdvice?: boolean
+  /**
+   * 2.82.0. `false` leaves the page's background alone. Default `true`: on every greeting and context
+   * the container's background the host said (`context.appearance`, `card` when it says none) is put
+   * on `<html>` with `applyBackground`, so with the container's background off `html`, `body`, `#root`
+   * and the element marked `data-kehikot-page` are transparent.
+   */
+  appearance?: boolean
 }
 
 /** 2.70.0. How long after the last header or footer declaration the client says a missing footer, in ms. */
@@ -435,6 +444,7 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
   const answerWithin = options.answerWithin ?? ANSWER_WITHIN_MS
   const gotoBackstop = options.gotoBackstop ?? GOTO_BACKSTOP_MS
   const pressBackstop = options.pressBackstop ?? PRESS_BACKSTOP_MS
+  const appearing = options.appearance !== false
 
   let host: Window | null = null
   let origin = '*'
@@ -718,6 +728,7 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
       projectIdNow = projectIdOf(message.context)
       sendActivity()
       pointer(message.pointer === true)
+      if (appearing) applyBackground(backgroundOf(message.context), { theme: message.context.theme === 'dark' ? 'dark' : 'light', remember: true })
       closeFind()
       findKeys(message.find === true)
       /* 2.59.0. A greeting handler that throws is said to the host (`kehikot.page.error`, `greeting`),
@@ -747,6 +758,7 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
         projectIdNow = projectId
         if (!byProject) sendActivity()
       }
+      if (appearing) applyBackground(backgroundOf(context), { theme: context.theme === 'dark' ? 'dark' : 'light', remember: true })
       events.onContext?.(context)
       return
     }

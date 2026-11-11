@@ -38,7 +38,7 @@ const due = (over: Partial<ReminderCase> = {}): ReminderCase => ({
 
 describe('the version', () => {
   test('is 2.56.0, and the docs say it', () => {
-    expect(PACKAGE_VERSION).toBe('2.81.0')
+    expect(PACKAGE_VERSION).toBe('2.82.0')
     expect(readFileSync(join(REPO, 'CHANGELOG.md'), 'utf8')).toContain('## 2.56.0')
     expect(readFileSync(join(REPO, 'docs/activity.md'), 'utf8')).toContain('shouldRemind')
   })

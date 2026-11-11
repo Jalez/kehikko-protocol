@@ -1028,6 +1028,24 @@ said as a page failure (`NO_ROOT`), not left blank. `{ reportErrors: false }` fo
 boundary of its own, `{ strict: false }`, `fallback`. A separate subpath, because it imports
 `react-dom/client`; import the client itself first, as before, so the mailbox is installed.
 
+### The container's background (2.82.0, `applyBackground`)
+
+With Settings › Appearance › "Container background" off, the host draws no card behind a module's
+page and says so in every context: `appearance: { background: 'none' }` (`card` otherwise; absent
+from an older host, which means `card`). `connect` puts it on the page's `<html>` on the greeting and
+on every context after it — `data-kehikot-background="card" | "none"`, `color-scheme` from the theme —
+and adds one style element (`BACKGROUND_CSS`, id `kehikot-background`) that, under `none`, makes
+`html`, `body`, `#root` and any element marked `data-kehikot-page` transparent, `!important` and
+unlayered so a page-level utility class does not paint over it. The page document's blocking script
+does the same before the first paint from what the host said last time (`BACKGROUND_KEY`), in a frame
+only, or from `?background=`.
+
+A module marks its outermost page element with `data-kehikot-page` and keeps no page-level background
+of its own. Cards, popovers, dialogs and menus inside keep their surfaces. A module that needs an
+opaque surface for legibility gives it under `html[data-kehikot-background="card"]` only, or on an
+element inside the marked one. `connect(…, { appearance: false })` leaves the page alone;
+`hostStore`'s `applyTheme: false` does too, unless `appearance: true` is passed with it.
+
 ### Presses from nested frames (`relay.ts`)
 
 The client hears presses on the page's window (2.49.0), so a press inside an iframe the page owns —

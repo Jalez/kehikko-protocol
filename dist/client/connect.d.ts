@@ -259,6 +259,13 @@ export interface ConnectOptions {
      * when a header or footer is declared, and "no footer" a moment after the last declaration.
      */
     rowsAdvice?: boolean;
+    /**
+     * 2.82.0. `false` leaves the page's background alone. Default `true`: on every greeting and context
+     * the container's background the host said (`context.appearance`, `card` when it says none) is put
+     * on `<html>` with `applyBackground`, so with the container's background off `html`, `body`, `#root`
+     * and the element marked `data-kehikot-page` are transparent.
+     */
+    appearance?: boolean;
 }
 /** 2.70.0. How long after the last header or footer declaration the client says a missing footer, in ms. */
 export declare const ROWS_ADVICE_AFTER_MS = 1500;

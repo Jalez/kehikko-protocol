@@ -61,7 +61,7 @@ export { CONTENT_HOST, CONTENT_STEPS, contentChangeSchema, contentSignalSchema, 
 export { notificationPayload, callPayload, EXTENSIONS, EXTENSION_NAMES, known, schemaFor, } from './extensions.js';
 export { CITE_STATUSES, CITE_MARKER, parseSource, serialiseSource, uncitable, markersIn, replaceMarkers, normaliseQuote, findQuote, resolveSource, linesOf, } from './citations.js';
 /* The names a module's server and its own page agree on. See `page.ts`. */
-export { PAGE_BACKGROUND, ROOT_ELEMENT, THEME_KEY, THEME_PARAM, ORIGINS_ELEMENT, TICKET_ELEMENT, TICKET_HEADER, originAmong, TICKET_REFUSED, PAGE_ERRORS_MAX, STACK_LINES, } from './page.js';
+export { PAGE_BACKGROUND, ROOT_ELEMENT, THEME_KEY, THEME_PARAM, ORIGINS_ELEMENT, TICKET_ELEMENT, TICKET_HEADER, originAmong, TICKET_REFUSED, PAGE_ERRORS_MAX, STACK_LINES, PAGE_BACKGROUNDS, BACKGROUND_ATTR, BACKGROUND_CSS, BACKGROUND_KEY, BACKGROUND_PARAM, BACKGROUND_STYLE_ID, PAGE_MARK, backgroundOf, } from './page.js';
 /* What a module's server is built from, and how two builds compare. See `build.ts`. */
 export { BUILD_ELEMENT, BUILD_HEADER, PACKAGE_VERSION, START_HEADER, START_TOKEN, START_TOKEN_ENV, buildIsStale, buildSchema, buildStamp, compareBuilds, describeBuild, readBuild, sameCode, sameProcess, startTokenOf, startVerdict, } from './build.js';
 /* Agent skills a module offers, and where it serves them (2.5.0); what each needs on the kehikko: modules by id (2.12.0) or what a module provides (2.21.0). See `skills.ts`. */

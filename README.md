@@ -184,6 +184,7 @@ knows, it has to do itself.
 | ⌘F searches what the page shows | `connect` (since 2.69.0) | `findKeys: false`, `findIn: false` |
 | Header and footer placed by the rule | `rowsAdvice` on the console; `kehikot-check-rows` in CI | `rowsAdvice: false` |
 | Agents told what changed in the door | `kehikot-check-notes` in CI | — |
+| The container's background followed: transparent when Appearance › "Container background" is off (2.82.0) | `connect` puts `data-kehikot-background` on `<html>` and makes `html`, `body`, `#root` and the element marked `data-kehikot-page` transparent | `appearance: false` |
 
 **The module still does itself:**
 
@@ -193,6 +194,10 @@ knows, it has to do itself.
   `xtermFind` (`client/find`, 2.74.0).
 - **A footer for crucial state**: counts, status, where you are. A container folded to two rows shows
   only the header and the footer.
+- **Mark the outermost page element with `data-kehikot-page`** (2.82.0), and keep no page-level
+  background (`bg-background` on the root, a painted `body`). Cards and popovers inside keep their own
+  surfaces; an opaque surface the page needs for legibility goes under
+  `html[data-kehikot-background="card"]` only.
 - **`ready()`** once what it shows is drawn, and **`relayPointer`** for each nested frame it owns.
 - **`kehikot.rows.json`** and **`notes/tools.json`** kept current, for the two checks.
 
@@ -215,6 +220,7 @@ The same list with what each version exported is in [CHANGELOG.md](CHANGELOG.md)
 
 | version | date | what it added |
 |---|---|---|
+| 2.82.0 | 2026-11-11 | Additive. The container's background: the host says `appearance: { background: 'card' \| 'none' }` in the context, and `connect` applies it by default (`data-kehikot-background` on `<html>`, `color-scheme`, and `html`, `body`, `#root` and the element marked `data-kehikot-page` transparent under `none`; `applyBackground`, `BACKGROUND_CSS`, `PAGE_MARK`, `backgroundOf`; opt out with `appearance: false`). The page document paints it before the first script. See [the client](docs/client.md). |
 | 2.81.0 | 2026-11-11 | Additive. Services: a module provides a service with a typed descriptor (`services` in its manifest, `SERVICES`), a consumer finds it through the host (`services.find` under `services:read`) and never names it; the first is `work.queue`. `messages.notifySession` under `sessions:observe`: a notice to one session found by its own id. See [services](docs/services.md) and [messages between agent sessions](docs/agent-messages.md). |
 | 2.80.0 | 2026-11-11 | Additive. One entry for every tool call: `checkToolCall` in `/serve` (pure: `toolCallDecision`) applies every guard kind to any call of an agent CLI, read through the protocol's table of each CLI's tools (`CLI_TOOLS`: Claude Code, Codex, Vibe, Antigravity, OpenCode); `patchPaths`. Every agent module routes every pre-tool call through it. See [asking](docs/asking.md). |
 | 2.79.0 | 2026-11-11 | Additive. The person's Inbox, shown by a module's page: `inbox:person` with `inbox.read`, `inbox.log`, `inbox.act`, `inbox.answer`, `inbox.open` and `inbox.use` — page-only (`PERSON_METHODS`, never a server method), every act but reading and `seen` on the person's press (`actNeedsPress`) — and `kehikot.inbox` (`changed`, `next`) with `onInbox`. See [inbox](docs/inbox.md). |
