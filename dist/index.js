@@ -58,7 +58,9 @@ export { PROVIDES, PROVIDED_NAMES, providesSchema, agentSessionsSchema, provides
 /* Services: one module provides, others consume, neither names the other (2.81.0). See `services.ts`, docs/services.md. */
 export { SERVICES, SERVICE_NAMES, SERVICE_NAME, serviceName, servicesSchema, serviceDescriptor, servicesOf, servicesFindParams, servicesFindResult, serviceProviderSchema, providerOf, WORK_QUEUE, WORK_KINDS, WORK_COMMAND, workQueueSchema, workRunLine, workQueueSaid, DOCUMENT_PROPOSALS, REVIEW_DRAFTS, CHECKLIST_HOLDER, WORK_STATUS, DIAGRAM_WRITER, DIAGRAM_KINDS, SERVICE_EPIC, SERVICE_CALLER_HEADER, SERVICE_PASS_HEADER, serviceTool, servicePath, documentProposalsSchema, reviewDraftsSchema, checklistHolderSchema, workStatusSchema, workJobSchema, workJobsIn, diagramWriterSchema, documentRoot, documentsFolder, 
 /* 2.85.0 */
-PAGE_VIEWER, CUE_TARGETS, MODULE_FOLDERS, KEHIKOT_FOLDER, pageViewerSchema, cueTargetSchema, cueTargetsSchema, ownedFolderSchema, moduleFoldersSchema, foldersOwned, CHECKLIST_JSON, checklistItemJson, checklistJson, checklistListsJson, holderTakesJson, checklistJsonIn, sessionsPlaceOfParams, sessionsPlaceOfResult, } from './services.js';
+PAGE_VIEWER, CUE_TARGETS, MODULE_FOLDERS, KEHIKOT_FOLDER, pageViewerSchema, cueTargetSchema, cueTargetsSchema, ownedFolderSchema, moduleFoldersSchema, foldersOwned, CHECKLIST_JSON, checklistItemJson, checklistJson, checklistListsJson, holderTakesJson, checklistJsonIn, sessionsPlaceOfParams, sessionsPlaceOfResult, 
+/* 2.86.0 */
+workWantSchema, WORK_WANT_DEFAULTS, workWant, wholeSuite, wantsQueued, } from './services.js';
 export { CONTENT_HOST, CONTENT_STEPS, contentChangeSchema, contentSignalSchema, contentStamp, } from './content.js';
 export { notificationPayload, callPayload, EXTENSIONS, EXTENSION_NAMES, known, schemaFor, } from './extensions.js';
 export { CITE_STATUSES, CITE_MARKER, parseSource, serialiseSource, uncitable, markersIn, replaceMarkers, normaliseQuote, findQuote, resolveSource, linesOf, } from './citations.js';

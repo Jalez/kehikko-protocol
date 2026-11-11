@@ -24,6 +24,44 @@ export type WorkKind = (typeof WORK_KINDS)[number];
 /** Where the command goes in a run line. */
 export declare const WORK_COMMAND = "{command}";
 /**
+ * 2.86.0. What a work queue wants handed to it, for one kind of work: a consumer that watches processes
+ * flags a run of that kind started outside the queue only when the rule holds (`wantsQueued`).
+ *
+ * - `minCpu`: CPU, in percent of one core (so above 100 on several cores), the run has to use…
+ * - `sustainedSeconds`: …for at least this long without dropping below it. A short spike is not flagged.
+ * - `wholeSuiteOnly`: for tests, flag only a run of the whole suite — a test command with no file
+ *   arguments, or only folders (`bun test`, `vitest run`, `bun test test/`), not `bun test a.test.ts`
+ *   or one filtered by name (`wholeSuite`). Ignored for other kinds.
+ *
+ * A field left out takes its default (`WORK_WANT_DEFAULTS`).
+ */
+export declare const workWantSchema: z.ZodObject<{
+    minCpu: z.ZodOptional<z.ZodNumber>;
+    sustainedSeconds: z.ZodOptional<z.ZodNumber>;
+    wholeSuiteOnly: z.ZodOptional<z.ZodBoolean>;
+}, "strip", z.ZodTypeAny, {
+    minCpu?: number | undefined;
+    sustainedSeconds?: number | undefined;
+    wholeSuiteOnly?: boolean | undefined;
+}, {
+    minCpu?: number | undefined;
+    sustainedSeconds?: number | undefined;
+    wholeSuiteOnly?: boolean | undefined;
+}>;
+export type WorkWantRule = z.infer<typeof workWantSchema>;
+/** What a field of a `wants` rule is when the provider leaves it out: 80% of a core for 20 s; tests only as whole suites. */
+export declare const WORK_WANT_DEFAULTS: {
+    readonly minCpu: 80;
+    readonly sustainedSeconds: 20;
+    readonly wholeSuiteOnly: true;
+};
+/** A rule with every field filled in. */
+export interface WorkWant {
+    minCpu: number;
+    sustainedSeconds: number;
+    wholeSuiteOnly: boolean;
+}
+/**
  * `work.queue`: a module that runs heavy work — test suites, typechecks, builds, big installs — in turn,
  * so that sessions on this computer do not collide.
  *
@@ -37,6 +75,10 @@ export declare const WORK_COMMAND = "{command}";
  *   guard's words.
  * - `marks`: text an ancestor's command line contains when a process is one of its own runs (its runner's
  *   wrapper line, its program's name), so a consumer that watches processes does not flag work in turn.
+ * - `wants` (2.86.0): which work started outside it the provider wants handed to it, per kind of work
+ *   (`workWantSchema`). A kind not listed is not wanted: a consumer does not flag it. With no `wants` at
+ *   all, every kind in `run` is wanted under the defaults (`WORK_WANT_DEFAULTS`). Read it with
+ *   `workWant` and judge a run with `wantsQueued`; never by your own numbers.
  */
 export declare const workQueueSchema: z.ZodObject<{
     name: z.ZodEffects<z.ZodString, string, string>;
@@ -65,6 +107,61 @@ export declare const workQueueSchema: z.ZodObject<{
     tool: z.ZodOptional<z.ZodString>;
     direct: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
     marks: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
+    wants: z.ZodOptional<z.ZodObject<Record<"test" | "typecheck" | "build" | "install", z.ZodOptional<z.ZodObject<{
+        minCpu: z.ZodOptional<z.ZodNumber>;
+        sustainedSeconds: z.ZodOptional<z.ZodNumber>;
+        wholeSuiteOnly: z.ZodOptional<z.ZodBoolean>;
+    }, "strip", z.ZodTypeAny, {
+        minCpu?: number | undefined;
+        sustainedSeconds?: number | undefined;
+        wholeSuiteOnly?: boolean | undefined;
+    }, {
+        minCpu?: number | undefined;
+        sustainedSeconds?: number | undefined;
+        wholeSuiteOnly?: boolean | undefined;
+    }>>>, "strip", z.ZodTypeAny, {
+        test?: {
+            minCpu?: number | undefined;
+            sustainedSeconds?: number | undefined;
+            wholeSuiteOnly?: boolean | undefined;
+        } | undefined;
+        typecheck?: {
+            minCpu?: number | undefined;
+            sustainedSeconds?: number | undefined;
+            wholeSuiteOnly?: boolean | undefined;
+        } | undefined;
+        build?: {
+            minCpu?: number | undefined;
+            sustainedSeconds?: number | undefined;
+            wholeSuiteOnly?: boolean | undefined;
+        } | undefined;
+        install?: {
+            minCpu?: number | undefined;
+            sustainedSeconds?: number | undefined;
+            wholeSuiteOnly?: boolean | undefined;
+        } | undefined;
+    }, {
+        test?: {
+            minCpu?: number | undefined;
+            sustainedSeconds?: number | undefined;
+            wholeSuiteOnly?: boolean | undefined;
+        } | undefined;
+        typecheck?: {
+            minCpu?: number | undefined;
+            sustainedSeconds?: number | undefined;
+            wholeSuiteOnly?: boolean | undefined;
+        } | undefined;
+        build?: {
+            minCpu?: number | undefined;
+            sustainedSeconds?: number | undefined;
+            wholeSuiteOnly?: boolean | undefined;
+        } | undefined;
+        install?: {
+            minCpu?: number | undefined;
+            sustainedSeconds?: number | undefined;
+            wholeSuiteOnly?: boolean | undefined;
+        } | undefined;
+    }>>;
 }, "strip", z.ZodTypeAny, {
     name: string;
     run: {
@@ -77,6 +174,28 @@ export declare const workQueueSchema: z.ZodObject<{
     cli?: string | undefined;
     tool?: string | undefined;
     direct?: string | undefined;
+    wants?: {
+        test?: {
+            minCpu?: number | undefined;
+            sustainedSeconds?: number | undefined;
+            wholeSuiteOnly?: boolean | undefined;
+        } | undefined;
+        typecheck?: {
+            minCpu?: number | undefined;
+            sustainedSeconds?: number | undefined;
+            wholeSuiteOnly?: boolean | undefined;
+        } | undefined;
+        build?: {
+            minCpu?: number | undefined;
+            sustainedSeconds?: number | undefined;
+            wholeSuiteOnly?: boolean | undefined;
+        } | undefined;
+        install?: {
+            minCpu?: number | undefined;
+            sustainedSeconds?: number | undefined;
+            wholeSuiteOnly?: boolean | undefined;
+        } | undefined;
+    } | undefined;
 }, {
     name: string;
     run: {
@@ -89,6 +208,28 @@ export declare const workQueueSchema: z.ZodObject<{
     tool?: string | undefined;
     direct?: string | undefined;
     marks?: string[] | undefined;
+    wants?: {
+        test?: {
+            minCpu?: number | undefined;
+            sustainedSeconds?: number | undefined;
+            wholeSuiteOnly?: boolean | undefined;
+        } | undefined;
+        typecheck?: {
+            minCpu?: number | undefined;
+            sustainedSeconds?: number | undefined;
+            wholeSuiteOnly?: boolean | undefined;
+        } | undefined;
+        build?: {
+            minCpu?: number | undefined;
+            sustainedSeconds?: number | undefined;
+            wholeSuiteOnly?: boolean | undefined;
+        } | undefined;
+        install?: {
+            minCpu?: number | undefined;
+            sustainedSeconds?: number | undefined;
+            wholeSuiteOnly?: boolean | undefined;
+        } | undefined;
+    } | undefined;
 }>;
 export type WorkQueue = z.infer<typeof workQueueSchema>;
 /**
@@ -659,6 +800,61 @@ export declare const SERVICES: {
             tool: z.ZodOptional<z.ZodString>;
             direct: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
             marks: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
+            wants: z.ZodOptional<z.ZodObject<Record<"test" | "typecheck" | "build" | "install", z.ZodOptional<z.ZodObject<{
+                minCpu: z.ZodOptional<z.ZodNumber>;
+                sustainedSeconds: z.ZodOptional<z.ZodNumber>;
+                wholeSuiteOnly: z.ZodOptional<z.ZodBoolean>;
+            }, "strip", z.ZodTypeAny, {
+                minCpu?: number | undefined;
+                sustainedSeconds?: number | undefined;
+                wholeSuiteOnly?: boolean | undefined;
+            }, {
+                minCpu?: number | undefined;
+                sustainedSeconds?: number | undefined;
+                wholeSuiteOnly?: boolean | undefined;
+            }>>>, "strip", z.ZodTypeAny, {
+                test?: {
+                    minCpu?: number | undefined;
+                    sustainedSeconds?: number | undefined;
+                    wholeSuiteOnly?: boolean | undefined;
+                } | undefined;
+                typecheck?: {
+                    minCpu?: number | undefined;
+                    sustainedSeconds?: number | undefined;
+                    wholeSuiteOnly?: boolean | undefined;
+                } | undefined;
+                build?: {
+                    minCpu?: number | undefined;
+                    sustainedSeconds?: number | undefined;
+                    wholeSuiteOnly?: boolean | undefined;
+                } | undefined;
+                install?: {
+                    minCpu?: number | undefined;
+                    sustainedSeconds?: number | undefined;
+                    wholeSuiteOnly?: boolean | undefined;
+                } | undefined;
+            }, {
+                test?: {
+                    minCpu?: number | undefined;
+                    sustainedSeconds?: number | undefined;
+                    wholeSuiteOnly?: boolean | undefined;
+                } | undefined;
+                typecheck?: {
+                    minCpu?: number | undefined;
+                    sustainedSeconds?: number | undefined;
+                    wholeSuiteOnly?: boolean | undefined;
+                } | undefined;
+                build?: {
+                    minCpu?: number | undefined;
+                    sustainedSeconds?: number | undefined;
+                    wholeSuiteOnly?: boolean | undefined;
+                } | undefined;
+                install?: {
+                    minCpu?: number | undefined;
+                    sustainedSeconds?: number | undefined;
+                    wholeSuiteOnly?: boolean | undefined;
+                } | undefined;
+            }>>;
         }, "strip", z.ZodTypeAny, {
             name: string;
             run: {
@@ -671,6 +867,28 @@ export declare const SERVICES: {
             cli?: string | undefined;
             tool?: string | undefined;
             direct?: string | undefined;
+            wants?: {
+                test?: {
+                    minCpu?: number | undefined;
+                    sustainedSeconds?: number | undefined;
+                    wholeSuiteOnly?: boolean | undefined;
+                } | undefined;
+                typecheck?: {
+                    minCpu?: number | undefined;
+                    sustainedSeconds?: number | undefined;
+                    wholeSuiteOnly?: boolean | undefined;
+                } | undefined;
+                build?: {
+                    minCpu?: number | undefined;
+                    sustainedSeconds?: number | undefined;
+                    wholeSuiteOnly?: boolean | undefined;
+                } | undefined;
+                install?: {
+                    minCpu?: number | undefined;
+                    sustainedSeconds?: number | undefined;
+                    wholeSuiteOnly?: boolean | undefined;
+                } | undefined;
+            } | undefined;
         }, {
             name: string;
             run: {
@@ -683,6 +901,28 @@ export declare const SERVICES: {
             tool?: string | undefined;
             direct?: string | undefined;
             marks?: string[] | undefined;
+            wants?: {
+                test?: {
+                    minCpu?: number | undefined;
+                    sustainedSeconds?: number | undefined;
+                    wholeSuiteOnly?: boolean | undefined;
+                } | undefined;
+                typecheck?: {
+                    minCpu?: number | undefined;
+                    sustainedSeconds?: number | undefined;
+                    wholeSuiteOnly?: boolean | undefined;
+                } | undefined;
+                build?: {
+                    minCpu?: number | undefined;
+                    sustainedSeconds?: number | undefined;
+                    wholeSuiteOnly?: boolean | undefined;
+                } | undefined;
+                install?: {
+                    minCpu?: number | undefined;
+                    sustainedSeconds?: number | undefined;
+                    wholeSuiteOnly?: boolean | undefined;
+                } | undefined;
+            } | undefined;
         }>;
     };
     readonly 'document.proposals': {
@@ -1056,6 +1296,35 @@ export declare function workRunLine(queue: WorkQueue, kind: WorkKind, command: s
  * not take that kind of work.
  */
 export declare function workQueueSaid(queue: WorkQueue, kind: WorkKind, command: string): string | null;
+/**
+ * The provider's rule for one kind of work, every field filled in (`WORK_WANT_DEFAULTS`); null when it
+ * does not want that kind flagged: it does not take it (`run`), or it says `wants` and leaves the kind out.
+ * `wholeSuiteOnly` is false for every kind but `test`.
+ */
+export declare function workWant(queue: Pick<WorkQueue, 'run' | 'wants'>, kind: WorkKind): WorkWant | null;
+/**
+ * Whether a test command runs the whole suite: after the runner (`bun test`, `vitest [run]`, `jest`,
+ * `playwright test`, `npm test`, `bun run test`), no file argument (a word with an extension such as
+ * `a.test.tsx`), no bare word that is not a usual folder name (a runner reads it as a name filter), and
+ * no option that picks tests by name (`-t`). Folders (`test/`, `src/unit`) keep it whole. A command whose
+ * runner it cannot find counts as whole.
+ */
+export declare function wholeSuite(command: string): boolean;
+/** One run a consumer saw outside the queue: its kind, its command line, and the CPU it has held for how long. */
+export interface SeenRun {
+    kind: WorkKind;
+    command: string;
+    /** The CPU it has used at least, in percent of one core, over the last `seconds`. */
+    cpu: number;
+    /** How long it has held at least `cpu`, in seconds. */
+    seconds: number;
+}
+/**
+ * Whether the work queue wants this run handed to it, so a consumer flags it: it wants the kind
+ * (`workWant`), the run held at least `minCpu` for at least `sustainedSeconds`, and, for a test run under
+ * `wholeSuiteOnly`, it runs the whole suite (`wholeSuite`). False otherwise — never flag on your own rule.
+ */
+export declare function wantsQueued(queue: Pick<WorkQueue, 'run' | 'wants'>, run: SeenRun): boolean;
 /** The document's folder for an epic, relative to the project (`root` with the epic in it). */
 export declare function documentRoot(document: Pick<DocumentProposals, 'root'>, epic: string): string;
 /** The folder every epic's document is under, relative to the project: `root` up to the first `{epic}`, without the trailing `/`. */

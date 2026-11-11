@@ -1,4 +1,4 @@
-# Services (2.81.0, 2.83.0, 2.85.0)
+# Services (2.81.0, 2.83.0, 2.85.0, 2.86.0)
 
 One module PROVIDES a service; others CONSUME it; neither names the other. A consumer never hard-codes
 a provider's id, name, program path or tool names, and a provider never knows who consumes it. What
@@ -82,6 +82,24 @@ Every word the consumer says about the provider comes from that descriptor.
 - `direct`: what in front of a command runs it directly after all (a guard's words).
 - `marks`: text in an ancestor's command line of one of its own runs, so a consumer watching processes
   does not flag work already in turn.
+- `wants` (2.86.0, optional): which runs started outside it the provider wants flagged, per kind of
+  work: `{ minCpu?, sustainedSeconds?, wholeSuiteOnly? }` (`workWantSchema`).
+  - `minCpu` (percent of one core) held for `sustainedSeconds`: a short spike or a light run is not
+    flagged.
+  - `wholeSuiteOnly`, for tests: only a run of the whole suite (`wholeSuite`: no file arguments, only
+    folders, no name filter — `bun test`, `vitest run`), never `bun test a.test.ts`.
+  - A kind left out is not flagged (an install that is network-bound and quick). With no `wants` at all,
+    every kind in `run` is, under `WORK_WANT_DEFAULTS` (80% for 20 s; tests as whole suites only).
+
+  A consumer tracks each process's CPU over time and asks `wantsQueued(queue, { kind, command, cpu,
+  seconds })` — `cpu` the least it used over the last `seconds` — and flags only on `true`.
+  `workWant(queue, kind)` gives the rule with its defaults, for the `minCpu` to track against:
+
+  ```ts
+  const want = workWant(queue, kind)              // null: never flag this kind
+  const streak = heldSince(pid, want.minCpu)      // the consumer's own samples
+  if (wantsQueued(queue, { kind, command, cpu: streak.least, seconds: streak.seconds })) flag()
+  ```
 
 ## Calling a provider (2.83.0)
 
