@@ -58,3 +58,5 @@ export { personEnv, utf8Locale, HOST_PATH_ENV } from './person.js';
 export { MAX_TOOL_STREAMS, TOOLS_LIST_CHANGED, TOOLS_RETRY_MS, markOfEventId, mcpPathOf, sayingListChanged, toolsChanged, toolsMark, toolStream, wantsToolStream, } from './tools-changed.js';
 /* Which kind of git checkout a file is in, for an edit guard (2.78.0). See `checkout.ts`. */
 export { checkoutOf } from './checkout.js';
+/* The one call every agent module makes before any tool runs, under every guard kind (2.80.0). See `tools.ts`. */
+export { checkToolCall } from './tools.js';

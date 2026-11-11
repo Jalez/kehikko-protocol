@@ -41,3 +41,4 @@ export { attach, eventFrame, events, publish, streams, watching, EVENTS_BAD_TOPI
 export { personEnv, utf8Locale, HOST_PATH_ENV, type PersonEnvOptions } from './person.js';
 export { MAX_TOOL_STREAMS, TOOLS_LIST_CHANGED, TOOLS_RETRY_MS, markOfEventId, mcpPathOf, sayingListChanged, toolsChanged, toolsMark, toolStream, wantsToolStream, } from './tools-changed.js';
 export { checkoutOf } from './checkout.js';
+export { checkToolCall } from './tools.js';

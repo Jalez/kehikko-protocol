@@ -64,7 +64,7 @@ const input = (over: Partial<NotesInput> = {}): NotesInput => ({
 
 describe('the version', () => {
   test('is 2.41.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.79.0')
+    expect(PACKAGE_VERSION).toBe('2.80.0')
     expect(PROTOCOL).toBe(2)
   })
 

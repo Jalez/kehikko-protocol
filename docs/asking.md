@@ -613,10 +613,28 @@ A shell guard cannot keep an agent from editing a file with its editor tools. An
   repository's main checkout — the nearest `.git` above it is a directory — and not a linked worktree
   (`.git` is a file). `allowPaths` lets files past.
 - Deny only. The agent module's pre-tool hook on its edit tools reads the file from the call
-  (`editedPaths`), resolves it against the session's folder, tells its checkout (`checkoutOf`), and
+  (`editedPaths`; since 2.80.0 `checkToolCall` does all of this), resolves it against the session's folder, tells its checkout (`checkoutOf`), and
   decides with `editDecision`; a refusal says `guardSays`. `KEHIKOT_DIRECT=1` in the session's own
   environment passes.
 - A shell command that writes a file (`sed -i`, `>`) is not an edit: only a shell guard can hold it.
+
+### Every tool call (2.80.0)
+
+Each agent module once wired each guard kind to its own tools. Now there is one entry: an agent
+module's hook hands **every** tool call to `checkToolCall({ cli, tool, input, cwd }, guards)` (`/serve`;
+pure: `toolCallDecision`), and it applies every guard kind the placed modules declare.
+
+- `cli` is one of `AGENT_CLIS`; the protocol's table `CLI_TOOLS` says, per CLI, which tools are shell
+  tools (and which input key holds the command, and its own `env`) and which edit files (and which keys
+  hold the paths, or which holds a `*** Begin Patch` patch, read with `patchPaths`). A tool not in the
+  table passes.
+- `pass`: run the call as it is. `deny`: refuse it with `guardSays(decision)`. `rewrite` (shell only):
+  write `decision.command` into the input's `decision.field` — the module still adds what its CLI needs
+  (handing a waiting command off, for one).
+- `facts.env` with `KEHIKOT_DIRECT` passes everything, as before; `home` and `checkoutOf` are filled
+  in from this computer unless given.
+- A CLI whose hooks cannot see a kind of tool (no hook on its file edits, say) cannot hold that kind;
+  the agent module says so in its notes rather than claim it.
 
 ### What a subagent is told
 
