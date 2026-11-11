@@ -12,6 +12,7 @@ export { DOOR_PROJECT_SAYS, DOOR_PLACE_SAYS, PLACE_PARAM, placeDefaults, type Do
 export { neighbourPorts, portOf, readRegistration, registerAt, takesOver, registryDir, type Registered, type Registration, } from './registry.js';
 export { anyPort, claimOrLeave, preferred, registerBound, serves, type DevServerLike, type HttpServerLike, type ServesOptions, type ServesPlugin, } from './plugin.js';
 export { doorOf, listTools, readNeighbour, readNeighbours, NEIGHBOUR_TIMEOUT_MS, type Neighbour, type NeighbourOptions, } from './neighbours.js';
+export { findService, callServiceTool, fetchService, callerHeaders, vouchCaller, type FoundService, type FindServiceOptions, type CallServiceOptions, type VouchOptions, } from './services.js';
 export { readJourney, readJourneys } from './journeys.js';
 export { readPlans, readPlansFor, writePlan, type PublishedPlans, type PlanWritten } from './plans.js';
 export { PLAN_FILE, PLAN_VERSION, type Plan, type PlanInput } from '../plan.js';
