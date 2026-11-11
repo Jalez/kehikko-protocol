@@ -345,7 +345,7 @@ and a module that declares none gets none of the methods below.
 | `messages.notify` | `agents:message` |
 | `messages.tell` | `agents:message` |
 | `messages.say` | `messages:as-person` |
-| `projects.mine` | `projects:read` |
+| `projects.mine` | `agents:message` |
 
 The host's table is the protocol's `METHODS`, read by its `capabilityOf`
 (`src/host/grants.ts`): there is no second list to keep in step. A host keeps a
@@ -400,14 +400,13 @@ sends it to that session only and stamps the module as its sender; the module
 that runs the session types it in like any message. See
 [agent messages](agent-messages.md#a-modules-notice-to-the-session-that-asked-2540).
 
-#### `CAPABILITIES.projects:read`
-
-2.76.0. `projects.mine {}` answers `projectsMineResult` (`{ projects }`, each a
+2.76.0, under `agents:message` since 2.77.0. A module's SERVER (or page) may
+ask `projects.mine {}`, answered `projectsMineResult` (`{ projects }`, each a
 `PickedProject`: `path`, `name`, `id`): the person's projects in which the
 ASKING module keeps its own folder (`<project>/.kehikot/<module>/`), in the
-host's order. Asked by a module's server at start (`watchKnownProjects` in
-`/serve`), so that what it runs for a project is picked up after a restart
-before anybody opens that project. Never the person's whole list. See
+host's order. Asked at start (`watchKnownProjects` in `/serve`), so that
+messages reach the module's asleep sessions in a project nobody has opened
+since a restart. Never the person's whole list. See
 [server ask](server-ask.md#the-projects-a-module-keeps-something-in-2760).
 
 #### `CAPABILITIES.messages:as-person`

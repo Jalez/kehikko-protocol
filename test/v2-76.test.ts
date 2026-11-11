@@ -13,6 +13,7 @@ import {
   SERVER_METHOD_SINCE,
   methodParams,
   methodResults,
+  needsOf,
   needsProject,
   projectsMineResult,
   serverAskSchema,
@@ -31,24 +32,27 @@ type Mine = AskedHost<'projects.mine'>
 const answered = (...paths: string[]): Mine => ({ ok: true, data: { projects: paths.map((path) => ({ path, name: path.split('/').at(-1) ?? '' })) } })
 
 describe('the version', () => {
-  test('is 2.76.0, PROTOCOL is still 2, and the docs say it', () => {
-    expect(PACKAGE_VERSION).toBe('2.76.0')
+  test('is 2.77.0, PROTOCOL is still 2, and the docs say it', () => {
+    expect(PACKAGE_VERSION).toBe('2.77.0')
     expect(PROTOCOL).toBe(2)
-    expect(readFileSync(join(REPO, 'CHANGELOG.md'), 'utf8')).toContain('## 2.76.0')
+    expect(readFileSync(join(REPO, 'CHANGELOG.md'), 'utf8')).toContain('## 2.77.0')
     expect(readFileSync(join(REPO, 'docs/server-ask.md'), 'utf8')).toContain('watchKnownProjects')
     expect(readFileSync(join(REPO, 'docs/methods.md'), 'utf8')).toContain('projects.mine')
   })
 })
 
 describe('projects.mine', () => {
-  test('a method and a server method under projects:read, since 2.76.0', () => {
-    expect(METHODS['projects.mine']).toBe('projects:read')
-    expect(typeof CAPABILITIES['projects:read']).toBe('string')
+  test('a method and a server method under agents:message (2.77.0), since 2.76.0', () => {
+    expect(METHODS['projects.mine']).toBe('agents:message')
+    expect(Object.hasOwn(CAPABILITIES, 'projects:read')).toBe(false)
     expect(METHOD_SINCE['projects.mine']).toBe('2.76.0')
-    expect(CAPABILITY_SINCE['projects:read']).toBe('2.76.0')
+    expect(Object.hasOwn(CAPABILITY_SINCE, 'projects:read')).toBe(false)
     expect((SERVER_METHODS as readonly string[]).includes('projects.mine')).toBe(true)
     expect(SERVER_METHOD_SINCE['projects.mine']).toBe('2.76.0')
     expect(methodResults['projects.mine']).toBe(projectsMineResult)
+  })
+  test('asking it needs nothing a module that runs agent sessions does not already declare (2.77.0)', () => {
+    expect(needsOf({ protocol: 2, declares: { uses: ['agents:message'] } }).version).toBe('2.41.0')
   })
   test('takes nothing and names no project', () => {
     expect(methodParams['projects.mine'].safeParse({}).success).toBe(true)

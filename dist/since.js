@@ -78,7 +78,6 @@ export const CAPABILITY_SINCE = {
     'dispositions:read': '2.21.0',
     'agents:message': '2.41.0',
     'messages:as-person': '2.50.0',
-    'projects:read': '2.76.0',
 };
 /** Each method a module's server may ask (`SERVER_METHODS`), and the version a server could first ask it in. */
 export const SERVER_METHOD_SINCE = {
@@ -275,7 +274,6 @@ export const PIECE_SAID = {
         'dispositions:read': 'marks for why references closed, from the host',
         'agents:message': 'messages between agent sessions',
         'messages:as-person': 'messages to agent sessions as the person',
-        'projects:read': 'the projects it keeps something in',
     },
     declarations: {
         'mcp.subjects': 'door subjects',

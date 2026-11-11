@@ -7,6 +7,21 @@ version listed: each one added something a module may ignore.
 Consumers install this package from git (`#main`, pinned by their lockfile), so a version here is a
 label on a commit rather than a published artifact. See [PACKAGING.md](PACKAGING.md).
 
+## 2.77.0 — 2026-11-11
+
+`projects.mine` is asked under `agents:message`. `PROTOCOL` is still 2.
+[docs/server-ask.md](docs/server-ask.md), "The projects a module keeps something in".
+
+### Changed
+
+- **`projects.mine`** is filed under **`agents:message`** in `METHODS`, and the capability
+  `projects:read` that 2.76.0 added for it is gone (no module declared it and no host answered it).
+  The method exists so that messages reach a module's asleep sessions after a restart, and every
+  module that runs agent sessions already declares `agents:message`. A new word in `declares.uses`
+  made a host older than 2.76.0 show the whole module as needing a newer Kehikot (`fitOf`); now such
+  a host answers `unknown-method`, `watchKnownProjects` stops asking, and the module goes on as
+  before. The answer is still only the projects in which the asking module's own folder exists.
+
 ## 2.76.0 — 2026-11-11
 
 The projects a module keeps something in, asked from its server at start. **Additive**; `PROTOCOL` is

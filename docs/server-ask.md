@@ -75,7 +75,7 @@ watchKnownProjects({ module: ID, know: (path) => runs.know(path) }).start()
 
 | method | capability | answered with |
 |---|---|---|
-| `projects.mine` | `projects:read` | `projectsMineResult`: `{ projects: PickedProject[] }` (names no project) |
+| `projects.mine` | `agents:message` (since 2.77.0) | `projectsMineResult`: `{ projects: PickedProject[] }` (names no project) |
 
 The host answers from the person's own list of projects, keeping only those in which the ASKING
 module's folder exists (`moduleDir(project, module)`): projects the module wrote into itself. Never
@@ -83,11 +83,17 @@ the whole list, never a folder the module has kept nothing in, never the unpicke
 module learns nothing about the disk it did not already hold — the reason `projects.pick` has no
 listing beside it still stands.
 
+2.77.0 files it under `agents:message`, where 2.76.0 had a capability of its own (`projects:read`).
+It exists so that messages reach a module's asleep sessions, and every module that runs agent
+sessions already declares `agents:message`. A new capability in `declares.uses` made a host older
+than 2.76.0 show the whole module as needing a newer Kehikot (`fitOf`), where the point was for it
+to go on as before with this one question unanswered.
+
 `watchKnownProjects({ module, know, everyMs?, retryMs?, log? })` asks at once, and then
 `KNOWN_PROJECTS_EVERY_MS` (5 minutes) after each answer, or `KNOWN_PROJECTS_RETRY_MS` (15 s) while no
 host answers (Kehikot is still starting). It hands each project to `know(path, project)` once per
 process. A host older than 2.76.0, or one that refuses the grant (the manifest does not declare
-`projects:read`), is asked no more, and the module goes on as before 2.76.0. `tick()` asks once and
+`agents:message`), is asked no more, and the module goes on as before 2.76.0. `tick()` asks once and
 says what it added; `known()` lists what it has handed over. Never throws.
 
 ## Who is asking: the pass

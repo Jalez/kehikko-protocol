@@ -14,7 +14,7 @@ import { askHost } from './ask.js';
  *     watchKnownProjects({ module: ID, know: (path) => runs.know(path) }).start()
  *
  * On a host that does not answer `projects.mine` (older than 2.76.0, or the manifest does not declare
- * `projects:read`) it stops asking, and the module goes on as before: it learns of a project when a
+ * `agents:message`) it stops asking, and the module goes on as before: it learns of a project when a
  * page or a session names it. Never throws.
  */
 /** How often the host is asked again once it has answered, in ms: a project added meanwhile is picked up on this clock. */
