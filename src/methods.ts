@@ -14,6 +14,7 @@ import { dispositionSchema } from './context.js'
 import { stepsListResult } from './plan.js'
 import { gotoProject, showAskSchema } from './show.js'
 import { trafficNoteResult, trafficNoteSchema, trafficReadResult } from './traffic.js'
+import { inboxActParams, inboxActResult, inboxAnswerParams, inboxAnswerResult, inboxLogParams, inboxLogResult, inboxOpenParams, inboxOpenResult, inboxReadParams, inboxReadResult, inboxUseParams, inboxUseResult } from './inbox.js'
 import { messageMineParams, messageMineResult, messageNotifyParams, messagePostParams, messageReadParams, messageReadResult, messageSayParams, messageSendParams, messageSendResult, messageTellParams } from './agent-messages.js'
 
 /**
@@ -172,6 +173,13 @@ export const CAPABILITIES = {
    * takes such a message as its person's instruction. Never asked by a module's server or an agent.
    */
   'messages:as-person': 'Send what you type or press in this module to agent sessions as your own instruction — only on your press, and only once you allow it in its settings.',
+  /**
+   * 2.79.0. Show the person's Inbox — the host's one record of what modules need, are doing and have
+   * said — and act on it for them: mark seen, dismiss, forget, answer a question, go to an item, stop
+   * showing a module (`inbox.*`, `inbox.ts`). Only from this module's PAGE, every act but `seen` only
+   * on the person's press there; never asked by a module's server or an agent.
+   */
+  'inbox:person': 'Show your Inbox — what modules need, are doing and have said — and, on your press, mark it seen, dismiss, forget, answer or go to it.',
 } as const
 
 export type Capability = keyof typeof CAPABILITIES
@@ -238,6 +246,18 @@ export const METHODS = {
    * capability it does not know.
    */
   'projects.mine': 'agents:message',
+  /** The person's Inbox, read by a module's page (2.79.0). */
+  'inbox.read': 'inbox:person',
+  /** Earlier: the Inbox's log, a page of it (2.79.0). */
+  'inbox.log': 'inbox:person',
+  /** Seen, dismiss, forget, seen-all: the person's acts on Inbox items, from a page (2.79.0). */
+  'inbox.act': 'inbox:person',
+  /** The person's answer to an item's question, from a page on their press (2.79.0). */
+  'inbox.answer': 'inbox:person',
+  /** Go to where an item happened, from a page on the person's press (2.79.0). */
+  'inbox.open': 'inbox:person',
+  /** The person's "Use inbox" for one module, from a page on their press (2.79.0). */
+  'inbox.use': 'inbox:person',
 } as const satisfies Record<string, Capability>
 
 export type Method = keyof typeof METHODS
@@ -590,6 +610,18 @@ export const methodParams = {
    * module's server (`SERVER_METHODS`) or its page.
    */
   'projects.mine': z.object({}),
+  /** 2.79.0. From a page only: the person's Inbox; answered with `inboxReadResult`. See `inbox.ts`. */
+  'inbox.read': inboxReadParams,
+  /** 2.79.0. From a page only: a page of Earlier; answered with `inboxLogResult`. */
+  'inbox.log': inboxLogParams,
+  /** 2.79.0. From a page only, on the person's press but for `seen`: answered with `inboxActResult`. */
+  'inbox.act': inboxActParams,
+  /** 2.79.0. From a page only, on the person's press: answered with `inboxAnswerResult`. */
+  'inbox.answer': inboxAnswerParams,
+  /** 2.79.0. From a page only, on the person's press (or a host's `next`): answered with `inboxOpenResult`. */
+  'inbox.open': inboxOpenParams,
+  /** 2.79.0. From a page only, on the person's press: answered with `inboxUseResult`. */
+  'inbox.use': inboxUseParams,
 } as const satisfies Record<Method, z.ZodTypeAny>
 
 /** The params one method takes, as a caller must construct them. */
@@ -828,6 +860,12 @@ export const methodResults: Partial<Record<Method, z.ZodTypeAny>> = {
   'messages.tell': messageSendResult,
   'messages.say': messageSendResult,
   'projects.mine': projectsMineResult,
+  'inbox.read': inboxReadResult,
+  'inbox.log': inboxLogResult,
+  'inbox.act': inboxActResult,
+  'inbox.answer': inboxAnswerResult,
+  'inbox.open': inboxOpenResult,
+  'inbox.use': inboxUseResult,
 }
 
 /** The schema for one method's answer, or nothing — which means unspecified. */

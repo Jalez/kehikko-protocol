@@ -156,6 +156,12 @@ export declare const MESSAGE: {
      * `HOLD_COVER_MS` passes. A host before 2.70.0 lifts its cover on `ready` and drops this unread.
      */
     readonly DRAWN: "kehikot.drawn";
+    /**
+     * Host → module (2.79.0). "The person's Inbox changed: read it again", or "they asked for the next
+     * thing that needs them: go to it". Sent only to a frame whose manifest declares `inbox:person`.
+     * No answer. See `inbox.ts` and docs/inbox.md.
+     */
+    readonly INBOX: "kehikot.inbox";
 };
 /**
  * 2.70.0. The longest a page asks a host to keep its cover up after `kehikot.ready` with `hold: true`,
@@ -173,7 +179,7 @@ export declare const MESSAGE_PREFIX = "kehikot.";
  * dropped without a word; a type that is listed and does not parse is a fault worth reporting.
  * See docs/header.md, "A message type the other side does not know".
  */
-export declare const HOST_MESSAGES: readonly ["kehikot.hello", "kehikot.context", "kehikot.response", "kehikot.goto", "kehikot.event", "kehikot.clear", "kehikot.refresh", "kehikot.press", "kehikot.opened", "kehikot.covered", "kehikot.visible", "kehikot.find"];
+export declare const HOST_MESSAGES: readonly ["kehikot.hello", "kehikot.context", "kehikot.response", "kehikot.goto", "kehikot.event", "kehikot.clear", "kehikot.refresh", "kehikot.press", "kehikot.opened", "kehikot.covered", "kehikot.visible", "kehikot.find", "kehikot.inbox"];
 /** And what the module says. */
 export declare const MODULE_MESSAGES: readonly ["kehikot.ready", "kehikot.request", "kehikot.resize", "kehikot.went", "kehikot.filters", "kehikot.clearable", "kehikot.refreshable", "kehikot.header", "kehikot.pressed", "kehikot.footer", "kehikot.pointer", "kehikot.page.error", "kehikot.find.result", "kehikot.find.open", "kehikot.drawn"];
 /**

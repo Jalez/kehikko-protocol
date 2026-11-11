@@ -366,6 +366,10 @@ export function hostStore(id, events = {}, options = {}) {
                         change({ visible });
                     events.onVisible?.(visible);
                 },
+                onInbox: (signal) => {
+                    if (!stopped)
+                        events.onInbox?.(signal);
+                },
                 /* Only when the page takes presses: without a listener the connection answers for it. */
                 ...(events.onPress ? { onPress: (press) => (stopped ? false : events.onPress(press)) } : {}),
                 /* 2.69.0. Only when the page searches itself: without a listener the client searches the page. */

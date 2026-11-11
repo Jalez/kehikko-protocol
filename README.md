@@ -203,6 +203,7 @@ The same list with what each version exported is in [CHANGELOG.md](CHANGELOG.md)
 
 | version | date | what it added |
 |---|---|---|
+| 2.79.0 | 2026-11-11 | Additive. The person's Inbox, shown by a module's page: `inbox:person` with `inbox.read`, `inbox.log`, `inbox.act`, `inbox.answer`, `inbox.open` and `inbox.use` — page-only (`PERSON_METHODS`, never a server method), every act but reading and `seen` on the person's press (`actNeedsPress`) — and `kehikot.inbox` (`changed`, `next`) with `onInbox`. See [inbox](docs/inbox.md). |
 | 2.78.0 | 2026-11-11 | Additive. Edit guards: `tool: 'edit'` with `match.paths` (`~/` or absolute, `*` and `**`), `match.checkouts: ['main']` (a repository's main checkout, not a linked worktree) and `allowPaths`, deny only; `editDecision`, `pathMatches`, `editedPaths`, and `checkoutOf` in `/serve`. shadcn's chart in `client/ui/chart`, with one tooltip at a time (`useTip`). See [asking](docs/asking.md). |
 | 2.77.0 | 2026-11-11 | `projects.mine` is asked under `agents:message`, which every agent module already declares; `projects:read` is gone, so a module asking it still runs on an older host. See [server ask](docs/server-ask.md). |
 | 2.76.0 | 2026-11-11 | Additive. `projects.mine` (under `agents:message` since 2.77.0), also a server method: the person's projects in which the asking module keeps its folder. `watchKnownProjects` in `/serve` asks it at start and on a slow clock and hands each to the module's `know`. See [server ask](docs/server-ask.md). |

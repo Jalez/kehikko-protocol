@@ -184,7 +184,7 @@ export declare const trafficCallSchema: z.ZodObject<{
     status: number | null;
     kind: string;
     by: string;
-    side: "out" | "in" | "seen";
+    side: "seen" | "out" | "in";
     host: string;
     reason: string | null;
     ok: boolean | null;
@@ -209,7 +209,7 @@ export declare const trafficCallSchema: z.ZodObject<{
     path: string;
     kind: string;
     by: string;
-    side: "out" | "in" | "seen";
+    side: "seen" | "out" | "in";
     host: string;
     reported: "module" | "host" | "sampled";
     seq: number;
@@ -1229,7 +1229,7 @@ export declare const trafficReadResult: z.ZodObject<{
         status: number | null;
         kind: string;
         by: string;
-        side: "out" | "in" | "seen";
+        side: "seen" | "out" | "in";
         host: string;
         reason: string | null;
         ok: boolean | null;
@@ -1254,7 +1254,7 @@ export declare const trafficReadResult: z.ZodObject<{
         path: string;
         kind: string;
         by: string;
-        side: "out" | "in" | "seen";
+        side: "seen" | "out" | "in";
         host: string;
         reported: "module" | "host" | "sampled";
         seq: number;
@@ -1967,7 +1967,7 @@ export declare const trafficReadResult: z.ZodObject<{
         status: number | null;
         kind: string;
         by: string;
-        side: "out" | "in" | "seen";
+        side: "seen" | "out" | "in";
         host: string;
         reason: string | null;
         ok: boolean | null;
@@ -2097,7 +2097,7 @@ export declare const trafficReadResult: z.ZodObject<{
         path: string;
         kind: string;
         by: string;
-        side: "out" | "in" | "seen";
+        side: "seen" | "out" | "in";
         host: string;
         reported: "module" | "host" | "sampled";
         seq: number;
