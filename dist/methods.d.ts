@@ -306,7 +306,7 @@ export declare const methodParams: {
      * `kehikot.goto` carries. Unlike `gotoSchema`, an epic alone is allowed; a call that names none
      * of epic, step or ref is refused.
      */
-    readonly 'view.goto': z.ZodEffects<z.ZodEffects<z.ZodEffects<z.ZodObject<{
+    readonly 'view.goto': z.ZodEffects<z.ZodEffects<z.ZodEffects<z.ZodEffects<z.ZodObject<{
         epic: z.ZodOptional<z.ZodString>;
         step: z.ZodOptional<z.ZodNumber>;
         /**
@@ -344,7 +344,14 @@ export declare const methodParams: {
             id: string;
             subject: string;
         }>>;
+        /**
+         * 2.89.0. The space to stand in, as a path of ids (`spaces.ts`), with the `epic` it is in (its
+         * first id), so a host before 2.89.0, which strips it, still goes to that epic. Deeper than
+         * `parts` can say; send `parts` too (`epicPartsOf`) for such a host.
+         */
+        space: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
     }, "strip", z.ZodTypeAny, {
+        space?: string[] | undefined;
         epic?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
@@ -356,6 +363,7 @@ export declare const methodParams: {
         ref?: string | undefined;
         step?: number | undefined;
     }, {
+        space?: string[] | undefined;
         epic?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
@@ -367,6 +375,7 @@ export declare const methodParams: {
         ref?: string | undefined;
         step?: number | undefined;
     }>, {
+        space?: string[] | undefined;
         epic?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
@@ -378,6 +387,7 @@ export declare const methodParams: {
         ref?: string | undefined;
         step?: number | undefined;
     }, {
+        space?: string[] | undefined;
         epic?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
@@ -389,6 +399,7 @@ export declare const methodParams: {
         ref?: string | undefined;
         step?: number | undefined;
     }>, {
+        space?: string[] | undefined;
         epic?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
@@ -400,6 +411,7 @@ export declare const methodParams: {
         ref?: string | undefined;
         step?: number | undefined;
     }, {
+        space?: string[] | undefined;
         epic?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
@@ -411,6 +423,7 @@ export declare const methodParams: {
         ref?: string | undefined;
         step?: number | undefined;
     }>, {
+        space?: string[] | undefined;
         epic?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
@@ -422,6 +435,31 @@ export declare const methodParams: {
         ref?: string | undefined;
         step?: number | undefined;
     }, {
+        space?: string[] | undefined;
+        epic?: string | undefined;
+        parts?: string[] | undefined;
+        kehikko?: string | undefined;
+        project?: string | undefined;
+        show?: {
+            id: string;
+            subject: string;
+        } | undefined;
+        ref?: string | undefined;
+        step?: number | undefined;
+    }>, {
+        space?: string[] | undefined;
+        epic?: string | undefined;
+        parts?: string[] | undefined;
+        kehikko?: string | undefined;
+        project?: string | undefined;
+        show?: {
+            id: string;
+            subject: string;
+        } | undefined;
+        ref?: string | undefined;
+        step?: number | undefined;
+    }, {
+        space?: string[] | undefined;
         epic?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
@@ -1203,15 +1241,28 @@ export declare const methodParams: {
             id: z.ZodString;
             state: z.ZodEnum<["working", "attention", "done"]>;
             label: z.ZodString;
-            place: z.ZodOptional<z.ZodObject<{
+            place: z.ZodOptional<z.ZodEffects<z.ZodObject<{
                 epic: z.ZodOptional<z.ZodString>;
                 parts: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
                 kehikko: z.ZodOptional<z.ZodString>;
+                space: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
             }, "strip", z.ZodTypeAny, {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
             }, {
+                space?: string[] | undefined;
+                epic?: string | undefined;
+                parts?: string[] | undefined;
+                kehikko?: string | undefined;
+            }>, {
+                space?: string[] | undefined;
+                epic?: string | undefined;
+                parts?: string[] | undefined;
+                kehikko?: string | undefined;
+            }, {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1270,6 +1321,7 @@ export declare const methodParams: {
             } | undefined;
             project?: string | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1288,6 +1340,7 @@ export declare const methodParams: {
             question?: unknown;
             project?: string | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1314,6 +1367,7 @@ export declare const methodParams: {
             } | undefined;
             project?: string | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1332,6 +1386,7 @@ export declare const methodParams: {
             question?: unknown;
             project?: string | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1358,6 +1413,7 @@ export declare const methodParams: {
             } | undefined;
             project?: string | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1376,6 +1432,7 @@ export declare const methodParams: {
             question?: unknown;
             project?: string | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1404,6 +1461,7 @@ export declare const methodParams: {
             } | undefined;
             project?: string | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1424,6 +1482,7 @@ export declare const methodParams: {
             question?: unknown;
             project?: string | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1567,31 +1626,48 @@ export declare const methodParams: {
         body: z.ZodString;
         to: z.ZodOptional<z.ZodEffects<z.ZodObject<{
             project: z.ZodOptional<z.ZodLiteral<true>>;
-            place: z.ZodOptional<z.ZodEffects<z.ZodEffects<z.ZodObject<{
+            place: z.ZodOptional<z.ZodEffects<z.ZodEffects<z.ZodEffects<z.ZodObject<{
                 epic: z.ZodOptional<z.ZodString>;
                 parts: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
                 kehikko: z.ZodOptional<z.ZodString>;
+                space: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
             }, "strip", z.ZodTypeAny, {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
             }, {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
             }>, {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
             }, {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
             }>, {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
             }, {
+                space?: string[] | undefined;
+                epic?: string | undefined;
+                parts?: string[] | undefined;
+                kehikko?: string | undefined;
+            }>, {
+                space?: string[] | undefined;
+                epic?: string | undefined;
+                parts?: string[] | undefined;
+                kehikko?: string | undefined;
+            }, {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1615,6 +1691,7 @@ export declare const methodParams: {
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1627,6 +1704,7 @@ export declare const methodParams: {
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1639,6 +1717,7 @@ export declare const methodParams: {
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1651,6 +1730,7 @@ export declare const methodParams: {
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1669,6 +1749,7 @@ export declare const methodParams: {
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1689,6 +1770,7 @@ export declare const methodParams: {
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1709,6 +1791,7 @@ export declare const methodParams: {
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1729,6 +1812,7 @@ export declare const methodParams: {
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1777,31 +1861,48 @@ export declare const methodParams: {
         body: z.ZodString;
         to: z.ZodEffects<z.ZodObject<{
             project: z.ZodOptional<z.ZodLiteral<true>>;
-            place: z.ZodOptional<z.ZodEffects<z.ZodEffects<z.ZodObject<{
+            place: z.ZodOptional<z.ZodEffects<z.ZodEffects<z.ZodEffects<z.ZodObject<{
                 epic: z.ZodOptional<z.ZodString>;
                 parts: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
                 kehikko: z.ZodOptional<z.ZodString>;
+                space: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
             }, "strip", z.ZodTypeAny, {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
             }, {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
             }>, {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
             }, {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
             }>, {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
             }, {
+                space?: string[] | undefined;
+                epic?: string | undefined;
+                parts?: string[] | undefined;
+                kehikko?: string | undefined;
+            }>, {
+                space?: string[] | undefined;
+                epic?: string | undefined;
+                parts?: string[] | undefined;
+                kehikko?: string | undefined;
+            }, {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1825,6 +1926,7 @@ export declare const methodParams: {
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1837,6 +1939,7 @@ export declare const methodParams: {
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1849,6 +1952,7 @@ export declare const methodParams: {
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1861,6 +1965,7 @@ export declare const methodParams: {
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1877,6 +1982,7 @@ export declare const methodParams: {
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1897,6 +2003,7 @@ export declare const methodParams: {
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1917,6 +2024,7 @@ export declare const methodParams: {
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1937,6 +2045,7 @@ export declare const methodParams: {
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1969,43 +2078,62 @@ export declare const methodParams: {
     /** 2.75.0. From a module's server: its news to every session at a place; answered with `messageSendResult`. */
     readonly 'messages.tell': z.ZodObject<{
         to: z.ZodObject<{
-            place: z.ZodEffects<z.ZodEffects<z.ZodObject<{
+            place: z.ZodEffects<z.ZodEffects<z.ZodEffects<z.ZodObject<{
                 epic: z.ZodOptional<z.ZodString>;
                 parts: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
                 kehikko: z.ZodOptional<z.ZodString>;
+                space: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
             }, "strip", z.ZodTypeAny, {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
             }, {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
             }>, {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
             }, {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
             }>, {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
             }, {
+                space?: string[] | undefined;
+                epic?: string | undefined;
+                parts?: string[] | undefined;
+                kehikko?: string | undefined;
+            }>, {
+                space?: string[] | undefined;
+                epic?: string | undefined;
+                parts?: string[] | undefined;
+                kehikko?: string | undefined;
+            }, {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
             }>;
         }, "strip", z.ZodTypeAny, {
             place: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
             };
         }, {
             place: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -2017,6 +2145,7 @@ export declare const methodParams: {
     }, "strip", z.ZodTypeAny, {
         to: {
             place: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -2028,6 +2157,7 @@ export declare const methodParams: {
     }, {
         to: {
             place: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -2048,31 +2178,48 @@ export declare const methodParams: {
         body: z.ZodString;
         to: z.ZodEffects<z.ZodObject<{
             project: z.ZodOptional<z.ZodLiteral<true>>;
-            place: z.ZodOptional<z.ZodEffects<z.ZodEffects<z.ZodObject<{
+            place: z.ZodOptional<z.ZodEffects<z.ZodEffects<z.ZodEffects<z.ZodObject<{
                 epic: z.ZodOptional<z.ZodString>;
                 parts: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
                 kehikko: z.ZodOptional<z.ZodString>;
+                space: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
             }, "strip", z.ZodTypeAny, {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
             }, {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
             }>, {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
             }, {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
             }>, {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
             }, {
+                space?: string[] | undefined;
+                epic?: string | undefined;
+                parts?: string[] | undefined;
+                kehikko?: string | undefined;
+            }>, {
+                space?: string[] | undefined;
+                epic?: string | undefined;
+                parts?: string[] | undefined;
+                kehikko?: string | undefined;
+            }, {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -2096,6 +2243,7 @@ export declare const methodParams: {
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -2108,6 +2256,7 @@ export declare const methodParams: {
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -2120,6 +2269,7 @@ export declare const methodParams: {
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -2132,6 +2282,7 @@ export declare const methodParams: {
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -2147,6 +2298,7 @@ export declare const methodParams: {
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -2166,6 +2318,7 @@ export declare const methodParams: {
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -2185,6 +2338,7 @@ export declare const methodParams: {
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -2204,6 +2358,7 @@ export declare const methodParams: {
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -2393,23 +2548,40 @@ export declare const methodParams: {
         project?: number | undefined;
     }>;
     /** 2.88.0. From a page only, on the person's press: answered with `inboxAdoptResult`. */
-    readonly 'inbox.adopt': z.ZodObject<{
+    readonly 'inbox.adopt': z.ZodEffects<z.ZodObject<{
         module: z.ZodString;
         id: z.ZodString;
         project: z.ZodOptional<z.ZodNumber>;
     } & {
         epic: z.ZodString;
         parts: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
+        space: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
     }, "strip", z.ZodTypeAny, {
         id: string;
         epic: string;
         parts: string[];
         module: string;
+        space?: string[] | undefined;
         project?: number | undefined;
     }, {
         id: string;
         epic: string;
         module: string;
+        space?: string[] | undefined;
+        parts?: string[] | undefined;
+        project?: number | undefined;
+    }>, {
+        id: string;
+        epic: string;
+        parts: string[];
+        module: string;
+        space?: string[] | undefined;
+        project?: number | undefined;
+    }, {
+        id: string;
+        epic: string;
+        module: string;
+        space?: string[] | undefined;
         parts?: string[] | undefined;
         project?: number | undefined;
     }>;
@@ -2470,13 +2642,13 @@ export declare const navigationResult: z.ZodObject<{
     epic: z.ZodDefault<z.ZodNullable<z.ZodString>>;
     why: z.ZodDefault<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
+    why: string;
     epic: string | null;
     outcome: "declined" | "moved" | "no-such-target";
-    why: string;
 }, {
     outcome: "declined" | "moved" | "no-such-target";
-    epic?: string | null | undefined;
     why?: string | undefined;
+    epic?: string | null | undefined;
 }>;
 export type NavigationResult = z.infer<typeof navigationResult>;
 /**
@@ -2498,8 +2670,8 @@ export declare const foldResult: z.ZodObject<{
     unfolded: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
     why: z.ZodDefault<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    outcome: "declined" | "changed" | "unchanged" | "no-such-container";
     why: string;
+    outcome: "declined" | "changed" | "unchanged" | "no-such-container";
     folded: string[];
     unfolded: string[];
 }, {
@@ -2521,8 +2693,8 @@ export declare const expandResult: z.ZodObject<{
     outcome: z.ZodEnum<["expanded", "shrunk", "unchanged", "declined"]>;
     why: z.ZodDefault<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    outcome: "declined" | "unchanged" | "expanded" | "shrunk";
     why: string;
+    outcome: "declined" | "unchanged" | "expanded" | "shrunk";
 }, {
     outcome: "declined" | "unchanged" | "expanded" | "shrunk";
     why?: string | undefined;
@@ -2562,20 +2734,20 @@ export declare const partsSetResult: z.ZodObject<{
     why: z.ZodDefault<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     id: string | null;
+    why: string;
     parts: {
         id: string;
         name: string;
     }[];
     outcome: "declined" | "changed" | "unchanged" | "no-such-part";
-    why: string;
 }, {
     outcome: "declined" | "changed" | "unchanged" | "no-such-part";
     id?: string | null | undefined;
+    why?: string | undefined;
     parts?: {
         id: string;
         name: string;
     }[] | undefined;
-    why?: string | undefined;
 }>;
 export type PartsSetResult = z.infer<typeof partsSetResult>;
 /**
@@ -2596,8 +2768,8 @@ export declare const activitySetResult: z.ZodObject<{
      */
     projects: z.ZodOptional<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
-    outcome: "declined" | "taken";
     why: string;
+    outcome: "declined" | "taken";
     taken: number;
     projects?: boolean | undefined;
 }, {
@@ -2618,8 +2790,8 @@ export declare const locationSetResult: z.ZodObject<{
     outcome: z.ZodEnum<["taken", "not-selected", "declined"]>;
     why: z.ZodDefault<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    outcome: "declined" | "taken" | "not-selected";
     why: string;
+    outcome: "declined" | "taken" | "not-selected";
 }, {
     outcome: "declined" | "taken" | "not-selected";
     why?: string | undefined;
@@ -2638,8 +2810,8 @@ export declare const addressOpenResult: z.ZodObject<{
     outcome: z.ZodEnum<["shown", "offered", "declined"]>;
     why: z.ZodDefault<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    outcome: "declined" | "shown" | "offered";
     why: string;
+    outcome: "declined" | "shown" | "offered";
 }, {
     outcome: "declined" | "shown" | "offered";
     why?: string | undefined;
@@ -2719,36 +2891,36 @@ export declare const partsGetResult: z.ZodObject<{
         documents: z.ZodOptional<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">>;
     }, "strip", z.ZodTypeAny, {
         id: string;
+        picked: boolean;
         refs: string[];
         heading: string;
-        picked: boolean;
         documents?: string[] | undefined;
         files?: string[] | undefined;
     }, {
         id: string;
+        picked?: boolean | undefined;
         refs?: string[] | undefined;
         documents?: string[] | undefined;
         files?: string[] | undefined;
         heading?: string | undefined;
-        picked?: boolean | undefined;
     }>, "many">;
 }, "strip", z.ZodTypeAny, {
     parts: {
         id: string;
+        picked: boolean;
         refs: string[];
         heading: string;
-        picked: boolean;
         documents?: string[] | undefined;
         files?: string[] | undefined;
     }[];
 }, {
     parts: {
         id: string;
+        picked?: boolean | undefined;
         refs?: string[] | undefined;
         documents?: string[] | undefined;
         files?: string[] | undefined;
         heading?: string | undefined;
-        picked?: boolean | undefined;
     }[];
 }>;
 export type PartsGetResult = z.infer<typeof partsGetResult>;
@@ -2878,21 +3050,21 @@ export declare const projectPickResult: z.ZodObject<{
     }>>>;
     why: z.ZodDefault<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
+    why: string;
     project: {
         path: string;
         name: string;
         id?: string | undefined;
     } | null;
-    outcome: "declined" | "picked" | "cancelled";
-    why: string;
+    outcome: "picked" | "declined" | "cancelled";
 }, {
-    outcome: "declined" | "picked" | "cancelled";
+    outcome: "picked" | "declined" | "cancelled";
+    why?: string | undefined;
     project?: {
         path: string;
         id?: string | undefined;
         name?: string | undefined;
     } | null | undefined;
-    why?: string | undefined;
 }>;
 export type ProjectPickResult = z.infer<typeof projectPickResult>;
 /**

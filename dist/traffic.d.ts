@@ -2150,8 +2150,8 @@ export declare const trafficNoteResult: z.ZodObject<{
     taken: z.ZodDefault<z.ZodNumber>;
     why: z.ZodDefault<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    outcome: "declined" | "taken";
     why: string;
+    outcome: "declined" | "taken";
     taken: number;
 }, {
     outcome: "declined" | "taken";

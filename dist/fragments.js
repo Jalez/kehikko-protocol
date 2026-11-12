@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { EPIC_SLUG, KEHIKKO_KEY } from './ids.js';
 import { LIMITS } from './limits.js';
+import { SPACE_WITH_EPIC, placeSpace, spaceGoesWithEpic } from './spaces.js';
 /**
  * Schema fragments that more than one file spells, written once: a reference, a step number, the
  * kehikko something happened on. Nothing here is exported from the package.
@@ -45,11 +46,15 @@ export const placeKehikko = z.string().regex(KEHIKKO_KEY);
  * A place, as a notification line and an activity item both carry it (1.4.0, 1.5.0): the epic, the
  * parts to pick out, the kehikko to be on. A press answers with `view.goto` carrying the same three.
  */
-export const placeSchema = z.object({
+export const placeSchema = z
+    .object({
     epic: z.string().regex(EPIC_SLUG).optional(),
     parts: placeParts.optional(),
     kehikko: placeKehikko.optional(),
-});
+    /** 2.89.0. The space, as a path of ids, with the `epic` it is in (its first id); see `spaces.ts`. */
+    space: placeSpace.optional(),
+})
+    .refine(spaceGoesWithEpic, { message: SPACE_WITH_EPIC, path: ['space'] });
 /** Both ends of a span are named, or neither is: a half-range is malformed. */
 export const bothEndsOrNeither = (span) => (span.from === null) === (span.to === null);
 /** A span that names its ends ends after it starts. */

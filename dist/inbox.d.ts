@@ -866,8 +866,8 @@ export declare const inboxActResult: z.ZodObject<{
     changed: z.ZodDefault<z.ZodNumber>;
     why: z.ZodDefault<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    outcome: "declined" | "done";
     why: string;
+    outcome: "declined" | "done";
     changed: number;
 }, {
     outcome: "declined" | "done";
@@ -915,8 +915,8 @@ export declare const inboxAnswerResult: z.ZodObject<{
     outcome: z.ZodEnum<["sent", "declined"]>;
     why: z.ZodDefault<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    outcome: "sent" | "declined";
     why: string;
+    outcome: "sent" | "declined";
 }, {
     outcome: "sent" | "declined";
     why?: string | undefined;
@@ -949,8 +949,8 @@ export declare const inboxOpenResult: z.ZodObject<{
     outcome: z.ZodEnum<["opened", "declined", "no-such-item"]>;
     why: z.ZodDefault<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    outcome: "declined" | "opened" | "no-such-item";
     why: string;
+    outcome: "declined" | "opened" | "no-such-item";
 }, {
     outcome: "declined" | "opened" | "no-such-item";
     why?: string | undefined;
@@ -976,8 +976,8 @@ export declare const inboxUseResult: z.ZodObject<{
     changed: z.ZodDefault<z.ZodNumber>;
     why: z.ZodDefault<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    outcome: "declined" | "done";
     why: string;
+    outcome: "declined" | "done";
     changed: number;
 }, {
     outcome: "declined" | "done";
@@ -1050,12 +1050,16 @@ export declare const conversationPlaceSchema: z.ZodObject<{
     epic: z.ZodNullable<z.ZodString>;
     parts: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
     kehikko: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+    /** 2.89.0. The space by ids, with the `epic` it is in; absent when the place says only epic and parts. */
+    space: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
 }, "strip", z.ZodTypeAny, {
     epic: string | null;
     parts: string[];
     kehikko: string | null;
+    space?: string[] | undefined;
 }, {
     epic: string | null;
+    space?: string[] | undefined;
     parts?: string[] | undefined;
     kehikko?: string | null | undefined;
 }>;
@@ -1181,17 +1185,25 @@ export declare const inboxAdoptionResult: z.ZodObject<{
         parts: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
         why: z.ZodString;
         sure: z.ZodBoolean;
+        space: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
     }, "strip", z.ZodTypeAny, {
+        why: string;
         epic: string;
         parts: string[];
-        why: string;
         sure: boolean;
+        space?: string[] | undefined;
     }, {
-        epic: string;
         why: string;
+        epic: string;
         sure: boolean;
+        space?: string[] | undefined;
         parts?: string[] | undefined;
     }>>>;
+    /**
+     * 2.89.0. The project's whole tree of spaces (`spaces.ts`), so a page can adopt into a space at any
+     * depth. Absent from a host before 2.89.0: then `epics` and their `parts` are the two levels.
+     */
+    spaces: z.ZodOptional<z.ZodArray<z.ZodType<import("./spaces.js").SpaceNode, z.ZodTypeDef, unknown>, "many">>;
     conversations: z.ZodDefault<z.ZodArray<z.ZodObject<{
         /** The agent module that runs it (the provider `services.find` answered). */
         module: z.ZodString;
@@ -1248,20 +1260,23 @@ export declare const inboxAdoptionResult: z.ZodObject<{
         parts: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
         conversations: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
         why: z.ZodString;
+        space: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
     }, "strip", z.ZodTypeAny, {
+        why: string;
         epic: string;
         parts: string[];
-        why: string;
         conversations: string[];
+        space?: string[] | undefined;
     }, {
-        epic: string;
         why: string;
+        epic: string;
+        space?: string[] | undefined;
         parts?: string[] | undefined;
         conversations?: string[] | undefined;
     }>>>;
 }, "strip", z.ZodTypeAny, {
-    outcome: "declined" | "no-such-item" | "ok";
     why: string;
+    outcome: "declined" | "no-such-item" | "ok";
     agent: {
         name: string;
         module: string;
@@ -1285,10 +1300,11 @@ export declare const inboxAdoptionResult: z.ZodObject<{
         title: string;
     }[];
     suggested: {
+        why: string;
         epic: string;
         parts: string[];
-        why: string;
         sure: boolean;
+        space?: string[] | undefined;
     } | null;
     conversations: {
         module: string;
@@ -1303,11 +1319,13 @@ export declare const inboxAdoptionResult: z.ZodObject<{
         comes: boolean;
     }[];
     proposal: {
+        why: string;
         epic: string;
         parts: string[];
-        why: string;
         conversations: string[];
+        space?: string[] | undefined;
     } | null;
+    spaces?: import("./spaces.js").SpaceNode[] | undefined;
 }, {
     outcome: "declined" | "no-such-item" | "ok";
     why?: string | undefined;
@@ -1334,11 +1352,13 @@ export declare const inboxAdoptionResult: z.ZodObject<{
         refs?: string[] | undefined;
     }[] | undefined;
     suggested?: {
-        epic: string;
         why: string;
+        epic: string;
         sure: boolean;
+        space?: string[] | undefined;
         parts?: string[] | undefined;
     } | null | undefined;
+    spaces?: unknown[] | undefined;
     conversations?: {
         module: string;
         session: string;
@@ -1352,31 +1372,53 @@ export declare const inboxAdoptionResult: z.ZodObject<{
         comes?: boolean | undefined;
     }[] | undefined;
     proposal?: {
-        epic: string;
         why: string;
+        epic: string;
+        space?: string[] | undefined;
         parts?: string[] | undefined;
         conversations?: string[] | undefined;
     } | null | undefined;
 }>;
 export type InboxAdoptionResult = z.infer<typeof inboxAdoptionResult>;
 /** `inbox.adopt`: the item, the epic and the parts to add its ref to. On the person's press only. */
-export declare const inboxAdoptParams: z.ZodObject<{
+export declare const inboxAdoptParams: z.ZodEffects<z.ZodObject<{
     module: z.ZodString;
     id: z.ZodString;
     project: z.ZodOptional<z.ZodNumber>;
 } & {
     epic: z.ZodString;
     parts: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
+    /**
+     * 2.89.0. The space to adopt into, by ids, with the `epic` it is in (its first id). A host before
+     * 2.89.0 strips it and adopts into `epic` and `parts`, which a page fills by `epicPartsOf`.
+     */
+    space: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
 }, "strip", z.ZodTypeAny, {
     id: string;
     epic: string;
     parts: string[];
     module: string;
+    space?: string[] | undefined;
     project?: number | undefined;
 }, {
     id: string;
     epic: string;
     module: string;
+    space?: string[] | undefined;
+    parts?: string[] | undefined;
+    project?: number | undefined;
+}>, {
+    id: string;
+    epic: string;
+    parts: string[];
+    module: string;
+    space?: string[] | undefined;
+    project?: number | undefined;
+}, {
+    id: string;
+    epic: string;
+    module: string;
+    space?: string[] | undefined;
     parts?: string[] | undefined;
     project?: number | undefined;
 }>;
@@ -1393,9 +1435,9 @@ export declare const inboxAdoptResult: z.ZodObject<{
         outcome: z.ZodEnum<["brought", "elsewhere", "failed"]>;
         why: z.ZodDefault<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
+        why: string;
         session: string;
         outcome: "elsewhere" | "brought" | "failed";
-        why: string;
         title: string;
         program: string;
     }, {
@@ -1407,13 +1449,13 @@ export declare const inboxAdoptResult: z.ZodObject<{
     }>, "many">>;
     why: z.ZodDefault<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    outcome: "declined" | "no-such-item" | "adopted";
     why: string;
+    outcome: "declined" | "no-such-item" | "adopted";
     said: string;
     brought: {
+        why: string;
         session: string;
         outcome: "elsewhere" | "brought" | "failed";
-        why: string;
         title: string;
         program: string;
     }[];
@@ -1448,8 +1490,8 @@ export declare const inboxAdoptWithResult: z.ZodObject<{
     outcome: z.ZodEnum<["opened", "no-agent", "declined", "no-such-item"]>;
     why: z.ZodDefault<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    outcome: "declined" | "opened" | "no-such-item" | "no-agent";
     why: string;
+    outcome: "declined" | "opened" | "no-such-item" | "no-agent";
 }, {
     outcome: "declined" | "opened" | "no-such-item" | "no-agent";
     why?: string | undefined;
@@ -1474,8 +1516,8 @@ export declare const inboxUntrackResult: z.ZodObject<{
     changed: z.ZodDefault<z.ZodNumber>;
     why: z.ZodDefault<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    outcome: "declined" | "done";
     why: string;
+    outcome: "declined" | "done";
     changed: number;
 }, {
     outcome: "declined" | "done";
@@ -1501,8 +1543,8 @@ export declare const inboxUndoResult: z.ZodObject<{
     changed: z.ZodDefault<z.ZodNumber>;
     why: z.ZodDefault<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    outcome: "declined" | "done";
     why: string;
+    outcome: "declined" | "done";
     changed: number;
 }, {
     outcome: "declined" | "done";

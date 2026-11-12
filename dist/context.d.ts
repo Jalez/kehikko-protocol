@@ -957,26 +957,82 @@ export declare const contextSchema: z.ZodObject<{
         documents: z.ZodOptional<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">>;
     }, "strip", z.ZodTypeAny, {
         id: string;
+        picked: boolean;
         refs: string[];
         heading: string;
-        picked: boolean;
         documents?: string[] | undefined;
         files?: string[] | undefined;
     }, {
         id: string;
+        picked?: boolean | undefined;
         refs?: string[] | undefined;
         documents?: string[] | undefined;
         files?: string[] | undefined;
         heading?: string | undefined;
-        picked?: boolean | undefined;
     }>, "many">>;
+    /**
+     * 2.89.0. The space the person stands in (`spaces.ts`): its id, its path from the top-level space,
+     * and the children picked out together, if any. Null when no space is open, on "All spaces", and
+     * from a host before 2.89.0. `epic` and `parts` are still filled from it (`epicPartsOf`) for modules
+     * that read them; a module that knows spaces narrows with `spaceWithin(context.space, …)`.
+     */
+    space: z.ZodDefault<z.ZodNullable<z.ZodEffects<z.ZodObject<{
+        id: z.ZodString;
+        path: z.ZodArray<z.ZodObject<{
+            id: z.ZodString;
+            name: z.ZodCatch<z.ZodString>;
+        }, "strip", z.ZodTypeAny, {
+            id: string;
+            name: string;
+        }, {
+            id: string;
+            name?: unknown;
+        }>, "many">;
+        picked: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
+    }, "strip", z.ZodTypeAny, {
+        path: {
+            id: string;
+            name: string;
+        }[];
+        id: string;
+        picked: string[];
+    }, {
+        path: {
+            id: string;
+            name?: unknown;
+        }[];
+        id: string;
+        picked?: string[] | undefined;
+    }>, {
+        path: {
+            id: string;
+            name: string;
+        }[];
+        id: string;
+        picked: string[];
+    }, {
+        path: {
+            id: string;
+            name?: unknown;
+        }[];
+        id: string;
+        picked?: string[] | undefined;
+    }>>>;
 }, "strip", z.ZodTypeAny, {
+    space: {
+        path: {
+            id: string;
+            name: string;
+        }[];
+        id: string;
+        picked: string[];
+    } | null;
     epic: string | null;
     parts: {
         id: string;
+        picked: boolean;
         refs: string[];
         heading: string;
-        picked: boolean;
         documents?: string[] | undefined;
         files?: string[] | undefined;
     }[];
@@ -1073,14 +1129,22 @@ export declare const contextSchema: z.ZodObject<{
     } | undefined;
     kept?: string | null | undefined;
 }, {
+    space?: {
+        path: {
+            id: string;
+            name?: unknown;
+        }[];
+        id: string;
+        picked?: string[] | undefined;
+    } | null | undefined;
     epic?: string | null | undefined;
     parts?: {
         id: string;
+        picked?: boolean | undefined;
         refs?: string[] | undefined;
         documents?: string[] | undefined;
         files?: string[] | undefined;
         heading?: string | undefined;
-        picked?: boolean | undefined;
     }[] | undefined;
     kehikko?: {
         id: number;

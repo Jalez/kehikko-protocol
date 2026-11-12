@@ -158,15 +158,28 @@ export declare const activityItemSchema: z.ZodEffects<z.ZodObject<{
     /** A short line a person recognises the thing by. REFUSED, not clipped, when longer. */
     label: z.ZodString;
     /** Where the thing belongs; the shape `kehikot.notifications@1` and `view.goto` use. Absent: the project. */
-    place: z.ZodOptional<z.ZodObject<{
+    place: z.ZodOptional<z.ZodEffects<z.ZodObject<{
         epic: z.ZodOptional<z.ZodString>;
         parts: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         kehikko: z.ZodOptional<z.ZodString>;
+        space: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
     }, "strip", z.ZodTypeAny, {
+        space?: string[] | undefined;
         epic?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
     }, {
+        space?: string[] | undefined;
+        epic?: string | undefined;
+        parts?: string[] | undefined;
+        kehikko?: string | undefined;
+    }>, {
+        space?: string[] | undefined;
+        epic?: string | undefined;
+        parts?: string[] | undefined;
+        kehikko?: string | undefined;
+    }, {
+        space?: string[] | undefined;
         epic?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
@@ -249,6 +262,7 @@ export declare const activityItemSchema: z.ZodEffects<z.ZodObject<{
     } | undefined;
     project?: string | undefined;
     place?: {
+        space?: string[] | undefined;
         epic?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
@@ -267,6 +281,7 @@ export declare const activityItemSchema: z.ZodEffects<z.ZodObject<{
     question?: unknown;
     project?: string | undefined;
     place?: {
+        space?: string[] | undefined;
         epic?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
@@ -293,6 +308,7 @@ export declare const activityItemSchema: z.ZodEffects<z.ZodObject<{
     } | undefined;
     project?: string | undefined;
     place?: {
+        space?: string[] | undefined;
         epic?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
@@ -311,6 +327,7 @@ export declare const activityItemSchema: z.ZodEffects<z.ZodObject<{
     question?: unknown;
     project?: string | undefined;
     place?: {
+        space?: string[] | undefined;
         epic?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
@@ -332,15 +349,28 @@ export declare const activityItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z
     /** A short line a person recognises the thing by. REFUSED, not clipped, when longer. */
     label: z.ZodString;
     /** Where the thing belongs; the shape `kehikot.notifications@1` and `view.goto` use. Absent: the project. */
-    place: z.ZodOptional<z.ZodObject<{
+    place: z.ZodOptional<z.ZodEffects<z.ZodObject<{
         epic: z.ZodOptional<z.ZodString>;
         parts: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         kehikko: z.ZodOptional<z.ZodString>;
+        space: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
     }, "strip", z.ZodTypeAny, {
+        space?: string[] | undefined;
         epic?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
     }, {
+        space?: string[] | undefined;
+        epic?: string | undefined;
+        parts?: string[] | undefined;
+        kehikko?: string | undefined;
+    }>, {
+        space?: string[] | undefined;
+        epic?: string | undefined;
+        parts?: string[] | undefined;
+        kehikko?: string | undefined;
+    }, {
+        space?: string[] | undefined;
         epic?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
@@ -423,6 +453,7 @@ export declare const activityItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z
     } | undefined;
     project?: string | undefined;
     place?: {
+        space?: string[] | undefined;
         epic?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
@@ -441,6 +472,7 @@ export declare const activityItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z
     question?: unknown;
     project?: string | undefined;
     place?: {
+        space?: string[] | undefined;
         epic?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
@@ -467,6 +499,7 @@ export declare const activityItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z
     } | undefined;
     project?: string | undefined;
     place?: {
+        space?: string[] | undefined;
         epic?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
@@ -485,6 +518,7 @@ export declare const activityItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z
     question?: unknown;
     project?: string | undefined;
     place?: {
+        space?: string[] | undefined;
         epic?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
@@ -511,6 +545,7 @@ export declare const activityItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z
     } | undefined;
     project?: string | undefined;
     place?: {
+        space?: string[] | undefined;
         epic?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
@@ -529,6 +564,7 @@ export declare const activityItemsSchema: z.ZodEffects<z.ZodArray<z.ZodEffects<z
     question?: unknown;
     project?: string | undefined;
     place?: {
+        space?: string[] | undefined;
         epic?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;

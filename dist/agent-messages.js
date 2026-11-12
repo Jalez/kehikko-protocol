@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { EPIC_SLUG, KEHIKKO_KEY, MODULE_ID } from './ids.js';
+import { SPACE_WITH_EPIC, placeSpace, spaceGoesWithEpic } from './spaces.js';
 import { LIMITS } from './limits.js';
 /**
  * 2.41.0. Messages between agent sessions: one agent session tells another — or every session at a
@@ -69,7 +70,13 @@ export const messagePlaceSchema = z
     epic: z.string().regex(EPIC_SLUG).optional(),
     parts: z.array(z.string().regex(EPIC_SLUG)).min(1).max(LIMITS.PARTS).optional(),
     kehikko: z.string().regex(KEHIKKO_KEY).optional(),
+    /**
+     * 2.89.0. Only with `epic` (its first id): the sessions whose space is this one or under it
+     * (`spaceWithin`). A host before 2.89.0 drops it and reaches what `epic` and `parts` say.
+     */
+    space: placeSpace.optional(),
 })
+    .refine(spaceGoesWithEpic, { message: SPACE_WITH_EPIC, path: ['space'] })
     .refine((place) => place.epic !== undefined || place.kehikko !== undefined, { message: 'a place names an epic, a kehikko or both' })
     .refine((place) => place.parts === undefined || place.epic !== undefined, { message: 'parts belong to an epic: a place with parts names its epic', path: ['parts'] });
 /**
@@ -93,6 +100,8 @@ export const messageFromPlaceSchema = z.object({
     epic: z.string().regex(EPIC_SLUG).nullable(),
     parts: z.array(z.string().regex(EPIC_SLUG)).max(LIMITS.PARTS).catch([]),
     kehikko: z.string().regex(KEHIKKO_KEY).nullable(),
+    /** 2.89.0. The sender's space by ids, when its record keeps one; absent from an older host. */
+    space: placeSpace.nullable().optional().catch(undefined),
 });
 /**
  * One message, as a host hands it out (`messages.read`, and `messages` in its answer to

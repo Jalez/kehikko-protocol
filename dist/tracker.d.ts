@@ -1817,8 +1817,8 @@ export declare const trackerRefreshResult: z.ZodObject<{
     why: z.ZodDefault<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     at: string | null;
-    outcome: "declined" | "failed" | "read";
     why: string;
+    outcome: "declined" | "failed" | "read";
 }, {
     outcome: "declined" | "failed" | "read";
     at?: string | null | undefined;

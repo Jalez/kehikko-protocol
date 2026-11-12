@@ -6,6 +6,7 @@ import { EPIC_SLUG, KEHIKKO_KEY, MODULE_ID, PROJECT_ID, own } from './ids.js'
 import { skillNameSchema } from './skills.js'
 import { kehikkoSkillsSchema } from './kehikko-skills.js'
 import { placedGuardsSchema } from './guards.js'
+import { doorSpace, epicPartsOf, spaceFromEpicParts, spaceIdsSchema, spacePathSchema, spaceSaid } from './spaces.js'
 
 /**
  * What a module's MCP door agrees with every other module's: how its tools spell the two context
@@ -106,6 +107,8 @@ export const lookingSchema = z.object({
   epic: z.string().regex(EPIC_SLUG).nullable(),
   parts: z.array(z.string().regex(EPIC_SLUG)).max(LIMITS.PARTS).catch([]),
   kehikko: placeKehikko.nullable().catch(null),
+  /** 2.89.0. The space on screen, root first with names; absent from an older host (read `epic`/`parts`). */
+  space: spacePathSchema.nullable().optional().catch(undefined),
 })
 export type Looking = z.infer<typeof lookingSchema>
 
@@ -126,6 +129,12 @@ export const doorPlaceSchema = z.object({
   parts: z.array(z.string().regex(EPIC_SLUG)).max(LIMITS.PARTS),
   kehikko: placeKehikko.nullable(),
   looking: lookingSchema.nullable().optional().catch(null),
+  /**
+   * 2.89.0. The conversation's space, root first with names (`spaces.ts`), which may be deeper than
+   * `epic` and `parts` can say: those stay filled by `epicPartsOf`. Absent from an older host, and for
+   * a record that says only an epic and parts — then read `spaceFromEpicParts(epic, parts)`.
+   */
+  space: spacePathSchema.nullable().optional().catch(undefined),
 })
 export type DoorPlace = z.infer<typeof doorPlaceSchema>
 
@@ -263,6 +272,8 @@ export const recordedPlaceResult = z.object({
       epic: z.string().regex(EPIC_SLUG).nullable(),
       parts: z.array(z.string().regex(EPIC_SLUG)).max(LIMITS.PARTS),
       kehikko: z.string().regex(KEHIKKO_KEY).nullable(),
+      /** 2.89.0. The space the record keeps, by ids, when it keeps one deeper than epic and parts say. */
+      space: spaceIdsSchema.nullable().optional().catch(undefined),
     })
     .nullable(),
 })
@@ -294,8 +305,41 @@ export function placeDefaults(
   return { project: place.project, epic, parts: epic === place.epic ? [...place.parts] : [], from: took ? 'session' : 'arguments' }
 }
 
-const namedPlace = (p: { epic: string | null; parts: readonly string[]; kehikko: { key: string; name?: string } | null }): string =>
-  `${p.epic ? `epic ${p.epic}` : 'no epic'}${p.parts.length ? ` (parts ${p.parts.join(', ')})` : ''}${p.kehikko ? ` on kehikko ${p.kehikko.name ? `"${p.kehikko.name}"` : p.kehikko.key}` : ''}`
+/**
+ * 2.89.0. `placeDefaults` with spaces: the same rule, with a `space` argument (`doorSpace`) beside
+ * `epic`. A path names its epic (its first id) and its parts (`epicPartsOf`); a bare id is returned
+ * in `spaceId` for the door to resolve against its tree (`findSpace`). `space` is the call's space as
+ * a path of ids: the argument's, else the session's (its `space`, or read from its epic and parts),
+ * else the named epic alone; null for none. Pure.
+ */
+export function placeSpaceDefaults(
+  args: Record<string, unknown>,
+  place: DoorPlace | null,
+): { project: string | null; epic: string | null; parts: string[]; from: PlaceSource; space: string[] | null; spaceId: string | null } {
+  const asked = doorSpace(args)
+  const askedIds = asked && 'ids' in asked ? asked.ids : null
+  const spaceId = asked && 'id' in asked ? asked.id : null
+  const base = placeDefaults(askedIds ? { ...args, epic: askedIds[0] } : args, place)
+  if (askedIds) return { ...base, parts: epicPartsOf(askedIds).parts, space: [...askedIds], spaceId }
+  const sameSession = !!place && base.project === place.project && base.epic === place.epic
+  const fromSession = sameSession
+    ? place!.space
+      ? place!.space.map((step) => step.id)
+      : (spaceFromEpicParts(place!.epic, place!.parts)?.ids ?? null)
+    : null
+  return { ...base, space: fromSession ?? (base.epic ? [base.epic] : null), spaceId }
+}
+
+const namedPlace = (p: {
+  epic: string | null
+  parts: readonly string[]
+  kehikko: { key: string; name?: string } | null
+  space?: readonly { id: string; name?: string }[] | null
+}): string => {
+  const older = `${p.epic ? `epic ${p.epic}` : 'no epic'}${p.parts.length ? ` (parts ${p.parts.join(', ')})` : ''}`
+  const where = p.space && p.space.length ? `space ${spaceSaid(p.space)} (${older})` : older
+  return `${where}${p.kehikko ? ` on kehikko ${p.kehikko.name ? `"${p.kehikko.name}"` : p.kehikko.key}` : ''}`
+}
 
 /**
  * The sentences a door says about a session's place, in one wording for every module (2.4.0).
@@ -315,7 +359,11 @@ export const DOOR_PLACE_SAYS = {
     if (now === undefined) return ''
     if (now === null) return 'No page of Kehikot is open, so the person is not looking at anything there now.'
     const same = now.projectId === place.projectId && now.epic === place.epic && now.kehikko?.key === place.kehikko?.key
-    const sameParts = same && [...now.parts].sort().join('+') === [...place.parts].sort().join('+')
+    const ids = (space: readonly { id: string }[] | null | undefined) => (space ?? []).map((step) => step.id).join('/')
+    const sameParts =
+      same &&
+      [...now.parts].sort().join('+') === [...place.parts].sort().join('+') &&
+      (now.space === undefined || place.space === undefined || ids(now.space) === ids(place.space))
     if (sameParts) return 'The person is looking at this place now.'
     const where = `${now.projectId !== place.projectId && now.project ? `${now.project}, ` : ''}${namedPlace(now)}`
     return `The person is looking at something else now (${where}); this conversation's place has not changed.`

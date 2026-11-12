@@ -47,15 +47,29 @@ export declare const placeKehikko: z.ZodString;
  * A place, as a notification line and an activity item both carry it (1.4.0, 1.5.0): the epic, the
  * parts to pick out, the kehikko to be on. A press answers with `view.goto` carrying the same three.
  */
-export declare const placeSchema: z.ZodObject<{
+export declare const placeSchema: z.ZodEffects<z.ZodObject<{
     epic: z.ZodOptional<z.ZodString>;
     parts: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
     kehikko: z.ZodOptional<z.ZodString>;
+    /** 2.89.0. The space, as a path of ids, with the `epic` it is in (its first id); see `spaces.ts`. */
+    space: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
 }, "strip", z.ZodTypeAny, {
+    space?: string[] | undefined;
     epic?: string | undefined;
     parts?: string[] | undefined;
     kehikko?: string | undefined;
 }, {
+    space?: string[] | undefined;
+    epic?: string | undefined;
+    parts?: string[] | undefined;
+    kehikko?: string | undefined;
+}>, {
+    space?: string[] | undefined;
+    epic?: string | undefined;
+    parts?: string[] | undefined;
+    kehikko?: string | undefined;
+}, {
+    space?: string[] | undefined;
     epic?: string | undefined;
     parts?: string[] | undefined;
     kehikko?: string | undefined;

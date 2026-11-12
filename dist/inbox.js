@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { LIMITS } from './limits.js';
 import { EPIC_SLUG, KEHIKKO_KEY } from './ids.js';
+import { SPACE_WITH_EPIC, placeSpace, spaceGoesWithEpic, spaceNodeSchema } from './spaces.js';
 import { ACTIVITY_PRIORITIES, ACTIVITY_STATES } from './activity.js';
 /**
  * 2.79.0. The person's Inbox, shown by a module's PAGE: the host keeps ONE record of what modules
@@ -276,6 +277,8 @@ export const conversationPlaceSchema = z.object({
     epic: epicSlug.nullable(),
     parts: z.array(partId).max(LIMITS.PARTS).default([]),
     kehikko: z.string().regex(KEHIKKO_KEY).nullable().default(null),
+    /** 2.89.0. The space by ids, with the `epic` it is in; absent when the place says only epic and parts. */
+    space: placeSpace.optional(),
 });
 /**
  * How a conversation is known to have worked on an item, strongest first: it `created` the change, it
@@ -334,21 +337,42 @@ export const inboxAdoptionResult = z.object({
      * The epic the host would suggest, and why ("the same repository as its other refs"); `sure` when it
      * is the only epic that matches, so a page may offer it as one press. Never adopted by itself.
      */
-    suggested: z.object({ epic: epicSlug, parts: z.array(partId).max(LIMITS.PARTS).default([]), why: z.string().max(LIMITS.REASON), sure: z.boolean() }).nullable().default(null),
+    suggested: z
+        .object({ epic: epicSlug, parts: z.array(partId).max(LIMITS.PARTS).default([]), why: z.string().max(LIMITS.REASON), sure: z.boolean(), space: placeSpace.optional() })
+        .nullable()
+        .default(null),
+    /**
+     * 2.89.0. The project's whole tree of spaces (`spaces.ts`), so a page can adopt into a space at any
+     * depth. Absent from a host before 2.89.0: then `epics` and their `parts` are the two levels.
+     */
+    spaces: z.array(spaceNodeSchema).max(LIMITS.SPACES).optional(),
     conversations: z.array(adoptionConversationSchema).max(20).default([]),
     /** The person's agent for Kehikot's own tasks (`inbox.adoptWith`); null when none is picked. */
     agent: z.object({ module: z.string().min(1).max(64), name: z.string().max(LIMITS.TITLE) }).nullable().default(null),
     /** An agent's proposal, when one was made for this item: what the dialog offers to confirm. */
     proposal: z
-        .object({ epic: epicSlug, parts: z.array(partId).max(LIMITS.PARTS).default([]), conversations: z.array(z.string().min(1).max(128)).max(20).default([]), why: z.string().max(LIMITS.REASON) })
+        .object({
+        epic: epicSlug,
+        parts: z.array(partId).max(LIMITS.PARTS).default([]),
+        conversations: z.array(z.string().min(1).max(128)).max(20).default([]),
+        why: z.string().max(LIMITS.REASON),
+        space: placeSpace.optional(),
+    })
         .nullable()
         .default(null),
 });
 /** `inbox.adopt`: the item, the epic and the parts to add its ref to. On the person's press only. */
-export const inboxAdoptParams = inboxItemKeyParams.extend({
+export const inboxAdoptParams = inboxItemKeyParams
+    .extend({
     epic: epicSlug,
     parts: z.array(partId).max(LIMITS.PARTS).default([]),
-});
+    /**
+     * 2.89.0. The space to adopt into, by ids, with the `epic` it is in (its first id). A host before
+     * 2.89.0 strips it and adopts into `epic` and `parts`, which a page fills by `epicPartsOf`.
+     */
+    space: placeSpace.optional(),
+})
+    .refine(spaceGoesWithEpic, { message: SPACE_WITH_EPIC, path: ['space'] });
 /** What became of one conversation when an item was adopted. */
 export const ADOPT_BROUGHT = ['brought', 'elsewhere', 'failed'];
 export const inboxAdoptResult = z.object({

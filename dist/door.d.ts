@@ -78,6 +78,17 @@ export declare const lookingSchema: z.ZodObject<{
         key: string;
         name?: unknown;
     }>>>;
+    /** 2.89.0. The space on screen, root first with names; absent from an older host (read `epic`/`parts`). */
+    space: z.ZodCatch<z.ZodOptional<z.ZodNullable<z.ZodArray<z.ZodObject<{
+        id: z.ZodString;
+        name: z.ZodCatch<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        id: string;
+        name: string;
+    }, {
+        id: string;
+        name?: unknown;
+    }>, "many">>>>;
 }, "strip", z.ZodTypeAny, {
     epic: string | null;
     parts: string[];
@@ -87,8 +98,13 @@ export declare const lookingSchema: z.ZodObject<{
     } | null;
     project: string | null;
     projectId: string | null;
+    space?: {
+        id: string;
+        name: string;
+    }[] | null | undefined;
 }, {
     epic: string | null;
+    space?: unknown;
     parts?: unknown;
     kehikko?: unknown;
     project?: unknown;
@@ -135,6 +151,17 @@ export declare const doorPlaceSchema: z.ZodObject<{
             key: string;
             name?: unknown;
         }>>>;
+        /** 2.89.0. The space on screen, root first with names; absent from an older host (read `epic`/`parts`). */
+        space: z.ZodCatch<z.ZodOptional<z.ZodNullable<z.ZodArray<z.ZodObject<{
+            id: z.ZodString;
+            name: z.ZodCatch<z.ZodString>;
+        }, "strip", z.ZodTypeAny, {
+            id: string;
+            name: string;
+        }, {
+            id: string;
+            name?: unknown;
+        }>, "many">>>>;
     }, "strip", z.ZodTypeAny, {
         epic: string | null;
         parts: string[];
@@ -144,13 +171,33 @@ export declare const doorPlaceSchema: z.ZodObject<{
         } | null;
         project: string | null;
         projectId: string | null;
+        space?: {
+            id: string;
+            name: string;
+        }[] | null | undefined;
     }, {
         epic: string | null;
+        space?: unknown;
         parts?: unknown;
         kehikko?: unknown;
         project?: unknown;
         projectId?: unknown;
     }>>>>;
+    /**
+     * 2.89.0. The conversation's space, root first with names (`spaces.ts`), which may be deeper than
+     * `epic` and `parts` can say: those stay filled by `epicPartsOf`. Absent from an older host, and for
+     * a record that says only an epic and parts — then read `spaceFromEpicParts(epic, parts)`.
+     */
+    space: z.ZodCatch<z.ZodOptional<z.ZodNullable<z.ZodArray<z.ZodObject<{
+        id: z.ZodString;
+        name: z.ZodCatch<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        id: string;
+        name: string;
+    }, {
+        id: string;
+        name?: unknown;
+    }>, "many">>>>;
 }, "strip", z.ZodTypeAny, {
     epic: string | null;
     parts: string[];
@@ -161,6 +208,10 @@ export declare const doorPlaceSchema: z.ZodObject<{
     project: string;
     token: string;
     projectId: string;
+    space?: {
+        id: string;
+        name: string;
+    }[] | null | undefined;
     conversation?: string | undefined;
     projectName?: string | undefined;
     looking?: {
@@ -172,6 +223,10 @@ export declare const doorPlaceSchema: z.ZodObject<{
         } | null;
         project: string | null;
         projectId: string | null;
+        space?: {
+            id: string;
+            name: string;
+        }[] | null | undefined;
     } | null | undefined;
 }, {
     epic: string | null;
@@ -183,6 +238,7 @@ export declare const doorPlaceSchema: z.ZodObject<{
     project: string;
     token: string;
     projectId: string;
+    space?: unknown;
     conversation?: unknown;
     projectName?: unknown;
     looking?: unknown;
@@ -225,6 +281,17 @@ export declare const placeResult: z.ZodObject<{
                 key: string;
                 name?: unknown;
             }>>>;
+            /** 2.89.0. The space on screen, root first with names; absent from an older host (read `epic`/`parts`). */
+            space: z.ZodCatch<z.ZodOptional<z.ZodNullable<z.ZodArray<z.ZodObject<{
+                id: z.ZodString;
+                name: z.ZodCatch<z.ZodString>;
+            }, "strip", z.ZodTypeAny, {
+                id: string;
+                name: string;
+            }, {
+                id: string;
+                name?: unknown;
+            }>, "many">>>>;
         }, "strip", z.ZodTypeAny, {
             epic: string | null;
             parts: string[];
@@ -234,13 +301,33 @@ export declare const placeResult: z.ZodObject<{
             } | null;
             project: string | null;
             projectId: string | null;
+            space?: {
+                id: string;
+                name: string;
+            }[] | null | undefined;
         }, {
             epic: string | null;
+            space?: unknown;
             parts?: unknown;
             kehikko?: unknown;
             project?: unknown;
             projectId?: unknown;
         }>>>>;
+        /**
+         * 2.89.0. The conversation's space, root first with names (`spaces.ts`), which may be deeper than
+         * `epic` and `parts` can say: those stay filled by `epicPartsOf`. Absent from an older host, and for
+         * a record that says only an epic and parts — then read `spaceFromEpicParts(epic, parts)`.
+         */
+        space: z.ZodCatch<z.ZodOptional<z.ZodNullable<z.ZodArray<z.ZodObject<{
+            id: z.ZodString;
+            name: z.ZodCatch<z.ZodString>;
+        }, "strip", z.ZodTypeAny, {
+            id: string;
+            name: string;
+        }, {
+            id: string;
+            name?: unknown;
+        }>, "many">>>>;
     }, "strip", z.ZodTypeAny, {
         epic: string | null;
         parts: string[];
@@ -251,6 +338,10 @@ export declare const placeResult: z.ZodObject<{
         project: string;
         token: string;
         projectId: string;
+        space?: {
+            id: string;
+            name: string;
+        }[] | null | undefined;
         conversation?: string | undefined;
         projectName?: string | undefined;
         looking?: {
@@ -262,6 +353,10 @@ export declare const placeResult: z.ZodObject<{
             } | null;
             project: string | null;
             projectId: string | null;
+            space?: {
+                id: string;
+                name: string;
+            }[] | null | undefined;
         } | null | undefined;
     }, {
         epic: string | null;
@@ -273,6 +368,7 @@ export declare const placeResult: z.ZodObject<{
         project: string;
         token: string;
         projectId: string;
+        space?: unknown;
         conversation?: unknown;
         projectName?: unknown;
         looking?: unknown;
@@ -290,6 +386,10 @@ export declare const placeResult: z.ZodObject<{
         project: string;
         token: string;
         projectId: string;
+        space?: {
+            id: string;
+            name: string;
+        }[] | null | undefined;
         conversation?: string | undefined;
         projectName?: string | undefined;
         looking?: {
@@ -301,6 +401,10 @@ export declare const placeResult: z.ZodObject<{
             } | null;
             project: string | null;
             projectId: string | null;
+            space?: {
+                id: string;
+                name: string;
+            }[] | null | undefined;
         } | null | undefined;
     } | null;
     ok: true;
@@ -316,6 +420,7 @@ export declare const placeResult: z.ZodObject<{
         project: string;
         token: string;
         projectId: string;
+        space?: unknown;
         conversation?: unknown;
         projectName?: unknown;
         looking?: unknown;
@@ -509,13 +614,16 @@ export declare const placeDoorsSchema: z.ZodObject<{
                 epic: z.ZodNullable<z.ZodString>;
                 parts: z.ZodCatch<z.ZodArray<z.ZodString, "many">>;
                 kehikko: z.ZodNullable<z.ZodString>;
+                space: z.ZodCatch<z.ZodOptional<z.ZodNullable<z.ZodArray<z.ZodString, "many">>>>;
             }, "strip", z.ZodTypeAny, {
                 epic: string | null;
                 parts: string[];
                 kehikko: string | null;
+                space?: string[] | null | undefined;
             }, {
                 epic: string | null;
                 kehikko: string | null;
+                space?: unknown;
                 parts?: unknown;
             }>;
             person: z.ZodCatch<z.ZodDefault<z.ZodBoolean>>;
@@ -527,6 +635,7 @@ export declare const placeDoorsSchema: z.ZodObject<{
                 epic: string | null;
                 parts: string[];
                 kehikko: string | null;
+                space?: string[] | null | undefined;
             };
             person: boolean;
         }, {
@@ -535,6 +644,7 @@ export declare const placeDoorsSchema: z.ZodObject<{
             place: {
                 epic: string | null;
                 kehikko: string | null;
+                space?: unknown;
                 parts?: unknown;
             };
             name?: unknown;
@@ -542,31 +652,48 @@ export declare const placeDoorsSchema: z.ZodObject<{
         }>;
         to: z.ZodEffects<z.ZodObject<{
             project: z.ZodOptional<z.ZodLiteral<true>>;
-            place: z.ZodOptional<z.ZodEffects<z.ZodEffects<z.ZodObject<{
+            place: z.ZodOptional<z.ZodEffects<z.ZodEffects<z.ZodEffects<z.ZodObject<{
                 epic: z.ZodOptional<z.ZodString>;
                 parts: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
                 kehikko: z.ZodOptional<z.ZodString>;
+                space: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
             }, "strip", z.ZodTypeAny, {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
             }, {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
             }>, {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
             }, {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
             }>, {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
             }, {
+                space?: string[] | undefined;
+                epic?: string | undefined;
+                parts?: string[] | undefined;
+                kehikko?: string | undefined;
+            }>, {
+                space?: string[] | undefined;
+                epic?: string | undefined;
+                parts?: string[] | undefined;
+                kehikko?: string | undefined;
+            }, {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -590,6 +717,7 @@ export declare const placeDoorsSchema: z.ZodObject<{
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -602,6 +730,7 @@ export declare const placeDoorsSchema: z.ZodObject<{
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -614,6 +743,7 @@ export declare const placeDoorsSchema: z.ZodObject<{
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -626,6 +756,7 @@ export declare const placeDoorsSchema: z.ZodObject<{
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -650,6 +781,7 @@ export declare const placeDoorsSchema: z.ZodObject<{
                 epic: string | null;
                 parts: string[];
                 kehikko: string | null;
+                space?: string[] | null | undefined;
             };
             person: boolean;
         };
@@ -661,6 +793,7 @@ export declare const placeDoorsSchema: z.ZodObject<{
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -681,6 +814,7 @@ export declare const placeDoorsSchema: z.ZodObject<{
             place: {
                 epic: string | null;
                 kehikko: string | null;
+                space?: unknown;
                 parts?: unknown;
             };
             name?: unknown;
@@ -694,6 +828,7 @@ export declare const placeDoorsSchema: z.ZodObject<{
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -794,6 +929,7 @@ export declare const placeDoorsSchema: z.ZodObject<{
                 epic: string | null;
                 parts: string[];
                 kehikko: string | null;
+                space?: string[] | null | undefined;
             };
             person: boolean;
         };
@@ -805,6 +941,7 @@ export declare const placeDoorsSchema: z.ZodObject<{
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -908,16 +1045,20 @@ export declare const recordedPlaceResult: z.ZodObject<{
         epic: z.ZodNullable<z.ZodString>;
         parts: z.ZodArray<z.ZodString, "many">;
         kehikko: z.ZodNullable<z.ZodString>;
+        /** 2.89.0. The space the record keeps, by ids, when it keeps one deeper than epic and parts say. */
+        space: z.ZodCatch<z.ZodOptional<z.ZodNullable<z.ZodArray<z.ZodString, "many">>>>;
     }, "strip", z.ZodTypeAny, {
         epic: string | null;
         parts: string[];
         kehikko: string | null;
         conversation: string;
+        space?: string[] | null | undefined;
     }, {
         epic: string | null;
         parts: string[];
         kehikko: string | null;
         conversation: string;
+        space?: unknown;
     }>>;
 }, "strip", z.ZodTypeAny, {
     place: {
@@ -925,6 +1066,7 @@ export declare const recordedPlaceResult: z.ZodObject<{
         parts: string[];
         kehikko: string | null;
         conversation: string;
+        space?: string[] | null | undefined;
     } | null;
     ok: true;
 }, {
@@ -933,6 +1075,7 @@ export declare const recordedPlaceResult: z.ZodObject<{
         parts: string[];
         kehikko: string | null;
         conversation: string;
+        space?: unknown;
     } | null;
     ok: true;
 }>;
@@ -952,6 +1095,21 @@ export declare function placeDefaults(args: Record<string, unknown>, place: Door
     epic: string | null;
     parts: string[];
     from: PlaceSource;
+};
+/**
+ * 2.89.0. `placeDefaults` with spaces: the same rule, with a `space` argument (`doorSpace`) beside
+ * `epic`. A path names its epic (its first id) and its parts (`epicPartsOf`); a bare id is returned
+ * in `spaceId` for the door to resolve against its tree (`findSpace`). `space` is the call's space as
+ * a path of ids: the argument's, else the session's (its `space`, or read from its epic and parts),
+ * else the named epic alone; null for none. Pure.
+ */
+export declare function placeSpaceDefaults(args: Record<string, unknown>, place: DoorPlace | null): {
+    project: string | null;
+    epic: string | null;
+    parts: string[];
+    from: PlaceSource;
+    space: string[] | null;
+    spaceId: string | null;
 };
 /**
  * The sentences a door says about a session's place, in one wording for every module (2.4.0).

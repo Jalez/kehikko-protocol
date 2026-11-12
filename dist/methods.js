@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { LIMITS } from './limits.js';
 import { EPIC_SLUG, MODULE_ID, PROJECT_ID } from './ids.js';
 import { gotoRef, placeKehikko, placeParts, ref, stepNumber } from './fragments.js';
+import { SPACE_WITH_EPIC, placeSpace, spaceGoesWithEpic } from './spaces.js';
 import { activityItemsSchema } from './activity.js';
 /**
  * `passageSchema` and `filterChoiceSchema` come from `wire.ts` so that both directions share one
@@ -357,7 +358,14 @@ export const methodParams = {
          * `moved`. Say `show` in `declares.navigates`.
          */
         show: showAskSchema.optional(),
+        /**
+         * 2.89.0. The space to stand in, as a path of ids (`spaces.ts`), with the `epic` it is in (its
+         * first id), so a host before 2.89.0, which strips it, still goes to that epic. Deeper than
+         * `parts` can say; send `parts` too (`epicPartsOf`) for such a host.
+         */
+        space: placeSpace.optional(),
     })
+        .refine(spaceGoesWithEpic, { message: SPACE_WITH_EPIC, path: ['space'] })
         .refine((g) => g.epic !== undefined || g.step !== undefined || g.ref !== undefined, {
         message: 'view.goto has to name an epic, a step or a ref; a call that names nothing asks for nothing',
     })
