@@ -14,7 +14,7 @@ import { dispositionSchema } from './context.js'
 import { stepsListResult } from './plan.js'
 import { gotoProject, showAskSchema } from './show.js'
 import { trafficNoteResult, trafficNoteSchema, trafficReadResult } from './traffic.js'
-import { inboxActParams, inboxActResult, inboxAnswerParams, inboxAnswerResult, inboxLogParams, inboxLogResult, inboxOpenParams, inboxOpenResult, inboxReadParams, inboxReadResult, inboxUseParams, inboxUseResult } from './inbox.js'
+import { inboxActParams, inboxActResult, inboxAnswerParams, inboxAnswerResult, inboxLogParams, inboxLogResult, inboxOpenParams, inboxOpenResult, inboxReadParams, inboxReadResult, inboxUseParams, inboxUseResult, inboxAdoptionParams, inboxAdoptionResult, inboxAdoptParams, inboxAdoptResult, inboxAdoptWithParams, inboxAdoptWithResult, inboxUntrackParams, inboxUntrackResult, inboxUndoParams, inboxUndoResult } from './inbox.js'
 import { servicesFindParams, servicesFindResult, sessionsPlaceOfParams, sessionsPlaceOfResult } from './services.js'
 import { messageMineParams, messageMineResult, messageNotifyParams, messageNotifySessionParams, messagePostParams, messageReadParams, messageReadResult, messageSayParams, messageSendParams, messageSendResult, messageTellParams } from './agent-messages.js'
 
@@ -283,6 +283,16 @@ export const METHODS = {
   'inbox.open': 'inbox:person',
   /** The person's "Use inbox" for one module, from a page on their press (2.79.0). */
   'inbox.use': 'inbox:person',
+  /** What a page needs to offer adopting a tracker item no epic names (2.88.0). A read. */
+  'inbox.adoption': 'inbox:person',
+  /** Add such an item's ref to an epic, from a page on the person's press (2.88.0). */
+  'inbox.adopt': 'inbox:person',
+  /** Open the host's adoption dialog with the person's agent, on their press (2.88.0). */
+  'inbox.adoptWith': 'inbox:person',
+  /** Tell nothing more about such an item's ref, on the person's press (2.88.0). */
+  'inbox.untrack': 'inbox:person',
+  /** Take back the last adopt or untrack of an item, on the person's press (2.88.0). */
+  'inbox.undo': 'inbox:person',
 } as const satisfies Record<string, Capability>
 
 export type Method = keyof typeof METHODS
@@ -653,6 +663,16 @@ export const methodParams = {
   'inbox.open': inboxOpenParams,
   /** 2.79.0. From a page only, on the person's press: answered with `inboxUseResult`. */
   'inbox.use': inboxUseParams,
+  /** 2.88.0. From a page only; a read: answered with `inboxAdoptionResult`. */
+  'inbox.adoption': inboxAdoptionParams,
+  /** 2.88.0. From a page only, on the person's press: answered with `inboxAdoptResult`. */
+  'inbox.adopt': inboxAdoptParams,
+  /** 2.88.0. From a page only, on the person's press: answered with `inboxAdoptWithResult`. */
+  'inbox.adoptWith': inboxAdoptWithParams,
+  /** 2.88.0. From a page only, on the person's press: answered with `inboxUntrackResult`. */
+  'inbox.untrack': inboxUntrackParams,
+  /** 2.88.0. From a page only, on the person's press: answered with `inboxUndoResult`. */
+  'inbox.undo': inboxUndoParams,
 } as const satisfies Record<Method, z.ZodTypeAny>
 
 /** The params one method takes, as a caller must construct them. */
@@ -900,6 +920,11 @@ export const methodResults: Partial<Record<Method, z.ZodTypeAny>> = {
   'inbox.answer': inboxAnswerResult,
   'inbox.open': inboxOpenResult,
   'inbox.use': inboxUseResult,
+  'inbox.adoption': inboxAdoptionResult,
+  'inbox.adopt': inboxAdoptResult,
+  'inbox.adoptWith': inboxAdoptWithResult,
+  'inbox.untrack': inboxUntrackResult,
+  'inbox.undo': inboxUndoResult,
 }
 
 /** The schema for one method's answer, or nothing — which means unspecified. */

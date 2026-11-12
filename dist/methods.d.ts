@@ -255,6 +255,16 @@ export declare const METHODS: {
     readonly 'inbox.open': "inbox:person";
     /** The person's "Use inbox" for one module, from a page on their press (2.79.0). */
     readonly 'inbox.use': "inbox:person";
+    /** What a page needs to offer adopting a tracker item no epic names (2.88.0). A read. */
+    readonly 'inbox.adoption': "inbox:person";
+    /** Add such an item's ref to an epic, from a page on the person's press (2.88.0). */
+    readonly 'inbox.adopt': "inbox:person";
+    /** Open the host's adoption dialog with the person's agent, on their press (2.88.0). */
+    readonly 'inbox.adoptWith': "inbox:person";
+    /** Tell nothing more about such an item's ref, on the person's press (2.88.0). */
+    readonly 'inbox.untrack': "inbox:person";
+    /** Take back the last adopt or untrack of an item, on the person's press (2.88.0). */
+    readonly 'inbox.undo': "inbox:person";
 };
 export type Method = keyof typeof METHODS;
 export declare const METHOD_NAMES: Method[];
@@ -1482,9 +1492,9 @@ export declare const methodParams: {
             path: string;
             status: number | null;
             kind: string;
-            host: string;
             reason: string | null;
             ok: boolean | null;
+            host: string;
             ms: number | null;
             bytesIn?: number | undefined;
             bytesOut?: number | undefined;
@@ -1508,9 +1518,9 @@ export declare const methodParams: {
             path: string;
             status: number | null;
             kind: string;
-            host: string;
             reason: string | null;
             ok: boolean | null;
+            host: string;
             ms: number | null;
             bytesIn?: number | undefined;
             bytesOut?: number | undefined;
@@ -2256,12 +2266,12 @@ export declare const methodParams: {
         limit: z.ZodDefault<z.ZodNumber>;
     }, "strip", z.ZodTypeAny, {
         limit: number;
-        offset: number;
         scope: "here" | "everywhere";
+        offset: number;
     }, {
         limit?: number | undefined;
-        offset?: number | undefined;
         scope?: "here" | "everywhere" | undefined;
+        offset?: number | undefined;
     }>;
     /** 2.79.0. From a page only, on the person's press but for `seen`: answered with `inboxActResult`. */
     readonly 'inbox.act': z.ZodEffects<z.ZodObject<{
@@ -2367,6 +2377,83 @@ export declare const methodParams: {
     }, {
         module: string;
         use: boolean;
+    }>;
+    /** 2.88.0. From a page only; a read: answered with `inboxAdoptionResult`. */
+    readonly 'inbox.adoption': z.ZodObject<{
+        module: z.ZodString;
+        id: z.ZodString;
+        project: z.ZodOptional<z.ZodNumber>;
+    }, "strip", z.ZodTypeAny, {
+        id: string;
+        module: string;
+        project?: number | undefined;
+    }, {
+        id: string;
+        module: string;
+        project?: number | undefined;
+    }>;
+    /** 2.88.0. From a page only, on the person's press: answered with `inboxAdoptResult`. */
+    readonly 'inbox.adopt': z.ZodObject<{
+        module: z.ZodString;
+        id: z.ZodString;
+        project: z.ZodOptional<z.ZodNumber>;
+    } & {
+        epic: z.ZodString;
+        parts: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
+    }, "strip", z.ZodTypeAny, {
+        id: string;
+        epic: string;
+        parts: string[];
+        module: string;
+        project?: number | undefined;
+    }, {
+        id: string;
+        epic: string;
+        module: string;
+        parts?: string[] | undefined;
+        project?: number | undefined;
+    }>;
+    /** 2.88.0. From a page only, on the person's press: answered with `inboxAdoptWithResult`. */
+    readonly 'inbox.adoptWith': z.ZodObject<{
+        module: z.ZodString;
+        id: z.ZodString;
+        project: z.ZodOptional<z.ZodNumber>;
+    }, "strip", z.ZodTypeAny, {
+        id: string;
+        module: string;
+        project?: number | undefined;
+    }, {
+        id: string;
+        module: string;
+        project?: number | undefined;
+    }>;
+    /** 2.88.0. From a page only, on the person's press: answered with `inboxUntrackResult`. */
+    readonly 'inbox.untrack': z.ZodObject<{
+        module: z.ZodString;
+        id: z.ZodString;
+        project: z.ZodOptional<z.ZodNumber>;
+    }, "strip", z.ZodTypeAny, {
+        id: string;
+        module: string;
+        project?: number | undefined;
+    }, {
+        id: string;
+        module: string;
+        project?: number | undefined;
+    }>;
+    /** 2.88.0. From a page only, on the person's press: answered with `inboxUndoResult`. */
+    readonly 'inbox.undo': z.ZodObject<{
+        module: z.ZodString;
+        id: z.ZodString;
+        project: z.ZodOptional<z.ZodNumber>;
+    }, "strip", z.ZodTypeAny, {
+        id: string;
+        module: string;
+        project?: number | undefined;
+    }, {
+        id: string;
+        module: string;
+        project?: number | undefined;
     }>;
 };
 /** The params one method takes, as a caller must construct them. */

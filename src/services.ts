@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import { LIMITS } from './limits.js'
 import { EPIC_SLUG, KEHIKKO_KEY, MODULE_ID } from './ids.js'
+import { CONVERSATION_MATCHES, conversationPlaceSchema, type ConversationMatch, type ConversationPlace } from './inbox.js'
 
 /**
  * 2.81.0. SERVICES: one module provides a service, others consume it, and neither names the other.
@@ -403,6 +404,160 @@ export function foldersOwned(providers: readonly ServiceProvider[] | null | unde
   return out
 }
 
+/* ---------------------------------------------------------------- 2.88.0 */
+
+/**
+ * The HOST calling a provider (2.88.0): `SERVICE_CALLER_HEADER` says `HOST_CALLER`, and
+ * `SERVICE_PASS_HEADER` carries a pass the host minted. The provider confirms it by asking the host at
+ * its own origins (`KEHIKOT_ORIGINS`), `GET <origin>HOST_PASS_PATH?pass=<pass>` → `{ ok, minted }`
+ * (spent by the asking) — `vouchHost` behind `/serve`. No page, agent or other module can pass for it.
+ */
+export const HOST_CALLER = 'kehikko'
+export const HOST_PASS_PATH = '/host/server-pass'
+
+/**
+ * `conversations.finder` (2.88.0): an agent module that can say which of its CLI's conversations worked
+ * on a ref, a branch or a folder, and file one of them under a place — what `/kehikot-here` does —
+ * when the HOST asks. It looks only in what it already reads of its CLI's conversations (its session
+ * listing, and transcripts only where it already reads them), never anywhere new.
+ *
+ * - `name`: the module, as it is told about. `program`: the CLI in its own words (`Claude Code`), which
+ *   a host says of a conversation ("its Claude Code conversation came along").
+ * - `find`: a route on its origin, `POST { project, refs, url?, branch?, repo? }`
+ *   (`conversationsFindParams`), answering `conversationsFindResult`: candidates with title, folder,
+ *   last active, how they matched (`ConversationMatch`) and why in words, where each is filed now, and
+ *   whether it is running. Titles and reasons only: never a transcript's content.
+ * - `bring`: a route on its origin, `POST { project, session, to, from }` (`conversationsBringParams`):
+ *   file that conversation under `to` (null: under no place) ONLY if it is filed under `from` now (null:
+ *   under none) — so a host never moves one from another place, and an undo never takes back a move
+ *   somebody made since. Answers `conversationsBringResult`. A running conversation is not restarted:
+ *   it gains the place now, and the module's guards and messaging the next time the module resumes it,
+ *   or at once when the module already holds its terminal.
+ *
+ * Both routes answer only the host (`vouchHost`).
+ */
+export const conversationsFinderSchema = z.object({
+  name: oneLine(LIMITS.TITLE),
+  program: oneLine(LIMITS.TITLE),
+  find: servicePath,
+  bring: servicePath,
+})
+export type ConversationsFinder = z.infer<typeof conversationsFinderSchema>
+
+/** `find`'s body: the project folder, the ref's spellings, and what else is known of the change. */
+export const conversationsFindParams = z.object({
+  project: z.string().min(1).max(1024),
+  refs: z.array(z.string().min(1).max(LIMITS.REF * 4)).min(1).max(8),
+  url: z.string().max(2048).optional(),
+  branch: z.string().max(400).optional(),
+  repo: z.string().max(400).optional(),
+})
+export type ConversationsFindParams = z.infer<typeof conversationsFindParams>
+
+/** One candidate. `place` where it is filed now (null: none); `running` whether its CLI runs it now. */
+export const conversationCandidateSchema = z.object({
+  session: z.string().trim().min(1).max(128),
+  title: z.string().max(LIMITS.TITLE).catch(''),
+  folder: z.string().max(1024).catch(''),
+  lastActive: z.number().int().min(0).catch(0),
+  match: z.enum(CONVERSATION_MATCHES),
+  reason: z.string().max(LIMITS.REASON).catch(''),
+  place: conversationPlaceSchema.nullable().catch(null).default(null),
+  running: z.boolean().catch(false).default(false),
+})
+export type ConversationCandidate = z.infer<typeof conversationCandidateSchema>
+
+export const conversationsFindResult = z.object({ conversations: z.array(conversationCandidateSchema).max(20) })
+export type ConversationsFindResult = z.infer<typeof conversationsFindResult>
+
+/** The candidates in a `find` answer, each that parses, strongest match first then newest; `[]` for anything else. */
+export function candidatesIn(body: unknown): ConversationCandidate[] {
+  const list = body && typeof body === 'object' && Array.isArray((body as { conversations?: unknown }).conversations) ? (body as { conversations: unknown[] }).conversations : []
+  const out: ConversationCandidate[] = []
+  for (const one of list.slice(0, 50)) {
+    const parsed = conversationCandidateSchema.safeParse(one)
+    if (parsed.success) out.push(parsed.data)
+  }
+  const rank = (match: ConversationMatch) => CONVERSATION_MATCHES.indexOf(match)
+  return out.sort((a, b) => rank(a.match) - rank(b.match) || b.lastActive - a.lastActive).slice(0, 20)
+}
+
+/** `bring`'s body: compare-and-set of one conversation's place. */
+export const conversationsBringParams = z.object({
+  project: z.string().min(1).max(1024),
+  session: z.string().trim().min(1).max(128),
+  to: conversationPlaceSchema.nullable(),
+  from: conversationPlaceSchema.nullable(),
+})
+export type ConversationsBringParams = z.infer<typeof conversationsBringParams>
+
+/**
+ * `brought`: it is filed under `to` now (`resumed` when the module holds its terminal and it gained the
+ * place at once). `elsewhere`: it was not under `from`, so nothing changed; `place` is where it is.
+ * `no-such-session`, `declined`: not done, and why.
+ */
+export const conversationsBringResult = z.object({
+  outcome: z.enum(['brought', 'elsewhere', 'no-such-session', 'declined']),
+  place: conversationPlaceSchema.nullable().default(null),
+  resumed: z.boolean().default(false),
+  why: z.string().max(LIMITS.REASON).default(''),
+})
+export type ConversationsBringResult = z.infer<typeof conversationsBringResult>
+
+/** Whether two places are the same place (parts in any order); null is no place. */
+export function sameConversationPlace(a: ConversationPlace | null | undefined, b: ConversationPlace | null | undefined): boolean {
+  if (!a || !b) return !a && !b
+  return a.epic === b.epic && (a.kehikko ?? null) === (b.kehikko ?? null) && [...a.parts].sort().join('+') === [...b.parts].sort().join('+')
+}
+
+/** Where `session` goes in an `agent.tasks` view. */
+export const SERVICE_SESSION = '{session}'
+
+/**
+ * `agent.tasks` (2.88.0): an agent module that starts a NEW conversation for one of Kehikot's own tasks,
+ * fed a brief on launch, filed under a place like any conversation it starts, and kept in its records.
+ *
+ * - `name`, `program`: as `conversations.finder`'s.
+ * - `start`: a route on its origin, `POST { project, brief, place, title }` (`agentTaskStartParams`),
+ *   answering `agentTaskStartResult` with the new conversation's id. Only the host (`vouchHost`).
+ * - `view`: the module's page showing that one conversation, `/app?…{session}…`, which a host frames in
+ *   its own dialog while the task runs.
+ */
+export const agentTasksSchema = z.object({
+  name: oneLine(LIMITS.TITLE),
+  program: oneLine(LIMITS.TITLE),
+  start: servicePath,
+  view: z
+    .string()
+    .max(200)
+    .regex(/^\/app(?:\?[A-Za-z0-9_\-.=&{}%]*)?$/, 'the module\'s page, /app?…')
+    .refine((path) => path.includes(SERVICE_SESSION), { message: 'the view says where the conversation goes: {session}' }),
+})
+export type AgentTasks = z.infer<typeof agentTasksSchema>
+
+/** The longest brief a task is started with. */
+export const AGENT_TASK_BRIEF_MAX = 32_000
+
+export const agentTaskStartParams = z.object({
+  project: z.string().min(1).max(1024),
+  brief: z.string().min(1).max(AGENT_TASK_BRIEF_MAX),
+  place: conversationPlaceSchema.nullable(),
+  title: oneLine(LIMITS.TITLE),
+})
+export type AgentTaskStartParams = z.infer<typeof agentTaskStartParams>
+
+export const agentTaskStartResult = z.object({
+  outcome: z.enum(['started', 'declined']),
+  session: z.string().trim().min(1).max(128).nullable().default(null),
+  why: z.string().max(LIMITS.REASON).default(''),
+})
+export type AgentTaskStartResult = z.infer<typeof agentTaskStartResult>
+
+/** An `agent.tasks` view with the conversation in it. */
+export function agentTaskView(tasks: Pick<AgentTasks, 'view'>, session: string): string {
+  return tasks.view.split(SERVICE_SESSION).join(encodeURIComponent(session))
+}
+
 /* ---------------------------------------------------------------- the registry */
 
 /**
@@ -446,6 +601,14 @@ export const SERVICES = {
     says: 'Owns folders under the project\'s .kehikot/, and says what is in each.',
     schema: moduleFoldersSchema,
   },
+  'conversations.finder': {
+    says: "Says which of its CLI's conversations worked on a ref, a branch or a folder, and files one under a place when the host asks.",
+    schema: conversationsFinderSchema,
+  },
+  'agent.tasks': {
+    says: "Starts a new conversation for one of Kehikot's own tasks, fed a brief on launch.",
+    schema: agentTasksSchema,
+  },
 } as const satisfies Record<string, { says: string; schema: z.ZodTypeAny }>
 export type Service = keyof typeof SERVICES
 export const SERVICE_NAMES = Object.keys(SERVICES) as Service[]
@@ -470,6 +633,10 @@ export const PAGE_VIEWER = 'page.viewer' satisfies Service
 export const CUE_TARGETS = 'cue.targets' satisfies Service
 /** 2.85.0. The folders a module owns under `.kehikot/`. */
 export const MODULE_FOLDERS = 'module.folders' satisfies Service
+/** 2.88.0. Which of an agent module's conversations worked on a ref, and filing one under a place. */
+export const CONVERSATIONS_FINDER = 'conversations.finder' satisfies Service
+/** 2.88.0. A new conversation for one of Kehikot's own tasks, fed a brief. */
+export const AGENT_TASKS = 'agent.tasks' satisfies Service
 
 /**
  * `services` in a manifest: each service this module provides, by name, and its descriptor. A known

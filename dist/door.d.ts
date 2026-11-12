@@ -736,13 +736,13 @@ export declare const placeDoorsSchema: z.ZodObject<{
         guard: {
             id: string;
             why: string;
-            tool: "edit" | "shell";
             match: {
                 commands: string[];
                 scripts?: string[] | undefined;
                 paths?: string[] | undefined;
                 checkouts?: "main"[] | undefined;
             };
+            tool: "edit" | "shell";
             action: "rewrite" | "deny";
             rewrite?: string | undefined;
             allow?: string[] | undefined;
@@ -817,6 +817,12 @@ export declare const placeDoorsSchema: z.ZodObject<{
         once: boolean;
         answers: string | null;
     }[] | undefined;
+    everywhere?: {
+        name: string;
+        module: string;
+        version: string;
+        origin: string;
+    }[] | undefined;
     host?: {
         version: string;
         changes: {
@@ -824,12 +830,6 @@ export declare const placeDoorsSchema: z.ZodObject<{
             lines: string[];
         }[];
     } | undefined;
-    everywhere?: {
-        name: string;
-        module: string;
-        version: string;
-        origin: string;
-    }[] | undefined;
     modules?: {
         name: string;
         module: string;
@@ -860,13 +860,13 @@ export declare const placeDoorsSchema: z.ZodObject<{
         guard: {
             id: string;
             why: string;
-            tool: "edit" | "shell";
             match: {
                 commands: string[];
                 scripts?: string[] | undefined;
                 paths?: string[] | undefined;
                 checkouts?: "main"[] | undefined;
             };
+            tool: "edit" | "shell";
             action: "rewrite" | "deny";
             rewrite?: string | undefined;
             allow?: string[] | undefined;
@@ -885,8 +885,8 @@ export declare const placeDoorsSchema: z.ZodObject<{
         transport?: unknown;
     }[];
     messages?: unknown;
-    host?: unknown;
     everywhere?: unknown;
+    host?: unknown;
     modules?: unknown;
     absent?: unknown;
     messagesMore?: unknown;

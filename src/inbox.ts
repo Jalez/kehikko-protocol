@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { LIMITS } from './limits.js'
+import { EPIC_SLUG, KEHIKKO_KEY } from './ids.js'
 import { ACTIVITY_PRIORITIES, ACTIVITY_STATES } from './activity.js'
 
 /**
@@ -21,11 +22,24 @@ import { ACTIVITY_PRIORITIES, ACTIVITY_STATES } from './activity.js'
  */
 
 /** The methods only a module's page may ask, and only for the person. None is a server method. */
-export const PERSON_METHODS = ['inbox.read', 'inbox.log', 'inbox.act', 'inbox.answer', 'inbox.open', 'inbox.use'] as const
+export const PERSON_METHODS = [
+  'inbox.read',
+  'inbox.log',
+  'inbox.act',
+  'inbox.answer',
+  'inbox.open',
+  'inbox.use',
+  /* 2.88.0: a tracker item no epic names, adopted into one or no longer tracked. */
+  'inbox.adoption',
+  'inbox.adopt',
+  'inbox.adoptWith',
+  'inbox.untrack',
+  'inbox.undo',
+] as const
 export type PersonMethod = (typeof PERSON_METHODS)[number]
 
 /** The acts a host takes only on the person's fresh press in the frame (everything but reading and `seen`). */
-export const PRESSED_METHODS: readonly PersonMethod[] = ['inbox.act', 'inbox.answer', 'inbox.open', 'inbox.use']
+export const PRESSED_METHODS: readonly PersonMethod[] = ['inbox.act', 'inbox.answer', 'inbox.open', 'inbox.use', 'inbox.adopt', 'inbox.adoptWith', 'inbox.untrack', 'inbox.undo']
 
 /** Whether an act is taken only on the person's fresh press: every one but `seen`. */
 export const actNeedsPress = (method: string, params: unknown): boolean =>
@@ -102,6 +116,16 @@ export const inboxItemSchema = z.object({
   question: inboxQuestionSchema.optional(),
   mutable: z.boolean().default(false),
   go: inboxGoSchema.optional(),
+  /**
+   * 2.88.0. A tracker item about a ref no epic of the project names: a page may offer to add it to an
+   * epic (`inbox.adopt`, `inbox.adoptWith`) and to stop tracking it (`inbox.untrack`).
+   */
+  adoptable: z.boolean().default(false),
+  /**
+   * 2.88.0. What the person's last act on this item did, in one line ("Added to Auth · its Claude Code
+   * conversation came along"), and whether `inbox.undo` takes it back. Text, like every string here.
+   */
+  after: z.object({ said: z.string().max(LIMITS.REASON), undo: z.boolean().default(false) }).optional(),
 })
 export type InboxItem = z.infer<typeof inboxItemSchema>
 
@@ -267,3 +291,152 @@ export type InboxSignal = (typeof INBOX_SIGNALS)[number]
  * person's press was the host's shortcut, and the page is going where they asked.
  */
 export const INBOX_NEXT_MS = 5000
+
+/* ---------------------------------------------------------------- adopting an item (2.88.0) */
+
+/**
+ * 2.88.0. A tracker item that no epic names — the person is its author, assignee or reviewer, and it was
+ * made somewhere else, by hand or by an agent outside Kehikot — can be ADOPTED into an epic, or no longer
+ * tracked. Every act is the person's: page-only, on a fresh press, never a server's or an agent's.
+ *
+ * - `inbox.adoption`: what the page needs to offer it (a read, no press): the item, the project's epics
+ *   with their parts and refs, the host's suggestion, the conversations that worked on it
+ *   (`conversations.finder`, services.ts), the person's agent for Kehikot's own tasks, and an agent's
+ *   proposal when one was made.
+ * - `inbox.adopt`: write the ref into an epic (and parts) through the host's one writer of epics. The host
+ *   then brings along, by itself, every conversation that CONFIDENTLY worked on it (`confidentMatch`) and
+ *   belongs to no place yet, through the agent module that runs it; one that belongs to another place is
+ *   never moved and is said in the result. The item is then an ordinary item of that epic.
+ * - `inbox.adoptWith`: open the host's adoption dialog with the person's agent for Kehikot's own tasks,
+ *   which starts a conversation fed the item and proposes an epic; the person confirms there.
+ * - `inbox.untrack`: tell nothing more about this ref in this project.
+ * - `inbox.undo`: take back the last adopt (the ref, and the conversations brought along) or untrack.
+ */
+
+/** One item named, as every adopting act names it. */
+export const inboxItemKeyParams = z.object({ module: inboxModule, id: inboxId, project: inboxProject.optional() })
+
+/** `inbox.adoption`'s params: the item. */
+export const inboxAdoptionParams = inboxItemKeyParams
+
+const epicSlug = z.string().regex(EPIC_SLUG)
+const partId = z.string().regex(EPIC_SLUG)
+
+/** A place a conversation is filed under: an epic (or none), its parts, a kehikko key (or none). */
+export const conversationPlaceSchema = z.object({
+  epic: epicSlug.nullable(),
+  parts: z.array(partId).max(LIMITS.PARTS).default([]),
+  kehikko: z.string().regex(KEHIKKO_KEY).nullable().default(null),
+})
+export type ConversationPlace = z.infer<typeof conversationPlaceSchema>
+
+/**
+ * How a conversation is known to have worked on an item, strongest first: it `created` the change, it
+ * `pushed` its branch, it worked on that `branch`, it `mentioned` the ref, or it only worked in the same
+ * `folder` (repository). Only the first three are confident enough to bring a conversation along without
+ * asking (`CONFIDENT_MATCHES`).
+ */
+export const CONVERSATION_MATCHES = ['created', 'pushed', 'branch', 'mentioned', 'folder'] as const
+export type ConversationMatch = (typeof CONVERSATION_MATCHES)[number]
+export const CONFIDENT_MATCHES: readonly ConversationMatch[] = ['created', 'pushed', 'branch']
+
+/** Whether a match is confident enough for a host to bring the conversation along by itself. */
+export const confidentMatch = (match: ConversationMatch): boolean => CONFIDENT_MATCHES.includes(match)
+
+/** One conversation that worked on an item, as the page is shown it: its title and why it matched, never its content. */
+export const adoptionConversationSchema = z.object({
+  /** The agent module that runs it (the provider `services.find` answered). */
+  module: z.string().min(1).max(64),
+  /** The program's name in its own words (`Claude Code`), from the provider's descriptor. */
+  program: z.string().max(LIMITS.TITLE),
+  session: z.string().min(1).max(128),
+  title: z.string().max(LIMITS.TITLE),
+  folder: z.string().max(1024).default(''),
+  lastActive: z.number().int().min(0),
+  match: z.enum(CONVERSATION_MATCHES),
+  /** Why it matched, in words ("created !4721", "pushed branch feat/x", "worked in this repository"). */
+  reason: z.string().max(LIMITS.REASON),
+  /** Where it is filed now, in words, when it belongs to a place; null when to none. */
+  placed: z.string().max(LIMITS.TITLE * 2).nullable().default(null),
+  /** Whether adopting brings it along by itself: confident, and filed under no place. */
+  comes: z.boolean().default(false),
+})
+export type AdoptionConversation = z.infer<typeof adoptionConversationSchema>
+
+/** `inbox.adoption`: everything a page needs to offer the item's adoption. */
+export const inboxAdoptionResult = z.object({
+  outcome: z.enum(['ok', 'no-such-item', 'declined']),
+  why: z.string().max(LIMITS.REASON).default(''),
+  item: z
+    .object({
+      ref: z.string().max(LIMITS.REF * 4),
+      title: z.string().max(LIMITS.TITLE),
+      url: z.string().max(2048),
+      repo: z.string().max(400),
+      host: z.string().max(200),
+      author: z.string().max(LIMITS.TITLE).optional(),
+      branch: z.string().max(400).optional(),
+    })
+    .nullable()
+    .default(null),
+  epics: z
+    .array(
+      z.object({
+        epic: epicSlug,
+        title: z.string().max(LIMITS.TITLE),
+        parts: z.array(z.object({ id: partId, name: z.string().max(LIMITS.TITLE) })).max(LIMITS.PARTS).default([]),
+        refs: z.array(z.string().max(LIMITS.REF * 4)).max(200).default([]),
+      }),
+    )
+    .max(200)
+    .default([]),
+  /**
+   * The epic the host would suggest, and why ("the same repository as its other refs"); `sure` when it
+   * is the only epic that matches, so a page may offer it as one press. Never adopted by itself.
+   */
+  suggested: z.object({ epic: epicSlug, parts: z.array(partId).max(LIMITS.PARTS).default([]), why: z.string().max(LIMITS.REASON), sure: z.boolean() }).nullable().default(null),
+  conversations: z.array(adoptionConversationSchema).max(20).default([]),
+  /** The person's agent for Kehikot's own tasks (`inbox.adoptWith`); null when none is picked. */
+  agent: z.object({ module: z.string().min(1).max(64), name: z.string().max(LIMITS.TITLE) }).nullable().default(null),
+  /** An agent's proposal, when one was made for this item: what the dialog offers to confirm. */
+  proposal: z
+    .object({ epic: epicSlug, parts: z.array(partId).max(LIMITS.PARTS).default([]), conversations: z.array(z.string().min(1).max(128)).max(20).default([]), why: z.string().max(LIMITS.REASON) })
+    .nullable()
+    .default(null),
+})
+export type InboxAdoptionResult = z.infer<typeof inboxAdoptionResult>
+
+/** `inbox.adopt`: the item, the epic and the parts to add its ref to. On the person's press only. */
+export const inboxAdoptParams = inboxItemKeyParams.extend({
+  epic: epicSlug,
+  parts: z.array(partId).max(LIMITS.PARTS).default([]),
+})
+
+/** What became of one conversation when an item was adopted. */
+export const ADOPT_BROUGHT = ['brought', 'elsewhere', 'failed'] as const
+export const inboxAdoptResult = z.object({
+  outcome: z.enum(['adopted', 'declined', 'no-such-item']),
+  /** What it did, in one line: the item's `after`. */
+  said: z.string().max(LIMITS.REASON).default(''),
+  brought: z
+    .array(z.object({ session: z.string().min(1).max(128), title: z.string().max(LIMITS.TITLE), program: z.string().max(LIMITS.TITLE), outcome: z.enum(ADOPT_BROUGHT), why: z.string().max(LIMITS.REASON).default('') }))
+    .max(20)
+    .default([]),
+  why: z.string().max(LIMITS.REASON).default(''),
+})
+export type InboxAdoptResult = z.infer<typeof inboxAdoptResult>
+
+/** `inbox.adoptWith`: open the host's adoption dialog with the person's agent. On the person's press only. */
+export const inboxAdoptWithParams = inboxItemKeyParams
+export const inboxAdoptWithResult = z.object({
+  outcome: z.enum(['opened', 'no-agent', 'declined', 'no-such-item']),
+  why: z.string().max(LIMITS.REASON).default(''),
+})
+export type InboxAdoptWithResult = z.infer<typeof inboxAdoptWithResult>
+
+/** `inbox.untrack`: tell nothing more about this item's ref in this project (undone in the host's settings, or `inbox.undo`). */
+export const inboxUntrackParams = inboxItemKeyParams
+export const inboxUntrackResult = inboxActResult
+/** `inbox.undo`: take back the last adopt or untrack of this item. */
+export const inboxUndoParams = inboxItemKeyParams
+export const inboxUndoResult = inboxActResult

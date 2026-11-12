@@ -56,6 +56,11 @@ export const METHOD_SINCE = {
     'inbox.answer': '2.79.0',
     'inbox.open': '2.79.0',
     'inbox.use': '2.79.0',
+    'inbox.adoption': '2.88.0',
+    'inbox.adopt': '2.88.0',
+    'inbox.adoptWith': '2.88.0',
+    'inbox.untrack': '2.88.0',
+    'inbox.undo': '2.88.0',
 };
 /** Each capability, and the version that added it: the oldest of its methods. */
 export const CAPABILITY_SINCE = {

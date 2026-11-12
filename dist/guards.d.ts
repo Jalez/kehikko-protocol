@@ -129,13 +129,13 @@ export declare const guardSchema: z.ZodEffects<z.ZodEffects<z.ZodEffects<z.ZodEf
 }, "strip", z.ZodTypeAny, {
     id: string;
     why: string;
-    tool: "edit" | "shell";
     match: {
         commands: string[];
         scripts?: string[] | undefined;
         paths?: string[] | undefined;
         checkouts?: "main"[] | undefined;
     };
+    tool: "edit" | "shell";
     action: "rewrite" | "deny";
     rewrite?: string | undefined;
     allow?: string[] | undefined;
@@ -143,13 +143,13 @@ export declare const guardSchema: z.ZodEffects<z.ZodEffects<z.ZodEffects<z.ZodEf
 }, {
     id: string;
     why: string;
-    tool: "edit" | "shell";
     match: {
         commands?: string[] | undefined;
         scripts?: string[] | undefined;
         paths?: string[] | undefined;
         checkouts?: "main"[] | undefined;
     };
+    tool: "edit" | "shell";
     action: "rewrite" | "deny";
     rewrite?: string | undefined;
     allow?: string[] | undefined;
@@ -157,13 +157,13 @@ export declare const guardSchema: z.ZodEffects<z.ZodEffects<z.ZodEffects<z.ZodEf
 }>, {
     id: string;
     why: string;
-    tool: "edit" | "shell";
     match: {
         commands: string[];
         scripts?: string[] | undefined;
         paths?: string[] | undefined;
         checkouts?: "main"[] | undefined;
     };
+    tool: "edit" | "shell";
     action: "rewrite" | "deny";
     rewrite?: string | undefined;
     allow?: string[] | undefined;
@@ -171,13 +171,13 @@ export declare const guardSchema: z.ZodEffects<z.ZodEffects<z.ZodEffects<z.ZodEf
 }, {
     id: string;
     why: string;
-    tool: "edit" | "shell";
     match: {
         commands?: string[] | undefined;
         scripts?: string[] | undefined;
         paths?: string[] | undefined;
         checkouts?: "main"[] | undefined;
     };
+    tool: "edit" | "shell";
     action: "rewrite" | "deny";
     rewrite?: string | undefined;
     allow?: string[] | undefined;
@@ -185,13 +185,13 @@ export declare const guardSchema: z.ZodEffects<z.ZodEffects<z.ZodEffects<z.ZodEf
 }>, {
     id: string;
     why: string;
-    tool: "edit" | "shell";
     match: {
         commands: string[];
         scripts?: string[] | undefined;
         paths?: string[] | undefined;
         checkouts?: "main"[] | undefined;
     };
+    tool: "edit" | "shell";
     action: "rewrite" | "deny";
     rewrite?: string | undefined;
     allow?: string[] | undefined;
@@ -199,13 +199,13 @@ export declare const guardSchema: z.ZodEffects<z.ZodEffects<z.ZodEffects<z.ZodEf
 }, {
     id: string;
     why: string;
-    tool: "edit" | "shell";
     match: {
         commands?: string[] | undefined;
         scripts?: string[] | undefined;
         paths?: string[] | undefined;
         checkouts?: "main"[] | undefined;
     };
+    tool: "edit" | "shell";
     action: "rewrite" | "deny";
     rewrite?: string | undefined;
     allow?: string[] | undefined;
@@ -213,13 +213,13 @@ export declare const guardSchema: z.ZodEffects<z.ZodEffects<z.ZodEffects<z.ZodEf
 }>, {
     id: string;
     why: string;
-    tool: "edit" | "shell";
     match: {
         commands: string[];
         scripts?: string[] | undefined;
         paths?: string[] | undefined;
         checkouts?: "main"[] | undefined;
     };
+    tool: "edit" | "shell";
     action: "rewrite" | "deny";
     rewrite?: string | undefined;
     allow?: string[] | undefined;
@@ -227,13 +227,13 @@ export declare const guardSchema: z.ZodEffects<z.ZodEffects<z.ZodEffects<z.ZodEf
 }, {
     id: string;
     why: string;
-    tool: "edit" | "shell";
     match: {
         commands?: string[] | undefined;
         scripts?: string[] | undefined;
         paths?: string[] | undefined;
         checkouts?: "main"[] | undefined;
     };
+    tool: "edit" | "shell";
     action: "rewrite" | "deny";
     rewrite?: string | undefined;
     allow?: string[] | undefined;
@@ -241,13 +241,13 @@ export declare const guardSchema: z.ZodEffects<z.ZodEffects<z.ZodEffects<z.ZodEf
 }>, {
     id: string;
     why: string;
-    tool: "edit" | "shell";
     match: {
         commands: string[];
         scripts?: string[] | undefined;
         paths?: string[] | undefined;
         checkouts?: "main"[] | undefined;
     };
+    tool: "edit" | "shell";
     action: "rewrite" | "deny";
     rewrite?: string | undefined;
     allow?: string[] | undefined;
@@ -255,13 +255,13 @@ export declare const guardSchema: z.ZodEffects<z.ZodEffects<z.ZodEffects<z.ZodEf
 }, {
     id: string;
     why: string;
-    tool: "edit" | "shell";
     match: {
         commands?: string[] | undefined;
         scripts?: string[] | undefined;
         paths?: string[] | undefined;
         checkouts?: "main"[] | undefined;
     };
+    tool: "edit" | "shell";
     action: "rewrite" | "deny";
     rewrite?: string | undefined;
     allow?: string[] | undefined;
@@ -269,13 +269,13 @@ export declare const guardSchema: z.ZodEffects<z.ZodEffects<z.ZodEffects<z.ZodEf
 }>, {
     id: string;
     why: string;
-    tool: "edit" | "shell";
     match: {
         commands: string[];
         scripts?: string[] | undefined;
         paths?: string[] | undefined;
         checkouts?: "main"[] | undefined;
     };
+    tool: "edit" | "shell";
     action: "rewrite" | "deny";
     rewrite?: string | undefined;
     allow?: string[] | undefined;
@@ -283,13 +283,13 @@ export declare const guardSchema: z.ZodEffects<z.ZodEffects<z.ZodEffects<z.ZodEf
 }, {
     id: string;
     why: string;
-    tool: "edit" | "shell";
     match: {
         commands?: string[] | undefined;
         scripts?: string[] | undefined;
         paths?: string[] | undefined;
         checkouts?: "main"[] | undefined;
     };
+    tool: "edit" | "shell";
     action: "rewrite" | "deny";
     rewrite?: string | undefined;
     allow?: string[] | undefined;
@@ -303,13 +303,13 @@ export type Guard = z.infer<typeof guardSchema>;
 export declare const guardsSchema: z.ZodEffects<z.ZodUnknown, {
     id: string;
     why: string;
-    tool: "edit" | "shell";
     match: {
         commands: string[];
         scripts?: string[] | undefined;
         paths?: string[] | undefined;
         checkouts?: "main"[] | undefined;
     };
+    tool: "edit" | "shell";
     action: "rewrite" | "deny";
     rewrite?: string | undefined;
     allow?: string[] | undefined;
@@ -354,13 +354,13 @@ export declare const placedGuardSchema: z.ZodObject<{
     }, "strip", z.ZodTypeAny, {
         id: string;
         why: string;
-        tool: "edit" | "shell";
         match: {
             commands: string[];
             scripts?: string[] | undefined;
             paths?: string[] | undefined;
             checkouts?: "main"[] | undefined;
         };
+        tool: "edit" | "shell";
         action: "rewrite" | "deny";
         rewrite?: string | undefined;
         allow?: string[] | undefined;
@@ -368,13 +368,13 @@ export declare const placedGuardSchema: z.ZodObject<{
     }, {
         id: string;
         why: string;
-        tool: "edit" | "shell";
         match: {
             commands?: string[] | undefined;
             scripts?: string[] | undefined;
             paths?: string[] | undefined;
             checkouts?: "main"[] | undefined;
         };
+        tool: "edit" | "shell";
         action: "rewrite" | "deny";
         rewrite?: string | undefined;
         allow?: string[] | undefined;
@@ -382,13 +382,13 @@ export declare const placedGuardSchema: z.ZodObject<{
     }>, {
         id: string;
         why: string;
-        tool: "edit" | "shell";
         match: {
             commands: string[];
             scripts?: string[] | undefined;
             paths?: string[] | undefined;
             checkouts?: "main"[] | undefined;
         };
+        tool: "edit" | "shell";
         action: "rewrite" | "deny";
         rewrite?: string | undefined;
         allow?: string[] | undefined;
@@ -396,13 +396,13 @@ export declare const placedGuardSchema: z.ZodObject<{
     }, {
         id: string;
         why: string;
-        tool: "edit" | "shell";
         match: {
             commands?: string[] | undefined;
             scripts?: string[] | undefined;
             paths?: string[] | undefined;
             checkouts?: "main"[] | undefined;
         };
+        tool: "edit" | "shell";
         action: "rewrite" | "deny";
         rewrite?: string | undefined;
         allow?: string[] | undefined;
@@ -410,13 +410,13 @@ export declare const placedGuardSchema: z.ZodObject<{
     }>, {
         id: string;
         why: string;
-        tool: "edit" | "shell";
         match: {
             commands: string[];
             scripts?: string[] | undefined;
             paths?: string[] | undefined;
             checkouts?: "main"[] | undefined;
         };
+        tool: "edit" | "shell";
         action: "rewrite" | "deny";
         rewrite?: string | undefined;
         allow?: string[] | undefined;
@@ -424,13 +424,13 @@ export declare const placedGuardSchema: z.ZodObject<{
     }, {
         id: string;
         why: string;
-        tool: "edit" | "shell";
         match: {
             commands?: string[] | undefined;
             scripts?: string[] | undefined;
             paths?: string[] | undefined;
             checkouts?: "main"[] | undefined;
         };
+        tool: "edit" | "shell";
         action: "rewrite" | "deny";
         rewrite?: string | undefined;
         allow?: string[] | undefined;
@@ -438,13 +438,13 @@ export declare const placedGuardSchema: z.ZodObject<{
     }>, {
         id: string;
         why: string;
-        tool: "edit" | "shell";
         match: {
             commands: string[];
             scripts?: string[] | undefined;
             paths?: string[] | undefined;
             checkouts?: "main"[] | undefined;
         };
+        tool: "edit" | "shell";
         action: "rewrite" | "deny";
         rewrite?: string | undefined;
         allow?: string[] | undefined;
@@ -452,13 +452,13 @@ export declare const placedGuardSchema: z.ZodObject<{
     }, {
         id: string;
         why: string;
-        tool: "edit" | "shell";
         match: {
             commands?: string[] | undefined;
             scripts?: string[] | undefined;
             paths?: string[] | undefined;
             checkouts?: "main"[] | undefined;
         };
+        tool: "edit" | "shell";
         action: "rewrite" | "deny";
         rewrite?: string | undefined;
         allow?: string[] | undefined;
@@ -466,13 +466,13 @@ export declare const placedGuardSchema: z.ZodObject<{
     }>, {
         id: string;
         why: string;
-        tool: "edit" | "shell";
         match: {
             commands: string[];
             scripts?: string[] | undefined;
             paths?: string[] | undefined;
             checkouts?: "main"[] | undefined;
         };
+        tool: "edit" | "shell";
         action: "rewrite" | "deny";
         rewrite?: string | undefined;
         allow?: string[] | undefined;
@@ -480,13 +480,13 @@ export declare const placedGuardSchema: z.ZodObject<{
     }, {
         id: string;
         why: string;
-        tool: "edit" | "shell";
         match: {
             commands?: string[] | undefined;
             scripts?: string[] | undefined;
             paths?: string[] | undefined;
             checkouts?: "main"[] | undefined;
         };
+        tool: "edit" | "shell";
         action: "rewrite" | "deny";
         rewrite?: string | undefined;
         allow?: string[] | undefined;
@@ -494,13 +494,13 @@ export declare const placedGuardSchema: z.ZodObject<{
     }>, {
         id: string;
         why: string;
-        tool: "edit" | "shell";
         match: {
             commands: string[];
             scripts?: string[] | undefined;
             paths?: string[] | undefined;
             checkouts?: "main"[] | undefined;
         };
+        tool: "edit" | "shell";
         action: "rewrite" | "deny";
         rewrite?: string | undefined;
         allow?: string[] | undefined;
@@ -508,13 +508,13 @@ export declare const placedGuardSchema: z.ZodObject<{
     }, {
         id: string;
         why: string;
-        tool: "edit" | "shell";
         match: {
             commands?: string[] | undefined;
             scripts?: string[] | undefined;
             paths?: string[] | undefined;
             checkouts?: "main"[] | undefined;
         };
+        tool: "edit" | "shell";
         action: "rewrite" | "deny";
         rewrite?: string | undefined;
         allow?: string[] | undefined;
@@ -526,13 +526,13 @@ export declare const placedGuardSchema: z.ZodObject<{
     guard: {
         id: string;
         why: string;
-        tool: "edit" | "shell";
         match: {
             commands: string[];
             scripts?: string[] | undefined;
             paths?: string[] | undefined;
             checkouts?: "main"[] | undefined;
         };
+        tool: "edit" | "shell";
         action: "rewrite" | "deny";
         rewrite?: string | undefined;
         allow?: string[] | undefined;
@@ -543,13 +543,13 @@ export declare const placedGuardSchema: z.ZodObject<{
     guard: {
         id: string;
         why: string;
-        tool: "edit" | "shell";
         match: {
             commands?: string[] | undefined;
             scripts?: string[] | undefined;
             paths?: string[] | undefined;
             checkouts?: "main"[] | undefined;
         };
+        tool: "edit" | "shell";
         action: "rewrite" | "deny";
         rewrite?: string | undefined;
         allow?: string[] | undefined;
@@ -565,13 +565,13 @@ export declare const placedGuardsSchema: z.ZodEffects<z.ZodUnknown, ({
     guard: {
         id: string;
         why: string;
-        tool: "edit" | "shell";
         match: {
             commands: string[];
             scripts?: string[] | undefined;
             paths?: string[] | undefined;
             checkouts?: "main"[] | undefined;
         };
+        tool: "edit" | "shell";
         action: "rewrite" | "deny";
         rewrite?: string | undefined;
         allow?: string[] | undefined;

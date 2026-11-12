@@ -17,7 +17,7 @@ import { z } from 'zod';
  * only to a frame whose manifest declares `inbox:person`. Design notes: docs/inbox.md.
  */
 /** The methods only a module's page may ask, and only for the person. None is a server method. */
-export declare const PERSON_METHODS: readonly ["inbox.read", "inbox.log", "inbox.act", "inbox.answer", "inbox.open", "inbox.use"];
+export declare const PERSON_METHODS: readonly ["inbox.read", "inbox.log", "inbox.act", "inbox.answer", "inbox.open", "inbox.use", "inbox.adoption", "inbox.adopt", "inbox.adoptWith", "inbox.untrack", "inbox.undo"];
 export type PersonMethod = (typeof PERSON_METHODS)[number];
 /** The acts a host takes only on the person's fresh press in the frame (everything but reading and `seen`). */
 export declare const PRESSED_METHODS: readonly PersonMethod[];
@@ -121,6 +121,25 @@ export declare const inboxItemSchema: z.ZodObject<{
     }, {
         label?: string | undefined;
     }>>;
+    /**
+     * 2.88.0. A tracker item about a ref no epic of the project names: a page may offer to add it to an
+     * epic (`inbox.adopt`, `inbox.adoptWith`) and to stop tracking it (`inbox.untrack`).
+     */
+    adoptable: z.ZodDefault<z.ZodBoolean>;
+    /**
+     * 2.88.0. What the person's last act on this item did, in one line ("Added to Auth · its Claude Code
+     * conversation came along"), and whether `inbox.undo` takes it back. Text, like every string here.
+     */
+    after: z.ZodOptional<z.ZodObject<{
+        said: z.ZodString;
+        undo: z.ZodDefault<z.ZodBoolean>;
+    }, "strip", z.ZodTypeAny, {
+        said: string;
+        undo: boolean;
+    }, {
+        said: string;
+        undo?: boolean | undefined;
+    }>>;
 }, "strip", z.ZodTypeAny, {
     id: string;
     module: string;
@@ -134,6 +153,7 @@ export declare const inboxItemSchema: z.ZodObject<{
     entered: number;
     seen: boolean;
     mutable: boolean;
+    adoptable: boolean;
     question?: {
         choices: string[];
         text: string;
@@ -143,6 +163,10 @@ export declare const inboxItemSchema: z.ZodObject<{
     detail?: string | undefined;
     go?: {
         label?: string | undefined;
+    } | undefined;
+    after?: {
+        said: string;
+        undo: boolean;
     } | undefined;
 }, {
     id: string;
@@ -160,13 +184,18 @@ export declare const inboxItemSchema: z.ZodObject<{
     says?: string | undefined;
     detail?: string | undefined;
     priority?: "urgent" | "normal" | "low" | undefined;
-    go?: {
-        label?: string | undefined;
-    } | undefined;
     where?: string | undefined;
     here?: boolean | undefined;
     seen?: boolean | undefined;
     mutable?: boolean | undefined;
+    go?: {
+        label?: string | undefined;
+    } | undefined;
+    adoptable?: boolean | undefined;
+    after?: {
+        said: string;
+        undo?: boolean | undefined;
+    } | undefined;
 }>;
 export type InboxItem = z.infer<typeof inboxItemSchema>;
 /** How many items an answer carries at most, per project. */
@@ -217,6 +246,25 @@ export declare const inboxReadResult: z.ZodObject<{
         }, {
             label?: string | undefined;
         }>>;
+        /**
+         * 2.88.0. A tracker item about a ref no epic of the project names: a page may offer to add it to an
+         * epic (`inbox.adopt`, `inbox.adoptWith`) and to stop tracking it (`inbox.untrack`).
+         */
+        adoptable: z.ZodDefault<z.ZodBoolean>;
+        /**
+         * 2.88.0. What the person's last act on this item did, in one line ("Added to Auth · its Claude Code
+         * conversation came along"), and whether `inbox.undo` takes it back. Text, like every string here.
+         */
+        after: z.ZodOptional<z.ZodObject<{
+            said: z.ZodString;
+            undo: z.ZodDefault<z.ZodBoolean>;
+        }, "strip", z.ZodTypeAny, {
+            said: string;
+            undo: boolean;
+        }, {
+            said: string;
+            undo?: boolean | undefined;
+        }>>;
     }, "strip", z.ZodTypeAny, {
         id: string;
         module: string;
@@ -230,6 +278,7 @@ export declare const inboxReadResult: z.ZodObject<{
         entered: number;
         seen: boolean;
         mutable: boolean;
+        adoptable: boolean;
         question?: {
             choices: string[];
             text: string;
@@ -239,6 +288,10 @@ export declare const inboxReadResult: z.ZodObject<{
         detail?: string | undefined;
         go?: {
             label?: string | undefined;
+        } | undefined;
+        after?: {
+            said: string;
+            undo: boolean;
         } | undefined;
     }, {
         id: string;
@@ -256,13 +309,18 @@ export declare const inboxReadResult: z.ZodObject<{
         says?: string | undefined;
         detail?: string | undefined;
         priority?: "urgent" | "normal" | "low" | undefined;
-        go?: {
-            label?: string | undefined;
-        } | undefined;
         where?: string | undefined;
         here?: boolean | undefined;
         seen?: boolean | undefined;
         mutable?: boolean | undefined;
+        go?: {
+            label?: string | undefined;
+        } | undefined;
+        adoptable?: boolean | undefined;
+        after?: {
+            said: string;
+            undo?: boolean | undefined;
+        } | undefined;
     }>, "many">;
     next: z.ZodDefault<z.ZodNullable<z.ZodObject<{
         module: z.ZodString;
@@ -320,6 +378,25 @@ export declare const inboxReadResult: z.ZodObject<{
             }, {
                 label?: string | undefined;
             }>>;
+            /**
+             * 2.88.0. A tracker item about a ref no epic of the project names: a page may offer to add it to an
+             * epic (`inbox.adopt`, `inbox.adoptWith`) and to stop tracking it (`inbox.untrack`).
+             */
+            adoptable: z.ZodDefault<z.ZodBoolean>;
+            /**
+             * 2.88.0. What the person's last act on this item did, in one line ("Added to Auth · its Claude Code
+             * conversation came along"), and whether `inbox.undo` takes it back. Text, like every string here.
+             */
+            after: z.ZodOptional<z.ZodObject<{
+                said: z.ZodString;
+                undo: z.ZodDefault<z.ZodBoolean>;
+            }, "strip", z.ZodTypeAny, {
+                said: string;
+                undo: boolean;
+            }, {
+                said: string;
+                undo?: boolean | undefined;
+            }>>;
         }, "strip", z.ZodTypeAny, {
             id: string;
             module: string;
@@ -333,6 +410,7 @@ export declare const inboxReadResult: z.ZodObject<{
             entered: number;
             seen: boolean;
             mutable: boolean;
+            adoptable: boolean;
             question?: {
                 choices: string[];
                 text: string;
@@ -342,6 +420,10 @@ export declare const inboxReadResult: z.ZodObject<{
             detail?: string | undefined;
             go?: {
                 label?: string | undefined;
+            } | undefined;
+            after?: {
+                said: string;
+                undo: boolean;
             } | undefined;
         }, {
             id: string;
@@ -359,13 +441,18 @@ export declare const inboxReadResult: z.ZodObject<{
             says?: string | undefined;
             detail?: string | undefined;
             priority?: "urgent" | "normal" | "low" | undefined;
-            go?: {
-                label?: string | undefined;
-            } | undefined;
             where?: string | undefined;
             here?: boolean | undefined;
             seen?: boolean | undefined;
             mutable?: boolean | undefined;
+            go?: {
+                label?: string | undefined;
+            } | undefined;
+            adoptable?: boolean | undefined;
+            after?: {
+                said: string;
+                undo?: boolean | undefined;
+            } | undefined;
         }>, "many">;
     }, "strip", z.ZodTypeAny, {
         project: {
@@ -385,6 +472,7 @@ export declare const inboxReadResult: z.ZodObject<{
             entered: number;
             seen: boolean;
             mutable: boolean;
+            adoptable: boolean;
             question?: {
                 choices: string[];
                 text: string;
@@ -394,6 +482,10 @@ export declare const inboxReadResult: z.ZodObject<{
             detail?: string | undefined;
             go?: {
                 label?: string | undefined;
+            } | undefined;
+            after?: {
+                said: string;
+                undo: boolean;
             } | undefined;
         }[];
     }, {
@@ -417,13 +509,18 @@ export declare const inboxReadResult: z.ZodObject<{
             says?: string | undefined;
             detail?: string | undefined;
             priority?: "urgent" | "normal" | "low" | undefined;
-            go?: {
-                label?: string | undefined;
-            } | undefined;
             where?: string | undefined;
             here?: boolean | undefined;
             seen?: boolean | undefined;
             mutable?: boolean | undefined;
+            go?: {
+                label?: string | undefined;
+            } | undefined;
+            adoptable?: boolean | undefined;
+            after?: {
+                said: string;
+                undo?: boolean | undefined;
+            } | undefined;
         }[];
     }>, "many">>;
     earlier: z.ZodDefault<z.ZodNumber>;
@@ -438,6 +535,7 @@ export declare const inboxReadResult: z.ZodObject<{
         name: string;
     }>, "many">>;
 }, "strip", z.ZodTypeAny, {
+    rev: number;
     items: {
         id: string;
         module: string;
@@ -451,6 +549,7 @@ export declare const inboxReadResult: z.ZodObject<{
         entered: number;
         seen: boolean;
         mutable: boolean;
+        adoptable: boolean;
         question?: {
             choices: string[];
             text: string;
@@ -461,12 +560,15 @@ export declare const inboxReadResult: z.ZodObject<{
         go?: {
             label?: string | undefined;
         } | undefined;
+        after?: {
+            said: string;
+            undo: boolean;
+        } | undefined;
     }[];
     next: {
         id: string;
         module: string;
     } | null;
-    rev: number;
     elsewhere: {
         project: {
             id: number;
@@ -485,6 +587,7 @@ export declare const inboxReadResult: z.ZodObject<{
             entered: number;
             seen: boolean;
             mutable: boolean;
+            adoptable: boolean;
             question?: {
                 choices: string[];
                 text: string;
@@ -495,6 +598,10 @@ export declare const inboxReadResult: z.ZodObject<{
             go?: {
                 label?: string | undefined;
             } | undefined;
+            after?: {
+                said: string;
+                undo: boolean;
+            } | undefined;
         }[];
     }[];
     earlier: number;
@@ -503,6 +610,7 @@ export declare const inboxReadResult: z.ZodObject<{
         name: string;
     }[];
 }, {
+    rev: number;
     items: {
         id: string;
         module: string;
@@ -519,15 +627,19 @@ export declare const inboxReadResult: z.ZodObject<{
         says?: string | undefined;
         detail?: string | undefined;
         priority?: "urgent" | "normal" | "low" | undefined;
-        go?: {
-            label?: string | undefined;
-        } | undefined;
         where?: string | undefined;
         here?: boolean | undefined;
         seen?: boolean | undefined;
         mutable?: boolean | undefined;
+        go?: {
+            label?: string | undefined;
+        } | undefined;
+        adoptable?: boolean | undefined;
+        after?: {
+            said: string;
+            undo?: boolean | undefined;
+        } | undefined;
     }[];
-    rev: number;
     next?: {
         id: string;
         module: string;
@@ -553,13 +665,18 @@ export declare const inboxReadResult: z.ZodObject<{
             says?: string | undefined;
             detail?: string | undefined;
             priority?: "urgent" | "normal" | "low" | undefined;
-            go?: {
-                label?: string | undefined;
-            } | undefined;
             where?: string | undefined;
             here?: boolean | undefined;
             seen?: boolean | undefined;
             mutable?: boolean | undefined;
+            go?: {
+                label?: string | undefined;
+            } | undefined;
+            adoptable?: boolean | undefined;
+            after?: {
+                said: string;
+                undo?: boolean | undefined;
+            } | undefined;
         }[];
     }[] | undefined;
     earlier?: number | undefined;
@@ -580,12 +697,12 @@ export declare const inboxLogParams: z.ZodObject<{
     limit: z.ZodDefault<z.ZodNumber>;
 }, "strip", z.ZodTypeAny, {
     limit: number;
-    offset: number;
     scope: "here" | "everywhere";
+    offset: number;
 }, {
     limit?: number | undefined;
-    offset?: number | undefined;
     scope?: "here" | "everywhere" | undefined;
+    offset?: number | undefined;
 }>;
 /** One row of Earlier: what became of an item (`what`, in words) and when. */
 export declare const inboxLogRowSchema: z.ZodObject<{
@@ -882,3 +999,513 @@ export type InboxSignal = (typeof INBOX_SIGNALS)[number];
  * person's press was the host's shortcut, and the page is going where they asked.
  */
 export declare const INBOX_NEXT_MS = 5000;
+/**
+ * 2.88.0. A tracker item that no epic names — the person is its author, assignee or reviewer, and it was
+ * made somewhere else, by hand or by an agent outside Kehikot — can be ADOPTED into an epic, or no longer
+ * tracked. Every act is the person's: page-only, on a fresh press, never a server's or an agent's.
+ *
+ * - `inbox.adoption`: what the page needs to offer it (a read, no press): the item, the project's epics
+ *   with their parts and refs, the host's suggestion, the conversations that worked on it
+ *   (`conversations.finder`, services.ts), the person's agent for Kehikot's own tasks, and an agent's
+ *   proposal when one was made.
+ * - `inbox.adopt`: write the ref into an epic (and parts) through the host's one writer of epics. The host
+ *   then brings along, by itself, every conversation that CONFIDENTLY worked on it (`confidentMatch`) and
+ *   belongs to no place yet, through the agent module that runs it; one that belongs to another place is
+ *   never moved and is said in the result. The item is then an ordinary item of that epic.
+ * - `inbox.adoptWith`: open the host's adoption dialog with the person's agent for Kehikot's own tasks,
+ *   which starts a conversation fed the item and proposes an epic; the person confirms there.
+ * - `inbox.untrack`: tell nothing more about this ref in this project.
+ * - `inbox.undo`: take back the last adopt (the ref, and the conversations brought along) or untrack.
+ */
+/** One item named, as every adopting act names it. */
+export declare const inboxItemKeyParams: z.ZodObject<{
+    module: z.ZodString;
+    id: z.ZodString;
+    project: z.ZodOptional<z.ZodNumber>;
+}, "strip", z.ZodTypeAny, {
+    id: string;
+    module: string;
+    project?: number | undefined;
+}, {
+    id: string;
+    module: string;
+    project?: number | undefined;
+}>;
+/** `inbox.adoption`'s params: the item. */
+export declare const inboxAdoptionParams: z.ZodObject<{
+    module: z.ZodString;
+    id: z.ZodString;
+    project: z.ZodOptional<z.ZodNumber>;
+}, "strip", z.ZodTypeAny, {
+    id: string;
+    module: string;
+    project?: number | undefined;
+}, {
+    id: string;
+    module: string;
+    project?: number | undefined;
+}>;
+/** A place a conversation is filed under: an epic (or none), its parts, a kehikko key (or none). */
+export declare const conversationPlaceSchema: z.ZodObject<{
+    epic: z.ZodNullable<z.ZodString>;
+    parts: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
+    kehikko: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+}, "strip", z.ZodTypeAny, {
+    epic: string | null;
+    parts: string[];
+    kehikko: string | null;
+}, {
+    epic: string | null;
+    parts?: string[] | undefined;
+    kehikko?: string | null | undefined;
+}>;
+export type ConversationPlace = z.infer<typeof conversationPlaceSchema>;
+/**
+ * How a conversation is known to have worked on an item, strongest first: it `created` the change, it
+ * `pushed` its branch, it worked on that `branch`, it `mentioned` the ref, or it only worked in the same
+ * `folder` (repository). Only the first three are confident enough to bring a conversation along without
+ * asking (`CONFIDENT_MATCHES`).
+ */
+export declare const CONVERSATION_MATCHES: readonly ["created", "pushed", "branch", "mentioned", "folder"];
+export type ConversationMatch = (typeof CONVERSATION_MATCHES)[number];
+export declare const CONFIDENT_MATCHES: readonly ConversationMatch[];
+/** Whether a match is confident enough for a host to bring the conversation along by itself. */
+export declare const confidentMatch: (match: ConversationMatch) => boolean;
+/** One conversation that worked on an item, as the page is shown it: its title and why it matched, never its content. */
+export declare const adoptionConversationSchema: z.ZodObject<{
+    /** The agent module that runs it (the provider `services.find` answered). */
+    module: z.ZodString;
+    /** The program's name in its own words (`Claude Code`), from the provider's descriptor. */
+    program: z.ZodString;
+    session: z.ZodString;
+    title: z.ZodString;
+    folder: z.ZodDefault<z.ZodString>;
+    lastActive: z.ZodNumber;
+    match: z.ZodEnum<["created", "pushed", "branch", "mentioned", "folder"]>;
+    /** Why it matched, in words ("created !4721", "pushed branch feat/x", "worked in this repository"). */
+    reason: z.ZodString;
+    /** Where it is filed now, in words, when it belongs to a place; null when to none. */
+    placed: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+    /** Whether adopting brings it along by itself: confident, and filed under no place. */
+    comes: z.ZodDefault<z.ZodBoolean>;
+}, "strip", z.ZodTypeAny, {
+    module: string;
+    session: string;
+    title: string;
+    folder: string;
+    program: string;
+    lastActive: number;
+    match: "created" | "pushed" | "branch" | "mentioned" | "folder";
+    reason: string;
+    placed: string | null;
+    comes: boolean;
+}, {
+    module: string;
+    session: string;
+    title: string;
+    program: string;
+    lastActive: number;
+    match: "created" | "pushed" | "branch" | "mentioned" | "folder";
+    reason: string;
+    folder?: string | undefined;
+    placed?: string | null | undefined;
+    comes?: boolean | undefined;
+}>;
+export type AdoptionConversation = z.infer<typeof adoptionConversationSchema>;
+/** `inbox.adoption`: everything a page needs to offer the item's adoption. */
+export declare const inboxAdoptionResult: z.ZodObject<{
+    outcome: z.ZodEnum<["ok", "no-such-item", "declined"]>;
+    why: z.ZodDefault<z.ZodString>;
+    item: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+        ref: z.ZodString;
+        title: z.ZodString;
+        url: z.ZodString;
+        repo: z.ZodString;
+        host: z.ZodString;
+        author: z.ZodOptional<z.ZodString>;
+        branch: z.ZodOptional<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        url: string;
+        title: string;
+        ref: string;
+        repo: string;
+        host: string;
+        branch?: string | undefined;
+        author?: string | undefined;
+    }, {
+        url: string;
+        title: string;
+        ref: string;
+        repo: string;
+        host: string;
+        branch?: string | undefined;
+        author?: string | undefined;
+    }>>>;
+    epics: z.ZodDefault<z.ZodArray<z.ZodObject<{
+        epic: z.ZodString;
+        title: z.ZodString;
+        parts: z.ZodDefault<z.ZodArray<z.ZodObject<{
+            id: z.ZodString;
+            name: z.ZodString;
+        }, "strip", z.ZodTypeAny, {
+            id: string;
+            name: string;
+        }, {
+            id: string;
+            name: string;
+        }>, "many">>;
+        refs: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
+    }, "strip", z.ZodTypeAny, {
+        epic: string;
+        parts: {
+            id: string;
+            name: string;
+        }[];
+        refs: string[];
+        title: string;
+    }, {
+        epic: string;
+        title: string;
+        parts?: {
+            id: string;
+            name: string;
+        }[] | undefined;
+        refs?: string[] | undefined;
+    }>, "many">>;
+    /**
+     * The epic the host would suggest, and why ("the same repository as its other refs"); `sure` when it
+     * is the only epic that matches, so a page may offer it as one press. Never adopted by itself.
+     */
+    suggested: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+        epic: z.ZodString;
+        parts: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
+        why: z.ZodString;
+        sure: z.ZodBoolean;
+    }, "strip", z.ZodTypeAny, {
+        epic: string;
+        parts: string[];
+        why: string;
+        sure: boolean;
+    }, {
+        epic: string;
+        why: string;
+        sure: boolean;
+        parts?: string[] | undefined;
+    }>>>;
+    conversations: z.ZodDefault<z.ZodArray<z.ZodObject<{
+        /** The agent module that runs it (the provider `services.find` answered). */
+        module: z.ZodString;
+        /** The program's name in its own words (`Claude Code`), from the provider's descriptor. */
+        program: z.ZodString;
+        session: z.ZodString;
+        title: z.ZodString;
+        folder: z.ZodDefault<z.ZodString>;
+        lastActive: z.ZodNumber;
+        match: z.ZodEnum<["created", "pushed", "branch", "mentioned", "folder"]>;
+        /** Why it matched, in words ("created !4721", "pushed branch feat/x", "worked in this repository"). */
+        reason: z.ZodString;
+        /** Where it is filed now, in words, when it belongs to a place; null when to none. */
+        placed: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+        /** Whether adopting brings it along by itself: confident, and filed under no place. */
+        comes: z.ZodDefault<z.ZodBoolean>;
+    }, "strip", z.ZodTypeAny, {
+        module: string;
+        session: string;
+        title: string;
+        folder: string;
+        program: string;
+        lastActive: number;
+        match: "created" | "pushed" | "branch" | "mentioned" | "folder";
+        reason: string;
+        placed: string | null;
+        comes: boolean;
+    }, {
+        module: string;
+        session: string;
+        title: string;
+        program: string;
+        lastActive: number;
+        match: "created" | "pushed" | "branch" | "mentioned" | "folder";
+        reason: string;
+        folder?: string | undefined;
+        placed?: string | null | undefined;
+        comes?: boolean | undefined;
+    }>, "many">>;
+    /** The person's agent for Kehikot's own tasks (`inbox.adoptWith`); null when none is picked. */
+    agent: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+        module: z.ZodString;
+        name: z.ZodString;
+    }, "strip", z.ZodTypeAny, {
+        name: string;
+        module: string;
+    }, {
+        name: string;
+        module: string;
+    }>>>;
+    /** An agent's proposal, when one was made for this item: what the dialog offers to confirm. */
+    proposal: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+        epic: z.ZodString;
+        parts: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
+        conversations: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
+        why: z.ZodString;
+    }, "strip", z.ZodTypeAny, {
+        epic: string;
+        parts: string[];
+        why: string;
+        conversations: string[];
+    }, {
+        epic: string;
+        why: string;
+        parts?: string[] | undefined;
+        conversations?: string[] | undefined;
+    }>>>;
+}, "strip", z.ZodTypeAny, {
+    outcome: "declined" | "no-such-item" | "ok";
+    why: string;
+    agent: {
+        name: string;
+        module: string;
+    } | null;
+    item: {
+        url: string;
+        title: string;
+        ref: string;
+        repo: string;
+        host: string;
+        branch?: string | undefined;
+        author?: string | undefined;
+    } | null;
+    epics: {
+        epic: string;
+        parts: {
+            id: string;
+            name: string;
+        }[];
+        refs: string[];
+        title: string;
+    }[];
+    suggested: {
+        epic: string;
+        parts: string[];
+        why: string;
+        sure: boolean;
+    } | null;
+    conversations: {
+        module: string;
+        session: string;
+        title: string;
+        folder: string;
+        program: string;
+        lastActive: number;
+        match: "created" | "pushed" | "branch" | "mentioned" | "folder";
+        reason: string;
+        placed: string | null;
+        comes: boolean;
+    }[];
+    proposal: {
+        epic: string;
+        parts: string[];
+        why: string;
+        conversations: string[];
+    } | null;
+}, {
+    outcome: "declined" | "no-such-item" | "ok";
+    why?: string | undefined;
+    agent?: {
+        name: string;
+        module: string;
+    } | null | undefined;
+    item?: {
+        url: string;
+        title: string;
+        ref: string;
+        repo: string;
+        host: string;
+        branch?: string | undefined;
+        author?: string | undefined;
+    } | null | undefined;
+    epics?: {
+        epic: string;
+        title: string;
+        parts?: {
+            id: string;
+            name: string;
+        }[] | undefined;
+        refs?: string[] | undefined;
+    }[] | undefined;
+    suggested?: {
+        epic: string;
+        why: string;
+        sure: boolean;
+        parts?: string[] | undefined;
+    } | null | undefined;
+    conversations?: {
+        module: string;
+        session: string;
+        title: string;
+        program: string;
+        lastActive: number;
+        match: "created" | "pushed" | "branch" | "mentioned" | "folder";
+        reason: string;
+        folder?: string | undefined;
+        placed?: string | null | undefined;
+        comes?: boolean | undefined;
+    }[] | undefined;
+    proposal?: {
+        epic: string;
+        why: string;
+        parts?: string[] | undefined;
+        conversations?: string[] | undefined;
+    } | null | undefined;
+}>;
+export type InboxAdoptionResult = z.infer<typeof inboxAdoptionResult>;
+/** `inbox.adopt`: the item, the epic and the parts to add its ref to. On the person's press only. */
+export declare const inboxAdoptParams: z.ZodObject<{
+    module: z.ZodString;
+    id: z.ZodString;
+    project: z.ZodOptional<z.ZodNumber>;
+} & {
+    epic: z.ZodString;
+    parts: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
+}, "strip", z.ZodTypeAny, {
+    id: string;
+    epic: string;
+    parts: string[];
+    module: string;
+    project?: number | undefined;
+}, {
+    id: string;
+    epic: string;
+    module: string;
+    parts?: string[] | undefined;
+    project?: number | undefined;
+}>;
+/** What became of one conversation when an item was adopted. */
+export declare const ADOPT_BROUGHT: readonly ["brought", "elsewhere", "failed"];
+export declare const inboxAdoptResult: z.ZodObject<{
+    outcome: z.ZodEnum<["adopted", "declined", "no-such-item"]>;
+    /** What it did, in one line: the item's `after`. */
+    said: z.ZodDefault<z.ZodString>;
+    brought: z.ZodDefault<z.ZodArray<z.ZodObject<{
+        session: z.ZodString;
+        title: z.ZodString;
+        program: z.ZodString;
+        outcome: z.ZodEnum<["brought", "elsewhere", "failed"]>;
+        why: z.ZodDefault<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        session: string;
+        outcome: "elsewhere" | "brought" | "failed";
+        why: string;
+        title: string;
+        program: string;
+    }, {
+        session: string;
+        outcome: "elsewhere" | "brought" | "failed";
+        title: string;
+        program: string;
+        why?: string | undefined;
+    }>, "many">>;
+    why: z.ZodDefault<z.ZodString>;
+}, "strip", z.ZodTypeAny, {
+    outcome: "declined" | "no-such-item" | "adopted";
+    why: string;
+    said: string;
+    brought: {
+        session: string;
+        outcome: "elsewhere" | "brought" | "failed";
+        why: string;
+        title: string;
+        program: string;
+    }[];
+}, {
+    outcome: "declined" | "no-such-item" | "adopted";
+    why?: string | undefined;
+    said?: string | undefined;
+    brought?: {
+        session: string;
+        outcome: "elsewhere" | "brought" | "failed";
+        title: string;
+        program: string;
+        why?: string | undefined;
+    }[] | undefined;
+}>;
+export type InboxAdoptResult = z.infer<typeof inboxAdoptResult>;
+/** `inbox.adoptWith`: open the host's adoption dialog with the person's agent. On the person's press only. */
+export declare const inboxAdoptWithParams: z.ZodObject<{
+    module: z.ZodString;
+    id: z.ZodString;
+    project: z.ZodOptional<z.ZodNumber>;
+}, "strip", z.ZodTypeAny, {
+    id: string;
+    module: string;
+    project?: number | undefined;
+}, {
+    id: string;
+    module: string;
+    project?: number | undefined;
+}>;
+export declare const inboxAdoptWithResult: z.ZodObject<{
+    outcome: z.ZodEnum<["opened", "no-agent", "declined", "no-such-item"]>;
+    why: z.ZodDefault<z.ZodString>;
+}, "strip", z.ZodTypeAny, {
+    outcome: "declined" | "opened" | "no-such-item" | "no-agent";
+    why: string;
+}, {
+    outcome: "declined" | "opened" | "no-such-item" | "no-agent";
+    why?: string | undefined;
+}>;
+export type InboxAdoptWithResult = z.infer<typeof inboxAdoptWithResult>;
+/** `inbox.untrack`: tell nothing more about this item's ref in this project (undone in the host's settings, or `inbox.undo`). */
+export declare const inboxUntrackParams: z.ZodObject<{
+    module: z.ZodString;
+    id: z.ZodString;
+    project: z.ZodOptional<z.ZodNumber>;
+}, "strip", z.ZodTypeAny, {
+    id: string;
+    module: string;
+    project?: number | undefined;
+}, {
+    id: string;
+    module: string;
+    project?: number | undefined;
+}>;
+export declare const inboxUntrackResult: z.ZodObject<{
+    outcome: z.ZodEnum<["done", "declined"]>;
+    changed: z.ZodDefault<z.ZodNumber>;
+    why: z.ZodDefault<z.ZodString>;
+}, "strip", z.ZodTypeAny, {
+    outcome: "declined" | "done";
+    why: string;
+    changed: number;
+}, {
+    outcome: "declined" | "done";
+    why?: string | undefined;
+    changed?: number | undefined;
+}>;
+/** `inbox.undo`: take back the last adopt or untrack of this item. */
+export declare const inboxUndoParams: z.ZodObject<{
+    module: z.ZodString;
+    id: z.ZodString;
+    project: z.ZodOptional<z.ZodNumber>;
+}, "strip", z.ZodTypeAny, {
+    id: string;
+    module: string;
+    project?: number | undefined;
+}, {
+    id: string;
+    module: string;
+    project?: number | undefined;
+}>;
+export declare const inboxUndoResult: z.ZodObject<{
+    outcome: z.ZodEnum<["done", "declined"]>;
+    changed: z.ZodDefault<z.ZodNumber>;
+    why: z.ZodDefault<z.ZodString>;
+}, "strip", z.ZodTypeAny, {
+    outcome: "declined" | "done";
+    why: string;
+    changed: number;
+}, {
+    outcome: "declined" | "done";
+    why?: string | undefined;
+    changed?: number | undefined;
+}>;

@@ -11,6 +11,28 @@ After 2.78.0, every entry's first line under its heading is its kind, and the ve
 (semver; CI checks it): `Kind: breaking` → next major, `Kind: feature` → next minor, `Kind: fix` →
 next patch.
 
+## 2.88.0 — 2026-11-12
+
+Kind: feature
+
+Adopting a tracker item no epic names, and the conversation that worked on it. **Additive**; `PROTOCOL`
+is still 2.
+
+- Inbox items carry `adoptable` and `after` (`{ said, undo }`). New page-only acts under `inbox:person`:
+  `inbox.adoption` (a read: the item, the project's epics with parts and refs, the host's suggestion,
+  the conversations that worked on it, the person's agent for Kehikot's own tasks, an agent's proposal),
+  and, on the person's fresh press, `inbox.adopt { epic, parts? }`, `inbox.adoptWith`, `inbox.untrack`
+  and `inbox.undo` (`PERSON_METHODS`, `PRESSED_METHODS`; none is a server method).
+- `CONVERSATION_MATCHES` (`created`, `pushed`, `branch`, `mentioned`, `folder`), `CONFIDENT_MATCHES`,
+  `confidentMatch`, `conversationPlaceSchema`, `adoptionConversationSchema`.
+- Services `conversations.finder` (`{ name, program, find, bring }`: `conversationsFindParams`,
+  `conversationsFindResult`, `candidatesIn`, `conversationsBringParams`, `conversationsBringResult`,
+  `sameConversationPlace`) and `agent.tasks` (`{ name, program, start, view }`: `agentTaskStartParams`,
+  `agentTaskStartResult`, `agentTaskView`, `AGENT_TASK_BRIEF_MAX`), both called by the host.
+- The host as a caller: `HOST_CALLER`, `HOST_PASS_PATH`, and `vouchHost` behind `/serve`.
+
+See [inbox](docs/inbox.md) and [services](docs/services.md).
+
 ## 2.87.0 — 2026-11-12
 
 Kind: feature

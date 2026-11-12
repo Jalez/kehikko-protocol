@@ -2447,6 +2447,7 @@ export declare const helloSchema: z.ZodObject<{
             at?: string | undefined;
             by?: string | undefined;
         } | null | undefined;
+        scope?: unknown;
         address?: {
             url: string;
             at?: string | undefined;
@@ -2462,7 +2463,6 @@ export declare const helloSchema: z.ZodObject<{
         } | undefined;
         projectPath?: string | null | undefined;
         theme?: "light" | "dark" | undefined;
-        scope?: unknown;
         appearance?: unknown;
         selection?: string[] | undefined;
         passage?: {
@@ -2716,6 +2716,7 @@ export declare const helloSchema: z.ZodObject<{
             at?: string | undefined;
             by?: string | undefined;
         } | null | undefined;
+        scope?: unknown;
         address?: {
             url: string;
             at?: string | undefined;
@@ -2731,7 +2732,6 @@ export declare const helloSchema: z.ZodObject<{
         } | undefined;
         projectPath?: string | null | undefined;
         theme?: "light" | "dark" | undefined;
-        scope?: unknown;
         appearance?: unknown;
         selection?: string[] | undefined;
         passage?: {
@@ -3407,6 +3407,7 @@ export declare const contextMessageSchema: z.ZodObject<{
         at?: string | undefined;
         by?: string | undefined;
     } | null | undefined;
+    scope?: unknown;
     address?: {
         url: string;
         at?: string | undefined;
@@ -3422,7 +3423,6 @@ export declare const contextMessageSchema: z.ZodObject<{
     } | undefined;
     projectPath?: string | null | undefined;
     theme?: "light" | "dark" | undefined;
-    scope?: unknown;
     appearance?: unknown;
     selection?: string[] | undefined;
     passage?: {
@@ -3546,9 +3546,9 @@ export declare const responseSchema: z.ZodDiscriminatedUnion<"ok", [z.ZodObject<
 }, "strip", z.ZodTypeAny, {
     type: "kehikot.response";
     id: string;
-    error: string;
     reason: "failed" | "unknown-module" | "unknown-method";
     ok: false;
+    error: string;
     since?: string | undefined;
     declined?: "host-too-old" | undefined;
 }, {
@@ -3674,17 +3674,17 @@ export declare const readySchema: z.ZodObject<{
         protocol: z.ZodString;
         start: z.ZodCatch<z.ZodOptional<z.ZodString>>;
     }, "strip", z.ZodTypeAny, {
+        started: string;
         version: string;
         commit: string | null;
         protocol: string;
-        started: string;
         start?: string | undefined;
     }, {
+        started: string;
         version: string;
         protocol: string;
-        started: string;
-        commit?: string | null | undefined;
         start?: unknown;
+        commit?: string | null | undefined;
     }>>>;
     /**
      * 2.70.0. "Keep your cover up until I say `kehikot.drawn`": the page is still reading what it shows,
@@ -3703,10 +3703,10 @@ export declare const readySchema: z.ZodObject<{
     protocol: number;
     label?: string | undefined;
     build?: {
+        started: string;
         version: string;
         commit: string | null;
         protocol: string;
-        started: string;
         start?: string | undefined;
     } | undefined;
     hold?: boolean | undefined;
@@ -3900,18 +3900,18 @@ export declare const inboxMessageSchema: z.ZodObject<{
     }>>>;
 }, "strip", z.ZodTypeAny, {
     type: "kehikot.inbox";
-    kind: "changed" | "next";
-    protocol: number;
+    kind: "next" | "changed";
     rev: number;
+    protocol: number;
     next?: {
         id: string;
         module: string;
     } | null | undefined;
 }, {
     type: "kehikot.inbox";
-    kind: "changed" | "next";
-    protocol: number;
+    kind: "next" | "changed";
     rev: number;
+    protocol: number;
     next?: {
         id: string;
         module: string;
@@ -3973,13 +3973,13 @@ export declare const pageErrorSchema: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     message: string;
     type: "kehikot.page.error";
-    stack: string;
     where: string;
+    stack: string;
 }, {
     message: string;
     type: "kehikot.page.error";
-    stack?: string | undefined;
     where?: string | undefined;
+    stack?: string | undefined;
 }>;
 export type PageErrorMessage = z.infer<typeof pageErrorSchema>;
 /**
@@ -4005,12 +4005,12 @@ export declare const findSchema: z.ZodObject<{
     caseSensitive: boolean;
     wholeWord: boolean;
     query: string;
-    direction: "first" | "next" | "prev" | "close";
+    direction: "next" | "first" | "prev" | "close";
 }, {
     type: "kehikot.find";
     id: string;
     protocol: number;
-    direction: "first" | "next" | "prev" | "close";
+    direction: "next" | "first" | "prev" | "close";
     caseSensitive?: boolean | undefined;
     wholeWord?: boolean | undefined;
     query?: string | undefined;
@@ -4678,6 +4678,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             at?: string | undefined;
             by?: string | undefined;
         } | null | undefined;
+        scope?: unknown;
         address?: {
             url: string;
             at?: string | undefined;
@@ -4693,7 +4694,6 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         } | undefined;
         projectPath?: string | null | undefined;
         theme?: "light" | "dark" | undefined;
-        scope?: unknown;
         appearance?: unknown;
         selection?: string[] | undefined;
         passage?: {
@@ -4947,6 +4947,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             at?: string | undefined;
             by?: string | undefined;
         } | null | undefined;
+        scope?: unknown;
         address?: {
             url: string;
             at?: string | undefined;
@@ -4962,7 +4963,6 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         } | undefined;
         projectPath?: string | null | undefined;
         theme?: "light" | "dark" | undefined;
-        scope?: unknown;
         appearance?: unknown;
         selection?: string[] | undefined;
         passage?: {
@@ -5632,6 +5632,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         at?: string | undefined;
         by?: string | undefined;
     } | null | undefined;
+    scope?: unknown;
     address?: {
         url: string;
         at?: string | undefined;
@@ -5647,7 +5648,6 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     } | undefined;
     projectPath?: string | null | undefined;
     theme?: "light" | "dark" | undefined;
-    scope?: unknown;
     appearance?: unknown;
     selection?: string[] | undefined;
     passage?: {
@@ -5741,9 +5741,9 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     type: "kehikot.response";
     id: string;
-    error: string;
     reason: "failed" | "unknown-module" | "unknown-method";
     ok: false;
+    error: string;
     since?: string | undefined;
     declined?: "host-too-old" | undefined;
 }, {
@@ -5954,12 +5954,12 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     caseSensitive: boolean;
     wholeWord: boolean;
     query: string;
-    direction: "first" | "next" | "prev" | "close";
+    direction: "next" | "first" | "prev" | "close";
 }, {
     type: "kehikot.find";
     id: string;
     protocol: number;
-    direction: "first" | "next" | "prev" | "close";
+    direction: "next" | "first" | "prev" | "close";
     caseSensitive?: boolean | undefined;
     wholeWord?: boolean | undefined;
     query?: string | undefined;
@@ -5980,18 +5980,18 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     }>>>;
 }, "strip", z.ZodTypeAny, {
     type: "kehikot.inbox";
-    kind: "changed" | "next";
-    protocol: number;
+    kind: "next" | "changed";
     rev: number;
+    protocol: number;
     next?: {
         id: string;
         module: string;
     } | null | undefined;
 }, {
     type: "kehikot.inbox";
-    kind: "changed" | "next";
-    protocol: number;
+    kind: "next" | "changed";
     rev: number;
+    protocol: number;
     next?: {
         id: string;
         module: string;
@@ -6010,17 +6010,17 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
         protocol: z.ZodString;
         start: z.ZodCatch<z.ZodOptional<z.ZodString>>;
     }, "strip", z.ZodTypeAny, {
+        started: string;
         version: string;
         commit: string | null;
         protocol: string;
-        started: string;
         start?: string | undefined;
     }, {
+        started: string;
         version: string;
         protocol: string;
-        started: string;
-        commit?: string | null | undefined;
         start?: unknown;
+        commit?: string | null | undefined;
     }>>>;
     /**
      * 2.70.0. "Keep your cover up until I say `kehikot.drawn`": the page is still reading what it shows,
@@ -6039,10 +6039,10 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
     protocol: number;
     label?: string | undefined;
     build?: {
+        started: string;
         version: string;
         commit: string | null;
         protocol: string;
-        started: string;
         start?: string | undefined;
     } | undefined;
     hold?: boolean | undefined;
@@ -7838,13 +7838,13 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     message: string;
     type: "kehikot.page.error";
-    stack: string;
     where: string;
+    stack: string;
 }, {
     message: string;
     type: "kehikot.page.error";
-    stack?: string | undefined;
     where?: string | undefined;
+    stack?: string | undefined;
 }>, z.ZodEffects<z.ZodObject<{
     unsupported: z.ZodDefault<z.ZodBoolean>;
     total: z.ZodNumber;

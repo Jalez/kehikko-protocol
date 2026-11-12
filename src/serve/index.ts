@@ -89,6 +89,8 @@ export {
   fetchService,
   callerHeaders,
   vouchCaller,
+  vouchHost,
+  type VouchHostOptions,
   type FoundService,
   type FindServiceOptions,
   type CallServiceOptions,

@@ -521,7 +521,7 @@ export declare const trackerRowSchema: z.ZodObject<{
      * The person's roles on this item, worked out by the host from who they are on this row's tracker
      * (2.7.0). Absent when the host does not know who the person is there; empty when they have none.
      */
-    myRoles: z.ZodOptional<z.ZodEffects<z.ZodArray<z.ZodEnum<["reviewer-asked", "reviewer-done", "author", "assignee"]>, "many">, ("reviewer-asked" | "reviewer-done" | "author" | "assignee")[], ("reviewer-asked" | "reviewer-done" | "author" | "assignee")[]>>;
+    myRoles: z.ZodOptional<z.ZodEffects<z.ZodArray<z.ZodEnum<["reviewer-asked", "reviewer-done", "author", "assignee"]>, "many">, ("author" | "reviewer-asked" | "reviewer-done" | "assignee")[], ("author" | "reviewer-asked" | "reviewer-done" | "assignee")[]>>;
     /** On a change: its resolvable review discussions, resolved and not. (2.7.0) */
     discussions: z.ZodOptional<z.ZodObject<{
         resolved: z.ZodNumber;
@@ -720,10 +720,10 @@ export declare const trackerRowSchema: z.ZodObject<{
     state: "open" | "merged" | "closed";
     title: string;
     ref: string;
+    repo: string;
+    host: string;
     readAt: string;
     tracker: "github" | "gitlab";
-    host: string;
-    repo: string;
     labels: string[];
     assignees: string[];
     links: {
@@ -743,13 +743,13 @@ export declare const trackerRowSchema: z.ZodObject<{
         headSha?: string | null | undefined;
         approvedBy?: string[] | undefined;
     } | undefined;
+    author?: string | null | undefined;
     column?: {
         name: string;
         board: string;
         boardUrl?: string | undefined;
     } | undefined;
     updatedAt?: string | null | undefined;
-    author?: string | null | undefined;
     review?: "required" | "approved" | "changes-requested" | undefined;
     stateReason?: string | null | undefined;
     closedByMerge?: boolean | undefined;
@@ -759,7 +759,7 @@ export declare const trackerRowSchema: z.ZodObject<{
     mergedAt?: string | null | undefined;
     contributes?: string[] | undefined;
     contributedBy?: string[] | undefined;
-    pipeline?: "failed" | "success" | "running" | "pending" | "canceled" | "skipped" | "manual" | undefined;
+    pipeline?: "failed" | "running" | "success" | "pending" | "canceled" | "skipped" | "manual" | undefined;
     pipelineUrl?: string | undefined;
     pipelineAt?: string | undefined;
     columns?: {
@@ -777,7 +777,7 @@ export declare const trackerRowSchema: z.ZodObject<{
     }[] | undefined;
     authorLogin?: string | null | undefined;
     assigneeLogins?: string[] | undefined;
-    myRoles?: ("reviewer-asked" | "reviewer-done" | "author" | "assignee")[] | undefined;
+    myRoles?: ("author" | "reviewer-asked" | "reviewer-done" | "assignee")[] | undefined;
     discussions?: {
         resolved: number;
         unresolved: number;
@@ -815,10 +815,10 @@ export declare const trackerRowSchema: z.ZodObject<{
     state: "open" | "merged" | "closed";
     title: string;
     ref: string;
+    repo: string;
+    host: string;
     readAt: string;
     tracker: "github" | "gitlab";
-    host: string;
-    repo: string;
     detail?: {
         readAt: string;
         body?: string | undefined;
@@ -832,13 +832,13 @@ export declare const trackerRowSchema: z.ZodObject<{
         headSha?: string | null | undefined;
         approvedBy?: string[] | undefined;
     } | undefined;
+    author?: string | null | undefined;
     column?: {
         name: string;
         board: string;
         boardUrl?: string | undefined;
     } | undefined;
     updatedAt?: string | null | undefined;
-    author?: string | null | undefined;
     review?: "required" | "approved" | "changes-requested" | undefined;
     stateReason?: string | null | undefined;
     closedByMerge?: boolean | undefined;
@@ -854,7 +854,7 @@ export declare const trackerRowSchema: z.ZodObject<{
     }[] | undefined;
     contributes?: unknown;
     contributedBy?: unknown;
-    pipeline?: "failed" | "success" | "running" | "pending" | "canceled" | "skipped" | "manual" | undefined;
+    pipeline?: "failed" | "running" | "success" | "pending" | "canceled" | "skipped" | "manual" | undefined;
     pipelineUrl?: unknown;
     pipelineAt?: unknown;
     columns?: {
@@ -872,7 +872,7 @@ export declare const trackerRowSchema: z.ZodObject<{
     }[] | undefined;
     authorLogin?: string | null | undefined;
     assigneeLogins?: string[] | undefined;
-    myRoles?: ("reviewer-asked" | "reviewer-done" | "author" | "assignee")[] | undefined;
+    myRoles?: ("author" | "reviewer-asked" | "reviewer-done" | "assignee")[] | undefined;
     discussions?: {
         resolved: number;
         unresolved: number;
@@ -928,17 +928,17 @@ export declare const trackerSourceSchema: z.ZodObject<{
     refreshing: z.ZodDefault<z.ZodBoolean>;
 }, "strip", z.ZodTypeAny, {
     at: string | null;
-    tracker: "github" | "gitlab";
-    host: string;
     repo: string;
+    host: string;
+    tracker: "github" | "gitlab";
     default: boolean;
     listed: boolean;
     error: string | null;
     refreshing: boolean;
 }, {
-    tracker: "github" | "gitlab";
-    host: string;
     repo: string;
+    host: string;
+    tracker: "github" | "gitlab";
     at?: string | null | undefined;
     default?: boolean | undefined;
     listed?: boolean | undefined;
@@ -957,11 +957,11 @@ export declare const trackerMissingSchema: z.ZodObject<{
     ref: z.ZodString;
     reason: z.ZodEnum<["pending", "not-found", "no-tracker", "failed"]>;
 }, "strip", z.ZodTypeAny, {
-    ref: string;
     reason: "failed" | "pending" | "not-found" | "no-tracker";
+    ref: string;
 }, {
-    ref: string;
     reason: "failed" | "pending" | "not-found" | "no-tracker";
+    ref: string;
 }>;
 export type TrackerMissing = z.infer<typeof trackerMissingSchema>;
 /**
@@ -996,17 +996,17 @@ export declare const trackerReadingResult: z.ZodObject<{
         refreshing: z.ZodDefault<z.ZodBoolean>;
     }, "strip", z.ZodTypeAny, {
         at: string | null;
-        tracker: "github" | "gitlab";
-        host: string;
         repo: string;
+        host: string;
+        tracker: "github" | "gitlab";
         default: boolean;
         listed: boolean;
         error: string | null;
         refreshing: boolean;
     }, {
-        tracker: "github" | "gitlab";
-        host: string;
         repo: string;
+        host: string;
+        tracker: "github" | "gitlab";
         at?: string | null | undefined;
         default?: boolean | undefined;
         listed?: boolean | undefined;
@@ -1182,7 +1182,7 @@ export declare const trackerReadingResult: z.ZodObject<{
          * The person's roles on this item, worked out by the host from who they are on this row's tracker
          * (2.7.0). Absent when the host does not know who the person is there; empty when they have none.
          */
-        myRoles: z.ZodOptional<z.ZodEffects<z.ZodArray<z.ZodEnum<["reviewer-asked", "reviewer-done", "author", "assignee"]>, "many">, ("reviewer-asked" | "reviewer-done" | "author" | "assignee")[], ("reviewer-asked" | "reviewer-done" | "author" | "assignee")[]>>;
+        myRoles: z.ZodOptional<z.ZodEffects<z.ZodArray<z.ZodEnum<["reviewer-asked", "reviewer-done", "author", "assignee"]>, "many">, ("author" | "reviewer-asked" | "reviewer-done" | "assignee")[], ("author" | "reviewer-asked" | "reviewer-done" | "assignee")[]>>;
         /** On a change: its resolvable review discussions, resolved and not. (2.7.0) */
         discussions: z.ZodOptional<z.ZodObject<{
             resolved: z.ZodNumber;
@@ -1381,10 +1381,10 @@ export declare const trackerReadingResult: z.ZodObject<{
         state: "open" | "merged" | "closed";
         title: string;
         ref: string;
+        repo: string;
+        host: string;
         readAt: string;
         tracker: "github" | "gitlab";
-        host: string;
-        repo: string;
         labels: string[];
         assignees: string[];
         links: {
@@ -1404,13 +1404,13 @@ export declare const trackerReadingResult: z.ZodObject<{
             headSha?: string | null | undefined;
             approvedBy?: string[] | undefined;
         } | undefined;
+        author?: string | null | undefined;
         column?: {
             name: string;
             board: string;
             boardUrl?: string | undefined;
         } | undefined;
         updatedAt?: string | null | undefined;
-        author?: string | null | undefined;
         review?: "required" | "approved" | "changes-requested" | undefined;
         stateReason?: string | null | undefined;
         closedByMerge?: boolean | undefined;
@@ -1420,7 +1420,7 @@ export declare const trackerReadingResult: z.ZodObject<{
         mergedAt?: string | null | undefined;
         contributes?: string[] | undefined;
         contributedBy?: string[] | undefined;
-        pipeline?: "failed" | "success" | "running" | "pending" | "canceled" | "skipped" | "manual" | undefined;
+        pipeline?: "failed" | "running" | "success" | "pending" | "canceled" | "skipped" | "manual" | undefined;
         pipelineUrl?: string | undefined;
         pipelineAt?: string | undefined;
         columns?: {
@@ -1438,7 +1438,7 @@ export declare const trackerReadingResult: z.ZodObject<{
         }[] | undefined;
         authorLogin?: string | null | undefined;
         assigneeLogins?: string[] | undefined;
-        myRoles?: ("reviewer-asked" | "reviewer-done" | "author" | "assignee")[] | undefined;
+        myRoles?: ("author" | "reviewer-asked" | "reviewer-done" | "assignee")[] | undefined;
         discussions?: {
             resolved: number;
             unresolved: number;
@@ -1476,10 +1476,10 @@ export declare const trackerReadingResult: z.ZodObject<{
         state: "open" | "merged" | "closed";
         title: string;
         ref: string;
+        repo: string;
+        host: string;
         readAt: string;
         tracker: "github" | "gitlab";
-        host: string;
-        repo: string;
         detail?: {
             readAt: string;
             body?: string | undefined;
@@ -1493,13 +1493,13 @@ export declare const trackerReadingResult: z.ZodObject<{
             headSha?: string | null | undefined;
             approvedBy?: string[] | undefined;
         } | undefined;
+        author?: string | null | undefined;
         column?: {
             name: string;
             board: string;
             boardUrl?: string | undefined;
         } | undefined;
         updatedAt?: string | null | undefined;
-        author?: string | null | undefined;
         review?: "required" | "approved" | "changes-requested" | undefined;
         stateReason?: string | null | undefined;
         closedByMerge?: boolean | undefined;
@@ -1515,7 +1515,7 @@ export declare const trackerReadingResult: z.ZodObject<{
         }[] | undefined;
         contributes?: unknown;
         contributedBy?: unknown;
-        pipeline?: "failed" | "success" | "running" | "pending" | "canceled" | "skipped" | "manual" | undefined;
+        pipeline?: "failed" | "running" | "success" | "pending" | "canceled" | "skipped" | "manual" | undefined;
         pipelineUrl?: unknown;
         pipelineAt?: unknown;
         columns?: {
@@ -1533,7 +1533,7 @@ export declare const trackerReadingResult: z.ZodObject<{
         }[] | undefined;
         authorLogin?: string | null | undefined;
         assigneeLogins?: string[] | undefined;
-        myRoles?: ("reviewer-asked" | "reviewer-done" | "author" | "assignee")[] | undefined;
+        myRoles?: ("author" | "reviewer-asked" | "reviewer-done" | "assignee")[] | undefined;
         discussions?: {
             resolved: number;
             unresolved: number;
@@ -1569,25 +1569,14 @@ export declare const trackerReadingResult: z.ZodObject<{
         ref: z.ZodString;
         reason: z.ZodEnum<["pending", "not-found", "no-tracker", "failed"]>;
     }, "strip", z.ZodTypeAny, {
-        ref: string;
         reason: "failed" | "pending" | "not-found" | "no-tracker";
+        ref: string;
     }, {
-        ref: string;
         reason: "failed" | "pending" | "not-found" | "no-tracker";
+        ref: string;
     }>, "many">>;
 }, "strip", z.ZodTypeAny, {
     at: string | null;
-    refreshing: boolean;
-    sources: {
-        at: string | null;
-        tracker: "github" | "gitlab";
-        host: string;
-        repo: string;
-        default: boolean;
-        listed: boolean;
-        error: string | null;
-        refreshing: boolean;
-    }[];
     rows: {
         number: number;
         kind: "change" | "issue";
@@ -1595,10 +1584,10 @@ export declare const trackerReadingResult: z.ZodObject<{
         state: "open" | "merged" | "closed";
         title: string;
         ref: string;
+        repo: string;
+        host: string;
         readAt: string;
         tracker: "github" | "gitlab";
-        host: string;
-        repo: string;
         labels: string[];
         assignees: string[];
         links: {
@@ -1618,13 +1607,13 @@ export declare const trackerReadingResult: z.ZodObject<{
             headSha?: string | null | undefined;
             approvedBy?: string[] | undefined;
         } | undefined;
+        author?: string | null | undefined;
         column?: {
             name: string;
             board: string;
             boardUrl?: string | undefined;
         } | undefined;
         updatedAt?: string | null | undefined;
-        author?: string | null | undefined;
         review?: "required" | "approved" | "changes-requested" | undefined;
         stateReason?: string | null | undefined;
         closedByMerge?: boolean | undefined;
@@ -1634,7 +1623,7 @@ export declare const trackerReadingResult: z.ZodObject<{
         mergedAt?: string | null | undefined;
         contributes?: string[] | undefined;
         contributedBy?: string[] | undefined;
-        pipeline?: "failed" | "success" | "running" | "pending" | "canceled" | "skipped" | "manual" | undefined;
+        pipeline?: "failed" | "running" | "success" | "pending" | "canceled" | "skipped" | "manual" | undefined;
         pipelineUrl?: string | undefined;
         pipelineAt?: string | undefined;
         columns?: {
@@ -1652,7 +1641,7 @@ export declare const trackerReadingResult: z.ZodObject<{
         }[] | undefined;
         authorLogin?: string | null | undefined;
         assigneeLogins?: string[] | undefined;
-        myRoles?: ("reviewer-asked" | "reviewer-done" | "author" | "assignee")[] | undefined;
+        myRoles?: ("author" | "reviewer-asked" | "reviewer-done" | "assignee")[] | undefined;
         discussions?: {
             resolved: number;
             unresolved: number;
@@ -1684,23 +1673,23 @@ export declare const trackerReadingResult: z.ZodObject<{
             url?: string | undefined;
         }[] | undefined;
     }[];
+    refreshing: boolean;
+    sources: {
+        at: string | null;
+        repo: string;
+        host: string;
+        tracker: "github" | "gitlab";
+        default: boolean;
+        listed: boolean;
+        error: string | null;
+        refreshing: boolean;
+    }[];
     missing: {
-        ref: string;
         reason: "failed" | "pending" | "not-found" | "no-tracker";
+        ref: string;
     }[];
 }, {
     at?: string | null | undefined;
-    refreshing?: boolean | undefined;
-    sources?: {
-        tracker: "github" | "gitlab";
-        host: string;
-        repo: string;
-        at?: string | null | undefined;
-        default?: boolean | undefined;
-        listed?: boolean | undefined;
-        error?: string | null | undefined;
-        refreshing?: boolean | undefined;
-    }[] | undefined;
     rows?: {
         number: number;
         kind: "change" | "issue";
@@ -1708,10 +1697,10 @@ export declare const trackerReadingResult: z.ZodObject<{
         state: "open" | "merged" | "closed";
         title: string;
         ref: string;
+        repo: string;
+        host: string;
         readAt: string;
         tracker: "github" | "gitlab";
-        host: string;
-        repo: string;
         detail?: {
             readAt: string;
             body?: string | undefined;
@@ -1725,13 +1714,13 @@ export declare const trackerReadingResult: z.ZodObject<{
             headSha?: string | null | undefined;
             approvedBy?: string[] | undefined;
         } | undefined;
+        author?: string | null | undefined;
         column?: {
             name: string;
             board: string;
             boardUrl?: string | undefined;
         } | undefined;
         updatedAt?: string | null | undefined;
-        author?: string | null | undefined;
         review?: "required" | "approved" | "changes-requested" | undefined;
         stateReason?: string | null | undefined;
         closedByMerge?: boolean | undefined;
@@ -1747,7 +1736,7 @@ export declare const trackerReadingResult: z.ZodObject<{
         }[] | undefined;
         contributes?: unknown;
         contributedBy?: unknown;
-        pipeline?: "failed" | "success" | "running" | "pending" | "canceled" | "skipped" | "manual" | undefined;
+        pipeline?: "failed" | "running" | "success" | "pending" | "canceled" | "skipped" | "manual" | undefined;
         pipelineUrl?: unknown;
         pipelineAt?: unknown;
         columns?: {
@@ -1765,7 +1754,7 @@ export declare const trackerReadingResult: z.ZodObject<{
         }[] | undefined;
         authorLogin?: string | null | undefined;
         assigneeLogins?: string[] | undefined;
-        myRoles?: ("reviewer-asked" | "reviewer-done" | "author" | "assignee")[] | undefined;
+        myRoles?: ("author" | "reviewer-asked" | "reviewer-done" | "assignee")[] | undefined;
         discussions?: {
             resolved: number;
             unresolved: number;
@@ -1797,9 +1786,20 @@ export declare const trackerReadingResult: z.ZodObject<{
             url?: string | undefined;
         }[] | undefined;
     }[] | undefined;
+    refreshing?: boolean | undefined;
+    sources?: {
+        repo: string;
+        host: string;
+        tracker: "github" | "gitlab";
+        at?: string | null | undefined;
+        default?: boolean | undefined;
+        listed?: boolean | undefined;
+        error?: string | null | undefined;
+        refreshing?: boolean | undefined;
+    }[] | undefined;
     missing?: {
-        ref: string;
         reason: "failed" | "pending" | "not-found" | "no-tracker";
+        ref: string;
     }[] | undefined;
 }>;
 export type TrackerReading = z.infer<typeof trackerReadingResult>;

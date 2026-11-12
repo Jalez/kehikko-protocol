@@ -117,16 +117,16 @@ export declare const serverAskResult: z.ZodDiscriminatedUnion<"ok", [z.ZodObject
     error: z.ZodString;
     refused: z.ZodCatch<z.ZodOptional<z.ZodEnum<["module", "pass", "grant", "project"]>>>;
 }, "strip", z.ZodTypeAny, {
-    error: string;
     reason: "failed" | "unknown-module" | "unknown-method";
     ok: false;
+    error: string;
     since?: string | undefined;
     declined?: "host-too-old" | undefined;
     refused?: "module" | "project" | "pass" | "grant" | undefined;
 }, {
-    error: string;
     reason: "failed" | "unknown-module" | "unknown-method";
     ok: false;
+    error: string;
     since?: unknown;
     declined?: unknown;
     refused?: unknown;

@@ -54,9 +54,9 @@ export declare const trafficNoteSchema: z.ZodObject<{
     path: string;
     status: number | null;
     kind: string;
-    host: string;
     reason: string | null;
     ok: boolean | null;
+    host: string;
     ms: number | null;
     bytesIn?: number | undefined;
     bytesOut?: number | undefined;
@@ -112,7 +112,7 @@ export declare const trafficCallerSchema: z.ZodObject<{
     pid: z.ZodOptional<z.ZodNumber>;
 }, "strip", z.ZodTypeAny, {
     name: string;
-    kind: "module" | "session" | "host" | "program" | "remote" | "gone";
+    kind: "module" | "session" | "program" | "host" | "remote" | "gone";
     how: "token" | "address" | "closed" | "process" | "route" | "origin";
     place?: string | undefined;
     process?: string | undefined;
@@ -120,7 +120,7 @@ export declare const trafficCallerSchema: z.ZodObject<{
     pid?: number | undefined;
 }, {
     name: string;
-    kind: "module" | "session" | "host" | "program" | "remote" | "gone";
+    kind: "module" | "session" | "program" | "host" | "remote" | "gone";
     how: "token" | "address" | "closed" | "process" | "route" | "origin";
     place?: string | undefined;
     process?: string | undefined;
@@ -163,7 +163,7 @@ export declare const trafficCallSchema: z.ZodObject<{
         pid: z.ZodOptional<z.ZodNumber>;
     }, "strip", z.ZodTypeAny, {
         name: string;
-        kind: "module" | "session" | "host" | "program" | "remote" | "gone";
+        kind: "module" | "session" | "program" | "host" | "remote" | "gone";
         how: "token" | "address" | "closed" | "process" | "route" | "origin";
         place?: string | undefined;
         process?: string | undefined;
@@ -171,7 +171,7 @@ export declare const trafficCallSchema: z.ZodObject<{
         pid?: number | undefined;
     }, {
         name: string;
-        kind: "module" | "session" | "host" | "program" | "remote" | "gone";
+        kind: "module" | "session" | "program" | "host" | "remote" | "gone";
         how: "token" | "address" | "closed" | "process" | "route" | "origin";
         place?: string | undefined;
         process?: string | undefined;
@@ -184,10 +184,10 @@ export declare const trafficCallSchema: z.ZodObject<{
     status: number | null;
     kind: string;
     by: string;
-    side: "seen" | "out" | "in";
-    host: string;
     reason: string | null;
     ok: boolean | null;
+    host: string;
+    side: "seen" | "out" | "in";
     reported: "module" | "host" | "sampled";
     ms: number | null;
     seq: number;
@@ -197,7 +197,7 @@ export declare const trafficCallSchema: z.ZodObject<{
     cache?: "hit" | "not-modified" | "refused" | undefined;
     caller?: {
         name: string;
-        kind: "module" | "session" | "host" | "program" | "remote" | "gone";
+        kind: "module" | "session" | "program" | "host" | "remote" | "gone";
         how: "token" | "address" | "closed" | "process" | "route" | "origin";
         place?: string | undefined;
         process?: string | undefined;
@@ -209,8 +209,8 @@ export declare const trafficCallSchema: z.ZodObject<{
     path: string;
     kind: string;
     by: string;
-    side: "seen" | "out" | "in";
     host: string;
+    side: "seen" | "out" | "in";
     reported: "module" | "host" | "sampled";
     seq: number;
     via: "page" | "server" | "process";
@@ -1208,7 +1208,7 @@ export declare const trafficReadResult: z.ZodObject<{
             pid: z.ZodOptional<z.ZodNumber>;
         }, "strip", z.ZodTypeAny, {
             name: string;
-            kind: "module" | "session" | "host" | "program" | "remote" | "gone";
+            kind: "module" | "session" | "program" | "host" | "remote" | "gone";
             how: "token" | "address" | "closed" | "process" | "route" | "origin";
             place?: string | undefined;
             process?: string | undefined;
@@ -1216,7 +1216,7 @@ export declare const trafficReadResult: z.ZodObject<{
             pid?: number | undefined;
         }, {
             name: string;
-            kind: "module" | "session" | "host" | "program" | "remote" | "gone";
+            kind: "module" | "session" | "program" | "host" | "remote" | "gone";
             how: "token" | "address" | "closed" | "process" | "route" | "origin";
             place?: string | undefined;
             process?: string | undefined;
@@ -1229,10 +1229,10 @@ export declare const trafficReadResult: z.ZodObject<{
         status: number | null;
         kind: string;
         by: string;
-        side: "seen" | "out" | "in";
-        host: string;
         reason: string | null;
         ok: boolean | null;
+        host: string;
+        side: "seen" | "out" | "in";
         reported: "module" | "host" | "sampled";
         ms: number | null;
         seq: number;
@@ -1242,7 +1242,7 @@ export declare const trafficReadResult: z.ZodObject<{
         cache?: "hit" | "not-modified" | "refused" | undefined;
         caller?: {
             name: string;
-            kind: "module" | "session" | "host" | "program" | "remote" | "gone";
+            kind: "module" | "session" | "program" | "host" | "remote" | "gone";
             how: "token" | "address" | "closed" | "process" | "route" | "origin";
             place?: string | undefined;
             process?: string | undefined;
@@ -1254,8 +1254,8 @@ export declare const trafficReadResult: z.ZodObject<{
         path: string;
         kind: string;
         by: string;
-        side: "seen" | "out" | "in";
         host: string;
+        side: "seen" | "out" | "in";
         reported: "module" | "host" | "sampled";
         seq: number;
         via: "page" | "server" | "process";
@@ -1959,18 +1959,18 @@ export declare const trafficReadResult: z.ZodObject<{
         } | undefined;
     }>>>;
 }, "strip", z.ZodTypeAny, {
-    kept: number;
     started: number;
+    kept: number;
     calls: {
         at: number;
         path: string;
         status: number | null;
         kind: string;
         by: string;
-        side: "seen" | "out" | "in";
-        host: string;
         reason: string | null;
         ok: boolean | null;
+        host: string;
+        side: "seen" | "out" | "in";
         reported: "module" | "host" | "sampled";
         ms: number | null;
         seq: number;
@@ -1980,7 +1980,7 @@ export declare const trafficReadResult: z.ZodObject<{
         cache?: "hit" | "not-modified" | "refused" | undefined;
         caller?: {
             name: string;
-            kind: "module" | "session" | "host" | "program" | "remote" | "gone";
+            kind: "module" | "session" | "program" | "host" | "remote" | "gone";
             how: "token" | "address" | "closed" | "process" | "route" | "origin";
             place?: string | undefined;
             process?: string | undefined;
@@ -2090,15 +2090,15 @@ export declare const trafficReadResult: z.ZodObject<{
         } | undefined;
     } | undefined;
 }, {
-    kept: number;
     started: number;
+    kept: number;
     calls: {
         at: number;
         path: string;
         kind: string;
         by: string;
-        side: "seen" | "out" | "in";
         host: string;
+        side: "seen" | "out" | "in";
         reported: "module" | "host" | "sampled";
         seq: number;
         via: "page" | "server" | "process";

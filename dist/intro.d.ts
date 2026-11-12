@@ -111,7 +111,7 @@ export declare const introPaneSchema: z.ZodObject<{
     y: number;
     w: number;
     h: number;
-    tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+    tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
     motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
 }, {
@@ -120,7 +120,7 @@ export declare const introPaneSchema: z.ZodObject<{
     y: number;
     w: number;
     h: number;
-    tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+    tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
     motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
 }>;
@@ -143,7 +143,7 @@ export declare const introBoxSchema: z.ZodObject<{
     y: number;
     w: number;
     h: number;
-    tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+    tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
     motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
     round?: number | undefined;
@@ -154,7 +154,7 @@ export declare const introBoxSchema: z.ZodObject<{
     y: number;
     w: number;
     h: number;
-    tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+    tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
     motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
     round?: number | undefined;
@@ -177,7 +177,7 @@ export declare const introRowsSchema: z.ZodObject<{
     y: number;
     widths: number[];
     gap?: number | undefined;
-    tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+    tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
     motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
 }, {
@@ -186,7 +186,7 @@ export declare const introRowsSchema: z.ZodObject<{
     y: number;
     widths: number[];
     gap?: number | undefined;
-    tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+    tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
     motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
 }>;
@@ -205,7 +205,7 @@ export declare const introDotSchema: z.ZodObject<{
     x: number;
     y: number;
     r: number;
-    tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+    tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
     motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
 }, {
@@ -213,7 +213,7 @@ export declare const introDotSchema: z.ZodObject<{
     x: number;
     y: number;
     r: number;
-    tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+    tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
     motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
 }>;
@@ -235,7 +235,7 @@ export declare const introLineSchema: z.ZodObject<{
     y: number;
     x2: number;
     y2: number;
-    tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+    tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
     motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
     dashed?: boolean | undefined;
@@ -245,7 +245,7 @@ export declare const introLineSchema: z.ZodObject<{
     y: number;
     x2: number;
     y2: number;
-    tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+    tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
     motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
     dashed?: boolean | undefined;
@@ -268,7 +268,7 @@ export declare const introTextSchema: z.ZodObject<{
     text: string;
     x: number;
     y: number;
-    tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+    tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
     motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
     size?: number | undefined;
@@ -279,7 +279,7 @@ export declare const introTextSchema: z.ZodObject<{
     text: string;
     x: number;
     y: number;
-    tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+    tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
     motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
     size?: number | undefined;
@@ -299,14 +299,14 @@ export declare const introPointerSchema: z.ZodObject<{
     kind: "pointer";
     x: number;
     y: number;
-    tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+    tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
     motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
 }, {
     kind: "pointer";
     x: number;
     y: number;
-    tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+    tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
     motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
 }>;
@@ -326,7 +326,7 @@ export declare const introShapeSchema: z.ZodDiscriminatedUnion<"kind", [z.ZodObj
     y: number;
     w: number;
     h: number;
-    tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+    tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
     motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
 }, {
@@ -335,7 +335,7 @@ export declare const introShapeSchema: z.ZodDiscriminatedUnion<"kind", [z.ZodObj
     y: number;
     w: number;
     h: number;
-    tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+    tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
     motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
 }>, z.ZodObject<{
@@ -356,7 +356,7 @@ export declare const introShapeSchema: z.ZodDiscriminatedUnion<"kind", [z.ZodObj
     y: number;
     w: number;
     h: number;
-    tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+    tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
     motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
     round?: number | undefined;
@@ -367,7 +367,7 @@ export declare const introShapeSchema: z.ZodDiscriminatedUnion<"kind", [z.ZodObj
     y: number;
     w: number;
     h: number;
-    tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+    tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
     motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
     round?: number | undefined;
@@ -388,7 +388,7 @@ export declare const introShapeSchema: z.ZodDiscriminatedUnion<"kind", [z.ZodObj
     y: number;
     widths: number[];
     gap?: number | undefined;
-    tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+    tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
     motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
 }, {
@@ -397,7 +397,7 @@ export declare const introShapeSchema: z.ZodDiscriminatedUnion<"kind", [z.ZodObj
     y: number;
     widths: number[];
     gap?: number | undefined;
-    tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+    tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
     motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
 }>, z.ZodObject<{
@@ -414,7 +414,7 @@ export declare const introShapeSchema: z.ZodDiscriminatedUnion<"kind", [z.ZodObj
     x: number;
     y: number;
     r: number;
-    tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+    tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
     motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
 }, {
@@ -422,7 +422,7 @@ export declare const introShapeSchema: z.ZodDiscriminatedUnion<"kind", [z.ZodObj
     x: number;
     y: number;
     r: number;
-    tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+    tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
     motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
 }>, z.ZodObject<{
@@ -442,7 +442,7 @@ export declare const introShapeSchema: z.ZodDiscriminatedUnion<"kind", [z.ZodObj
     y: number;
     x2: number;
     y2: number;
-    tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+    tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
     motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
     dashed?: boolean | undefined;
@@ -452,7 +452,7 @@ export declare const introShapeSchema: z.ZodDiscriminatedUnion<"kind", [z.ZodObj
     y: number;
     x2: number;
     y2: number;
-    tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+    tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
     motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
     dashed?: boolean | undefined;
@@ -473,7 +473,7 @@ export declare const introShapeSchema: z.ZodDiscriminatedUnion<"kind", [z.ZodObj
     text: string;
     x: number;
     y: number;
-    tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+    tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
     motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
     size?: number | undefined;
@@ -484,7 +484,7 @@ export declare const introShapeSchema: z.ZodDiscriminatedUnion<"kind", [z.ZodObj
     text: string;
     x: number;
     y: number;
-    tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+    tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
     motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
     size?: number | undefined;
@@ -502,14 +502,14 @@ export declare const introShapeSchema: z.ZodDiscriminatedUnion<"kind", [z.ZodObj
     kind: "pointer";
     x: number;
     y: number;
-    tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+    tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
     motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
 }, {
     kind: "pointer";
     x: number;
     y: number;
-    tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+    tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
     motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
     delay?: number | undefined;
 }>]>;
@@ -534,7 +534,7 @@ export declare const introArtSchema: z.ZodObject<{
         y: number;
         w: number;
         h: number;
-        tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+        tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
         motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
     }, {
@@ -543,7 +543,7 @@ export declare const introArtSchema: z.ZodObject<{
         y: number;
         w: number;
         h: number;
-        tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+        tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
         motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
     }>, z.ZodObject<{
@@ -564,7 +564,7 @@ export declare const introArtSchema: z.ZodObject<{
         y: number;
         w: number;
         h: number;
-        tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+        tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
         motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
         round?: number | undefined;
@@ -575,7 +575,7 @@ export declare const introArtSchema: z.ZodObject<{
         y: number;
         w: number;
         h: number;
-        tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+        tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
         motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
         round?: number | undefined;
@@ -596,7 +596,7 @@ export declare const introArtSchema: z.ZodObject<{
         y: number;
         widths: number[];
         gap?: number | undefined;
-        tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+        tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
         motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
     }, {
@@ -605,7 +605,7 @@ export declare const introArtSchema: z.ZodObject<{
         y: number;
         widths: number[];
         gap?: number | undefined;
-        tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+        tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
         motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
     }>, z.ZodObject<{
@@ -622,7 +622,7 @@ export declare const introArtSchema: z.ZodObject<{
         x: number;
         y: number;
         r: number;
-        tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+        tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
         motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
     }, {
@@ -630,7 +630,7 @@ export declare const introArtSchema: z.ZodObject<{
         x: number;
         y: number;
         r: number;
-        tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+        tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
         motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
     }>, z.ZodObject<{
@@ -650,7 +650,7 @@ export declare const introArtSchema: z.ZodObject<{
         y: number;
         x2: number;
         y2: number;
-        tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+        tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
         motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
         dashed?: boolean | undefined;
@@ -660,7 +660,7 @@ export declare const introArtSchema: z.ZodObject<{
         y: number;
         x2: number;
         y2: number;
-        tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+        tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
         motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
         dashed?: boolean | undefined;
@@ -681,7 +681,7 @@ export declare const introArtSchema: z.ZodObject<{
         text: string;
         x: number;
         y: number;
-        tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+        tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
         motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
         size?: number | undefined;
@@ -692,7 +692,7 @@ export declare const introArtSchema: z.ZodObject<{
         text: string;
         x: number;
         y: number;
-        tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+        tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
         motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
         size?: number | undefined;
@@ -710,14 +710,14 @@ export declare const introArtSchema: z.ZodObject<{
         kind: "pointer";
         x: number;
         y: number;
-        tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+        tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
         motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
     }, {
         kind: "pointer";
         x: number;
         y: number;
-        tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+        tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
         motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
     }>]>, "many">;
@@ -729,7 +729,7 @@ export declare const introArtSchema: z.ZodObject<{
         y: number;
         w: number;
         h: number;
-        tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+        tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
         motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
     } | {
@@ -738,7 +738,7 @@ export declare const introArtSchema: z.ZodObject<{
         y: number;
         w: number;
         h: number;
-        tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+        tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
         motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
         round?: number | undefined;
@@ -749,7 +749,7 @@ export declare const introArtSchema: z.ZodObject<{
         y: number;
         widths: number[];
         gap?: number | undefined;
-        tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+        tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
         motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
     } | {
@@ -757,7 +757,7 @@ export declare const introArtSchema: z.ZodObject<{
         x: number;
         y: number;
         r: number;
-        tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+        tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
         motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
     } | {
@@ -766,7 +766,7 @@ export declare const introArtSchema: z.ZodObject<{
         y: number;
         x2: number;
         y2: number;
-        tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+        tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
         motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
         dashed?: boolean | undefined;
@@ -775,7 +775,7 @@ export declare const introArtSchema: z.ZodObject<{
         text: string;
         x: number;
         y: number;
-        tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+        tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
         motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
         size?: number | undefined;
@@ -785,7 +785,7 @@ export declare const introArtSchema: z.ZodObject<{
         kind: "pointer";
         x: number;
         y: number;
-        tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+        tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
         motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
     })[];
@@ -797,7 +797,7 @@ export declare const introArtSchema: z.ZodObject<{
         y: number;
         w: number;
         h: number;
-        tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+        tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
         motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
     } | {
@@ -806,7 +806,7 @@ export declare const introArtSchema: z.ZodObject<{
         y: number;
         w: number;
         h: number;
-        tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+        tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
         motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
         round?: number | undefined;
@@ -817,7 +817,7 @@ export declare const introArtSchema: z.ZodObject<{
         y: number;
         widths: number[];
         gap?: number | undefined;
-        tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+        tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
         motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
     } | {
@@ -825,7 +825,7 @@ export declare const introArtSchema: z.ZodObject<{
         x: number;
         y: number;
         r: number;
-        tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+        tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
         motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
     } | {
@@ -834,7 +834,7 @@ export declare const introArtSchema: z.ZodObject<{
         y: number;
         x2: number;
         y2: number;
-        tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+        tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
         motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
         dashed?: boolean | undefined;
@@ -843,7 +843,7 @@ export declare const introArtSchema: z.ZodObject<{
         text: string;
         x: number;
         y: number;
-        tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+        tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
         motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
         size?: number | undefined;
@@ -853,7 +853,7 @@ export declare const introArtSchema: z.ZodObject<{
         kind: "pointer";
         x: number;
         y: number;
-        tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+        tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
         motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
         delay?: number | undefined;
     })[];
@@ -881,7 +881,7 @@ export declare const introSlideSchema: z.ZodObject<{
             y: number;
             w: number;
             h: number;
-            tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+            tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
             motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
         }, {
@@ -890,7 +890,7 @@ export declare const introSlideSchema: z.ZodObject<{
             y: number;
             w: number;
             h: number;
-            tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+            tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
             motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
         }>, z.ZodObject<{
@@ -911,7 +911,7 @@ export declare const introSlideSchema: z.ZodObject<{
             y: number;
             w: number;
             h: number;
-            tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+            tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
             motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
             round?: number | undefined;
@@ -922,7 +922,7 @@ export declare const introSlideSchema: z.ZodObject<{
             y: number;
             w: number;
             h: number;
-            tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+            tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
             motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
             round?: number | undefined;
@@ -943,7 +943,7 @@ export declare const introSlideSchema: z.ZodObject<{
             y: number;
             widths: number[];
             gap?: number | undefined;
-            tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+            tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
             motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
         }, {
@@ -952,7 +952,7 @@ export declare const introSlideSchema: z.ZodObject<{
             y: number;
             widths: number[];
             gap?: number | undefined;
-            tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+            tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
             motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
         }>, z.ZodObject<{
@@ -969,7 +969,7 @@ export declare const introSlideSchema: z.ZodObject<{
             x: number;
             y: number;
             r: number;
-            tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+            tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
             motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
         }, {
@@ -977,7 +977,7 @@ export declare const introSlideSchema: z.ZodObject<{
             x: number;
             y: number;
             r: number;
-            tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+            tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
             motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
         }>, z.ZodObject<{
@@ -997,7 +997,7 @@ export declare const introSlideSchema: z.ZodObject<{
             y: number;
             x2: number;
             y2: number;
-            tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+            tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
             motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
             dashed?: boolean | undefined;
@@ -1007,7 +1007,7 @@ export declare const introSlideSchema: z.ZodObject<{
             y: number;
             x2: number;
             y2: number;
-            tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+            tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
             motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
             dashed?: boolean | undefined;
@@ -1028,7 +1028,7 @@ export declare const introSlideSchema: z.ZodObject<{
             text: string;
             x: number;
             y: number;
-            tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+            tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
             motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
             size?: number | undefined;
@@ -1039,7 +1039,7 @@ export declare const introSlideSchema: z.ZodObject<{
             text: string;
             x: number;
             y: number;
-            tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+            tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
             motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
             size?: number | undefined;
@@ -1057,14 +1057,14 @@ export declare const introSlideSchema: z.ZodObject<{
             kind: "pointer";
             x: number;
             y: number;
-            tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+            tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
             motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
         }, {
             kind: "pointer";
             x: number;
             y: number;
-            tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+            tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
             motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
         }>]>, "many">;
@@ -1076,7 +1076,7 @@ export declare const introSlideSchema: z.ZodObject<{
             y: number;
             w: number;
             h: number;
-            tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+            tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
             motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
         } | {
@@ -1085,7 +1085,7 @@ export declare const introSlideSchema: z.ZodObject<{
             y: number;
             w: number;
             h: number;
-            tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+            tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
             motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
             round?: number | undefined;
@@ -1096,7 +1096,7 @@ export declare const introSlideSchema: z.ZodObject<{
             y: number;
             widths: number[];
             gap?: number | undefined;
-            tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+            tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
             motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
         } | {
@@ -1104,7 +1104,7 @@ export declare const introSlideSchema: z.ZodObject<{
             x: number;
             y: number;
             r: number;
-            tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+            tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
             motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
         } | {
@@ -1113,7 +1113,7 @@ export declare const introSlideSchema: z.ZodObject<{
             y: number;
             x2: number;
             y2: number;
-            tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+            tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
             motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
             dashed?: boolean | undefined;
@@ -1122,7 +1122,7 @@ export declare const introSlideSchema: z.ZodObject<{
             text: string;
             x: number;
             y: number;
-            tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+            tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
             motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
             size?: number | undefined;
@@ -1132,7 +1132,7 @@ export declare const introSlideSchema: z.ZodObject<{
             kind: "pointer";
             x: number;
             y: number;
-            tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+            tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
             motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
         })[];
@@ -1144,7 +1144,7 @@ export declare const introSlideSchema: z.ZodObject<{
             y: number;
             w: number;
             h: number;
-            tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+            tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
             motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
         } | {
@@ -1153,7 +1153,7 @@ export declare const introSlideSchema: z.ZodObject<{
             y: number;
             w: number;
             h: number;
-            tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+            tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
             motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
             round?: number | undefined;
@@ -1164,7 +1164,7 @@ export declare const introSlideSchema: z.ZodObject<{
             y: number;
             widths: number[];
             gap?: number | undefined;
-            tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+            tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
             motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
         } | {
@@ -1172,7 +1172,7 @@ export declare const introSlideSchema: z.ZodObject<{
             x: number;
             y: number;
             r: number;
-            tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+            tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
             motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
         } | {
@@ -1181,7 +1181,7 @@ export declare const introSlideSchema: z.ZodObject<{
             y: number;
             x2: number;
             y2: number;
-            tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+            tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
             motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
             dashed?: boolean | undefined;
@@ -1190,7 +1190,7 @@ export declare const introSlideSchema: z.ZodObject<{
             text: string;
             x: number;
             y: number;
-            tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+            tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
             motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
             size?: number | undefined;
@@ -1200,7 +1200,7 @@ export declare const introSlideSchema: z.ZodObject<{
             kind: "pointer";
             x: number;
             y: number;
-            tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+            tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
             motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
         })[];
@@ -1216,7 +1216,7 @@ export declare const introSlideSchema: z.ZodObject<{
             y: number;
             w: number;
             h: number;
-            tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+            tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
             motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
         } | {
@@ -1225,7 +1225,7 @@ export declare const introSlideSchema: z.ZodObject<{
             y: number;
             w: number;
             h: number;
-            tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+            tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
             motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
             round?: number | undefined;
@@ -1236,7 +1236,7 @@ export declare const introSlideSchema: z.ZodObject<{
             y: number;
             widths: number[];
             gap?: number | undefined;
-            tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+            tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
             motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
         } | {
@@ -1244,7 +1244,7 @@ export declare const introSlideSchema: z.ZodObject<{
             x: number;
             y: number;
             r: number;
-            tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+            tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
             motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
         } | {
@@ -1253,7 +1253,7 @@ export declare const introSlideSchema: z.ZodObject<{
             y: number;
             x2: number;
             y2: number;
-            tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+            tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
             motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
             dashed?: boolean | undefined;
@@ -1262,7 +1262,7 @@ export declare const introSlideSchema: z.ZodObject<{
             text: string;
             x: number;
             y: number;
-            tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+            tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
             motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
             size?: number | undefined;
@@ -1272,7 +1272,7 @@ export declare const introSlideSchema: z.ZodObject<{
             kind: "pointer";
             x: number;
             y: number;
-            tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+            tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
             motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
             delay?: number | undefined;
         })[];
@@ -1306,7 +1306,7 @@ export declare const introSchema: z.ZodObject<{
                 y: number;
                 w: number;
                 h: number;
-                tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+                tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
                 motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             }, {
@@ -1315,7 +1315,7 @@ export declare const introSchema: z.ZodObject<{
                 y: number;
                 w: number;
                 h: number;
-                tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+                tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
                 motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             }>, z.ZodObject<{
@@ -1336,7 +1336,7 @@ export declare const introSchema: z.ZodObject<{
                 y: number;
                 w: number;
                 h: number;
-                tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+                tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
                 motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
                 round?: number | undefined;
@@ -1347,7 +1347,7 @@ export declare const introSchema: z.ZodObject<{
                 y: number;
                 w: number;
                 h: number;
-                tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+                tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
                 motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
                 round?: number | undefined;
@@ -1368,7 +1368,7 @@ export declare const introSchema: z.ZodObject<{
                 y: number;
                 widths: number[];
                 gap?: number | undefined;
-                tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+                tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
                 motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             }, {
@@ -1377,7 +1377,7 @@ export declare const introSchema: z.ZodObject<{
                 y: number;
                 widths: number[];
                 gap?: number | undefined;
-                tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+                tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
                 motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             }>, z.ZodObject<{
@@ -1394,7 +1394,7 @@ export declare const introSchema: z.ZodObject<{
                 x: number;
                 y: number;
                 r: number;
-                tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+                tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
                 motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             }, {
@@ -1402,7 +1402,7 @@ export declare const introSchema: z.ZodObject<{
                 x: number;
                 y: number;
                 r: number;
-                tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+                tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
                 motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             }>, z.ZodObject<{
@@ -1422,7 +1422,7 @@ export declare const introSchema: z.ZodObject<{
                 y: number;
                 x2: number;
                 y2: number;
-                tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+                tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
                 motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
                 dashed?: boolean | undefined;
@@ -1432,7 +1432,7 @@ export declare const introSchema: z.ZodObject<{
                 y: number;
                 x2: number;
                 y2: number;
-                tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+                tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
                 motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
                 dashed?: boolean | undefined;
@@ -1453,7 +1453,7 @@ export declare const introSchema: z.ZodObject<{
                 text: string;
                 x: number;
                 y: number;
-                tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+                tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
                 motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
                 size?: number | undefined;
@@ -1464,7 +1464,7 @@ export declare const introSchema: z.ZodObject<{
                 text: string;
                 x: number;
                 y: number;
-                tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+                tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
                 motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
                 size?: number | undefined;
@@ -1482,14 +1482,14 @@ export declare const introSchema: z.ZodObject<{
                 kind: "pointer";
                 x: number;
                 y: number;
-                tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+                tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
                 motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             }, {
                 kind: "pointer";
                 x: number;
                 y: number;
-                tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+                tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
                 motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             }>]>, "many">;
@@ -1501,7 +1501,7 @@ export declare const introSchema: z.ZodObject<{
                 y: number;
                 w: number;
                 h: number;
-                tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+                tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
                 motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             } | {
@@ -1510,7 +1510,7 @@ export declare const introSchema: z.ZodObject<{
                 y: number;
                 w: number;
                 h: number;
-                tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+                tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
                 motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
                 round?: number | undefined;
@@ -1521,7 +1521,7 @@ export declare const introSchema: z.ZodObject<{
                 y: number;
                 widths: number[];
                 gap?: number | undefined;
-                tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+                tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
                 motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             } | {
@@ -1529,7 +1529,7 @@ export declare const introSchema: z.ZodObject<{
                 x: number;
                 y: number;
                 r: number;
-                tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+                tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
                 motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             } | {
@@ -1538,7 +1538,7 @@ export declare const introSchema: z.ZodObject<{
                 y: number;
                 x2: number;
                 y2: number;
-                tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+                tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
                 motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
                 dashed?: boolean | undefined;
@@ -1547,7 +1547,7 @@ export declare const introSchema: z.ZodObject<{
                 text: string;
                 x: number;
                 y: number;
-                tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+                tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
                 motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
                 size?: number | undefined;
@@ -1557,7 +1557,7 @@ export declare const introSchema: z.ZodObject<{
                 kind: "pointer";
                 x: number;
                 y: number;
-                tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+                tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
                 motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             })[];
@@ -1569,7 +1569,7 @@ export declare const introSchema: z.ZodObject<{
                 y: number;
                 w: number;
                 h: number;
-                tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+                tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
                 motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             } | {
@@ -1578,7 +1578,7 @@ export declare const introSchema: z.ZodObject<{
                 y: number;
                 w: number;
                 h: number;
-                tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+                tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
                 motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
                 round?: number | undefined;
@@ -1589,7 +1589,7 @@ export declare const introSchema: z.ZodObject<{
                 y: number;
                 widths: number[];
                 gap?: number | undefined;
-                tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+                tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
                 motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             } | {
@@ -1597,7 +1597,7 @@ export declare const introSchema: z.ZodObject<{
                 x: number;
                 y: number;
                 r: number;
-                tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+                tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
                 motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             } | {
@@ -1606,7 +1606,7 @@ export declare const introSchema: z.ZodObject<{
                 y: number;
                 x2: number;
                 y2: number;
-                tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+                tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
                 motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
                 dashed?: boolean | undefined;
@@ -1615,7 +1615,7 @@ export declare const introSchema: z.ZodObject<{
                 text: string;
                 x: number;
                 y: number;
-                tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+                tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
                 motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
                 size?: number | undefined;
@@ -1625,7 +1625,7 @@ export declare const introSchema: z.ZodObject<{
                 kind: "pointer";
                 x: number;
                 y: number;
-                tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+                tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
                 motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             })[];
@@ -1641,7 +1641,7 @@ export declare const introSchema: z.ZodObject<{
                 y: number;
                 w: number;
                 h: number;
-                tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+                tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
                 motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             } | {
@@ -1650,7 +1650,7 @@ export declare const introSchema: z.ZodObject<{
                 y: number;
                 w: number;
                 h: number;
-                tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+                tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
                 motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
                 round?: number | undefined;
@@ -1661,7 +1661,7 @@ export declare const introSchema: z.ZodObject<{
                 y: number;
                 widths: number[];
                 gap?: number | undefined;
-                tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+                tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
                 motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             } | {
@@ -1669,7 +1669,7 @@ export declare const introSchema: z.ZodObject<{
                 x: number;
                 y: number;
                 r: number;
-                tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+                tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
                 motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             } | {
@@ -1678,7 +1678,7 @@ export declare const introSchema: z.ZodObject<{
                 y: number;
                 x2: number;
                 y2: number;
-                tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+                tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
                 motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
                 dashed?: boolean | undefined;
@@ -1687,7 +1687,7 @@ export declare const introSchema: z.ZodObject<{
                 text: string;
                 x: number;
                 y: number;
-                tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+                tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
                 motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
                 size?: number | undefined;
@@ -1697,7 +1697,7 @@ export declare const introSchema: z.ZodObject<{
                 kind: "pointer";
                 x: number;
                 y: number;
-                tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+                tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
                 motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             })[];
@@ -1719,7 +1719,7 @@ export declare const introSchema: z.ZodObject<{
                 y: number;
                 w: number;
                 h: number;
-                tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+                tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
                 motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             } | {
@@ -1728,7 +1728,7 @@ export declare const introSchema: z.ZodObject<{
                 y: number;
                 w: number;
                 h: number;
-                tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+                tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
                 motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
                 round?: number | undefined;
@@ -1739,7 +1739,7 @@ export declare const introSchema: z.ZodObject<{
                 y: number;
                 widths: number[];
                 gap?: number | undefined;
-                tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+                tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
                 motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             } | {
@@ -1747,7 +1747,7 @@ export declare const introSchema: z.ZodObject<{
                 x: number;
                 y: number;
                 r: number;
-                tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+                tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
                 motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             } | {
@@ -1756,7 +1756,7 @@ export declare const introSchema: z.ZodObject<{
                 y: number;
                 x2: number;
                 y2: number;
-                tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+                tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
                 motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
                 dashed?: boolean | undefined;
@@ -1765,7 +1765,7 @@ export declare const introSchema: z.ZodObject<{
                 text: string;
                 x: number;
                 y: number;
-                tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+                tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
                 motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
                 size?: number | undefined;
@@ -1775,7 +1775,7 @@ export declare const introSchema: z.ZodObject<{
                 kind: "pointer";
                 x: number;
                 y: number;
-                tone?: "busy" | "text" | "warn" | "card" | "muted" | "ok" | "faint" | "strong" | "danger" | undefined;
+                tone?: "busy" | "text" | "muted" | "ok" | "warn" | "card" | "faint" | "strong" | "danger" | undefined;
                 motion?: "pop" | "fill" | "drop" | "rise" | "draw" | "pulse" | "blink" | "ping" | "narrow" | "chip" | "spin" | undefined;
                 delay?: number | undefined;
             })[];
