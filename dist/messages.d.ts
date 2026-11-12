@@ -2309,26 +2309,76 @@ export declare const helloSchema: z.ZodObject<{
             documents: z.ZodOptional<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">>;
         }, "strip", z.ZodTypeAny, {
             id: string;
+            picked: boolean;
             refs: string[];
             heading: string;
-            picked: boolean;
             documents?: string[] | undefined;
             files?: string[] | undefined;
         }, {
             id: string;
+            picked?: boolean | undefined;
             refs?: string[] | undefined;
             documents?: string[] | undefined;
             files?: string[] | undefined;
             heading?: string | undefined;
-            picked?: boolean | undefined;
         }>, "many">>;
+        space: z.ZodDefault<z.ZodNullable<z.ZodEffects<z.ZodObject<{
+            id: z.ZodString;
+            path: z.ZodArray<z.ZodObject<{
+                id: z.ZodString;
+                name: z.ZodCatch<z.ZodString>;
+            }, "strip", z.ZodTypeAny, {
+                id: string;
+                name: string;
+            }, {
+                id: string;
+                name?: unknown;
+            }>, "many">;
+            picked: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
+        }, "strip", z.ZodTypeAny, {
+            path: {
+                id: string;
+                name: string;
+            }[];
+            id: string;
+            picked: string[];
+        }, {
+            path: {
+                id: string;
+                name?: unknown;
+            }[];
+            id: string;
+            picked?: string[] | undefined;
+        }>, {
+            path: {
+                id: string;
+                name: string;
+            }[];
+            id: string;
+            picked: string[];
+        }, {
+            path: {
+                id: string;
+                name?: unknown;
+            }[];
+            id: string;
+            picked?: string[] | undefined;
+        }>>>;
     }, "strip", z.ZodTypeAny, {
+        space: {
+            path: {
+                id: string;
+                name: string;
+            }[];
+            id: string;
+            picked: string[];
+        } | null;
         epic: string | null;
         parts: {
             id: string;
+            picked: boolean;
             refs: string[];
             heading: string;
-            picked: boolean;
             documents?: string[] | undefined;
             files?: string[] | undefined;
         }[];
@@ -2425,14 +2475,22 @@ export declare const helloSchema: z.ZodObject<{
         } | undefined;
         kept?: string | null | undefined;
     }, {
+        space?: {
+            path: {
+                id: string;
+                name?: unknown;
+            }[];
+            id: string;
+            picked?: string[] | undefined;
+        } | null | undefined;
         epic?: string | null | undefined;
         parts?: {
             id: string;
+            picked?: boolean | undefined;
             refs?: string[] | undefined;
             documents?: string[] | undefined;
             files?: string[] | undefined;
             heading?: string | undefined;
-            picked?: boolean | undefined;
         }[] | undefined;
         kehikko?: {
             id: number;
@@ -2580,12 +2638,20 @@ export declare const helloSchema: z.ZodObject<{
     state: string | null;
     protocol: number;
     context: {
+        space: {
+            path: {
+                id: string;
+                name: string;
+            }[];
+            id: string;
+            picked: string[];
+        } | null;
         epic: string | null;
         parts: {
             id: string;
+            picked: boolean;
             refs: string[];
             heading: string;
-            picked: boolean;
             documents?: string[] | undefined;
             files?: string[] | undefined;
         }[];
@@ -2694,14 +2760,22 @@ export declare const helloSchema: z.ZodObject<{
     session: string;
     protocol: number;
     context: {
+        space?: {
+            path: {
+                id: string;
+                name?: unknown;
+            }[];
+            id: string;
+            picked?: string[] | undefined;
+        } | null | undefined;
         epic?: string | null | undefined;
         parts?: {
             id: string;
+            picked?: boolean | undefined;
             refs?: string[] | undefined;
             documents?: string[] | undefined;
             files?: string[] | undefined;
             heading?: string | undefined;
-            picked?: boolean | undefined;
         }[] | undefined;
         kehikko?: {
             id: number;
@@ -3262,30 +3336,80 @@ export declare const contextMessageSchema: z.ZodObject<{
         documents: z.ZodOptional<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">>;
     }, "strip", z.ZodTypeAny, {
         id: string;
+        picked: boolean;
         refs: string[];
         heading: string;
-        picked: boolean;
         documents?: string[] | undefined;
         files?: string[] | undefined;
     }, {
         id: string;
+        picked?: boolean | undefined;
         refs?: string[] | undefined;
         documents?: string[] | undefined;
         files?: string[] | undefined;
         heading?: string | undefined;
-        picked?: boolean | undefined;
     }>, "many">>;
+    space: z.ZodDefault<z.ZodNullable<z.ZodEffects<z.ZodObject<{
+        id: z.ZodString;
+        path: z.ZodArray<z.ZodObject<{
+            id: z.ZodString;
+            name: z.ZodCatch<z.ZodString>;
+        }, "strip", z.ZodTypeAny, {
+            id: string;
+            name: string;
+        }, {
+            id: string;
+            name?: unknown;
+        }>, "many">;
+        picked: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
+    }, "strip", z.ZodTypeAny, {
+        path: {
+            id: string;
+            name: string;
+        }[];
+        id: string;
+        picked: string[];
+    }, {
+        path: {
+            id: string;
+            name?: unknown;
+        }[];
+        id: string;
+        picked?: string[] | undefined;
+    }>, {
+        path: {
+            id: string;
+            name: string;
+        }[];
+        id: string;
+        picked: string[];
+    }, {
+        path: {
+            id: string;
+            name?: unknown;
+        }[];
+        id: string;
+        picked?: string[] | undefined;
+    }>>>;
 } & {
     type: z.ZodLiteral<"kehikot.context">;
     protocol: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
     type: "kehikot.context";
+    space: {
+        path: {
+            id: string;
+            name: string;
+        }[];
+        id: string;
+        picked: string[];
+    } | null;
     epic: string | null;
     parts: {
         id: string;
+        picked: boolean;
         refs: string[];
         heading: string;
-        picked: boolean;
         documents?: string[] | undefined;
         files?: string[] | undefined;
     }[];
@@ -3385,14 +3509,22 @@ export declare const contextMessageSchema: z.ZodObject<{
 }, {
     type: "kehikot.context";
     protocol: number;
+    space?: {
+        path: {
+            id: string;
+            name?: unknown;
+        }[];
+        id: string;
+        picked?: string[] | undefined;
+    } | null | undefined;
     epic?: string | null | undefined;
     parts?: {
         id: string;
+        picked?: boolean | undefined;
         refs?: string[] | undefined;
         documents?: string[] | undefined;
         files?: string[] | undefined;
         heading?: string | undefined;
-        picked?: boolean | undefined;
     }[] | undefined;
     kehikko?: {
         id: number;
@@ -4540,26 +4672,76 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
             documents: z.ZodOptional<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">>;
         }, "strip", z.ZodTypeAny, {
             id: string;
+            picked: boolean;
             refs: string[];
             heading: string;
-            picked: boolean;
             documents?: string[] | undefined;
             files?: string[] | undefined;
         }, {
             id: string;
+            picked?: boolean | undefined;
             refs?: string[] | undefined;
             documents?: string[] | undefined;
             files?: string[] | undefined;
             heading?: string | undefined;
-            picked?: boolean | undefined;
         }>, "many">>;
+        space: z.ZodDefault<z.ZodNullable<z.ZodEffects<z.ZodObject<{
+            id: z.ZodString;
+            path: z.ZodArray<z.ZodObject<{
+                id: z.ZodString;
+                name: z.ZodCatch<z.ZodString>;
+            }, "strip", z.ZodTypeAny, {
+                id: string;
+                name: string;
+            }, {
+                id: string;
+                name?: unknown;
+            }>, "many">;
+            picked: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
+        }, "strip", z.ZodTypeAny, {
+            path: {
+                id: string;
+                name: string;
+            }[];
+            id: string;
+            picked: string[];
+        }, {
+            path: {
+                id: string;
+                name?: unknown;
+            }[];
+            id: string;
+            picked?: string[] | undefined;
+        }>, {
+            path: {
+                id: string;
+                name: string;
+            }[];
+            id: string;
+            picked: string[];
+        }, {
+            path: {
+                id: string;
+                name?: unknown;
+            }[];
+            id: string;
+            picked?: string[] | undefined;
+        }>>>;
     }, "strip", z.ZodTypeAny, {
+        space: {
+            path: {
+                id: string;
+                name: string;
+            }[];
+            id: string;
+            picked: string[];
+        } | null;
         epic: string | null;
         parts: {
             id: string;
+            picked: boolean;
             refs: string[];
             heading: string;
-            picked: boolean;
             documents?: string[] | undefined;
             files?: string[] | undefined;
         }[];
@@ -4656,14 +4838,22 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         } | undefined;
         kept?: string | null | undefined;
     }, {
+        space?: {
+            path: {
+                id: string;
+                name?: unknown;
+            }[];
+            id: string;
+            picked?: string[] | undefined;
+        } | null | undefined;
         epic?: string | null | undefined;
         parts?: {
             id: string;
+            picked?: boolean | undefined;
             refs?: string[] | undefined;
             documents?: string[] | undefined;
             files?: string[] | undefined;
             heading?: string | undefined;
-            picked?: boolean | undefined;
         }[] | undefined;
         kehikko?: {
             id: number;
@@ -4811,12 +5001,20 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     state: string | null;
     protocol: number;
     context: {
+        space: {
+            path: {
+                id: string;
+                name: string;
+            }[];
+            id: string;
+            picked: string[];
+        } | null;
         epic: string | null;
         parts: {
             id: string;
+            picked: boolean;
             refs: string[];
             heading: string;
-            picked: boolean;
             documents?: string[] | undefined;
             files?: string[] | undefined;
         }[];
@@ -4925,14 +5123,22 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     session: string;
     protocol: number;
     context: {
+        space?: {
+            path: {
+                id: string;
+                name?: unknown;
+            }[];
+            id: string;
+            picked?: string[] | undefined;
+        } | null | undefined;
         epic?: string | null | undefined;
         parts?: {
             id: string;
+            picked?: boolean | undefined;
             refs?: string[] | undefined;
             documents?: string[] | undefined;
             files?: string[] | undefined;
             heading?: string | undefined;
-            picked?: boolean | undefined;
         }[] | undefined;
         kehikko?: {
             id: number;
@@ -5487,30 +5693,80 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         documents: z.ZodOptional<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">>;
     }, "strip", z.ZodTypeAny, {
         id: string;
+        picked: boolean;
         refs: string[];
         heading: string;
-        picked: boolean;
         documents?: string[] | undefined;
         files?: string[] | undefined;
     }, {
         id: string;
+        picked?: boolean | undefined;
         refs?: string[] | undefined;
         documents?: string[] | undefined;
         files?: string[] | undefined;
         heading?: string | undefined;
-        picked?: boolean | undefined;
     }>, "many">>;
+    space: z.ZodDefault<z.ZodNullable<z.ZodEffects<z.ZodObject<{
+        id: z.ZodString;
+        path: z.ZodArray<z.ZodObject<{
+            id: z.ZodString;
+            name: z.ZodCatch<z.ZodString>;
+        }, "strip", z.ZodTypeAny, {
+            id: string;
+            name: string;
+        }, {
+            id: string;
+            name?: unknown;
+        }>, "many">;
+        picked: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
+    }, "strip", z.ZodTypeAny, {
+        path: {
+            id: string;
+            name: string;
+        }[];
+        id: string;
+        picked: string[];
+    }, {
+        path: {
+            id: string;
+            name?: unknown;
+        }[];
+        id: string;
+        picked?: string[] | undefined;
+    }>, {
+        path: {
+            id: string;
+            name: string;
+        }[];
+        id: string;
+        picked: string[];
+    }, {
+        path: {
+            id: string;
+            name?: unknown;
+        }[];
+        id: string;
+        picked?: string[] | undefined;
+    }>>>;
 } & {
     type: z.ZodLiteral<"kehikot.context">;
     protocol: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
     type: "kehikot.context";
+    space: {
+        path: {
+            id: string;
+            name: string;
+        }[];
+        id: string;
+        picked: string[];
+    } | null;
     epic: string | null;
     parts: {
         id: string;
+        picked: boolean;
         refs: string[];
         heading: string;
-        picked: boolean;
         documents?: string[] | undefined;
         files?: string[] | undefined;
     }[];
@@ -5610,14 +5866,22 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
 }, {
     type: "kehikot.context";
     protocol: number;
+    space?: {
+        path: {
+            id: string;
+            name?: unknown;
+        }[];
+        id: string;
+        picked?: string[] | undefined;
+    } | null | undefined;
     epic?: string | null | undefined;
     parts?: {
         id: string;
+        picked?: boolean | undefined;
         refs?: string[] | undefined;
         documents?: string[] | undefined;
         files?: string[] | undefined;
         heading?: string | undefined;
-        picked?: boolean | undefined;
     }[] | undefined;
     kehikko?: {
         id: number;

@@ -16,15 +16,28 @@ export declare const notificationPayload: z.ZodObject<{
      * `view.goto` carrying the same three. Optional: a line without it goes to its epic as before, and
      * a reader before 1.4.0 strips it.
      */
-    place: z.ZodOptional<z.ZodObject<{
+    place: z.ZodOptional<z.ZodEffects<z.ZodObject<{
         epic: z.ZodOptional<z.ZodString>;
         parts: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         kehikko: z.ZodOptional<z.ZodString>;
+        space: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
     }, "strip", z.ZodTypeAny, {
+        space?: string[] | undefined;
         epic?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
     }, {
+        space?: string[] | undefined;
+        epic?: string | undefined;
+        parts?: string[] | undefined;
+        kehikko?: string | undefined;
+    }>, {
+        space?: string[] | undefined;
+        epic?: string | undefined;
+        parts?: string[] | undefined;
+        kehikko?: string | undefined;
+    }, {
+        space?: string[] | undefined;
         epic?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
@@ -35,6 +48,7 @@ export declare const notificationPayload: z.ZodObject<{
     refs: string[];
     level: "attention" | "done" | "blocked" | "info";
     place?: {
+        space?: string[] | undefined;
         epic?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
@@ -44,6 +58,7 @@ export declare const notificationPayload: z.ZodObject<{
     message: string;
     epic: string;
     place?: {
+        space?: string[] | undefined;
         epic?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;

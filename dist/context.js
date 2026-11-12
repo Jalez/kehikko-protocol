@@ -11,6 +11,7 @@ import { sharedShowSchema } from './show.js';
 import { filterChoiceSchema } from './filters.js';
 import { kehikkoSchema, ref } from './fragments.js';
 import { MODULE_SCOPES } from './scope.js';
+import { spaceSchema } from './spaces.js';
 import { PAGE_BACKGROUNDS } from './page.js';
 /* ------------------------------------------------------------------------ *
  * Dispositions: why a reference closed, in a person's words
@@ -215,6 +216,13 @@ export const contextSchema = z.object({
      * asks for an edit of it with `parts.set`. With parts picked a module shows what `anchorInFocus` admits.
      */
     parts: partsSchema.default([]),
+    /**
+     * 2.89.0. The space the person stands in (`spaces.ts`): its id, its path from the top-level space,
+     * and the children picked out together, if any. Null when no space is open, on "All spaces", and
+     * from a host before 2.89.0. `epic` and `parts` are still filled from it (`epicPartsOf`) for modules
+     * that read them; a module that knows spaces narrows with `spaceWithin(context.space, …)`.
+     */
+    space: spaceSchema.nullable().default(null),
 });
 /**
  * 2.9.0. Whether a context is about one epic or the whole project, `epic` when it does not say (a

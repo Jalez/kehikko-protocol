@@ -1463,3 +1463,33 @@ export {
   type InboxSignal,
   INBOX_NEXT_MS,
 } from './inbox.js'
+
+/* 2.89.0: spaces, one nested concept in place of epic → parts. See docs/spaces.md. */
+export {
+  SPACE_ID,
+  spaceStepSchema,
+  spacePathSchema,
+  spaceIdsSchema,
+  spaceSchema,
+  spaceNodeSchema,
+  spaceTreeSchema,
+  spaceIdsOf,
+  spaceWithin,
+  epicPartsOf,
+  spaceFromEpicParts,
+  spaceAgrees,
+  spaceSaid,
+  spaceIdFor,
+  DOOR_SPACE_ARGUMENT,
+  doorSpace,
+  findSpace,
+  spaceAt,
+  spaceOf,
+  nodeAt,
+  placeSpace,
+  type SpaceStep,
+  type Space,
+  type SpaceNode,
+  type SpaceLike,
+} from './spaces.js'
+export { placeSpaceDefaults } from './door.js'

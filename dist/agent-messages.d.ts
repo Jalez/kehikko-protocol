@@ -34,31 +34,52 @@ export type AgentSessionRef = z.infer<typeof agentSessionRefSchema>;
  * 2.75.0: `parts`, only with `epic` — the sessions at any of those parts of it, or at the whole epic. A
  * host before 2.75.0 drops it and reaches every session in the epic.
  */
-export declare const messagePlaceSchema: z.ZodEffects<z.ZodEffects<z.ZodObject<{
+export declare const messagePlaceSchema: z.ZodEffects<z.ZodEffects<z.ZodEffects<z.ZodObject<{
     epic: z.ZodOptional<z.ZodString>;
     parts: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
     kehikko: z.ZodOptional<z.ZodString>;
+    /**
+     * 2.89.0. Only with `epic` (its first id): the sessions whose space is this one or under it
+     * (`spaceWithin`). A host before 2.89.0 drops it and reaches what `epic` and `parts` say.
+     */
+    space: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
 }, "strip", z.ZodTypeAny, {
+    space?: string[] | undefined;
     epic?: string | undefined;
     parts?: string[] | undefined;
     kehikko?: string | undefined;
 }, {
+    space?: string[] | undefined;
     epic?: string | undefined;
     parts?: string[] | undefined;
     kehikko?: string | undefined;
 }>, {
+    space?: string[] | undefined;
     epic?: string | undefined;
     parts?: string[] | undefined;
     kehikko?: string | undefined;
 }, {
+    space?: string[] | undefined;
     epic?: string | undefined;
     parts?: string[] | undefined;
     kehikko?: string | undefined;
 }>, {
+    space?: string[] | undefined;
     epic?: string | undefined;
     parts?: string[] | undefined;
     kehikko?: string | undefined;
 }, {
+    space?: string[] | undefined;
+    epic?: string | undefined;
+    parts?: string[] | undefined;
+    kehikko?: string | undefined;
+}>, {
+    space?: string[] | undefined;
+    epic?: string | undefined;
+    parts?: string[] | undefined;
+    kehikko?: string | undefined;
+}, {
+    space?: string[] | undefined;
     epic?: string | undefined;
     parts?: string[] | undefined;
     kehikko?: string | undefined;
@@ -72,31 +93,52 @@ export type MessagePlace = z.infer<typeof messagePlaceSchema>;
  */
 export declare const messageToSchema: z.ZodEffects<z.ZodObject<{
     project: z.ZodOptional<z.ZodLiteral<true>>;
-    place: z.ZodOptional<z.ZodEffects<z.ZodEffects<z.ZodObject<{
+    place: z.ZodOptional<z.ZodEffects<z.ZodEffects<z.ZodEffects<z.ZodObject<{
         epic: z.ZodOptional<z.ZodString>;
         parts: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         kehikko: z.ZodOptional<z.ZodString>;
+        /**
+         * 2.89.0. Only with `epic` (its first id): the sessions whose space is this one or under it
+         * (`spaceWithin`). A host before 2.89.0 drops it and reaches what `epic` and `parts` say.
+         */
+        space: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
     }, "strip", z.ZodTypeAny, {
+        space?: string[] | undefined;
         epic?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
     }, {
+        space?: string[] | undefined;
         epic?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
     }>, {
+        space?: string[] | undefined;
         epic?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
     }, {
+        space?: string[] | undefined;
         epic?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
     }>, {
+        space?: string[] | undefined;
         epic?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
     }, {
+        space?: string[] | undefined;
+        epic?: string | undefined;
+        parts?: string[] | undefined;
+        kehikko?: string | undefined;
+    }>, {
+        space?: string[] | undefined;
+        epic?: string | undefined;
+        parts?: string[] | undefined;
+        kehikko?: string | undefined;
+    }, {
+        space?: string[] | undefined;
         epic?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
@@ -120,6 +162,7 @@ export declare const messageToSchema: z.ZodEffects<z.ZodObject<{
     } | undefined;
     project?: true | undefined;
     place?: {
+        space?: string[] | undefined;
         epic?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
@@ -132,6 +175,7 @@ export declare const messageToSchema: z.ZodEffects<z.ZodObject<{
     } | undefined;
     project?: true | undefined;
     place?: {
+        space?: string[] | undefined;
         epic?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
@@ -144,6 +188,7 @@ export declare const messageToSchema: z.ZodEffects<z.ZodObject<{
     } | undefined;
     project?: true | undefined;
     place?: {
+        space?: string[] | undefined;
         epic?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
@@ -156,6 +201,7 @@ export declare const messageToSchema: z.ZodEffects<z.ZodObject<{
     } | undefined;
     project?: true | undefined;
     place?: {
+        space?: string[] | undefined;
         epic?: string | undefined;
         parts?: string[] | undefined;
         kehikko?: string | undefined;
@@ -167,13 +213,17 @@ export declare const messageFromPlaceSchema: z.ZodObject<{
     epic: z.ZodNullable<z.ZodString>;
     parts: z.ZodCatch<z.ZodArray<z.ZodString, "many">>;
     kehikko: z.ZodNullable<z.ZodString>;
+    /** 2.89.0. The sender's space by ids, when its record keeps one; absent from an older host. */
+    space: z.ZodCatch<z.ZodOptional<z.ZodNullable<z.ZodArray<z.ZodString, "many">>>>;
 }, "strip", z.ZodTypeAny, {
     epic: string | null;
     parts: string[];
     kehikko: string | null;
+    space?: string[] | null | undefined;
 }, {
     epic: string | null;
     kehikko: string | null;
+    space?: unknown;
     parts?: unknown;
 }>;
 /**
@@ -193,13 +243,17 @@ export declare const agentMessageSchema: z.ZodObject<{
             epic: z.ZodNullable<z.ZodString>;
             parts: z.ZodCatch<z.ZodArray<z.ZodString, "many">>;
             kehikko: z.ZodNullable<z.ZodString>;
+            /** 2.89.0. The sender's space by ids, when its record keeps one; absent from an older host. */
+            space: z.ZodCatch<z.ZodOptional<z.ZodNullable<z.ZodArray<z.ZodString, "many">>>>;
         }, "strip", z.ZodTypeAny, {
             epic: string | null;
             parts: string[];
             kehikko: string | null;
+            space?: string[] | null | undefined;
         }, {
             epic: string | null;
             kehikko: string | null;
+            space?: unknown;
             parts?: unknown;
         }>;
         /**
@@ -217,6 +271,7 @@ export declare const agentMessageSchema: z.ZodObject<{
             epic: string | null;
             parts: string[];
             kehikko: string | null;
+            space?: string[] | null | undefined;
         };
         person: boolean;
     }, {
@@ -225,6 +280,7 @@ export declare const agentMessageSchema: z.ZodObject<{
         place: {
             epic: string | null;
             kehikko: string | null;
+            space?: unknown;
             parts?: unknown;
         };
         name?: unknown;
@@ -232,31 +288,52 @@ export declare const agentMessageSchema: z.ZodObject<{
     }>;
     to: z.ZodEffects<z.ZodObject<{
         project: z.ZodOptional<z.ZodLiteral<true>>;
-        place: z.ZodOptional<z.ZodEffects<z.ZodEffects<z.ZodObject<{
+        place: z.ZodOptional<z.ZodEffects<z.ZodEffects<z.ZodEffects<z.ZodObject<{
             epic: z.ZodOptional<z.ZodString>;
             parts: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
             kehikko: z.ZodOptional<z.ZodString>;
+            /**
+             * 2.89.0. Only with `epic` (its first id): the sessions whose space is this one or under it
+             * (`spaceWithin`). A host before 2.89.0 drops it and reaches what `epic` and `parts` say.
+             */
+            space: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, "strip", z.ZodTypeAny, {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
         }, {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
         }>, {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
         }, {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
         }>, {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
         }, {
+            space?: string[] | undefined;
+            epic?: string | undefined;
+            parts?: string[] | undefined;
+            kehikko?: string | undefined;
+        }>, {
+            space?: string[] | undefined;
+            epic?: string | undefined;
+            parts?: string[] | undefined;
+            kehikko?: string | undefined;
+        }, {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
@@ -280,6 +357,7 @@ export declare const agentMessageSchema: z.ZodObject<{
         } | undefined;
         project?: true | undefined;
         place?: {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
@@ -292,6 +370,7 @@ export declare const agentMessageSchema: z.ZodObject<{
         } | undefined;
         project?: true | undefined;
         place?: {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
@@ -304,6 +383,7 @@ export declare const agentMessageSchema: z.ZodObject<{
         } | undefined;
         project?: true | undefined;
         place?: {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
@@ -316,6 +396,7 @@ export declare const agentMessageSchema: z.ZodObject<{
         } | undefined;
         project?: true | undefined;
         place?: {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
@@ -352,6 +433,7 @@ export declare const agentMessageSchema: z.ZodObject<{
             epic: string | null;
             parts: string[];
             kehikko: string | null;
+            space?: string[] | null | undefined;
         };
         person: boolean;
     };
@@ -363,6 +445,7 @@ export declare const agentMessageSchema: z.ZodObject<{
         } | undefined;
         project?: true | undefined;
         place?: {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
@@ -383,6 +466,7 @@ export declare const agentMessageSchema: z.ZodObject<{
         place: {
             epic: string | null;
             kehikko: string | null;
+            space?: unknown;
             parts?: unknown;
         };
         name?: unknown;
@@ -396,6 +480,7 @@ export declare const agentMessageSchema: z.ZodObject<{
         } | undefined;
         project?: true | undefined;
         place?: {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
@@ -424,31 +509,52 @@ export declare const messageSendParams: z.ZodEffects<z.ZodObject<{
     body: z.ZodString;
     to: z.ZodOptional<z.ZodEffects<z.ZodObject<{
         project: z.ZodOptional<z.ZodLiteral<true>>;
-        place: z.ZodOptional<z.ZodEffects<z.ZodEffects<z.ZodObject<{
+        place: z.ZodOptional<z.ZodEffects<z.ZodEffects<z.ZodEffects<z.ZodObject<{
             epic: z.ZodOptional<z.ZodString>;
             parts: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
             kehikko: z.ZodOptional<z.ZodString>;
+            /**
+             * 2.89.0. Only with `epic` (its first id): the sessions whose space is this one or under it
+             * (`spaceWithin`). A host before 2.89.0 drops it and reaches what `epic` and `parts` say.
+             */
+            space: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, "strip", z.ZodTypeAny, {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
         }, {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
         }>, {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
         }, {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
         }>, {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
         }, {
+            space?: string[] | undefined;
+            epic?: string | undefined;
+            parts?: string[] | undefined;
+            kehikko?: string | undefined;
+        }>, {
+            space?: string[] | undefined;
+            epic?: string | undefined;
+            parts?: string[] | undefined;
+            kehikko?: string | undefined;
+        }, {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
@@ -472,6 +578,7 @@ export declare const messageSendParams: z.ZodEffects<z.ZodObject<{
         } | undefined;
         project?: true | undefined;
         place?: {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
@@ -484,6 +591,7 @@ export declare const messageSendParams: z.ZodEffects<z.ZodObject<{
         } | undefined;
         project?: true | undefined;
         place?: {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
@@ -496,6 +604,7 @@ export declare const messageSendParams: z.ZodEffects<z.ZodObject<{
         } | undefined;
         project?: true | undefined;
         place?: {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
@@ -508,6 +617,7 @@ export declare const messageSendParams: z.ZodEffects<z.ZodObject<{
         } | undefined;
         project?: true | undefined;
         place?: {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
@@ -526,6 +636,7 @@ export declare const messageSendParams: z.ZodEffects<z.ZodObject<{
         } | undefined;
         project?: true | undefined;
         place?: {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
@@ -546,6 +657,7 @@ export declare const messageSendParams: z.ZodEffects<z.ZodObject<{
         } | undefined;
         project?: true | undefined;
         place?: {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
@@ -566,6 +678,7 @@ export declare const messageSendParams: z.ZodEffects<z.ZodObject<{
         } | undefined;
         project?: true | undefined;
         place?: {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
@@ -586,6 +699,7 @@ export declare const messageSendParams: z.ZodEffects<z.ZodObject<{
         } | undefined;
         project?: true | undefined;
         place?: {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
@@ -610,31 +724,52 @@ export declare const messageSayParams: z.ZodEffects<z.ZodObject<{
     body: z.ZodString;
     to: z.ZodEffects<z.ZodObject<{
         project: z.ZodOptional<z.ZodLiteral<true>>;
-        place: z.ZodOptional<z.ZodEffects<z.ZodEffects<z.ZodObject<{
+        place: z.ZodOptional<z.ZodEffects<z.ZodEffects<z.ZodEffects<z.ZodObject<{
             epic: z.ZodOptional<z.ZodString>;
             parts: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
             kehikko: z.ZodOptional<z.ZodString>;
+            /**
+             * 2.89.0. Only with `epic` (its first id): the sessions whose space is this one or under it
+             * (`spaceWithin`). A host before 2.89.0 drops it and reaches what `epic` and `parts` say.
+             */
+            space: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, "strip", z.ZodTypeAny, {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
         }, {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
         }>, {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
         }, {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
         }>, {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
         }, {
+            space?: string[] | undefined;
+            epic?: string | undefined;
+            parts?: string[] | undefined;
+            kehikko?: string | undefined;
+        }>, {
+            space?: string[] | undefined;
+            epic?: string | undefined;
+            parts?: string[] | undefined;
+            kehikko?: string | undefined;
+        }, {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
@@ -658,6 +793,7 @@ export declare const messageSayParams: z.ZodEffects<z.ZodObject<{
         } | undefined;
         project?: true | undefined;
         place?: {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
@@ -670,6 +806,7 @@ export declare const messageSayParams: z.ZodEffects<z.ZodObject<{
         } | undefined;
         project?: true | undefined;
         place?: {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
@@ -682,6 +819,7 @@ export declare const messageSayParams: z.ZodEffects<z.ZodObject<{
         } | undefined;
         project?: true | undefined;
         place?: {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
@@ -694,6 +832,7 @@ export declare const messageSayParams: z.ZodEffects<z.ZodObject<{
         } | undefined;
         project?: true | undefined;
         place?: {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
@@ -709,6 +848,7 @@ export declare const messageSayParams: z.ZodEffects<z.ZodObject<{
         } | undefined;
         project?: true | undefined;
         place?: {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
@@ -728,6 +868,7 @@ export declare const messageSayParams: z.ZodEffects<z.ZodObject<{
         } | undefined;
         project?: true | undefined;
         place?: {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
@@ -747,6 +888,7 @@ export declare const messageSayParams: z.ZodEffects<z.ZodObject<{
         } | undefined;
         project?: true | undefined;
         place?: {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
@@ -766,6 +908,7 @@ export declare const messageSayParams: z.ZodEffects<z.ZodObject<{
         } | undefined;
         project?: true | undefined;
         place?: {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
@@ -793,31 +936,52 @@ export declare const messagePostParams: z.ZodEffects<z.ZodObject<{
     body: z.ZodString;
     to: z.ZodEffects<z.ZodObject<{
         project: z.ZodOptional<z.ZodLiteral<true>>;
-        place: z.ZodOptional<z.ZodEffects<z.ZodEffects<z.ZodObject<{
+        place: z.ZodOptional<z.ZodEffects<z.ZodEffects<z.ZodEffects<z.ZodObject<{
             epic: z.ZodOptional<z.ZodString>;
             parts: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
             kehikko: z.ZodOptional<z.ZodString>;
+            /**
+             * 2.89.0. Only with `epic` (its first id): the sessions whose space is this one or under it
+             * (`spaceWithin`). A host before 2.89.0 drops it and reaches what `epic` and `parts` say.
+             */
+            space: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, "strip", z.ZodTypeAny, {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
         }, {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
         }>, {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
         }, {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
         }>, {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
         }, {
+            space?: string[] | undefined;
+            epic?: string | undefined;
+            parts?: string[] | undefined;
+            kehikko?: string | undefined;
+        }>, {
+            space?: string[] | undefined;
+            epic?: string | undefined;
+            parts?: string[] | undefined;
+            kehikko?: string | undefined;
+        }, {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
@@ -841,6 +1005,7 @@ export declare const messagePostParams: z.ZodEffects<z.ZodObject<{
         } | undefined;
         project?: true | undefined;
         place?: {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
@@ -853,6 +1018,7 @@ export declare const messagePostParams: z.ZodEffects<z.ZodObject<{
         } | undefined;
         project?: true | undefined;
         place?: {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
@@ -865,6 +1031,7 @@ export declare const messagePostParams: z.ZodEffects<z.ZodObject<{
         } | undefined;
         project?: true | undefined;
         place?: {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
@@ -877,6 +1044,7 @@ export declare const messagePostParams: z.ZodEffects<z.ZodObject<{
         } | undefined;
         project?: true | undefined;
         place?: {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
@@ -893,6 +1061,7 @@ export declare const messagePostParams: z.ZodEffects<z.ZodObject<{
         } | undefined;
         project?: true | undefined;
         place?: {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
@@ -913,6 +1082,7 @@ export declare const messagePostParams: z.ZodEffects<z.ZodObject<{
         } | undefined;
         project?: true | undefined;
         place?: {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
@@ -933,6 +1103,7 @@ export declare const messagePostParams: z.ZodEffects<z.ZodObject<{
         } | undefined;
         project?: true | undefined;
         place?: {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
@@ -953,6 +1124,7 @@ export declare const messagePostParams: z.ZodEffects<z.ZodObject<{
         } | undefined;
         project?: true | undefined;
         place?: {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
@@ -1035,43 +1207,66 @@ export declare const messageNotifySessionParams: z.ZodObject<{
  */
 export declare const messageTellParams: z.ZodObject<{
     to: z.ZodObject<{
-        place: z.ZodEffects<z.ZodEffects<z.ZodObject<{
+        place: z.ZodEffects<z.ZodEffects<z.ZodEffects<z.ZodObject<{
             epic: z.ZodOptional<z.ZodString>;
             parts: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
             kehikko: z.ZodOptional<z.ZodString>;
+            /**
+             * 2.89.0. Only with `epic` (its first id): the sessions whose space is this one or under it
+             * (`spaceWithin`). A host before 2.89.0 drops it and reaches what `epic` and `parts` say.
+             */
+            space: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, "strip", z.ZodTypeAny, {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
         }, {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
         }>, {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
         }, {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
         }>, {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
         }, {
+            space?: string[] | undefined;
+            epic?: string | undefined;
+            parts?: string[] | undefined;
+            kehikko?: string | undefined;
+        }>, {
+            space?: string[] | undefined;
+            epic?: string | undefined;
+            parts?: string[] | undefined;
+            kehikko?: string | undefined;
+        }, {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
         }>;
     }, "strip", z.ZodTypeAny, {
         place: {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
         };
     }, {
         place: {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
@@ -1083,6 +1278,7 @@ export declare const messageTellParams: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     to: {
         place: {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
@@ -1094,6 +1290,7 @@ export declare const messageTellParams: z.ZodObject<{
 }, {
     to: {
         place: {
+            space?: string[] | undefined;
             epic?: string | undefined;
             parts?: string[] | undefined;
             kehikko?: string | undefined;
@@ -1131,13 +1328,17 @@ export declare const messageMineResult: z.ZodObject<{
                 epic: z.ZodNullable<z.ZodString>;
                 parts: z.ZodCatch<z.ZodArray<z.ZodString, "many">>;
                 kehikko: z.ZodNullable<z.ZodString>;
+                /** 2.89.0. The sender's space by ids, when its record keeps one; absent from an older host. */
+                space: z.ZodCatch<z.ZodOptional<z.ZodNullable<z.ZodArray<z.ZodString, "many">>>>;
             }, "strip", z.ZodTypeAny, {
                 epic: string | null;
                 parts: string[];
                 kehikko: string | null;
+                space?: string[] | null | undefined;
             }, {
                 epic: string | null;
                 kehikko: string | null;
+                space?: unknown;
                 parts?: unknown;
             }>;
             /**
@@ -1155,6 +1356,7 @@ export declare const messageMineResult: z.ZodObject<{
                 epic: string | null;
                 parts: string[];
                 kehikko: string | null;
+                space?: string[] | null | undefined;
             };
             person: boolean;
         }, {
@@ -1163,6 +1365,7 @@ export declare const messageMineResult: z.ZodObject<{
             place: {
                 epic: string | null;
                 kehikko: string | null;
+                space?: unknown;
                 parts?: unknown;
             };
             name?: unknown;
@@ -1170,31 +1373,52 @@ export declare const messageMineResult: z.ZodObject<{
         }>;
         to: z.ZodEffects<z.ZodObject<{
             project: z.ZodOptional<z.ZodLiteral<true>>;
-            place: z.ZodOptional<z.ZodEffects<z.ZodEffects<z.ZodObject<{
+            place: z.ZodOptional<z.ZodEffects<z.ZodEffects<z.ZodEffects<z.ZodObject<{
                 epic: z.ZodOptional<z.ZodString>;
                 parts: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
                 kehikko: z.ZodOptional<z.ZodString>;
+                /**
+                 * 2.89.0. Only with `epic` (its first id): the sessions whose space is this one or under it
+                 * (`spaceWithin`). A host before 2.89.0 drops it and reaches what `epic` and `parts` say.
+                 */
+                space: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
             }, "strip", z.ZodTypeAny, {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
             }, {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
             }>, {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
             }, {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
             }>, {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
             }, {
+                space?: string[] | undefined;
+                epic?: string | undefined;
+                parts?: string[] | undefined;
+                kehikko?: string | undefined;
+            }>, {
+                space?: string[] | undefined;
+                epic?: string | undefined;
+                parts?: string[] | undefined;
+                kehikko?: string | undefined;
+            }, {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1218,6 +1442,7 @@ export declare const messageMineResult: z.ZodObject<{
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1230,6 +1455,7 @@ export declare const messageMineResult: z.ZodObject<{
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1242,6 +1468,7 @@ export declare const messageMineResult: z.ZodObject<{
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1254,6 +1481,7 @@ export declare const messageMineResult: z.ZodObject<{
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1290,6 +1518,7 @@ export declare const messageMineResult: z.ZodObject<{
                 epic: string | null;
                 parts: string[];
                 kehikko: string | null;
+                space?: string[] | null | undefined;
             };
             person: boolean;
         };
@@ -1301,6 +1530,7 @@ export declare const messageMineResult: z.ZodObject<{
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1321,6 +1551,7 @@ export declare const messageMineResult: z.ZodObject<{
             place: {
                 epic: string | null;
                 kehikko: string | null;
+                space?: unknown;
                 parts?: unknown;
             };
             name?: unknown;
@@ -1334,6 +1565,7 @@ export declare const messageMineResult: z.ZodObject<{
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1361,6 +1593,7 @@ export declare const messageMineResult: z.ZodObject<{
                 epic: string | null;
                 parts: string[];
                 kehikko: string | null;
+                space?: string[] | null | undefined;
             };
             person: boolean;
         };
@@ -1372,6 +1605,7 @@ export declare const messageMineResult: z.ZodObject<{
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1395,6 +1629,7 @@ export declare const messageMineResult: z.ZodObject<{
             place: {
                 epic: string | null;
                 kehikko: string | null;
+                space?: unknown;
                 parts?: unknown;
             };
             name?: unknown;
@@ -1408,6 +1643,7 @@ export declare const messageMineResult: z.ZodObject<{
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1461,8 +1697,8 @@ export declare const messageSendResult: z.ZodObject<{
     why: z.ZodDefault<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     id: number | null;
-    outcome: "sent" | "declined";
     why: string;
+    outcome: "sent" | "declined";
 }, {
     outcome: "sent" | "declined";
     id?: number | null | undefined;
@@ -1485,13 +1721,17 @@ export declare const messageReadResult: z.ZodObject<{
                 epic: z.ZodNullable<z.ZodString>;
                 parts: z.ZodCatch<z.ZodArray<z.ZodString, "many">>;
                 kehikko: z.ZodNullable<z.ZodString>;
+                /** 2.89.0. The sender's space by ids, when its record keeps one; absent from an older host. */
+                space: z.ZodCatch<z.ZodOptional<z.ZodNullable<z.ZodArray<z.ZodString, "many">>>>;
             }, "strip", z.ZodTypeAny, {
                 epic: string | null;
                 parts: string[];
                 kehikko: string | null;
+                space?: string[] | null | undefined;
             }, {
                 epic: string | null;
                 kehikko: string | null;
+                space?: unknown;
                 parts?: unknown;
             }>;
             /**
@@ -1509,6 +1749,7 @@ export declare const messageReadResult: z.ZodObject<{
                 epic: string | null;
                 parts: string[];
                 kehikko: string | null;
+                space?: string[] | null | undefined;
             };
             person: boolean;
         }, {
@@ -1517,6 +1758,7 @@ export declare const messageReadResult: z.ZodObject<{
             place: {
                 epic: string | null;
                 kehikko: string | null;
+                space?: unknown;
                 parts?: unknown;
             };
             name?: unknown;
@@ -1524,31 +1766,52 @@ export declare const messageReadResult: z.ZodObject<{
         }>;
         to: z.ZodEffects<z.ZodObject<{
             project: z.ZodOptional<z.ZodLiteral<true>>;
-            place: z.ZodOptional<z.ZodEffects<z.ZodEffects<z.ZodObject<{
+            place: z.ZodOptional<z.ZodEffects<z.ZodEffects<z.ZodEffects<z.ZodObject<{
                 epic: z.ZodOptional<z.ZodString>;
                 parts: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
                 kehikko: z.ZodOptional<z.ZodString>;
+                /**
+                 * 2.89.0. Only with `epic` (its first id): the sessions whose space is this one or under it
+                 * (`spaceWithin`). A host before 2.89.0 drops it and reaches what `epic` and `parts` say.
+                 */
+                space: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
             }, "strip", z.ZodTypeAny, {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
             }, {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
             }>, {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
             }, {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
             }>, {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
             }, {
+                space?: string[] | undefined;
+                epic?: string | undefined;
+                parts?: string[] | undefined;
+                kehikko?: string | undefined;
+            }>, {
+                space?: string[] | undefined;
+                epic?: string | undefined;
+                parts?: string[] | undefined;
+                kehikko?: string | undefined;
+            }, {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1572,6 +1835,7 @@ export declare const messageReadResult: z.ZodObject<{
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1584,6 +1848,7 @@ export declare const messageReadResult: z.ZodObject<{
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1596,6 +1861,7 @@ export declare const messageReadResult: z.ZodObject<{
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1608,6 +1874,7 @@ export declare const messageReadResult: z.ZodObject<{
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1644,6 +1911,7 @@ export declare const messageReadResult: z.ZodObject<{
                 epic: string | null;
                 parts: string[];
                 kehikko: string | null;
+                space?: string[] | null | undefined;
             };
             person: boolean;
         };
@@ -1655,6 +1923,7 @@ export declare const messageReadResult: z.ZodObject<{
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1675,6 +1944,7 @@ export declare const messageReadResult: z.ZodObject<{
             place: {
                 epic: string | null;
                 kehikko: string | null;
+                space?: unknown;
                 parts?: unknown;
             };
             name?: unknown;
@@ -1688,6 +1958,7 @@ export declare const messageReadResult: z.ZodObject<{
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1709,13 +1980,17 @@ export declare const messageReadResult: z.ZodObject<{
             epic: z.ZodNullable<z.ZodString>;
             parts: z.ZodCatch<z.ZodArray<z.ZodString, "many">>;
             kehikko: z.ZodNullable<z.ZodString>;
+            /** 2.89.0. The sender's space by ids, when its record keeps one; absent from an older host. */
+            space: z.ZodCatch<z.ZodOptional<z.ZodNullable<z.ZodArray<z.ZodString, "many">>>>;
         }, "strip", z.ZodTypeAny, {
             epic: string | null;
             parts: string[];
             kehikko: string | null;
+            space?: string[] | null | undefined;
         }, {
             epic: string | null;
             kehikko: string | null;
+            space?: unknown;
             parts?: unknown;
         }>;
     }, "strip", z.ZodTypeAny, {
@@ -1725,6 +2000,7 @@ export declare const messageReadResult: z.ZodObject<{
             epic: string | null;
             parts: string[];
             kehikko: string | null;
+            space?: string[] | null | undefined;
         };
     }, {
         module: string;
@@ -1732,6 +2008,7 @@ export declare const messageReadResult: z.ZodObject<{
         place: {
             epic: string | null;
             kehikko: string | null;
+            space?: unknown;
             parts?: unknown;
         };
     }>>>;
@@ -1748,6 +2025,7 @@ export declare const messageReadResult: z.ZodObject<{
                 epic: string | null;
                 parts: string[];
                 kehikko: string | null;
+                space?: string[] | null | undefined;
             };
             person: boolean;
         };
@@ -1759,6 +2037,7 @@ export declare const messageReadResult: z.ZodObject<{
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1779,6 +2058,7 @@ export declare const messageReadResult: z.ZodObject<{
             epic: string | null;
             parts: string[];
             kehikko: string | null;
+            space?: string[] | null | undefined;
         };
     } | null;
 }, {
@@ -1791,6 +2071,7 @@ export declare const messageReadResult: z.ZodObject<{
             place: {
                 epic: string | null;
                 kehikko: string | null;
+                space?: unknown;
                 parts?: unknown;
             };
             name?: unknown;
@@ -1804,6 +2085,7 @@ export declare const messageReadResult: z.ZodObject<{
             } | undefined;
             project?: true | undefined;
             place?: {
+                space?: string[] | undefined;
                 epic?: string | undefined;
                 parts?: string[] | undefined;
                 kehikko?: string | undefined;
@@ -1824,6 +2106,7 @@ export declare const messageReadResult: z.ZodObject<{
         place: {
             epic: string | null;
             kehikko: string | null;
+            space?: unknown;
             parts?: unknown;
         };
     } | null | undefined;

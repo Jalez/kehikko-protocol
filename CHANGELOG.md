@@ -11,6 +11,30 @@ After 2.78.0, every entry's first line under its heading is its kind, and the ve
 (semver; CI checks it): `Kind: breaking` → next major, `Kind: feature` → next minor, `Kind: fix` →
 next patch.
 
+## 2.89.0 — 2026-11-12
+
+Kind: feature
+
+Spaces: one nested concept in place of the two fixed levels epic → parts. A space can hold spaces to
+any depth; top-level spaces are epics and their children parts, with the same ids. **Additive**;
+`PROTOCOL` is still 2, and `epic` and `parts` are still filled for every module. [docs/spaces.md](docs/spaces.md).
+
+### Added
+
+- `context.space` (`spaceSchema`: `{ id, path: [{ id, name }], picked }`), null by default.
+- `spaces.ts`: `SPACE_ID`, `spaceStepSchema`, `spacePathSchema`, `spaceIdsSchema`, `spaceNodeSchema`,
+  `spaceTreeSchema`, `spaceIdsOf`, **`spaceWithin(selected, candidate)`** ("in this space or below"),
+  **`epicPartsOf`** (the compatibility mapping: the top-level space is the epic; the picked children,
+  the depth-2 space, or a deeper space's depth-2 ancestor are the parts), `spaceFromEpicParts`,
+  `spaceAgrees`, `spaceSaid`, `spaceIdFor`, `nodeAt`, `spaceAt`, `spaceOf`.
+- `space` (a path of ids, with the `epic` it is in) on `placeSchema`, `view.goto`, `messagePlaceSchema`,
+  `conversationPlaceSchema`, `inbox.adopt`, and an adoption's `suggested` and `proposal`;
+  `inboxAdoptionResult.spaces` (the tree). `space` (with names) on `doorPlaceSchema` and `lookingSchema`,
+  and by ids on `recordedPlaceResult` and `messageFromPlaceSchema`.
+- Doors: `DOOR_SPACE_ARGUMENT`, `doorSpace(args)` (a path, `a/b`, or one id) and `findSpace(tree, asked)`;
+  `placeSpaceDefaults` is `placeDefaults` with `space` and `spaceId`; `DOOR_PLACE_SAYS` names a place's space when it has one.
+- `LIMITS.SPACE_DEPTH` (32) and `LIMITS.SPACES` (2000).
+
 ## 2.88.0 — 2026-11-12
 
 Kind: feature

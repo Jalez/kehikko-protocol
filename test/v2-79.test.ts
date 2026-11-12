@@ -35,7 +35,7 @@ const REPO = resolve(dirname(new URL(import.meta.url).pathname), '..')
 
 describe('the version', () => {
   test('is 2.79.0 or later, PROTOCOL is still 2, and the entry declares its kind', () => {
-    expect(PACKAGE_VERSION).toBe('2.88.0')
+    expect(PACKAGE_VERSION).toBe('2.89.0')
     expect(PROTOCOL).toBe(2)
     const log = readFileSync(join(REPO, 'CHANGELOG.md'), 'utf8')
     expect(log).toMatch(/## 2\.79\.0 — \d{4}-\d{2}-\d{2}\n\nKind: feature\n/)

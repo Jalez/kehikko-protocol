@@ -846,12 +846,15 @@ export declare const conversationCandidateSchema: z.ZodObject<{
         epic: z.ZodNullable<z.ZodString>;
         parts: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
         kehikko: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+        space: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
     }, "strip", z.ZodTypeAny, {
         epic: string | null;
         parts: string[];
         kehikko: string | null;
+        space?: string[] | undefined;
     }, {
         epic: string | null;
+        space?: string[] | undefined;
         parts?: string[] | undefined;
         kehikko?: string | null | undefined;
     }>>>>;
@@ -862,6 +865,7 @@ export declare const conversationCandidateSchema: z.ZodObject<{
         epic: string | null;
         parts: string[];
         kehikko: string | null;
+        space?: string[] | undefined;
     } | null;
     title: string;
     folder: string;
@@ -892,12 +896,15 @@ export declare const conversationsFindResult: z.ZodObject<{
             epic: z.ZodNullable<z.ZodString>;
             parts: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
             kehikko: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+            space: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, "strip", z.ZodTypeAny, {
             epic: string | null;
             parts: string[];
             kehikko: string | null;
+            space?: string[] | undefined;
         }, {
             epic: string | null;
+            space?: string[] | undefined;
             parts?: string[] | undefined;
             kehikko?: string | null | undefined;
         }>>>>;
@@ -908,6 +915,7 @@ export declare const conversationsFindResult: z.ZodObject<{
             epic: string | null;
             parts: string[];
             kehikko: string | null;
+            space?: string[] | undefined;
         } | null;
         title: string;
         folder: string;
@@ -932,6 +940,7 @@ export declare const conversationsFindResult: z.ZodObject<{
             epic: string | null;
             parts: string[];
             kehikko: string | null;
+            space?: string[] | undefined;
         } | null;
         title: string;
         folder: string;
@@ -963,12 +972,15 @@ export declare const conversationsBringParams: z.ZodObject<{
         epic: z.ZodNullable<z.ZodString>;
         parts: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
         kehikko: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+        space: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
     }, "strip", z.ZodTypeAny, {
         epic: string | null;
         parts: string[];
         kehikko: string | null;
+        space?: string[] | undefined;
     }, {
         epic: string | null;
+        space?: string[] | undefined;
         parts?: string[] | undefined;
         kehikko?: string | null | undefined;
     }>>;
@@ -976,12 +988,15 @@ export declare const conversationsBringParams: z.ZodObject<{
         epic: z.ZodNullable<z.ZodString>;
         parts: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
         kehikko: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+        space: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
     }, "strip", z.ZodTypeAny, {
         epic: string | null;
         parts: string[];
         kehikko: string | null;
+        space?: string[] | undefined;
     }, {
         epic: string | null;
+        space?: string[] | undefined;
         parts?: string[] | undefined;
         kehikko?: string | null | undefined;
     }>>;
@@ -992,22 +1007,26 @@ export declare const conversationsBringParams: z.ZodObject<{
         epic: string | null;
         parts: string[];
         kehikko: string | null;
+        space?: string[] | undefined;
     } | null;
     to: {
         epic: string | null;
         parts: string[];
         kehikko: string | null;
+        space?: string[] | undefined;
     } | null;
 }, {
     session: string;
     project: string;
     from: {
         epic: string | null;
+        space?: string[] | undefined;
         parts?: string[] | undefined;
         kehikko?: string | null | undefined;
     } | null;
     to: {
         epic: string | null;
+        space?: string[] | undefined;
         parts?: string[] | undefined;
         kehikko?: string | null | undefined;
     } | null;
@@ -1024,34 +1043,39 @@ export declare const conversationsBringResult: z.ZodObject<{
         epic: z.ZodNullable<z.ZodString>;
         parts: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
         kehikko: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+        space: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
     }, "strip", z.ZodTypeAny, {
         epic: string | null;
         parts: string[];
         kehikko: string | null;
+        space?: string[] | undefined;
     }, {
         epic: string | null;
+        space?: string[] | undefined;
         parts?: string[] | undefined;
         kehikko?: string | null | undefined;
     }>>>;
     resumed: z.ZodDefault<z.ZodBoolean>;
     why: z.ZodDefault<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
+    why: string;
     place: {
         epic: string | null;
         parts: string[];
         kehikko: string | null;
+        space?: string[] | undefined;
     } | null;
     outcome: "declined" | "elsewhere" | "brought" | "no-such-session";
-    why: string;
     resumed: boolean;
 }, {
     outcome: "declined" | "elsewhere" | "brought" | "no-such-session";
+    why?: string | undefined;
     place?: {
         epic: string | null;
+        space?: string[] | undefined;
         parts?: string[] | undefined;
         kehikko?: string | null | undefined;
     } | null | undefined;
-    why?: string | undefined;
     resumed?: boolean | undefined;
 }>;
 export type ConversationsBringResult = z.infer<typeof conversationsBringResult>;
@@ -1095,12 +1119,15 @@ export declare const agentTaskStartParams: z.ZodObject<{
         epic: z.ZodNullable<z.ZodString>;
         parts: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
         kehikko: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+        space: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
     }, "strip", z.ZodTypeAny, {
         epic: string | null;
         parts: string[];
         kehikko: string | null;
+        space?: string[] | undefined;
     }, {
         epic: string | null;
+        space?: string[] | undefined;
         parts?: string[] | undefined;
         kehikko?: string | null | undefined;
     }>>;
@@ -1111,6 +1138,7 @@ export declare const agentTaskStartParams: z.ZodObject<{
         epic: string | null;
         parts: string[];
         kehikko: string | null;
+        space?: string[] | undefined;
     } | null;
     title: string;
     brief: string;
@@ -1118,6 +1146,7 @@ export declare const agentTaskStartParams: z.ZodObject<{
     project: string;
     place: {
         epic: string | null;
+        space?: string[] | undefined;
         parts?: string[] | undefined;
         kehikko?: string | null | undefined;
     } | null;
@@ -1130,13 +1159,13 @@ export declare const agentTaskStartResult: z.ZodObject<{
     session: z.ZodDefault<z.ZodNullable<z.ZodString>>;
     why: z.ZodDefault<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
+    why: string;
     session: string | null;
     outcome: "declined" | "started";
-    why: string;
 }, {
     outcome: "declined" | "started";
-    session?: string | null | undefined;
     why?: string | undefined;
+    session?: string | null | undefined;
 }>;
 export type AgentTaskStartResult = z.infer<typeof agentTaskStartResult>;
 /** An `agent.tasks` view with the conversation in it. */

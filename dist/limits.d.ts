@@ -466,4 +466,11 @@ export declare const LIMITS: {
     readonly PAGE_ERROR_WHERE: 32;
     /** The trimmed stack, in characters: its first lines, enough to name the file and the line. */
     readonly PAGE_ERROR_STACK: 2000;
+    /**
+     * 2.89.0. How deep a space may be nested (`spaces.ts`): a path from the top-level space to the
+     * picked one has at most this many steps. Far beyond any tree a person keeps; a bound for the wire.
+     */
+    readonly SPACE_DEPTH: 32;
+    /** 2.89.0. How many spaces one tree (`spaceTreeSchema`) may hold in all, at every depth. */
+    readonly SPACES: 2000;
 };
