@@ -930,8 +930,8 @@ export declare const trackerSourceSchema: z.ZodObject<{
     at: string | null;
     repo: string;
     host: string;
-    tracker: "github" | "gitlab";
     default: boolean;
+    tracker: "github" | "gitlab";
     listed: boolean;
     error: string | null;
     refreshing: boolean;
@@ -998,8 +998,8 @@ export declare const trackerReadingResult: z.ZodObject<{
         at: string | null;
         repo: string;
         host: string;
-        tracker: "github" | "gitlab";
         default: boolean;
+        tracker: "github" | "gitlab";
         listed: boolean;
         error: string | null;
         refreshing: boolean;
@@ -1678,8 +1678,8 @@ export declare const trackerReadingResult: z.ZodObject<{
         at: string | null;
         repo: string;
         host: string;
-        tracker: "github" | "gitlab";
         default: boolean;
+        tracker: "github" | "gitlab";
         listed: boolean;
         error: string | null;
         refreshing: boolean;

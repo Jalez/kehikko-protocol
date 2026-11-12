@@ -4,6 +4,7 @@ import { EPIC_SLUG, MODULE_ID, PROJECT_ID } from './ids.js';
 import { gotoRef, placeKehikko, placeParts, ref, stepNumber } from './fragments.js';
 import { SPACE_WITH_EPIC, placeSpace, spaceGoesWithEpic } from './spaces.js';
 import { activityItemsSchema } from './activity.js';
+import { settingKeySchema } from './settings.js';
 /**
  * `passageSchema` and `filterChoiceSchema` come from `wire.ts` so that both directions share one
  * definition; `wire.ts` imports nothing from here.
@@ -193,6 +194,12 @@ export const CAPABILITIES = {
      */
     'sessions:place': 'See which epic, parts and kehikko an agent session is working on, by its session id.',
     'inbox:person': 'Show your Inbox — what modules need, are doing and have said — and, on your press, mark it seen, dismiss, forget, answer or go to it.',
+    /**
+     * 2.90.0. Asks the host to open THIS module's settings (the ones it declared, `declares.settings`),
+     * at one setting when it names one (`settings.open`): only on the person's press in the module's
+     * page. Reads and changes no value; the person changes it in the host's form.
+     */
+    'settings:open': "Open this module's settings when you press to, at the setting it names. Nothing is changed until you change it.",
 };
 export const CAPABILITY_NAMES = Object.keys(CAPABILITIES);
 /**
@@ -284,6 +291,8 @@ export const METHODS = {
     'inbox.untrack': 'inbox:person',
     /** Take back the last adopt or untrack of an item, on the person's press (2.88.0). */
     'inbox.undo': 'inbox:person',
+    /** This module's settings, opened in the host at one setting, on the person's press (2.90.0). */
+    'settings.open': 'settings:open',
 };
 export const METHOD_NAMES = Object.keys(METHODS);
 /**
@@ -653,6 +662,13 @@ export const methodParams = {
     'inbox.untrack': inboxUntrackParams,
     /** 2.88.0. From a page only, on the person's press: answered with `inboxUndoResult`. */
     'inbox.undo': inboxUndoParams,
+    /**
+     * 2.90.0. Ask the host to open the asking module's own settings, scrolled to the setting `key`
+     * names (one of the keys it declared in `declares.settings`) and focused there; without `key`, at
+     * the top. Only the asker's own settings, so there is no module id. Honoured only on the person's
+     * fresh press in the page. Answered with `settingsOpenResult`.
+     */
+    'settings.open': z.object({ key: settingKeySchema.optional() }),
 };
 /* ------------------------------------------------------------------------ *
  * The answers that are outcomes rather than material
@@ -684,6 +700,17 @@ export const foldResult = z.object({
     outcome: z.enum(FOLD_OUTCOMES),
     folded: z.array(z.string().regex(MODULE_ID)).max(LIMITS.CONTAINERS).default([]),
     unfolded: z.array(z.string().regex(MODULE_ID)).max(LIMITS.CONTAINERS).default([]),
+    why: z.string().max(LIMITS.REASON).default(''),
+});
+/**
+ * 2.90.0. What became of a `settings.open`. `opened`: the host shows the module's settings now, at
+ * the setting named when it has one. `declined`: the host will not, right now (no press of the
+ * person's, no settings declared, a `key` the module did not declare, the module not ready) and
+ * `why` says so in words a person reads.
+ */
+export const SETTINGS_OPEN_OUTCOMES = ['opened', 'declined'];
+export const settingsOpenResult = z.object({
+    outcome: z.enum(SETTINGS_OPEN_OUTCOMES),
     why: z.string().max(LIMITS.REASON).default(''),
 });
 /**
@@ -856,6 +883,7 @@ export const methodResults = {
     'inbox.adoptWith': inboxAdoptWithResult,
     'inbox.untrack': inboxUntrackResult,
     'inbox.undo': inboxUndoResult,
+    'settings.open': settingsOpenResult,
 };
 /** The schema for one method's answer, or nothing — which means unspecified. */
 export function resultSchemaFor(method) {
