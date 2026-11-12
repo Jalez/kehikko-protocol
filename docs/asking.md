@@ -557,6 +557,33 @@ The rules are the host's to keep:
 
 A host before 2.58.0 answers `unknown-method`.
 
+## Opening its settings at one setting: `settings.open`
+
+A module's page can ask the host to open the module's own settings — the form the host draws from
+`declares.settings` — scrolled to one setting and focused there (2.90.0, capability `settings:open`).
+Use it where a page shows a number a setting governs: a chart of the load opens the load limit.
+
+```ts
+const said = settingsOpenResult.parse(await host.request('settings.open', { key: 'load_above' }))
+// { outcome: 'opened', why: '' }
+```
+
+| `outcome` | |
+|---|---|
+| `opened` | the host shows the settings now, at the setting named |
+| `declined` | the host will not, right now, and `why` says so |
+
+The rules are the host's to keep:
+
+- Only the asker's own settings; the call names no module. `key` is one the module declared;
+  without it the settings open at the top.
+- Only on the person's fresh press in the page.
+- Nothing is read or changed by the call: the person changes the value in the host's form, which
+  sends `settings.set` to the module as any change there does.
+
+A host before 2.90.0 answers `unknown-method`: offer nothing to press, or say where the setting is
+("Settings › Modules › Queue").
+
 ## Guards (2.61.0)
 
 A line a module says to agents (`agentSays`) reaches the session's own context, and nothing holds an

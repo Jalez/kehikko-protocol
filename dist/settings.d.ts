@@ -368,10 +368,10 @@ export declare const settingsSetResult: z.ZodObject<{
     values: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
 }, "strip", z.ZodTypeAny, {
     why: string;
-    outcome: "refused" | "saved";
+    outcome: "saved" | "refused";
     values?: Record<string, unknown> | undefined;
 }, {
-    outcome: "refused" | "saved";
+    outcome: "saved" | "refused";
     values?: Record<string, unknown> | undefined;
     why?: string | undefined;
 }>;
@@ -396,10 +396,10 @@ export declare const doorMethodResults: {
         values: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
     }, "strip", z.ZodTypeAny, {
         why: string;
-        outcome: "refused" | "saved";
+        outcome: "saved" | "refused";
         values?: Record<string, unknown> | undefined;
     }, {
-        outcome: "refused" | "saved";
+        outcome: "saved" | "refused";
         values?: Record<string, unknown> | undefined;
         why?: string | undefined;
     }>;

@@ -41,6 +41,17 @@ tools and skills in conversations started outside Kehikot too. **Additive**; `PR
   `inbox.adoptWith` now always leads somewhere: the agent's dialog, the choice of agent, the update, or
   adding an agent module.
 
+## 2.90.0 — 2026-11-12
+
+Kind: feature
+
+A module's page can open its own settings at one setting. **Additive**; `PROTOCOL` is still 2.
+
+- `settings.open { key? }` under the new capability `settings:open`: the host opens the asking module's
+  settings (`declares.settings`) scrolled to the setting `key` names and focused there, only on the
+  person's fresh press in the page. Answered with `settingsOpenResult` (`opened` | `declined`, with
+  `why`; `SETTINGS_OPEN_OUTCOMES`). See [asking](docs/asking.md).
+
 ## 2.89.0 — 2026-11-12
 
 Kind: feature

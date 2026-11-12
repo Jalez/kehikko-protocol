@@ -59,6 +59,7 @@ export declare const METHOD_SINCE: {
     readonly 'inbox.adoptWith': "2.88.0";
     readonly 'inbox.untrack': "2.88.0";
     readonly 'inbox.undo': "2.88.0";
+    readonly 'settings.open': "2.90.0";
 };
 /** Each capability, and the version that added it: the oldest of its methods. */
 export declare const CAPABILITY_SINCE: {
@@ -91,6 +92,7 @@ export declare const CAPABILITY_SINCE: {
     readonly 'agents:message': "2.41.0";
     readonly 'messages:as-person': "2.50.0";
     readonly 'inbox:person': "2.79.0";
+    readonly 'settings:open': "2.90.0";
     readonly 'sessions:observe': "2.81.0";
     readonly 'services:read': "2.81.0";
     readonly 'sessions:place': "2.85.0";
@@ -292,6 +294,7 @@ export declare const SINCE: {
         readonly 'inbox.adoptWith': "2.88.0";
         readonly 'inbox.untrack': "2.88.0";
         readonly 'inbox.undo': "2.88.0";
+        readonly 'settings.open': "2.90.0";
     };
     readonly capabilities: {
         readonly 'epics:read': "0.25.0";
@@ -323,6 +326,7 @@ export declare const SINCE: {
         readonly 'agents:message': "2.41.0";
         readonly 'messages:as-person': "2.50.0";
         readonly 'inbox:person': "2.79.0";
+        readonly 'settings:open': "2.90.0";
         readonly 'sessions:observe': "2.81.0";
         readonly 'services:read': "2.81.0";
         readonly 'sessions:place': "2.85.0";
@@ -469,6 +473,7 @@ export declare const PIECE_SAID: {
         readonly 'agents:message': "messages between agent sessions";
         readonly 'messages:as-person': "messages to agent sessions as the person";
         readonly 'inbox:person': "your Inbox, shown and acted on for you";
+        readonly 'settings:open': "opening its settings at a setting";
         readonly 'sessions:observe': "notices to agent sessions it sees working on this computer";
         readonly 'services:read': "which modules here provide a service to other modules";
         readonly 'sessions:place': "which epic, parts and kehikko an agent session is on";
