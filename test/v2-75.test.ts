@@ -53,12 +53,12 @@ const notice = (over: Partial<AgentMessage> = {}) => message({ ...over, from: { 
 
 describe('the version', () => {
   test('is 2.75.0, and the changelog and docs say it', () => {
-    expect(PACKAGE_VERSION).toBe('2.91.0')
+    expect(PACKAGE_VERSION).toBe('2.92.0')
     const changelog = readFileSync(join(REPO, 'CHANGELOG.md'), 'utf8')
     expect(changelog).toContain('## 2.75.0')
     expect(readFileSync(join(REPO, 'docs/agent-messages.md'), 'utf8')).toContain('markersNote')
     expect(readFileSync(join(REPO, 'docs/proposals.md'), 'utf8')).toContain('proposalDigester')
-    expect(NOTES_VERSION).toBe(10)
+    expect(NOTES_VERSION).toBeGreaterThanOrEqual(10)
   })
 })
 
@@ -72,7 +72,7 @@ describe('the markers', () => {
 
   test('elsewhere: the place, short', () => {
     const one = message({ id: 108, from: { module: 'kehikot.queue', name: 'Queue', session: null, place: { epic: 'auth', parts: ['login'], kehikko: 'k1' } } })
-    expect(typedFrame(one, YOU)).toBe('⟦Queue · #108 · epic auth (parts login), kehikko k1⟧')
+    expect(typedFrame(one, YOU)).toBe('⟦Queue · #108 · space auth › login, kehikko k1⟧')
   })
 
   test('three kinds, told apart', () => {

@@ -1114,7 +1114,8 @@ export declare function placeSpaceDefaults(args: Record<string, unknown>, place:
 /**
  * The sentences a door says about a session's place, in one wording for every module (2.4.0).
  *
- * - `belongs(place)`: "This conversation belongs to <project>, epic E (parts …) on kehikko K."
+ * - `belongs(place)`: "This conversation belongs to <project>, space Auth › Login (auth/login) on kehikko K."
+ *   2.92.0: the place is said as a space (`spaceWords`), from `space` or the older `epic` and `parts`.
  * - `looking(place)`: whether the person is looking at the same thing, and what they are on if not;
  *   `''` when the host sent no `looking`.
  * - `used(from, place)`: the line a door adds when it took the project or epic from the session.
@@ -1125,7 +1126,7 @@ export declare const DOOR_PLACE_SAYS: {
     readonly belongs: (place: DoorPlace) => string;
     readonly looking: (place: DoorPlace) => string;
     readonly used: (from: PlaceSource, place: DoorPlace | null) => string;
-    readonly unplaced: "This conversation isn’t recorded under any place. Name the project (and epic) in the call, or ask the person which epic it is for.";
+    readonly unplaced: "This conversation isn’t recorded under any place. Name the project (and space) in the call, or ask the person which space it is for.";
     /** The line a door adds whenever it answered from the person's current view for want of a record: never silently. */
     readonly fellBack: "This conversation is not recorded under any place, so this answer is about what the person has open NOW — not this conversation’s place.";
 };

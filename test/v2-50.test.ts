@@ -74,7 +74,7 @@ const fromPerson = (over: Record<string, unknown> = {}): AgentMessage =>
 
 describe('the version', () => {
   test('is 2.50.0, PROTOCOL is still 2, and the docs say it', () => {
-    expect(PACKAGE_VERSION).toBe('2.91.0')
+    expect(PACKAGE_VERSION).toBe('2.92.0')
     expect(PROTOCOL).toBe(2)
     expect(readFileSync(join(REPO, 'CHANGELOG.md'), 'utf8')).toContain('## 2.50.0')
     const docs = readFileSync(join(REPO, 'docs/agent-messages.md'), 'utf8')
@@ -229,7 +229,7 @@ describe('what a receiver is told', () => {
   })
   test('an agent’s question typed: kind in the frame, choices under the body, never the person’s authority', () => {
     const typed = typedMessages([message({ id: 20, kind: 'question', choices: ['Postgres', 'SQLite'] })])
-    expect(typed).toContain('⟦Codex session · question #20 · epic methods, kehikko writing⟧ Which database?')
+    expect(typed).toContain('⟦Codex session · question #20 · space methods, kehikko writing⟧ Which database?')
     expect(typed).toContain('  Choices: (1) Postgres  (2) SQLite')
     expect(typed).not.toContain(PERSON_MESSAGE_AUTHORITY)
   })

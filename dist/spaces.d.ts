@@ -198,3 +198,24 @@ export declare const spaceGoesWithEpic: (place: {
     space?: readonly string[];
 }) => boolean;
 export declare const SPACE_WITH_EPIC = "a place with a space names its epic: the space\u2019s first id";
+/** A place's step as the words about it take it: an id, or an id with a name. */
+type StepLike = string | {
+    id: string;
+    name?: string;
+};
+/**
+ * 2.92.0. A place's space in the words agents read (notes, markers, a door's sentences): `space Auth ›
+ * Login`, `space Auth (sub-spaces Login + Errors)` for several children picked together, `no space`.
+ * Read from `space` (a path of steps or ids) when the place carries one, else from the older `epic` and
+ * `parts` by the compatibility mapping read backwards (`spaceFromEpicParts`), so a place from a host or
+ * a record before 2.89.0 is said the same way. With `ids`, the path of ids follows in parentheses
+ * (`space Auth › Login (auth/login)`), for an agent to pass as a `space` argument. Pure.
+ */
+export declare function spaceWords(place: {
+    epic?: string | null;
+    parts?: readonly StepLike[];
+    space?: readonly StepLike[] | null;
+}, options?: {
+    ids?: boolean;
+}): string;
+export {};

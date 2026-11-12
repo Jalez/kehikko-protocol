@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { LIMITS } from './limits.js';
+import { spaceWords } from './spaces.js';
 import { messagesNotes, markersNote, messagingLine } from './agent-messages.js';
 import { versionParts } from './since.js';
 /**
@@ -123,9 +124,10 @@ export const absentModuleSchema = z.object({
  * skills (`kehikkoSkills`). 8 (2.55.0): how to end a turn (`finishLine`). 9 (2.62.0): what changed for
  * agents since the session started (`changedSince`), which needs `versions` kept, so every running
  * session is told once and its record starts keeping them. 10 (2.75.0): what the markers typed
- * messages come under mean (`markersNote`), said once instead of after every delivery.
+ * messages come under mean (`markersNote`), said once instead of after every delivery. 11 (2.92.0): the
+ * place is said as a space (`spaceWords`), and the message lines say a space where they said an epic.
  */
-export const NOTES_VERSION = 10;
+export const NOTES_VERSION = 11;
 /** 2.50.0. What one module on the kehikko says to agents, as the notes say it. */
 const sayOf = (one) => oneLine(one.says) || oneLine(one.summary);
 /** The line before the full notes a session gets again because the notes' wording changed since it was told. */
@@ -135,14 +137,17 @@ export const NOTES_MOST = { modules: 30, absent: 12 };
 /** A module's own words, as one line in quotes: nothing in it can start another line. */
 const quoted = (text) => JSON.stringify(oneLine(text, 4096));
 const keyOf = (place) => place ? JSON.stringify([place.project, place.epic, [...place.parts.map((p) => p.id)].sort(), place.kehikko?.key ?? null]) : null;
-/** The place in words: `project thesis (/path), epic methods (parts Data + Results) on the kehikko "writing"`. */
+/**
+ * The place in words: `project thesis (/path), space Methods › Data (methods/data) on the kehikko "writing"`.
+ * 2.92.0: said as a space (`spaceWords`), from `space` or from the older `epic` and `parts`.
+ */
 export function placeWords(place) {
     const folder = place.project.replace(/\/+$/, '');
     const base = folder.slice(folder.lastIndexOf('/') + 1) || folder;
-    const parts = place.parts.length ? `parts ${place.parts.map((part) => oneLine(part.name, 80) || part.id).join(' + ')}` : 'the whole epic';
-    const epic = place.epic ? `epic ${place.epic} (${parts})` : 'no epic';
+    const named = (step) => ({ id: step.id, name: oneLine(step.name, 80) });
+    const space = spaceWords({ epic: place.epic, parts: place.parts.map(named), space: place.space?.map(named) ?? null }, { ids: true });
     const kehikko = place.kehikko ? `the kehikko ${quoted(place.kehikko.name || place.kehikko.key)}` : 'no kehikko';
-    return `project ${base} (${place.project}), ${epic} on ${kehikko}`;
+    return `project ${base} (${place.project}), ${space} on ${kehikko}`;
 }
 /**
  * One module on the kehikko as one line: `- Test runs (door queue) — "Queue heavy test runs here…" Skills: a, b.`

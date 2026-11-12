@@ -59,7 +59,7 @@ const readOf = (messages: AgentMessage[], unread: number, you: WakeReader | null
 
 describe('the version', () => {
   test('is 2.43.0, PROTOCOL is still 2, and the notes moved to 4', () => {
-    expect(PACKAGE_VERSION).toBe('2.91.0')
+    expect(PACKAGE_VERSION).toBe('2.92.0')
     expect(PROTOCOL).toBe(2)
     expect(NOTES_VERSION).toBeGreaterThanOrEqual(4)
     expect(readFileSync(join(REPO, 'CHANGELOG.md'), 'utf8')).toContain('## 2.43.0')
@@ -124,7 +124,7 @@ describe('wakeLine', () => {
     const one = message()
     const line = wakeLine([one])
     /* 2.75.0: the compact marker; the place only when it is not the reader's. */
-    expect(line).toBe(`⟦Codex session · #${one.id} · epic methods, kehikko writing⟧ New message; read it with read_messages.`)
+    expect(line).toBe(`⟦Codex session · #${one.id} · space methods, kehikko writing⟧ New message; read it with read_messages.`)
     expect(wakeLine([one], false, YOU)).toBe(`⟦Codex session · #${one.id}⟧ New message; read it with read_messages.`)
     expect(line).not.toContain('BODY-SECRET')
     expect(line).not.toMatch(/[\r\n]/)

@@ -263,3 +263,35 @@ export const placeSpace = spaceIdsSchema;
 /** The refinement every place with a `space` shares: the space's first id is the place's epic. */
 export const spaceGoesWithEpic = (place) => place.space === undefined || place.space[0] === place.epic;
 export const SPACE_WITH_EPIC = 'a place with a space names its epic: the space’s first id';
+const stepSaid = (step) => (typeof step === 'string' ? step : step.name && step.name.trim() ? step.name.trim() : step.id);
+const stepId = (step) => (typeof step === 'string' ? step : step.id);
+/**
+ * 2.92.0. A place's space in the words agents read (notes, markers, a door's sentences): `space Auth ›
+ * Login`, `space Auth (sub-spaces Login + Errors)` for several children picked together, `no space`.
+ * Read from `space` (a path of steps or ids) when the place carries one, else from the older `epic` and
+ * `parts` by the compatibility mapping read backwards (`spaceFromEpicParts`), so a place from a host or
+ * a record before 2.89.0 is said the same way. With `ids`, the path of ids follows in parentheses
+ * (`space Auth › Login (auth/login)`), for an agent to pass as a `space` argument. Pure.
+ */
+export function spaceWords(place, options = {}) {
+    const parts = place.parts ?? [];
+    let path;
+    let picked = [];
+    if (place.space && place.space.length) {
+        path = place.space;
+        if (place.space.length === 1 && parts.length > 1)
+            picked = parts;
+    }
+    else if (place.epic) {
+        path = parts.length === 1 ? [place.epic, parts[0]] : [place.epic];
+        if (parts.length > 1)
+            picked = parts;
+    }
+    else {
+        return 'no space';
+    }
+    const said = path.map(stepSaid).join(' › ');
+    const ids = options.ids && path.some((step) => stepSaid(step) !== stepId(step)) ? ` (${path.map(stepId).join('/')})` : '';
+    const children = picked.length ? ` (sub-spaces ${picked.map(stepSaid).join(' + ')})` : '';
+    return `space ${said}${ids}${children}`;
+}

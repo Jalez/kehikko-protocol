@@ -55,7 +55,7 @@ const readOf = (messages: AgentMessage[], unread: number, you: WakeReader | null
 
 describe('the version', () => {
   test('is 2.48.0, PROTOCOL is still 2, and the docs say it', () => {
-    expect(PACKAGE_VERSION).toBe('2.91.0')
+    expect(PACKAGE_VERSION).toBe('2.92.0')
     expect(PROTOCOL).toBe(2)
     expect(readFileSync(join(REPO, 'CHANGELOG.md'), 'utf8')).toContain('## 2.48.0')
     const docs = readFileSync(join(REPO, 'docs/agent-messages.md'), 'utf8')
@@ -87,7 +87,7 @@ describe('typedMessages', () => {
   test('the message itself after its marker, and nothing after it', () => {
     const one = message({ id: 12 })
     const text = typedMessages([one])
-    expect(text).toBe('⟦Codex session · #12 · epic methods, kehikko writing⟧ Please leave server/auth.ts alone for an hour.')
+    expect(text).toBe('⟦Codex session · #12 · space methods, kehikko writing⟧ Please leave server/auth.ts alone for an hour.')
     expect(typedMessages([one], false, { you: YOU })).toBe('⟦Codex session · #12⟧ Please leave server/auth.ts alone for an hour.')
     expect(text).not.toContain(MESSAGES_TYPED_READ_ONLY)
     expect(text).not.toContain(ACT_ON_MESSAGES)
@@ -105,7 +105,7 @@ describe('typedMessages', () => {
     const a = message({ id: 20, body: 'first' })
     const b = message({ id: 21, body: 'second', from: { module: 'kehikot.vibe', name: 'Vibe', session: 's2', place: { epic: null, parts: [], kehikko: null } } })
     const text = typedMessages([a, b], false, { you: YOU })
-    expect(text).toBe('⟦Codex session · #20⟧ first\n⟦Vibe session · #21 · no epic⟧ second')
+    expect(text).toBe('⟦Codex session · #20⟧ first\n⟦Vibe session · #21 · no space⟧ second')
   })
 
   test('at most DELIVER_MOST', () => {
@@ -141,7 +141,7 @@ describe('typedMessages', () => {
   test('none is empty', () => expect(typedMessages([])).toBe(''))
 
   test('the frame is only host-stamped fields', () => {
-    expect(typedFrame(message({ id: 7, body: 'SECRET' }))).toBe('⟦Codex session · #7 · epic methods, kehikko writing⟧')
+    expect(typedFrame(message({ id: 7, body: 'SECRET' }))).toBe('⟦Codex session · #7 · space methods, kehikko writing⟧')
   })
 })
 

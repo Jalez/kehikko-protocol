@@ -2128,7 +2128,7 @@ export declare const isPersonMessage: (message: Pick<AgentMessage, "from">) => b
  * with no session and not the person's. Its words are that module's, never an agent session's.
  */
 export declare const isModuleMessage: (message: Pick<AgentMessage, "from">) => boolean;
-/** One message as one line: `- #12, 2026-10-31T14:02Z, from Codex (session …, epic methods) to every session at the epic methods, thread "auth": "…"`. */
+/** One message as one line: `- #12, 2026-10-31T14:02Z, from Codex (session …, space methods) to every session at the space methods, thread "auth": "…"`. */
 export declare function messageLine(message: AgentMessage, you?: AgentSessionRef | null): string;
 /** The head over messages in a session's notes and in `read_messages`: what they are, and what they are not. */
 export declare const MESSAGES_HEAD: string;

@@ -11,6 +11,32 @@ After 2.78.0, every entry's first line under its heading is its kind, and the ve
 (semver; CI checks it): `Kind: breaking` → next major, `Kind: feature` → next minor, `Kind: fix` →
 next patch.
 
+## 2.92.0 — 2026-11-12
+
+Kind: feature
+
+What agents read says spaces. Every place an agent is told — its notes, a message's line and marker, a
+door's sentences, `send_message`'s description — is said as a space (`space Auth › Login`), with epic
+and parts as older names. **Additive**; the wire is unchanged (`epic` and `parts` are still sent and
+read); `PROTOCOL` is still 2. [docs/spaces.md](docs/spaces.md#what-agents-read-2920).
+
+### Added
+
+- `spaceWords(place, { ids? })`: a place as a space in words — `space Auth › Login`, `space Auth
+  (sub-spaces Login + Errors)`, `no space`; with `ids`, the path of ids after it (`(auth/login)`). From
+  `space` when the place carries one, else from `epic` and `parts`.
+- `NotesPlace.space`: the place's space as a path of steps, when the host said it.
+
+### Changed
+
+- `placeWords` (the notes, the subagent notes), `messageLine` / `messageToWords`, the wake line and
+  `typedFrame`'s markers (`· space auth › login, kehikko k1`) and `DOOR_PLACE_SAYS` say a space where
+  they said an epic and its parts. `NOTES_VERSION` is 11, so every session is told its notes once more.
+- `messagingLine` and `send_message`: a place is "a space, a kehikko, or both"; `to.place` takes
+  `space` (a path of ids) first, and says `epic` and `parts` are older names, still accepted.
+  `answerMessageTool` fills `epic` from `space` when only `space` is given.
+- `messagePlaceSchema`'s refusals and `DOOR_PLACE_SAYS.unplaced` name a space.
+
 ## 2.91.0 — 2026-11-12
 
 Kind: feature

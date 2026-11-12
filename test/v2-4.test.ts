@@ -26,7 +26,7 @@ function host(table: Record<string, unknown>): typeof fetch {
 }
 
 describe('the version', () => {
-  test('is 2.8.0', () => expect(PACKAGE_VERSION).toBe('2.91.0'))
+  test('is 2.8.0', () => expect(PACKAGE_VERSION).toBe('2.92.0'))
 })
 
 describe('placeTokenOf', () => {
@@ -85,12 +85,12 @@ describe('placeDefaults: arguments, then the session, then nothing', () => {
 })
 
 describe('DOOR_PLACE_SAYS', () => {
-  test('belongs names the project, epic, parts and kehikko', () => {
-    expect(DOOR_PLACE_SAYS.belongs(PLACE)).toBe('This conversation belongs to thesis (/work/thesis), epic methods (parts data) on kehikko "main".')
+  test('belongs names the project, space and kehikko', () => {
+    expect(DOOR_PLACE_SAYS.belongs(PLACE)).toBe('This conversation belongs to thesis (/work/thesis), space methods › data on kehikko "main".')
   })
   test('looking says what the person is on when it differs', () => {
     expect(DOOR_PLACE_SAYS.looking(PLACE)).toBe(
-      'The person is looking at something else now (epic results on kehikko "main"); this conversation\'s place has not changed.',
+      'The person is looking at something else now (space results on kehikko "main"); this conversation\'s place has not changed.',
     )
     expect(DOOR_PLACE_SAYS.looking({ ...PLACE, looking: { ...PLACE.looking!, epic: 'methods', parts: ['data'] } })).toBe('The person is looking at this place now.')
     expect(DOOR_PLACE_SAYS.looking({ ...PLACE, looking: null })).toContain('No page of Kehikot is open')

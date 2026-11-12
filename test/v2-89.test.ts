@@ -162,7 +162,7 @@ describe('2.89.0: spaces', () => {
     /* An older place: the space read from epic and parts. */
     const older = { ...place, space: undefined }
     expect(placeSpaceDefaults({}, older).space).toEqual(['auth', 'login'])
-    expect(DOOR_PLACE_SAYS.belongs(place)).toContain('space Auth › Login › Errors (epic auth (parts login))')
-    expect(DOOR_PLACE_SAYS.belongs(older)).toBe('This conversation belongs to /work/x (/work/x), epic auth (parts login).')
+    expect(DOOR_PLACE_SAYS.belongs(place)).toBe('This conversation belongs to /work/x (/work/x), space Auth › Login › Errors (auth/login/errors).')
+    expect(DOOR_PLACE_SAYS.belongs(older)).toBe('This conversation belongs to /work/x (/work/x), space auth › login.')
   })
 })

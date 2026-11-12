@@ -74,6 +74,20 @@ A door takes a `space` argument (`DOOR_SPACE_ARGUMENT`) beside `project` and `ep
 resolves it, and refuses an id that names two spaces by listing their paths. `placeSpaceDefaults` is
 `placeDefaults` with the session's space (`space`, a path of ids) and an unresolved bare id (`spaceId`).
 
+## What agents read (2.92.0)
+
+Agents are told places as spaces. `spaceWords(place, { ids? })` says one: `space Auth › Login`,
+`space Auth (sub-spaces Login + Errors)` for several children picked together, `no space`; with `ids`,
+the path of ids follows (`space Auth › Login (auth/login)`) for an agent to pass back as a `space`
+argument. It reads `space` when the place carries one, else `epic` and `parts` by the mapping read
+backwards, so a place from an older host is said the same way.
+
+Every text an agent gets says a place this way: the notes (`placeWords`, `NOTES_VERSION` 11, with
+`NotesPlace.space`), a message's line and marker (`messageLine`, `typedFrame`: `· space auth › login,
+kehikko k1`), a door's sentences (`DOOR_PLACE_SAYS`), and `send_message`'s `to.place`, which leads with
+`space` and calls `epic` and `parts` older names, still accepted (`answerMessageTool` fills `epic` from
+`space`). The wire is unchanged: `epic` and `parts` are still sent and read.
+
 ## The tree
 
 `spaceTreeSchema` is a whole tree: `[{ id, name, children }]`, siblings in order, no two siblings with
