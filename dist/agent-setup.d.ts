@@ -31,3 +31,11 @@ export interface AgentSetupChoice {
 export declare function agentSetupChoice(values: Record<string, unknown> | null | undefined): AgentSetupChoice;
 /** The settings values that say a choice, by key: what a host sends to carry an earlier choice over. */
 export declare function agentSetupValues(choice: AgentSetupChoice): Record<string, boolean | string[]>;
+/**
+ * Where a host answers the choice it held itself before 2.91.0, as settings values
+ * (`agentSetupValues`): `GET` → `{ ok: true, values }`, to programs on this machine. A module that
+ * provides `agent.setup` asks it once, before it has a choice of its own, and keeps what it is told as
+ * its own — so nothing the person set up changes when the choice moves to the module. A host that
+ * never held one answers 404; the module then starts from its defaults (off).
+ */
+export declare const AGENT_SETUP_CARRIED_PATH = "/host/agent-setup/carried";

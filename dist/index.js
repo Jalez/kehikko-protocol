@@ -95,4 +95,4 @@ inboxGoSchema, INBOX_GO_LABEL, INBOX_ITEMS_MAX, inboxReadParams, inboxReadResult
 export { SPACE_ID, spaceStepSchema, spacePathSchema, spaceIdsSchema, spaceSchema, spaceNodeSchema, spaceTreeSchema, spaceIdsOf, spaceWithin, epicPartsOf, spaceFromEpicParts, spaceAgrees, spaceSaid, spaceIdFor, DOOR_SPACE_ARGUMENT, doorSpace, findSpace, spaceAt, spaceOf, nodeAt, placeSpace, } from './spaces.js';
 export { placeSpaceDefaults } from './door.js';
 /* 2.91.0: the choice an `agent.setup` provider holds. */
-export { AGENT_SETUP_KEYS, agentSetupSettings, agentSetupChoice, agentSetupValues, } from './agent-setup.js';
+export { AGENT_SETUP_KEYS, AGENT_SETUP_CARRIED_PATH, agentSetupSettings, agentSetupChoice, agentSetupValues, } from './agent-setup.js';

@@ -231,7 +231,8 @@ settings: `agentSetupSettings(program)` declares the four (`AGENT_SETUP_KEYS`: t
 modules left out, the same for skills), off by default and `personOnly`. A host reads them with
 `settings.get` at the module's door (no project) and acts on them with `agentSetupChoice`; it writes
 them only as the person (a pass, like any change in its Settings), and `agentSetupValues` says the
-values that carry an earlier choice over.
+values that carry an earlier choice over: a module asks the host at `AGENT_SETUP_CARRIED_PATH` once, before
+it has a choice of its own, and keeps the answer as its own.
 
 `cli` is the program's command (`claude`): it says which of the host's ways of writing a program's
 user-wide configuration applies. A host with none for that command sets nothing up for it. The host,

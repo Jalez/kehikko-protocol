@@ -29,6 +29,9 @@ tools and skills in conversations started outside Kehikot too. **Additive**; `PR
 - `agentSetupChoice(values)`: the choice in a module's `settings.get` values, read leniently;
   `agentSetupValues(choice)`: the values that carry an earlier choice over. Types `AgentSetup`,
   `AgentSetupKind`, `AgentSetupChoice`.
+- `AGENT_SETUP_CARRIED_PATH` (`/host/agent-setup/carried`): where a host answers the choice it held
+  itself before, as settings values, so the module carries it over once and nothing the person set up
+  changes.
 - `inboxAdoptionResult.taskAgents` (optional): with `agent` null, the agent modules on the person's kehikko
   that could do the task, none primary. Two or more: `inbox.adoptWith` asks which (it becomes the
   kehikko's primary agent). Empty: none there can. `agent` is now filled from that kehikko's primary or

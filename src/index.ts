@@ -1502,6 +1502,7 @@ export { placeSpaceDefaults } from './door.js'
 /* 2.91.0: the choice an `agent.setup` provider holds. */
 export {
   AGENT_SETUP_KEYS,
+  AGENT_SETUP_CARRIED_PATH,
   agentSetupSettings,
   agentSetupChoice,
   agentSetupValues,
