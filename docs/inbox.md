@@ -35,6 +35,19 @@ These are the person's acts, so:
   `inbox.open` for the item a `next` named, for `INBOX_NEXT_MS` after the host sent it: the person's
   press was the host's shortcut.
 
+## Items that take the person somewhere (2.87.0)
+
+An item may carry `go: { label? }`: its primary action is to take the person to its place. A host
+sets it on an agent's offer — an agent that wants to show the person something they did not ask to
+see files an item ("the failing test is in the auth epic, part 3") instead of moving the view.
+
+- A page draws it as a primary button beside dismiss: `go.label` when given (text), else
+  `INBOX_GO_LABEL` ("Take me there"). A one-line view makes it the press action.
+- Pressing it is `inbox.open`, on the person's fresh press as ever. No new act: the host goes there as
+  an agent's `jump` would (kehikko, epic, parts, step), leaves a Go back mark that restores where the
+  person was, and closes the item — an offer is done once taken.
+- Dismiss works as for any item.
+
 ## `kehikot.inbox`
 
 Host → module, only to a frame whose manifest declares `inbox:person`:

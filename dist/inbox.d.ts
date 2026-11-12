@@ -54,6 +54,21 @@ export declare const inboxQuestionSchema: z.ZodObject<{
 }>;
 export type InboxQuestion = z.infer<typeof inboxQuestionSchema>;
 /**
+ * 2.87.0. An item whose primary action is to take the person to its place (`inboxItemSchema.go`):
+ * `label` is the button's words when the host has its own (text, never markup); absent, a page says
+ * "Take me there". Taking it is `inbox.open`, as for any item.
+ */
+export declare const inboxGoSchema: z.ZodObject<{
+    label: z.ZodOptional<z.ZodString>;
+}, "strip", z.ZodTypeAny, {
+    label?: string | undefined;
+}, {
+    label?: string | undefined;
+}>;
+export type InboxGo = z.infer<typeof inboxGoSchema>;
+/** What a page says on an item's `go` button when the host gave no `label`. */
+export declare const INBOX_GO_LABEL = "Take me there";
+/**
  * One open item of the record, in the words the host has for it. Every string is TEXT: a page never
  * renders one as markup or a link and never opens a URL from one.
  *
@@ -66,6 +81,10 @@ export type InboxQuestion = z.infer<typeof inboxQuestionSchema>;
  *   has been to. A dismissed item is not listed; a module the person stopped showing is not listed.
  * - `mutable`: whether a page may offer "Stop showing <by> here" (`inbox.use`): a module's items, never
  *   the host's own lists.
+ * - `go` (2.87.0): the item's primary action is to take the person to its place — an agent's offer
+ *   ("the failing test is in the auth epic, part 3"). A page draws it as a primary button, `label`
+ *   when given (text), else its own words ("Take me there"), beside dismiss; pressing it is
+ *   `inbox.open`, which goes there with a Go back mark and closes the offer. Absent: an ordinary item.
  */
 export declare const inboxItemSchema: z.ZodObject<{
     module: z.ZodString;
@@ -95,6 +114,13 @@ export declare const inboxItemSchema: z.ZodObject<{
         answered?: string | null | undefined;
     }>>;
     mutable: z.ZodDefault<z.ZodBoolean>;
+    go: z.ZodOptional<z.ZodObject<{
+        label: z.ZodOptional<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        label?: string | undefined;
+    }, {
+        label?: string | undefined;
+    }>>;
 }, "strip", z.ZodTypeAny, {
     id: string;
     module: string;
@@ -115,6 +141,9 @@ export declare const inboxItemSchema: z.ZodObject<{
     } | undefined;
     says?: string | undefined;
     detail?: string | undefined;
+    go?: {
+        label?: string | undefined;
+    } | undefined;
 }, {
     id: string;
     module: string;
@@ -131,6 +160,9 @@ export declare const inboxItemSchema: z.ZodObject<{
     says?: string | undefined;
     detail?: string | undefined;
     priority?: "urgent" | "normal" | "low" | undefined;
+    go?: {
+        label?: string | undefined;
+    } | undefined;
     where?: string | undefined;
     here?: boolean | undefined;
     seen?: boolean | undefined;
@@ -178,6 +210,13 @@ export declare const inboxReadResult: z.ZodObject<{
             answered?: string | null | undefined;
         }>>;
         mutable: z.ZodDefault<z.ZodBoolean>;
+        go: z.ZodOptional<z.ZodObject<{
+            label: z.ZodOptional<z.ZodString>;
+        }, "strip", z.ZodTypeAny, {
+            label?: string | undefined;
+        }, {
+            label?: string | undefined;
+        }>>;
     }, "strip", z.ZodTypeAny, {
         id: string;
         module: string;
@@ -198,6 +237,9 @@ export declare const inboxReadResult: z.ZodObject<{
         } | undefined;
         says?: string | undefined;
         detail?: string | undefined;
+        go?: {
+            label?: string | undefined;
+        } | undefined;
     }, {
         id: string;
         module: string;
@@ -214,6 +256,9 @@ export declare const inboxReadResult: z.ZodObject<{
         says?: string | undefined;
         detail?: string | undefined;
         priority?: "urgent" | "normal" | "low" | undefined;
+        go?: {
+            label?: string | undefined;
+        } | undefined;
         where?: string | undefined;
         here?: boolean | undefined;
         seen?: boolean | undefined;
@@ -268,6 +313,13 @@ export declare const inboxReadResult: z.ZodObject<{
                 answered?: string | null | undefined;
             }>>;
             mutable: z.ZodDefault<z.ZodBoolean>;
+            go: z.ZodOptional<z.ZodObject<{
+                label: z.ZodOptional<z.ZodString>;
+            }, "strip", z.ZodTypeAny, {
+                label?: string | undefined;
+            }, {
+                label?: string | undefined;
+            }>>;
         }, "strip", z.ZodTypeAny, {
             id: string;
             module: string;
@@ -288,6 +340,9 @@ export declare const inboxReadResult: z.ZodObject<{
             } | undefined;
             says?: string | undefined;
             detail?: string | undefined;
+            go?: {
+                label?: string | undefined;
+            } | undefined;
         }, {
             id: string;
             module: string;
@@ -304,6 +359,9 @@ export declare const inboxReadResult: z.ZodObject<{
             says?: string | undefined;
             detail?: string | undefined;
             priority?: "urgent" | "normal" | "low" | undefined;
+            go?: {
+                label?: string | undefined;
+            } | undefined;
             where?: string | undefined;
             here?: boolean | undefined;
             seen?: boolean | undefined;
@@ -334,6 +392,9 @@ export declare const inboxReadResult: z.ZodObject<{
             } | undefined;
             says?: string | undefined;
             detail?: string | undefined;
+            go?: {
+                label?: string | undefined;
+            } | undefined;
         }[];
     }, {
         project: {
@@ -356,6 +417,9 @@ export declare const inboxReadResult: z.ZodObject<{
             says?: string | undefined;
             detail?: string | undefined;
             priority?: "urgent" | "normal" | "low" | undefined;
+            go?: {
+                label?: string | undefined;
+            } | undefined;
             where?: string | undefined;
             here?: boolean | undefined;
             seen?: boolean | undefined;
@@ -394,6 +458,9 @@ export declare const inboxReadResult: z.ZodObject<{
         } | undefined;
         says?: string | undefined;
         detail?: string | undefined;
+        go?: {
+            label?: string | undefined;
+        } | undefined;
     }[];
     next: {
         id: string;
@@ -425,6 +492,9 @@ export declare const inboxReadResult: z.ZodObject<{
             } | undefined;
             says?: string | undefined;
             detail?: string | undefined;
+            go?: {
+                label?: string | undefined;
+            } | undefined;
         }[];
     }[];
     earlier: number;
@@ -449,6 +519,9 @@ export declare const inboxReadResult: z.ZodObject<{
         says?: string | undefined;
         detail?: string | undefined;
         priority?: "urgent" | "normal" | "low" | undefined;
+        go?: {
+            label?: string | undefined;
+        } | undefined;
         where?: string | undefined;
         here?: boolean | undefined;
         seen?: boolean | undefined;
@@ -480,6 +553,9 @@ export declare const inboxReadResult: z.ZodObject<{
             says?: string | undefined;
             detail?: string | undefined;
             priority?: "urgent" | "normal" | "low" | undefined;
+            go?: {
+                label?: string | undefined;
+            } | undefined;
             where?: string | undefined;
             here?: boolean | undefined;
             seen?: boolean | undefined;
@@ -733,6 +809,10 @@ export type InboxAnswerResult = z.infer<typeof inboxAnswerResult>;
  * `inbox.open`: go to where an item happened — its project, kehikko, epic and parts — as pressing it
  * in the host's own Inbox did; the module that reported it is told (`kehikot.opened`). A finished
  * item is marked seen. On the person's press only.
+ *
+ * 2.87.0: for an item with `go` (an agent's offer), the host goes there as an agent's `jump` would —
+ * its kehikko, epic, parts and step — leaves a Go back mark that restores where the person was, and
+ * closes the item: an offer is done once taken. `opened` once the view is on its way.
  */
 export declare const inboxOpenParams: z.ZodObject<{
     module: z.ZodString;
