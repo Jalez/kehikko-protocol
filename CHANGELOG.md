@@ -11,6 +11,21 @@ After 2.78.0, every entry's first line under its heading is its kind, and the ve
 (semver; CI checks it): `Kind: breaking` → next major, `Kind: feature` → next minor, `Kind: fix` →
 next patch.
 
+## 2.87.0 — 2026-11-12
+
+Kind: feature
+
+An Inbox item that takes the person somewhere. **Additive**; `PROTOCOL` is still 2.
+
+- `inboxItemSchema` gains an optional `go: { label? }` (`inboxGoSchema`): the item's primary action is
+  to take the person to its place — a host sets it on an agent's offer, filed instead of moving the
+  view unasked. A page draws a primary button, `label` or `INBOX_GO_LABEL` ("Take me there"), beside
+  dismiss.
+- Pressing it is the existing `inbox.open` (page-only, on a fresh press): for an item with `go` the host
+  goes there as an agent's `jump` would, leaves a Go back mark, and closes the item.
+
+See [inbox](docs/inbox.md).
+
 ## 2.86.0 — 2026-11-12
 
 Kind: feature

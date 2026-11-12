@@ -1378,6 +1378,10 @@ export {
   type InboxQuestion,
   inboxItemSchema,
   type InboxItem,
+  /* 2.87.0: an item whose primary action is to go to its place (an agent's offer). */
+  inboxGoSchema,
+  type InboxGo,
+  INBOX_GO_LABEL,
   INBOX_ITEMS_MAX,
   inboxReadParams,
   inboxReadResult,
