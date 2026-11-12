@@ -33,6 +33,10 @@ tools and skills in conversations started outside Kehikot too. **Additive**; `PR
   that could do the task, none primary. Two or more: `inbox.adoptWith` asks which (it becomes the
   kehikko's primary agent). Empty: none there can. `agent` is now filled from that kehikko's primary or
   only agent module.
+- `inboxAdoptionResult.agentsToUpdate` (optional): with no agent and no `taskAgents`, the agent modules on
+  that kehikko that do not provide `agent.tasks`, so a page offers "Update <name>…" instead of a dead end.
+  `inbox.adoptWith` now always leads somewhere: the agent's dialog, the choice of agent, the update, or
+  adding an agent module.
 
 ## 2.89.0 — 2026-11-12
 

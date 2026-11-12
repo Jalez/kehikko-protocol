@@ -62,3 +62,12 @@ describe('the adoption names the agents a page may offer (2.91.0)', () => {
     expect(inboxAdoptionResult.safeParse({ ...base, taskAgents: [{ module: '', name: 'A' }] }).success).toBe(false)
   })
 })
+
+describe('the adoption names agent modules to update (2.91.0)', () => {
+  test('agentsToUpdate is optional, and read when given', async () => {
+    const { inboxAdoptionResult } = await import('../src/index.js')
+    const base = { outcome: 'ok', why: '', item: null, epics: [], suggested: null, conversations: [], agent: null, proposal: null }
+    expect(inboxAdoptionResult.parse(base).agentsToUpdate).toBeUndefined()
+    expect(inboxAdoptionResult.parse({ ...base, taskAgents: [], agentsToUpdate: [{ module: 'kehikot.a', name: 'A' }] }).agentsToUpdate).toEqual([{ module: 'kehikot.a', name: 'A' }])
+  })
+})

@@ -66,8 +66,9 @@ offer:
   proposes a place; the person confirms there in one press. Since 2.91.0 `agent` is the primary agent
   of the person's kehikko, or its only agent module. With `agent` null and two or more `taskAgents`
   (none primary): **Adopt with an agent…** — the host asks which first, and that one becomes the
-  kehikko's primary agent. With `taskAgents` empty, the picker, and a page may say that adding an agent
-  module would let it find the place.
+  kehikko's primary agent. With `agentsToUpdate`: **Update <name>…** — `inbox.adoptWith` takes the
+  person to that module's update. With `taskAgents` empty and nothing to update: **Add an agent
+  module…** — `inbox.adoptWith` opens the host's module list. The picker stays a secondary choice.
 - **Don't track this**: `inbox.untrack`. The host tells nothing more about that ref in this project.
 - **Undo**: `inbox.undo`, after either, while the item's `after.undo` says it can.
 

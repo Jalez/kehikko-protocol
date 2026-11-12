@@ -360,6 +360,12 @@ export const inboxAdoptionResult = z.object({
      * that adding one would let it find the place. Absent from an older host: say nothing of it.
      */
     taskAgents: z.array(z.object({ module: z.string().min(1).max(64), name: z.string().max(LIMITS.TITLE) })).max(16).optional(),
+    /**
+     * 2.91.0. With `agent` null and no `taskAgents`: the agent modules on that kehikko that do not provide
+     * `agent.tasks` (an older version of them, or one that never will). A page offers "Update <name>…"
+     * (`inbox.adoptWith`, which takes the person to it) rather than leaving only the picker.
+     */
+    agentsToUpdate: z.array(z.object({ module: z.string().min(1).max(64), name: z.string().max(LIMITS.TITLE) })).max(16).optional(),
     /** An agent's proposal, when one was made for this item: what the dialog offers to confirm. */
     proposal: z
         .object({

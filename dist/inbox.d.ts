@@ -1274,6 +1274,21 @@ export declare const inboxAdoptionResult: z.ZodObject<{
         name: string;
         module: string;
     }>, "many">>;
+    /**
+     * 2.91.0. With `agent` null and no `taskAgents`: the agent modules on that kehikko that do not provide
+     * `agent.tasks` (an older version of them, or one that never will). A page offers "Update <name>…"
+     * (`inbox.adoptWith`, which takes the person to it) rather than leaving only the picker.
+     */
+    agentsToUpdate: z.ZodOptional<z.ZodArray<z.ZodObject<{
+        module: z.ZodString;
+        name: z.ZodString;
+    }, "strip", z.ZodTypeAny, {
+        name: string;
+        module: string;
+    }, {
+        name: string;
+        module: string;
+    }>, "many">>;
     /** An agent's proposal, when one was made for this item: what the dialog offers to confirm. */
     proposal: z.ZodDefault<z.ZodNullable<z.ZodObject<{
         epic: z.ZodString;
@@ -1350,6 +1365,10 @@ export declare const inboxAdoptionResult: z.ZodObject<{
         name: string;
         module: string;
     }[] | undefined;
+    agentsToUpdate?: {
+        name: string;
+        module: string;
+    }[] | undefined;
 }, {
     outcome: "declined" | "no-such-item" | "ok";
     why?: string | undefined;
@@ -1396,6 +1415,10 @@ export declare const inboxAdoptionResult: z.ZodObject<{
         comes?: boolean | undefined;
     }[] | undefined;
     taskAgents?: {
+        name: string;
+        module: string;
+    }[] | undefined;
+    agentsToUpdate?: {
         name: string;
         module: string;
     }[] | undefined;
