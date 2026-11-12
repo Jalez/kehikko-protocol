@@ -1095,6 +1095,7 @@ export declare const contextSchema: z.ZodObject<{
         at?: string | undefined;
         by?: string | undefined;
     } | null | undefined;
+    scope?: unknown;
     address?: {
         url: string;
         at?: string | undefined;
@@ -1110,7 +1111,6 @@ export declare const contextSchema: z.ZodObject<{
     } | undefined;
     projectPath?: string | null | undefined;
     theme?: "light" | "dark" | undefined;
-    scope?: unknown;
     appearance?: unknown;
     selection?: string[] | undefined;
     passage?: {

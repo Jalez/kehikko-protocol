@@ -87,4 +87,21 @@ export declare function vouchCaller(headers: HeaderBag, options?: VouchOptions):
     ok: false;
     why: string;
 }>;
+export interface VouchHostOptions {
+    env?: Record<string, string | undefined>;
+    timeoutMs?: number;
+    fetch?: typeof fetch;
+}
+/**
+ * 2.88.0. Whether this request came from the HOST's server: `SERVICE_CALLER_HEADER` is `HOST_CALLER`,
+ * and the host, asked at its own origins (`KEHIKOT_ORIGINS`, loopback only) at `HOST_PASS_PATH`, says it
+ * minted the pass in `SERVICE_PASS_HEADER` (spent by the asking). What a provider holds its host-only
+ * service routes to (`conversations.finder`, `agent.tasks`). Never throws.
+ */
+export declare function vouchHost(headers: HeaderBag, options?: VouchHostOptions): Promise<{
+    ok: true;
+} | {
+    ok: false;
+    why: string;
+}>;
 export {};

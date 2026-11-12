@@ -54,6 +54,11 @@ export declare const METHOD_SINCE: {
     readonly 'inbox.answer': "2.79.0";
     readonly 'inbox.open': "2.79.0";
     readonly 'inbox.use': "2.79.0";
+    readonly 'inbox.adoption': "2.88.0";
+    readonly 'inbox.adopt': "2.88.0";
+    readonly 'inbox.adoptWith': "2.88.0";
+    readonly 'inbox.untrack': "2.88.0";
+    readonly 'inbox.undo': "2.88.0";
 };
 /** Each capability, and the version that added it: the oldest of its methods. */
 export declare const CAPABILITY_SINCE: {
@@ -282,6 +287,11 @@ export declare const SINCE: {
         readonly 'inbox.answer': "2.79.0";
         readonly 'inbox.open': "2.79.0";
         readonly 'inbox.use': "2.79.0";
+        readonly 'inbox.adoption': "2.88.0";
+        readonly 'inbox.adopt': "2.88.0";
+        readonly 'inbox.adoptWith': "2.88.0";
+        readonly 'inbox.untrack': "2.88.0";
+        readonly 'inbox.undo': "2.88.0";
     };
     readonly capabilities: {
         readonly 'epics:read': "0.25.0";

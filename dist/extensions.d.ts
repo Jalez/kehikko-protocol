@@ -71,12 +71,12 @@ export declare const callPayload: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     why: string;
     refs: string[];
-    target: string;
     ok: boolean;
+    target: string;
     ms: number;
 }, {
-    target: string;
     ok: boolean;
+    target: string;
     ms: number;
     why?: string | undefined;
     refs?: string[] | undefined;

@@ -233,5 +233,5 @@ describe('client/ui/chart', () => {
 })
 
 test('the package says 2.78.0', () => {
-  expect(PACKAGE_VERSION).toBe('2.87.0')
+  expect(PACKAGE_VERSION).toBe('2.88.0')
 })

@@ -1,4 +1,4 @@
-# Services (2.81.0, 2.83.0, 2.85.0, 2.86.0)
+# Services (2.81.0, 2.83.0, 2.85.0, 2.86.0, 2.88.0)
 
 One module PROVIDES a service; others CONSUME it; neither names the other. A consumer never hard-codes
 a provider's id, name, program path or tool names, and a provider never knows who consumes it. What
@@ -189,3 +189,35 @@ An entry in `SERVICES` with its `says` and its `schema`, the readers it needs, a
 version. Nothing changes in a host: it carries the descriptor and answers `services.find` for any name.
 A service whose consumers CALL the provider (not only read its descriptor) will get a call path through
 the host by service and operation — never by module id or tool name — when the first one needs it.
+
+## The host as a consumer (2.88.0)
+
+Two services are called by the HOST, not by another module: `conversations.finder` and `agent.tasks`.
+The host's server sends `x-kehikot-caller: kehikko` (`HOST_CALLER`) and a pass it minted; the provider
+holds the route to `vouchHost`, which asks the host at its own origins (`HOST_PASS_PATH`) whether it
+minted that pass. No page, agent or other module can pass for the host.
+
+### `conversations.finder`
+
+`{ name, program, find, bring }`. An agent module provides it from what it already reads of its CLI's
+conversations — its session listing, and transcripts only where it already reads them; nothing new
+from outside its CLI's own folders.
+
+- `POST <find> { project, refs, url?, branch?, repo? }` → `{ conversations: [{ session, title, folder,
+  lastActive, match, reason, place, running }] }`. `match` is `created` | `pushed` | `branch` |
+  `mentioned` | `folder`, strongest first; `reason` says it in words ("created !4721", "pushed branch
+  feat/x", "worked in this repository"). Titles and reasons only. Read with `candidatesIn`.
+- `POST <bring> { project, session, to, from }`: a compare-and-set of one conversation's place — the
+  record writes `/kehikot-here` does — taken only when the conversation is filed under `from` now.
+  `elsewhere` otherwise, with where it is. A running conversation is not restarted: it gains the place
+  now, and the module's guards and messaging when the module next resumes it, or at once when the
+  module holds its terminal (`resumed`).
+
+### `agent.tasks`
+
+`{ name, program, start, view }`.
+
+- `POST <start> { project, brief, place, title }` → `{ outcome, session, why }`: a NEW conversation fed
+  `brief` on launch, filed under `place`, kept in the module's records like any other.
+- `view`: the module's page for that one conversation, `/app?…{session}…` (`agentTaskView`), which the
+  host frames in its dialog while the task runs.

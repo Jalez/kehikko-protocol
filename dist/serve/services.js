@@ -2,8 +2,9 @@ import { join } from 'node:path';
 import { LIMITS } from '../limits.js';
 import { MODULE_ID } from '../ids.js';
 import { SERVER_PASS, SERVER_PASS_PATH } from '../server-ask.js';
-import { SERVICE_CALLER_HEADER, SERVICE_PASS_HEADER, SERVICES, providerOf } from '../services.js';
-import { askHost, mintServerPass } from './ask.js';
+import { HOST_CALLER, HOST_PASS_PATH, SERVICE_CALLER_HEADER, SERVICE_PASS_HEADER, SERVICES, providerOf } from '../services.js';
+import { askHost, hostAskUrls, mintServerPass } from './ask.js';
+import { SERVER_ASK_PATH } from '../server-ask.js';
 import { readNeighbour } from './neighbours.js';
 import { readRegistration, registryDir } from './registry.js';
 /**
@@ -118,4 +119,36 @@ export async function vouchCaller(headers, options = {}) {
     finally {
         clearTimeout(timer);
     }
+}
+/**
+ * 2.88.0. Whether this request came from the HOST's server: `SERVICE_CALLER_HEADER` is `HOST_CALLER`,
+ * and the host, asked at its own origins (`KEHIKOT_ORIGINS`, loopback only) at `HOST_PASS_PATH`, says it
+ * minted the pass in `SERVICE_PASS_HEADER` (spent by the asking). What a provider holds its host-only
+ * service routes to (`conversations.finder`, `agent.tasks`). Never throws.
+ */
+export async function vouchHost(headers, options = {}) {
+    const caller = header(headers, SERVICE_CALLER_HEADER)?.trim() ?? '';
+    const pass = header(headers, SERVICE_PASS_HEADER)?.trim() ?? '';
+    if (caller !== HOST_CALLER)
+        return { ok: false, why: 'Only Kehikot itself may ask this.' };
+    if (!SERVER_PASS.test(pass))
+        return { ok: false, why: 'The request carries no pass from Kehikot.' };
+    const origins = hostAskUrls(options.env ?? process.env).map((url) => url.slice(0, -SERVER_ASK_PATH.length));
+    for (const origin of origins) {
+        const control = new AbortController();
+        const timer = setTimeout(() => control.abort(), options.timeoutMs ?? LIMITS.SERVER_ASK_MS);
+        try {
+            const response = await (options.fetch ?? fetch)(`${origin}${HOST_PASS_PATH}?pass=${encodeURIComponent(pass)}`, { headers: { accept: 'application/json' }, signal: control.signal });
+            const body = (await response.json());
+            if (response.ok && body.minted === true)
+                return { ok: true };
+        }
+        catch {
+            /* Not this origin: the next. */
+        }
+        finally {
+            clearTimeout(timer);
+        }
+    }
+    return { ok: false, why: 'Kehikot did not vouch for that pass.' };
 }

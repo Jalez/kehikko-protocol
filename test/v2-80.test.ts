@@ -13,7 +13,7 @@ import { checkToolCall } from '../src/serve/index.js'
 
 describe('the version', () => {
   test('is 2.80.0, PROTOCOL is still 2, and the entry declares its kind', () => {
-    expect(PACKAGE_VERSION).toBe('2.87.0')
+    expect(PACKAGE_VERSION).toBe('2.88.0')
     expect(PROTOCOL).toBe(2)
     const log = readFileSync(join(resolve(dirname(new URL(import.meta.url).pathname), '..'), 'CHANGELOG.md'), 'utf8')
     expect(log).toMatch(/## 2\.80\.0 — \d{4}-\d{2}-\d{2}\n\nKind: feature\n/)

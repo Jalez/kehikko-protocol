@@ -1,6 +1,6 @@
 import { z } from 'zod';
 /** This package's own version. A test holds it to `package.json`. */
-export declare const PACKAGE_VERSION = "2.87.0";
+export declare const PACKAGE_VERSION = "2.88.0";
 /** The response header a module's doors carry the build stamp in, on every answer. */
 export declare const BUILD_HEADER = "x-module-build";
 /**
@@ -38,17 +38,17 @@ export declare const buildSchema: z.ZodObject<{
      */
     start: z.ZodCatch<z.ZodOptional<z.ZodString>>;
 }, "strip", z.ZodTypeAny, {
+    started: string;
     version: string;
     commit: string | null;
     protocol: string;
-    started: string;
     start?: string | undefined;
 }, {
+    started: string;
     version: string;
     protocol: string;
-    started: string;
-    commit?: string | null | undefined;
     start?: unknown;
+    commit?: string | null | undefined;
 }>;
 export type Build = z.infer<typeof buildSchema>;
 /** Read a build off anything, or null. Never throws: a malformed build is an unknown one. */

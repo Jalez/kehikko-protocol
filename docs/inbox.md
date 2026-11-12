@@ -19,6 +19,11 @@ All of them are page methods: asked through the frame (`ask`), answered by the h
 | `inbox.answer` | `{ module, id, choice? \| answer?, project? }` | `inboxAnswerResult` |
 | `inbox.open` | `{ module, id, project? }` | `inboxOpenResult` |
 | `inbox.use` | `{ module, use }` | `inboxUseResult` |
+| `inbox.adoption` (2.88.0) | `{ module, id, project? }` | `inboxAdoptionResult`: the item, epics, suggestion, conversations, agent, proposal |
+| `inbox.adopt` (2.88.0) | `{ module, id, epic, parts?, project? }` | `inboxAdoptResult` |
+| `inbox.adoptWith` (2.88.0) | `{ module, id, project? }` | `inboxAdoptWithResult` |
+| `inbox.untrack` (2.88.0) | `{ module, id, project? }` | `inboxUntrackResult` |
+| `inbox.undo` (2.88.0) | `{ module, id, project? }` | `inboxUndoResult` |
 
 Every string in an answer is text. A page never renders a label, a place or a question as markup or
 a link, and never opens a URL from one.
@@ -47,6 +52,29 @@ see files an item ("the failing test is in the auth epic, part 3") instead of mo
   an agent's `jump` would (kehikko, epic, parts, step), leaves a Go back mark that restores where the
   person was, and closes the item — an offer is done once taken.
 - Dismiss works as for any item.
+## Adopting an item no epic names (2.88.0)
+
+A tracker item about a ref the person is author, assignee or reviewer of, which no epic of the project
+names — a change made by hand or by an agent outside Kehikot — comes with `adoptable: true`. A page may
+offer:
+
+- **Add to <epic>** in one press when `inbox.adoption`'s `suggested.sure` (the only epic whose other refs
+  or tracker source match its repository or branch), and **Another epic…** — a picker of `epics` and
+  their parts — otherwise. Either is `inbox.adopt`. A host never adopts by itself.
+- **Adopt with <agent>…** when `agent` is set: `inbox.adoptWith` opens the host's dialog, where the
+  person's agent for Kehikot's own tasks is started on the item (`agent.tasks`, services.md) and
+  proposes an epic; the person confirms there in one press.
+- **Don't track this**: `inbox.untrack`. The host tells nothing more about that ref in this project.
+- **Undo**: `inbox.undo`, after either, while the item's `after.undo` says it can.
+
+On `inbox.adopt` the host writes the ref into the epic (and parts) through its one writer of epics, and
+brings along every conversation that confidently worked on it (`created`, `pushed`, `branch`:
+`confidentMatch`) and is filed under no place — through the agent module that runs it
+(`conversations.finder`). A weak match (`mentioned`, `folder`) is never brought; one filed under another
+place is never moved and is said instead. The item then carries `after.said` ("Added to Auth · its
+Claude Code conversation came along"), and Undo takes back the ref and those conversations' places.
+
+The page is shown titles and reasons only, never a conversation's content.
 
 ## `kehikot.inbox`
 

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { type ConversationPlace } from './inbox.js';
 /**
  * 2.81.0. SERVICES: one module provides a service, others consume it, and neither names the other.
  *
@@ -430,14 +431,14 @@ export declare const checklistItemJson: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     id: string;
     text: string;
-    state: "passed" | "failed" | "na" | null;
+    state: "failed" | "passed" | "na" | null;
     byPerson: boolean;
     note?: string | undefined;
     by?: string | undefined;
 }, {
     id: string;
     text: string;
-    state: "passed" | "failed" | "na" | null;
+    state: "failed" | "passed" | "na" | null;
     note?: string | undefined;
     by?: string | undefined;
     byPerson?: boolean | undefined;
@@ -458,14 +459,14 @@ export declare const checklistJson: z.ZodObject<{
     }, "strip", z.ZodTypeAny, {
         id: string;
         text: string;
-        state: "passed" | "failed" | "na" | null;
+        state: "failed" | "passed" | "na" | null;
         byPerson: boolean;
         note?: string | undefined;
         by?: string | undefined;
     }, {
         id: string;
         text: string;
-        state: "passed" | "failed" | "na" | null;
+        state: "failed" | "passed" | "na" | null;
         note?: string | undefined;
         by?: string | undefined;
         byPerson?: boolean | undefined;
@@ -473,27 +474,27 @@ export declare const checklistJson: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     id: string;
     name: string;
-    held: string[];
     items: {
         id: string;
         text: string;
-        state: "passed" | "failed" | "na" | null;
+        state: "failed" | "passed" | "na" | null;
         byPerson: boolean;
         note?: string | undefined;
         by?: string | undefined;
     }[];
+    held: string[];
 }, {
     id: string;
     name: string;
-    held?: string[] | undefined;
     items?: {
         id: string;
         text: string;
-        state: "passed" | "failed" | "na" | null;
+        state: "failed" | "passed" | "na" | null;
         note?: string | undefined;
         by?: string | undefined;
         byPerson?: boolean | undefined;
     }[] | undefined;
+    held?: string[] | undefined;
 }>;
 export type ChecklistJson = z.infer<typeof checklistJson>;
 /** Every list, with no `checklist`. */
@@ -766,6 +767,380 @@ export declare function foldersOwned(providers: readonly ServiceProvider[] | nul
     says: string;
     derived: boolean;
 }>;
+/**
+ * The HOST calling a provider (2.88.0): `SERVICE_CALLER_HEADER` says `HOST_CALLER`, and
+ * `SERVICE_PASS_HEADER` carries a pass the host minted. The provider confirms it by asking the host at
+ * its own origins (`KEHIKOT_ORIGINS`), `GET <origin>HOST_PASS_PATH?pass=<pass>` → `{ ok, minted }`
+ * (spent by the asking) — `vouchHost` behind `/serve`. No page, agent or other module can pass for it.
+ */
+export declare const HOST_CALLER = "kehikko";
+export declare const HOST_PASS_PATH = "/host/server-pass";
+/**
+ * `conversations.finder` (2.88.0): an agent module that can say which of its CLI's conversations worked
+ * on a ref, a branch or a folder, and file one of them under a place — what `/kehikot-here` does —
+ * when the HOST asks. It looks only in what it already reads of its CLI's conversations (its session
+ * listing, and transcripts only where it already reads them), never anywhere new.
+ *
+ * - `name`: the module, as it is told about. `program`: the CLI in its own words (`Claude Code`), which
+ *   a host says of a conversation ("its Claude Code conversation came along").
+ * - `find`: a route on its origin, `POST { project, refs, url?, branch?, repo? }`
+ *   (`conversationsFindParams`), answering `conversationsFindResult`: candidates with title, folder,
+ *   last active, how they matched (`ConversationMatch`) and why in words, where each is filed now, and
+ *   whether it is running. Titles and reasons only: never a transcript's content.
+ * - `bring`: a route on its origin, `POST { project, session, to, from }` (`conversationsBringParams`):
+ *   file that conversation under `to` (null: under no place) ONLY if it is filed under `from` now (null:
+ *   under none) — so a host never moves one from another place, and an undo never takes back a move
+ *   somebody made since. Answers `conversationsBringResult`. A running conversation is not restarted:
+ *   it gains the place now, and the module's guards and messaging the next time the module resumes it,
+ *   or at once when the module already holds its terminal.
+ *
+ * Both routes answer only the host (`vouchHost`).
+ */
+export declare const conversationsFinderSchema: z.ZodObject<{
+    name: z.ZodEffects<z.ZodString, string, string>;
+    program: z.ZodEffects<z.ZodString, string, string>;
+    find: z.ZodEffects<z.ZodString, string, string>;
+    bring: z.ZodEffects<z.ZodString, string, string>;
+}, "strip", z.ZodTypeAny, {
+    find: string;
+    name: string;
+    program: string;
+    bring: string;
+}, {
+    find: string;
+    name: string;
+    program: string;
+    bring: string;
+}>;
+export type ConversationsFinder = z.infer<typeof conversationsFinderSchema>;
+/** `find`'s body: the project folder, the ref's spellings, and what else is known of the change. */
+export declare const conversationsFindParams: z.ZodObject<{
+    project: z.ZodString;
+    refs: z.ZodArray<z.ZodString, "many">;
+    url: z.ZodOptional<z.ZodString>;
+    branch: z.ZodOptional<z.ZodString>;
+    repo: z.ZodOptional<z.ZodString>;
+}, "strip", z.ZodTypeAny, {
+    project: string;
+    refs: string[];
+    url?: string | undefined;
+    branch?: string | undefined;
+    repo?: string | undefined;
+}, {
+    project: string;
+    refs: string[];
+    url?: string | undefined;
+    branch?: string | undefined;
+    repo?: string | undefined;
+}>;
+export type ConversationsFindParams = z.infer<typeof conversationsFindParams>;
+/** One candidate. `place` where it is filed now (null: none); `running` whether its CLI runs it now. */
+export declare const conversationCandidateSchema: z.ZodObject<{
+    session: z.ZodString;
+    title: z.ZodCatch<z.ZodString>;
+    folder: z.ZodCatch<z.ZodString>;
+    lastActive: z.ZodCatch<z.ZodNumber>;
+    match: z.ZodEnum<["created", "pushed", "branch", "mentioned", "folder"]>;
+    reason: z.ZodCatch<z.ZodString>;
+    place: z.ZodDefault<z.ZodCatch<z.ZodNullable<z.ZodObject<{
+        epic: z.ZodNullable<z.ZodString>;
+        parts: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
+        kehikko: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+    }, "strip", z.ZodTypeAny, {
+        epic: string | null;
+        parts: string[];
+        kehikko: string | null;
+    }, {
+        epic: string | null;
+        parts?: string[] | undefined;
+        kehikko?: string | null | undefined;
+    }>>>>;
+    running: z.ZodDefault<z.ZodCatch<z.ZodBoolean>>;
+}, "strip", z.ZodTypeAny, {
+    session: string;
+    place: {
+        epic: string | null;
+        parts: string[];
+        kehikko: string | null;
+    } | null;
+    title: string;
+    folder: string;
+    lastActive: number;
+    match: "created" | "pushed" | "branch" | "mentioned" | "folder";
+    reason: string;
+    running: boolean;
+}, {
+    session: string;
+    match: "created" | "pushed" | "branch" | "mentioned" | "folder";
+    place?: unknown;
+    title?: unknown;
+    folder?: unknown;
+    lastActive?: unknown;
+    reason?: unknown;
+    running?: unknown;
+}>;
+export type ConversationCandidate = z.infer<typeof conversationCandidateSchema>;
+export declare const conversationsFindResult: z.ZodObject<{
+    conversations: z.ZodArray<z.ZodObject<{
+        session: z.ZodString;
+        title: z.ZodCatch<z.ZodString>;
+        folder: z.ZodCatch<z.ZodString>;
+        lastActive: z.ZodCatch<z.ZodNumber>;
+        match: z.ZodEnum<["created", "pushed", "branch", "mentioned", "folder"]>;
+        reason: z.ZodCatch<z.ZodString>;
+        place: z.ZodDefault<z.ZodCatch<z.ZodNullable<z.ZodObject<{
+            epic: z.ZodNullable<z.ZodString>;
+            parts: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
+            kehikko: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+        }, "strip", z.ZodTypeAny, {
+            epic: string | null;
+            parts: string[];
+            kehikko: string | null;
+        }, {
+            epic: string | null;
+            parts?: string[] | undefined;
+            kehikko?: string | null | undefined;
+        }>>>>;
+        running: z.ZodDefault<z.ZodCatch<z.ZodBoolean>>;
+    }, "strip", z.ZodTypeAny, {
+        session: string;
+        place: {
+            epic: string | null;
+            parts: string[];
+            kehikko: string | null;
+        } | null;
+        title: string;
+        folder: string;
+        lastActive: number;
+        match: "created" | "pushed" | "branch" | "mentioned" | "folder";
+        reason: string;
+        running: boolean;
+    }, {
+        session: string;
+        match: "created" | "pushed" | "branch" | "mentioned" | "folder";
+        place?: unknown;
+        title?: unknown;
+        folder?: unknown;
+        lastActive?: unknown;
+        reason?: unknown;
+        running?: unknown;
+    }>, "many">;
+}, "strip", z.ZodTypeAny, {
+    conversations: {
+        session: string;
+        place: {
+            epic: string | null;
+            parts: string[];
+            kehikko: string | null;
+        } | null;
+        title: string;
+        folder: string;
+        lastActive: number;
+        match: "created" | "pushed" | "branch" | "mentioned" | "folder";
+        reason: string;
+        running: boolean;
+    }[];
+}, {
+    conversations: {
+        session: string;
+        match: "created" | "pushed" | "branch" | "mentioned" | "folder";
+        place?: unknown;
+        title?: unknown;
+        folder?: unknown;
+        lastActive?: unknown;
+        reason?: unknown;
+        running?: unknown;
+    }[];
+}>;
+export type ConversationsFindResult = z.infer<typeof conversationsFindResult>;
+/** The candidates in a `find` answer, each that parses, strongest match first then newest; `[]` for anything else. */
+export declare function candidatesIn(body: unknown): ConversationCandidate[];
+/** `bring`'s body: compare-and-set of one conversation's place. */
+export declare const conversationsBringParams: z.ZodObject<{
+    project: z.ZodString;
+    session: z.ZodString;
+    to: z.ZodNullable<z.ZodObject<{
+        epic: z.ZodNullable<z.ZodString>;
+        parts: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
+        kehikko: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+    }, "strip", z.ZodTypeAny, {
+        epic: string | null;
+        parts: string[];
+        kehikko: string | null;
+    }, {
+        epic: string | null;
+        parts?: string[] | undefined;
+        kehikko?: string | null | undefined;
+    }>>;
+    from: z.ZodNullable<z.ZodObject<{
+        epic: z.ZodNullable<z.ZodString>;
+        parts: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
+        kehikko: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+    }, "strip", z.ZodTypeAny, {
+        epic: string | null;
+        parts: string[];
+        kehikko: string | null;
+    }, {
+        epic: string | null;
+        parts?: string[] | undefined;
+        kehikko?: string | null | undefined;
+    }>>;
+}, "strip", z.ZodTypeAny, {
+    session: string;
+    project: string;
+    from: {
+        epic: string | null;
+        parts: string[];
+        kehikko: string | null;
+    } | null;
+    to: {
+        epic: string | null;
+        parts: string[];
+        kehikko: string | null;
+    } | null;
+}, {
+    session: string;
+    project: string;
+    from: {
+        epic: string | null;
+        parts?: string[] | undefined;
+        kehikko?: string | null | undefined;
+    } | null;
+    to: {
+        epic: string | null;
+        parts?: string[] | undefined;
+        kehikko?: string | null | undefined;
+    } | null;
+}>;
+export type ConversationsBringParams = z.infer<typeof conversationsBringParams>;
+/**
+ * `brought`: it is filed under `to` now (`resumed` when the module holds its terminal and it gained the
+ * place at once). `elsewhere`: it was not under `from`, so nothing changed; `place` is where it is.
+ * `no-such-session`, `declined`: not done, and why.
+ */
+export declare const conversationsBringResult: z.ZodObject<{
+    outcome: z.ZodEnum<["brought", "elsewhere", "no-such-session", "declined"]>;
+    place: z.ZodDefault<z.ZodNullable<z.ZodObject<{
+        epic: z.ZodNullable<z.ZodString>;
+        parts: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
+        kehikko: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+    }, "strip", z.ZodTypeAny, {
+        epic: string | null;
+        parts: string[];
+        kehikko: string | null;
+    }, {
+        epic: string | null;
+        parts?: string[] | undefined;
+        kehikko?: string | null | undefined;
+    }>>>;
+    resumed: z.ZodDefault<z.ZodBoolean>;
+    why: z.ZodDefault<z.ZodString>;
+}, "strip", z.ZodTypeAny, {
+    place: {
+        epic: string | null;
+        parts: string[];
+        kehikko: string | null;
+    } | null;
+    outcome: "declined" | "elsewhere" | "brought" | "no-such-session";
+    why: string;
+    resumed: boolean;
+}, {
+    outcome: "declined" | "elsewhere" | "brought" | "no-such-session";
+    place?: {
+        epic: string | null;
+        parts?: string[] | undefined;
+        kehikko?: string | null | undefined;
+    } | null | undefined;
+    why?: string | undefined;
+    resumed?: boolean | undefined;
+}>;
+export type ConversationsBringResult = z.infer<typeof conversationsBringResult>;
+/** Whether two places are the same place (parts in any order); null is no place. */
+export declare function sameConversationPlace(a: ConversationPlace | null | undefined, b: ConversationPlace | null | undefined): boolean;
+/** Where `session` goes in an `agent.tasks` view. */
+export declare const SERVICE_SESSION = "{session}";
+/**
+ * `agent.tasks` (2.88.0): an agent module that starts a NEW conversation for one of Kehikot's own tasks,
+ * fed a brief on launch, filed under a place like any conversation it starts, and kept in its records.
+ *
+ * - `name`, `program`: as `conversations.finder`'s.
+ * - `start`: a route on its origin, `POST { project, brief, place, title }` (`agentTaskStartParams`),
+ *   answering `agentTaskStartResult` with the new conversation's id. Only the host (`vouchHost`).
+ * - `view`: the module's page showing that one conversation, `/app?…{session}…`, which a host frames in
+ *   its own dialog while the task runs.
+ */
+export declare const agentTasksSchema: z.ZodObject<{
+    name: z.ZodEffects<z.ZodString, string, string>;
+    program: z.ZodEffects<z.ZodString, string, string>;
+    start: z.ZodEffects<z.ZodString, string, string>;
+    view: z.ZodEffects<z.ZodString, string, string>;
+}, "strip", z.ZodTypeAny, {
+    name: string;
+    program: string;
+    start: string;
+    view: string;
+}, {
+    name: string;
+    program: string;
+    start: string;
+    view: string;
+}>;
+export type AgentTasks = z.infer<typeof agentTasksSchema>;
+/** The longest brief a task is started with. */
+export declare const AGENT_TASK_BRIEF_MAX = 32000;
+export declare const agentTaskStartParams: z.ZodObject<{
+    project: z.ZodString;
+    brief: z.ZodString;
+    place: z.ZodNullable<z.ZodObject<{
+        epic: z.ZodNullable<z.ZodString>;
+        parts: z.ZodDefault<z.ZodArray<z.ZodString, "many">>;
+        kehikko: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+    }, "strip", z.ZodTypeAny, {
+        epic: string | null;
+        parts: string[];
+        kehikko: string | null;
+    }, {
+        epic: string | null;
+        parts?: string[] | undefined;
+        kehikko?: string | null | undefined;
+    }>>;
+    title: z.ZodEffects<z.ZodString, string, string>;
+}, "strip", z.ZodTypeAny, {
+    project: string;
+    place: {
+        epic: string | null;
+        parts: string[];
+        kehikko: string | null;
+    } | null;
+    title: string;
+    brief: string;
+}, {
+    project: string;
+    place: {
+        epic: string | null;
+        parts?: string[] | undefined;
+        kehikko?: string | null | undefined;
+    } | null;
+    title: string;
+    brief: string;
+}>;
+export type AgentTaskStartParams = z.infer<typeof agentTaskStartParams>;
+export declare const agentTaskStartResult: z.ZodObject<{
+    outcome: z.ZodEnum<["started", "declined"]>;
+    session: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+    why: z.ZodDefault<z.ZodString>;
+}, "strip", z.ZodTypeAny, {
+    session: string | null;
+    outcome: "declined" | "started";
+    why: string;
+}, {
+    outcome: "declined" | "started";
+    session?: string | null | undefined;
+    why?: string | undefined;
+}>;
+export type AgentTaskStartResult = z.infer<typeof agentTaskStartResult>;
+/** An `agent.tasks` view with the conversation in it. */
+export declare function agentTaskView(tasks: Pick<AgentTasks, 'view'>, session: string): string;
 /**
  * Every service this protocol gives a descriptor's shape to, with what it means. Grows by an entry.
  * Names a module may say but this package does not know are carried as they came (`servicesSchema`).
@@ -1174,6 +1549,44 @@ export declare const SERVICES: {
             }[];
         }>;
     };
+    readonly 'conversations.finder': {
+        readonly says: "Says which of its CLI's conversations worked on a ref, a branch or a folder, and files one under a place when the host asks.";
+        readonly schema: z.ZodObject<{
+            name: z.ZodEffects<z.ZodString, string, string>;
+            program: z.ZodEffects<z.ZodString, string, string>;
+            find: z.ZodEffects<z.ZodString, string, string>;
+            bring: z.ZodEffects<z.ZodString, string, string>;
+        }, "strip", z.ZodTypeAny, {
+            find: string;
+            name: string;
+            program: string;
+            bring: string;
+        }, {
+            find: string;
+            name: string;
+            program: string;
+            bring: string;
+        }>;
+    };
+    readonly 'agent.tasks': {
+        readonly says: "Starts a new conversation for one of Kehikot's own tasks, fed a brief on launch.";
+        readonly schema: z.ZodObject<{
+            name: z.ZodEffects<z.ZodString, string, string>;
+            program: z.ZodEffects<z.ZodString, string, string>;
+            start: z.ZodEffects<z.ZodString, string, string>;
+            view: z.ZodEffects<z.ZodString, string, string>;
+        }, "strip", z.ZodTypeAny, {
+            name: string;
+            program: string;
+            start: string;
+            view: string;
+        }, {
+            name: string;
+            program: string;
+            start: string;
+            view: string;
+        }>;
+    };
 };
 export type Service = keyof typeof SERVICES;
 export declare const SERVICE_NAMES: Service[];
@@ -1197,6 +1610,10 @@ export declare const PAGE_VIEWER = "page.viewer";
 export declare const CUE_TARGETS = "cue.targets";
 /** 2.85.0. The folders a module owns under `.kehikot/`. */
 export declare const MODULE_FOLDERS = "module.folders";
+/** 2.88.0. Which of an agent module's conversations worked on a ref, and filing one under a place. */
+export declare const CONVERSATIONS_FINDER = "conversations.finder";
+/** 2.88.0. A new conversation for one of Kehikot's own tasks, fed a brief. */
+export declare const AGENT_TASKS = "agent.tasks";
 /**
  * `services` in a manifest: each service this module provides, by name, and its descriptor. A known
  * service's descriptor must parse with its schema, or the whole field is dropped (the manifest still
@@ -1239,8 +1656,8 @@ export declare const serviceProviderSchema: z.ZodObject<{
 }, {
     name: string;
     module: string;
-    descriptor?: unknown;
     placed?: boolean | null | undefined;
+    descriptor?: unknown;
 }>;
 export type ServiceProvider = z.infer<typeof serviceProviderSchema>;
 /**
@@ -1262,8 +1679,8 @@ export declare const servicesFindResult: z.ZodObject<{
     }, {
         name: string;
         module: string;
-        descriptor?: unknown;
         placed?: boolean | null | undefined;
+        descriptor?: unknown;
     }>, "many">;
 }, "strip", z.ZodTypeAny, {
     providers: {
@@ -1276,8 +1693,8 @@ export declare const servicesFindResult: z.ZodObject<{
     providers: {
         name: string;
         module: string;
-        descriptor?: unknown;
         placed?: boolean | null | undefined;
+        descriptor?: unknown;
     }[];
 }>;
 export type ServicesFindResult = z.infer<typeof servicesFindResult>;
