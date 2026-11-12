@@ -132,6 +132,15 @@ export declare const MESSAGE: {
      */
     readonly PAGE_ERROR: "kehikot.page.error";
     /**
+     * Module → host (2.93.0). "I will not answer this window": `{ origin, allowed }`, sent instead of
+     * silence when a greeting comes from a window whose origin the page was not told it may be framed
+     * by (`mayGreet`) — `origin` is that window's, `allowed` the list the page's server printed. Sent
+     * to that window only, once per greeting. The page answers nothing else to it. A host says why
+     * the page will not speak — a module started for one window and framed by another — and offers
+     * the restart that gives it this window's origin; a host before 2.93.0 drops it unread.
+     */
+    readonly REFUSED: "kehikot.refused";
+    /**
      * Host → module (2.69.0). "Search what you show": `{ id, query, caseSensitive, wholeWord,
      * direction }`, sent while the host's find bar is open — for every change of the query or an
      * option (`first`), for previous and next, and once with `close` when the bar closes. Answered by
@@ -195,7 +204,7 @@ export declare const MESSAGE_PREFIX = "kehikot.";
  */
 export declare const HOST_MESSAGES: readonly ["kehikot.hello", "kehikot.context", "kehikot.response", "kehikot.goto", "kehikot.event", "kehikot.clear", "kehikot.refresh", "kehikot.press", "kehikot.opened", "kehikot.covered", "kehikot.visible", "kehikot.find", "kehikot.inbox"];
 /** And what the module says. */
-export declare const MODULE_MESSAGES: readonly ["kehikot.ready", "kehikot.request", "kehikot.resize", "kehikot.went", "kehikot.filters", "kehikot.clearable", "kehikot.refreshable", "kehikot.header", "kehikot.pressed", "kehikot.footer", "kehikot.pointer", "kehikot.page.error", "kehikot.find.result", "kehikot.find.open", "kehikot.drawn", "kehikot.loading"];
+export declare const MODULE_MESSAGES: readonly ["kehikot.ready", "kehikot.request", "kehikot.resize", "kehikot.went", "kehikot.filters", "kehikot.clearable", "kehikot.refreshable", "kehikot.header", "kehikot.pressed", "kehikot.footer", "kehikot.pointer", "kehikot.page.error", "kehikot.refused", "kehikot.find.result", "kehikot.find.open", "kehikot.drawn", "kehikot.loading"];
 /**
  * How tall a frame may be asked to be, in pixels, bounded on both sides. `clampHeight` restates
  * the host's answer so a module can do the arithmetic on its own side.

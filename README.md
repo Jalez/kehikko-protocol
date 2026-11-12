@@ -221,6 +221,7 @@ The same list with what each version exported is in [CHANGELOG.md](CHANGELOG.md)
 
 | version | date | what it added |
 |---|---|---|
+| 2.93.0 | 2026-11-13 | Additive. A page that will not answer a window says so: `kehikot.refused` `{ origin, allowed }` (`refusedSchema`) to a greeting from an origin it may not be framed by, and a greeting it cannot read is said as `kehikot.page.error` (`greeting`) instead of dropped. |
 | 2.92.0 | 2026-11-12 | Additive. What agents read says spaces: `spaceWords` says a place as a space (`space Auth › Login`), used by the notes (`NotesPlace.space`, `NOTES_VERSION` 11), message lines and markers and a door's sentences; `send_message`'s `to.place` leads with `space` (epic and parts: older names, still accepted). |
 | 2.91.0 | 2026-11-12 | Additive. `agent.setup`: an agent module owns the choice of whether its program uses every module's tools and skills outside Kehikot too, as four `machine` settings (`agentSetupSettings`, `AGENT_SETUP_KEYS`); a host reads it with `agentSetupChoice`. See [services](docs/services.md). |
 | 2.90.0 | 2026-11-12 | Additive. `settings.open { key? }` (capability `settings:open`): a module's page opens its own settings in the host at one setting, on the person's press; `settingsOpenResult`. See [asking](docs/asking.md). |

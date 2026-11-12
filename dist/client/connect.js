@@ -335,19 +335,45 @@ export function connect(id, events = {}, options = {}) {
         else
             pending.reject(new HostRefused(outcome.refusal));
     };
+    /**
+     * 2.93.0. Tell a window whose greeting this page will not answer why: its origin, and the origins
+     * the page was told it may be framed by. To that window only, and nothing else is ever sent it.
+     */
+    const refuse = (ev) => {
+        const to = ev.source;
+        if (!to || typeof to.postMessage !== 'function')
+            return;
+        const allowed = (options.origins ?? pageOrigins() ?? []).slice(0, LIMITS.REFUSED_ALLOWED);
+        try {
+            to.postMessage({ type: MESSAGE.REFUSED, origin: ev.origin || 'null', allowed: [...allowed] }, ev.origin && ev.origin !== 'null' ? ev.origin : '*');
+        }
+        catch {
+            /* A window that went away: there is nobody to tell. */
+        }
+    };
     const onMessage = (ev) => {
         if (!live)
             return;
         if (!looksLikeWireMessage(ev.data))
             return;
         const parsed = hostMessageSchema.safeParse(ev.data);
-        if (!parsed.success)
+        if (!parsed.success) {
+            /* 2.93.0. A greeting this page cannot read is said, not dropped: the host would otherwise see
+               a page that loaded and never answered. Said as a failure to whoever greeted (`errors.ts`). */
+            if (ev.data.type === MESSAGE.HELLO) {
+                const issue = parsed.error.issues[0];
+                reportPageError(new Error(`This page could not read the host's greeting${issue ? ` (${issue.path.join('.') || 'the message'}: ${issue.message})` : ''}. The module and this Kehikot do not agree on the protocol.`), 'greeting');
+            }
             return;
+        }
         const message = parsed.data;
         if (message.type === MESSAGE.HELLO) {
-            /* Before anything is answered: a window this page may not be framed by is not its host. */
-            if (!mayGreet(ev, options.origins ?? pageOrigins(), here()))
+            /* Before anything is answered: a window this page may not be framed by is not its host.
+               2.93.0: it is told so, once, instead of being met with silence (`refused`). */
+            if (!mayGreet(ev, options.origins ?? pageOrigins(), here())) {
+                refuse(ev);
                 return;
+            }
             /* Answered on EVERY greeting, not only the first: the newest greeting wins, its window
                becomes the one we answer, and `ready` goes back every time. */
             host = ev.source ?? source.parent ?? null;

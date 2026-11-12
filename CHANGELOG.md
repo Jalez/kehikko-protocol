@@ -11,6 +11,27 @@ After 2.78.0, every entry's first line under its heading is its kind, and the ve
 (semver; CI checks it): `Kind: breaking` → next major, `Kind: feature` → next minor, `Kind: fix` →
 next patch.
 
+## 2.93.0 — 2026-11-13
+
+Kind: feature
+
+A page that will not answer a window says so, instead of silence. **Additive**; `PROTOCOL` is still 2.
+[docs/client.md](docs/client.md#when-the-page-will-not-answer-a-window-2930).
+
+### Added
+
+- `kehikot.refused` (`MESSAGE.REFUSED`, module → host), `refusedSchema`: `{ origin, allowed }`. `connect`
+  sends it, once per greeting and to that window only, when a greeting comes from an origin the page
+  was not told it may be framed by (`mayGreet`). A host before 2.93.0 drops it unread
+  (`MODULE_MESSAGES`).
+- `LIMITS.REFUSED_ORIGIN` (256) and `LIMITS.REFUSED_ALLOWED` (16): longer text is cut, a longer list
+  shortened, never refused.
+
+### Changed
+
+- A greeting the page cannot read (it fails `hostMessageSchema`) is said as `kehikot.page.error`
+  (`where: 'greeting'`) to whoever greeted, instead of being dropped.
+
 ## 2.92.0 — 2026-11-12
 
 Kind: feature

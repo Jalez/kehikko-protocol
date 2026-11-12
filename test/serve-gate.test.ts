@@ -495,7 +495,9 @@ describe('a greeting is answered only from where the page may be framed', () => 
     const { live, deliver, greeted } = page()
     const other = speaker()
     for (const origin of ['http://127.0.0.1:9530', 'https://elsewhere.example', 'null']) deliver({ data: hello, origin, source: other })
-    expect([other.said.length, greeted.length, live.greeted()]).toEqual([0, 0, false])
+    /* 2.93.0: each is told it was refused, and nothing else. */
+    const refusedOnly = () => other.said.every((one) => one.type === MESSAGE.REFUSED)
+    expect([other.said.length, refusedOnly(), greeted.length, live.greeted()]).toEqual([3, true, 0, false])
 
     const host = speaker()
     deliver({ data: hello, origin: 'http://127.0.0.1:4170', source: host })
@@ -503,10 +505,10 @@ describe('a greeting is answered only from where the page may be framed', () => 
 
     /* A later greeting from elsewhere does not take the conversation over: the host is still who is answered. */
     deliver({ data: hello, origin: 'http://127.0.0.1:9530', source: other })
-    expect([other.said.length, greeted.length]).toEqual([0, 1])
+    expect([other.said.length, refusedOnly(), greeted.length]).toEqual([4, true, 1])
     live.resize(300)
     expect(host.said.at(-1)?.type).toBe(MESSAGE.RESIZE)
-    expect(other.said.length).toBe(0)
+    expect([other.said.length, refusedOnly()]).toEqual([4, true])
   })
 
   test('nothing but a greeting is heard from a window that was refused one', () => {
@@ -519,7 +521,8 @@ describe('a greeting is answered only from where the page may be framed', () => 
     for (const data of [hello, { type: MESSAGE.CLEAR, protocol: PROTOCOL }]) {
       for (const fn of [...listeners]) fn({ data, origin: 'http://127.0.0.1:9530', source: other } as unknown as MessageEvent)
     }
-    expect([cleared, other.said.length]).toEqual([0, 0])
+    /* The greeting was told it was refused (2.93.0); the rest heard nothing. */
+    expect([cleared, other.said.map((one) => one.type)]).toEqual([0, [MESSAGE.REFUSED]])
   })
 
   test('a page that greets itself is answered: a harness in the same document, and one on the same origin', () => {

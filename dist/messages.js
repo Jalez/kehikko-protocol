@@ -487,6 +487,21 @@ export const pageErrorSchema = z.object({
     where: cut(LIMITS.PAGE_ERROR_WHERE).default('error'),
     stack: cut(LIMITS.PAGE_ERROR_STACK).default(''),
 });
+/**
+ * Module → host (2.93.0). The page will not answer this window: the greeting came from `origin`,
+ * which is not among the origins the page was told it may be framed by (`allowed`, as its server
+ * printed them — the same list its `frame-ancestors` names, so nothing here is a secret). Before
+ * 2.93.0 such a greeting was dropped without a word, and a host could only see a page that loaded
+ * every script and said nothing, which reads as a broken module. Sent to the greeting's window
+ * only, once per greeting; nothing else is answered to it. Text, never markup. A host shows why
+ * and offers the restart that starts the module with this window's origin; a host before 2.93.0
+ * drops it unread (`MODULE_MESSAGES`).
+ */
+export const refusedSchema = z.object({
+    type: messageType(MESSAGE.REFUSED),
+    origin: cut(LIMITS.REFUSED_ORIGIN),
+    allowed: z.array(cut(LIMITS.REFUSED_ORIGIN)).transform((list) => list.slice(0, LIMITS.REFUSED_ALLOWED)).default([]),
+});
 /* ------------------------------------------------------------------------ *
  * Find (2.69.0): the host's bar, the page's search
  * ------------------------------------------------------------------------ */
@@ -566,6 +581,7 @@ export const moduleMessageSchema = z.union([
     footerSchema,
     pointerSchema,
     pageErrorSchema,
+    refusedSchema,
     findResultSchema,
     findOpenSchema,
     drawnSchema,
