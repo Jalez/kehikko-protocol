@@ -11,6 +11,17 @@ After 2.78.0, every entry's first line under its heading is its kind, and the ve
 (semver; CI checks it): `Kind: breaking` → next major, `Kind: feature` → next minor, `Kind: fix` →
 next patch.
 
+## 2.90.0 — 2026-11-12
+
+Kind: feature
+
+A module's page can open its own settings at one setting. **Additive**; `PROTOCOL` is still 2.
+
+- `settings.open { key? }` under the new capability `settings:open`: the host opens the asking module's
+  settings (`declares.settings`) scrolled to the setting `key` names and focused there, only on the
+  person's fresh press in the page. Answered with `settingsOpenResult` (`opened` | `declined`, with
+  `why`; `SETTINGS_OPEN_OUTCOMES`). See [asking](docs/asking.md).
+
 ## 2.89.0 — 2026-11-12
 
 Kind: feature
