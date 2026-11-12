@@ -52,3 +52,13 @@ describe('agent.setup (2.91.0)', () => {
     expect(agentSetupChoice(values)).toEqual({ tools: { auto: true, except: ['kehikot.a', 'kehikot.b'] }, skills: { auto: false, except: ['kehikot.c'] } })
   })
 })
+
+describe('the adoption names the agents a page may offer (2.91.0)', () => {
+  test('agents is optional, and read when given', async () => {
+    const { inboxAdoptionResult } = await import('../src/index.js')
+    const base = { outcome: 'ok', why: '', item: null, epics: [], suggested: null, conversations: [], agent: null, proposal: null }
+    expect(inboxAdoptionResult.parse(base).taskAgents).toBeUndefined()
+    expect(inboxAdoptionResult.parse({ ...base, taskAgents: [{ module: 'kehikot.a', name: 'A' }, { module: 'kehikot.b', name: 'B' }] }).taskAgents).toHaveLength(2)
+    expect(inboxAdoptionResult.safeParse({ ...base, taskAgents: [{ module: '', name: 'A' }] }).success).toBe(false)
+  })
+})
