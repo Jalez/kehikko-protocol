@@ -61,6 +61,7 @@ export const METHOD_SINCE = {
     'inbox.adoptWith': '2.88.0',
     'inbox.untrack': '2.88.0',
     'inbox.undo': '2.88.0',
+    'settings.open': '2.90.0',
 };
 /** Each capability, and the version that added it: the oldest of its methods. */
 export const CAPABILITY_SINCE = {
@@ -93,6 +94,7 @@ export const CAPABILITY_SINCE = {
     'agents:message': '2.41.0',
     'messages:as-person': '2.50.0',
     'inbox:person': '2.79.0',
+    'settings:open': '2.90.0',
     'sessions:observe': '2.81.0',
     'services:read': '2.81.0',
     'sessions:place': '2.85.0',
@@ -300,6 +302,7 @@ export const PIECE_SAID = {
         'agents:message': 'messages between agent sessions',
         'messages:as-person': 'messages to agent sessions as the person',
         'inbox:person': 'your Inbox, shown and acted on for you',
+        'settings:open': 'opening its settings at a setting',
         'sessions:observe': 'notices to agent sessions it sees working on this computer',
         'services:read': 'which modules here provide a service to other modules',
         'sessions:place': 'which epic, parts and kehikko an agent session is on',

@@ -59,7 +59,7 @@ const readOf = (messages: AgentMessage[], unread: number, you: WakeReader | null
 
 describe('the version', () => {
   test('is 2.43.0, PROTOCOL is still 2, and the notes moved to 4', () => {
-    expect(PACKAGE_VERSION).toBe('2.89.0')
+    expect(PACKAGE_VERSION).toBe('2.90.0')
     expect(PROTOCOL).toBe(2)
     expect(NOTES_VERSION).toBeGreaterThanOrEqual(4)
     expect(readFileSync(join(REPO, 'CHANGELOG.md'), 'utf8')).toContain('## 2.43.0')

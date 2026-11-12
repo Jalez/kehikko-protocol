@@ -360,6 +360,7 @@ and a module that declares none gets none of the methods below.
 | `inbox.adoptWith` | `inbox:person` |
 | `inbox.untrack` | `inbox:person` |
 | `inbox.undo` | `inbox:person` |
+| `settings.open` | `settings:open` |
 
 The host's table is the protocol's `METHODS`, read by its `capabilityOf`
 (`src/host/grants.ts`): there is no second list to keep in step. A host keeps a

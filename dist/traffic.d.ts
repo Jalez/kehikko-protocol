@@ -60,7 +60,7 @@ export declare const trafficNoteSchema: z.ZodObject<{
     ms: number | null;
     bytesIn?: number | undefined;
     bytesOut?: number | undefined;
-    cache?: "hit" | "not-modified" | "refused" | undefined;
+    cache?: "refused" | "hit" | "not-modified" | undefined;
 }, {
     at: number;
     path: string;
@@ -72,7 +72,7 @@ export declare const trafficNoteSchema: z.ZodObject<{
     ms?: number | null | undefined;
     bytesIn?: number | undefined;
     bytesOut?: number | undefined;
-    cache?: "hit" | "not-modified" | "refused" | undefined;
+    cache?: "refused" | "hit" | "not-modified" | undefined;
 }>;
 export type TrafficNote = z.infer<typeof trafficNoteSchema>;
 export type TrafficNoteInput = z.input<typeof trafficNoteSchema>;
@@ -194,7 +194,7 @@ export declare const trafficCallSchema: z.ZodObject<{
     via: "page" | "server" | "process";
     bytesIn?: number | undefined;
     bytesOut?: number | undefined;
-    cache?: "hit" | "not-modified" | "refused" | undefined;
+    cache?: "refused" | "hit" | "not-modified" | undefined;
     caller?: {
         name: string;
         kind: "module" | "session" | "program" | "host" | "remote" | "gone";
@@ -220,7 +220,7 @@ export declare const trafficCallSchema: z.ZodObject<{
     ms?: number | null | undefined;
     bytesIn?: number | undefined;
     bytesOut?: number | undefined;
-    cache?: "hit" | "not-modified" | "refused" | undefined;
+    cache?: "refused" | "hit" | "not-modified" | undefined;
     caller?: unknown;
 }>;
 export type TrafficCall = z.infer<typeof trafficCallSchema>;
@@ -1239,7 +1239,7 @@ export declare const trafficReadResult: z.ZodObject<{
         via: "page" | "server" | "process";
         bytesIn?: number | undefined;
         bytesOut?: number | undefined;
-        cache?: "hit" | "not-modified" | "refused" | undefined;
+        cache?: "refused" | "hit" | "not-modified" | undefined;
         caller?: {
             name: string;
             kind: "module" | "session" | "program" | "host" | "remote" | "gone";
@@ -1265,7 +1265,7 @@ export declare const trafficReadResult: z.ZodObject<{
         ms?: number | null | undefined;
         bytesIn?: number | undefined;
         bytesOut?: number | undefined;
-        cache?: "hit" | "not-modified" | "refused" | undefined;
+        cache?: "refused" | "hit" | "not-modified" | undefined;
         caller?: unknown;
     }>, "many">;
     newest: z.ZodNumber;
@@ -1977,7 +1977,7 @@ export declare const trafficReadResult: z.ZodObject<{
         via: "page" | "server" | "process";
         bytesIn?: number | undefined;
         bytesOut?: number | undefined;
-        cache?: "hit" | "not-modified" | "refused" | undefined;
+        cache?: "refused" | "hit" | "not-modified" | undefined;
         caller?: {
             name: string;
             kind: "module" | "session" | "program" | "host" | "remote" | "gone";
@@ -2108,7 +2108,7 @@ export declare const trafficReadResult: z.ZodObject<{
         ms?: number | null | undefined;
         bytesIn?: number | undefined;
         bytesOut?: number | undefined;
-        cache?: "hit" | "not-modified" | "refused" | undefined;
+        cache?: "refused" | "hit" | "not-modified" | undefined;
         caller?: unknown;
     }[];
     newest: number;

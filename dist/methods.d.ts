@@ -173,6 +173,12 @@ export declare const CAPABILITIES: {
      */
     readonly 'sessions:place': "See which epic, parts and kehikko an agent session is working on, by its session id.";
     readonly 'inbox:person': "Show your Inbox — what modules need, are doing and have said — and, on your press, mark it seen, dismiss, forget, answer or go to it.";
+    /**
+     * 2.90.0. Asks the host to open THIS module's settings (the ones it declared, `declares.settings`),
+     * at one setting when it names one (`settings.open`): only on the person's press in the module's
+     * page. Reads and changes no value; the person changes it in the host's form.
+     */
+    readonly 'settings:open': "Open this module's settings when you press to, at the setting it names. Nothing is changed until you change it.";
 };
 export type Capability = keyof typeof CAPABILITIES;
 export declare const CAPABILITY_NAMES: Capability[];
@@ -265,6 +271,8 @@ export declare const METHODS: {
     readonly 'inbox.untrack': "inbox:person";
     /** Take back the last adopt or untrack of an item, on the person's press (2.88.0). */
     readonly 'inbox.undo': "inbox:person";
+    /** This module's settings, opened in the host at one setting, on the person's press (2.90.0). */
+    readonly 'settings.open': "settings:open";
 };
 export type Method = keyof typeof METHODS;
 export declare const METHOD_NAMES: Method[];
@@ -1557,7 +1565,7 @@ export declare const methodParams: {
             ms: number | null;
             bytesIn?: number | undefined;
             bytesOut?: number | undefined;
-            cache?: "hit" | "not-modified" | "refused" | undefined;
+            cache?: "refused" | "hit" | "not-modified" | undefined;
         }, {
             at: number;
             path: string;
@@ -1569,7 +1577,7 @@ export declare const methodParams: {
             ms?: number | null | undefined;
             bytesIn?: number | undefined;
             bytesOut?: number | undefined;
-            cache?: "hit" | "not-modified" | "refused" | undefined;
+            cache?: "refused" | "hit" | "not-modified" | undefined;
         }>, "many">;
     }, "strip", z.ZodTypeAny, {
         calls: {
@@ -1583,7 +1591,7 @@ export declare const methodParams: {
             ms: number | null;
             bytesIn?: number | undefined;
             bytesOut?: number | undefined;
-            cache?: "hit" | "not-modified" | "refused" | undefined;
+            cache?: "refused" | "hit" | "not-modified" | undefined;
         }[];
     }, {
         calls: {
@@ -1597,7 +1605,7 @@ export declare const methodParams: {
             ms?: number | null | undefined;
             bytesIn?: number | undefined;
             bytesOut?: number | undefined;
-            cache?: "hit" | "not-modified" | "refused" | undefined;
+            cache?: "refused" | "hit" | "not-modified" | undefined;
         }[];
     }>;
     /**
@@ -2627,6 +2635,19 @@ export declare const methodParams: {
         module: string;
         project?: number | undefined;
     }>;
+    /**
+     * 2.90.0. Ask the host to open the asking module's own settings, scrolled to the setting `key`
+     * names (one of the keys it declared in `declares.settings`) and focused there; without `key`, at
+     * the top. Only the asker's own settings, so there is no module id. Honoured only on the person's
+     * fresh press in the page. Answered with `settingsOpenResult`.
+     */
+    readonly 'settings.open': z.ZodObject<{
+        key: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
+    }, "strip", z.ZodTypeAny, {
+        key?: string | undefined;
+    }, {
+        key?: string | undefined;
+    }>;
 };
 /** The params one method takes, as a caller must construct them. */
 export type MethodParams<M extends Method> = z.input<(typeof methodParams)[M]>;
@@ -2681,6 +2702,25 @@ export declare const foldResult: z.ZodObject<{
     unfolded?: string[] | undefined;
 }>;
 export type FoldResult = z.infer<typeof foldResult>;
+/**
+ * 2.90.0. What became of a `settings.open`. `opened`: the host shows the module's settings now, at
+ * the setting named when it has one. `declined`: the host will not, right now (no press of the
+ * person's, no settings declared, a `key` the module did not declare, the module not ready) and
+ * `why` says so in words a person reads.
+ */
+export declare const SETTINGS_OPEN_OUTCOMES: readonly ["opened", "declined"];
+export type SettingsOpenOutcome = (typeof SETTINGS_OPEN_OUTCOMES)[number];
+export declare const settingsOpenResult: z.ZodObject<{
+    outcome: z.ZodEnum<["opened", "declined"]>;
+    why: z.ZodDefault<z.ZodString>;
+}, "strip", z.ZodTypeAny, {
+    why: string;
+    outcome: "declined" | "opened";
+}, {
+    outcome: "declined" | "opened";
+    why?: string | undefined;
+}>;
+export type SettingsOpenResult = z.infer<typeof settingsOpenResult>;
 /**
  * 2.58.0. What became of a `view.expand`; all four are `ok: true`. `expanded`: the container is shown
  * large now. `shrunk`: it is back in its place. `unchanged`: it already was as asked. `declined`: the

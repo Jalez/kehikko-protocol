@@ -1258,9 +1258,9 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     }, {
         provides?: unknown;
         uses?: string[] | undefined;
+        settings?: unknown;
         protocol?: string | undefined;
         prompt?: boolean | undefined;
-        settings?: unknown;
         scopes?: ("epic" | "project")[] | undefined;
         skills?: {
             name: string;
@@ -1499,9 +1499,9 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     declares?: {
         provides?: unknown;
         uses?: string[] | undefined;
+        settings?: unknown;
         protocol?: string | undefined;
         prompt?: boolean | undefined;
-        settings?: unknown;
         scopes?: ("epic" | "project")[] | undefined;
         skills?: {
             name: string;
@@ -1753,9 +1753,9 @@ export declare const manifestSchema: z.ZodEffects<z.ZodObject<{
     declares?: {
         provides?: unknown;
         uses?: string[] | undefined;
+        settings?: unknown;
         protocol?: string | undefined;
         prompt?: boolean | undefined;
-        settings?: unknown;
         scopes?: ("epic" | "project")[] | undefined;
         skills?: {
             name: string;

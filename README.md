@@ -221,6 +221,7 @@ The same list with what each version exported is in [CHANGELOG.md](CHANGELOG.md)
 
 | version | date | what it added |
 |---|---|---|
+| 2.90.0 | 2026-11-12 | Additive. `settings.open { key? }` (capability `settings:open`): a module's page opens its own settings in the host at one setting, on the person's press; `settingsOpenResult`. See [asking](docs/asking.md). |
 | 2.89.0 | 2026-11-12 | Additive. Spaces: a tree of spaces to any depth in place of epic → parts, same ids; `context.space`, `spaceWithin`, `epicPartsOf` (epic and parts still filled), `space` on places, `view.goto`, messages and `inbox.adopt`, the door's `space` argument (`doorSpace`, `findSpace`). See [spaces](docs/spaces.md). |
 | 2.88.0 | 2026-11-12 | Additive. Adopting a tracker item no epic names: Inbox items' `adoptable` and `after`; page-only `inbox.adoption`, `inbox.adopt`, `inbox.adoptWith`, `inbox.untrack` and `inbox.undo`; the host-called services `conversations.finder` (which conversations worked on a ref, and filing one under a place) and `agent.tasks` (a new conversation fed a brief); `vouchHost`. See [inbox](docs/inbox.md) and [services](docs/services.md). |
 | 2.87.0 | 2026-11-12 | Additive. An Inbox item may carry `go: { label? }` (`inboxGoSchema`, `INBOX_GO_LABEL`): its primary action is to take the person to its place — a host sets it on an agent's offer. A page draws a primary "Take me there" button beside dismiss; pressing it is `inbox.open`, which goes there with a Go back mark and closes the offer. See [inbox](docs/inbox.md). |
