@@ -4115,6 +4115,30 @@ export declare const pageErrorSchema: z.ZodObject<{
 }>;
 export type PageErrorMessage = z.infer<typeof pageErrorSchema>;
 /**
+ * Module → host (2.93.0). The page will not answer this window: the greeting came from `origin`,
+ * which is not among the origins the page was told it may be framed by (`allowed`, as its server
+ * printed them — the same list its `frame-ancestors` names, so nothing here is a secret). Before
+ * 2.93.0 such a greeting was dropped without a word, and a host could only see a page that loaded
+ * every script and said nothing, which reads as a broken module. Sent to the greeting's window
+ * only, once per greeting; nothing else is answered to it. Text, never markup. A host shows why
+ * and offers the restart that starts the module with this window's origin; a host before 2.93.0
+ * drops it unread (`MODULE_MESSAGES`).
+ */
+export declare const refusedSchema: z.ZodObject<{
+    type: z.ZodLiteral<"kehikot.refused">;
+    origin: z.ZodEffects<z.ZodString, string, string>;
+    allowed: z.ZodDefault<z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">, string[], string[]>>;
+}, "strip", z.ZodTypeAny, {
+    type: "kehikot.refused";
+    origin: string;
+    allowed: string[];
+}, {
+    type: "kehikot.refused";
+    origin: string;
+    allowed?: string[] | undefined;
+}>;
+export type RefusedMessage = z.infer<typeof refusedSchema>;
+/**
  * Host → module (2.69.0). Search what this page shows. `direction` says what to do: `first` (the
  * query or an option changed: search anew, go to the first match at or after what is on screen),
  * `next` and `prev` (move, wrapping), or `close` (the bar closed: clear every mark). `id` pairs it
@@ -8109,6 +8133,18 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
     type: "kehikot.page.error";
     where?: string | undefined;
     stack?: string | undefined;
+}>, z.ZodObject<{
+    type: z.ZodLiteral<"kehikot.refused">;
+    origin: z.ZodEffects<z.ZodString, string, string>;
+    allowed: z.ZodDefault<z.ZodEffects<z.ZodArray<z.ZodEffects<z.ZodString, string, string>, "many">, string[], string[]>>;
+}, "strip", z.ZodTypeAny, {
+    type: "kehikot.refused";
+    origin: string;
+    allowed: string[];
+}, {
+    type: "kehikot.refused";
+    origin: string;
+    allowed?: string[] | undefined;
 }>, z.ZodEffects<z.ZodObject<{
     unsupported: z.ZodDefault<z.ZodBoolean>;
     total: z.ZodNumber;

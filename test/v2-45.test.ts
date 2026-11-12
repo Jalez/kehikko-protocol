@@ -17,7 +17,7 @@ const REPO = resolve(dirname(new URL(import.meta.url).pathname), '..')
 
 describe('the version', () => {
   test('is 2.45.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.92.0')
+    expect(PACKAGE_VERSION).toBe('2.93.0')
     expect(PROTOCOL).toBe(2)
     expect(readFileSync(join(REPO, 'CHANGELOG.md'), 'utf8')).toContain('## 2.45.0')
   })

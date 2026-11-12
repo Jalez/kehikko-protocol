@@ -930,6 +930,19 @@ the rule: the sentence for a declined outcome, null for anything else. A press t
 then never silent. A rejected request says nothing on the tile; handle it where the module handles
 its other refusals.
 
+## When the page will not answer a window (2.93.0)
+
+A greeting from a window whose origin the page was not told it may be framed by (`mayGreet`: the
+origins its server printed, the same list as its `frame-ancestors`) is not answered, and until
+2.93.0 it was not answered at all — from the host that is a page which loaded every script and
+said nothing. Now `connect` tells that window why, once per greeting: `kehikot.refused`
+`{ origin, allowed }` (`refusedSchema`), to that window only. Nothing else is ever sent to it.
+The usual cause is a module started for one window and framed by another (the app started again on
+another address); a host says so and offers the restart that hands the module this window's origin.
+
+A greeting the page cannot READ — a host and a module that do not agree on the protocol — is no
+longer dropped either: it is said as a failure (`kehikot.page.error`, `greeting`) to whoever greeted.
+
 ## When the page fails (2.59.0)
 
 A page that throws before `connect` is greeted and says nothing, and the host can only say the page

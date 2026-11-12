@@ -113,7 +113,7 @@ export declare const trafficCallerSchema: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     name: string;
     kind: "module" | "session" | "program" | "host" | "remote" | "gone";
-    how: "token" | "address" | "closed" | "process" | "route" | "origin";
+    how: "token" | "address" | "closed" | "origin" | "process" | "route";
     place?: string | undefined;
     process?: string | undefined;
     parent?: string | undefined;
@@ -121,7 +121,7 @@ export declare const trafficCallerSchema: z.ZodObject<{
 }, {
     name: string;
     kind: "module" | "session" | "program" | "host" | "remote" | "gone";
-    how: "token" | "address" | "closed" | "process" | "route" | "origin";
+    how: "token" | "address" | "closed" | "origin" | "process" | "route";
     place?: string | undefined;
     process?: string | undefined;
     parent?: string | undefined;
@@ -164,7 +164,7 @@ export declare const trafficCallSchema: z.ZodObject<{
     }, "strip", z.ZodTypeAny, {
         name: string;
         kind: "module" | "session" | "program" | "host" | "remote" | "gone";
-        how: "token" | "address" | "closed" | "process" | "route" | "origin";
+        how: "token" | "address" | "closed" | "origin" | "process" | "route";
         place?: string | undefined;
         process?: string | undefined;
         parent?: string | undefined;
@@ -172,7 +172,7 @@ export declare const trafficCallSchema: z.ZodObject<{
     }, {
         name: string;
         kind: "module" | "session" | "program" | "host" | "remote" | "gone";
-        how: "token" | "address" | "closed" | "process" | "route" | "origin";
+        how: "token" | "address" | "closed" | "origin" | "process" | "route";
         place?: string | undefined;
         process?: string | undefined;
         parent?: string | undefined;
@@ -198,7 +198,7 @@ export declare const trafficCallSchema: z.ZodObject<{
     caller?: {
         name: string;
         kind: "module" | "session" | "program" | "host" | "remote" | "gone";
-        how: "token" | "address" | "closed" | "process" | "route" | "origin";
+        how: "token" | "address" | "closed" | "origin" | "process" | "route";
         place?: string | undefined;
         process?: string | undefined;
         parent?: string | undefined;
@@ -1209,7 +1209,7 @@ export declare const trafficReadResult: z.ZodObject<{
         }, "strip", z.ZodTypeAny, {
             name: string;
             kind: "module" | "session" | "program" | "host" | "remote" | "gone";
-            how: "token" | "address" | "closed" | "process" | "route" | "origin";
+            how: "token" | "address" | "closed" | "origin" | "process" | "route";
             place?: string | undefined;
             process?: string | undefined;
             parent?: string | undefined;
@@ -1217,7 +1217,7 @@ export declare const trafficReadResult: z.ZodObject<{
         }, {
             name: string;
             kind: "module" | "session" | "program" | "host" | "remote" | "gone";
-            how: "token" | "address" | "closed" | "process" | "route" | "origin";
+            how: "token" | "address" | "closed" | "origin" | "process" | "route";
             place?: string | undefined;
             process?: string | undefined;
             parent?: string | undefined;
@@ -1243,7 +1243,7 @@ export declare const trafficReadResult: z.ZodObject<{
         caller?: {
             name: string;
             kind: "module" | "session" | "program" | "host" | "remote" | "gone";
-            how: "token" | "address" | "closed" | "process" | "route" | "origin";
+            how: "token" | "address" | "closed" | "origin" | "process" | "route";
             place?: string | undefined;
             process?: string | undefined;
             parent?: string | undefined;
@@ -1981,7 +1981,7 @@ export declare const trafficReadResult: z.ZodObject<{
         caller?: {
             name: string;
             kind: "module" | "session" | "program" | "host" | "remote" | "gone";
-            how: "token" | "address" | "closed" | "process" | "route" | "origin";
+            how: "token" | "address" | "closed" | "origin" | "process" | "route";
             place?: string | undefined;
             process?: string | undefined;
             parent?: string | undefined;
