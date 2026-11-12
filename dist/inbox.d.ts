@@ -1243,7 +1243,11 @@ export declare const inboxAdoptionResult: z.ZodObject<{
         placed?: string | null | undefined;
         comes?: boolean | undefined;
     }>, "many">>;
-    /** The person's agent for Kehikot's own tasks (`inbox.adoptWith`); null when none is picked. */
+    /**
+     * The agent that would do the task (`inbox.adoptWith`); null when none would. Since 2.91.0 a host
+     * fills it from the kehikko the person is on: its primary agent, or its only agent module, when that
+     * provides `agent.tasks`.
+     */
     agent: z.ZodDefault<z.ZodNullable<z.ZodObject<{
         module: z.ZodString;
         name: z.ZodString;
@@ -1254,6 +1258,37 @@ export declare const inboxAdoptionResult: z.ZodObject<{
         name: string;
         module: string;
     }>>>;
+    /**
+     * 2.91.0. With `agent` null: the agent modules on that kehikko that could do it, none of them primary.
+     * Two or more: `inbox.adoptWith` asks the person which (and that one becomes the kehikko's primary
+     * agent), so a page offers "Adopt with an agent…". Empty: no agent module there can — a page may say
+     * that adding one would let it find the place. Absent from an older host: say nothing of it.
+     */
+    taskAgents: z.ZodOptional<z.ZodArray<z.ZodObject<{
+        module: z.ZodString;
+        name: z.ZodString;
+    }, "strip", z.ZodTypeAny, {
+        name: string;
+        module: string;
+    }, {
+        name: string;
+        module: string;
+    }>, "many">>;
+    /**
+     * 2.91.0. With `agent` null and no `taskAgents`: the agent modules on that kehikko that do not provide
+     * `agent.tasks` (an older version of them, or one that never will). A page offers "Update <name>…"
+     * (`inbox.adoptWith`, which takes the person to it) rather than leaving only the picker.
+     */
+    agentsToUpdate: z.ZodOptional<z.ZodArray<z.ZodObject<{
+        module: z.ZodString;
+        name: z.ZodString;
+    }, "strip", z.ZodTypeAny, {
+        name: string;
+        module: string;
+    }, {
+        name: string;
+        module: string;
+    }>, "many">>;
     /** An agent's proposal, when one was made for this item: what the dialog offers to confirm. */
     proposal: z.ZodDefault<z.ZodNullable<z.ZodObject<{
         epic: z.ZodString;
@@ -1326,6 +1361,14 @@ export declare const inboxAdoptionResult: z.ZodObject<{
         space?: string[] | undefined;
     } | null;
     spaces?: import("./spaces.js").SpaceNode[] | undefined;
+    taskAgents?: {
+        name: string;
+        module: string;
+    }[] | undefined;
+    agentsToUpdate?: {
+        name: string;
+        module: string;
+    }[] | undefined;
 }, {
     outcome: "declined" | "no-such-item" | "ok";
     why?: string | undefined;
@@ -1370,6 +1413,14 @@ export declare const inboxAdoptionResult: z.ZodObject<{
         folder?: string | undefined;
         placed?: string | null | undefined;
         comes?: boolean | undefined;
+    }[] | undefined;
+    taskAgents?: {
+        name: string;
+        module: string;
+    }[] | undefined;
+    agentsToUpdate?: {
+        name: string;
+        module: string;
     }[] | undefined;
     proposal?: {
         why: string;

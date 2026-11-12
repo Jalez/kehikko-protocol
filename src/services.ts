@@ -558,6 +558,33 @@ export function agentTaskView(tasks: Pick<AgentTasks, 'view'>, session: string):
   return tasks.view.split(SERVICE_SESSION).join(encodeURIComponent(session))
 }
 
+/* ---------------------------------------------------------------- agent.setup (2.91.0) */
+
+/** A program's command, as a shell runs it: lowercase, one word (`claude`). */
+export const AGENT_CLI = /^[a-z][a-z0-9_-]{0,31}$/
+
+/**
+ * `agent.setup` (2.91.0): an agent module whose program can be set up, user-wide, to use every
+ * module's MCP tools and skills in conversations started OUTSIDE Kehikot too. The module owns the
+ * person's choice — its own `machine` settings (`agentSetupSettings`, keys in `AGENT_SETUP_KEYS`),
+ * shown in its settings and in a host's Settings like any other — and a host that keeps that
+ * program's user-wide configuration in step reads the choice at the module's settings door
+ * (`settings.get`, no project) and acts on it (`agentSetupChoice`).
+ *
+ * - `name`: the module's name where it is told about.
+ * - `program`: the program a person reads it sets up ("Claude Code"): the one place a host says it.
+ * - `cli`: the program's command (`AGENT_CLI`): which of a host's ways of writing a program's
+ *   configuration applies. A host with none for that command sets nothing up for it, and says so.
+ */
+export const agentSetupSchema = z.object({
+  name: oneLine(LIMITS.TITLE),
+  program: oneLine(LIMITS.TITLE),
+  cli: z.string().regex(AGENT_CLI, 'a program\'s command: lowercase, one word'),
+})
+export type AgentSetup = z.infer<typeof agentSetupSchema>
+
+/* The four settings that hold the choice, and reading it: `agent-setup.ts`. */
+
 /* ---------------------------------------------------------------- the registry */
 
 /**
@@ -609,6 +636,10 @@ export const SERVICES = {
     says: "Starts a new conversation for one of Kehikot's own tasks, fed a brief on launch.",
     schema: agentTasksSchema,
   },
+  'agent.setup': {
+    says: "Owns the person's choice of whether its program uses every module's tools and skills outside Kehikot too.",
+    schema: agentSetupSchema,
+  },
 } as const satisfies Record<string, { says: string; schema: z.ZodTypeAny }>
 export type Service = keyof typeof SERVICES
 export const SERVICE_NAMES = Object.keys(SERVICES) as Service[]
@@ -637,6 +668,8 @@ export const MODULE_FOLDERS = 'module.folders' satisfies Service
 export const CONVERSATIONS_FINDER = 'conversations.finder' satisfies Service
 /** 2.88.0. A new conversation for one of Kehikot's own tasks, fed a brief. */
 export const AGENT_TASKS = 'agent.tasks' satisfies Service
+/** 2.91.0. The person's choice of setting up an agent program, user-wide, with every module's tools and skills. */
+export const AGENT_SETUP = 'agent.setup' satisfies Service
 
 /**
  * `services` in a manifest: each service this module provides, by name, and its descriptor. A known

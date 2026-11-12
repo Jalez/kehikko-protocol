@@ -11,6 +11,36 @@ After 2.78.0, every entry's first line under its heading is its kind, and the ve
 (semver; CI checks it): `Kind: breaking` → next major, `Kind: feature` → next minor, `Kind: fix` →
 next patch.
 
+## 2.91.0 — 2026-11-12
+
+Kind: feature
+
+`agent.setup`: an agent module owns the person's choice of whether its program uses every module's MCP
+tools and skills in conversations started outside Kehikot too. **Additive**; `PROTOCOL` is still 2.
+[docs/services.md](docs/services.md#agentsetup-2910).
+
+### Added
+
+- The service `agent.setup` (`AGENT_SETUP`), descriptor `agentSetupSchema`: `{ name, program, cli }`.
+  `cli` (`AGENT_CLI`) is the program's command, which says which of a host's ways of writing a program's
+  user-wide configuration applies.
+- `agentSetupSettings(program)`: the four `machine`, `personOnly` settings such a module declares, off by
+  default, under the keys in `AGENT_SETUP_KEYS` (tools on or off, the modules left out; the same for skills).
+- `agentSetupChoice(values)`: the choice in a module's `settings.get` values, read leniently;
+  `agentSetupValues(choice)`: the values that carry an earlier choice over. Types `AgentSetup`,
+  `AgentSetupKind`, `AgentSetupChoice`.
+- `AGENT_SETUP_CARRIED_PATH` (`/host/agent-setup/carried`): where a host answers the choice it held
+  itself before, as settings values, so the module carries it over once and nothing the person set up
+  changes.
+- `inboxAdoptionResult.taskAgents` (optional): with `agent` null, the agent modules on the person's kehikko
+  that could do the task, none primary. Two or more: `inbox.adoptWith` asks which (it becomes the
+  kehikko's primary agent). Empty: none there can. `agent` is now filled from that kehikko's primary or
+  only agent module.
+- `inboxAdoptionResult.agentsToUpdate` (optional): with no agent and no `taskAgents`, the agent modules on
+  that kehikko that do not provide `agent.tasks`, so a page offers "Update <name>…" instead of a dead end.
+  `inbox.adoptWith` now always leads somewhere: the agent's dialog, the choice of agent, the update, or
+  adding an agent module.
+
 ## 2.90.0 — 2026-11-12
 
 Kind: feature

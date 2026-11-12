@@ -1170,6 +1170,35 @@ export declare const agentTaskStartResult: z.ZodObject<{
 export type AgentTaskStartResult = z.infer<typeof agentTaskStartResult>;
 /** An `agent.tasks` view with the conversation in it. */
 export declare function agentTaskView(tasks: Pick<AgentTasks, 'view'>, session: string): string;
+/** A program's command, as a shell runs it: lowercase, one word (`claude`). */
+export declare const AGENT_CLI: RegExp;
+/**
+ * `agent.setup` (2.91.0): an agent module whose program can be set up, user-wide, to use every
+ * module's MCP tools and skills in conversations started OUTSIDE Kehikot too. The module owns the
+ * person's choice — its own `machine` settings (`agentSetupSettings`, keys in `AGENT_SETUP_KEYS`),
+ * shown in its settings and in a host's Settings like any other — and a host that keeps that
+ * program's user-wide configuration in step reads the choice at the module's settings door
+ * (`settings.get`, no project) and acts on it (`agentSetupChoice`).
+ *
+ * - `name`: the module's name where it is told about.
+ * - `program`: the program a person reads it sets up ("Claude Code"): the one place a host says it.
+ * - `cli`: the program's command (`AGENT_CLI`): which of a host's ways of writing a program's
+ *   configuration applies. A host with none for that command sets nothing up for it, and says so.
+ */
+export declare const agentSetupSchema: z.ZodObject<{
+    name: z.ZodEffects<z.ZodString, string, string>;
+    program: z.ZodEffects<z.ZodString, string, string>;
+    cli: z.ZodString;
+}, "strip", z.ZodTypeAny, {
+    name: string;
+    program: string;
+    cli: string;
+}, {
+    name: string;
+    program: string;
+    cli: string;
+}>;
+export type AgentSetup = z.infer<typeof agentSetupSchema>;
 /**
  * Every service this protocol gives a descriptor's shape to, with what it means. Grows by an entry.
  * Names a module may say but this package does not know are carried as they came (`servicesSchema`).
@@ -1616,6 +1645,22 @@ export declare const SERVICES: {
             view: string;
         }>;
     };
+    readonly 'agent.setup': {
+        readonly says: "Owns the person's choice of whether its program uses every module's tools and skills outside Kehikot too.";
+        readonly schema: z.ZodObject<{
+            name: z.ZodEffects<z.ZodString, string, string>;
+            program: z.ZodEffects<z.ZodString, string, string>;
+            cli: z.ZodString;
+        }, "strip", z.ZodTypeAny, {
+            name: string;
+            program: string;
+            cli: string;
+        }, {
+            name: string;
+            program: string;
+            cli: string;
+        }>;
+    };
 };
 export type Service = keyof typeof SERVICES;
 export declare const SERVICE_NAMES: Service[];
@@ -1643,6 +1688,8 @@ export declare const MODULE_FOLDERS = "module.folders";
 export declare const CONVERSATIONS_FINDER = "conversations.finder";
 /** 2.88.0. A new conversation for one of Kehikot's own tasks, fed a brief. */
 export declare const AGENT_TASKS = "agent.tasks";
+/** 2.91.0. The person's choice of setting up an agent program, user-wide, with every module's tools and skills. */
+export declare const AGENT_SETUP = "agent.setup";
 /**
  * `services` in a manifest: each service this module provides, by name, and its descriptor. A known
  * service's descriptor must parse with its schema, or the whole field is dropped (the manifest still

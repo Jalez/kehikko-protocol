@@ -221,6 +221,7 @@ The same list with what each version exported is in [CHANGELOG.md](CHANGELOG.md)
 
 | version | date | what it added |
 |---|---|---|
+| 2.91.0 | 2026-11-12 | Additive. `agent.setup`: an agent module owns the choice of whether its program uses every module's tools and skills outside Kehikot too, as four `machine` settings (`agentSetupSettings`, `AGENT_SETUP_KEYS`); a host reads it with `agentSetupChoice`. See [services](docs/services.md). |
 | 2.90.0 | 2026-11-12 | Additive. `settings.open { key? }` (capability `settings:open`): a module's page opens its own settings in the host at one setting, on the person's press; `settingsOpenResult`. See [asking](docs/asking.md). |
 | 2.89.0 | 2026-11-12 | Additive. Spaces: a tree of spaces to any depth in place of epic → parts, same ids; `context.space`, `spaceWithin`, `epicPartsOf` (epic and parts still filled), `space` on places, `view.goto`, messages and `inbox.adopt`, the door's `space` argument (`doorSpace`, `findSpace`). See [spaces](docs/spaces.md). |
 | 2.88.0 | 2026-11-12 | Additive. Adopting a tracker item no epic names: Inbox items' `adoptable` and `after`; page-only `inbox.adoption`, `inbox.adopt`, `inbox.adoptWith`, `inbox.untrack` and `inbox.undo`; the host-called services `conversations.finder` (which conversations worked on a ref, and filing one under a place) and `agent.tasks` (a new conversation fed a brief); `vouchHost`. See [inbox](docs/inbox.md) and [services](docs/services.md). |

@@ -61,9 +61,14 @@ offer:
 - **Add to <epic>** in one press when `inbox.adoption`'s `suggested.sure` (the only epic whose other refs
   or tracker source match its repository or branch), and **Another epic…** — a picker of `epics` and
   their parts — otherwise. Either is `inbox.adopt`. A host never adopts by itself.
-- **Adopt with <agent>…** when `agent` is set: `inbox.adoptWith` opens the host's dialog, where the
-  person's agent for Kehikot's own tasks is started on the item (`agent.tasks`, services.md) and
-  proposes an epic; the person confirms there in one press.
+- **Adopt with <agent>…** when `agent` is set — the primary action whenever it is: `inbox.adoptWith`
+  opens the host's dialog, where that agent is started on the item (`agent.tasks`, services.md) and
+  proposes a place; the person confirms there in one press. Since 2.91.0 `agent` is the primary agent
+  of the person's kehikko, or its only agent module. With `agent` null and two or more `taskAgents`
+  (none primary): **Adopt with an agent…** — the host asks which first, and that one becomes the
+  kehikko's primary agent. With `agentsToUpdate`: **Update <name>…** — `inbox.adoptWith` takes the
+  person to that module's update. With `taskAgents` empty and nothing to update: **Add an agent
+  module…** — `inbox.adoptWith` opens the host's module list. The picker stays a secondary choice.
 - **Don't track this**: `inbox.untrack`. The host tells nothing more about that ref in this project.
 - **Undo**: `inbox.undo`, after either, while the item's `after.undo` says it can.
 

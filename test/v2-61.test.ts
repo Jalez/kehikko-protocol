@@ -37,7 +37,7 @@ const placed = (guard: Guard, module = 'kehikot.queue', name = 'Test runs'): Pla
 
 describe('2.61.0', () => {
   test('the version', () => {
-    expect(PACKAGE_VERSION).toBe('2.90.0')
+    expect(PACKAGE_VERSION).toBe('2.91.0')
     expect(SESSION_FIELD_SINCE.guards).toBe('2.61.0')
   })
 })

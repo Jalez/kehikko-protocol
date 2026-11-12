@@ -57,6 +57,8 @@ export { PLAN_FILE, PLAN_VERSION, PLAN_ID, PLAN_GATE_KINDS, PLAN_GATE_KIND_NAMES
 export { PROVIDES, PROVIDED_NAMES, providesSchema, agentSessionsSchema, providesOf, loadsSkills, installsSkills, } from './provides.js';
 /* Services: one module provides, others consume, neither names the other (2.81.0). See `services.ts`, docs/services.md. */
 export { SERVICES, SERVICE_NAMES, SERVICE_NAME, serviceName, servicesSchema, serviceDescriptor, servicesOf, servicesFindParams, servicesFindResult, serviceProviderSchema, providerOf, WORK_QUEUE, WORK_KINDS, WORK_COMMAND, workQueueSchema, workRunLine, workQueueSaid, DOCUMENT_PROPOSALS, REVIEW_DRAFTS, CHECKLIST_HOLDER, WORK_STATUS, DIAGRAM_WRITER, DIAGRAM_KINDS, SERVICE_EPIC, SERVICE_CALLER_HEADER, SERVICE_PASS_HEADER, serviceTool, servicePath, documentProposalsSchema, reviewDraftsSchema, checklistHolderSchema, workStatusSchema, workJobSchema, workJobsIn, diagramWriterSchema, documentRoot, documentsFolder, 
+/* 2.91.0 */
+AGENT_SETUP, AGENT_CLI, agentSetupSchema, 
 /* 2.88.0 */
 HOST_CALLER, HOST_PASS_PATH, CONVERSATIONS_FINDER, AGENT_TASKS, conversationsFinderSchema, conversationsFindParams, conversationCandidateSchema, conversationsFindResult, candidatesIn, conversationsBringParams, conversationsBringResult, sameConversationPlace, SERVICE_SESSION, agentTasksSchema, AGENT_TASK_BRIEF_MAX, agentTaskStartParams, agentTaskStartResult, agentTaskView, 
 /* 2.85.0 */
@@ -92,3 +94,5 @@ inboxGoSchema, INBOX_GO_LABEL, INBOX_ITEMS_MAX, inboxReadParams, inboxReadResult
 /* 2.89.0: spaces, one nested concept in place of epic → parts. See docs/spaces.md. */
 export { SPACE_ID, spaceStepSchema, spacePathSchema, spaceIdsSchema, spaceSchema, spaceNodeSchema, spaceTreeSchema, spaceIdsOf, spaceWithin, epicPartsOf, spaceFromEpicParts, spaceAgrees, spaceSaid, spaceIdFor, DOOR_SPACE_ARGUMENT, doorSpace, findSpace, spaceAt, spaceOf, nodeAt, placeSpace, } from './spaces.js';
 export { placeSpaceDefaults } from './door.js';
+/* 2.91.0: the choice an `agent.setup` provider holds. */
+export { AGENT_SETUP_KEYS, AGENT_SETUP_CARRIED_PATH, agentSetupSettings, agentSetupChoice, agentSetupValues, } from './agent-setup.js';
