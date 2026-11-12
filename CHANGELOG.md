@@ -11,6 +11,25 @@ After 2.78.0, every entry's first line under its heading is its kind, and the ve
 (semver; CI checks it): `Kind: breaking` → next major, `Kind: feature` → next minor, `Kind: fix` →
 next patch.
 
+## 2.91.0 — 2026-11-12
+
+Kind: feature
+
+`agent.setup`: an agent module owns the person's choice of whether its program uses every module's MCP
+tools and skills in conversations started outside Kehikot too. **Additive**; `PROTOCOL` is still 2.
+[docs/services.md](docs/services.md#agentsetup-2910).
+
+### Added
+
+- The service `agent.setup` (`AGENT_SETUP`), descriptor `agentSetupSchema`: `{ name, program, cli }`.
+  `cli` (`AGENT_CLI`) is the program's command, which says which of a host's ways of writing a program's
+  user-wide configuration applies.
+- `agentSetupSettings(program)`: the four `machine`, `personOnly` settings such a module declares, off by
+  default, under the keys in `AGENT_SETUP_KEYS` (tools on or off, the modules left out; the same for skills).
+- `agentSetupChoice(values)`: the choice in a module's `settings.get` values, read leniently;
+  `agentSetupValues(choice)`: the values that carry an earlier choice over. Types `AgentSetup`,
+  `AgentSetupKind`, `AgentSetupChoice`.
+
 ## 2.89.0 — 2026-11-12
 
 Kind: feature

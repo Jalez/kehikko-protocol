@@ -985,6 +985,11 @@ export {
   type ServicesFindResult,
   type WorkKind,
   type WorkQueue,
+  /* 2.91.0 */
+  AGENT_SETUP,
+  AGENT_CLI,
+  agentSetupSchema,
+  type AgentSetup,
   /* 2.88.0 */
   HOST_CALLER,
   HOST_PASS_PATH,
@@ -1493,3 +1498,13 @@ export {
   type SpaceLike,
 } from './spaces.js'
 export { placeSpaceDefaults } from './door.js'
+
+/* 2.91.0: the choice an `agent.setup` provider holds. */
+export {
+  AGENT_SETUP_KEYS,
+  agentSetupSettings,
+  agentSetupChoice,
+  agentSetupValues,
+  type AgentSetupKind,
+  type AgentSetupChoice,
+} from './agent-setup.js'

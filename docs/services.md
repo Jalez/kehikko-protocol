@@ -192,7 +192,8 @@ the host by service and operation — never by module id or tool name — when t
 
 ## The host as a consumer (2.88.0)
 
-Two services are called by the HOST, not by another module: `conversations.finder` and `agent.tasks`.
+Two services are called by the HOST, not by another module: `conversations.finder` and `agent.tasks`
+(and a third, `agent.setup`, is read by it: see below).
 The host's server sends `x-kehikot-caller: kehikko` (`HOST_CALLER`) and a pass it minted; the provider
 holds the route to `vouchHost`, which asks the host at its own origins (`HOST_PASS_PATH`) whether it
 minted that pass. No page, agent or other module can pass for the host.
@@ -221,3 +222,18 @@ from outside its CLI's own folders.
   `brief` on launch, filed under `place`, kept in the module's records like any other.
 - `view`: the module's page for that one conversation, `/app?…{session}…` (`agentTaskView`), which the
   host frames in its dialog while the task runs.
+
+### `agent.setup` (2.91.0)
+
+`{ name, program, cli }`. An agent module whose program can use every module's MCP tools and skills
+in conversations started OUTSIDE Kehikot too. The module owns the person's choice, as its own `machine`
+settings: `agentSetupSettings(program)` declares the four (`AGENT_SETUP_KEYS`: tools on or off and the
+modules left out, the same for skills), off by default and `personOnly`. A host reads them with
+`settings.get` at the module's door (no project) and acts on them with `agentSetupChoice`; it writes
+them only as the person (a pass, like any change in its Settings), and `agentSetupValues` says the
+values that carry an earlier choice over.
+
+`cli` is the program's command (`claude`): it says which of the host's ways of writing a program's
+user-wide configuration applies. A host with none for that command sets nothing up for it. The host,
+not the module, keeps that configuration in step — it runs while the module sleeps, and it is the one
+that sees modules installed, moved and uninstalled.

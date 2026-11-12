@@ -37,7 +37,7 @@ const SELF = { module: 'kehikot.claude', name: 'Claude', door: 'kehikko-claude' 
 
 describe('2.55.0', () => {
   test('is the package version, and the notes are told again', () => {
-    expect(PACKAGE_VERSION).toBe('2.89.0')
+    expect(PACKAGE_VERSION).toBe('2.91.0')
     expect(NOTES_VERSION).toBeGreaterThanOrEqual(8)
   })
 
