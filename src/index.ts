@@ -1488,6 +1488,7 @@ export {
   spaceFromEpicParts,
   spaceAgrees,
   spaceSaid,
+  spaceWords,
   spaceIdFor,
   DOOR_SPACE_ARGUMENT,
   doorSpace,

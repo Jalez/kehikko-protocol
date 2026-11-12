@@ -57,6 +57,21 @@ export async function messageToolsFor(token, options) {
 }
 const NO_TOKEN = 'This conversation was not started from a Kehikot place (its door carries no place token), so it has no address to send from or read for. Nothing was sent or read.';
 /**
+ * 2.92.0. A `to` whose place names a `space` and no `epic` gets the space's first id as its epic, which
+ * every host reads (`spaceGoesWithEpic`): an agent names a place by its space alone. Anything else as given.
+ */
+function withEpicFromSpace(to) {
+    if (!to || typeof to !== 'object' || Array.isArray(to))
+        return to;
+    const place = to.place;
+    if (!place || typeof place !== 'object' || Array.isArray(place))
+        return to;
+    const { space, epic } = place;
+    if (epic !== undefined || !Array.isArray(space) || typeof space[0] !== 'string')
+        return to;
+    return { ...to, place: { ...place, epic: space[0] } };
+}
+/**
  * Answer `send_message` or `read_messages`; null for any other tool, so a door asks this first and
  * falls through. Arguments are passed to the host as they came; the host holds them to the method's
  * params and says what it refused. Never throws.
@@ -71,7 +86,7 @@ export async function answerMessageTool(name, args, options) {
     if (name === 'send_message') {
         const params = { token, body: given.body };
         if (given.to !== undefined)
-            params.to = given.to;
+            params.to = withEpicFromSpace(given.to);
         if (given.thread !== undefined)
             params.thread = given.thread;
         /* 2.50.0: what it is, a question's choices, and what it answers. A host before 2.50.0 drops them. */

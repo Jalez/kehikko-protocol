@@ -59,7 +59,7 @@ const notice = (over: Record<string, unknown> = {}): AgentMessage =>
 
 describe('the version', () => {
   test('is 2.54.0, PROTOCOL is still 2, and the docs say it', () => {
-    expect(PACKAGE_VERSION).toBe('2.91.0')
+    expect(PACKAGE_VERSION).toBe('2.92.0')
     expect(PROTOCOL).toBe(2)
     expect(readFileSync(join(REPO, 'CHANGELOG.md'), 'utf8')).toContain('## 2.54.0')
     expect(readFileSync(join(REPO, 'docs/agent-messages.md'), 'utf8')).toContain('messages.notify')
@@ -115,7 +115,7 @@ describe('a notice, delivered', () => {
   test('typed under the module’s name, and told as the module’s words', () => {
     const one = notice()
     /* 2.75.0: the compact marker; what a module's notice is is said once, in the notes. */
-    expect(typedFrame(one)).toBe(`⟦Queue · report #${one.id} · epic methods, kehikko writing⟧`)
+    expect(typedFrame(one)).toBe(`⟦Queue · report #${one.id} · space methods, kehikko writing⟧`)
     expect(typedFrame(one, YOU)).toBe(`⟦Queue · report #${one.id}⟧`)
     const text = typedMessages([one], false, { you: YOU })
     expect(text).toBe(`⟦Queue · report #${one.id}⟧ Run "kehikko main" passed (exit 0) in 4m 12s.`)

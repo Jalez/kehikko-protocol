@@ -116,7 +116,7 @@ The source says what each field is and what it is bounded by, in a line or three
 | [Limits](docs/limits.md) | Why every string and every list is bounded, and the reasoning behind each number in `LIMITS`. |
 | [The protocol number](docs/protocol-number.md) | Why `PROTOCOL` is 2 and what would raise it, and what would raise it. |
 | [Where a module keeps a project's data](docs/project-data.md) | The `.kehikot/` folder inside a project, the folder each module gets in it, the project's own id in `.kehikot/project.json` (2.1.0) and how machine-level state is keyed by it, and the lines a project's `.gitignore` gains. |
-| [Spaces](docs/spaces.md) | A tree of spaces to any depth in place of epic → parts: `context.space`, narrowing by subtree with `spaceWithin`, and the epic and parts older modules are still told. |
+| [Spaces](docs/spaces.md) | The model: a tree of spaces to any depth (epic → parts are its older names, the top-level space and its direct sub-spaces): `context.space`, narrowing by subtree with `spaceWithin`, the epic and parts older modules are still told, and the words agents read a place in (`spaceWords`). |
 | [Parts of an epic, focus, and the record of an epic's steps](docs/parts.md) | The parts an epic is divided into, what it means for some of them to be picked out, the one rule for whether a thing is in focus, the files a part owns, and the on-disk record of an epic's steps that parts are read from. |
 | [Trackers](docs/tracker.md) | One reading of GitHub and GitLab shared by every module: the row a host hands back, what is missing and why, refreshing, and how a reference is spelled. |
 | [Content changes](docs/content.md) | How a container is told that the material it shows has changed, and how a module reports a change of its own. |
@@ -221,6 +221,7 @@ The same list with what each version exported is in [CHANGELOG.md](CHANGELOG.md)
 
 | version | date | what it added |
 |---|---|---|
+| 2.92.0 | 2026-11-12 | Additive. What agents read says spaces: `spaceWords` says a place as a space (`space Auth › Login`), used by the notes (`NotesPlace.space`, `NOTES_VERSION` 11), message lines and markers and a door's sentences; `send_message`'s `to.place` leads with `space` (epic and parts: older names, still accepted). |
 | 2.91.0 | 2026-11-12 | Additive. `agent.setup`: an agent module owns the choice of whether its program uses every module's tools and skills outside Kehikot too, as four `machine` settings (`agentSetupSettings`, `AGENT_SETUP_KEYS`); a host reads it with `agentSetupChoice`. See [services](docs/services.md). |
 | 2.90.0 | 2026-11-12 | Additive. `settings.open { key? }` (capability `settings:open`): a module's page opens its own settings in the host at one setting, on the person's press; `settingsOpenResult`. See [asking](docs/asking.md). |
 | 2.89.0 | 2026-11-12 | Additive. Spaces: a tree of spaces to any depth in place of epic → parts, same ids; `context.space`, `spaceWithin`, `epicPartsOf` (epic and parts still filled), `space` on places, `view.goto`, messages and `inbox.adopt`, the door's `space` argument (`doorSpace`, `findSpace`). See [spaces](docs/spaces.md). |

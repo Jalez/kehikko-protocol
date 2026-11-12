@@ -162,6 +162,15 @@ export interface NotesPlace {
         key: string;
         name?: string;
     } | null;
+    /**
+     * 2.92.0. The place's space as a path of steps, root first, when the host said it (`space` in its
+     * answer to `POST /host/place`). Absent or null: said from `epic` and `parts` by the compatibility
+     * mapping, the same words.
+     */
+    space?: readonly {
+        id: string;
+        name?: string;
+    }[] | null;
 }
 /** The module that runs the session: its id (it is not listed among the modules around it), its name and its door's name. */
 export interface NotesSelf {
@@ -252,9 +261,10 @@ export interface NotesInput {
  * skills (`kehikkoSkills`). 8 (2.55.0): how to end a turn (`finishLine`). 9 (2.62.0): what changed for
  * agents since the session started (`changedSince`), which needs `versions` kept, so every running
  * session is told once and its record starts keeping them. 10 (2.75.0): what the markers typed
- * messages come under mean (`markersNote`), said once instead of after every delivery.
+ * messages come under mean (`markersNote`), said once instead of after every delivery. 11 (2.92.0): the
+ * place is said as a space (`spaceWords`), and the message lines say a space where they said an epic.
  */
-export declare const NOTES_VERSION = 10;
+export declare const NOTES_VERSION = 11;
 /** What a session was last told: its place by key, and which modules (null when they could not be read). */
 export interface NotesTold {
     key: string | null;
@@ -298,7 +308,10 @@ export declare const NOTES_MOST: {
     readonly modules: 30;
     readonly absent: 12;
 };
-/** The place in words: `project thesis (/path), epic methods (parts Data + Results) on the kehikko "writing"`. */
+/**
+ * The place in words: `project thesis (/path), space Methods › Data (methods/data) on the kehikko "writing"`.
+ * 2.92.0: said as a space (`spaceWords`), from `space` or from the older `epic` and `parts`.
+ */
 export declare function placeWords(place: NotesPlace): string;
 /**
  * One module on the kehikko as one line: `- Test runs (door queue) — "Queue heavy test runs here…" Skills: a, b.`

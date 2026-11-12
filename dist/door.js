@@ -6,7 +6,7 @@ import { EPIC_SLUG, KEHIKKO_KEY, MODULE_ID, PROJECT_ID, own } from './ids.js';
 import { skillNameSchema } from './skills.js';
 import { kehikkoSkillsSchema } from './kehikko-skills.js';
 import { placedGuardsSchema } from './guards.js';
-import { doorSpace, epicPartsOf, spaceFromEpicParts, spaceIdsSchema, spacePathSchema, spaceSaid } from './spaces.js';
+import { doorSpace, epicPartsOf, spaceFromEpicParts, spaceIdsSchema, spacePathSchema, spaceWords } from './spaces.js';
 /**
  * What a module's MCP door agrees with every other module's: how its tools spell the two context
  * arguments, how a tool says whether it only reads, and the shape of the two answers a caller acts
@@ -292,15 +292,12 @@ export function placeSpaceDefaults(args, place) {
         : null;
     return { ...base, space: fromSession ?? (base.epic ? [base.epic] : null), spaceId };
 }
-const namedPlace = (p) => {
-    const older = `${p.epic ? `epic ${p.epic}` : 'no epic'}${p.parts.length ? ` (parts ${p.parts.join(', ')})` : ''}`;
-    const where = p.space && p.space.length ? `space ${spaceSaid(p.space)} (${older})` : older;
-    return `${where}${p.kehikko ? ` on kehikko ${p.kehikko.name ? `"${p.kehikko.name}"` : p.kehikko.key}` : ''}`;
-};
+const namedPlace = (p) => `${spaceWords(p, { ids: true })}${p.kehikko ? ` on kehikko ${p.kehikko.name ? `"${p.kehikko.name}"` : p.kehikko.key}` : ''}`;
 /**
  * The sentences a door says about a session's place, in one wording for every module (2.4.0).
  *
- * - `belongs(place)`: "This conversation belongs to <project>, epic E (parts …) on kehikko K."
+ * - `belongs(place)`: "This conversation belongs to <project>, space Auth › Login (auth/login) on kehikko K."
+ *   2.92.0: the place is said as a space (`spaceWords`), from `space` or the older `epic` and `parts`.
  * - `looking(place)`: whether the person is looking at the same thing, and what they are on if not;
  *   `''` when the host sent no `looking`.
  * - `used(from, place)`: the line a door adds when it took the project or epic from the session.
@@ -326,7 +323,7 @@ export const DOOR_PLACE_SAYS = {
         return `The person is looking at something else now (${where}); this conversation's place has not changed.`;
     },
     used: (from, place) => from === 'session' && place ? `Taken from this conversation's place: ${place.project}, ${namedPlace(place)}.` : '',
-    unplaced: 'This conversation isn’t recorded under any place. Name the project (and epic) in the call, or ask the person which epic it is for.',
+    unplaced: 'This conversation isn’t recorded under any place. Name the project (and space) in the call, or ask the person which space it is for.',
     /** The line a door adds whenever it answered from the person's current view for want of a record: never silently. */
     fellBack: 'This conversation is not recorded under any place, so this answer is about what the person has open NOW — not this conversation’s place.',
 };
