@@ -333,6 +333,21 @@ export declare const trackerDetailSchema: z.ZodObject<{
         url?: unknown;
         stage?: string | undefined;
     }>, "many">>>;
+    /**
+     * For a change: how many approvals its tracker's rule asks for and how many it has (2.101.0), so
+     * "1 of 2" is a fact the host read. Absent when the change has no approval rule, from an older
+     * host and where the host did not read it; dropped, not fatal, when it does not parse.
+     */
+    approvals: z.ZodCatch<z.ZodOptional<z.ZodObject<{
+        given: z.ZodNumber;
+        required: z.ZodNumber;
+    }, "strip", z.ZodTypeAny, {
+        required: number;
+        given: number;
+    }, {
+        required: number;
+        given: number;
+    }>>>;
     /** More checks than `TRACKER_CHECKS` ran, and the list stops there. (2.98.0) */
     checksClipped: z.ZodCatch<z.ZodOptional<z.ZodBoolean>>;
     /** For a change from a fork: the fork and its branch (2.98.0). Absent for a change from the row's own repository. */
@@ -386,6 +401,10 @@ export declare const trackerDetailSchema: z.ZodObject<{
         url?: string | undefined;
         stage?: string | undefined;
     }[] | undefined;
+    approvals?: {
+        required: number;
+        given: number;
+    } | undefined;
     checksClipped?: boolean | undefined;
     fork?: {
         branch: string;
@@ -407,6 +426,7 @@ export declare const trackerDetailSchema: z.ZodObject<{
     comments?: unknown;
     commentCount?: unknown;
     checks?: unknown;
+    approvals?: unknown;
     checksClipped?: unknown;
     fork?: unknown;
 }>;
@@ -1073,6 +1093,21 @@ export declare const trackerRowSchema: z.ZodObject<{
             url?: unknown;
             stage?: string | undefined;
         }>, "many">>>;
+        /**
+         * For a change: how many approvals its tracker's rule asks for and how many it has (2.101.0), so
+         * "1 of 2" is a fact the host read. Absent when the change has no approval rule, from an older
+         * host and where the host did not read it; dropped, not fatal, when it does not parse.
+         */
+        approvals: z.ZodCatch<z.ZodOptional<z.ZodObject<{
+            given: z.ZodNumber;
+            required: z.ZodNumber;
+        }, "strip", z.ZodTypeAny, {
+            required: number;
+            given: number;
+        }, {
+            required: number;
+            given: number;
+        }>>>;
         /** More checks than `TRACKER_CHECKS` ran, and the list stops there. (2.98.0) */
         checksClipped: z.ZodCatch<z.ZodOptional<z.ZodBoolean>>;
         /** For a change from a fork: the fork and its branch (2.98.0). Absent for a change from the row's own repository. */
@@ -1126,6 +1161,10 @@ export declare const trackerRowSchema: z.ZodObject<{
             url?: string | undefined;
             stage?: string | undefined;
         }[] | undefined;
+        approvals?: {
+            required: number;
+            given: number;
+        } | undefined;
         checksClipped?: boolean | undefined;
         fork?: {
             branch: string;
@@ -1147,6 +1186,7 @@ export declare const trackerRowSchema: z.ZodObject<{
         comments?: unknown;
         commentCount?: unknown;
         checks?: unknown;
+        approvals?: unknown;
         checksClipped?: unknown;
         fork?: unknown;
     }>>;
@@ -1207,6 +1247,10 @@ export declare const trackerRowSchema: z.ZodObject<{
             url?: string | undefined;
             stage?: string | undefined;
         }[] | undefined;
+        approvals?: {
+            required: number;
+            given: number;
+        } | undefined;
         checksClipped?: boolean | undefined;
         fork?: {
             branch: string;
@@ -1305,6 +1349,7 @@ export declare const trackerRowSchema: z.ZodObject<{
         comments?: unknown;
         commentCount?: unknown;
         checks?: unknown;
+        approvals?: unknown;
         checksClipped?: unknown;
         fork?: unknown;
     } | undefined;
@@ -1936,6 +1981,21 @@ export declare const trackerReadingResult: z.ZodObject<{
                 url?: unknown;
                 stage?: string | undefined;
             }>, "many">>>;
+            /**
+             * For a change: how many approvals its tracker's rule asks for and how many it has (2.101.0), so
+             * "1 of 2" is a fact the host read. Absent when the change has no approval rule, from an older
+             * host and where the host did not read it; dropped, not fatal, when it does not parse.
+             */
+            approvals: z.ZodCatch<z.ZodOptional<z.ZodObject<{
+                given: z.ZodNumber;
+                required: z.ZodNumber;
+            }, "strip", z.ZodTypeAny, {
+                required: number;
+                given: number;
+            }, {
+                required: number;
+                given: number;
+            }>>>;
             /** More checks than `TRACKER_CHECKS` ran, and the list stops there. (2.98.0) */
             checksClipped: z.ZodCatch<z.ZodOptional<z.ZodBoolean>>;
             /** For a change from a fork: the fork and its branch (2.98.0). Absent for a change from the row's own repository. */
@@ -1989,6 +2049,10 @@ export declare const trackerReadingResult: z.ZodObject<{
                 url?: string | undefined;
                 stage?: string | undefined;
             }[] | undefined;
+            approvals?: {
+                required: number;
+                given: number;
+            } | undefined;
             checksClipped?: boolean | undefined;
             fork?: {
                 branch: string;
@@ -2010,6 +2074,7 @@ export declare const trackerReadingResult: z.ZodObject<{
             comments?: unknown;
             commentCount?: unknown;
             checks?: unknown;
+            approvals?: unknown;
             checksClipped?: unknown;
             fork?: unknown;
         }>>;
@@ -2070,6 +2135,10 @@ export declare const trackerReadingResult: z.ZodObject<{
                 url?: string | undefined;
                 stage?: string | undefined;
             }[] | undefined;
+            approvals?: {
+                required: number;
+                given: number;
+            } | undefined;
             checksClipped?: boolean | undefined;
             fork?: {
                 branch: string;
@@ -2168,6 +2237,7 @@ export declare const trackerReadingResult: z.ZodObject<{
             comments?: unknown;
             commentCount?: unknown;
             checks?: unknown;
+            approvals?: unknown;
             checksClipped?: unknown;
             fork?: unknown;
         } | undefined;
@@ -2314,6 +2384,10 @@ export declare const trackerReadingResult: z.ZodObject<{
                 url?: string | undefined;
                 stage?: string | undefined;
             }[] | undefined;
+            approvals?: {
+                required: number;
+                given: number;
+            } | undefined;
             checksClipped?: boolean | undefined;
             fork?: {
                 branch: string;
@@ -2430,6 +2504,7 @@ export declare const trackerReadingResult: z.ZodObject<{
             comments?: unknown;
             commentCount?: unknown;
             checks?: unknown;
+            approvals?: unknown;
             checksClipped?: unknown;
             fork?: unknown;
         } | undefined;
@@ -2595,6 +2670,45 @@ export declare const trackerColumnsResult: z.ZodObject<{
     }[] | undefined;
 }>;
 export type TrackerColumns = z.infer<typeof trackerColumnsResult>;
+/** The image types `tracker.image` passes on; anything else is declined as `type`. SVG is never one: it can carry script. */
+export declare const TRACKER_IMAGE_TYPES: readonly ["image/png", "image/jpeg", "image/gif", "image/webp", "image/avif"];
+export type TrackerImageType = (typeof TRACKER_IMAGE_TYPES)[number];
+/**
+ * Why `tracker.image` did not return an image (2.101.0). `host`: the address is not on the item's
+ * tracker or one of its known upload hosts, so the host never fetched it. `type`: it is not an
+ * image of a type in `TRACKER_IMAGE_TYPES`. `size`: more than `LIMITS.TRACKER_IMAGE_BYTES`.
+ * `unreadable`: the tracker would not give it (no sign-in, gone, offline).
+ */
+export declare const TRACKER_IMAGE_REFUSALS: readonly ["host", "type", "size", "unreadable"];
+export type TrackerImageRefusal = (typeof TRACKER_IMAGE_REFUSALS)[number];
+/**
+ * What `tracker.image` answers (2.101.0): the image's bytes as `base64` with its `mime`, fetched by
+ * the host with the person's own sign-in, or `declined` with the reason. The page never sees a
+ * credential and never loads an address itself; it turns `base64` into a `blob:` or `data:` address.
+ */
+export declare const trackerImageResult: z.ZodDiscriminatedUnion<"outcome", [z.ZodObject<{
+    outcome: z.ZodLiteral<"image">;
+    mime: z.ZodEnum<["image/png", "image/jpeg", "image/gif", "image/webp", "image/avif"]>;
+    base64: z.ZodString;
+}, "strip", z.ZodTypeAny, {
+    outcome: "image";
+    base64: string;
+    mime: "image/png" | "image/jpeg" | "image/gif" | "image/webp" | "image/avif";
+}, {
+    outcome: "image";
+    base64: string;
+    mime: "image/png" | "image/jpeg" | "image/gif" | "image/webp" | "image/avif";
+}>, z.ZodObject<{
+    outcome: z.ZodLiteral<"declined">;
+    why: z.ZodEnum<["host", "type", "size", "unreadable"]>;
+}, "strip", z.ZodTypeAny, {
+    why: "type" | "host" | "size" | "unreadable";
+    outcome: "declined";
+}, {
+    why: "type" | "host" | "size" | "unreadable";
+    outcome: "declined";
+}>]>;
+export type TrackerImage = z.infer<typeof trackerImageResult>;
 /** How long to wait for a `tracker.refresh` to answer. A read of a few hundred refs over two trackers. */
 export declare const TRACKER_REFRESH_WITHIN_MS = 90000;
 /**

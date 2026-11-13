@@ -203,6 +203,15 @@ export const trackerDetailSchema = z.object({
    * does not parse.
    */
   checks: z.array(trackerCheckSchema).max(LIMITS.TRACKER_CHECKS).optional().catch(undefined),
+  /**
+   * For a change: how many approvals its tracker's rule asks for and how many it has (2.101.0), so
+   * "1 of 2" is a fact the host read. Absent when the change has no approval rule, from an older
+   * host and where the host did not read it; dropped, not fatal, when it does not parse.
+   */
+  approvals: z
+    .object({ given: z.number().int().min(0).max(999), required: z.number().int().min(1).max(999) })
+    .optional()
+    .catch(undefined),
   /** More checks than `TRACKER_CHECKS` ran, and the list stops there. (2.98.0) */
   checksClipped: z.boolean().optional().catch(undefined),
   /** For a change from a fork: the fork and its branch (2.98.0). Absent for a change from the row's own repository. */
@@ -619,6 +628,34 @@ export const trackerColumnsResult = z.object({
   boards: z.array(trackerBoardSchema).max(LIMITS.TRACKER_BOARDS).default([]),
 })
 export type TrackerColumns = z.infer<typeof trackerColumnsResult>
+
+/** The image types `tracker.image` passes on; anything else is declined as `type`. SVG is never one: it can carry script. */
+export const TRACKER_IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/gif', 'image/webp', 'image/avif'] as const
+export type TrackerImageType = (typeof TRACKER_IMAGE_TYPES)[number]
+
+/**
+ * Why `tracker.image` did not return an image (2.101.0). `host`: the address is not on the item's
+ * tracker or one of its known upload hosts, so the host never fetched it. `type`: it is not an
+ * image of a type in `TRACKER_IMAGE_TYPES`. `size`: more than `LIMITS.TRACKER_IMAGE_BYTES`.
+ * `unreadable`: the tracker would not give it (no sign-in, gone, offline).
+ */
+export const TRACKER_IMAGE_REFUSALS = ['host', 'type', 'size', 'unreadable'] as const
+export type TrackerImageRefusal = (typeof TRACKER_IMAGE_REFUSALS)[number]
+
+/**
+ * What `tracker.image` answers (2.101.0): the image's bytes as `base64` with its `mime`, fetched by
+ * the host with the person's own sign-in, or `declined` with the reason. The page never sees a
+ * credential and never loads an address itself; it turns `base64` into a `blob:` or `data:` address.
+ */
+export const trackerImageResult = z.discriminatedUnion('outcome', [
+  z.object({
+    outcome: z.literal('image'),
+    mime: z.enum(TRACKER_IMAGE_TYPES),
+    base64: z.string().max(LIMITS.TRACKER_IMAGE_BASE64),
+  }),
+  z.object({ outcome: z.literal('declined'), why: z.enum(TRACKER_IMAGE_REFUSALS) }),
+])
+export type TrackerImage = z.infer<typeof trackerImageResult>
 
 /** How long to wait for a `tracker.refresh` to answer. A read of a few hundred refs over two trackers. */
 export const TRACKER_REFRESH_WITHIN_MS = 90_000

@@ -245,6 +245,10 @@ export const LIMITS = {
   TRACKER_COMMENT: 4000,
   /** How many checks or pipeline jobs one change's `detail` lists (2.98.0). */
   TRACKER_CHECKS: 50,
+  /** The most bytes of one image `tracker.image` answers with (2.101.0). Bigger is declined as `size`. */
+  TRACKER_IMAGE_BYTES: 10 * 1024 * 1024,
+  /** The longest `base64` a `tracker.image` answer carries: `TRACKER_IMAGE_BYTES` spelled in base64. */
+  TRACKER_IMAGE_BASE64: Math.ceil((10 * 1024 * 1024 * 4) / 3) + 4,
   /** How many boards one project's sources have, and one row may sit on. (2.6.0) */
   TRACKER_BOARDS: 16,
   /** How many columns one board has. (2.6.0) */

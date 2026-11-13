@@ -11,6 +11,29 @@ After 2.78.0, every entry's first line under its heading is its kind, and the ve
 (semver; CI checks it): `Kind: breaking` → next major, `Kind: feature` → next minor, `Kind: fix` →
 next patch.
 
+## 2.101.0 — 2026-11-13
+
+Kind: feature
+
+A change says how many approvals it needs, and a module can show the pictures in an item's text without
+ever loading an address itself. **Additive**; `PROTOCOL` is still 2.
+
+Screenshots in a description or a comment sit behind the tracker's sign-in, so a page could only link them,
+and "Approvals: 1 of 2" was not something the reading could say. Now the host fetches an image with the
+person's own sign-in and hands the page its bytes, and a change's detail carries its approval count.
+
+### Added
+
+- **`tracker.image`** (`trackers:read`; `trackerImageResult`, `TRACKER_IMAGE_TYPES`,
+  `TRACKER_IMAGE_REFUSALS`): params `{ ref, url }`; answers `{ outcome: 'image', mime, base64 }` or
+  `{ outcome: 'declined', why }` with `why` one of `host` (not the item's tracker or a known upload host),
+  `type` (not a png, jpeg, gif, webp or avif image; never SVG), `size` (over `LIMITS.TRACKER_IMAGE_BYTES`,
+  10 MB) or `unreadable`. A page never loads an image address itself. A host before 2.101.0 does not answer
+  it, and a module keeps the image as a link.
+- **`trackerDetailSchema.approvals`** `{ given, required }`: on a change whose tracker has an approval rule.
+  Optional and dropped, not fatal, when it does not parse. [docs/methods.md](docs/methods.md),
+  [docs/tracker.md](docs/tracker.md).
+
 ## 2.100.0 — 2026-11-13
 
 Kind: feature
