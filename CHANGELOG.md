@@ -11,6 +11,24 @@ After 2.78.0, every entry's first line under its heading is its kind, and the ve
 (semver; CI checks it): `Kind: breaking` → next major, `Kind: feature` → next minor, `Kind: fix` →
 next patch.
 
+## 2.100.0 — 2026-11-13
+
+Kind: feature
+
+A `closed-by` link says where the closing change stands. **Additive**; `PROTOCOL` is still 2.
+
+An issue whose closing change is still open had no way to say so: its `closed-by` link named the change
+and nothing else, so a module could only count a closer once it had merged, and an open issue with a
+merge request on its way showed nothing. Now the link can carry the change's state, so "Closing in !56
+(open)" is a fact the host read, even when the change's own row is not in the reading.
+
+### Added
+
+- `trackerLinkSchema.state` (`open`, `merged`, `closed`) and `.draft`: on a `closed-by` link, where the
+  closing change stands and whether it is a draft. Both optional and dropped, not fatal, when they do not
+  parse; absent from an older host and where the host did not know. A module built before them reads the
+  link whole. [docs/tracker.md](docs/tracker.md).
+
 ## 2.99.0 — 2026-11-13
 
 Kind: feature

@@ -361,6 +361,11 @@ How two refs are tied together, from the side of the row carrying the link.
 references, or a GitLab merge request's own description saying "Closes #12".
 `closed-by` — the reverse, on the issue: these changes say they deliver it.
 
+A `closed-by` link may say where that change stands (2.100.0): `state` (`open`, `merged`, `closed`) and,
+for an open change, `draft`. That is what an issue's "closing in !56 (open)" rests on — an open change
+that says it closes an issue is work on its way, which a module could not tell from the link alone. Absent
+when the host did not know; a `closed` change that never merged is not on its way.
+
 Direction is the whole point. GitLab attaches a merge request to an issue for
 any cross-reference either way, so an issue that cites `!1772` as prior art
 would come back with it attached and read as work in flight. A link here is

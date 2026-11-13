@@ -55,12 +55,25 @@ export declare const trackerLinkSchema: z.ZodObject<{
     /** The other ref, spelled the way `spellTrackerRef` spells it. */
     ref: z.ZodString;
     relation: z.ZodEnum<["closes", "closed-by"]>;
+    /**
+     * On a `closed-by` link (2.100.0): where the closing change stands — `open`, `merged` or `closed`
+     * without merging. It is what lets an issue say "closing in !56" while that change is still open,
+     * even when the change's own row is not in the reading. Absent when the host did not know (an
+     * older host; a change it never read); dropped, not fatal, when it does not parse.
+     */
+    state: z.ZodCatch<z.ZodOptional<z.ZodEnum<["open", "closed", "merged"]>>>;
+    /** On a `closed-by` link to an open change (2.100.0): whether that change is a draft. Absent when unknown. */
+    draft: z.ZodCatch<z.ZodOptional<z.ZodBoolean>>;
 }, "strip", z.ZodTypeAny, {
     ref: string;
     relation: "closes" | "closed-by";
+    state?: "open" | "merged" | "closed" | undefined;
+    draft?: boolean | undefined;
 }, {
     ref: string;
     relation: "closes" | "closed-by";
+    state?: unknown;
+    draft?: unknown;
 }>;
 export type TrackerLink = z.infer<typeof trackerLinkSchema>;
 /** One file a change touched. Counts are absent where the tracker did not say. */
@@ -659,12 +672,25 @@ export declare const trackerRowSchema: z.ZodObject<{
         /** The other ref, spelled the way `spellTrackerRef` spells it. */
         ref: z.ZodString;
         relation: z.ZodEnum<["closes", "closed-by"]>;
+        /**
+         * On a `closed-by` link (2.100.0): where the closing change stands — `open`, `merged` or `closed`
+         * without merging. It is what lets an issue say "closing in !56" while that change is still open,
+         * even when the change's own row is not in the reading. Absent when the host did not know (an
+         * older host; a change it never read); dropped, not fatal, when it does not parse.
+         */
+        state: z.ZodCatch<z.ZodOptional<z.ZodEnum<["open", "closed", "merged"]>>>;
+        /** On a `closed-by` link to an open change (2.100.0): whether that change is a draft. Absent when unknown. */
+        draft: z.ZodCatch<z.ZodOptional<z.ZodBoolean>>;
     }, "strip", z.ZodTypeAny, {
         ref: string;
         relation: "closes" | "closed-by";
+        state?: "open" | "merged" | "closed" | undefined;
+        draft?: boolean | undefined;
     }, {
         ref: string;
         relation: "closes" | "closed-by";
+        state?: unknown;
+        draft?: unknown;
     }>, "many">>;
     /**
      * On a change: the issues it says it delivers part of without closing them (2.26.0) — "Part of
@@ -1140,6 +1166,8 @@ export declare const trackerRowSchema: z.ZodObject<{
     links: {
         ref: string;
         relation: "closes" | "closed-by";
+        state?: "open" | "merged" | "closed" | undefined;
+        draft?: boolean | undefined;
     }[];
     detail?: {
         body: string;
@@ -1192,10 +1220,10 @@ export declare const trackerRowSchema: z.ZodObject<{
         boardUrl?: string | undefined;
     } | undefined;
     updatedAt?: string | null | undefined;
+    draft?: boolean | undefined;
     review?: "required" | "approved" | "changes-requested" | undefined;
     stateReason?: string | null | undefined;
     closedByMerge?: boolean | undefined;
-    draft?: boolean | undefined;
     createdAt?: string | null | undefined;
     closedAt?: string | null | undefined;
     mergedAt?: string | null | undefined;
@@ -1287,10 +1315,10 @@ export declare const trackerRowSchema: z.ZodObject<{
         boardUrl?: string | undefined;
     } | undefined;
     updatedAt?: string | null | undefined;
+    draft?: boolean | undefined;
     review?: "required" | "approved" | "changes-requested" | undefined;
     stateReason?: string | null | undefined;
     closedByMerge?: boolean | undefined;
-    draft?: boolean | undefined;
     labels?: string[] | undefined;
     assignees?: string[] | undefined;
     createdAt?: string | null | undefined;
@@ -1299,6 +1327,8 @@ export declare const trackerRowSchema: z.ZodObject<{
     links?: {
         ref: string;
         relation: "closes" | "closed-by";
+        state?: unknown;
+        draft?: unknown;
     }[] | undefined;
     contributes?: unknown;
     contributedBy?: unknown;
@@ -1505,12 +1535,25 @@ export declare const trackerReadingResult: z.ZodObject<{
             /** The other ref, spelled the way `spellTrackerRef` spells it. */
             ref: z.ZodString;
             relation: z.ZodEnum<["closes", "closed-by"]>;
+            /**
+             * On a `closed-by` link (2.100.0): where the closing change stands — `open`, `merged` or `closed`
+             * without merging. It is what lets an issue say "closing in !56" while that change is still open,
+             * even when the change's own row is not in the reading. Absent when the host did not know (an
+             * older host; a change it never read); dropped, not fatal, when it does not parse.
+             */
+            state: z.ZodCatch<z.ZodOptional<z.ZodEnum<["open", "closed", "merged"]>>>;
+            /** On a `closed-by` link to an open change (2.100.0): whether that change is a draft. Absent when unknown. */
+            draft: z.ZodCatch<z.ZodOptional<z.ZodBoolean>>;
         }, "strip", z.ZodTypeAny, {
             ref: string;
             relation: "closes" | "closed-by";
+            state?: "open" | "merged" | "closed" | undefined;
+            draft?: boolean | undefined;
         }, {
             ref: string;
             relation: "closes" | "closed-by";
+            state?: unknown;
+            draft?: unknown;
         }>, "many">>;
         /**
          * On a change: the issues it says it delivers part of without closing them (2.26.0) — "Part of
@@ -1986,6 +2029,8 @@ export declare const trackerReadingResult: z.ZodObject<{
         links: {
             ref: string;
             relation: "closes" | "closed-by";
+            state?: "open" | "merged" | "closed" | undefined;
+            draft?: boolean | undefined;
         }[];
         detail?: {
             body: string;
@@ -2038,10 +2083,10 @@ export declare const trackerReadingResult: z.ZodObject<{
             boardUrl?: string | undefined;
         } | undefined;
         updatedAt?: string | null | undefined;
+        draft?: boolean | undefined;
         review?: "required" | "approved" | "changes-requested" | undefined;
         stateReason?: string | null | undefined;
         closedByMerge?: boolean | undefined;
-        draft?: boolean | undefined;
         createdAt?: string | null | undefined;
         closedAt?: string | null | undefined;
         mergedAt?: string | null | undefined;
@@ -2133,10 +2178,10 @@ export declare const trackerReadingResult: z.ZodObject<{
             boardUrl?: string | undefined;
         } | undefined;
         updatedAt?: string | null | undefined;
+        draft?: boolean | undefined;
         review?: "required" | "approved" | "changes-requested" | undefined;
         stateReason?: string | null | undefined;
         closedByMerge?: boolean | undefined;
-        draft?: boolean | undefined;
         labels?: string[] | undefined;
         assignees?: string[] | undefined;
         createdAt?: string | null | undefined;
@@ -2145,6 +2190,8 @@ export declare const trackerReadingResult: z.ZodObject<{
         links?: {
             ref: string;
             relation: "closes" | "closed-by";
+            state?: unknown;
+            draft?: unknown;
         }[] | undefined;
         contributes?: unknown;
         contributedBy?: unknown;
@@ -2226,6 +2273,8 @@ export declare const trackerReadingResult: z.ZodObject<{
         links: {
             ref: string;
             relation: "closes" | "closed-by";
+            state?: "open" | "merged" | "closed" | undefined;
+            draft?: boolean | undefined;
         }[];
         detail?: {
             body: string;
@@ -2278,10 +2327,10 @@ export declare const trackerReadingResult: z.ZodObject<{
             boardUrl?: string | undefined;
         } | undefined;
         updatedAt?: string | null | undefined;
+        draft?: boolean | undefined;
         review?: "required" | "approved" | "changes-requested" | undefined;
         stateReason?: string | null | undefined;
         closedByMerge?: boolean | undefined;
-        draft?: boolean | undefined;
         createdAt?: string | null | undefined;
         closedAt?: string | null | undefined;
         mergedAt?: string | null | undefined;
@@ -2391,10 +2440,10 @@ export declare const trackerReadingResult: z.ZodObject<{
             boardUrl?: string | undefined;
         } | undefined;
         updatedAt?: string | null | undefined;
+        draft?: boolean | undefined;
         review?: "required" | "approved" | "changes-requested" | undefined;
         stateReason?: string | null | undefined;
         closedByMerge?: boolean | undefined;
-        draft?: boolean | undefined;
         labels?: string[] | undefined;
         assignees?: string[] | undefined;
         createdAt?: string | null | undefined;
@@ -2403,6 +2452,8 @@ export declare const trackerReadingResult: z.ZodObject<{
         links?: {
             ref: string;
             relation: "closes" | "closed-by";
+            state?: unknown;
+            draft?: unknown;
         }[] | undefined;
         contributes?: unknown;
         contributedBy?: unknown;

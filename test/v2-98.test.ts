@@ -36,7 +36,7 @@ const change = {
 
 describe('the version', () => {
   test('is 2.98.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.99.0')
+    expect(PACKAGE_VERSION).toBe('2.100.0')
     expect(PROTOCOL).toBe(2)
   })
 })

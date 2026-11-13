@@ -70,6 +70,15 @@ export const trackerLinkSchema = z.object({
   /** The other ref, spelled the way `spellTrackerRef` spells it. */
   ref,
   relation: z.enum(LINK_RELATIONS),
+  /**
+   * On a `closed-by` link (2.100.0): where the closing change stands — `open`, `merged` or `closed`
+   * without merging. It is what lets an issue say "closing in !56" while that change is still open,
+   * even when the change's own row is not in the reading. Absent when the host did not know (an
+   * older host; a change it never read); dropped, not fatal, when it does not parse.
+   */
+  state: z.enum(TRACKER_STATES).optional().catch(undefined),
+  /** On a `closed-by` link to an open change (2.100.0): whether that change is a draft. Absent when unknown. */
+  draft: z.boolean().optional().catch(undefined),
 })
 export type TrackerLink = z.infer<typeof trackerLinkSchema>
 
