@@ -3,6 +3,7 @@ import { HOLD_COVER_MS, MESSAGE, PROTOCOL, clampHeight, } from '../constants.js'
 import { LIMITS } from '../limits.js';
 import { activityItemsSchema } from '../activity.js';
 import { footerItemsSchema, footerPressRefusal, headerItemsSchema, hostMessageSchema, looksLikeWireMessage, pressRefusal, } from '../wire.js';
+import { FILE_DRAG_TYPE, fileDragSchema } from '../file-drag.js';
 import { tooOldOf } from '../fit.js';
 import { rowsAdvice } from '../rows.js';
 import { mailbox } from './mailbox.js';
@@ -323,6 +324,68 @@ export function connect(id, events = {}, options = {}) {
             return;
         host.postMessage(message, origin);
     };
+    /*
+     * 2.94.0. A file dragged out of this page (`fileDrag.set`), told to the host as it starts and as it
+     * ends, so a drop on another module's frame — which WebKit never tells that frame — can be handed on.
+     * Heard on the window in the bubble phase, after the page's own `dragstart` put the file on the drag.
+     */
+    const dragWindow = options.dragTarget === false ? null : (options.dragTarget ?? (typeof window === 'undefined' ? null : window));
+    let dragging = null;
+    const dragStarted = (event) => {
+        dragging = null;
+        const data = event.dataTransfer;
+        let said = '';
+        try {
+            said = data?.getData(FILE_DRAG_TYPE) ?? '';
+        }
+        catch {
+            said = '';
+        }
+        if (!said || said.length > LIMITS.PATH * 3)
+            return;
+        let file = null;
+        try {
+            const read = fileDragSchema.safeParse(JSON.parse(said));
+            file = read.success ? read.data : null;
+        }
+        catch {
+            file = null;
+        }
+        if (!file)
+            return;
+        dragging = file;
+        send({ type: MESSAGE.DRAG, phase: 'start', file });
+    };
+    const dragEnded = (event) => {
+        const file = dragging;
+        dragging = null;
+        if (!file)
+            return;
+        const effect = event.dataTransfer?.dropEffect ?? 'none';
+        const x = Number(event.clientX);
+        const y = Number(event.clientY);
+        const inBounds = (n) => Number.isFinite(n) && Math.abs(n) <= LIMITS.DRAG_POINT;
+        send({
+            type: MESSAGE.DRAG,
+            phase: 'end',
+            file,
+            ...(inBounds(x) && inBounds(y) ? { at: { x, y } } : {}),
+            dropped: effect !== 'none',
+        });
+    };
+    const drags = (want) => {
+        if (!dragWindow)
+            return;
+        if (want) {
+            dragWindow.addEventListener('dragstart', dragStarted, { passive: true });
+            dragWindow.addEventListener('dragend', dragEnded, { passive: true });
+        }
+        else {
+            dragWindow.removeEventListener('dragstart', dragStarted);
+            dragWindow.removeEventListener('dragend', dragEnded);
+            dragging = null;
+        }
+    };
     const settle = (correlation, outcome) => {
         /* A late answer to a question nobody is waiting for is dropped, quietly. */
         const pending = waiting.get(correlation);
@@ -483,6 +546,10 @@ export function connect(id, events = {}, options = {}) {
         }
         if (message.type === MESSAGE.OPENED) {
             events.onOpened?.({ item: message.item });
+            return;
+        }
+        if (message.type === MESSAGE.DROP) {
+            events.onDrop?.({ file: message.file, at: message.at });
             return;
         }
         if (message.type === MESSAGE.COVERED) {
@@ -692,6 +759,7 @@ export function connect(id, events = {}, options = {}) {
                 return this;
             listening = true;
             source.addEventListener('message', onMessage);
+            drags(true);
             return this;
         },
         request(method, params = {}, options) {
@@ -783,6 +851,7 @@ export function connect(id, events = {}, options = {}) {
             if (listening) {
                 listening = false;
                 source.removeEventListener('message', onMessage);
+                drags(false);
             }
             for (const correlation of [...waiting.keys()]) {
                 settle(correlation, { ok: false, refusal: { reason: 'silent', error: 'This page stopped listening.' } });

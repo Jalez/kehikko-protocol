@@ -24,7 +24,9 @@ import {
   type ModuleEvent,
   type Press,
   type ResponseFailureReason,
+  type PagePoint,
 } from '../wire.js'
+import { FILE_DRAG_TYPE, fileDragSchema, type FileDrag } from '../file-drag.js'
 
 import { tooOldOf } from '../fit.js'
 import { rowsAdvice } from '../rows.js'
@@ -258,6 +260,14 @@ export interface HostEvents {
    * itself (new output while the bar is open), say it with `findResult`.
    */
   onFind?: (query: string, ask: FindAsk) => FindAnswer | Promise<FindAnswer>
+  /**
+   * 2.94.0. A file another module's page was dragging was let go over this page, where no drag event
+   * reached it (WebKit hands none across origins): `file` as the dragging page put it on the drag,
+   * `at` where it was let go, in this page's coordinates. Only for a module whose manifest says
+   * `opens: ['file']`. Treat it as the drop it is — and confine the path, as any path. A drop this
+   * page heard itself (`fileDrag.read` in its own `drop` handler) never arrives here as well.
+   */
+  onDrop?: (drop: { file: FileDrag; at: PagePoint }) => void
 }
 
 /**
@@ -322,6 +332,11 @@ export interface ConnectOptions {
    * and the element marked `data-kehikot-page` are transparent.
    */
   appearance?: boolean
+  /**
+   * 2.94.0. Where a file dragged out of the page is heard (`dragstart` and `dragend`, to tell the host
+   * as `kehikot.drag`): the page's window by default; `false` tells nothing. For tests.
+   */
+  dragTarget?: PointerTarget | false
 }
 
 /** 2.70.0. How long after the last header or footer declaration the client says a missing footer, in ms. */
@@ -695,6 +710,62 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
     host.postMessage(message, origin)
   }
 
+  /*
+   * 2.94.0. A file dragged out of this page (`fileDrag.set`), told to the host as it starts and as it
+   * ends, so a drop on another module's frame — which WebKit never tells that frame — can be handed on.
+   * Heard on the window in the bubble phase, after the page's own `dragstart` put the file on the drag.
+   */
+  const dragWindow: PointerTarget | null = options.dragTarget === false ? null : (options.dragTarget ?? (typeof window === 'undefined' ? null : (window as unknown as PointerTarget)))
+  let dragging: FileDrag | null = null
+  const dragStarted = (event: PointerEventLike) => {
+    dragging = null
+    const data = (event as { dataTransfer?: { getData(type: string): string } | null }).dataTransfer
+    let said = ''
+    try {
+      said = data?.getData(FILE_DRAG_TYPE) ?? ''
+    } catch {
+      said = ''
+    }
+    if (!said || said.length > LIMITS.PATH * 3) return
+    let file: FileDrag | null = null
+    try {
+      const read = fileDragSchema.safeParse(JSON.parse(said))
+      file = read.success ? read.data : null
+    } catch {
+      file = null
+    }
+    if (!file) return
+    dragging = file
+    send({ type: MESSAGE.DRAG, phase: 'start', file })
+  }
+  const dragEnded = (event: PointerEventLike) => {
+    const file = dragging
+    dragging = null
+    if (!file) return
+    const effect = (event as { dataTransfer?: { dropEffect?: string } | null }).dataTransfer?.dropEffect ?? 'none'
+    const x = Number(event.clientX)
+    const y = Number(event.clientY)
+    const inBounds = (n: number) => Number.isFinite(n) && Math.abs(n) <= LIMITS.DRAG_POINT
+    send({
+      type: MESSAGE.DRAG,
+      phase: 'end',
+      file,
+      ...(inBounds(x) && inBounds(y) ? { at: { x, y } } : {}),
+      dropped: effect !== 'none',
+    })
+  }
+  const drags = (want: boolean) => {
+    if (!dragWindow) return
+    if (want) {
+      dragWindow.addEventListener('dragstart', dragStarted, { passive: true })
+      dragWindow.addEventListener('dragend', dragEnded, { passive: true })
+    } else {
+      dragWindow.removeEventListener('dragstart', dragStarted)
+      dragWindow.removeEventListener('dragend', dragEnded)
+      dragging = null
+    }
+  }
+
   const settle = (correlation: string, outcome: { ok: true; data: unknown } | { ok: false; refusal: Refusal }) => {
     /* A late answer to a question nobody is waiting for is dropped, quietly. */
     const pending = waiting.get(correlation)
@@ -848,6 +919,11 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
 
     if (message.type === MESSAGE.OPENED) {
       events.onOpened?.({ item: message.item })
+      return
+    }
+
+    if (message.type === MESSAGE.DROP) {
+      events.onDrop?.({ file: message.file, at: message.at })
       return
     }
 
@@ -1043,6 +1119,7 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
       if (listening || !live) return this
       listening = true
       source.addEventListener('message', onMessage)
+      drags(true)
       return this
     },
 
@@ -1144,6 +1221,7 @@ export function connect(id: string, events: HostEvents = {}, options: ConnectOpt
       if (listening) {
         listening = false
         source.removeEventListener('message', onMessage)
+        drags(false)
       }
       for (const correlation of [...waiting.keys()]) {
         settle(correlation, { ok: false, refusal: { reason: 'silent', error: 'This page stopped listening.' } })

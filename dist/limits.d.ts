@@ -470,6 +470,8 @@ export declare const LIMITS: {
     readonly REFUSED_ORIGIN: 256;
     /** How many origins the page says it may be framed by. More are left out. */
     readonly REFUSED_ALLOWED: 16;
+    /** How far from a page's corner a drag's point may be said, in CSS pixels either way (2.94.0, `pagePointSchema`). */
+    readonly DRAG_POINT: 100000;
     /**
      * 2.89.0. How deep a space may be nested (`spaces.ts`): a path from the top-level space to the
      * picked one has at most this many steps. Far beyond any tree a person keeps; a bound for the wire.

@@ -4234,6 +4234,138 @@ export declare const findOpenSchema: z.ZodObject<{
     query?: string | undefined;
 }>;
 export type FindOpenMessage = z.infer<typeof findOpenSchema>;
+/** 2.94.0. A point in a page, in CSS pixels from its top left; bounded, so a forged one is refused. */
+export declare const pagePointSchema: z.ZodObject<{
+    x: z.ZodNumber;
+    y: z.ZodNumber;
+}, "strip", z.ZodTypeAny, {
+    x: number;
+    y: number;
+}, {
+    x: number;
+    y: number;
+}>;
+export type PagePoint = z.infer<typeof pagePointSchema>;
+export declare const DRAG_PHASES: readonly ["start", "end"];
+export type DragPhase = (typeof DRAG_PHASES)[number];
+/**
+ * Module → host (2.94.0). A file of the project dragged out of this page (`fileDrag.set`), told when
+ * the drag starts and when it ends. On `end`, `at` is where the pointer was let go, in this page's
+ * coordinates (it may be outside the page), and `dropped` whether something took the drop. `connect`
+ * sends it by itself. A host hands a drop nothing took to the frame under `at` as `kehikot.drop`.
+ */
+export declare const dragSchema: z.ZodObject<{
+    type: z.ZodLiteral<"kehikot.drag">;
+    phase: z.ZodEnum<["start", "end"]>;
+    file: z.ZodObject<{
+        project: z.ZodEffects<z.ZodEffects<z.ZodString, string, string>, string, string>;
+        path: z.ZodEffects<z.ZodEffects<z.ZodEffects<z.ZodString, string, string>, string, string>, string, string>;
+        kind: z.ZodDefault<z.ZodEnum<["file", "folder"]>>;
+    }, "strip", z.ZodTypeAny, {
+        path: string;
+        project: string;
+        kind: "file" | "folder";
+    }, {
+        path: string;
+        project: string;
+        kind?: "file" | "folder" | undefined;
+    }>;
+    at: z.ZodOptional<z.ZodObject<{
+        x: z.ZodNumber;
+        y: z.ZodNumber;
+    }, "strip", z.ZodTypeAny, {
+        x: number;
+        y: number;
+    }, {
+        x: number;
+        y: number;
+    }>>;
+    dropped: z.ZodDefault<z.ZodBoolean>;
+}, "strip", z.ZodTypeAny, {
+    type: "kehikot.drag";
+    file: {
+        path: string;
+        project: string;
+        kind: "file" | "folder";
+    };
+    phase: "start" | "end";
+    dropped: boolean;
+    at?: {
+        x: number;
+        y: number;
+    } | undefined;
+}, {
+    type: "kehikot.drag";
+    file: {
+        path: string;
+        project: string;
+        kind?: "file" | "folder" | undefined;
+    };
+    phase: "start" | "end";
+    at?: {
+        x: number;
+        y: number;
+    } | undefined;
+    dropped?: boolean | undefined;
+}>;
+export type DragMessage = z.infer<typeof dragSchema>;
+/**
+ * Host → module (2.94.0). A file another module's page was dragging was let go over this page, and
+ * nothing took it there: `at` is where, in this page's coordinates. Only to a module whose manifest
+ * says `opens: ['file']`. The file is the dragging page's claim; confine it as any path.
+ */
+export declare const dropSchema: z.ZodObject<{
+    type: z.ZodLiteral<"kehikot.drop">;
+    protocol: z.ZodNumber;
+    file: z.ZodObject<{
+        project: z.ZodEffects<z.ZodEffects<z.ZodString, string, string>, string, string>;
+        path: z.ZodEffects<z.ZodEffects<z.ZodEffects<z.ZodString, string, string>, string, string>, string, string>;
+        kind: z.ZodDefault<z.ZodEnum<["file", "folder"]>>;
+    }, "strip", z.ZodTypeAny, {
+        path: string;
+        project: string;
+        kind: "file" | "folder";
+    }, {
+        path: string;
+        project: string;
+        kind?: "file" | "folder" | undefined;
+    }>;
+    at: z.ZodObject<{
+        x: z.ZodNumber;
+        y: z.ZodNumber;
+    }, "strip", z.ZodTypeAny, {
+        x: number;
+        y: number;
+    }, {
+        x: number;
+        y: number;
+    }>;
+}, "strip", z.ZodTypeAny, {
+    at: {
+        x: number;
+        y: number;
+    };
+    type: "kehikot.drop";
+    file: {
+        path: string;
+        project: string;
+        kind: "file" | "folder";
+    };
+    protocol: number;
+}, {
+    at: {
+        x: number;
+        y: number;
+    };
+    type: "kehikot.drop";
+    file: {
+        path: string;
+        project: string;
+        kind?: "file" | "folder" | undefined;
+    };
+    protocol: number;
+}>;
+export type DropMessage = z.infer<typeof dropSchema>;
 /**
  * Every message a host sends. A plain union, not a `discriminatedUnion`, because `responseSchema`
  * is itself a union on a different key and cannot be an option of one.
@@ -6284,6 +6416,56 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         id: string;
         module: string;
     } | null | undefined;
+}>, z.ZodObject<{
+    type: z.ZodLiteral<"kehikot.drop">;
+    protocol: z.ZodNumber;
+    file: z.ZodObject<{
+        project: z.ZodEffects<z.ZodEffects<z.ZodString, string, string>, string, string>;
+        path: z.ZodEffects<z.ZodEffects<z.ZodEffects<z.ZodString, string, string>, string, string>, string, string>;
+        kind: z.ZodDefault<z.ZodEnum<["file", "folder"]>>;
+    }, "strip", z.ZodTypeAny, {
+        path: string;
+        project: string;
+        kind: "file" | "folder";
+    }, {
+        path: string;
+        project: string;
+        kind?: "file" | "folder" | undefined;
+    }>;
+    at: z.ZodObject<{
+        x: z.ZodNumber;
+        y: z.ZodNumber;
+    }, "strip", z.ZodTypeAny, {
+        x: number;
+        y: number;
+    }, {
+        x: number;
+        y: number;
+    }>;
+}, "strip", z.ZodTypeAny, {
+    at: {
+        x: number;
+        y: number;
+    };
+    type: "kehikot.drop";
+    file: {
+        path: string;
+        project: string;
+        kind: "file" | "folder";
+    };
+    protocol: number;
+}, {
+    at: {
+        x: number;
+        y: number;
+    };
+    type: "kehikot.drop";
+    file: {
+        path: string;
+        project: string;
+        kind?: "file" | "folder" | undefined;
+    };
+    protocol: number;
 }>]>;
 export type HostMessage = z.infer<typeof hostMessageSchema>;
 export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
@@ -8202,6 +8384,59 @@ export declare const moduleMessageSchema: z.ZodUnion<[z.ZodObject<{
 }, {
     type: "kehikot.loading";
     label?: unknown;
+}>, z.ZodObject<{
+    type: z.ZodLiteral<"kehikot.drag">;
+    phase: z.ZodEnum<["start", "end"]>;
+    file: z.ZodObject<{
+        project: z.ZodEffects<z.ZodEffects<z.ZodString, string, string>, string, string>;
+        path: z.ZodEffects<z.ZodEffects<z.ZodEffects<z.ZodString, string, string>, string, string>, string, string>;
+        kind: z.ZodDefault<z.ZodEnum<["file", "folder"]>>;
+    }, "strip", z.ZodTypeAny, {
+        path: string;
+        project: string;
+        kind: "file" | "folder";
+    }, {
+        path: string;
+        project: string;
+        kind?: "file" | "folder" | undefined;
+    }>;
+    at: z.ZodOptional<z.ZodObject<{
+        x: z.ZodNumber;
+        y: z.ZodNumber;
+    }, "strip", z.ZodTypeAny, {
+        x: number;
+        y: number;
+    }, {
+        x: number;
+        y: number;
+    }>>;
+    dropped: z.ZodDefault<z.ZodBoolean>;
+}, "strip", z.ZodTypeAny, {
+    type: "kehikot.drag";
+    file: {
+        path: string;
+        project: string;
+        kind: "file" | "folder";
+    };
+    phase: "start" | "end";
+    dropped: boolean;
+    at?: {
+        x: number;
+        y: number;
+    } | undefined;
+}, {
+    type: "kehikot.drag";
+    file: {
+        path: string;
+        project: string;
+        kind?: "file" | "folder" | undefined;
+    };
+    phase: "start" | "end";
+    at?: {
+        x: number;
+        y: number;
+    } | undefined;
+    dropped?: boolean | undefined;
 }>]>;
 export type ModuleMessage = z.infer<typeof moduleMessageSchema>;
 export type WireMessage = HostMessage | ModuleMessage;

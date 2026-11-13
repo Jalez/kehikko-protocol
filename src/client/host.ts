@@ -76,6 +76,7 @@ export function useHost<Kept = unknown>(
         onClear: () => handlers.current.onClear?.(),
         onRefresh: () => handlers.current.onRefresh?.(),
         onOpened: (opened) => handlers.current.onOpened?.(opened),
+        onDrop: (drop) => handlers.current.onDrop?.(drop),
         onCovered: (covered) => handlers.current.onCovered?.(covered),
         onVisible: (visible) => handlers.current.onVisible?.(visible),
         onInbox: (signal) => handlers.current.onInbox?.(signal),

@@ -9,6 +9,7 @@ import { footerItemsSchema } from './footer.js'
 import { RUN_CARRIES, headerItemsSchema, pressValueSchema } from './header.js'
 import { gotoRef, kehikkoSchema, stepNumber } from './fragments.js'
 import { coveredFields } from './reveal.js'
+import { fileDragSchema } from './file-drag.js'
 import { FIND_DIRECTIONS, findCountFields, findOptionsFields, findQuerySchema } from './find.js'
 import { INBOX_SIGNALS, inboxKeySchema } from './inbox.js'
 
@@ -625,6 +626,44 @@ export const findOpenSchema = z.object({
 })
 export type FindOpenMessage = z.infer<typeof findOpenSchema>
 
+/** 2.94.0. A point in a page, in CSS pixels from its top left; bounded, so a forged one is refused. */
+export const pagePointSchema = z.object({
+  x: z.number().finite().min(-LIMITS.DRAG_POINT).max(LIMITS.DRAG_POINT),
+  y: z.number().finite().min(-LIMITS.DRAG_POINT).max(LIMITS.DRAG_POINT),
+})
+export type PagePoint = z.infer<typeof pagePointSchema>
+
+export const DRAG_PHASES = ['start', 'end'] as const
+export type DragPhase = (typeof DRAG_PHASES)[number]
+
+/**
+ * Module → host (2.94.0). A file of the project dragged out of this page (`fileDrag.set`), told when
+ * the drag starts and when it ends. On `end`, `at` is where the pointer was let go, in this page's
+ * coordinates (it may be outside the page), and `dropped` whether something took the drop. `connect`
+ * sends it by itself. A host hands a drop nothing took to the frame under `at` as `kehikot.drop`.
+ */
+export const dragSchema = z.object({
+  type: messageType(MESSAGE.DRAG),
+  phase: z.enum(DRAG_PHASES),
+  file: fileDragSchema,
+  at: pagePointSchema.optional(),
+  dropped: z.boolean().default(false),
+})
+export type DragMessage = z.infer<typeof dragSchema>
+
+/**
+ * Host → module (2.94.0). A file another module's page was dragging was let go over this page, and
+ * nothing took it there: `at` is where, in this page's coordinates. Only to a module whose manifest
+ * says `opens: ['file']`. The file is the dragging page's claim; confine it as any path.
+ */
+export const dropSchema = z.object({
+  type: messageType(MESSAGE.DROP),
+  protocol: z.number().int().min(1),
+  file: fileDragSchema,
+  at: pagePointSchema,
+})
+export type DropMessage = z.infer<typeof dropSchema>
+
 /**
  * Every message a host sends. A plain union, not a `discriminatedUnion`, because `responseSchema`
  * is itself a union on a different key and cannot be an option of one.
@@ -643,6 +682,7 @@ export const hostMessageSchema = z.union([
   visibleSchema,
   findSchema,
   inboxMessageSchema,
+  dropSchema,
 ])
 export type HostMessage = z.infer<typeof hostMessageSchema>
 
@@ -664,6 +704,7 @@ export const moduleMessageSchema = z.union([
   findOpenSchema,
   drawnSchema,
   loadingSchema,
+  dragSchema,
 ])
 export type ModuleMessage = z.infer<typeof moduleMessageSchema>
 

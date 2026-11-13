@@ -141,6 +141,23 @@ export declare const MESSAGE: {
      */
     readonly REFUSED: "kehikot.refused";
     /**
+     * Module → host (2.94.0). "The person is dragging a file of the project out of my page": `{ phase,
+     * file, at, dropped }`, `start` when the drag begins, `end` when it ends, with where it ended in the
+     * page's own coordinates and whether something took it (`dropEffect` not `none`). Sent by `connect`
+     * by itself for a drag the page put a file on with `fileDrag.set`. WebKit hands no drag events to a
+     * page of another origin than the one the drag began in, so a drop on another module's frame is
+     * never heard there: the host, which knows where each frame is, hands it on as `kehikot.drop`. A
+     * host before 2.94.0 drops it unread.
+     */
+    readonly DRAG: "kehikot.drag";
+    /**
+     * Host → module (2.94.0). "A file was dropped on your page": `{ file, at }`, `at` in this page's
+     * own coordinates. Sent only to a module whose manifest says `opens: ['file']`, for a drag another
+     * module's page told of (`kehikot.drag`) that nothing took where it ended, over this module's frame.
+     * The file is the dragging page's claim: confine it like any path. No answer.
+     */
+    readonly DROP: "kehikot.drop";
+    /**
      * Host → module (2.69.0). "Search what you show": `{ id, query, caseSensitive, wholeWord,
      * direction }`, sent while the host's find bar is open — for every change of the query or an
      * option (`first`), for previous and next, and once with `close` when the bar closes. Answered by
@@ -202,9 +219,9 @@ export declare const MESSAGE_PREFIX = "kehikot.";
  * dropped without a word; a type that is listed and does not parse is a fault worth reporting.
  * See docs/header.md, "A message type the other side does not know".
  */
-export declare const HOST_MESSAGES: readonly ["kehikot.hello", "kehikot.context", "kehikot.response", "kehikot.goto", "kehikot.event", "kehikot.clear", "kehikot.refresh", "kehikot.press", "kehikot.opened", "kehikot.covered", "kehikot.visible", "kehikot.find", "kehikot.inbox"];
+export declare const HOST_MESSAGES: readonly ["kehikot.hello", "kehikot.context", "kehikot.response", "kehikot.goto", "kehikot.event", "kehikot.clear", "kehikot.refresh", "kehikot.press", "kehikot.opened", "kehikot.covered", "kehikot.visible", "kehikot.find", "kehikot.inbox", "kehikot.drop"];
 /** And what the module says. */
-export declare const MODULE_MESSAGES: readonly ["kehikot.ready", "kehikot.request", "kehikot.resize", "kehikot.went", "kehikot.filters", "kehikot.clearable", "kehikot.refreshable", "kehikot.header", "kehikot.pressed", "kehikot.footer", "kehikot.pointer", "kehikot.page.error", "kehikot.refused", "kehikot.find.result", "kehikot.find.open", "kehikot.drawn", "kehikot.loading"];
+export declare const MODULE_MESSAGES: readonly ["kehikot.ready", "kehikot.request", "kehikot.resize", "kehikot.went", "kehikot.filters", "kehikot.clearable", "kehikot.refreshable", "kehikot.header", "kehikot.pressed", "kehikot.footer", "kehikot.pointer", "kehikot.page.error", "kehikot.refused", "kehikot.find.result", "kehikot.find.open", "kehikot.drawn", "kehikot.loading", "kehikot.drag"];
 /**
  * How tall a frame may be asked to be, in pixels, bounded on both sides. `clampHeight` restates
  * the host's answer so a module can do the arithmetic on its own side.
