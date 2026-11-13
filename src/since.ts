@@ -183,6 +183,21 @@ export const TRACKER_FIELD_SINCE = {
 export type TrackerField = keyof typeof TRACKER_FIELD_SINCE
 
 /**
+ * The fields of a ref's `detail` (`trackerDetailSchema`) added after it first had a shape, and the
+ * version that added each (2.98.0). Like `TRACKER_FIELD_SINCE`: a host before a field leaves it out,
+ * and a module reading the detail finds it absent and must not take the absence for "none".
+ */
+export const TRACKER_DETAIL_FIELD_SINCE = {
+  milestone: '2.98.0',
+  comments: '2.98.0',
+  commentCount: '2.98.0',
+  checks: '2.98.0',
+  checksClipped: '2.98.0',
+  fork: '2.98.0',
+} as const
+export type TrackerDetailField = keyof typeof TRACKER_DETAIL_FIELD_SINCE
+
+/**
  * The fields of an activity item (`activityItemSchema`) added after `activity.set` first had a shape
  * (1.5.0), and the version that added each. Like `TRACKER_FIELD_SINCE`: nothing a manifest has to
  * be held to, since a host that does not know a field strips it and files the item by what it does

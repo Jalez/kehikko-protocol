@@ -62,6 +62,70 @@ export const trackerFileSchema = z.object({
     deletions: z.number().int().min(0).optional(),
 });
 /**
+ * What a comment in a ref's `detail` is (2.98.0). `comment`: a comment on the item's conversation.
+ * `review`: a review submitted with words (GitHub's review body; GitLab has none apart from notes).
+ * `line`: a comment on a line of a change's diff, with `path` saying which file.
+ */
+export const COMMENT_KINDS = ['comment', 'review', 'line'];
+/**
+ * One comment on an item, as its tracker last said (2.98.0). The text is Markdown as written,
+ * clipped at `LIMITS.TRACKER_COMMENT` (`bodyClipped` says so); a module renders it as text or as
+ * Markdown without raw HTML, never as markup the tracker sent. A tracker's own notes about the
+ * item (GitLab's system notes: "changed the description", "added 1 commit") are not comments.
+ */
+export const trackerCommentSchema = z.object({
+    /** The tracker's id for it, as a string; unique within the item. */
+    id: z.string().min(1).max(LIMITS.TRACKER_WORD),
+    kind: z.enum(COMMENT_KINDS).default('comment'),
+    /** Who wrote it, by login. Absent when the tracker named nobody (a deleted account). */
+    login: person.optional(),
+    /** Their display name, when the tracker gave one. */
+    name: person.optional(),
+    at: instant,
+    /** When it was last edited, when the tracker says it was. */
+    editedAt: instant.optional(),
+    body: z.string().max(LIMITS.TRACKER_COMMENT).default(''),
+    bodyClipped: z.boolean().default(false),
+    /** Where a person reads it on its tracker, `https:`, when the host could spell one. */
+    url: z.string().max(LIMITS.URL).optional().catch(undefined),
+    /** On a `line` comment: the file of the change it is on. */
+    path: z.string().max(LIMITS.PATH).optional(),
+    /** On a `review`: what the review said, in `REVIEWER_STATES`' words (`approved`, `changes`, `commented`). */
+    verdict: z.enum(['approved', 'changes', 'commented']).optional(),
+});
+/**
+ * One check of a change's head commit (2.98.0): a GitHub check run or commit status, or a job of
+ * a GitLab merge request's head pipeline. `state` in the same words as the row's `pipeline`.
+ */
+export const trackerCheckSchema = z.object({
+    name: z.string().min(1).max(LIMITS.TRACKER_LABEL),
+    state: z.enum(PIPELINE_STATES),
+    /** Where a person sees it on its tracker, `https:`, when the host could spell one. */
+    url: z.string().max(LIMITS.URL).optional().catch(undefined),
+    /** When its state last moved: finished, else started, else made. */
+    at: instant.optional().catch(undefined),
+    /** GitLab: the stage the job is in. */
+    stage: z.string().max(LIMITS.TRACKER_LABEL).optional(),
+});
+/** The milestone an item is in (2.98.0). `dueOn` is a calendar date, `YYYY-MM-DD`, when it has one. */
+export const trackerMilestoneSchema = z.object({
+    title: z.string().min(1).max(LIMITS.TITLE),
+    url: z.string().max(LIMITS.URL).optional().catch(undefined),
+    dueOn: z
+        .string()
+        .regex(/^\d{4}-\d{2}-\d{2}$/)
+        .optional()
+        .catch(undefined),
+});
+/**
+ * Where a change from a fork comes from (2.98.0): the fork's repository and its branch. The row's
+ * `headBranch` is left out for such a change, since no change here can target it; this says it.
+ */
+export const trackerForkSchema = z.object({
+    repo: z.string().min(1).max(LIMITS.TRACKER_REPO),
+    branch: z.string().min(1).max(LIMITS.BRANCH),
+});
+/**
  * What `detail: 'detail'` adds. Present on a row only when it was asked for
  * and has been read; a summary row has no `detail` at all, which is not the
  * same as a detail with an empty body.
@@ -78,6 +142,32 @@ export const trackerDetailSchema = z.object({
     headSha: z.string().max(LIMITS.TRACKER_WORD).nullable().optional(),
     /** For a change: who approved it, by name. */
     approvedBy: z.array(person).max(LIMITS.TRACKER_PEOPLE).optional(),
+    /**
+     * The item's milestone (2.98.0). Absent when it has none or the host did not read it; an older
+     * host never sends it. Dropped, not fatal, when it does not parse.
+     */
+    milestone: trackerMilestoneSchema.optional().catch(undefined),
+    /**
+     * The newest comments on the item, oldest first, at most `LIMITS.TRACKER_COMMENTS` (2.98.0):
+     * its conversation, reviews with words, and on a change the comments on its lines. Absent when
+     * the host did not read them; empty when there are none. Dropped, not fatal, when it does not parse.
+     */
+    comments: z.array(trackerCommentSchema).max(LIMITS.TRACKER_COMMENTS).optional().catch(undefined),
+    /**
+     * How many comments the item has in all, by the tracker's count (2.98.0). More than
+     * `comments.length` when the thread is longer than what is carried; the rest is on the tracker.
+     */
+    commentCount: z.number().int().min(0).optional().catch(undefined),
+    /**
+     * For a change: the checks of its head commit, or the jobs of its head pipeline (2.98.0), in the
+     * tracker's order. Absent when none ran or the host did not read them. Dropped, not fatal, when it
+     * does not parse.
+     */
+    checks: z.array(trackerCheckSchema).max(LIMITS.TRACKER_CHECKS).optional().catch(undefined),
+    /** More checks than `TRACKER_CHECKS` ran, and the list stops there. (2.98.0) */
+    checksClipped: z.boolean().optional().catch(undefined),
+    /** For a change from a fork: the fork and its branch (2.98.0). Absent for a change from the row's own repository. */
+    fork: trackerForkSchema.optional().catch(undefined),
     /** When this detail was read, which may be earlier than the row's `readAt`. */
     readAt: instant,
 });

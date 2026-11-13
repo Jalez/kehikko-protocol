@@ -11,6 +11,31 @@ After 2.78.0, every entry's first line under its heading is its kind, and the ve
 (semver; CI checks it): `Kind: breaking` → next major, `Kind: feature` → next minor, `Kind: fix` →
 next patch.
 
+## 2.98.0 — 2026-11-13
+
+Kind: feature
+
+What a person reads an item for, in a ref's detail. **Additive**; `PROTOCOL` is still 2.
+[docs/tracker.md](docs/tracker.md#what-detail-carries-2980).
+
+A module that shows one issue or change in full (its conversation, its checks, its milestone)
+had to load the tracker's website to get them. The host already reads a ref's detail with the
+person's own sign-ins and keeps it with its freshness; now the detail carries them too.
+
+### Added
+
+- `trackerDetailSchema` gains `milestone` (`trackerMilestoneSchema`: `title`, `url?`, `dueOn?`),
+  `comments` (the newest `LIMITS.TRACKER_COMMENTS`, oldest first; `trackerCommentSchema`: `id`,
+  `kind` in `COMMENT_KINDS` = `comment` | `review` | `line`, `login?`, `name?`, `at`, `editedAt?`,
+  `body` clipped at `LIMITS.TRACKER_COMMENT` with `bodyClipped`, `url?`, `path?` on a line comment,
+  `verdict?` on a review), `commentCount` (the tracker's total), `checks` (a change's checks or head
+  pipeline jobs, `trackerCheckSchema`: `name`, `state` in `PIPELINE_STATES`, `url?`, `at?`, `stage?`;
+  at most `LIMITS.TRACKER_CHECKS`, `checksClipped`) and `fork` (`trackerForkSchema`: `repo`,
+  `branch`, for a change from a fork, whose row has no `headBranch`). Each is optional and dropped,
+  not fatal, when it does not parse.
+- `TRACKER_DETAIL_FIELD_SINCE` / `TrackerDetailField`: when each detail field came in.
+- `LIMITS.TRACKER_COMMENTS` (50), `LIMITS.TRACKER_COMMENT` (4000), `LIMITS.TRACKER_CHECKS` (50).
+
 ## 2.97.0 — 2026-11-13
 
 Kind: feature

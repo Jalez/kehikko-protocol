@@ -231,6 +231,15 @@ export declare const LIMITS: {
     readonly TRACKER_BODY: 20000;
     /** How many files of a change `detail` lists. */
     readonly TRACKER_FILES: 300;
+    /**
+     * How many comments one ref's `detail` carries (2.98.0): the newest, oldest first. A thread
+     * longer than this says so with `commentCount`, and the rest is on the tracker.
+     */
+    readonly TRACKER_COMMENTS: 50;
+    /** One comment's text in a ref's `detail`, in characters (2.98.0); `bodyClipped` says when it was cut. */
+    readonly TRACKER_COMMENT: 4000;
+    /** How many checks or pipeline jobs one change's `detail` lists (2.98.0). */
+    readonly TRACKER_CHECKS: 50;
     /** How many boards one project's sources have, and one row may sit on. (2.6.0) */
     readonly TRACKER_BOARDS: 16;
     /** How many columns one board has. (2.6.0) */
