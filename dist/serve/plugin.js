@@ -1,11 +1,13 @@
-import { claim, sayClaim } from './ports.js';
+import { MODULE_PORTS, claim, modulePort, sayClaim } from './ports.js';
 import { registerAt, takesOver } from './registry.js';
 /**
  * Whether the host asked for ANY free port (2.65.0): `PORT=0`. A host that reaches modules at
  * stable addresses of its own does not need a module on a port it knows in advance; it reads the
  * port the module registers (`registerBound`). Then neither `claim` nor the drift rules run: the
- * system picks a free port, the module binds it, and says so in its registration. Any other `PORT`
- * (or none) is as before: `preferred`, then `claim`'s drift.
+ * module takes a port from `MODULE_PORTS` that is free on every address (`anyPortOrLeave`, 2.97.0;
+ * before, port 0, which the system fills from the range it also gives other programs' servers),
+ * binds it, and says so in its registration. Any other `PORT` (or none) is as before: `preferred`,
+ * then `claim`'s drift.
  */
 export function anyPort(env = process.env) {
     return env.PORT?.trim() === '0';
@@ -24,10 +26,11 @@ export function serves({ id, prefer, dir, span, timeoutMs }) {
         name: 'kehikot-module-serves',
         apply: 'serve',
         async config(config) {
-            /* Any free port (2.65.0): the system picks it, and `configureServer` registers what was bound. */
+            /* Any free port (2.65.0): one of `MODULE_PORTS`, free on every address (2.97.0), and
+               `configureServer` registers what was bound. */
             if (anyPort()) {
                 const said = config?.server?.cors !== undefined;
-                return { server: { host: '127.0.0.1', port: 0, strictPort: false, ...(said ? {} : { cors: false }) } };
+                return { server: { host: '127.0.0.1', port: await anyPortOrLeave(id), strictPort: false, ...(said ? {} : { cors: false }) } };
             }
             claimed = await claimOrLeave({ id, prefer: preferred(prefer), span, timeoutMs });
             /* No cross-origin sharing unless the module wrote `server.cors` itself: a module's page asks
@@ -73,6 +76,21 @@ export async function claimOrLeave(options) {
     if (claimed.moved)
         console.log(sayClaim(claimed));
     return claimed;
+}
+/**
+ * The port for `PORT=0` (2.97.0), for a dev server (`serves`) and a built one (`run`) alike: one of
+ * `MODULE_PORTS` that nothing holds on any address (`modulePort`). Never port 0: the system fills
+ * that from its temporary range, where another program asking for "any port" on `[::]` is handed
+ * the same number and its own requests to `127.0.0.1` reach this module instead. Exit 1 when the
+ * whole band is held.
+ */
+export async function anyPortOrLeave(id) {
+    const port = await modulePort();
+    if (port === null) {
+        console.error(`${id} could not find a free port: every port from ${MODULE_PORTS.from} to ${MODULE_PORTS.to} is held`);
+        process.exit(1);
+    }
+    return port;
 }
 /**
  * Write down the address a server ACTUALLY bound, once it is listening, for a dev server and a built

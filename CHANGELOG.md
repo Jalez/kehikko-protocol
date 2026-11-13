@@ -11,6 +11,25 @@ After 2.78.0, every entry's first line under its heading is its kind, and the ve
 (semver; CI checks it): `Kind: breaking` → next major, `Kind: feature` → next minor, `Kind: fix` →
 next patch.
 
+## 2.97.0 — 2026-11-13
+
+Kind: feature
+
+A module's port is nobody else's. **Additive**; `PROTOCOL` is still 2.
+[docs/serving.md](docs/serving.md#which-port-module_ports-and-free-on-every-address-2970).
+
+- `PORT=0` no longer binds port 0. The system fills port 0 from its temporary range, the range it
+  also hands another program's "any port" server (bound to `[::]`); macOS lets that bind share the
+  module's `127.0.0.1` port, and the other program's requests to `127.0.0.1` reached the module.
+  `serves` and `run` now take a port from `MODULE_PORTS` (20000–21999, below every system's
+  temporary range) that is free on every address: `modulePort()`, `anyPortOrLeave()`,
+  `inModulePorts()`.
+- `free(port)` binds on `127.0.0.1`, `::1`, `0.0.0.0` and `[::]` (`ADDRESSES_A_PORT_IS_FREE_ON`),
+  not `127.0.0.1` alone, which called a port free that another program held on `[::]`. `free(port,
+  host)` still asks one address. `claim`'s drift uses it.
+- `check:serving` (`kehikot-check-serving`): fails a module whose own sources bind a server or probe
+  a port without taking the port from `/serve` or `/run`, and a Vite config without `serves()`.
+
 ## 2.96.0 — 2026-11-13
 
 Kind: feature

@@ -5,7 +5,7 @@
  * Node-only — it binds sockets and reads and writes disk — so it stands beside the front door.
  * Design notes: docs/serving.md.
  */
-export { claim, free, identify, originFor, readManifest, sayClaim, search, verdict, DRIFT_SPAN, IDENTIFY_TIMEOUT_MS, LOOPBACK, } from './ports.js';
+export { claim, free, identify, inModulePorts, modulePort, originFor, readManifest, sayClaim, search, verdict, DRIFT_SPAN, IDENTIFY_TIMEOUT_MS, LOOPBACK, ADDRESSES_A_PORT_IS_FREE_ON, MODULE_PORTS, } from './ports.js';
 export { DEFAULT_FRAME_ORIGINS, frameAncestors, frameOrigins } from './origins.js';
 /* The host that started this module, and the only doors a session is handed on it (2.95.0). */
 export { askedHosts, doorConfigProblems, doorTarget, doorUrl, isStableDoor, keptFolderName, legacyKeptFolderName, loopbackOrigin, stableDoor, stableDoors, startingHost, tokenOnDoor, HOST_DOOR_MODULE, HOST_ENV, MODULE_PATH_PREFIX, } from './host-door.js';
@@ -13,7 +13,7 @@ export { askedHosts, doorConfigProblems, doorTarget, doorUrl, isStableDoor, kept
 export { hostHasProject, hostIsProjectUrls, hostProject, forgetHostProjects, resolveDoorProject, hostPlace, hostPlaceUrls, placeTokenOf, resolveDoorPlace, PLACE_PATH, IS_PROJECT_PATH, isProjectResult, NO_HOST_ANSWERED, } from './host.js';
 export { DOOR_PROJECT_SAYS, DOOR_PLACE_SAYS, PLACE_PARAM, placeDefaults } from '../door.js';
 export { neighbourPorts, portOf, readRegistration, registerAt, takesOver, registryDir, } from './registry.js';
-export { anyPort, claimOrLeave, preferred, registerBound, serves, } from './plugin.js';
+export { anyPort, anyPortOrLeave, claimOrLeave, preferred, registerBound, serves, } from './plugin.js';
 /* Another module, as this one can learn of it: its manifest and the tools at its door. */
 export { doorOf, listTools, readNeighbour, readNeighbours, NEIGHBOUR_TIMEOUT_MS, } from './neighbours.js';
 /* 2.83.0. Using a service from a module's server, and proving who calls one. */

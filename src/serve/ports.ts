@@ -68,16 +68,81 @@ export function search(
 }
 
 /**
- * Whether a port can be bound, asked by binding it and releasing it. The port can be taken again
- * before the caller binds it; `serves()` survives that by leaving `strictPort` off.
+ * Every address a program on this machine can hold a port on and still be reached at `127.0.0.1`
+ * (2.97.0). macOS (any BSD) lets a wildcard bind (`[::]`, `0.0.0.0`) and a loopback bind share one
+ * port number, and a connection to `127.0.0.1` goes to the more specific of the two. So a port free
+ * on `127.0.0.1` alone may be held by another program on `[::]`, and a port this module holds on
+ * `127.0.0.1` can still be handed to another program's `[::]` server. Asking all four is how a port
+ * is known to be nobody else's. Design notes: docs/serving.md, "Which port".
  */
-export function free(port: number, host = LOOPBACK): Promise<boolean> {
+export const ADDRESSES_A_PORT_IS_FREE_ON: readonly string[] = [LOOPBACK, '::1', '0.0.0.0', '::']
+
+/**
+ * The band a module started on any port (`PORT=0`) takes its port from (2.97.0), and the band a host
+ * hands ports out of. Below every operating system's temporary range (macOS and Windows 49152–65535,
+ * Linux 32768–60999), so a program that asks the system for "any port" is never given one a module
+ * holds, and clear of the ports modules prefer (the official list's 7000s and 8000s) and the host's.
+ */
+export const MODULE_PORTS = { from: 20000, to: 21999 } as const
+
+/** Whether `port` is in `MODULE_PORTS`. */
+export function inModulePorts(port: number): boolean {
+  return Number.isInteger(port) && port >= MODULE_PORTS.from && port <= MODULE_PORTS.to
+}
+
+/** The errors that say an address does not exist here (no IPv6 loopback), rather than that it is held. */
+const NO_SUCH_ADDRESS = new Set(['EADDRNOTAVAIL', 'EAFNOSUPPORT', 'EPROTONOSUPPORT'])
+
+function bindsOn(port: number, host: string): Promise<boolean> {
   return new Promise((resolve) => {
-    const probe = createServer()
-    probe.once('error', () => resolve(false))
+    /* A connection that arrives while the probe listens (somebody polling the port) is dropped:
+       `close` waits for every connection to end, and one left open would hold the probe forever. */
+    const probe = createServer({ pauseOnConnect: true }, (socket) => socket.destroy())
+    probe.once('error', (error: NodeJS.ErrnoException) => resolve(NO_SUCH_ADDRESS.has(error.code ?? '') && host !== LOOPBACK))
     probe.once('listening', () => probe.close(() => resolve(true)))
-    probe.listen(port, host)
+    /* `ipv6Only` off: `[::]` is the dual-stack wildcard, as another program's server binds it. */
+    probe.listen({ port, host, ipv6Only: false, exclusive: true })
   })
+}
+
+/**
+ * Whether a port can be bound, asked by binding it and releasing it — on every address in
+ * `ADDRESSES_A_PORT_IS_FREE_ON` unless `host` names one (2.97.0; before, `127.0.0.1` alone, which
+ * calls a port free that another program holds on `[::]`). An address the machine does not have
+ * (no IPv6) is skipped. The port can be taken again before the caller binds it; `serves()` survives
+ * that by leaving `strictPort` off.
+ */
+export async function free(port: number, host?: string): Promise<boolean> {
+  for (const address of host === undefined ? ADDRESSES_A_PORT_IS_FREE_ON : [host]) {
+    if (!(await bindsOn(port, address))) return false
+  }
+  return true
+}
+
+export interface ModulePortOptions {
+  /** Ports to pass over, e.g. the ones other modules are registered on. */
+  taken?: (port: number) => boolean
+  /** Where in the band to start looking. Random by default, so two modules starting together rarely race. */
+  start?: number
+  /** Injected by the tests. */
+  probe?: (port: number) => Promise<boolean>
+}
+
+/**
+ * A port for a module started on any port (2.97.0): the first in `MODULE_PORTS`, from a random
+ * place in it and around, that `taken` does not name and that is `free` on every address. `null`
+ * when the whole band is held. What `PORT=0` binds — never port 0, which is the system's temporary
+ * range, the range another program's "any port" server is given ports from.
+ */
+export async function modulePort({ taken = () => false, start, probe = free }: ModulePortOptions = {}): Promise<number | null> {
+  const size = MODULE_PORTS.to - MODULE_PORTS.from + 1
+  const first = start !== undefined && inModulePorts(start) ? start - MODULE_PORTS.from : Math.floor(Math.random() * size)
+  for (let i = 0; i < size; i++) {
+    const port = MODULE_PORTS.from + ((first + i) % size)
+    if (taken(port)) continue
+    if (await probe(port)) return port
+  }
+  return null
 }
 
 /**

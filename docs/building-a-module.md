@@ -226,6 +226,7 @@ Inbox, the page — so a new behaviour has an obvious home.
 bun test && bun run typecheck
 bun run check:door     # what the MCP door says about its tools
 bun run check:parts    # how it follows the parts of an epic
+bun run check:serving  # that it takes its port from the protocol, not its own way
 ```
 
 ## 5. Run it

@@ -29,7 +29,7 @@ import { serverPassReply } from '../src/serve/ask.js'
 
 describe('the version', () => {
   test('is 2.83.0 and the entry declares its kind', () => {
-    expect(PACKAGE_VERSION).toBe('2.96.0')
+    expect(PACKAGE_VERSION).toBe('2.97.0')
     const log = readFileSync(join(resolve(dirname(new URL(import.meta.url).pathname), '..'), 'CHANGELOG.md'), 'utf8')
     expect(log).toMatch(/## 2\.83\.0 — \d{4}-\d{2}-\d{2}\n\nKind: feature\n/)
   })

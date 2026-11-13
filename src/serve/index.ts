@@ -10,6 +10,8 @@ export {
   claim,
   free,
   identify,
+  inModulePorts,
+  modulePort,
   originFor,
   readManifest,
   sayClaim,
@@ -18,6 +20,9 @@ export {
   DRIFT_SPAN,
   IDENTIFY_TIMEOUT_MS,
   LOOPBACK,
+  ADDRESSES_A_PORT_IS_FREE_ON,
+  MODULE_PORTS,
+  type ModulePortOptions,
   type Claimed,
   type ClaimOptions,
   type Occupant,
@@ -81,6 +86,7 @@ export {
 
 export {
   anyPort,
+  anyPortOrLeave,
   claimOrLeave,
   preferred,
   registerBound,
