@@ -30,6 +30,7 @@ export declare const METHOD_SINCE: {
     readonly 'tracker.get': "0.25.0";
     readonly 'tracker.refresh': "0.25.0";
     readonly 'tracker.columns': "2.6.0";
+    readonly 'tracker.image': "2.101.0";
     readonly 'content.changed': "0.27.0";
     readonly 'parts.set': "1.2.0";
     readonly 'activity.set': "1.5.0";
@@ -281,6 +282,7 @@ export declare const SINCE: {
         readonly 'tracker.get': "0.25.0";
         readonly 'tracker.refresh': "0.25.0";
         readonly 'tracker.columns': "2.6.0";
+        readonly 'tracker.image': "2.101.0";
         readonly 'content.changed': "0.27.0";
         readonly 'parts.set': "1.2.0";
         readonly 'activity.set': "1.5.0";

@@ -10,7 +10,7 @@ import { settingKeySchema } from './settings.js';
  * definition; `wire.ts` imports nothing from here.
  */
 import { ADDRESS_INTENTS, DISPOSITIONS, LOCATION_INTENTS, codeLocationSchema, filterChoiceSchema, passageSchema, webAddress } from './wire.js';
-import { TRACKER_DETAILS, trackerColumnsResult, trackerReadingResult, trackerRefreshResult } from './tracker.js';
+import { TRACKER_DETAILS, trackerColumnsResult, trackerImageResult, trackerReadingResult, trackerRefreshResult } from './tracker.js';
 import { PART_ID, partListSchema, partsSchema } from './parts.js';
 import { dispositionSchema } from './context.js';
 import { stepsListResult } from './plan.js';
@@ -231,6 +231,7 @@ export const METHODS = {
     'tracker.refresh': 'trackers:refresh',
     /** The boards and their columns: part of the same reading, so under the same capability. (2.6.0) */
     'tracker.columns': 'trackers:read',
+    'tracker.image': 'trackers:read',
     'content.changed': 'content:report',
     'parts.set': 'parts:set',
     'activity.set': 'activity:report',
@@ -547,6 +548,14 @@ export const methodParams = {
      */
     'tracker.columns': z.object({}),
     /**
+     * One image from an item's description or a comment, fetched by the host with the person's own
+     * sign-in (2.101.0): `ref` is the item whose text holds it, `url` the image's `https:` address as
+     * written there. Only an address on that item's tracker or its known upload hosts is fetched, only
+     * image types in `TRACKER_IMAGE_TYPES`, at most `LIMITS.TRACKER_IMAGE_BYTES`; anything else is
+     * `declined` with a reason (`trackerImageResult`). A page never loads an image address itself.
+     */
+    'tracker.image': z.object({ ref, url: z.string().url().max(LIMITS.URL) }),
+    /**
      * This module's own material changed, for this epic or, with no epic, for no one epic in particular. The host
      * tells every container in the project through `context.content`, the caller's included. Whose material and
      * `at` are the host's facts, not params. Report AFTER the write has landed.
@@ -858,6 +867,7 @@ export const methodResults = {
     'tracker.get': trackerReadingResult,
     'tracker.refresh': trackerRefreshResult,
     'tracker.columns': trackerColumnsResult,
+    'tracker.image': trackerImageResult,
     'parts.set': partsSetResult,
     'activity.set': activitySetResult,
     'location.set': locationSetResult,

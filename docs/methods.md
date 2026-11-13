@@ -331,6 +331,7 @@ and a module that declares none gets none of the methods below.
 | `tracker.get` | `trackers:read` |
 | `tracker.refresh` | `trackers:refresh` |
 | `tracker.columns` | `trackers:read` |
+| `tracker.image` | `trackers:read` |
 | `content.changed` | `content:report` |
 | `parts.set` | `parts:set` |
 | `activity.set` | `activity:report` |
@@ -1159,6 +1160,17 @@ The boards of the open project's sources and their columns, from the host's
 reading, answered at once with `trackerColumnsResult`. No params: it is
 about the project, and where each item stands is on its row (`column`).
 Filed under `trackers:read` because it is part of the same reading. (2.6.0)
+
+#### `methodParams.tracker.image`
+
+One image from an item's description or a comment, fetched by the host with the
+person's own sign-in and answered with `trackerImageResult`: `{ outcome: 'image',
+mime, base64 }` or `{ outcome: 'declined', why }` (`host`, `type`, `size`,
+`unreadable`). Params: `ref` (the item whose text holds it) and `url` (the
+image's address as written there). The host fetches only an address on that
+item's tracker or its known upload hosts, only `TRACKER_IMAGE_TYPES` (never SVG),
+at most `LIMITS.TRACKER_IMAGE_BYTES`. A page never loads an image address itself
+and never holds a credential. Filed under `trackers:read`. (2.101.0)
 
 #### `methodParams.content.changed`
 

@@ -3,7 +3,7 @@ import { describe, expect, test } from 'bun:test'
 import { PACKAGE_VERSION, PROTOCOL, trackerLinkSchema, trackerRowSchema } from '../src/index.js'
 
 /**
- * 2.100.0: a `closed-by` link says where the closing change stands, so an issue can say "closing in
+ * 2.101.0: a `closed-by` link says where the closing change stands, so an issue can say "closing in
  * !56" while that change is open. Optional, and dropped rather than fatal, so a module built before
  * it reads a newer host's rows whole.
  */
@@ -24,8 +24,8 @@ const issue = {
 }
 
 describe('the version', () => {
-  test('is 2.100.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.100.0')
+  test('is 2.101.0, and PROTOCOL is still 2', () => {
+    expect(PACKAGE_VERSION).toBe('2.101.0')
     expect(PROTOCOL).toBe(2)
   })
 })

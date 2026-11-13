@@ -36,6 +36,7 @@ export const METHOD_SINCE = {
   'tracker.get': SINCE_FLOOR,
   'tracker.refresh': SINCE_FLOOR,
   'tracker.columns': '2.6.0',
+  'tracker.image': '2.101.0',
   'content.changed': '0.27.0',
   'parts.set': '1.2.0',
   'activity.set': '1.5.0',
