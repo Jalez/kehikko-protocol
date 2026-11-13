@@ -832,6 +832,14 @@ export {
   type MessageReadResult,
   type MessageToolName,
   type MessageToolDefinition,
+  PLACE_TOKEN_ARG,
+  PLACE_TOKEN_LINE,
+  OLDER_MESSAGE_DOOR,
+  NOT_PLACED_HEAD,
+  placeTokenLine,
+  placeTokenIn,
+  notPlacedText,
+  type MessageToolsOptions,
 } from './agent-messages.js'
 
 /* Going to another project, and asking for one thing to be shown there (2.28.0). */
@@ -1079,6 +1087,14 @@ export {
   type WorkWantRule,
   type WorkWant,
   type SeenRun,
+  AGENT_DELIVERY,
+  agentDeliverySchema,
+  agentDeliverParams,
+  agentDeliverResult,
+  adoptWays,
+  type AgentDelivery,
+  type AgentDeliverParams,
+  type AgentDeliverResult,
 } from './services.js'
 
 export {

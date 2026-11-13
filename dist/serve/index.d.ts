@@ -5,13 +5,13 @@
  * Node-only — it binds sockets and reads and writes disk — so it stands beside the front door.
  * Design notes: docs/serving.md.
  */
-export { claim, free, identify, originFor, readManifest, sayClaim, search, verdict, DRIFT_SPAN, IDENTIFY_TIMEOUT_MS, LOOPBACK, type Claimed, type ClaimOptions, type Occupant, type Verdict, } from './ports.js';
+export { claim, free, identify, inModulePorts, modulePort, originFor, readManifest, sayClaim, search, verdict, DRIFT_SPAN, IDENTIFY_TIMEOUT_MS, LOOPBACK, ADDRESSES_A_PORT_IS_FREE_ON, MODULE_PORTS, type ModulePortOptions, type Claimed, type ClaimOptions, type Occupant, type Verdict, } from './ports.js';
 export { DEFAULT_FRAME_ORIGINS, frameAncestors, frameOrigins } from './origins.js';
 export { askedHosts, doorConfigProblems, doorTarget, doorUrl, isStableDoor, keptFolderName, legacyKeptFolderName, loopbackOrigin, stableDoor, stableDoors, startingHost, tokenOnDoor, HOST_DOOR_MODULE, HOST_ENV, MODULE_PATH_PREFIX, type HandedDoor, } from './host-door.js';
 export { hostHasProject, hostIsProjectUrls, hostProject, forgetHostProjects, resolveDoorProject, hostPlace, hostPlaceUrls, placeTokenOf, resolveDoorPlace, PLACE_PATH, IS_PROJECT_PATH, isProjectResult, NO_HOST_ANSWERED, type DoorProject, type HostHasProjectOptions, type HostProject, type IsProjectResult, } from './host.js';
 export { DOOR_PROJECT_SAYS, DOOR_PLACE_SAYS, PLACE_PARAM, placeDefaults, type DoorPlace } from '../door.js';
 export { neighbourPorts, portOf, readRegistration, registerAt, takesOver, registryDir, type Registered, type Registration, } from './registry.js';
-export { anyPort, claimOrLeave, preferred, registerBound, serves, type DevServerLike, type HttpServerLike, type ServesOptions, type ServesPlugin, } from './plugin.js';
+export { anyPort, anyPortOrLeave, claimOrLeave, preferred, registerBound, serves, type DevServerLike, type HttpServerLike, type ServesOptions, type ServesPlugin, } from './plugin.js';
 export { doorOf, listTools, readNeighbour, readNeighbours, NEIGHBOUR_TIMEOUT_MS, type Neighbour, type NeighbourOptions, } from './neighbours.js';
 export { findService, callServiceTool, fetchService, callerHeaders, vouchCaller, vouchHost, type VouchHostOptions, type FoundService, type FindServiceOptions, type CallServiceOptions, type VouchOptions, } from './services.js';
 export { readJourney, readJourneys } from './journeys.js';
@@ -33,7 +33,8 @@ export { hostVouches, hostVouchUrls, settingsDoor, type HostVouchesOptions, type
 export { SETTINGS_PATH, SETTINGS_PASS_PATH } from '../settings.js';
 export { askHost, hostAskUrls, mintServerPass, serverPassReply, spendServerPass, NO_HOST_TO_ASK, type AskedHost, type AskHostOptions, type ServerAnswers, } from './ask.js';
 export { SERVER_ASK_PATH, SERVER_PASS_PATH, SERVER_METHODS, type ServerMethod } from '../server-ask.js';
-export { answerMessageTool, forgetMessageHosts, hostKeepsMessages, hostOnMessages, messageToolsFor, messageWaker, messageDelivery, DELIVERY_KEEP_MS, ASLEEP_EVERY_MS, WAKE_EVERY_MS, WAKE_SETTLE_MS, type MessageToolAnswer, type MessageToolOptions, type MessageWaker, type MessageWakerOptions, type WakeSession, type DeliverySession, type MessageDelivery, type MessageDeliveryOptions, placeTeller, tellDigest, TELL_EVERY_MS, type PlaceTeller, type PlaceTellerOptions, } from './messages.js';
+export { answerMessageTool, forgetMessageHosts, hostKeepsMessages, hostOnMessages, messageToolsFor, messageWaker, messageDelivery, DELIVERY_KEEP_MS, ASLEEP_EVERY_MS, WAKE_EVERY_MS, WAKE_SETTLE_MS, type MessageToolAnswer, type MessageToolOptions, type MessageWaker, type MessageWakerOptions, type WakeSession, type DeliverySession, type MessageDelivery, type MessageDeliveryOptions, placeTeller, tellDigest, TELL_EVERY_MS, type PlaceTeller, type PlaceTellerOptions, callToken, } from './messages.js';
+export { freshPlaceToken, issuePlaceToken, deliveryReply } from './adopt.js';
 export { messageTools, isMessageTool, MESSAGE_TOOL_NAMES, ACT_ON_MESSAGES_SETTING, WAKE_ON_MESSAGES_SETTING, actsOnMessages, wakesOnMessages, typedMessages, markersNote, shortPath, type TypedOptions, pasted, deliveryFor, DELIVERY_STATES, RESUME_EVERY_MS, RESUME_MOST, type DeliveryState, type MessageToolDefinition, } from '../agent-messages.js';
 export { watchKnownProjects, KNOWN_PROJECTS_EVERY_MS, KNOWN_PROJECTS_RETRY_MS, type KnownProjects, type KnownProjectsOptions, type KnownProjectsTick, } from './known-projects.js';
 export { hostTooOld, FIT_SAYS, type HostTooOld } from '../fit.js';

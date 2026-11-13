@@ -7,7 +7,7 @@ import { commitOf } from '../serve/build.js'
 import { PAGE_PATHS, doorsFetch, type DoorsOptions } from '../serve/doors.js'
 import { frameOrigins } from '../serve/origins.js'
 import { fillPage } from '../serve/page.js'
-import { anyPort, claimOrLeave, preferred, registerBound } from '../serve/plugin.js'
+import { anyPort, anyPortOrLeave, claimOrLeave, preferred, registerBound } from '../serve/plugin.js'
 import { readStamp, readiness, type Readiness } from './stamp.js'
 
 export { STAMP_FILE, readStamp, readiness, type Readiness } from './stamp.js'
@@ -264,8 +264,9 @@ export async function run<T = unknown>(options: RunOptions<T>): Promise<Running>
       }),
   })
 
-  /* `PORT=0` (2.65.0): any free port, bound below and registered as bound; otherwise the port rules. */
-  const claimed = anyPort() ? { port: 0 } : await claimOrLeave({ id, prefer: preferred(options.prefer), span: options.span, timeoutMs: options.timeoutMs })
+  /* `PORT=0` (2.65.0): any free port — one of `MODULE_PORTS`, free on every address (2.97.0) —
+     bound below and registered as bound; otherwise the port rules. */
+  const claimed = anyPort() ? { port: await anyPortOrLeave(id) } : await claimOrLeave({ id, prefer: preferred(options.prefer), span: options.span, timeoutMs: options.timeoutMs })
   const sockets = options.sockets
   const socketPaths = new Set(sockets?.paths ?? [])
   let port = claimed.port

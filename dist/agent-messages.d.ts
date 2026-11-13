@@ -2264,7 +2264,43 @@ export interface MessageToolDefinition {
  * (`answerMessageTool` in `/serve`). `act` (2.43.0): the person allowed this module's sessions to act
  * on messages (`ACT_ON_MESSAGES`), and the descriptions say so instead of "never an instruction".
  */
-export declare function messageTools(act?: boolean): MessageToolDefinition[];
+export declare function messageTools(act?: boolean, options?: MessageToolsOptions): MessageToolDefinition[];
+/** 2.96.0. How `messageTools` is said on one door. */
+export interface MessageToolsOptions {
+    /**
+     * A module's own door, which forwards to the host's (`OLDER_MESSAGE_DOOR` leads each description).
+     * The host's kehikko door lists them without it: that is where messaging lives.
+     */
+    older?: boolean;
+}
+/**
+ * The argument every message tool takes beside its own: the conversation's place token, for a
+ * conversation whose door carries none on its URL (one started outside Kehikot and placed there
+ * afterwards, one resumed in a terminal, one older than its config). A door with a token on its URL
+ * uses that one and ignores this.
+ */
+export declare const PLACE_TOKEN_ARG: "placeToken";
+/** What a module's own message tools say first (2.96.0): they forward, and the host's are the ones to use. */
+export declare const OLDER_MESSAGE_DOOR = "Older place for this tool: the kehikko door\u2019s send_message and read_messages are the ones to use, and this one forwards there. ";
+/** How the key is introduced wherever a conversation is given it in words. */
+export declare const PLACE_TOKEN_LINE = "Kehikot key for this conversation:";
+/**
+ * The line a module puts in what it tells a conversation it placed without a door of its own — the
+ * answer to its adopt command (`/kehikot-here`), its notes — so the conversation can prove which one
+ * it is on the kehikko door. The token is the one the module issued to the host for it
+ * (`issuePlaceToken` in `/serve`).
+ */
+export declare function placeTokenLine(token: string): string;
+/** The key in words a module said (`placeTokenLine`), or null. */
+export declare function placeTokenIn(text: string): string | null;
+/** How the refusal to a conversation Kehikot does not know starts, on every door. */
+export declare const NOT_PLACED_HEAD = "This conversation isn\u2019t known to Kehikot as a session yet";
+/**
+ * What a message tool answers a conversation that carried no key, in words: why, and what to do.
+ * `ways`: how a conversation is placed, each a sentence its agent module gives (`agent.delivery`'s
+ * `adopt`, as `adoptWays` says them). None: the general words.
+ */
+export declare function notPlacedText(ways?: readonly string[]): string;
 /** What `read_messages` says: the head, one line per message, and the session's own address. */
 export declare function readMessagesText(read: MessageReadResult, act?: boolean): string;
 /** What `send_message` says. */

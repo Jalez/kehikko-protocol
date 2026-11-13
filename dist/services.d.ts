@@ -1200,6 +1200,69 @@ export declare const agentSetupSchema: z.ZodObject<{
 }>;
 export type AgentSetup = z.infer<typeof agentSetupSchema>;
 /**
+ * `agent.delivery` (2.96.0): an agent module that hands messages to the conversations it holds.
+ * Messaging itself is the HOST's: `send_message` and `read_messages` are on the kehikko door, for every
+ * agent conversation whatever program it runs in, and the host keeps every message. What only the
+ * module can do is bring a message to its program's conversation — type it into an idle session, say
+ * it in its notes — and say how a conversation started elsewhere is placed.
+ *
+ * - `name`, `program`: as `agent.tasks`'s.
+ * - `deliver`: a route on its origin, `POST { project }` (`agentDeliverParams`): messages changed in
+ *   that project; hand any that wait to the conversations this module holds there, now. The module
+ *   asks the host what each of its sessions may read (`messages.read`, under its own pass and the
+ *   session's token), so the route grants nothing and reveals nothing: anyone may knock. Answers
+ *   `agentDeliverResult`. The host knocks after a message is kept, at most once a second per project.
+ * - `adopt`: one sentence for a conversation the host does not know, saying how it is placed with
+ *   this module (`Type /kehikot-here in it.`). A host says it after `In <program>:` (`adoptWays`).
+ */
+export declare const agentDeliverySchema: z.ZodObject<{
+    name: z.ZodEffects<z.ZodString, string, string>;
+    program: z.ZodEffects<z.ZodString, string, string>;
+    deliver: z.ZodEffects<z.ZodString, string, string>;
+    adopt: z.ZodEffects<z.ZodString, string, string>;
+}, "strip", z.ZodTypeAny, {
+    name: string;
+    program: string;
+    deliver: string;
+    adopt: string;
+}, {
+    name: string;
+    program: string;
+    deliver: string;
+    adopt: string;
+}>;
+export type AgentDelivery = z.infer<typeof agentDeliverySchema>;
+/** What the host posts to `agent.delivery`'s `deliver`. */
+export declare const agentDeliverParams: z.ZodObject<{
+    project: z.ZodString;
+}, "strip", z.ZodTypeAny, {
+    project: string;
+}, {
+    project: string;
+}>;
+export type AgentDeliverParams = z.infer<typeof agentDeliverParams>;
+/**
+ * What a module answers at `deliver`: `delivered` (how many conversations it handed messages to now),
+ * `none` (none of its conversations there had any waiting, or none is idle), `later` (it cannot now:
+ * it is starting; it will on its own next look).
+ */
+export declare const agentDeliverResult: z.ZodObject<{
+    outcome: z.ZodEnum<["delivered", "none", "later"]>;
+    delivered: z.ZodDefault<z.ZodNumber>;
+    why: z.ZodDefault<z.ZodString>;
+}, "strip", z.ZodTypeAny, {
+    why: string;
+    outcome: "delivered" | "none" | "later";
+    delivered: number;
+}, {
+    outcome: "delivered" | "none" | "later";
+    why?: string | undefined;
+    delivered?: number | undefined;
+}>;
+export type AgentDeliverResult = z.infer<typeof agentDeliverResult>;
+/** How each provider of `agent.delivery` says a conversation is placed, as one sentence each: for `notPlacedText`. */
+export declare function adoptWays(deliveries: readonly Pick<AgentDelivery, 'program' | 'adopt'>[]): string[];
+/**
  * Every service this protocol gives a descriptor's shape to, with what it means. Grows by an entry.
  * Names a module may say but this package does not know are carried as they came (`servicesSchema`).
  */
@@ -1661,6 +1724,25 @@ export declare const SERVICES: {
             cli: string;
         }>;
     };
+    readonly 'agent.delivery': {
+        readonly says: "Hands the messages Kehikot keeps to the conversations its program runs, and says how a conversation started elsewhere is placed.";
+        readonly schema: z.ZodObject<{
+            name: z.ZodEffects<z.ZodString, string, string>;
+            program: z.ZodEffects<z.ZodString, string, string>;
+            deliver: z.ZodEffects<z.ZodString, string, string>;
+            adopt: z.ZodEffects<z.ZodString, string, string>;
+        }, "strip", z.ZodTypeAny, {
+            name: string;
+            program: string;
+            deliver: string;
+            adopt: string;
+        }, {
+            name: string;
+            program: string;
+            deliver: string;
+            adopt: string;
+        }>;
+    };
 };
 export type Service = keyof typeof SERVICES;
 export declare const SERVICE_NAMES: Service[];
@@ -1690,6 +1772,8 @@ export declare const CONVERSATIONS_FINDER = "conversations.finder";
 export declare const AGENT_TASKS = "agent.tasks";
 /** 2.91.0. The person's choice of setting up an agent program, user-wide, with every module's tools and skills. */
 export declare const AGENT_SETUP = "agent.setup";
+/** 2.96.0. Hands kept messages to an agent module's own conversations; says how one is placed. */
+export declare const AGENT_DELIVERY = "agent.delivery";
 /**
  * `services` in a manifest: each service this module provides, by name, and its descriptor. A known
  * service's descriptor must parse with its schema, or the whole field is dropped (the manifest still

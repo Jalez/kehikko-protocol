@@ -10,6 +10,8 @@ export {
   claim,
   free,
   identify,
+  inModulePorts,
+  modulePort,
   originFor,
   readManifest,
   sayClaim,
@@ -18,6 +20,9 @@ export {
   DRIFT_SPAN,
   IDENTIFY_TIMEOUT_MS,
   LOOPBACK,
+  ADDRESSES_A_PORT_IS_FREE_ON,
+  MODULE_PORTS,
+  type ModulePortOptions,
   type Claimed,
   type ClaimOptions,
   type Occupant,
@@ -81,6 +86,7 @@ export {
 
 export {
   anyPort,
+  anyPortOrLeave,
   claimOrLeave,
   preferred,
   registerBound,
@@ -215,7 +221,10 @@ export {
   TELL_EVERY_MS,
   type PlaceTeller,
   type PlaceTellerOptions,
+  callToken,
 } from './messages.js'
+/* 2.96.0. One key for a conversation however it started, and the delivery knock. See `adopt.ts`. */
+export { freshPlaceToken, issuePlaceToken, deliveryReply } from './adopt.js'
 export {
   messageTools,
   isMessageTool,

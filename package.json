@@ -74,6 +74,10 @@
       "types": "./dist/ready/build.d.ts",
       "default": "./dist/ready/build.js"
     },
+    "./testing": {
+      "types": "./dist/testing/index.d.ts",
+      "default": "./dist/testing/index.js"
+    },
     "./package.json": "./package.json"
   },
   "bin": {
@@ -82,7 +86,9 @@
     "kehikot-check-door": "./bin/check-door.ts",
     "kehikot-check-rows": "./bin/check-rows.ts",
     "kehikot-check-notes": "./bin/check-notes.ts",
-    "kehikot-check-door-config": "./bin/check-door-config.ts"
+    "kehikot-check-door-config": "./bin/check-door-config.ts",
+    "kehikot-check-agent": "./bin/check-agent.ts",
+    "kehikot-check-serving": "./bin/check-serving.ts"
   },
   "files": [
     "dist",
@@ -114,7 +120,9 @@
     "check:door": "bun run bin/check-door.ts",
     "check:rows": "bun run bin/check-rows.ts",
     "check:notes": "bun run bin/check-notes.ts",
-    "check:door-config": "bun run bin/check-door-config.ts"
+    "check:door-config": "bun run bin/check-door-config.ts",
+    "check:agent": "bun run bin/check-agent.ts",
+    "check:serving": "bun run bin/check-serving.ts"
   },
   "peerDependencies": {
     "@radix-ui/react-collapsible": "^1.1.12",

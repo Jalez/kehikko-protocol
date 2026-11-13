@@ -200,6 +200,22 @@ Every sentence a person reads says what happened and what they can do, in their
 words: no ids, codes, stack traces or blame. A refusal is a sentence, never a
 silent no-op.
 
+### An agent module: messaging comes from the host, your module delivers (2.96.0)
+
+A module that runs agent conversations (Claude Code, Codex, …) does not build messaging. The host's
+kehikko door has `send_message` and `read_messages` for every conversation; the module:
+
+- issues each conversation a place token, launched or not: on its doors' URLs when it launches one,
+  and in words (`placeTokenLine`, after `freshPlaceToken` + `issuePlaceToken`) when a person places
+  one started elsewhere with its adopt command;
+- provides `agent.delivery` (`deliver` answered with `deliveryReply`, waking its idle conversations
+  that have messages waiting; `adopt`, the sentence that says how a conversation is placed);
+- lists every tool it declares to every caller, and answers in words when one cannot be used yet;
+- adds ONE test file that runs `expectAgentConformance` from `kehikot-module-protocol/testing` with its
+  door. The shared module CI fails an agent module without it (`kehikot-check-agent`).
+
+See [agent-messages.md](agent-messages.md#messaging-comes-from-the-host-your-module-delivers-2960).
+
 ## 4. Build it test-first
 
 Write the test, watch it fail, make it pass. The template has one test file per
@@ -210,6 +226,7 @@ Inbox, the page — so a new behaviour has an obvious home.
 bun test && bun run typecheck
 bun run check:door     # what the MCP door says about its tools
 bun run check:parts    # how it follows the parts of an epic
+bun run check:serving  # that it takes its port from the protocol, not its own way
 ```
 
 ## 5. Run it
