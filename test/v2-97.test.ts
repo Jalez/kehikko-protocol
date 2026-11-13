@@ -66,8 +66,10 @@ describe('free asks every address a port can be held on', () => {
   test.skipIf(!ipv6)('a port another program holds on [::] is not free, though 127.0.0.1 alone would say it is', async () => {
     const held = (await hold('::'))!
     try {
-      /* What `free` asked before 2.97.0, and what the host's own probe asked: blind to it. */
-      expect(await free(held.port, '127.0.0.1')).toBe(true)
+      /* What `free` asked before 2.97.0, and what the host's own probe asked: blind to it. Only
+       * where a wildcard bind and a loopback bind may share a port (macOS, the BSDs): on Linux a
+       * dual-stack `[::]` bind already blocks 127.0.0.1, so there the old probe was not blind. */
+      if (process.platform === 'darwin') expect(await free(held.port, '127.0.0.1')).toBe(true)
       expect(await free(held.port)).toBe(false)
     } finally {
       await close(held.server)
