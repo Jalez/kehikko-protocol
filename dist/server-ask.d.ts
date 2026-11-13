@@ -24,7 +24,7 @@ export declare const SERVER_PASS_PATH = "/api/kehikot/server-pass";
  * 2.21.0 adds the epic's own material — `epics.list`, `epic.get`, `steps.list`, `parts.get` and
  * `dispositions.get` — so that no module's server reads the host's files or another module's.
  */
-export declare const SERVER_METHODS: readonly ["tracker.get", "tracker.columns", "traffic.read", "traffic.note", "epics.list", "epic.get", "steps.list", "parts.get", "dispositions.get", "messages.send", "messages.read", "messages.notify", "messages.tell", "projects.mine", "messages.notifySession", "services.find", "sessions.placeOf"];
+export declare const SERVER_METHODS: readonly ["tracker.get", "tracker.columns", "traffic.read", "traffic.note", "epics.list", "epic.get", "steps.list", "parts.get", "dispositions.get", "messages.send", "messages.read", "messages.notify", "messages.tell", "projects.mine", "messages.notifySession", "services.find", "sessions.placeOf", "tasks.report"];
 export type ServerMethod = (typeof SERVER_METHODS)[number];
 /**
  * The server methods that are about one project, and so name it. The traffic methods (2.20.0) are
@@ -47,30 +47,30 @@ export declare const serverAskSchema: z.ZodEffects<z.ZodObject<{
     pass: z.ZodString;
     /** Required for `SERVER_PROJECT_METHODS`; absent for a question about this computer (2.20.0). */
     project: z.ZodOptional<z.ZodEffects<z.ZodString, string, string>>;
-    method: z.ZodEnum<["tracker.get", "tracker.columns", "traffic.read", "traffic.note", "epics.list", "epic.get", "steps.list", "parts.get", "dispositions.get", "messages.send", "messages.read", "messages.notify", "messages.tell", "projects.mine", "messages.notifySession", "services.find", "sessions.placeOf"]>;
+    method: z.ZodEnum<["tracker.get", "tracker.columns", "traffic.read", "traffic.note", "epics.list", "epic.get", "steps.list", "parts.get", "dispositions.get", "messages.send", "messages.read", "messages.notify", "messages.tell", "projects.mine", "messages.notifySession", "services.find", "sessions.placeOf", "tasks.report"]>;
     params: z.ZodDefault<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
 }, "strip", z.ZodTypeAny, {
     params: Record<string, unknown>;
     module: string;
     pass: string;
-    method: "epics.list" | "epic.get" | "steps.list" | "tracker.get" | "tracker.columns" | "traffic.read" | "traffic.note" | "parts.get" | "dispositions.get" | "messages.send" | "messages.read" | "messages.notify" | "messages.tell" | "projects.mine" | "messages.notifySession" | "services.find" | "sessions.placeOf";
+    method: "epics.list" | "epic.get" | "steps.list" | "tracker.get" | "tracker.columns" | "traffic.read" | "traffic.note" | "parts.get" | "dispositions.get" | "messages.send" | "messages.read" | "messages.notify" | "messages.tell" | "projects.mine" | "messages.notifySession" | "services.find" | "sessions.placeOf" | "tasks.report";
     project?: string | undefined;
 }, {
     module: string;
     pass: string;
-    method: "epics.list" | "epic.get" | "steps.list" | "tracker.get" | "tracker.columns" | "traffic.read" | "traffic.note" | "parts.get" | "dispositions.get" | "messages.send" | "messages.read" | "messages.notify" | "messages.tell" | "projects.mine" | "messages.notifySession" | "services.find" | "sessions.placeOf";
+    method: "epics.list" | "epic.get" | "steps.list" | "tracker.get" | "tracker.columns" | "traffic.read" | "traffic.note" | "parts.get" | "dispositions.get" | "messages.send" | "messages.read" | "messages.notify" | "messages.tell" | "projects.mine" | "messages.notifySession" | "services.find" | "sessions.placeOf" | "tasks.report";
     params?: Record<string, unknown> | undefined;
     project?: string | undefined;
 }>, {
     params: Record<string, unknown>;
     module: string;
     pass: string;
-    method: "epics.list" | "epic.get" | "steps.list" | "tracker.get" | "tracker.columns" | "traffic.read" | "traffic.note" | "parts.get" | "dispositions.get" | "messages.send" | "messages.read" | "messages.notify" | "messages.tell" | "projects.mine" | "messages.notifySession" | "services.find" | "sessions.placeOf";
+    method: "epics.list" | "epic.get" | "steps.list" | "tracker.get" | "tracker.columns" | "traffic.read" | "traffic.note" | "parts.get" | "dispositions.get" | "messages.send" | "messages.read" | "messages.notify" | "messages.tell" | "projects.mine" | "messages.notifySession" | "services.find" | "sessions.placeOf" | "tasks.report";
     project?: string | undefined;
 }, {
     module: string;
     pass: string;
-    method: "epics.list" | "epic.get" | "steps.list" | "tracker.get" | "tracker.columns" | "traffic.read" | "traffic.note" | "parts.get" | "dispositions.get" | "messages.send" | "messages.read" | "messages.notify" | "messages.tell" | "projects.mine" | "messages.notifySession" | "services.find" | "sessions.placeOf";
+    method: "epics.list" | "epic.get" | "steps.list" | "tracker.get" | "tracker.columns" | "traffic.read" | "traffic.note" | "parts.get" | "dispositions.get" | "messages.send" | "messages.read" | "messages.notify" | "messages.tell" | "projects.mine" | "messages.notifySession" | "services.find" | "sessions.placeOf" | "tasks.report";
     params?: Record<string, unknown> | undefined;
     project?: string | undefined;
 }>;

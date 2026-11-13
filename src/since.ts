@@ -54,6 +54,7 @@ export const METHOD_SINCE = {
   'messages.notifySession': '2.81.0',
   'services.find': '2.81.0',
   'sessions.placeOf': '2.85.0',
+  'tasks.report': '2.99.0',
   'inbox.read': '2.79.0',
   'inbox.log': '2.79.0',
   'inbox.act': '2.79.0',
@@ -124,6 +125,7 @@ export const SERVER_METHOD_SINCE = {
   'messages.notifySession': '2.81.0',
   'services.find': '2.81.0',
   'sessions.placeOf': '2.85.0',
+  'tasks.report': '2.99.0',
 } as const satisfies Record<ServerMethod, string>
 
 /**

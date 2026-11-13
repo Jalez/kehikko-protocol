@@ -1,7 +1,7 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join, relative, resolve } from 'node:path'
 
-import { AGENT_DELIVERY, serviceDescriptor } from '../services.js'
+import { AGENT_DELIVERY, AGENT_TASKS, serviceDescriptor } from '../services.js'
 import { manifestOf, sourcesOf } from './parts.js'
 
 /**
@@ -15,7 +15,10 @@ import { manifestOf, sourcesOf } from './parts.js'
  *   `expectAgentConformance` or `agentConformance`): the behaviour itself — tools listed to a caller
  *   with no token, an adopted conversation messaging with its key, guesses refused — is checked there,
  *   by `bun test`, against the module's own door;
- * - lists the message tools only behind a token (`token ? … messageToolsFor` / `messageToolsFor(…) : []`).
+ * - lists the message tools only behind a token (`token ? … messageToolsFor` / `messageToolsFor(…) : []`);
+ * - (2.99.0) provides `agent.tasks` and its conformance test gives no `tasks` (`{ start, program }`): the
+ *   check that `start` answers within a second while its program takes 20 s to boot, and that what became
+ *   of a task reaches the host, then never runs — and a fake provider is the only proof.
  */
 export interface AgentCheck {
   module: string
@@ -24,6 +27,8 @@ export interface AgentCheck {
 }
 
 const CONFORMANCE = /kehikot-module-protocol\/testing['"][\s\S]*\b(?:expectAgentConformance|agentConformance)\s*\(/
+/** 2.99.0. The conformance given `tasks` (`tasks:` or the shorthand `tasks,` / `tasks }`). */
+const WITH_TASKS = /\b(?:expectAgentConformance|agentConformance)\s*\(\s*\{[\s\S]*?\btasks\s*[:,}]/
 
 /** Test files under a module directory (test/, tests/, or `*.test.*` anywhere outside node_modules). */
 function testsOf(dir: string): { path: string; text: string }[] {
@@ -55,6 +60,9 @@ export function checkAgentFiles(
   }
   if (!tests.some((one) => CONFORMANCE.test(one.text))) {
     failures.push(`${module} has no test that runs the shared conformance: add one file that calls expectAgentConformance from kehikot-module-protocol/testing with its door.`)
+  }
+  if (serviceDescriptor(AGENT_TASKS, manifest.services?.[AGENT_TASKS]) && !tests.some((one) => CONFORMANCE.test(one.text) && WITH_TASKS.test(one.text))) {
+    failures.push(`${module} provides agent.tasks and its conformance test gives no tasks ({ start, program }): pass them, so that start is held to answering within a second against a program that is slow to boot.`)
   }
   const gated = sources.filter((one) => /\?\s*(?:await\s*)?messageToolsFor\s*\(|messageToolsFor\s*\([^)]*\)\s*\)?\s*:\s*\[\s*\]/.test(one.text)).map((one) => one.path)
   if (gated.length) failures.push(`${gated.join(', ')}: the message tools are listed only behind a token. List them to every caller; an unknown conversation is answered in words.`)

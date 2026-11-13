@@ -249,6 +249,11 @@ export declare const METHODS: {
     readonly 'services.find': "services:read";
     /** Which place a session is filed under, by its own id (2.85.0). */
     readonly 'sessions.placeOf': "sessions:place";
+    /**
+     * What became of a task an agent module accepted (`agent.tasks`, 2.99.0): its sessions' states, for
+     * the Inbox, which is what `activity:report` is for, and every agent module declares it.
+     */
+    readonly 'tasks.report': "activity:report";
     /** The person's Inbox, read by a module's page (2.79.0). */
     readonly 'inbox.read': "inbox:person";
     /** Earlier: the Inbox's log, a page of it (2.79.0). */
@@ -2419,6 +2424,23 @@ export declare const methodParams: {
         session: string;
     }, {
         session: string;
+    }>;
+    /** 2.99.0. From an agent module's server: what became of a task its `agent.tasks` start accepted; answered with `tasksReportResult`. */
+    readonly 'tasks.report': z.ZodObject<{
+        session: z.ZodString;
+        outcome: z.ZodEnum<["started", "failed"]>;
+        conversation: z.ZodDefault<z.ZodNullable<z.ZodString>>;
+        why: z.ZodDefault<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        why: string;
+        session: string;
+        outcome: "failed" | "started";
+        conversation: string | null;
+    }, {
+        session: string;
+        outcome: "failed" | "started";
+        why?: string | undefined;
+        conversation?: string | null | undefined;
     }>;
     /** 2.79.0. From a page only: the person's Inbox; answered with `inboxReadResult`. See `inbox.ts`. */
     readonly 'inbox.read': z.ZodObject<{}, "strip", z.ZodTypeAny, {}, {}>;

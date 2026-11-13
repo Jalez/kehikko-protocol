@@ -9,7 +9,10 @@
  *   `expectAgentConformance` or `agentConformance`): the behaviour itself — tools listed to a caller
  *   with no token, an adopted conversation messaging with its key, guesses refused — is checked there,
  *   by `bun test`, against the module's own door;
- * - lists the message tools only behind a token (`token ? … messageToolsFor` / `messageToolsFor(…) : []`).
+ * - lists the message tools only behind a token (`token ? … messageToolsFor` / `messageToolsFor(…) : []`);
+ * - (2.99.0) provides `agent.tasks` and its conformance test gives no `tasks` (`{ start, program }`): the
+ *   check that `start` answers within a second while its program takes 20 s to boot, and that what became
+ *   of a task reaches the host, then never runs — and a fake provider is the only proof.
  */
 export interface AgentCheck {
     module: string;

@@ -727,7 +727,7 @@ export interface MessageToolsOptions {
  */
 export const PLACE_TOKEN_ARG = 'placeToken' as const
 
-const PLACE_TOKEN_PROPERTY = {
+export const PLACE_TOKEN_PROPERTY = {
   type: 'string',
   pattern: '^[A-Za-z0-9_-]{22,64}$',
   description:

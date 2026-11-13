@@ -56,6 +56,8 @@ export const SERVER_METHODS = [
   'services.find',
   /* 2.85.0: the place a session is filed under in a project, by its own id. Names its project. */
   'sessions.placeOf',
+  /* 2.99.0: what became of a task an agent module's `agent.tasks` start accepted. Names no project: the host knows the task. */
+  'tasks.report',
 ] as const
 export type ServerMethod = (typeof SERVER_METHODS)[number]
 

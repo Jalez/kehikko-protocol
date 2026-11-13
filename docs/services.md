@@ -223,6 +223,28 @@ from outside its CLI's own folders.
 - `view`: the module's page for that one conversation, `/app?…{session}…` (`agentTaskView`), which the
   host frames in its dialog while the task runs.
 
+#### `start` answers at once (2.99.0)
+
+`start` answers within `AGENT_TASK_ANSWER_MS` (1 s), however long the program takes to boot. Check what
+can be checked at once — the caller (`vouchHost`), the body, the project, that the program is
+installed — and decline in words if one fails. Otherwise ACCEPT: `{ outcome: 'started', session,
+pending: true }`, and do everything slow afterwards (spawning the program, waiting for it, attaching a
+background session, writing its config, asking the host for doors, gathering skills). `session` is the
+conversation's id when the module chooses it up front, else a handle of its own that its `view`, its
+`bring` and its records follow to the conversation once the program says its id.
+
+`acceptTask(handle, starting, { module })` in `/serve` is that shape: it answers, runs `starting` after
+the answer has gone, and reports what it came to with `tasks.report` (`tasksReportParams`: `started`
+with the conversation's id, or `failed` with why). The host puts a failure in the person's Inbox in
+words, naming the module and the task. `tasks.report` is filed under `activity:report`.
+
+Why: until 2.99.0 every module started its program and only then answered. The host waits a few
+seconds; a program slow to boot ran past that, the person was told the agent did not answer — and the
+conversation started anyway, unseen. The conformance harness (`expectAgentConformance` with `tasks: {
+start, program }`) starts a task against a stand-in program that takes 20 s to boot and fails a module
+that does not answer within the second, or whose failures and starts do not reach the host;
+`kehikot-check-agent` fails a module providing `agent.tasks` whose conformance test gives no `tasks`.
+
 ### `agent.setup` (2.91.0)
 
 `{ name, program, cli }`. An agent module whose program can use every module's MCP tools and skills
