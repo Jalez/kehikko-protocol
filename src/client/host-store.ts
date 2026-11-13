@@ -586,6 +586,9 @@ export function hostStore<Kept = unknown>(
           onOpened: (opened) => {
             if (!stopped) events.onOpened?.(opened)
           },
+          onDrop: (drop) => {
+            if (!stopped) events.onDrop?.(drop)
+          },
           onCovered: (covered) => {
             if (stopped) return
             if (covered.top !== standing.covered.top || covered.bottom !== standing.covered.bottom) change({ covered })

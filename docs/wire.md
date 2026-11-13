@@ -123,6 +123,50 @@ merged change) is derived on each side with `deriveDisposition`, and
 `dispositionOf` puts the two together with the mark winning and the source
 named, so a module can always say whose verdict it is showing.
 
+### Dragging a file between modules (2.94.0)
+
+A person drags a file out of one module's page (a tree of the project, a list of search results) and
+drops it on another's (an editor, a viewer). The two pages never name each other: they meet on one
+format, `fileDrag` in `src/file-drag.ts`, carried by the browser's own drag and drop.
+
+    // the page the drag starts in
+    onDragStart={(event) => fileDrag.set(event.dataTransfer, { project: projectPath, path: 'src/a.ts' })}
+
+    // the page it is dropped on
+    onDragOver={(event) => fileDrag.offered(event.dataTransfer) && event.preventDefault()}
+    onDrop={(event) => { const file = fileDrag.read(event.dataTransfer, { project: projectPath }); … }}
+
+`set` writes the file three ways: `application/x-kehikot-file+json` (`{ project, path, kind }`),
+`text/uri-list` (a `file://` URL with the project in its fragment) and `text/plain` (the absolute
+path). Each module's page is its own origin, and WebKit — the desktop app's web view — hands a custom
+drag type only to the origin that set it, so across two modules there the custom type is not seen and
+the URL is what carries the file; Chromium and Firefox carry all three. `read` takes them in that
+order, and with `{ project }` a bare absolute path inside that folder counts too. During `dragover` a
+browser shows only the types, so `offered` answers from them.
+
+**Across frames in WebKit, no drag event arrives at all.** WebKit dispatches `dragenter`, `dragover`
+and `drop` only to documents of the origin the drag began in (`canReceiveDragData`); measured in a
+WKWebView with three origins, a drag out of one frame reached neither the other frame nor the page
+around them, while a drop inside the source's own document worked. So the browser's drag alone
+cannot carry a file from one module to another in the desktop app. The host carries it:
+
+- `connect` hears `dragstart` and `dragend` on the page's window and tells the host `kehikot.drag`
+  `{ phase, file, at, dropped }` for a drag the page put a file on — the page does nothing more than
+  `fileDrag.set`. `at` on `end` is where the pointer was let go, in the page's coordinates (WebKit
+  gives it on `dragend` even outside the page); `dropped` is whether anything took the drop.
+- When nothing took it, the host finds the frame under that point and, when its module says
+  `opens: ['file']`, sends it `kehikot.drop` `{ file, at }` with `at` in that page's coordinates. The
+  page takes it in `onDrop` (`useHost({ onDrop })`) as it takes a drop it heard itself.
+- Where the browser does deliver the drop (Chromium, Firefox, a drop inside one module's page),
+  `dropped` is true and the host hands nothing on, so a page never gets the same drop twice.
+
+Nothing marks the frame under the pointer while the drag is in the air in WebKit: no `dragover`
+reaches it.
+
+`path` is relative and cannot leave `project` by its shape (no `..`, no absolute path). It is still the
+dragging page's claim: a receiver that opens it runs it through the same confinement check as any
+other path it is handed, links and all.
+
 ## Notes by symbol
 
 ### `src/wire.ts`

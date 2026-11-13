@@ -11,6 +11,36 @@ After 2.78.0, every entry's first line under its heading is its kind, and the ve
 (semver; CI checks it): `Kind: breaking` → next major, `Kind: feature` → next minor, `Kind: fix` →
 next patch.
 
+## 2.94.0 — 2026-11-13
+
+Kind: feature
+
+One drag format for "a file in a project", so a file dragged out of one module's page can be dropped
+on another's without either naming the other. **Additive**; `PROTOCOL` is still 2.
+[docs/wire.md](docs/wire.md#dragging-a-file-between-modules-2940).
+
+### Added
+
+- `fileDrag.set(dataTransfer, { project, path, kind? })` on `dragstart` and `fileDrag.read(dataTransfer,
+  { project? })` on `drop`; `fileDrag.offered(dataTransfer)` from the types alone, for `dragover`.
+- `FILE_DRAG_TYPE` (`application/x-kehikot-file+json`), `fileDragSchema` (`project`: the absolute
+  folder; `path`: relative, at most `LIMITS.PATH`, no `..`, empty or `.` part, no NUL or backslash;
+  `kind`: `file` or `folder`), `projectPathSchema`, `FILE_DRAG_KINDS`, `DataTransferLike`.
+- Beside the custom type, the same file as `text/uri-list` (`fileDragUrl`: a `file://` URL with the
+  project in the fragment, `#kehikot-project=<folder>`; `fileDragFromUrl` reads it back) and as
+  `text/plain` (the absolute path). WebKit keeps a custom drag type to the origin that set it, and
+  each module's page is its own origin; the standard types cross.
+- `kehikot.drag` (`MESSAGE.DRAG`, module → host, `dragSchema`): `{ phase: 'start' | 'end', file, at?,
+  dropped }`. `connect` sends it by itself for a drag the page put a file on with `fileDrag.set`
+  (heard on the window, `dragstart` and `dragend`; `dragTarget: false` turns it off).
+- `kehikot.drop` (`MESSAGE.DROP`, host → module, `dropSchema`): `{ file, at }` in the receiving
+  page's coordinates, and `HostEvents.onDrop` (also through `hostStore` and `useHost`). Sent only to a
+  module whose manifest says `opens: ['file']`. WebKit dispatches no drag event at all to a document
+  of another origin than the one the drag began in (measured in a WKWebView: a drag out of one
+  module's frame is never heard by another's, nor by the host's page), so the host, which knows where
+  each frame is, hands on a drop nothing took. `pagePointSchema`, `DRAG_PHASES`, `LIMITS.DRAG_POINT`.
+- A host and a module before 2.94.0 drop both messages unread.
+
 ## 2.93.0 — 2026-11-13
 
 Kind: feature

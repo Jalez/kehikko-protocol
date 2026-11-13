@@ -352,6 +352,10 @@ export function hostStore(id, events = {}, options = {}) {
                     if (!stopped)
                         events.onOpened?.(opened);
                 },
+                onDrop: (drop) => {
+                    if (!stopped)
+                        events.onDrop?.(drop);
+                },
                 onCovered: (covered) => {
                     if (stopped)
                         return;

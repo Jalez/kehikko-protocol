@@ -1,5 +1,6 @@
 import { type ActivityItem } from '../activity.js';
-import { type FilterGroup, type FooterItemInput, type Goto, type HeaderItemInput, type ModuleContext, type ModuleEvent, type Press, type ResponseFailureReason } from '../wire.js';
+import { type FilterGroup, type FooterItemInput, type Goto, type HeaderItemInput, type ModuleContext, type ModuleEvent, type Press, type ResponseFailureReason, type PagePoint } from '../wire.js';
+import { type FileDrag } from '../file-drag.js';
 import type { Covered } from '../reveal.js';
 import { type MessageSource } from './mailbox.js';
 import { type PageFindOptions } from './find.js';
@@ -204,6 +205,17 @@ export interface HostEvents {
      * itself (new output while the bar is open), say it with `findResult`.
      */
     onFind?: (query: string, ask: FindAsk) => FindAnswer | Promise<FindAnswer>;
+    /**
+     * 2.94.0. A file another module's page was dragging was let go over this page, where no drag event
+     * reached it (WebKit hands none across origins): `file` as the dragging page put it on the drag,
+     * `at` where it was let go, in this page's coordinates. Only for a module whose manifest says
+     * `opens: ['file']`. Treat it as the drop it is — and confine the path, as any path. A drop this
+     * page heard itself (`fileDrag.read` in its own `drop` handler) never arrives here as well.
+     */
+    onDrop?: (drop: {
+        file: FileDrag;
+        at: PagePoint;
+    }) => void;
 }
 /**
  * What a single question may say about itself, beyond its params. A ceiling on waiting, never a
@@ -266,6 +278,11 @@ export interface ConnectOptions {
      * and the element marked `data-kehikot-page` are transparent.
      */
     appearance?: boolean;
+    /**
+     * 2.94.0. Where a file dragged out of the page is heard (`dragstart` and `dragend`, to tell the host
+     * as `kehikot.drag`): the page's window by default; `false` tells nothing. For tests.
+     */
+    dragTarget?: PointerTarget | false;
 }
 /** 2.70.0. How long after the last header or footer declaration the client says a missing footer, in ms. */
 export declare const ROWS_ADVICE_AFTER_MS = 1500;
