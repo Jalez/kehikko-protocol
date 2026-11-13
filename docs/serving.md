@@ -625,14 +625,14 @@ the id is the preference when it does not.
 addresses of its own (the module's frame and program addresses on the host's
 port) does not need to know a module's port in advance: it reads the port the
 module registers. So with `PORT=0`, `serves` and `run` neither claim nor drift:
-they take a port from `MODULE_PORTS` (2.96.0, below) and `registerBound` writes
+they take a port from `MODULE_PORTS` (2.97.0, below) and `registerBound` writes
 the port bound. `preferred` still reads 0 as "not a port": a module built
 before 2.65.0 that a host hands `PORT=0` takes its preference and the drift
 rules, as it always did. That is the fallback.
 
-#### Which port: `MODULE_PORTS` and `free` on every address (2.96.0)
+#### Which port: `MODULE_PORTS` and `free` on every address (2.97.0)
 
-Until 2.96.0, `PORT=0` meant port 0, and the system filled it from its
+Until 2.97.0, `PORT=0` meant port 0, and the system filled it from its
 temporary range (49152–65535 on macOS). That is the same range it hands any
 other program that asks for "any port" — a test runner's server, typically
 bound to `[::]`. macOS (any BSD) does not count a wildcard bind (`[::]` or
@@ -670,7 +670,7 @@ it still shares the number; that is an ordinary fixed-port clash, not a random
 one. Unix domain sockets between the host and its modules (the host proxying)
 would remove ports altogether; not done.
 
-#### `check:serving` (2.96.0)
+#### `check:serving` (2.97.0)
 
 ```
 bun run check:serving [<module dir> …]      # the bin is kehikot-check-serving

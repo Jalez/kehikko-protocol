@@ -264,7 +264,7 @@ export async function run<T = unknown>(options: RunOptions<T>): Promise<Running>
       }),
   })
 
-  /* `PORT=0` (2.65.0): any free port — one of `MODULE_PORTS`, free on every address (2.96.0) —
+  /* `PORT=0` (2.65.0): any free port — one of `MODULE_PORTS`, free on every address (2.97.0) —
      bound below and registered as bound; otherwise the port rules. */
   const claimed = anyPort() ? { port: await anyPortOrLeave(id) } : await claimOrLeave({ id, prefer: preferred(options.prefer), span: options.span, timeoutMs: options.timeoutMs })
   const sockets = options.sockets

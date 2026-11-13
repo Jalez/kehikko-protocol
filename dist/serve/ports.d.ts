@@ -46,7 +46,7 @@ export declare function verdict(id: string, occupant: Occupant): Verdict;
 export declare function search(from: number, taken: (port: number) => boolean, reserved: (port: number) => boolean, span?: number): number | null;
 /**
  * Every address a program on this machine can hold a port on and still be reached at `127.0.0.1`
- * (2.96.0). macOS (any BSD) lets a wildcard bind (`[::]`, `0.0.0.0`) and a loopback bind share one
+ * (2.97.0). macOS (any BSD) lets a wildcard bind (`[::]`, `0.0.0.0`) and a loopback bind share one
  * port number, and a connection to `127.0.0.1` goes to the more specific of the two. So a port free
  * on `127.0.0.1` alone may be held by another program on `[::]`, and a port this module holds on
  * `127.0.0.1` can still be handed to another program's `[::]` server. Asking all four is how a port
@@ -54,7 +54,7 @@ export declare function search(from: number, taken: (port: number) => boolean, r
  */
 export declare const ADDRESSES_A_PORT_IS_FREE_ON: readonly string[];
 /**
- * The band a module started on any port (`PORT=0`) takes its port from (2.96.0), and the band a host
+ * The band a module started on any port (`PORT=0`) takes its port from (2.97.0), and the band a host
  * hands ports out of. Below every operating system's temporary range (macOS and Windows 49152–65535,
  * Linux 32768–60999), so a program that asks the system for "any port" is never given one a module
  * holds, and clear of the ports modules prefer (the official list's 7000s and 8000s) and the host's.
@@ -67,7 +67,7 @@ export declare const MODULE_PORTS: {
 export declare function inModulePorts(port: number): boolean;
 /**
  * Whether a port can be bound, asked by binding it and releasing it — on every address in
- * `ADDRESSES_A_PORT_IS_FREE_ON` unless `host` names one (2.96.0; before, `127.0.0.1` alone, which
+ * `ADDRESSES_A_PORT_IS_FREE_ON` unless `host` names one (2.97.0; before, `127.0.0.1` alone, which
  * calls a port free that another program holds on `[::]`). An address the machine does not have
  * (no IPv6) is skipped. The port can be taken again before the caller binds it; `serves()` survives
  * that by leaving `strictPort` off.
@@ -82,7 +82,7 @@ export interface ModulePortOptions {
     probe?: (port: number) => Promise<boolean>;
 }
 /**
- * A port for a module started on any port (2.96.0): the first in `MODULE_PORTS`, from a random
+ * A port for a module started on any port (2.97.0): the first in `MODULE_PORTS`, from a random
  * place in it and around, that `taken` does not name and that is `free` on every address. `null`
  * when the whole band is held. What `PORT=0` binds — never port 0, which is the system's temporary
  * range, the range another program's "any port" server is given ports from.

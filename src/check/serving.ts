@@ -4,7 +4,7 @@ import { join, resolve } from 'node:path'
 import { sourcesOf } from './parts.js'
 
 /**
- * `bun run check:serving <module dir>…` (2.96.0): does a module take its port the shared way? A
+ * `bun run check:serving <module dir>…` (2.97.0): does a module take its port the shared way? A
  * module that picks and binds its own port bypasses every rule `/serve` keeps about ports: the
  * band outside the system's temporary range (`MODULE_PORTS`), the probe on every address a port can
  * be held on (`free`), the drift and the registration. That is how a module ends up on a port

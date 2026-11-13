@@ -16,7 +16,7 @@ next patch.
 Kind: feature
 
 A module's port is nobody else's. **Additive**; `PROTOCOL` is still 2.
-[docs/serving.md](docs/serving.md#which-port-module_ports-and-free-on-every-address-2960).
+[docs/serving.md](docs/serving.md#which-port-module_ports-and-free-on-every-address-2970).
 
 - `PORT=0` no longer binds port 0. The system fills port 0 from its temporary range, the range it
   also hands another program's "any port" server (bound to `[::]`); macOS lets that bind share the

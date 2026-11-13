@@ -45,7 +45,7 @@ export interface ServesPlugin {
  * Whether the host asked for ANY free port (2.65.0): `PORT=0`. A host that reaches modules at
  * stable addresses of its own does not need a module on a port it knows in advance; it reads the
  * port the module registers (`registerBound`). Then neither `claim` nor the drift rules run: the
- * module takes a port from `MODULE_PORTS` that is free on every address (`anyPortOrLeave`, 2.96.0;
+ * module takes a port from `MODULE_PORTS` that is free on every address (`anyPortOrLeave`, 2.97.0;
  * before, port 0, which the system fills from the range it also gives other programs' servers),
  * binds it, and says so in its registration. Any other `PORT` (or none) is as before: `preferred`,
  * then `claim`'s drift.
@@ -71,7 +71,7 @@ export function serves({ id, prefer, dir, span, timeoutMs }: ServesOptions): Ser
     apply: 'serve',
 
     async config(config) {
-      /* Any free port (2.65.0): one of `MODULE_PORTS`, free on every address (2.96.0), and
+      /* Any free port (2.65.0): one of `MODULE_PORTS`, free on every address (2.97.0), and
          `configureServer` registers what was bound. */
       if (anyPort()) {
         const said = config?.server?.cors !== undefined
@@ -128,7 +128,7 @@ export async function claimOrLeave(options: { id: string; prefer: number; span?:
 }
 
 /**
- * The port for `PORT=0` (2.96.0), for a dev server (`serves`) and a built one (`run`) alike: one of
+ * The port for `PORT=0` (2.97.0), for a dev server (`serves`) and a built one (`run`) alike: one of
  * `MODULE_PORTS` that nothing holds on any address (`modulePort`). Never port 0: the system fills
  * that from its temporary range, where another program asking for "any port" on `[::]` is handed
  * the same number and its own requests to `127.0.0.1` reach this module instead. Exit 1 when the
