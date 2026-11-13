@@ -1,4 +1,5 @@
 import { resolve } from 'node:path';
+import { MESSAGE_TOOL_NAMES } from '../agent-messages.js';
 import { DOOR_ARGUMENTS_BEFORE, toolEffect } from '../door.js';
 import { manifestSchema } from '../manifest.js';
 import { listTools, readNeighbour } from '../serve/neighbours.js';
@@ -51,6 +52,14 @@ export function checkDoor(manifest, tools) {
             if (missing.length) {
                 failures.push(`${name} ${ROLE[role]} a ${subject.kind}, and its outputSchema has no ${missing.join(' or ')}. Answer with `
                     + `${role === 'show' ? 'SHOW_OUTPUT_SCHEMA' : 'DONE_OUTPUT_SCHEMA'} in structuredContent, so a caller reads a state and not a sentence.`);
+            }
+        }
+    }
+    /* 2.96.0. A module that messages lists the message tools to every caller: the door was asked with no place token. */
+    if ((manifest.declares?.uses ?? []).includes('agents:message')) {
+        for (const name of MESSAGE_TOOL_NAMES) {
+            if (!byName.has(name)) {
+                failures.push(`${manifest.id} messages (agents:message), and its door lists no ${name} to a caller with no place token. List it to every caller; an unknown conversation is answered in words (messageToolsFor, answerMessageTool).`);
             }
         }
     }

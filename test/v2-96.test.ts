@@ -1,235 +1,166 @@
-import { afterAll, beforeAll, describe, expect, test } from 'bun:test'
-import { execFileSync } from 'node:child_process'
-import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs'
-import { createServer, type Server } from 'node:net'
-import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { describe, expect, test } from 'bun:test'
+import { readFileSync } from 'node:fs'
 
-import { PACKAGE_VERSION, PROTOCOL } from '../src/index.js'
-import { STAMP_FILE } from '../src/ready/build.js'
-import { ADDRESSES_A_PORT_IS_FREE_ON, MODULE_PORTS, free, inModulePorts, modulePort, readRegistration, registryDir, serves } from '../src/serve/index.js'
-import { bindsItsOwnWay, checkModuleServing, checkServingSources } from '../src/check/serving.js'
+import {
+  AGENT_DELIVERY,
+  NOT_PLACED_HEAD,
+  OLDER_MESSAGE_DOOR,
+  PLACE_TOKEN_ARG,
+  adoptWays,
+  agentDeliverResult,
+  messageTools,
+  notPlacedText,
+  placeTokenIn,
+  placeTokenLine,
+  serviceDescriptor,
+  servicesSchema,
+} from '../src/index.js'
+import { answerMessageTool, callToken, deliveryReply, freshPlaceToken, issuePlaceToken, messageToolsFor } from '../src/serve/index.js'
+import { agentConformance, type AgentDoor } from '../src/testing/index.js'
+import { checkAgentFiles } from '../src/check/agent.js'
+import { checkDoor } from '../src/check/door.js'
 
-/**
- * 2.96.0: a module's port is nobody else's. On macOS a wildcard bind (`[::]`, as a test server
- * asking for "any port" makes) and a `127.0.0.1` bind share one port number without a clash, and a
- * request to `127.0.0.1` reaches the more specific one: the module. With `PORT=0` a module took a
- * port from the system's temporary range, where such test servers are handed theirs.
- */
+const TOKEN = 'abcdefghijklmnopqrstuvwxyz012345'
+const DELIVERY = { name: 'Claude', program: 'Claude Code', deliver: '/api/deliver', adopt: 'Type /kehikot-here in it.' }
 
-describe('the version', () => {
-  test('is 2.96.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.96.0')
-    expect(PROTOCOL).toBe(2)
+describe('2.96.0 — one key for a conversation however it started', () => {
+  test('the message tools take placeToken; a module’s say they forward to the kehikko door', () => {
+    for (const tool of messageTools()) expect((tool.inputSchema.properties as Record<string, unknown>)[PLACE_TOKEN_ARG]).toBeDefined()
+    for (const tool of messageTools(false, { older: true })) expect(tool.description.startsWith(OLDER_MESSAGE_DOOR)).toBe(true)
+    for (const tool of messageTools()) expect(tool.description.startsWith(OLDER_MESSAGE_DOOR)).toBe(false)
+  })
+
+  test('the key is said in words and read back; a session id is never one', () => {
+    const token = freshPlaceToken()
+    expect(token).toMatch(/^[A-Za-z0-9_-]{43}$/)
+    expect(freshPlaceToken()).not.toBe(token)
+    expect(placeTokenIn(`Kehikot: Assigned.\n${placeTokenLine(token)}`)).toBe(token)
+    expect(placeTokenIn('Kehikot: Assigned.')).toBeNull()
+    expect(callToken(null, { [PLACE_TOKEN_ARG]: token })).toBe(token)
+    expect(callToken(TOKEN, { [PLACE_TOKEN_ARG]: token })).toBe(TOKEN)
+    expect(callToken(null, { [PLACE_TOKEN_ARG]: 'short' })).toBeNull()
+    expect(callToken(null, {})).toBeNull()
+  })
+
+  test('no key: the tools are listed and say why and what to do, with the module’s way', async () => {
+    expect((await messageToolsFor(null, { module: 'kehikot.claude' })).map((tool) => tool.name)).toEqual(['send_message', 'read_messages'])
+    const said = await answerMessageTool('send_message', { body: 'hi' }, { module: 'kehikot.claude', token: null, adopt: 'In Claude Code: Type /kehikot-here in it.' })
+    expect(said?.isError).toBe(true)
+    expect(said?.text.startsWith(NOT_PLACED_HEAD)).toBe(true)
+    expect(said?.text).toContain('/kehikot-here')
+    expect(notPlacedText()).toContain(PLACE_TOKEN_ARG)
+  })
+
+  test('a placeToken argument is the session asked about, and is not passed on as an argument', async () => {
+    const asked: unknown[] = []
+    const fetch = (async (_url: string, init?: RequestInit) => {
+      asked.push(JSON.parse(String(init?.body)).params)
+      return new Response(JSON.stringify({ ok: true, data: { outcome: 'sent', id: 3, why: '' } }))
+    }) as unknown as typeof globalThis.fetch
+    const said = await answerMessageTool('send_message', { body: 'hi', [PLACE_TOKEN_ARG]: TOKEN }, { module: 'kehikot.claude', token: null, env: { KEHIKOT_ORIGINS: 'http://127.0.0.1:1' }, fetch })
+    expect(said).toEqual({ text: 'Sent (message #3).', isError: false })
+    expect(asked).toEqual([{ token: TOKEN, body: 'hi' }])
+  })
+
+  test('agent.delivery: a known service, its words, and the knock’s answer', async () => {
+    expect(serviceDescriptor(AGENT_DELIVERY, DELIVERY)).toEqual(DELIVERY)
+    expect(serviceDescriptor(AGENT_DELIVERY, { ...DELIVERY, deliver: 'http://elsewhere/' })).toBeNull()
+    expect(servicesSchema.safeParse({ [AGENT_DELIVERY]: DELIVERY }).success).toBe(true)
+    expect(adoptWays([DELIVERY])).toEqual(['In Claude Code: Type /kehikot-here in it.'])
+    const knocked = await deliveryReply('POST', { project: '/p' }, async () => 2)
+    expect(agentDeliverResult.parse(knocked.body)).toEqual({ outcome: 'delivered', delivered: 2, why: '' })
+    expect((await deliveryReply('POST', { project: '/p' }, async () => 0)).body).toEqual({ outcome: 'none', delivered: 0, why: '' })
+    expect((await deliveryReply('POST', {}, async () => 0)).status).toBe(400)
+    expect((await deliveryReply('GET', null, async () => 0)).status).toBe(405)
+  })
+
+  test('issuePlaceToken posts the issue to a loopback host and is true only when it took it', async () => {
+    const posted: unknown[] = []
+    const fetch = (async (url: string | URL, init?: RequestInit) => {
+      posted.push([String(url), JSON.parse(String(init?.body))])
+      return new Response(JSON.stringify({ ok: true, token: TOKEN, doors: [] }))
+    }) as unknown as typeof globalThis.fetch
+    const issue = { module: 'kehikot.claude', token: TOKEN, project: '/p', kehikko: null }
+    expect(await issuePlaceToken(issue, { env: { KEHIKOT_ORIGINS: 'http://127.0.0.1:4170 https://example.com' }, fetch })).toBe(true)
+    expect(posted).toEqual([['http://127.0.0.1:4170/host/place', issue]])
+    expect(await issuePlaceToken({ ...issue, token: 'short' }, { env: { KEHIKOT_ORIGINS: 'http://127.0.0.1:4170' }, fetch })).toBe(false)
   })
 })
 
-/** Hold a port on one address, as another program would. */
-function hold(host: string, port = 0): Promise<{ port: number; server: Server } | null> {
-  return new Promise((resolve) => {
-    const server = createServer()
-    server.once('error', () => resolve(null))
-    server.listen({ port, host, ipv6Only: false }, () => {
-      const address = server.address()
-      resolve({ port: typeof address === 'object' && address ? address.port : 0, server })
-    })
-  })
-}
+describe('2.96.0 — the conformance harness, against a module door built the 2.96.0 way and one built the old way', () => {
+  const ID = 'kehikot.example'
+  const manifest = { id: ID, declares: { uses: ['agents:message'] }, services: { [AGENT_DELIVERY]: DELIVERY } }
 
-const close = (server: Server) => new Promise<void>((resolve) => server.close(() => resolve()))
-
-/** Whether this machine has an IPv6 loopback at all (CI containers may not). */
-const ipv6 = await (async () => {
-  const held = await hold('::1')
-  if (held) await close(held.server)
-  return held !== null
-})()
-
-/** The first port the system hands out for "any port". */
-function temporaryRangeStarts(): number {
-  if (process.platform === 'darwin') {
-    try {
-      return Number(execFileSync('sysctl', ['-n', 'net.inet.ip.portrange.first'], { encoding: 'utf8' }).trim())
-    } catch {
-      return 49152
+  /** A tiny agent module: a record of conversations by token, an adopt that issues, and a door. */
+  function moduleDoor(old: boolean) {
+    const records = new Map<string, string>()
+    const door: AgentDoor = async (method, path, query, body) => {
+      if (path === '/api/kehikot/place') {
+        const conversation = records.get(query.get('kehikot-place') ?? '')
+        return { status: 200, body: { ok: true, place: conversation ? { conversation, epic: 'auth', parts: [], kehikko: null } : null } }
+      }
+      if (path === DELIVERY.deliver) return deliveryReply(method, body, async () => 0)
+      if (path === '/mcp') {
+        const rpc = body as { id: number; method: string; params?: { name?: string; arguments?: Record<string, unknown> } }
+        const token = query.get('kehikot-place')
+        if (rpc.method === 'tools/list') return { status: 200, body: { result: { tools: old && !token ? [] : await messageToolsFor(token, { module: ID }) } } }
+        const said = await answerMessageTool(rpc.params?.name ?? '', rpc.params?.arguments ?? {}, { module: ID, token, adopt: 'In Example: type /here.' })
+        return { status: 200, body: { result: { content: [{ type: 'text', text: said?.text ?? '' }], isError: said?.isError } } }
+      }
+      return null
     }
+    const adopt = async () => {
+      const token = freshPlaceToken()
+      records.set(token, 'conv-1234')
+      await issuePlaceToken({ module: ID, token, project: '/p', kehikko: null })
+      return { said: `Kehikot: Assigned to auth.\n${placeTokenLine(token)}`, conversation: 'conv-1234' }
+    }
+    const launched = async () => {
+      const token = freshPlaceToken()
+      records.set(token, 'conv-launched')
+      await issuePlaceToken({ module: ID, token, project: '/p', kehikko: null })
+      return { token }
+    }
+    return { door, adopt, launched }
   }
-  if (process.platform === 'linux') return 32768
-  return 49152
-}
 
-describe('free asks every address a port can be held on', () => {
-  test('the addresses', () => {
-    expect(ADDRESSES_A_PORT_IS_FREE_ON).toEqual(['127.0.0.1', '::1', '0.0.0.0', '::'])
+  test('a module built the 2.96.0 way passes', async () => {
+    const built = moduleDoor(false)
+    const said = await agentConformance({ manifest, door: built.door, project: '/p', adopt: built.adopt, launched: built.launched })
+    expect(said.failures).toEqual([])
+    expect(said.passed.length).toBeGreaterThanOrEqual(10)
   })
 
-  test.skipIf(!ipv6)('a port another program holds on [::] is not free, though 127.0.0.1 alone would say it is', async () => {
-    const held = (await hold('::'))!
-    try {
-      /* What `free` asked before 2.96.0, and what the host's own probe asked: blind to it. */
-      expect(await free(held.port, '127.0.0.1')).toBe(true)
-      expect(await free(held.port)).toBe(false)
-    } finally {
-      await close(held.server)
-    }
+  test('one that lists the message tools only for a launched conversation fails, and says so', async () => {
+    const built = moduleDoor(true)
+    const said = await agentConformance({ manifest, door: built.door, project: '/p', adopt: built.adopt })
+    expect(said.failures.some((one) => one.startsWith('lists every tool to a caller with no place token'))).toBe(true)
   })
 
-  test('a port held on 0.0.0.0 or on 127.0.0.1 is not free', async () => {
-    for (const host of ['0.0.0.0', '127.0.0.1']) {
-      const held = (await hold(host))!
-      try {
-        expect(await free(held.port)).toBe(false)
-      } finally {
-        await close(held.server)
-      }
-    }
+  test('one that messages without agent.delivery fails', async () => {
+    const built = moduleDoor(false)
+    const said = await agentConformance({ manifest: { ...manifest, services: {} }, door: built.door, project: '/p', adopt: built.adopt })
+    expect(said.failures.some((one) => one.startsWith('provides agent.delivery'))).toBe(true)
   })
 
-  test('a port nothing holds is free', async () => {
-    const held = (await hold('127.0.0.1'))!
-    await close(held.server)
-    expect(await free(held.port)).toBe(true)
-  })
-})
-
-describe('MODULE_PORTS', () => {
-  test("is below every system's temporary range and clear of the ports modules prefer", () => {
-    expect(MODULE_PORTS.to).toBeLessThan(32768)
-    expect(MODULE_PORTS.to).toBeLessThan(temporaryRangeStarts())
-    expect(MODULE_PORTS.from).toBeGreaterThan(9999)
-    expect(inModulePorts(MODULE_PORTS.from)).toBe(true)
-    expect(inModulePorts(MODULE_PORTS.to + 1)).toBe(false)
-    expect(inModulePorts(0)).toBe(false)
+  test('check:agent fails a module with no delivery, no conformance test, or tools behind a token', () => {
+    const conformance = { path: 'test/agent.test.ts', text: "import { expectAgentConformance } from 'kehikot-module-protocol/testing'\nawait expectAgentConformance({})" }
+    expect(checkAgentFiles(manifest, [], [conformance]).failures).toEqual([])
+    expect(checkAgentFiles({ id: 'x', declares: { uses: [] } }, [], []).agent).toBe(false)
+    expect(checkAgentFiles({ ...manifest, services: {} }, [], [conformance]).failures).toHaveLength(1)
+    expect(checkAgentFiles(manifest, [], []).failures).toHaveLength(1)
+    const gated = { path: 'doors.ts', text: 'tools: [...tools(), ...(token ? await messageToolsFor(token, o) : [])]' }
+    expect(checkAgentFiles(manifest, [gated], [conformance]).failures).toHaveLength(1)
   })
 
-  test('a server asking the system for any port, on [::] as a test server does, is never given one of them', async () => {
-    const held: Server[] = []
-    try {
-      for (let i = 0; i < 40; i++) {
-        const one = (await hold(ipv6 ? '::' : '0.0.0.0'))!
-        held.push(one.server)
-        expect(inModulePorts(one.port)).toBe(false)
-      }
-    } finally {
-      await Promise.all(held.map(close))
-    }
-  })
-})
-
-describe('modulePort', () => {
-  test('a port of the band that is free on every address', async () => {
-    const port = await modulePort()
-    expect(port).not.toBeNull()
-    expect(inModulePorts(port!)).toBe(true)
-    expect(await free(port!)).toBe(true)
+  test('check:door --running fails a messaging module whose door lists no message tools to a caller with no token', () => {
+    const declared = { id: ID, mcp: { subjects: [] } as never, declares: { uses: ['agents:message'] } }
+    expect(checkDoor(declared, []).failures).toHaveLength(2)
+    expect(checkDoor(declared, messageTools() as never).failures).toEqual([])
   })
 
-  test.skipIf(!ipv6)('passes over a port another program holds on [::]', async () => {
-    const held = (await hold('::', MODULE_PORTS.from + 7))
-    if (!held) return
-    try {
-      expect(await modulePort({ start: MODULE_PORTS.from + 7 })).toBe(MODULE_PORTS.from + 8)
-    } finally {
-      await close(held.server)
-    }
-  })
-
-  test('passes over what `taken` names, wraps around the band, and says null when all of it is held', async () => {
-    const all = async () => true
-    expect(await modulePort({ start: MODULE_PORTS.to, taken: (port) => port === MODULE_PORTS.to, probe: all })).toBe(MODULE_PORTS.from)
-    expect(await modulePort({ probe: async () => false })).toBeNull()
-  })
-})
-
-describe('PORT=0', () => {
-  test("the dev server's plugin asks Vite for a port of the band, never 0", async () => {
-    const before = process.env.PORT
-    process.env.PORT = '0'
-    try {
-      const said = await serves({ id: 'kehikot.anyport', prefer: 1 }).config()
-      expect(inModulePorts(said.server.port)).toBe(true)
-      expect(said.server.host).toBe('127.0.0.1')
-    } finally {
-      if (before === undefined) delete process.env.PORT
-      else process.env.PORT = before
-    }
-  })
-})
-
-const git = (dir: string, ...args: string[]) => execFileSync('git', ['-C', dir, ...args], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim()
-
-function builtCheckout(): string {
-  const dir = mkdtempSync(join(tmpdir(), 'kehikot-band-'))
-  git(dir, 'init', '-q')
-  git(dir, 'config', 'user.email', 'test@example.invalid')
-  git(dir, 'config', 'user.name', 'Test')
-  writeFileSync(join(dir, '.gitignore'), 'dist\n')
-  writeFileSync(join(dir, 'source.ts'), 'export {}\n')
-  git(dir, 'add', '.')
-  git(dir, 'commit', '-q', '-m', 'one')
-  mkdirSync(join(dir, 'dist'), { recursive: true })
-  writeFileSync(join(dir, 'dist', 'index.html'), '<!doctype html><title>t</title>')
-  writeFileSync(join(dir, 'dist', STAMP_FILE), `${git(dir, 'rev-parse', 'HEAD')}\n`)
-  return dir
-}
-
-describe('a built module run with PORT=0, as a host starts it', () => {
-  let child: ReturnType<typeof Bun.spawn> | null = null
-  let said: { origin: string; port: number } = { origin: '', port: 0 }
-  const registry = mkdtempSync(join(tmpdir(), 'kehikot-band-registry-'))
-
-  beforeAll(async () => {
-    child = Bun.spawn(['bun', join(import.meta.dirname, 'fixtures', 'ready', 'server.ts'), builtCheckout(), '7999'], {
-      env: { ...process.env, PORT: '0', KEHIKOT_MODULES_DIR: registry },
-      stdout: 'pipe',
-      stderr: 'pipe',
-    })
-    const reader = (child.stdout as ReadableStream<Uint8Array>).getReader()
-    const text = new TextDecoder()
-    let held = ''
-    for (;;) {
-      const { value, done } = await reader.read()
-      if (done) throw new Error(`the server ended before it was ready: ${held}`)
-      held += text.decode(value, { stream: true })
-      const ready = held.split('\n').find((line) => line.startsWith('READY '))
-      if (ready) {
-        said = JSON.parse(ready.slice(6)) as { origin: string; port: number }
-        break
-      }
-    }
-  })
-  afterAll(() => {
-    child?.kill()
-  })
-
-  test('binds a port of the band, outside the range the system hands out, and registers it', () => {
-    expect(inModulePorts(said.port)).toBe(true)
-    expect(said.port).toBeLessThan(temporaryRangeStarts())
-    expect(readRegistration(join(registryDir({ KEHIKOT_MODULES_DIR: registry }), 'kehikot.readyexample.json'))?.url).toBe(said.origin)
-  })
-
-  test('a probe of that port on every address says it is held, so nothing of ours hands it out again', async () => {
-    expect(await free(said.port)).toBe(false)
-  })
-})
-
-describe('check:serving', () => {
-  test('a file that binds its own port fails; one that takes it from the protocol passes', () => {
-    expect(bindsItsOwnWay("import { createServer } from 'node:net'\nserver.listen(port, '127.0.0.1')")).toBe(true)
-    expect(bindsItsOwnWay('Bun.serve({ port: 0, hostname: "127.0.0.1", fetch })')).toBe(true)
-    expect(bindsItsOwnWay("import { claim } from 'kehikot-module-protocol/serve'\nconst c = await claim({ id, prefer })\nBun.serve({ port: c.port, fetch })")).toBe(false)
-    expect(bindsItsOwnWay("import { run } from 'kehikot-module-protocol/run'\nawait run({ id })")).toBe(false)
-    /* A client's `listen()` with nothing to bind, and a sentence about `listen(port)`, are not binds. */
-    expect(bindsItsOwnWay('connection.listen()')).toBe(false)
-    expect(bindsItsOwnWay('/* we never call server.listen(port) here */\nexport {}')).toBe(false)
-  })
-
-  test('a Vite config without serves() fails; with it, passes', () => {
-    expect(checkServingSources('m', [{ path: 'vite.config.ts', text: 'export default { server: { port: 5173 } }' }]).failures).toHaveLength(1)
-    expect(checkServingSources('m', [{ path: 'vite.config.ts', text: 'plugins: [serves({ id, prefer })]' }]).failures).toEqual([])
-  })
-
-  test('the module template passes', () => {
-    expect(checkModuleServing(join(import.meta.dirname, '..', 'template')).failures).toEqual([])
+  test('the docs say where messaging lives', () => {
+    const doc = readFileSync(new URL('../docs/agent-messages.md', import.meta.url), 'utf8')
+    for (const word of ['2.96.0', 'agent.delivery', 'placeToken', 'expectAgentConformance', 'kehikot-check-agent']) expect(doc).toContain(word)
   })
 })

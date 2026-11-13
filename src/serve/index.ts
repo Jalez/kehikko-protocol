@@ -31,6 +31,26 @@ export {
 
 export { DEFAULT_FRAME_ORIGINS, frameAncestors, frameOrigins } from './origins.js'
 
+/* The host that started this module, and the only doors a session is handed on it (2.95.0). */
+export {
+  askedHosts,
+  doorConfigProblems,
+  doorTarget,
+  doorUrl,
+  isStableDoor,
+  keptFolderName,
+  legacyKeptFolderName,
+  loopbackOrigin,
+  stableDoor,
+  stableDoors,
+  startingHost,
+  tokenOnDoor,
+  HOST_DOOR_MODULE,
+  HOST_ENV,
+  MODULE_PATH_PREFIX,
+  type HandedDoor,
+} from './host-door.js'
+
 /* Whether a folder is a project the host holds: a module's server asks before it reads one. */
 export {
   hostHasProject,
@@ -201,7 +221,10 @@ export {
   TELL_EVERY_MS,
   type PlaceTeller,
   type PlaceTellerOptions,
+  callToken,
 } from './messages.js'
+/* 2.96.0. One key for a conversation however it started, and the delivery knock. See `adopt.ts`. */
+export { freshPlaceToken, issuePlaceToken, deliveryReply } from './adopt.js'
 export {
   messageTools,
   isMessageTool,

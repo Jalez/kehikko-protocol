@@ -422,7 +422,7 @@ export declare const contextSchema: z.ZodObject<{
     appearance: z.ZodCatch<z.ZodOptional<z.ZodObject<{
         background: z.ZodCatch<z.ZodEnum<["card", "none"]>>;
     }, "strip", z.ZodTypeAny, {
-        background: "card" | "none";
+        background: "none" | "card";
     }, {
         background?: unknown;
     }>>>;
@@ -1125,7 +1125,7 @@ export declare const contextSchema: z.ZodObject<{
     }[];
     scope?: "epic" | "kehikko" | "project" | "machine" | "part" | undefined;
     appearance?: {
-        background: "card" | "none";
+        background: "none" | "card";
     } | undefined;
     kept?: string | null | undefined;
 }, {

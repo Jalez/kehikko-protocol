@@ -20,7 +20,11 @@ export interface DoorCheck {
     /** What a person might want to look at. Never a failure. */
     notes: string[];
 }
-type Declared = Pick<Manifest, 'id' | 'mcp'>;
+type Declared = Pick<Manifest, 'id' | 'mcp'> & {
+    declares?: {
+        uses?: readonly string[];
+    };
+};
 /** The check over the files alone. Pure. Fails nothing: text can only hint at what a door lists. */
 export declare function checkDoorSources(manifest: Declared, sources: readonly {
     path: string;

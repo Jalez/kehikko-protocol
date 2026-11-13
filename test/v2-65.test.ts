@@ -13,7 +13,7 @@ import { anyPort, inModulePorts, preferred, readRegistration, registryDir, serve
 
 describe('the version', () => {
   test('is 2.66.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.96.0')
+    expect(PACKAGE_VERSION).toBe('2.97.0')
     expect(PROTOCOL).toBe(2)
   })
 })
@@ -28,12 +28,12 @@ describe('anyPort', () => {
     expect(preferred(7920, { PORT: '0' })).toBe(7920)
   })
 
-  test("the dev server's plugin asks Vite for a port of the band (2.96.0) and claims nothing", async () => {
+  test("the dev server's plugin asks Vite for a port of the band (2.97.0) and claims nothing", async () => {
     const before = process.env.PORT
     process.env.PORT = '0'
     try {
       const said = await serves({ id: 'kehikot.anyport', prefer: 1 }).config()
-      /* 2.96.0: one of `MODULE_PORTS`, never 0 — see v2-96.test.ts. */
+      /* 2.97.0: one of `MODULE_PORTS`, never 0 — see v2-97.test.ts. */
       expect(inModulePorts(said.server.port)).toBe(true)
       expect(said.server.host).toBe('127.0.0.1')
     } finally {

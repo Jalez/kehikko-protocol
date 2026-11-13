@@ -11,7 +11,7 @@ After 2.78.0, every entry's first line under its heading is its kind, and the ve
 (semver; CI checks it): `Kind: breaking` → next major, `Kind: feature` → next minor, `Kind: fix` →
 next patch.
 
-## 2.96.0 — 2026-11-13
+## 2.97.0 — 2026-11-13
 
 Kind: feature
 
@@ -29,6 +29,69 @@ A module's port is nobody else's. **Additive**; `PROTOCOL` is still 2.
   host)` still asks one address. `claim`'s drift uses it.
 - `check:serving` (`kehikot-check-serving`): fails a module whose own sources bind a server or probe
   a port without taking the port from `/serve` or `/run`, and a Vite config without `serves()`.
+
+## 2.96.0 — 2026-11-13
+
+Kind: feature
+
+Messaging comes from the host, and every agent conversation can use it however it started. **Additive**;
+`PROTOCOL` is still 2. [docs/agent-messages.md](docs/agent-messages.md#messaging-comes-from-the-host-your-module-delivers-2960).
+
+### Added
+
+- One key for a conversation however it started: `PLACE_TOKEN_ARG` (`placeToken`), taken by every
+  message tool; `placeTokenLine(token)` / `placeTokenIn(text)` ("Kehikot key for this conversation: …"),
+  said to a conversation placed afterwards; `freshPlaceToken()` and `issuePlaceToken(issue)` in `/serve`
+  (`POST /host/place`); `callToken(urlToken, args)`: the URL's token, else `placeToken`, never an id.
+- `notPlacedText(ways)` / `NOT_PLACED_HEAD`: what a message tool answers a conversation with no key —
+  why, and how it is placed.
+- `agent.delivery` service (`agentDeliverySchema`: `name`, `program`, `deliver`, `adopt`;
+  `agentDeliverParams`, `agentDeliverResult`, `adoptWays`, `AGENT_DELIVERY`), and `deliveryReply` in
+  `/serve` for the `deliver` route.
+- `messageTools(act, { older })` and `OLDER_MESSAGE_DOOR`: a module's own message tools say they forward
+  to the kehikko door's.
+- `kehikot-module-protocol/testing`: `expectAgentConformance` / `agentConformance` / `fakeHost`, the
+  conformance check an agent module runs with one test file.
+- `kehikot-check-agent` (`check:agent`): fails an agent module with no `agent.delivery`, no conformance
+  test, or message tools listed behind a token. `check:door --running` fails a messaging module whose
+  door lists no message tools to a caller with no token.
+
+### Changed
+
+- `messageToolsFor` lists `send_message` and `read_messages` to every caller, with or without a token
+  and whatever the host said; a call with no key answers `notPlacedText` (with the module's `adopt`)
+  instead of the old sentence. Nothing is omitted silently any more.
+
+## 2.95.0 — 2026-11-13
+
+Kind: feature
+
+The host that started a module, and the only doors an agent session is handed on it. **Additive**;
+`PROTOCOL` is still 2. [docs/serving.md](docs/serving.md#the-starting-host-2950).
+
+A scratch host an agent ran opened a copy of a project, which carried the same conversation tokens,
+and its copy of an agent module wrote that host's doors into the real sessions' kept door configs
+(the per-user temporary folder is not a machine directory, so a scratch environment did not move it).
+Claude Code reads `--mcp-config` at launch and `/mcp` reconnects with what it read, so the sessions
+could not reach any door until restarted.
+
+### Added
+
+- `HOST_ENV` (`KEHIKOT_HOST`): a host puts its own origin there in the environment of every module it
+  starts. `startingHost(env)` reads it, or, from an older host, the first loopback `http(s)` origin of
+  `KEHIKOT_ORIGINS` / `KEHIKOT_ORIGIN`; never a default, a page's greeting, a request's origin or a door list.
+- `askedHosts(env)`: the hosts a module's server asks anything of. With `KEHIKOT_HOST` set, that host
+  alone: `hostPlace`, `hostHasProject`, `askHost`, `hostVouches` and the settings pass no longer fall
+  through to another host on the machine. Without it, the list in order, as before.
+- `doorUrl(host, module, token?, path?)`: `<host>/mcp` for the host (`HOST_DOOR_MODULE`), `<host>/m/<id>/mcp`
+  for a module, with the place token. `stableDoor` / `stableDoors` rebuild a door list from any source
+  on the starting host (another host's, a module's raw port, the stable one); a door that names no module
+  is dropped. `isStableDoor(url, host)`, `doorTarget(url, module?)`, `tokenOnDoor(url)`, `loopbackOrigin`.
+- `keptFolderName(token, host)`: a session's kept folder named for the host as well as the token, so the
+  same token under another host names another folder; `legacyKeptFolderName(token)` is the name before.
+- `doorConfigProblems(config, host)`: the conformance check over a written door config; and
+  `bun run check:door-config` (`kehikot-check-door-config`, `src/check/door-config.ts`): fails a module
+  that writes an agent's door config and spells a session door at a raw loopback port.
 
 ## 2.94.0 — 2026-11-13
 
