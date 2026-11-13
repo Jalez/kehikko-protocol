@@ -1,6 +1,6 @@
 {
   "name": "kehikot-module-protocol",
-  "version": "2.95.0",
+  "version": "2.96.0",
   "description": "The shapes a Kehikot host and a module it frames agree on: the manifest, the wire, and the extension payloads. Shapes only — no I/O, no state, no decisions.",
   "keywords": [
     "kehikot",
@@ -74,6 +74,10 @@
       "types": "./dist/ready/build.d.ts",
       "default": "./dist/ready/build.js"
     },
+    "./testing": {
+      "types": "./dist/testing/index.d.ts",
+      "default": "./dist/testing/index.js"
+    },
     "./package.json": "./package.json"
   },
   "bin": {
@@ -82,7 +86,8 @@
     "kehikot-check-door": "./bin/check-door.ts",
     "kehikot-check-rows": "./bin/check-rows.ts",
     "kehikot-check-notes": "./bin/check-notes.ts",
-    "kehikot-check-door-config": "./bin/check-door-config.ts"
+    "kehikot-check-door-config": "./bin/check-door-config.ts",
+    "kehikot-check-agent": "./bin/check-agent.ts"
   },
   "files": [
     "dist",
@@ -114,7 +119,8 @@
     "check:door": "bun run bin/check-door.ts",
     "check:rows": "bun run bin/check-rows.ts",
     "check:notes": "bun run bin/check-notes.ts",
-    "check:door-config": "bun run bin/check-door-config.ts"
+    "check:door-config": "bun run bin/check-door-config.ts",
+    "check:agent": "bun run bin/check-agent.ts"
   },
   "peerDependencies": {
     "@radix-ui/react-collapsible": "^1.1.12",

@@ -1865,7 +1865,7 @@ export declare const helloSchema: z.ZodObject<{
         appearance: z.ZodCatch<z.ZodOptional<z.ZodObject<{
             background: z.ZodCatch<z.ZodEnum<["card", "none"]>>;
         }, "strip", z.ZodTypeAny, {
-            background: "card" | "none";
+            background: "none" | "card";
         }, {
             background?: unknown;
         }>>>;
@@ -2471,7 +2471,7 @@ export declare const helloSchema: z.ZodObject<{
         }[];
         scope?: "epic" | "kehikko" | "project" | "machine" | "part" | undefined;
         appearance?: {
-            background: "card" | "none";
+            background: "none" | "card";
         } | undefined;
         kept?: string | null | undefined;
     }, {
@@ -2744,7 +2744,7 @@ export declare const helloSchema: z.ZodObject<{
         }[];
         scope?: "epic" | "kehikko" | "project" | "machine" | "part" | undefined;
         appearance?: {
-            background: "card" | "none";
+            background: "none" | "card";
         } | undefined;
         kept?: string | null | undefined;
     };
@@ -2892,7 +2892,7 @@ export declare const contextMessageSchema: z.ZodObject<{
     appearance: z.ZodCatch<z.ZodOptional<z.ZodObject<{
         background: z.ZodCatch<z.ZodEnum<["card", "none"]>>;
     }, "strip", z.ZodTypeAny, {
-        background: "card" | "none";
+        background: "none" | "card";
     }, {
         background?: unknown;
     }>>>;
@@ -3503,7 +3503,7 @@ export declare const contextMessageSchema: z.ZodObject<{
     }[];
     scope?: "epic" | "kehikko" | "project" | "machine" | "part" | undefined;
     appearance?: {
-        background: "card" | "none";
+        background: "none" | "card";
     } | undefined;
     kept?: string | null | undefined;
 }, {
@@ -4384,7 +4384,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         appearance: z.ZodCatch<z.ZodOptional<z.ZodObject<{
             background: z.ZodCatch<z.ZodEnum<["card", "none"]>>;
         }, "strip", z.ZodTypeAny, {
-            background: "card" | "none";
+            background: "none" | "card";
         }, {
             background?: unknown;
         }>>>;
@@ -4990,7 +4990,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         }[];
         scope?: "epic" | "kehikko" | "project" | "machine" | "part" | undefined;
         appearance?: {
-            background: "card" | "none";
+            background: "none" | "card";
         } | undefined;
         kept?: string | null | undefined;
     }, {
@@ -5263,7 +5263,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
         }[];
         scope?: "epic" | "kehikko" | "project" | "machine" | "part" | undefined;
         appearance?: {
-            background: "card" | "none";
+            background: "none" | "card";
         } | undefined;
         kept?: string | null | undefined;
     };
@@ -5405,7 +5405,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     appearance: z.ZodCatch<z.ZodOptional<z.ZodObject<{
         background: z.ZodCatch<z.ZodEnum<["card", "none"]>>;
     }, "strip", z.ZodTypeAny, {
-        background: "card" | "none";
+        background: "none" | "card";
     }, {
         background?: unknown;
     }>>>;
@@ -6016,7 +6016,7 @@ export declare const hostMessageSchema: z.ZodUnion<[z.ZodObject<{
     }[];
     scope?: "epic" | "kehikko" | "project" | "machine" | "part" | undefined;
     appearance?: {
-        background: "card" | "none";
+        background: "none" | "card";
     } | undefined;
     kept?: string | null | undefined;
 }, {

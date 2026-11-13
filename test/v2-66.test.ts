@@ -18,7 +18,7 @@ const HOST = 'http://127.0.0.1:4889'
 
 describe('the version', () => {
   test('is 2.66.0', () => {
-    expect(PACKAGE_VERSION).toBe('2.95.0')
+    expect(PACKAGE_VERSION).toBe('2.96.0')
     expect(readFileSync(join(REPO, 'CHANGELOG.md'), 'utf8')).toContain('## 2.66.0')
     expect(readFileSync(join(REPO, 'docs/agent-messages.md'), 'utf8')).toContain('The notes and the door agree (2.66.0)')
   })
@@ -58,20 +58,21 @@ describe('the door lists the tools for its token', () => {
     expect(await names(TOKEN)).toEqual(['send_message', 'read_messages'])
   })
 
-  test('a host that never can (too old, or no grant) lists none', async () => {
+  test('a host that never can (too old, or no grant) still has them listed (2.95.0): the call says why', async () => {
     answer = () => ({ ok: false, reason: 'unknown-method', declined: 'host-too-old', error: 'no' })
-    expect(await names(TOKEN)).toEqual([])
+    expect(await names(TOKEN)).toEqual(['send_message', 'read_messages'])
     forgetMessageHosts()
     answer = () => ({ ok: false, reason: 'failed', refused: 'grant', error: 'not declared' })
     expect(await hostOnMessages({ ...options, token: TOKEN })).toBe('never')
-    expect(await names(TOKEN)).toEqual([])
+    expect(await names(TOKEN)).toEqual(['send_message', 'read_messages'])
   })
 
-  test('no token, no tools, and a call without one sends nothing', async () => {
-    expect(await names(null)).toEqual([])
-    expect(await names('')).toEqual([])
+  test('no token: the tools are listed, and a call without one sends nothing and says why', async () => {
+    expect(await names(null)).toEqual(['send_message', 'read_messages'])
+    expect(await names('')).toEqual(['send_message', 'read_messages'])
     const said = await answerMessageTool('send_message', { body: 'hi' }, { ...options, token: null })
     expect(said?.isError).toBe(true)
+    expect(said?.text).toContain('isn’t known to Kehikot as a session yet')
     expect(asked).toEqual([])
   })
 

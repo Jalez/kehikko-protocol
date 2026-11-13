@@ -45,7 +45,9 @@ export { SETTINGS_PATH, SETTINGS_PASS_PATH } from '../settings.js';
 export { askHost, hostAskUrls, mintServerPass, serverPassReply, spendServerPass, NO_HOST_TO_ASK, } from './ask.js';
 export { SERVER_ASK_PATH, SERVER_PASS_PATH, SERVER_METHODS } from '../server-ask.js';
 /* The message tools every module that runs agent sessions puts on its MCP door (2.41.0): a thin adapter over `askHost`. */
-export { answerMessageTool, forgetMessageHosts, hostKeepsMessages, hostOnMessages, messageToolsFor, messageWaker, messageDelivery, DELIVERY_KEEP_MS, ASLEEP_EVERY_MS, WAKE_EVERY_MS, WAKE_SETTLE_MS, placeTeller, tellDigest, TELL_EVERY_MS, } from './messages.js';
+export { answerMessageTool, forgetMessageHosts, hostKeepsMessages, hostOnMessages, messageToolsFor, messageWaker, messageDelivery, DELIVERY_KEEP_MS, ASLEEP_EVERY_MS, WAKE_EVERY_MS, WAKE_SETTLE_MS, placeTeller, tellDigest, TELL_EVERY_MS, callToken, } from './messages.js';
+/* 2.96.0. One key for a conversation however it started, and the delivery knock. See `adopt.ts`. */
+export { freshPlaceToken, issuePlaceToken, deliveryReply } from './adopt.js';
 export { messageTools, isMessageTool, MESSAGE_TOOL_NAMES, ACT_ON_MESSAGES_SETTING, WAKE_ON_MESSAGES_SETTING, actsOnMessages, wakesOnMessages, typedMessages, markersNote, shortPath, pasted, deliveryFor, DELIVERY_STATES, RESUME_EVERY_MS, RESUME_MOST, } from '../agent-messages.js';
 /* The projects this module keeps something in, asked at start and on a slow clock, each handed to its own `know` (2.76.0). */
 export { watchKnownProjects, KNOWN_PROJECTS_EVERY_MS, KNOWN_PROJECTS_RETRY_MS, } from './known-projects.js';
