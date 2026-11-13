@@ -6,7 +6,7 @@ import { z } from 'zod'
 import { DOOR_PROJECT_SAYS, PLACE_PARAM, PLACE_TOKEN, doorContext, placeResult, type DoorPlace } from '../door.js'
 import { PROJECT_ID } from '../ids.js'
 import { LIMITS } from '../limits.js'
-import { frameOrigins } from './origins.js'
+import { askedHosts } from './host-door.js'
 
 /**
  * Asking the host one question a module's SERVER has: is this folder a project a person added here?
@@ -45,19 +45,8 @@ export const isProjectResult = z.object({
 })
 export type IsProjectResult = z.infer<typeof isProjectResult>
 
-/** The origins a host may be asked on: `KEHIKOT_ORIGINS` and its fallbacks, kept to `http(s)` loopback. */
-function hostOrigins(env: Record<string, string | undefined>): string[] {
-  const out: string[] = []
-  for (const origin of frameOrigins(env)) {
-    try {
-      const url = new URL(origin)
-      if ((url.protocol === 'http:' || url.protocol === 'https:') && ['127.0.0.1', 'localhost', '[::1]'].includes(url.hostname)) out.push(url.origin)
-    } catch {
-      /* Not a URL: nobody to ask there. */
-    }
-  }
-  return [...new Set(out)]
-}
+/** The hosts asked: the starting host alone, when there is one (`askedHosts`, 2.95.0). */
+const hostOrigins = askedHosts
 
 /** The URLs `hostProject` asks, in order, for one folder. Pure; exported for tests and for a module that wants to ask its own way. */
 export function hostIsProjectUrls(folder: string, env: Record<string, string | undefined> = process.env): string[] {
@@ -138,7 +127,7 @@ export function forgetHostProjects(): void {
 }
 
 /**
- * What the host says about `folder` (2.3.0). Asks each origin in `KEHIKOT_ORIGINS` (the same list
+ * What the host says about `folder` (2.3.0). Asks the host that started this module (`askedHosts`, 2.95.0), or, for a module nobody started, each origin in `KEHIKOT_ORIGINS` (the same list
  * `frameOrigins` reads; non-loopback and `tauri:` entries are skipped) until one says `project:
  * true`. A `project: false` that names `movedTo` is kept over a bare one. Fails closed: a relative
  * path, no answer, a refusal, a slow host or a reply of another shape is `project: false`. Never throws.

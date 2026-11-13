@@ -11,6 +11,37 @@ After 2.78.0, every entry's first line under its heading is its kind, and the ve
 (semver; CI checks it): `Kind: breaking` → next major, `Kind: feature` → next minor, `Kind: fix` →
 next patch.
 
+## 2.95.0 — 2026-11-13
+
+Kind: feature
+
+The host that started a module, and the only doors an agent session is handed on it. **Additive**;
+`PROTOCOL` is still 2. [docs/serving.md](docs/serving.md#the-starting-host-2950).
+
+A scratch host an agent ran opened a copy of a project, which carried the same conversation tokens,
+and its copy of an agent module wrote that host's doors into the real sessions' kept door configs
+(the per-user temporary folder is not a machine directory, so a scratch environment did not move it).
+Claude Code reads `--mcp-config` at launch and `/mcp` reconnects with what it read, so the sessions
+could not reach any door until restarted.
+
+### Added
+
+- `HOST_ENV` (`KEHIKOT_HOST`): a host puts its own origin there in the environment of every module it
+  starts. `startingHost(env)` reads it, or, from an older host, the first loopback `http(s)` origin of
+  `KEHIKOT_ORIGINS` / `KEHIKOT_ORIGIN`; never a default, a page's greeting, a request's origin or a door list.
+- `askedHosts(env)`: the hosts a module's server asks anything of. With `KEHIKOT_HOST` set, that host
+  alone: `hostPlace`, `hostHasProject`, `askHost`, `hostVouches` and the settings pass no longer fall
+  through to another host on the machine. Without it, the list in order, as before.
+- `doorUrl(host, module, token?, path?)`: `<host>/mcp` for the host (`HOST_DOOR_MODULE`), `<host>/m/<id>/mcp`
+  for a module, with the place token. `stableDoor` / `stableDoors` rebuild a door list from any source
+  on the starting host (another host's, a module's raw port, the stable one); a door that names no module
+  is dropped. `isStableDoor(url, host)`, `doorTarget(url, module?)`, `tokenOnDoor(url)`, `loopbackOrigin`.
+- `keptFolderName(token, host)`: a session's kept folder named for the host as well as the token, so the
+  same token under another host names another folder; `legacyKeptFolderName(token)` is the name before.
+- `doorConfigProblems(config, host)`: the conformance check over a written door config; and
+  `bun run check:door-config` (`kehikot-check-door-config`, `src/check/door-config.ts`): fails a module
+  that writes an agent's door config and spells a session door at a raw loopback port.
+
 ## 2.94.0 — 2026-11-13
 
 Kind: feature

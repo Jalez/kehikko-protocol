@@ -4,7 +4,7 @@ import { FIT_SAYS, tooOldOf } from '../fit.js';
 import { methodResults } from '../methods.js';
 import { sinceOf } from '../since.js';
 import { SERVER_ASK_PATH, SERVER_PASS, SERVER_PASS_PATH, serverAskResult, } from '../server-ask.js';
-import { frameOrigins } from './origins.js';
+import { askedHosts } from './host-door.js';
 /**
  * A module's server asking the host (2.19.0): `askHost`, and the passes it mints for each question,
  * which the doors answer for at `SERVER_PASS_PATH`. Node-only, like the rest of `/serve`. The shapes
@@ -43,21 +43,8 @@ export function serverPassReply(method, path, query) {
         return { status: 405, body: { ok: false, error: `${SERVER_PASS_PATH} answers GET.` } };
     return { status: 200, body: { ok: true, minted: spendServerPass(query.get('pass')) } };
 }
-/** The origins a host may be asked on: `KEHIKOT_ORIGINS` and its fallbacks, kept to `http(s)` loopback. */
-function hostOrigins(env) {
-    const out = [];
-    for (const origin of frameOrigins(env)) {
-        try {
-            const url = new URL(origin);
-            if ((url.protocol === 'http:' || url.protocol === 'https:') && ['127.0.0.1', 'localhost', '[::1]'].includes(url.hostname))
-                out.push(url.origin);
-        }
-        catch {
-            /* Not a URL: nobody to ask there. */
-        }
-    }
-    return [...new Set(out)];
-}
+/** The hosts asked: the starting host alone, when there is one (`askedHosts`, 2.95.0). */
+const hostOrigins = askedHosts;
 /** The URLs `askHost` posts to, in order. Pure; exported for tests. */
 export function hostAskUrls(env = process.env) {
     return hostOrigins(env).map((origin) => `${origin}${SERVER_ASK_PATH}`);

@@ -813,3 +813,26 @@ What the new module's `kehikot-module-protocol` dependency says, instead of
 the GitHub source — e.g. `file:/path/to/this/checkout`. The protocol's own
 test uses it so a generated module is tested against the protocol as it is
 now, offline.
+
+## The starting host (2.95.0)
+
+A module a host started belongs to that host. The host says which by putting its own origin in
+`KEHIKOT_HOST` when it spawns the module; `startingHost(env)` reads it (from an older host, the first
+loopback origin of `KEHIKOT_ORIGINS`). Three rules follow, all in `kehikot-module-protocol/serve`:
+
+- **Ask only that host.** `askedHosts(env)` is the starting host alone when `KEHIKOT_HOST` is set; every
+  host question the package asks (`hostPlace`, `hostHasProject`, `askHost`, the passes) goes there. A
+  scratch host an agent runs on the same machine is never asked by the person's modules, and a scratch
+  module never asks the person's host.
+- **Hand only its stable doors.** An agent module writes each session door as `doorUrl(host, id, token)`
+  (`<host>/mcp`, `<host>/m/<id>/mcp`), rebuilding whatever it was handed with `stableDoors`. A module's
+  own port changes when it restarts onto a taken one; the host's stable address does not, and the host
+  holds a request there while the module comes back up. The host's own port can move (the desktop app
+  takes 4170, or the next free one up to 4199, when 4170 is taken), so an agent module rewrites its live
+  sessions' kept configs at start onto the host that started it.
+- **Keep its own files.** Kept files are named with `keptFolderName(token, host)`: a copy of a project
+  carries the same conversation tokens, and a scratch host's copy of the module must write beside the
+  person's files, never over them.
+
+`doorConfigProblems(config, host)` is the check over a written config; `bun run check:door-config` the
+check over a module's sources, run by the shared module CI.

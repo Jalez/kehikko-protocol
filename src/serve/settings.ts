@@ -13,8 +13,8 @@ import {
   type SettingsSetResult,
 } from '../settings.js'
 import type { Answer, Reply } from './doors.js'
-import { frameOrigins } from './origins.js'
 import { sameTicket } from './ticket.js'
+import { askedHosts } from './host-door.js'
 
 /**
  * A module's settings door (2.15.0): `settings.get` and `settings.set` at `SETTINGS_PATH`, answered
@@ -22,19 +22,8 @@ import { sameTicket } from './ticket.js'
  * pass. Node-only, like the rest of `/serve`. Design notes: docs/settings.md.
  */
 
-/** The origins a host may be asked on: `KEHIKOT_ORIGINS` and its fallbacks, kept to `http(s)` loopback. */
-function hostOrigins(env: Record<string, string | undefined>): string[] {
-  const out: string[] = []
-  for (const origin of frameOrigins(env)) {
-    try {
-      const url = new URL(origin)
-      if ((url.protocol === 'http:' || url.protocol === 'https:') && ['127.0.0.1', 'localhost', '[::1]'].includes(url.hostname)) out.push(url.origin)
-    } catch {
-      /* Not a URL: nobody to ask there. */
-    }
-  }
-  return [...new Set(out)]
-}
+/** The hosts asked: the starting host alone, when there is one (`askedHosts`, 2.95.0). */
+const hostOrigins = askedHosts
 
 export interface HostVouchesOptions {
   env?: Record<string, string | undefined>
