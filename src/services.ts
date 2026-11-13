@@ -585,6 +585,53 @@ export type AgentSetup = z.infer<typeof agentSetupSchema>
 
 /* The four settings that hold the choice, and reading it: `agent-setup.ts`. */
 
+/* ---------------------------------------------------------------- agent.delivery (2.95.0) */
+
+/**
+ * `agent.delivery` (2.95.0): an agent module that hands messages to the conversations it holds.
+ * Messaging itself is the HOST's: `send_message` and `read_messages` are on the kehikko door, for every
+ * agent conversation whatever program it runs in, and the host keeps every message. What only the
+ * module can do is bring a message to its program's conversation — type it into an idle session, say
+ * it in its notes — and say how a conversation started elsewhere is placed.
+ *
+ * - `name`, `program`: as `agent.tasks`'s.
+ * - `deliver`: a route on its origin, `POST { project }` (`agentDeliverParams`): messages changed in
+ *   that project; hand any that wait to the conversations this module holds there, now. The module
+ *   asks the host what each of its sessions may read (`messages.read`, under its own pass and the
+ *   session's token), so the route grants nothing and reveals nothing: anyone may knock. Answers
+ *   `agentDeliverResult`. The host knocks after a message is kept, at most once a second per project.
+ * - `adopt`: one sentence for a conversation the host does not know, saying how it is placed with
+ *   this module (`Type /kehikot-here in it.`). A host says it after `In <program>:` (`adoptWays`).
+ */
+export const agentDeliverySchema = z.object({
+  name: oneLine(LIMITS.TITLE),
+  program: oneLine(LIMITS.TITLE),
+  deliver: servicePath,
+  adopt: oneLine(LIMITS.SERVICE_LINE),
+})
+export type AgentDelivery = z.infer<typeof agentDeliverySchema>
+
+/** What the host posts to `agent.delivery`'s `deliver`. */
+export const agentDeliverParams = z.object({ project: z.string().min(1).max(4096) })
+export type AgentDeliverParams = z.infer<typeof agentDeliverParams>
+
+/**
+ * What a module answers at `deliver`: `delivered` (how many conversations it handed messages to now),
+ * `none` (none of its conversations there had any waiting, or none is idle), `later` (it cannot now:
+ * it is starting; it will on its own next look).
+ */
+export const agentDeliverResult = z.object({
+  outcome: z.enum(['delivered', 'none', 'later']),
+  delivered: z.number().int().min(0).default(0),
+  why: z.string().max(LIMITS.REASON).default(''),
+})
+export type AgentDeliverResult = z.infer<typeof agentDeliverResult>
+
+/** How each provider of `agent.delivery` says a conversation is placed, as one sentence each: for `notPlacedText`. */
+export function adoptWays(deliveries: readonly Pick<AgentDelivery, 'program' | 'adopt'>[]): string[] {
+  return deliveries.map((one) => `In ${one.program}: ${one.adopt}`)
+}
+
 /* ---------------------------------------------------------------- the registry */
 
 /**
@@ -640,6 +687,10 @@ export const SERVICES = {
     says: "Owns the person's choice of whether its program uses every module's tools and skills outside Kehikot too.",
     schema: agentSetupSchema,
   },
+  'agent.delivery': {
+    says: 'Hands the messages Kehikot keeps to the conversations its program runs, and says how a conversation started elsewhere is placed.',
+    schema: agentDeliverySchema,
+  },
 } as const satisfies Record<string, { says: string; schema: z.ZodTypeAny }>
 export type Service = keyof typeof SERVICES
 export const SERVICE_NAMES = Object.keys(SERVICES) as Service[]
@@ -670,6 +721,8 @@ export const CONVERSATIONS_FINDER = 'conversations.finder' satisfies Service
 export const AGENT_TASKS = 'agent.tasks' satisfies Service
 /** 2.91.0. The person's choice of setting up an agent program, user-wide, with every module's tools and skills. */
 export const AGENT_SETUP = 'agent.setup' satisfies Service
+/** 2.95.0. Hands kept messages to an agent module's own conversations; says how one is placed. */
+export const AGENT_DELIVERY = 'agent.delivery' satisfies Service
 
 /**
  * `services` in a manifest: each service this module provides, by name, and its descriptor. A known

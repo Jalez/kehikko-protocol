@@ -1,5 +1,6 @@
 import { resolve } from 'node:path'
 
+import { MESSAGE_TOOL_NAMES } from '../agent-messages.js'
 import { DOOR_ARGUMENTS_BEFORE, toolEffect, type DoorTool } from '../door.js'
 import { manifestSchema, type Manifest } from '../manifest.js'
 import { listTools, readNeighbour, type NeighbourOptions } from '../serve/neighbours.js'
@@ -26,7 +27,7 @@ export interface DoorCheck {
   notes: string[]
 }
 
-type Declared = Pick<Manifest, 'id' | 'mcp'>
+type Declared = Pick<Manifest, 'id' | 'mcp'> & { declares?: { uses?: readonly string[] } }
 
 /** The check over the files alone. Pure. Fails nothing: text can only hint at what a door lists. */
 export function checkDoorSources(manifest: Declared, sources: readonly { path: string; text: string }[]): DoorCheck {
@@ -83,6 +84,15 @@ export function checkDoor(manifest: Declared, tools: readonly DoorTool[]): DoorC
           `${name} ${ROLE[role]} a ${subject.kind}, and its outputSchema has no ${missing.join(' or ')}. Answer with `
             + `${role === 'show' ? 'SHOW_OUTPUT_SCHEMA' : 'DONE_OUTPUT_SCHEMA'} in structuredContent, so a caller reads a state and not a sentence.`,
         )
+      }
+    }
+  }
+
+  /* 2.95.0. A module that messages lists the message tools to every caller: the door was asked with no place token. */
+  if ((manifest.declares?.uses ?? []).includes('agents:message')) {
+    for (const name of MESSAGE_TOOL_NAMES) {
+      if (!byName.has(name)) {
+        failures.push(`${manifest.id} messages (agents:message), and its door lists no ${name} to a caller with no place token. List it to every caller; an unknown conversation is answered in words (messageToolsFor, answerMessageTool).`)
       }
     }
   }

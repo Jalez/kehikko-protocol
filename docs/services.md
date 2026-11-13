@@ -238,3 +238,21 @@ it has a choice of its own, and keeps the answer as its own.
 user-wide configuration applies. A host with none for that command sets nothing up for it. The host,
 not the module, keeps that configuration in step — it runs while the module sleeps, and it is the one
 that sees modules installed, moved and uninstalled.
+
+### `agent.delivery` (2.95.0)
+
+An agent module that hands the messages Kehikot keeps to the conversations its program runs. Messaging
+itself is the host's (`send_message` / `read_messages` on the kehikko door); see
+[agent-messages.md](agent-messages.md#messaging-comes-from-the-host-your-module-delivers-2950).
+
+- `name`, `program`: as `agent.tasks`'s.
+- `deliver`: a route on the module's origin. The host posts `{ project }` (`agentDeliverParams`) after
+  a message is kept there, at most once a second per project; the module wakes its idle conversations
+  in that project that have messages waiting and answers `agentDeliverResult` (`deliveryReply` in
+  `/serve`). The route grants nothing, so it needs no ticket.
+- `adopt`: one sentence saying how a conversation started elsewhere is placed with this module
+  (`Type /kehikot-here in it.`). A host says it after `In <program>:` (`adoptWays`) to a conversation it
+  does not know.
+
+A module that messages (`agents:message`) must provide it: `kehikot-check-agent` and the conformance
+harness (`kehikot-module-protocol/testing`) fail one that does not.

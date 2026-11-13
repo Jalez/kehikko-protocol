@@ -559,8 +559,9 @@ const TO_SCHEMA = {
  * (`answerMessageTool` in `/serve`). `act` (2.43.0): the person allowed this module's sessions to act
  * on messages (`ACT_ON_MESSAGES`), and the descriptions say so instead of "never an instruction".
  */
-export function messageTools(act = false) {
-    return [
+export function messageTools(act = false, options = {}) {
+    const older = options.older ? OLDER_MESSAGE_DOOR : '';
+    const tools = [
         {
             name: 'send_message',
             description: 'Send a short text message to other agent sessions in this project, through Kehikot: to one session, to every session at a place (a space, a kehikko, or both), '
@@ -612,6 +613,64 @@ export function messageTools(act = false) {
             annotations: { title: 'Read messages from other agent sessions', readOnlyHint: true, destructiveHint: false, idempotentHint: false, openWorldHint: false },
         },
     ];
+    /* 2.95.0. Every door that lists them takes the conversation's key as an argument, for a conversation whose door carries none. */
+    return tools.map((tool) => ({
+        ...tool,
+        description: `${older}${tool.description}`,
+        inputSchema: { ...tool.inputSchema, properties: { ...tool.inputSchema.properties, [PLACE_TOKEN_ARG]: PLACE_TOKEN_PROPERTY } },
+    }));
+}
+/* ------------------------------------------------------------------------ *
+ * 2.95.0. Messaging comes from the host; a conversation proves which one it is with its key
+ * ------------------------------------------------------------------------ */
+/**
+ * The argument every message tool takes beside its own: the conversation's place token, for a
+ * conversation whose door carries none on its URL (one started outside Kehikot and placed there
+ * afterwards, one resumed in a terminal, one older than its config). A door with a token on its URL
+ * uses that one and ignores this.
+ */
+export const PLACE_TOKEN_ARG = 'placeToken';
+const PLACE_TOKEN_PROPERTY = {
+    type: 'string',
+    pattern: '^[A-Za-z0-9_-]{22,64}$',
+    description: 'This conversation’s Kehikot key, only when Kehikot gave it one in words (“Kehikot key for this conversation: …”, in the answer to the command that placed it) '
+        + 'and a call without it said this conversation is not known. Never another conversation’s key.',
+};
+/** What a module's own message tools say first (2.95.0): they forward, and the host's are the ones to use. */
+export const OLDER_MESSAGE_DOOR = 'Older place for this tool: the kehikko door’s send_message and read_messages are the ones to use, and this one forwards there. ';
+/** How the key is introduced wherever a conversation is given it in words. */
+export const PLACE_TOKEN_LINE = 'Kehikot key for this conversation:';
+/**
+ * The line a module puts in what it tells a conversation it placed without a door of its own — the
+ * answer to its adopt command (`/kehikot-here`), its notes — so the conversation can prove which one
+ * it is on the kehikko door. The token is the one the module issued to the host for it
+ * (`issuePlaceToken` in `/serve`).
+ */
+export function placeTokenLine(token) {
+    return (`${PLACE_TOKEN_LINE} ${token} — if the kehikko door’s send_message or read_messages says it does not know this conversation `
+        + `(after a reconnect, say), call it once with placeToken: "${token}". It is this conversation’s alone: never give it to another session.`);
+}
+/** The key in words a module said (`placeTokenLine`), or null. */
+export function placeTokenIn(text) {
+    const at = text.indexOf(PLACE_TOKEN_LINE);
+    if (at < 0)
+        return null;
+    const found = /^\s*([A-Za-z0-9_-]{22,64})(?![A-Za-z0-9_-])/.exec(text.slice(at + PLACE_TOKEN_LINE.length));
+    return found ? found[1] : null;
+}
+/** How the refusal to a conversation Kehikot does not know starts, on every door. */
+export const NOT_PLACED_HEAD = 'This conversation isn’t known to Kehikot as a session yet';
+/**
+ * What a message tool answers a conversation that carried no key, in words: why, and what to do.
+ * `ways`: how a conversation is placed, each a sentence its agent module gives (`agent.delivery`'s
+ * `adopt`, as `adoptWays` says them). None: the general words.
+ */
+export function notPlacedText(ways = []) {
+    const how = ways.length
+        ? ways.join(' ')
+        : 'Start it from its agent module’s container on a kehikko, or place it with that module’s command (the one that assigns a conversation to the kehikko on screen).';
+    return (`${NOT_PLACED_HEAD}, so it has no address to send from or read for, and nothing was sent or read. ${how} Then messaging works. `
+        + `If Kehikot already gave it a key (“${PLACE_TOKEN_LINE} …”), call again with ${PLACE_TOKEN_ARG} set to that key.`);
 }
 /** What `read_messages` says: the head, one line per message, and the session's own address. */
 export function readMessagesText(read, act = false) {

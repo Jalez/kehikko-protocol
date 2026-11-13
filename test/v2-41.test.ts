@@ -64,7 +64,7 @@ const input = (over: Partial<NotesInput> = {}): NotesInput => ({
 
 describe('the version', () => {
   test('is 2.41.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.94.0')
+    expect(PACKAGE_VERSION).toBe('2.95.0')
     expect(PROTOCOL).toBe(2)
   })
 
@@ -215,15 +215,15 @@ describe('the adapter', () => {
     answer = () => ({ ok: true, data: { messages: [], unread: 0, you: null } })
   })
 
-  test('lists the tools when the host keeps messages for the session, none without a token', async () => {
+  test('lists the tools to every caller, token or not (2.95.0), asking the host nothing to list them', async () => {
     expect((await messageToolsFor(TOKEN, options)).map((tool) => tool.name)).toEqual(['send_message', 'read_messages'])
-    expect(asked[0]).toEqual({ method: 'messages.read', params: { token: TOKEN, limit: 1 } })
-    expect(await messageToolsFor(null, options)).toEqual([])
+    expect((await messageToolsFor(null, options)).map((tool) => tool.name)).toEqual(['send_message', 'read_messages'])
+    expect(asked).toEqual([])
   })
 
-  test('lists none on a host too old for them', async () => {
+  test('lists them on a host too old for them too, which the call then says (2.95.0)', async () => {
     answer = () => ({ ok: false, reason: 'unknown-method', declined: 'host-too-old', error: 'no' })
-    expect(await messageToolsFor(TOKEN, options)).toEqual([])
+    expect((await messageToolsFor(TOKEN, options)).length).toBe(2)
     expect(await hostKeepsMessages({ ...options, token: TOKEN })).toBe(false)
   })
 

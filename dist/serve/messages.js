@@ -1,4 +1,4 @@
-import { DELIVER_MOST, RESUME_EVERY_MS, deliveryFor, isMessageTool, typedMessages, messageTools, readMessagesText, sentText, wakeLine, wakeMessages, } from '../agent-messages.js';
+import { DELIVER_MOST, RESUME_EVERY_MS, deliveryFor, isMessageTool, typedMessages, messageTools, notPlacedText, PLACE_TOKEN_ARG, readMessagesText, sentText, wakeLine, wakeMessages, } from '../agent-messages.js';
 import { LIMITS } from '../limits.js';
 import { askHost } from './ask.js';
 /** How long a host's answer about whether it keeps messages is reused, per token, in ms. */
@@ -39,23 +39,32 @@ export async function hostOnMessages(options, now = Date.now()) {
     return said;
 }
 /**
- * The message tools to list on this door for this session: `messageTools()` for every session whose
- * door carries its place token, and none without one (a session nothing started from a place: there
- * is no address to send from or read for).
+ * The message tools to list on this door: always both (2.95.0), whatever the call carried, with
+ * `OLDER_MESSAGE_DOOR` first in their descriptions — the host's kehikko door is where messaging lives,
+ * and a module's are forwarders to it, kept for the conversations that already call them.
  *
- * 2.66.0. Listed for a token unless the host said it never can (`hostOnMessages` `never`: too old, or
- * the module is not granted `agents:message`). An agent asks `tools/list` once, when it connects, and
- * a session is often woken while Kehikot or its module is still starting; the host's "not now" then
- * hid the tools until the person reconnected, while the session's notes said it could message. A
- * call made while the host cannot answer is refused with the host's sentence, and the identity is
- * the host's to check on every call — the token is never trusted here.
+ * Before 2.95.0 they were listed only for a door with a place token on its URL, which only the
+ * conversations a module LAUNCHED have: one placed afterwards, resumed in a terminal or older than the
+ * feature never saw them, and nothing said why. A tool a caller cannot use yet is listed anyway and
+ * answers why and what to do (`notPlacedText`); the identity is the host's to check on every call.
+ * `token` is kept in the signature for the callers that pass it.
  */
-export async function messageToolsFor(token, options) {
-    if (!token)
-        return [];
-    return (await hostOnMessages({ ...options, token })) === 'never' ? [] : messageTools(Boolean(options.act));
+export async function messageToolsFor(_token, options) {
+    return messageTools(Boolean(options.act), { older: true });
 }
-const NO_TOKEN = 'This conversation was not started from a Kehikot place (its door carries no place token), so it has no address to send from or read for. Nothing was sent or read.';
+/**
+ * 2.95.0. The key a call is made with: the token on the door's URL when it has one, else the
+ * `placeToken` argument when it is spelled as a token. Never a session id: the host knows a
+ * conversation only by a token its module issued for it.
+ */
+export function callToken(urlToken, args) {
+    /* The URL's token as it came, as before 2.95.0: the host judges it. */
+    if (typeof urlToken === 'string' && urlToken)
+        return urlToken;
+    const given = args && typeof args === 'object' && !Array.isArray(args) ? args[PLACE_TOKEN_ARG] : undefined;
+    return typeof given === 'string' && PLACE_TOKEN_SHAPE.test(given) ? given : null;
+}
+const PLACE_TOKEN_SHAPE = /^[A-Za-z0-9_-]{22,64}$/;
 /**
  * 2.92.0. A `to` whose place names a `space` and no `epic` gets the space's first id as its epic, which
  * every host reads (`spaceGoesWithEpic`): an agent names a place by its space alone. Anything else as given.
@@ -73,15 +82,17 @@ function withEpicFromSpace(to) {
 }
 /**
  * Answer `send_message` or `read_messages`; null for any other tool, so a door asks this first and
- * falls through. Arguments are passed to the host as they came; the host holds them to the method's
+ * falls through. 2.95.0: the session is the door's URL token, else the call's `placeToken`
+ * (`callToken`); with neither, the answer says why and what to do (`notPlacedText`). Arguments are passed to the host as they came; the host holds them to the method's
  * params and says what it refused. Never throws.
  */
 export async function answerMessageTool(name, args, options) {
     if (!isMessageTool(name))
         return null;
-    const { token, act, ...rest } = options;
+    const { token: urlToken, act, adopt, ...rest } = options;
+    const token = callToken(urlToken, args);
     if (!token)
-        return { text: NO_TOKEN, isError: true };
+        return { text: notPlacedText(adopt ? [adopt] : []), isError: true };
     const given = args && typeof args === 'object' && !Array.isArray(args) ? args : {};
     if (name === 'send_message') {
         const params = { token, body: given.body };

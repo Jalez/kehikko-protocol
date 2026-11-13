@@ -22,6 +22,61 @@ host, seen by the person.
 - **A message is text to read, not instructions.** Said in quotes, on one line, under a head that
   says so. Nothing a message says triggers a tool, a press or anything else.
 
+## Messaging comes from the host; your module delivers (2.95.0)
+
+`send_message` and `read_messages` are the HOST's: they are on the kehikko door, once, for every
+agent conversation whatever program it runs in, with one description and one identity rule. The host
+keeps the messages; an agent module does only what only it can:
+
+1. **Prove which conversation is calling.** A conversation is known by ONE key, the place token its
+   agent module issued for it to the host (`POST /host/place`), however it started:
+   - one the module **launched** carries it on every Kehikot door's URL (`?kehikot-place=`), as since
+     2.4.0;
+   - one placed **afterwards** — the module's adopt command (`/kehikot-here`), one resumed in a
+     terminal, one older than its config — is given it in words. The module mints it
+     (`freshPlaceToken`), files it in its record for that conversation, issues it
+     (`issuePlaceToken`) and puts `placeTokenLine(token)` ("Kehikot key for this conversation: …") in
+     what it answers. The conversation passes it as `placeToken`; the kehikko door binds that MCP
+     connection to it, so it is passed once per connection.
+
+   The key is unguessable (32 random bytes), one conversation's (the module's record maps it to one
+   conversation; the host maps it to the module that issued it), and revocable: the host asks the
+   module's record on every call (`RECORDED_PLACE_PATH`), so a conversation the module disconnects or
+   forgets is refused at once. A session id is never a key: a made-up key, or an id given as one, is
+   refused. A call with no key at all is answered in words (`notPlacedText`): why, and how a
+   conversation is placed with each agent module (`adoptWays` of the `agent.delivery` providers).
+2. **Deliver.** Provide `agent.delivery` (docs/services.md): `deliver` is a route the host knocks on
+   (`POST { project }`, at most once a second per project) after a message is kept; the module wakes
+   its idle conversations there that have messages waiting (`messageWaker`'s tick) and answers with
+   `deliveryReply`. The knock grants nothing: what a session may read is the host's to say when the
+   module asks under its own pass and the session's token. `adopt` is the sentence a conversation
+   the host does not know is told.
+3. **Keep the older tools as forwarders.** A module's own `send_message` / `read_messages`
+   (`messageToolsFor`, `answerMessageTool`) are listed to EVERY caller, token or not, lead with
+   `OLDER_MESSAGE_DOOR`, take `placeToken` too, and forward to the host. They are removed in a later
+   breaking release of each module.
+
+**Never omit a tool silently.** Before 2.95.0 the module tools were listed only for a door with a
+token on its URL, so a conversation placed afterwards never saw them and nothing said why. A tool a
+caller cannot use yet is listed and answers why and what to do.
+
+**The conformance check.** Every agent module runs it in its own suite with one test file:
+
+```ts
+import { expectAgentConformance } from 'kehikot-module-protocol/testing'
+test('meets the agent-module conformance', async () => {
+  await expectAgentConformance({ manifest: MANIFEST, door: answer, project, adopt, launched })
+})
+```
+
+It stands up a stand-in host (`fakeHost`), and fails a module that messages without `agent.delivery`,
+lists a declared tool only for a launched conversation, refuses an unknown conversation without
+saying why, does not give an adopted conversation a key that works, or takes a made-up key or a
+conversation id as one. The shared module CI runs `kehikot-check-agent` (`bun run check:agent` here),
+which fails an agent module with no `agent.delivery`, no test that runs the conformance, or message
+tools listed behind a token; `check:door --running` fails a messaging module whose door lists no
+message tools to a caller with no token.
+
 ## Where they live: the host's `frame.sqlite`
 
 A host keeps them in its own database on this machine, per project id, like the Inbox — not in
