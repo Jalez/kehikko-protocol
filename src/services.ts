@@ -522,6 +522,24 @@ export const SERVICE_SESSION = '{session}'
  *   answering `agentTaskStartResult` with the new conversation's id. Only the host (`vouchHost`).
  * - `view`: the module's page showing that one conversation, `/app?…{session}…`, which a host frames in
  *   its own dialog while the task runs.
+ *
+ * ## `start` answers at once (2.99.0)
+ *
+ * `start` ANSWERS within `AGENT_TASK_ANSWER_MS` (1 s), whatever its program takes to boot. It checks
+ * what it can check at once (the caller, the body, the project, that its program is installed), and
+ * then either declines in words or ACCEPTS: `{ outcome: 'started', session, pending: true }`, where
+ * `session` is the conversation's id when the module chooses it up front, or a handle of the module's
+ * own that its `view`, `conversations.finder`'s `bring` and its records follow to the conversation once
+ * the program has said its id. Everything slow — spawning the program, waiting for it to boot, attaching
+ * a background session, writing its config, asking the host for its doors, gathering skills — happens
+ * AFTER the answer. What became of it is reported to the host with `tasks.report` (`tasksReportParams`):
+ * `started` with the conversation's id, or `failed` with why, which the host puts in the person's Inbox
+ * in words, naming the module and the task.
+ *
+ * A module that does it all before answering (as every module did before 2.99.0) was held to the host's
+ * wait and lost to it: the person was told the agent did not answer while the conversation started
+ * anyway, unseen. The shared conformance (`expectAgentConformance`, `tasks`) starts a task with a
+ * program that takes 20 s to boot and fails a module that does not answer within the second.
  */
 export const agentTasksSchema = z.object({
   name: oneLine(LIMITS.TITLE),
@@ -546,12 +564,44 @@ export const agentTaskStartParams = z.object({
 })
 export type AgentTaskStartParams = z.infer<typeof agentTaskStartParams>
 
+/**
+ * `start`'s answer. `started` with `pending: true` (2.99.0) is an acceptance: the module has the task and
+ * is starting its conversation, and says what became of it with `tasks.report`. `started` without it is a
+ * conversation already running (a module built before 2.99.0). A host before 2.99.0 drops `pending` and
+ * reads the acceptance as `started`, which is what the person sees either way: the agent has it.
+ */
 export const agentTaskStartResult = z.object({
   outcome: z.enum(['started', 'declined']),
   session: z.string().trim().min(1).max(128).nullable().default(null),
   why: z.string().max(LIMITS.REASON).default(''),
+  /** 2.99.0. Accepted, still starting: the outcome comes later, as `tasks.report`. */
+  pending: z.boolean().default(false),
 })
 export type AgentTaskStartResult = z.infer<typeof agentTaskStartResult>
+
+/** 2.99.0. How long `agent.tasks`' `start` may take to answer: it accepts first and starts after. */
+export const AGENT_TASK_ANSWER_MS = 1000
+
+/**
+ * 2.99.0. `tasks.report`'s params, from an agent module's server: what became of a task its `start`
+ * accepted (`pending: true`). `session` is what `start` answered; `conversation` the conversation's own id
+ * once known (`started`); `why` a sentence for the person (`failed`), in the module's words. The host
+ * answers only for a task it started with that module, and puts a failure in the person's Inbox.
+ */
+export const tasksReportParams = z.object({
+  session: z.string().trim().min(1).max(128),
+  outcome: z.enum(['started', 'failed']),
+  conversation: z.string().trim().min(1).max(128).nullable().default(null),
+  why: z.string().max(LIMITS.REASON).default(''),
+})
+export type TasksReportParams = z.infer<typeof tasksReportParams>
+
+/** `told`: the host took it; `unknown`: it started no such task with this module (or forgot it). */
+export const tasksReportResult = z.object({
+  outcome: z.enum(['told', 'unknown']),
+  why: z.string().max(LIMITS.REASON).default(''),
+})
+export type TasksReportResult = z.infer<typeof tasksReportResult>
 
 /** An `agent.tasks` view with the conversation in it. */
 export function agentTaskView(tasks: Pick<AgentTasks, 'view'>, session: string): string {

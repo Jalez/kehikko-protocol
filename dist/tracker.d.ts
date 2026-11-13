@@ -151,13 +151,13 @@ export declare const trackerCheckSchema: z.ZodObject<{
     stage: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     name: string;
-    state: "failed" | "running" | "success" | "pending" | "canceled" | "skipped" | "manual";
+    state: "failed" | "running" | "pending" | "success" | "canceled" | "skipped" | "manual";
     at?: string | undefined;
     url?: string | undefined;
     stage?: string | undefined;
 }, {
     name: string;
-    state: "failed" | "running" | "success" | "pending" | "canceled" | "skipped" | "manual";
+    state: "failed" | "running" | "pending" | "success" | "canceled" | "skipped" | "manual";
     at?: unknown;
     url?: unknown;
     stage?: string | undefined;
@@ -309,13 +309,13 @@ export declare const trackerDetailSchema: z.ZodObject<{
         stage: z.ZodOptional<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
         name: string;
-        state: "failed" | "running" | "success" | "pending" | "canceled" | "skipped" | "manual";
+        state: "failed" | "running" | "pending" | "success" | "canceled" | "skipped" | "manual";
         at?: string | undefined;
         url?: string | undefined;
         stage?: string | undefined;
     }, {
         name: string;
-        state: "failed" | "running" | "success" | "pending" | "canceled" | "skipped" | "manual";
+        state: "failed" | "running" | "pending" | "success" | "canceled" | "skipped" | "manual";
         at?: unknown;
         url?: unknown;
         stage?: string | undefined;
@@ -368,7 +368,7 @@ export declare const trackerDetailSchema: z.ZodObject<{
     commentCount?: number | undefined;
     checks?: {
         name: string;
-        state: "failed" | "running" | "success" | "pending" | "canceled" | "skipped" | "manual";
+        state: "failed" | "running" | "pending" | "success" | "canceled" | "skipped" | "manual";
         at?: string | undefined;
         url?: string | undefined;
         stage?: string | undefined;
@@ -1036,13 +1036,13 @@ export declare const trackerRowSchema: z.ZodObject<{
             stage: z.ZodOptional<z.ZodString>;
         }, "strip", z.ZodTypeAny, {
             name: string;
-            state: "failed" | "running" | "success" | "pending" | "canceled" | "skipped" | "manual";
+            state: "failed" | "running" | "pending" | "success" | "canceled" | "skipped" | "manual";
             at?: string | undefined;
             url?: string | undefined;
             stage?: string | undefined;
         }, {
             name: string;
-            state: "failed" | "running" | "success" | "pending" | "canceled" | "skipped" | "manual";
+            state: "failed" | "running" | "pending" | "success" | "canceled" | "skipped" | "manual";
             at?: unknown;
             url?: unknown;
             stage?: string | undefined;
@@ -1095,7 +1095,7 @@ export declare const trackerRowSchema: z.ZodObject<{
         commentCount?: number | undefined;
         checks?: {
             name: string;
-            state: "failed" | "running" | "success" | "pending" | "canceled" | "skipped" | "manual";
+            state: "failed" | "running" | "pending" | "success" | "canceled" | "skipped" | "manual";
             at?: string | undefined;
             url?: string | undefined;
             stage?: string | undefined;
@@ -1174,7 +1174,7 @@ export declare const trackerRowSchema: z.ZodObject<{
         commentCount?: number | undefined;
         checks?: {
             name: string;
-            state: "failed" | "running" | "success" | "pending" | "canceled" | "skipped" | "manual";
+            state: "failed" | "running" | "pending" | "success" | "canceled" | "skipped" | "manual";
             at?: string | undefined;
             url?: string | undefined;
             stage?: string | undefined;
@@ -1201,7 +1201,7 @@ export declare const trackerRowSchema: z.ZodObject<{
     mergedAt?: string | null | undefined;
     contributes?: string[] | undefined;
     contributedBy?: string[] | undefined;
-    pipeline?: "failed" | "running" | "success" | "pending" | "canceled" | "skipped" | "manual" | undefined;
+    pipeline?: "failed" | "running" | "pending" | "success" | "canceled" | "skipped" | "manual" | undefined;
     pipelineUrl?: string | undefined;
     pipelineAt?: string | undefined;
     columns?: {
@@ -1302,7 +1302,7 @@ export declare const trackerRowSchema: z.ZodObject<{
     }[] | undefined;
     contributes?: unknown;
     contributedBy?: unknown;
-    pipeline?: "failed" | "running" | "success" | "pending" | "canceled" | "skipped" | "manual" | undefined;
+    pipeline?: "failed" | "running" | "pending" | "success" | "canceled" | "skipped" | "manual" | undefined;
     pipelineUrl?: unknown;
     pipelineAt?: unknown;
     columns?: {
@@ -1882,13 +1882,13 @@ export declare const trackerReadingResult: z.ZodObject<{
                 stage: z.ZodOptional<z.ZodString>;
             }, "strip", z.ZodTypeAny, {
                 name: string;
-                state: "failed" | "running" | "success" | "pending" | "canceled" | "skipped" | "manual";
+                state: "failed" | "running" | "pending" | "success" | "canceled" | "skipped" | "manual";
                 at?: string | undefined;
                 url?: string | undefined;
                 stage?: string | undefined;
             }, {
                 name: string;
-                state: "failed" | "running" | "success" | "pending" | "canceled" | "skipped" | "manual";
+                state: "failed" | "running" | "pending" | "success" | "canceled" | "skipped" | "manual";
                 at?: unknown;
                 url?: unknown;
                 stage?: string | undefined;
@@ -1941,7 +1941,7 @@ export declare const trackerReadingResult: z.ZodObject<{
             commentCount?: number | undefined;
             checks?: {
                 name: string;
-                state: "failed" | "running" | "success" | "pending" | "canceled" | "skipped" | "manual";
+                state: "failed" | "running" | "pending" | "success" | "canceled" | "skipped" | "manual";
                 at?: string | undefined;
                 url?: string | undefined;
                 stage?: string | undefined;
@@ -2020,7 +2020,7 @@ export declare const trackerReadingResult: z.ZodObject<{
             commentCount?: number | undefined;
             checks?: {
                 name: string;
-                state: "failed" | "running" | "success" | "pending" | "canceled" | "skipped" | "manual";
+                state: "failed" | "running" | "pending" | "success" | "canceled" | "skipped" | "manual";
                 at?: string | undefined;
                 url?: string | undefined;
                 stage?: string | undefined;
@@ -2047,7 +2047,7 @@ export declare const trackerReadingResult: z.ZodObject<{
         mergedAt?: string | null | undefined;
         contributes?: string[] | undefined;
         contributedBy?: string[] | undefined;
-        pipeline?: "failed" | "running" | "success" | "pending" | "canceled" | "skipped" | "manual" | undefined;
+        pipeline?: "failed" | "running" | "pending" | "success" | "canceled" | "skipped" | "manual" | undefined;
         pipelineUrl?: string | undefined;
         pipelineAt?: string | undefined;
         columns?: {
@@ -2148,7 +2148,7 @@ export declare const trackerReadingResult: z.ZodObject<{
         }[] | undefined;
         contributes?: unknown;
         contributedBy?: unknown;
-        pipeline?: "failed" | "running" | "success" | "pending" | "canceled" | "skipped" | "manual" | undefined;
+        pipeline?: "failed" | "running" | "pending" | "success" | "canceled" | "skipped" | "manual" | undefined;
         pipelineUrl?: unknown;
         pipelineAt?: unknown;
         columns?: {
@@ -2260,7 +2260,7 @@ export declare const trackerReadingResult: z.ZodObject<{
             commentCount?: number | undefined;
             checks?: {
                 name: string;
-                state: "failed" | "running" | "success" | "pending" | "canceled" | "skipped" | "manual";
+                state: "failed" | "running" | "pending" | "success" | "canceled" | "skipped" | "manual";
                 at?: string | undefined;
                 url?: string | undefined;
                 stage?: string | undefined;
@@ -2287,7 +2287,7 @@ export declare const trackerReadingResult: z.ZodObject<{
         mergedAt?: string | null | undefined;
         contributes?: string[] | undefined;
         contributedBy?: string[] | undefined;
-        pipeline?: "failed" | "running" | "success" | "pending" | "canceled" | "skipped" | "manual" | undefined;
+        pipeline?: "failed" | "running" | "pending" | "success" | "canceled" | "skipped" | "manual" | undefined;
         pipelineUrl?: string | undefined;
         pipelineAt?: string | undefined;
         columns?: {
@@ -2406,7 +2406,7 @@ export declare const trackerReadingResult: z.ZodObject<{
         }[] | undefined;
         contributes?: unknown;
         contributedBy?: unknown;
-        pipeline?: "failed" | "running" | "success" | "pending" | "canceled" | "skipped" | "manual" | undefined;
+        pipeline?: "failed" | "running" | "pending" | "success" | "canceled" | "skipped" | "manual" | undefined;
         pipelineUrl?: unknown;
         pipelineAt?: unknown;
         columns?: {

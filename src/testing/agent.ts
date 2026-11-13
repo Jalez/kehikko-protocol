@@ -1,10 +1,26 @@
+import { randomBytes } from 'node:crypto'
 import { createServer, type IncomingMessage, type Server } from 'node:http'
 
 import { NOT_PLACED_HEAD, MESSAGE_TOOL_NAMES, PLACE_TOKEN_ARG, placeTokenIn } from '../agent-messages.js'
 import { RECORDED_PLACE_PATH, placeIssueSchema } from '../door.js'
+import { METHODS } from '../methods.js'
 import { SERVER_ASK_PATH } from '../server-ask.js'
-import { AGENT_DELIVERY, agentDeliverResult, serviceDescriptor } from '../services.js'
+import {
+  AGENT_DELIVERY,
+  AGENT_TASKS,
+  AGENT_TASK_ANSWER_MS,
+  HOST_CALLER,
+  HOST_PASS_PATH,
+  SERVICE_CALLER_HEADER,
+  SERVICE_PASS_HEADER,
+  agentDeliverResult,
+  agentTaskStartResult,
+  serviceDescriptor,
+  tasksReportParams,
+} from '../services.js'
+import { TELL_FINISHED_TOOL } from '../turns.js'
 import { freshPlaceToken } from '../serve/adopt.js'
+import { HOST_ENV } from '../serve/host-door.js'
 import { forgetMessageHosts } from '../serve/messages.js'
 
 /**
@@ -28,8 +44,19 @@ import { forgetMessageHosts } from '../serve/messages.js'
  *    with it as `placeToken`.
  * 5. A made-up key, and the conversation's own id given as a key, are refused.
  * 6. With `launched`: a conversation it launched messages with the token on its door's URL, as before.
+ * 7. (2.99.0) Its `tell_finished` takes `placeToken`, and an adopted conversation can tell with its key.
+ * 8. (2.99.0) A module providing `agent.tasks` is given `tasks` (a check:agent failure otherwise):
+ *    - `start` refuses a caller the host did not vouch for;
+ *    - with a program that takes 20 s to boot, `start` ANSWERS within `AGENT_TASK_ANSWER_MS`, accepting
+ *      (`started`, a session, `pending: true`);
+ *    - with a program that fails, the failure reaches the host as `tasks.report` `failed`, with why;
+ *    - with a program that boots, `tasks.report` `started` names the conversation.
+ * 9. (2.99.0) Every question its server asked the host is under a capability its manifest declares
+ *    (`declares.uses`): a module calling a method it did not declare is not answered by a real host.
  *
- * Node-only. It writes nothing but what the module's own `adopt` writes.
+ * The stand-in host is the only host the module can reach for the run: `KEHIKOT_HOST`,
+ * `KEHIKOT_ORIGINS` and `KEHIKOT_ORIGIN` all name it, and are put back after. Node-only. It writes
+ * nothing but what the module's own `adopt` and `start` write.
  */
 
 /** One call on the module's doors, as the modules' `answer(method, path, query, body, ticket)` takes it. */
@@ -47,7 +74,31 @@ export interface FakeHost {
   issued: Map<string, { module: string; project: string }>
   /** Every server question it was asked, in order. */
   asked: { module: string; method: string; params: Record<string, unknown> }[]
+  /** 2.99.0. A pass this host vouches for once (`HOST_PASS_PATH`), as a real host mints one for a service call. */
+  mintPass(): string
   close(): Promise<void>
+}
+
+/** 2.99.0. How the stand-in for the module's program behaves on the next `start`. */
+export interface StandInProgram {
+  /** How long it takes from being run to having started the conversation, in ms. */
+  bootMs: number
+  /** It fails after `bootMs` instead (says something and exits non-zero, as a program that cannot start does). */
+  fails?: boolean
+}
+
+/** 2.99.0. What the conformance needs of a module that provides `agent.tasks`. */
+export interface AgentTasksConformance {
+  /**
+   * Call the module's `agent.tasks` start route as a request from the host reaches it: `body` as JSON
+   * and these headers. The module's own route (its `Before`, its door) answers.
+   */
+  start(body: unknown, headers: Record<string, string>): Promise<{ status: number; body: unknown }>
+  /**
+   * Put a stand-in for the module's program (its CLI) in place for the next start, behaving as said; the
+   * returned function puts things back and ends whatever the stand-in left running.
+   */
+  program(behaviour: StandInProgram): Promise<() => Promise<void> | void>
 }
 
 export interface AgentConformanceOptions {
@@ -64,6 +115,10 @@ export interface AgentConformanceOptions {
   adopt(host: FakeHost): Promise<{ said: string; conversation: string }>
   /** A conversation this module launched: the token on its doors' URLs, issued to `host` already. */
   launched?(host: FakeHost): Promise<{ token: string }>
+  /** 2.99.0. Required for a module that provides `agent.tasks`: how to start one, and its program's stand-in. */
+  tasks?: AgentTasksConformance
+  /** 2.99.0. How long to wait for a `tasks.report` after a quick program, in ms (default 15 000). */
+  reportWithinMs?: number
 }
 
 export interface AgentConformance {
@@ -90,6 +145,7 @@ async function bodyOf(request: IncomingMessage): Promise<Record<string, unknown>
 export async function fakeHost(door: AgentDoor): Promise<FakeHost> {
   const issued = new Map<string, { module: string; project: string }>()
   const asked: FakeHost['asked'] = []
+  const passes = new Set<string>()
   let sent = 0
   const send = (response: import('node:http').ServerResponse, status: number, body: unknown) => {
     response.writeHead(status, { 'content-type': 'application/json', ...OPEN })
@@ -110,11 +166,20 @@ export async function fakeHost(door: AgentDoor): Promise<FakeHost> {
       issued.set(read.data.token, { module: read.data.module, project: read.data.project })
       return send(response, 200, { ok: true, token: read.data.token, doors: [] })
     }
+    if (url.pathname === HOST_PASS_PATH && request.method === 'GET') {
+      const pass = url.searchParams.get('pass') ?? ''
+      const minted = passes.delete(pass)
+      return send(response, 200, { ok: true, minted })
+    }
     if (url.pathname === SERVER_ASK_PATH && request.method === 'POST' && body) {
       const module = String(body.module ?? '')
       const method = String(body.method ?? '')
       const params = (body.params && typeof body.params === 'object' ? body.params : {}) as Record<string, unknown>
       asked.push({ module, method, params })
+      if (method === 'tasks.report') {
+        const read = tasksReportParams.safeParse(params)
+        return send(response, 200, read.success ? { ok: true, data: { outcome: 'told', why: '' } } : refuse('That is not a task report: { session, outcome, conversation?, why? }.'))
+      }
       if (method !== 'messages.send' && method !== 'messages.read') return send(response, 200, refuse(`${method} is not answered by this test host.`))
       const token = typeof params.token === 'string' ? params.token : ''
       const issue = issued.get(token)
@@ -138,6 +203,11 @@ export async function fakeHost(door: AgentDoor): Promise<FakeHost> {
     origin: `http://127.0.0.1:${port}`,
     issued,
     asked,
+    mintPass: () => {
+      const pass = randomBytes(24).toString('base64url')
+      passes.add(pass)
+      return pass
+    },
     close: () => new Promise<void>((done) => server.close(() => done())),
   }
 }
@@ -181,9 +251,11 @@ export async function agentConformance(options: AgentConformanceOptions): Promis
   const messages = (manifest.declares?.uses ?? []).includes('agents:message')
 
   const host = await fakeHost(door)
-  const had = { origins: process.env.KEHIKOT_ORIGINS, origin: process.env.KEHIKOT_ORIGIN }
+  const had = { origins: process.env.KEHIKOT_ORIGINS, origin: process.env.KEHIKOT_ORIGIN, host: process.env[HOST_ENV] }
   process.env.KEHIKOT_ORIGINS = host.origin
   process.env.KEHIKOT_ORIGIN = host.origin
+  /* 2.99.0: the starting host too, so a module asks this one and no other (`askedHosts`). */
+  process.env[HOST_ENV] = host.origin
   forgetMessageHosts()
   try {
     /* 1. The delivery service. */
@@ -206,7 +278,11 @@ export async function agentConformance(options: AgentConformanceOptions): Promis
     const owed = [...(messages ? MESSAGE_TOOL_NAMES : []), ...declaredTools(manifest.mcp)]
     const missing = owed.filter((name) => !names.has(name))
     check(missing.length === 0, 'lists every tool to a caller with no place token', `tools/list without a token lacks ${missing.join(', ')}. List every tool; one a caller cannot use yet answers why.`)
-    if (!messages) return { failures, passed }
+    if (!messages) {
+      await tasksChecks(options, host, check)
+      declaredChecks(manifest, host, check)
+      return { failures, passed }
+    }
     const takesKey = bare.filter((tool) => (MESSAGE_TOOL_NAMES as readonly string[]).includes(tool.name)).every((tool) => tool.inputSchema?.properties?.[PLACE_TOKEN_ARG])
     check(takesKey, 'message tools take placeToken', `send_message and read_messages must take ${PLACE_TOKEN_ARG} (messageTools / messageToolsFor in the protocol list it).`)
 
@@ -225,6 +301,13 @@ export async function agentConformance(options: AgentConformanceOptions): Promis
       check(!sentAdopted.isError, 'an adopted conversation can send', `send_message with its key answered ${JSON.stringify(sentAdopted.text.slice(0, 200))}`)
       const readAdopted = await called(door, null, 'read_messages', { [PLACE_TOKEN_ARG]: key })
       check(!readAdopted.isError, 'an adopted conversation can read', `read_messages with its key answered ${JSON.stringify(readAdopted.text.slice(0, 200))}`)
+      /* 7. 2.99.0: and say how its turn ends. */
+      const tells = bare.find((tool) => tool.name === TELL_FINISHED_TOOL)
+      if (tells) {
+        check(Boolean(tells.inputSchema?.properties?.[PLACE_TOKEN_ARG]), 'tell_finished takes placeToken', `tell_finished must take ${PLACE_TOKEN_ARG} (tellFinishedTool in the protocol lists it), so an adopted conversation can say how its turn ends.`)
+        const toldAdopted = await called(door, null, TELL_FINISHED_TOOL, { event: 'done', label: 'conformance', [PLACE_TOKEN_ARG]: key })
+        check(!toldAdopted.isError, 'an adopted conversation can tell_finished', `tell_finished with its key answered ${JSON.stringify(toldAdopted.text.slice(0, 200))}; resolve the conversation with callToken(urlToken, args), as the message tools do.`)
+      }
     }
 
     /* 5. Guessing. */
@@ -241,15 +324,101 @@ export async function agentConformance(options: AgentConformanceOptions): Promis
       const sentLaunched = await called(door, token, 'send_message', { body: 'conformance: launched' })
       check(!sentLaunched.isError, 'a launched conversation can send', `send_message with the URL token answered ${JSON.stringify(sentLaunched.text.slice(0, 200))}`)
     }
+    await tasksChecks(options, host, check)
+    declaredChecks(manifest, host, check)
     return { failures, passed }
   } finally {
     if (had.origins === undefined) delete process.env.KEHIKOT_ORIGINS
     else process.env.KEHIKOT_ORIGINS = had.origins
     if (had.origin === undefined) delete process.env.KEHIKOT_ORIGIN
     else process.env.KEHIKOT_ORIGIN = had.origin
+    if (had.host === undefined) delete process.env[HOST_ENV]
+    else process.env[HOST_ENV] = had.host
     forgetMessageHosts()
     await host.close()
   }
+}
+
+type Check = (ok: boolean, what: string, why: string) => void
+
+const pause = (ms: number) => new Promise<void>((done) => setTimeout(done, ms))
+
+/** 8. `agent.tasks`: start answers at once, and what became of the task reaches the host. */
+async function tasksChecks(options: AgentConformanceOptions, host: FakeHost, check: Check): Promise<void> {
+  const { manifest } = options
+  const descriptor = serviceDescriptor(AGENT_TASKS, manifest.services?.[AGENT_TASKS])
+  if (!descriptor) return
+  const tasks = options.tasks
+  check(Boolean(tasks), 'is given a way to start a task', `${manifest.id} provides agent.tasks and the conformance was given no \`tasks\` ({ start, program }): it cannot check that start answers at once.`)
+  if (!tasks) return
+  const body = { project: options.project, brief: 'conformance: a task for Kehikot', place: null, title: 'Conformance task' }
+  const vouched = () => ({ 'content-type': 'application/json', [SERVICE_CALLER_HEADER]: HOST_CALLER, [SERVICE_PASS_HEADER]: host.mintPass() })
+
+  const stranger = await tasks.start(body, { 'content-type': 'application/json', [SERVICE_CALLER_HEADER]: HOST_CALLER, [SERVICE_PASS_HEADER]: randomBytes(24).toString('base64url') }).catch(() => null)
+  check(stranger?.status === 403, 'start refuses a caller the host did not vouch for', `start with a pass the host never minted answered ${stranger ? `HTTP ${stranger.status}` : 'nothing'}, not 403 (vouchHost).`)
+
+  /* A program that takes 20 s to boot: the answer comes first. */
+  const slow = await tasks.program({ bootMs: 20_000 })
+  try {
+    const began = Date.now()
+    const got = await tasks.start(body, vouched()).catch((error: unknown) => ({ status: 0, body: String(error) }))
+    const took = Date.now() - began
+    check(took <= AGENT_TASK_ANSWER_MS, 'start answers within a second while its program boots', `start took ${took} ms to answer with a program that boots in 20 s; it must answer within ${AGENT_TASK_ANSWER_MS} ms — accept the task (pending: true) and start the program after.`)
+    const read = agentTaskStartResult.safeParse(got.body)
+    check(
+      got.status === 200 && read.success && read.data.outcome === 'started' && Boolean(read.data.session) && read.data.pending,
+      'start accepts the task (started, a session, pending)',
+      `start answered HTTP ${got.status} ${JSON.stringify(got.body).slice(0, 200)}; an accepted task is { outcome: 'started', session, pending: true }.`,
+    )
+  } finally {
+    await slow()
+  }
+
+  /* What became of it reaches the host: a failure with why, and a start with the conversation. */
+  for (const fails of [true, false]) {
+    const undo = await tasks.program({ bootMs: 100, fails })
+    try {
+      const got = await tasks.start(body, vouched()).catch(() => null)
+      const read = agentTaskStartResult.safeParse(got?.body)
+      const session = read.success ? read.data.session : null
+      const want = fails ? 'failed' : 'started'
+      let report: Record<string, unknown> | undefined
+      const until = Date.now() + (options.reportWithinMs ?? 15_000)
+      while (session && !report && Date.now() < until) {
+        report = host.asked.find((one) => one.module === manifest.id && one.method === 'tasks.report' && one.params.session === session)?.params
+        if (!report) await pause(100)
+      }
+      const parsed = tasksReportParams.safeParse(report)
+      const ok = parsed.success && parsed.data.outcome === want && (fails ? parsed.data.why.trim().length > 0 : Boolean(parsed.data.conversation))
+      check(
+        ok,
+        fails ? 'a task whose program fails is reported failed, with why' : 'a task whose program starts is reported started, with its conversation',
+        report
+          ? `tasks.report said ${JSON.stringify(report).slice(0, 200)}; expected outcome ${want}${fails ? ' and a why for the person' : ' and the conversation’s id'}.`
+          : `no tasks.report for session ${session ?? '(none: start did not accept)'} reached the host; report ${want} with askHost('tasks.report', …) once the program has ${fails ? 'failed' : 'started'}.`,
+      )
+    } finally {
+      await undo()
+    }
+  }
+}
+
+/** 9. Every question asked of the host under a declared capability. */
+function declaredChecks(manifest: AgentConformanceOptions['manifest'], host: FakeHost, check: Check): void {
+  const uses = new Set(manifest.declares?.uses ?? [])
+  const undeclared = [
+    ...new Set(
+      host.asked
+        .filter((one) => one.module === manifest.id)
+        .map((one) => one.method)
+        .filter((method) => {
+          const capability = (METHODS as Record<string, string>)[method]
+          return capability !== undefined && !uses.has(capability)
+        })
+        .map((method) => `${method} (${(METHODS as Record<string, string>)[method]})`),
+    ),
+  ]
+  check(undeclared.length === 0, 'asks the host only what its manifest declares', `its server asked ${undeclared.join(', ')} without declaring the capability in declares.uses; a host does not answer that.`)
 }
 
 /** `agentConformance`, throwing one error that lists every failure. For a test. */

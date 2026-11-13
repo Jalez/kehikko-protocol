@@ -4,7 +4,7 @@ import type { TrafficNoteResult, TrafficReadResult } from '../traffic.js';
 import type { DispositionsGetResult, EpicsListResult, PartsGetResult, ProjectsMineResult } from '../methods.js';
 import type { StepsListResult } from '../plan.js';
 import type { MessageReadResult, MessageSendResult } from '../agent-messages.js';
-import type { ServicesFindResult, SessionsPlaceOfResult } from '../services.js';
+import type { ServicesFindResult, SessionsPlaceOfResult, TasksReportResult } from '../services.js';
 import type { Reply } from './doors.js';
 /** A new pass for one question, good once for `LIMITS.SERVER_PASS_MS`. `askHost` mints its own. */
 export declare function mintServerPass(now?: number): string;
@@ -49,6 +49,8 @@ export interface ServerAnswers {
     'services.find': ServicesFindResult;
     /** 2.85.0. The place an agent session is filed under in a project, by its own id. */
     'sessions.placeOf': SessionsPlaceOfResult;
+    /** 2.99.0. Whether the host took what became of an accepted task. */
+    'tasks.report': TasksReportResult;
 }
 /**
  * What came of one question. `ok: true`: the host's answer, held to the method's result schema.

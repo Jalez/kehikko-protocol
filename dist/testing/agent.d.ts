@@ -19,8 +19,19 @@
  *    with it as `placeToken`.
  * 5. A made-up key, and the conversation's own id given as a key, are refused.
  * 6. With `launched`: a conversation it launched messages with the token on its door's URL, as before.
+ * 7. (2.99.0) Its `tell_finished` takes `placeToken`, and an adopted conversation can tell with its key.
+ * 8. (2.99.0) A module providing `agent.tasks` is given `tasks` (a check:agent failure otherwise):
+ *    - `start` refuses a caller the host did not vouch for;
+ *    - with a program that takes 20 s to boot, `start` ANSWERS within `AGENT_TASK_ANSWER_MS`, accepting
+ *      (`started`, a session, `pending: true`);
+ *    - with a program that fails, the failure reaches the host as `tasks.report` `failed`, with why;
+ *    - with a program that boots, `tasks.report` `started` names the conversation.
+ * 9. (2.99.0) Every question its server asked the host is under a capability its manifest declares
+ *    (`declares.uses`): a module calling a method it did not declare is not answered by a real host.
  *
- * Node-only. It writes nothing but what the module's own `adopt` writes.
+ * The stand-in host is the only host the module can reach for the run: `KEHIKOT_HOST`,
+ * `KEHIKOT_ORIGINS` and `KEHIKOT_ORIGIN` all name it, and are put back after. Node-only. It writes
+ * nothing but what the module's own `adopt` and `start` write.
  */
 /** One call on the module's doors, as the modules' `answer(method, path, query, body, ticket)` takes it. */
 export type AgentDoor = (method: string, path: string, query: URLSearchParams, body: Record<string, unknown> | null) => Promise<{
@@ -44,7 +55,32 @@ export interface FakeHost {
         method: string;
         params: Record<string, unknown>;
     }[];
+    /** 2.99.0. A pass this host vouches for once (`HOST_PASS_PATH`), as a real host mints one for a service call. */
+    mintPass(): string;
     close(): Promise<void>;
+}
+/** 2.99.0. How the stand-in for the module's program behaves on the next `start`. */
+export interface StandInProgram {
+    /** How long it takes from being run to having started the conversation, in ms. */
+    bootMs: number;
+    /** It fails after `bootMs` instead (says something and exits non-zero, as a program that cannot start does). */
+    fails?: boolean;
+}
+/** 2.99.0. What the conformance needs of a module that provides `agent.tasks`. */
+export interface AgentTasksConformance {
+    /**
+     * Call the module's `agent.tasks` start route as a request from the host reaches it: `body` as JSON
+     * and these headers. The module's own route (its `Before`, its door) answers.
+     */
+    start(body: unknown, headers: Record<string, string>): Promise<{
+        status: number;
+        body: unknown;
+    }>;
+    /**
+     * Put a stand-in for the module's program (its CLI) in place for the next start, behaving as said; the
+     * returned function puts things back and ends whatever the stand-in left running.
+     */
+    program(behaviour: StandInProgram): Promise<() => Promise<void> | void>;
 }
 export interface AgentConformanceOptions {
     /** The module's manifest, as it exports it. */
@@ -72,6 +108,10 @@ export interface AgentConformanceOptions {
     launched?(host: FakeHost): Promise<{
         token: string;
     }>;
+    /** 2.99.0. Required for a module that provides `agent.tasks`: how to start one, and its program's stand-in. */
+    tasks?: AgentTasksConformance;
+    /** 2.99.0. How long to wait for a `tasks.report` after a quick program, in ms (default 15 000). */
+    reportWithinMs?: number;
 }
 export interface AgentConformance {
     failures: string[];

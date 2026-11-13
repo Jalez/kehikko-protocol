@@ -48,6 +48,7 @@ export declare const METHOD_SINCE: {
     readonly 'messages.notifySession': "2.81.0";
     readonly 'services.find': "2.81.0";
     readonly 'sessions.placeOf': "2.85.0";
+    readonly 'tasks.report': "2.99.0";
     readonly 'inbox.read': "2.79.0";
     readonly 'inbox.log': "2.79.0";
     readonly 'inbox.act': "2.79.0";
@@ -116,6 +117,7 @@ export declare const SERVER_METHOD_SINCE: {
     readonly 'messages.notifySession': "2.81.0";
     readonly 'services.find': "2.81.0";
     readonly 'sessions.placeOf': "2.85.0";
+    readonly 'tasks.report': "2.99.0";
 };
 /**
  * The manifest declarations a host has to know to do what the module asks, and the version that
@@ -297,6 +299,7 @@ export declare const SINCE: {
         readonly 'messages.notifySession': "2.81.0";
         readonly 'services.find': "2.81.0";
         readonly 'sessions.placeOf': "2.85.0";
+        readonly 'tasks.report': "2.99.0";
         readonly 'inbox.read': "2.79.0";
         readonly 'inbox.log': "2.79.0";
         readonly 'inbox.act': "2.79.0";
@@ -363,6 +366,7 @@ export declare const SINCE: {
         readonly 'messages.notifySession': "2.81.0";
         readonly 'services.find': "2.81.0";
         readonly 'sessions.placeOf': "2.85.0";
+        readonly 'tasks.report': "2.99.0";
     };
     readonly declarations: {
         readonly 'mcp.subjects': "1.1.0";

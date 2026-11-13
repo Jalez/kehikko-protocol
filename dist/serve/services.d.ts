@@ -104,4 +104,36 @@ export declare function vouchHost(headers: HeaderBag, options?: VouchHostOptions
     ok: false;
     why: string;
 }>;
+/** What a module's slow start came to: the conversation it started, or why not, in words for the person. */
+export type TaskStarting = {
+    ok: true;
+    conversation: string;
+} | {
+    ok: false;
+    why: string;
+};
+export interface AcceptTaskOptions {
+    /** This module's id: who reports. */
+    module: string;
+    /** A line for the module's log, when it has one. */
+    log?: (line: string) => void;
+    env?: Record<string, string | undefined>;
+    fetch?: typeof fetch;
+}
+/**
+ * 2.99.0. `agent.tasks`' `start`, the shape every agent module answers it in: ACCEPT at once (`started`,
+ * `session` = `handle`, `pending: true`) and run `starting` after the answer has gone; what it came to
+ * is reported to the host with `tasks.report` — `started` with the conversation's id, or `failed` with
+ * why (a throw is a failure, in its message). Never throws; the report is best effort, logged when the
+ * host did not take it.
+ *
+ * Checks that can be made at once (the body, the project, that the program is installed) belong BEFORE
+ * this, as a `declined` answer: the person is told at once rather than through the Inbox.
+ */
+export declare function acceptTask(handle: string, starting: () => Promise<TaskStarting>, options: AcceptTaskOptions): {
+    outcome: 'started';
+    session: string;
+    why: string;
+    pending: true;
+};
 export {};

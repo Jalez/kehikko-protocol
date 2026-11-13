@@ -11,6 +11,41 @@ After 2.78.0, every entry's first line under its heading is its kind, and the ve
 (semver; CI checks it): `Kind: breaking` → next major, `Kind: feature` → next minor, `Kind: fix` →
 next patch.
 
+## 2.99.0 — 2026-11-13
+
+Kind: feature
+
+`agent.tasks`' `start` answers at once, and an adopted conversation can say how its turn ends.
+**Additive**; `PROTOCOL` is still 2. [docs/services.md](docs/services.md#start-answers-at-once-2990).
+
+Adopting an item with an agent failed four times in a row with "it did not answer within 8 s": every
+agent module started its program (and waited for it to boot, attach, list itself) before it answered
+`start`, and the host's wait ran out first — while the conversation went on to start, unseen. Every
+fix was proven against a fake provider that answered at once. Now the contract says the answer comes
+first, and the conformance holds every agent module to it against a program that takes 20 s to boot.
+
+### Added
+
+- `agentTaskStartResult.pending` (default `false`): `started` + `pending: true` is an ACCEPTANCE — the
+  module has the task and is starting its conversation. A host before 2.99.0 drops it and reads
+  `started`. `AGENT_TASK_ANSWER_MS` (1000): how long `start` may take to answer.
+- `tasks.report` (`SERVER_METHODS`, under `activity:report`; `tasksReportParams`,
+  `tasksReportResult`): from an agent module's server, what became of an accepted task — `started` with
+  the conversation's id, or `failed` with why, which the host puts in the person's Inbox.
+- `/serve`: `acceptTask(handle, starting, { module })` answers the acceptance, runs the slow start after
+  the answer has gone and reports it (`TaskStarting`, `AcceptTaskOptions`).
+- `tellFinishedTool()` takes `placeToken` (`PLACE_TOKEN_PROPERTY`, now exported): a conversation placed
+  after it started has no token on its door's URL, so a module resolves the conversation with
+  `callToken(urlToken, args)`, as the message tools do since 2.96.0.
+- `/testing`: `expectAgentConformance` takes `tasks: { start, program }` (`AgentTasksConformance`,
+  `StandInProgram`) and checks that `start` refuses an unvouched caller, answers within the second while
+  the stand-in program boots for 20 s, and that a failed and a started task are reported to the host; that
+  an adopted conversation's `tell_finished` works with its key; and that every question the module's
+  server asked is under a capability its manifest declares. The stand-in host now also vouches for passes
+  it minted (`FakeHost.mintPass`) and is the only host the module can reach (`KEHIKOT_HOST` too).
+- `kehikot-check-agent` fails a module that provides `agent.tasks` and whose conformance test gives no
+  `tasks`.
+
 ## 2.98.0 — 2026-11-13
 
 Kind: feature

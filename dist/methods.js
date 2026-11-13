@@ -17,7 +17,7 @@ import { stepsListResult } from './plan.js';
 import { gotoProject, showAskSchema } from './show.js';
 import { trafficNoteResult, trafficNoteSchema, trafficReadResult } from './traffic.js';
 import { inboxActParams, inboxActResult, inboxAnswerParams, inboxAnswerResult, inboxLogParams, inboxLogResult, inboxOpenParams, inboxOpenResult, inboxReadParams, inboxReadResult, inboxUseParams, inboxUseResult, inboxAdoptionParams, inboxAdoptionResult, inboxAdoptParams, inboxAdoptResult, inboxAdoptWithParams, inboxAdoptWithResult, inboxUntrackParams, inboxUntrackResult, inboxUndoParams, inboxUndoResult } from './inbox.js';
-import { servicesFindParams, servicesFindResult, sessionsPlaceOfParams, sessionsPlaceOfResult } from './services.js';
+import { servicesFindParams, servicesFindResult, sessionsPlaceOfParams, sessionsPlaceOfResult, tasksReportParams, tasksReportResult } from './services.js';
 import { messageMineParams, messageMineResult, messageNotifyParams, messageNotifySessionParams, messagePostParams, messageReadParams, messageReadResult, messageSayParams, messageSendParams, messageSendResult, messageTellParams } from './agent-messages.js';
 /**
  * The questions a module can ask, by name and by shape: capabilities, methods, each method's
@@ -269,6 +269,11 @@ export const METHODS = {
     'services.find': 'services:read',
     /** Which place a session is filed under, by its own id (2.85.0). */
     'sessions.placeOf': 'sessions:place',
+    /**
+     * What became of a task an agent module accepted (`agent.tasks`, 2.99.0): its sessions' states, for
+     * the Inbox, which is what `activity:report` is for, and every agent module declares it.
+     */
+    'tasks.report': 'activity:report',
     /** The person's Inbox, read by a module's page (2.79.0). */
     'inbox.read': 'inbox:person',
     /** Earlier: the Inbox's log, a page of it (2.79.0). */
@@ -640,6 +645,8 @@ export const methodParams = {
     'services.find': servicesFindParams,
     /** 2.85.0. From a module's server about one project: the place a session is filed under; answered with `sessionsPlaceOfResult`. */
     'sessions.placeOf': sessionsPlaceOfParams,
+    /** 2.99.0. From an agent module's server: what became of a task its `agent.tasks` start accepted; answered with `tasksReportResult`. */
+    'tasks.report': tasksReportParams,
     /** 2.79.0. From a page only: the person's Inbox; answered with `inboxReadResult`. See `inbox.ts`. */
     'inbox.read': inboxReadParams,
     /** 2.79.0. From a page only: a page of Earlier; answered with `inboxLogResult`. */
@@ -872,6 +879,7 @@ export const methodResults = {
     'messages.notifySession': messageSendResult,
     'services.find': servicesFindResult,
     'sessions.placeOf': sessionsPlaceOfResult,
+    'tasks.report': tasksReportResult,
     'inbox.read': inboxReadResult,
     'inbox.log': inboxLogResult,
     'inbox.act': inboxActResult,

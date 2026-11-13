@@ -630,7 +630,7 @@ export function messageTools(act = false, options = {}) {
  * uses that one and ignores this.
  */
 export const PLACE_TOKEN_ARG = 'placeToken';
-const PLACE_TOKEN_PROPERTY = {
+export const PLACE_TOKEN_PROPERTY = {
     type: 'string',
     pattern: '^[A-Za-z0-9_-]{22,64}$',
     description: 'This conversation’s Kehikot key, only when Kehikot gave it one in words (“Kehikot key for this conversation: …”, in the answer to the command that placed it) '

@@ -1,5 +1,5 @@
 import type { ActivityQuestion, InboxEvent } from './activity.js'
-import { messageChoicesSchema, type AgentSessionRef, type DeliveryState } from './agent-messages.js'
+import { PLACE_TOKEN_ARG, PLACE_TOKEN_PROPERTY, messageChoicesSchema, type AgentSessionRef, type DeliveryState } from './agent-messages.js'
 import { LIMITS } from './limits.js'
 import { oneLine, type NotesSelf } from './notes.js'
 
@@ -92,6 +92,8 @@ export function tellFinishedTool(): {
           maxItems: LIMITS.MESSAGE_CHOICES,
           description: 'For needs-decision only: the answers the person can press, each short and different. They can always answer in their own words instead.',
         },
+        /* 2.99.0. The conversation's key, for one placed after it started (adopted), whose door carries none: as the message tools take it (`callToken`). */
+        [PLACE_TOKEN_ARG]: PLACE_TOKEN_PROPERTY,
       },
       required: ['event'],
     },

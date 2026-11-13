@@ -198,3 +198,50 @@ export async function vouchHost(headers: HeaderBag, options: VouchHostOptions = 
   }
   return { ok: false, why: 'Kehikot did not vouch for that pass.' }
 }
+
+/* ---------------------------------------------------------------- agent.tasks: accept now, start after (2.99.0) */
+
+/** What a module's slow start came to: the conversation it started, or why not, in words for the person. */
+export type TaskStarting = { ok: true; conversation: string } | { ok: false; why: string }
+
+export interface AcceptTaskOptions {
+  /** This module's id: who reports. */
+  module: string
+  /** A line for the module's log, when it has one. */
+  log?: (line: string) => void
+  env?: Record<string, string | undefined>
+  fetch?: typeof fetch
+}
+
+/**
+ * 2.99.0. `agent.tasks`' `start`, the shape every agent module answers it in: ACCEPT at once (`started`,
+ * `session` = `handle`, `pending: true`) and run `starting` after the answer has gone; what it came to
+ * is reported to the host with `tasks.report` — `started` with the conversation's id, or `failed` with
+ * why (a throw is a failure, in its message). Never throws; the report is best effort, logged when the
+ * host did not take it.
+ *
+ * Checks that can be made at once (the body, the project, that the program is installed) belong BEFORE
+ * this, as a `declined` answer: the person is told at once rather than through the Inbox.
+ */
+export function acceptTask(handle: string, starting: () => Promise<TaskStarting>, options: AcceptTaskOptions): { outcome: 'started'; session: string; why: string; pending: true } {
+  const report = async (params: { outcome: 'started' | 'failed'; conversation?: string | null; why?: string }) => {
+    const said = await askHost('tasks.report', { session: handle, conversation: params.conversation ?? null, outcome: params.outcome, why: (params.why ?? '').slice(0, LIMITS.REASON) }, { module: options.module, env: options.env, fetch: options.fetch }).catch(
+      (error: unknown) => ({ ok: false as const, why: error instanceof Error ? error.message : String(error) }),
+    )
+    if (!said.ok) options.log?.(`the host was not told what became of task ${handle} (${said.why})`)
+  }
+  /* After the answer: a macrotask, so the route has returned before any of the slow work begins. */
+  setTimeout(() => {
+    void (async () => {
+      let came: TaskStarting
+      try {
+        came = await starting()
+      } catch (error) {
+        came = { ok: false, why: error instanceof Error ? error.message : String(error) }
+      }
+      if (came.ok) await report({ outcome: 'started', conversation: came.conversation })
+      else await report({ outcome: 'failed', why: came.why || 'it gave no reason' })
+    })()
+  }, 0)
+  return { outcome: 'started', session: handle, why: '', pending: true }
+}

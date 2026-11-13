@@ -152,3 +152,37 @@ export async function vouchHost(headers, options = {}) {
     }
     return { ok: false, why: 'Kehikot did not vouch for that pass.' };
 }
+/**
+ * 2.99.0. `agent.tasks`' `start`, the shape every agent module answers it in: ACCEPT at once (`started`,
+ * `session` = `handle`, `pending: true`) and run `starting` after the answer has gone; what it came to
+ * is reported to the host with `tasks.report` — `started` with the conversation's id, or `failed` with
+ * why (a throw is a failure, in its message). Never throws; the report is best effort, logged when the
+ * host did not take it.
+ *
+ * Checks that can be made at once (the body, the project, that the program is installed) belong BEFORE
+ * this, as a `declined` answer: the person is told at once rather than through the Inbox.
+ */
+export function acceptTask(handle, starting, options) {
+    const report = async (params) => {
+        const said = await askHost('tasks.report', { session: handle, conversation: params.conversation ?? null, outcome: params.outcome, why: (params.why ?? '').slice(0, LIMITS.REASON) }, { module: options.module, env: options.env, fetch: options.fetch }).catch((error) => ({ ok: false, why: error instanceof Error ? error.message : String(error) }));
+        if (!said.ok)
+            options.log?.(`the host was not told what became of task ${handle} (${said.why})`);
+    };
+    /* After the answer: a macrotask, so the route has returned before any of the slow work begins. */
+    setTimeout(() => {
+        void (async () => {
+            let came;
+            try {
+                came = await starting();
+            }
+            catch (error) {
+                came = { ok: false, why: error instanceof Error ? error.message : String(error) };
+            }
+            if (came.ok)
+                await report({ outcome: 'started', conversation: came.conversation });
+            else
+                await report({ outcome: 'failed', why: came.why || 'it gave no reason' });
+        })();
+    }, 0);
+    return { outcome: 'started', session: handle, why: '', pending: true };
+}
