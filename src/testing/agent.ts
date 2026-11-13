@@ -8,7 +8,7 @@ import { freshPlaceToken } from '../serve/adopt.js'
 import { forgetMessageHosts } from '../serve/messages.js'
 
 /**
- * 2.95.0. The conformance check every agent module runs in its own test suite, with one file:
+ * 2.96.0. The conformance check every agent module runs in its own test suite, with one file:
  *
  *     import { expectAgentConformance } from 'kehikot-module-protocol/testing'
  *     test('meets the agent-module conformance', async () => {

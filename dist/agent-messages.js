@@ -613,7 +613,7 @@ export function messageTools(act = false, options = {}) {
             annotations: { title: 'Read messages from other agent sessions', readOnlyHint: true, destructiveHint: false, idempotentHint: false, openWorldHint: false },
         },
     ];
-    /* 2.95.0. Every door that lists them takes the conversation's key as an argument, for a conversation whose door carries none. */
+    /* 2.96.0. Every door that lists them takes the conversation's key as an argument, for a conversation whose door carries none. */
     return tools.map((tool) => ({
         ...tool,
         description: `${older}${tool.description}`,
@@ -621,7 +621,7 @@ export function messageTools(act = false, options = {}) {
     }));
 }
 /* ------------------------------------------------------------------------ *
- * 2.95.0. Messaging comes from the host; a conversation proves which one it is with its key
+ * 2.96.0. Messaging comes from the host; a conversation proves which one it is with its key
  * ------------------------------------------------------------------------ */
 /**
  * The argument every message tool takes beside its own: the conversation's place token, for a
@@ -636,7 +636,7 @@ const PLACE_TOKEN_PROPERTY = {
     description: 'This conversation’s Kehikot key, only when Kehikot gave it one in words (“Kehikot key for this conversation: …”, in the answer to the command that placed it) '
         + 'and a call without it said this conversation is not known. Never another conversation’s key.',
 };
-/** What a module's own message tools say first (2.95.0): they forward, and the host's are the ones to use. */
+/** What a module's own message tools say first (2.96.0): they forward, and the host's are the ones to use. */
 export const OLDER_MESSAGE_DOOR = 'Older place for this tool: the kehikko door’s send_message and read_messages are the ones to use, and this one forwards there. ';
 /** How the key is introduced wherever a conversation is given it in words. */
 export const PLACE_TOKEN_LINE = 'Kehikot key for this conversation:';

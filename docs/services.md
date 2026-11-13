@@ -239,11 +239,11 @@ user-wide configuration applies. A host with none for that command sets nothing 
 not the module, keeps that configuration in step — it runs while the module sleeps, and it is the one
 that sees modules installed, moved and uninstalled.
 
-### `agent.delivery` (2.95.0)
+### `agent.delivery` (2.96.0)
 
 An agent module that hands the messages Kehikot keeps to the conversations its program runs. Messaging
 itself is the host's (`send_message` / `read_messages` on the kehikko door); see
-[agent-messages.md](agent-messages.md#messaging-comes-from-the-host-your-module-delivers-2950).
+[agent-messages.md](agent-messages.md#messaging-comes-from-the-host-your-module-delivers-2960).
 
 - `name`, `program`: as `agent.tasks`'s.
 - `deliver`: a route on the module's origin. The host posts `{ project }` (`agentDeliverParams`) after

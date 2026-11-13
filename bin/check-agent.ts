@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 /**
- * Check that an agent module is built so every conversation can message (2.95.0).
+ * Check that an agent module is built so every conversation can message (2.96.0).
  *
  *   bun run check:agent [<module dir> …]
  *

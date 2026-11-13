@@ -1,5 +1,5 @@
 /**
- * 2.95.0. `kehikot-check-agent <module dir>…`: is an agent module built so that every conversation can
+ * 2.96.0. `kehikot-check-agent <module dir>…`: is an agent module built so that every conversation can
  * message, however it started? Run by the shared module CI on every pull request. A module that does
  * not message (`agents:message` absent from `declares.uses`) passes as `not an agent module`.
  *

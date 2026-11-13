@@ -1,166 +1,138 @@
 import { describe, expect, test } from 'bun:test'
-import { readFileSync } from 'node:fs'
 
 import {
-  AGENT_DELIVERY,
-  NOT_PLACED_HEAD,
-  OLDER_MESSAGE_DOOR,
-  PLACE_TOKEN_ARG,
-  adoptWays,
-  agentDeliverResult,
-  messageTools,
-  notPlacedText,
-  placeTokenIn,
-  placeTokenLine,
-  serviceDescriptor,
-  servicesSchema,
-} from '../src/index.js'
-import { answerMessageTool, callToken, deliveryReply, freshPlaceToken, issuePlaceToken, messageToolsFor } from '../src/serve/index.js'
-import { agentConformance, type AgentDoor } from '../src/testing/index.js'
-import { checkAgentFiles } from '../src/check/agent.js'
-import { checkDoor } from '../src/check/door.js'
+  askedHosts,
+  doorConfigProblems,
+  doorUrl,
+  hostIsProjectUrls,
+  hostPlaceUrls,
+  isStableDoor,
+  keptFolderName,
+  legacyKeptFolderName,
+  stableDoors,
+  startingHost,
+  tokenOnDoor,
+  HOST_ENV,
+} from '../src/serve/index.js'
+import { hostAskUrls } from '../src/serve/ask.js'
 
-const TOKEN = 'abcdefghijklmnopqrstuvwxyz012345'
-const DELIVERY = { name: 'Claude', program: 'Claude Code', deliver: '/api/deliver', adopt: 'Type /kehikot-here in it.' }
+const HOST = 'http://127.0.0.1:4170'
+const TOKEN = 'a'.repeat(43)
 
-describe('2.95.0 — one key for a conversation however it started', () => {
-  test('the message tools take placeToken; a module’s say they forward to the kehikko door', () => {
-    for (const tool of messageTools()) expect((tool.inputSchema.properties as Record<string, unknown>)[PLACE_TOKEN_ARG]).toBeDefined()
-    for (const tool of messageTools(false, { older: true })) expect(tool.description.startsWith(OLDER_MESSAGE_DOOR)).toBe(true)
-    for (const tool of messageTools()) expect(tool.description.startsWith(OLDER_MESSAGE_DOOR)).toBe(false)
+describe('the host that started the module (2.95.0)', () => {
+  test('KEHIKOT_HOST names it, over every list', () => {
+    expect(startingHost({ [HOST_ENV]: HOST, KEHIKOT_ORIGINS: 'http://127.0.0.1:47700 http://127.0.0.1:4181' })).toBe(HOST)
   })
 
-  test('the key is said in words and read back; a session id is never one', () => {
-    const token = freshPlaceToken()
-    expect(token).toMatch(/^[A-Za-z0-9_-]{43}$/)
-    expect(freshPlaceToken()).not.toBe(token)
-    expect(placeTokenIn(`Kehikot: Assigned.\n${placeTokenLine(token)}`)).toBe(token)
-    expect(placeTokenIn('Kehikot: Assigned.')).toBeNull()
-    expect(callToken(null, { [PLACE_TOKEN_ARG]: token })).toBe(token)
-    expect(callToken(TOKEN, { [PLACE_TOKEN_ARG]: token })).toBe(TOKEN)
-    expect(callToken(null, { [PLACE_TOKEN_ARG]: 'short' })).toBeNull()
-    expect(callToken(null, {})).toBeNull()
+  test('from an older host: the first loopback origin of its list, never a tauri one', () => {
+    expect(startingHost({ KEHIKOT_ORIGINS: 'tauri://localhost http://tauri.localhost http://127.0.0.1:4170 http://127.0.0.1:4181' })).toBe(HOST)
+    expect(startingHost({ KEHIKOT_ORIGIN: 'tauri://localhost http://127.0.0.1:4171' })).toBe('http://127.0.0.1:4171')
   })
 
-  test('no key: the tools are listed and say why and what to do, with the module’s way', async () => {
-    expect((await messageToolsFor(null, { module: 'kehikot.claude' })).map((tool) => tool.name)).toEqual(['send_message', 'read_messages'])
-    const said = await answerMessageTool('send_message', { body: 'hi' }, { module: 'kehikot.claude', token: null, adopt: 'In Claude Code: Type /kehikot-here in it.' })
-    expect(said?.isError).toBe(true)
-    expect(said?.text.startsWith(NOT_PLACED_HEAD)).toBe(true)
-    expect(said?.text).toContain('/kehikot-here')
-    expect(notPlacedText()).toContain(PLACE_TOKEN_ARG)
+  test('nobody started it: null, and never one of the defaults', () => {
+    expect(startingHost({})).toBeNull()
+    expect(startingHost({ [HOST_ENV]: 'https://example.com' })).toBeNull()
   })
 
-  test('a placeToken argument is the session asked about, and is not passed on as an argument', async () => {
-    const asked: unknown[] = []
-    const fetch = (async (_url: string, init?: RequestInit) => {
-      asked.push(JSON.parse(String(init?.body)).params)
-      return new Response(JSON.stringify({ ok: true, data: { outcome: 'sent', id: 3, why: '' } }))
-    }) as unknown as typeof globalThis.fetch
-    const said = await answerMessageTool('send_message', { body: 'hi', [PLACE_TOKEN_ARG]: TOKEN }, { module: 'kehikot.claude', token: null, env: { KEHIKOT_ORIGINS: 'http://127.0.0.1:1' }, fetch })
-    expect(said).toEqual({ text: 'Sent (message #3).', isError: false })
-    expect(asked).toEqual([{ token: TOKEN, body: 'hi' }])
+  test('a module a host started asks that host alone, whatever else its list names', () => {
+    const env = { [HOST_ENV]: HOST, KEHIKOT_ORIGINS: 'http://127.0.0.1:47700 http://127.0.0.1:4181' }
+    expect(askedHosts(env)).toEqual([HOST])
+    expect(hostPlaceUrls(TOKEN, env)).toEqual([`${HOST}/host/place?kehikot-place=${TOKEN}`])
+    expect(hostIsProjectUrls('/p', env).map((url) => new URL(url).origin)).toEqual([HOST])
+    expect(hostAskUrls(env).map((url) => new URL(url).origin)).toEqual([HOST])
   })
 
-  test('agent.delivery: a known service, its words, and the knock’s answer', async () => {
-    expect(serviceDescriptor(AGENT_DELIVERY, DELIVERY)).toEqual(DELIVERY)
-    expect(serviceDescriptor(AGENT_DELIVERY, { ...DELIVERY, deliver: 'http://elsewhere/' })).toBeNull()
-    expect(servicesSchema.safeParse({ [AGENT_DELIVERY]: DELIVERY }).success).toBe(true)
-    expect(adoptWays([DELIVERY])).toEqual(['In Claude Code: Type /kehikot-here in it.'])
-    const knocked = await deliveryReply('POST', { project: '/p' }, async () => 2)
-    expect(agentDeliverResult.parse(knocked.body)).toEqual({ outcome: 'delivered', delivered: 2, why: '' })
-    expect((await deliveryReply('POST', { project: '/p' }, async () => 0)).body).toEqual({ outcome: 'none', delivered: 0, why: '' })
-    expect((await deliveryReply('POST', {}, async () => 0)).status).toBe(400)
-    expect((await deliveryReply('GET', null, async () => 0)).status).toBe(405)
-  })
-
-  test('issuePlaceToken posts the issue to a loopback host and is true only when it took it', async () => {
-    const posted: unknown[] = []
-    const fetch = (async (url: string | URL, init?: RequestInit) => {
-      posted.push([String(url), JSON.parse(String(init?.body))])
-      return new Response(JSON.stringify({ ok: true, token: TOKEN, doors: [] }))
-    }) as unknown as typeof globalThis.fetch
-    const issue = { module: 'kehikot.claude', token: TOKEN, project: '/p', kehikko: null }
-    expect(await issuePlaceToken(issue, { env: { KEHIKOT_ORIGINS: 'http://127.0.0.1:4170 https://example.com' }, fetch })).toBe(true)
-    expect(posted).toEqual([['http://127.0.0.1:4170/host/place', issue]])
-    expect(await issuePlaceToken({ ...issue, token: 'short' }, { env: { KEHIKOT_ORIGINS: 'http://127.0.0.1:4170' }, fetch })).toBe(false)
+  test('under an older host, its list in order, as before', () => {
+    expect(askedHosts({ KEHIKOT_ORIGINS: 'http://127.0.0.1:1 http://127.0.0.1:2' })).toEqual(['http://127.0.0.1:1', 'http://127.0.0.1:2'])
   })
 })
 
-describe('2.95.0 — the conformance harness, against a module door built the 2.95.0 way and one built the old way', () => {
-  const ID = 'kehikot.example'
-  const manifest = { id: ID, declares: { uses: ['agents:message'] }, services: { [AGENT_DELIVERY]: DELIVERY } }
+describe('the stable door', () => {
+  test('the host’s own and a module’s, with the token', () => {
+    expect(doorUrl(HOST, 'kehikko', TOKEN)).toBe(`${HOST}/mcp?kehikot-place=${TOKEN}`)
+    expect(doorUrl(HOST, 'kehikot.paper', TOKEN)).toBe(`${HOST}/m/kehikot.paper/mcp?kehikot-place=${TOKEN}`)
+    expect(() => doorUrl('http://example.com', 'kehikot.paper')).toThrow()
+  })
 
-  /** A tiny agent module: a record of conversations by token, an adopt that issues, and a door. */
-  function moduleDoor(old: boolean) {
-    const records = new Map<string, string>()
-    const door: AgentDoor = async (method, path, query, body) => {
-      if (path === '/api/kehikot/place') {
-        const conversation = records.get(query.get('kehikot-place') ?? '')
-        return { status: 200, body: { ok: true, place: conversation ? { conversation, epic: 'auth', parts: [], kehikko: null } : null } }
-      }
-      if (path === DELIVERY.deliver) return deliveryReply(method, body, async () => 0)
-      if (path === '/mcp') {
-        const rpc = body as { id: number; method: string; params?: { name?: string; arguments?: Record<string, unknown> } }
-        const token = query.get('kehikot-place')
-        if (rpc.method === 'tools/list') return { status: 200, body: { result: { tools: old && !token ? [] : await messageToolsFor(token, { module: ID }) } } }
-        const said = await answerMessageTool(rpc.params?.name ?? '', rpc.params?.arguments ?? {}, { module: ID, token, adopt: 'In Example: type /here.' })
-        return { status: 200, body: { result: { content: [{ type: 'text', text: said?.text ?? '' }], isError: said?.isError } } }
-      }
-      return null
+  test('a door list from anywhere is rebuilt on the starting host: another host, a raw port, the stable one', () => {
+    const doors = stableDoors(
+      [
+        { module: 'kehikko', name: 'kehikko', url: `http://127.0.0.1:47700/mcp?kehikot-place=${TOKEN}`, transport: 'http' as const },
+        { module: 'kehikot.paper', name: 'paper', url: `http://127.0.0.1:47700/m/kehikot.paper/mcp?kehikot-place=${TOKEN}`, transport: 'http' as const },
+        { module: 'kehikot.notes', name: 'notes', url: `http://127.0.0.1:7940/mcp?kehikot-place=${TOKEN}`, transport: 'http' as const },
+        { module: '', name: 'slides', url: `http://127.0.0.1:47700/m/kehikot.slides/mcp?kehikot-place=${TOKEN}`, transport: 'http' as const },
+        { module: '', name: 'mystery', url: 'http://127.0.0.1:7999/mcp', transport: 'http' as const },
+      ],
+      HOST,
+      TOKEN,
+    )
+    expect(doors.map((door) => [door.name, door.url])).toEqual([
+      ['kehikko', `${HOST}/mcp?kehikot-place=${TOKEN}`],
+      ['paper', `${HOST}/m/kehikot.paper/mcp?kehikot-place=${TOKEN}`],
+      ['notes', `${HOST}/m/kehikot.notes/mcp?kehikot-place=${TOKEN}`],
+      ['slides', `${HOST}/m/kehikot.slides/mcp?kehikot-place=${TOKEN}`],
+    ])
+    for (const door of doors) expect(isStableDoor(door.url, HOST)).toBe(true)
+  })
+
+  test('a raw port is never a stable door, nor another host', () => {
+    expect(isStableDoor(`http://127.0.0.1:7870/mcp`, HOST)).toBe(false)
+    expect(isStableDoor(`http://127.0.0.1:47700/m/kehikot.paper/mcp`, HOST)).toBe(false)
+    expect(isStableDoor(`${HOST}/m/kehikot.paper@v1.2.0/mcp`, HOST)).toBe(true)
+  })
+
+  test('the conformance check names each entry that is not one', () => {
+    const config = {
+      mcpServers: {
+        kehikko: { type: 'http', url: `${HOST}/mcp?kehikot-place=${TOKEN}` },
+        paper: { type: 'http', url: `http://127.0.0.1:47700/m/kehikot.paper/mcp?kehikot-place=${TOKEN}` },
+        notes: { type: 'http', url: `http://127.0.0.1:7940/mcp` },
+        local: { command: 'node', args: ['x.js'] },
+      },
     }
-    const adopt = async () => {
-      const token = freshPlaceToken()
-      records.set(token, 'conv-1234')
-      await issuePlaceToken({ module: ID, token, project: '/p', kehikko: null })
-      return { said: `Kehikot: Assigned to auth.\n${placeTokenLine(token)}`, conversation: 'conv-1234' }
-    }
-    const launched = async () => {
-      const token = freshPlaceToken()
-      records.set(token, 'conv-launched')
-      await issuePlaceToken({ module: ID, token, project: '/p', kehikko: null })
-      return { token }
-    }
-    return { door, adopt, launched }
-  }
+    const problems = doorConfigProblems(config, HOST)
+    expect(problems).toHaveLength(2)
+    expect(problems[0]).toContain('paper')
+    expect(problems[1]).toContain('raw address')
+    expect(doorConfigProblems({ mcpServers: { kehikko: { url: `${HOST}/mcp` } } }, HOST)).toEqual([])
+  })
+})
 
-  test('a module built the 2.95.0 way passes', async () => {
-    const built = moduleDoor(false)
-    const said = await agentConformance({ manifest, door: built.door, project: '/p', adopt: built.adopt, launched: built.launched })
-    expect(said.failures).toEqual([])
-    expect(said.passed.length).toBeGreaterThanOrEqual(10)
+describe('kept folders are the starting host’s', () => {
+  test('the same token under another host names another folder', () => {
+    expect(keptFolderName(TOKEN, HOST)).not.toBe(keptFolderName(TOKEN, 'http://127.0.0.1:47700'))
+    expect(keptFolderName(TOKEN, HOST)).toMatch(/^session-[0-9a-f]{24}$/)
+    expect(keptFolderName(TOKEN, null)).toBe(legacyKeptFolderName(TOKEN))
   })
 
-  test('one that lists the message tools only for a launched conversation fails, and says so', async () => {
-    const built = moduleDoor(true)
-    const said = await agentConformance({ manifest, door: built.door, project: '/p', adopt: built.adopt })
-    expect(said.failures.some((one) => one.startsWith('lists every tool to a caller with no place token'))).toBe(true)
+  test('the token on a door', () => {
+    expect(tokenOnDoor(`${HOST}/mcp?kehikot-place=${TOKEN}`)).toBe(TOKEN)
+    expect(tokenOnDoor('not a url')).toBeNull()
+  })
+})
+
+describe('the conformance check over a module’s sources (check:door-config)', () => {
+  const { checkDoorConfigSources } = require('../src/check/door-config.ts') as typeof import('../src/check/door-config.ts')
+
+  test('a raw-port door beside a door config fails', () => {
+    const check = checkDoorConfigSources('m', [
+      { path: 'doorConfig.ts', text: 'const own = { url: `http://127.0.0.1:${port}/mcp?kehikot-place=${token}` }' },
+      { path: 'skills.ts', text: 'const c = { mcpServers: {} }' },
+    ])
+    expect(check.writesConfig).toBe(true)
+    expect(check.failures).toHaveLength(1)
+    expect(check.failures[0]).toContain('doorConfig.ts:1')
   })
 
-  test('one that messages without agent.delivery fails', async () => {
-    const built = moduleDoor(false)
-    const said = await agentConformance({ manifest: { ...manifest, services: {} }, door: built.door, project: '/p', adopt: built.adopt })
-    expect(said.failures.some((one) => one.startsWith('provides agent.delivery'))).toBe(true)
+  test('the stable door passes, and a manifest’s own door url is not judged', () => {
+    const check = checkDoorConfigSources('m', [
+      { path: 'doorConfig.ts', text: 'const own = doorUrl(startingHost(), ID, token)\nconst c = { mcpServers: {} }' },
+      { path: 'manifest.ts', text: 'mcp: { url: `http://127.0.0.1:${PORT}/mcp` }' },
+    ])
+    expect(check.failures).toEqual([])
   })
 
-  test('check:agent fails a module with no delivery, no conformance test, or tools behind a token', () => {
-    const conformance = { path: 'test/agent.test.ts', text: "import { expectAgentConformance } from 'kehikot-module-protocol/testing'\nawait expectAgentConformance({})" }
-    expect(checkAgentFiles(manifest, [], [conformance]).failures).toEqual([])
-    expect(checkAgentFiles({ id: 'x', declares: { uses: [] } }, [], []).agent).toBe(false)
-    expect(checkAgentFiles({ ...manifest, services: {} }, [], [conformance]).failures).toHaveLength(1)
-    expect(checkAgentFiles(manifest, [], []).failures).toHaveLength(1)
-    const gated = { path: 'doors.ts', text: 'tools: [...tools(), ...(token ? await messageToolsFor(token, o) : [])]' }
-    expect(checkAgentFiles(manifest, [gated], [conformance]).failures).toHaveLength(1)
-  })
-
-  test('check:door --running fails a messaging module whose door lists no message tools to a caller with no token', () => {
-    const declared = { id: ID, mcp: { subjects: [] } as never, declares: { uses: ['agents:message'] } }
-    expect(checkDoor(declared, []).failures).toHaveLength(2)
-    expect(checkDoor(declared, messageTools() as never).failures).toEqual([])
-  })
-
-  test('the docs say where messaging lives', () => {
-    const doc = readFileSync(new URL('../docs/agent-messages.md', import.meta.url), 'utf8')
-    for (const word of ['2.95.0', 'agent.delivery', 'placeToken', 'expectAgentConformance', 'kehikot-check-agent']) expect(doc).toContain(word)
+  test('a module that writes no door config has nothing to check', () => {
+    expect(checkDoorConfigSources('m', [{ path: 'manifest.ts', text: 'mcp: { url: `http://127.0.0.1:${PORT}/mcp?kehikot-place=x` }' }]).writesConfig).toBe(false)
   })
 })

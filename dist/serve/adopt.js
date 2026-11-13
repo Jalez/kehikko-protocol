@@ -3,9 +3,9 @@ import { placeIssueSchema } from '../door.js';
 import { agentDeliverParams, agentDeliverResult } from '../services.js';
 import { frameOrigins } from './origins.js';
 /**
- * 2.95.0. A conversation, however it started, proves which one it is with ONE key: the place token its
+ * 2.96.0. A conversation, however it started, proves which one it is with ONE key: the place token its
  * agent module issued for it to the host. Node-only, like the rest of `/serve`. Design notes:
- * docs/agent-messages.md#messaging-comes-from-the-host-2950.
+ * docs/agent-messages.md#messaging-comes-from-the-host-2960.
  *
  * - A conversation the module LAUNCHES has the token on every Kehikot door's URL, as since 2.4.0.
  * - A conversation placed AFTERWARDS (the module's adopt command, `/kehikot-here`; one resumed in a

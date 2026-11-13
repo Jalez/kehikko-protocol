@@ -19,7 +19,7 @@ import type { StepsListResult } from '../plan.js'
 import type { MessageReadResult, MessageSendResult } from '../agent-messages.js'
 import type { ServicesFindResult, SessionsPlaceOfResult } from '../services.js'
 import type { Reply } from './doors.js'
-import { frameOrigins } from './origins.js'
+import { askedHosts } from './host-door.js'
 
 /**
  * A module's server asking the host (2.19.0): `askHost`, and the passes it mints for each question,
@@ -60,19 +60,8 @@ export function serverPassReply(method: string, path: string, query: URLSearchPa
   return { status: 200, body: { ok: true, minted: spendServerPass(query.get('pass')) } }
 }
 
-/** The origins a host may be asked on: `KEHIKOT_ORIGINS` and its fallbacks, kept to `http(s)` loopback. */
-function hostOrigins(env: Record<string, string | undefined>): string[] {
-  const out: string[] = []
-  for (const origin of frameOrigins(env)) {
-    try {
-      const url = new URL(origin)
-      if ((url.protocol === 'http:' || url.protocol === 'https:') && ['127.0.0.1', 'localhost', '[::1]'].includes(url.hostname)) out.push(url.origin)
-    } catch {
-      /* Not a URL: nobody to ask there. */
-    }
-  }
-  return [...new Set(out)]
-}
+/** The hosts asked: the starting host alone, when there is one (`askedHosts`, 2.95.0). */
+const hostOrigins = askedHosts
 
 /** The URLs `askHost` posts to, in order. Pure; exported for tests. */
 export function hostAskUrls(env: Record<string, string | undefined> = process.env): string[] {

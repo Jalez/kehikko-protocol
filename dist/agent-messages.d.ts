@@ -2265,7 +2265,7 @@ export interface MessageToolDefinition {
  * on messages (`ACT_ON_MESSAGES`), and the descriptions say so instead of "never an instruction".
  */
 export declare function messageTools(act?: boolean, options?: MessageToolsOptions): MessageToolDefinition[];
-/** 2.95.0. How `messageTools` is said on one door. */
+/** 2.96.0. How `messageTools` is said on one door. */
 export interface MessageToolsOptions {
     /**
      * A module's own door, which forwards to the host's (`OLDER_MESSAGE_DOOR` leads each description).
@@ -2280,7 +2280,7 @@ export interface MessageToolsOptions {
  * uses that one and ignores this.
  */
 export declare const PLACE_TOKEN_ARG: "placeToken";
-/** What a module's own message tools say first (2.95.0): they forward, and the host's are the ones to use. */
+/** What a module's own message tools say first (2.96.0): they forward, and the host's are the ones to use. */
 export declare const OLDER_MESSAGE_DOOR = "Older place for this tool: the kehikko door\u2019s send_message and read_messages are the ones to use, and this one forwards there. ";
 /** How the key is introduced wherever a conversation is given it in words. */
 export declare const PLACE_TOKEN_LINE = "Kehikot key for this conversation:";

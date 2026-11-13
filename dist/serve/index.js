@@ -7,6 +7,8 @@
  */
 export { claim, free, identify, originFor, readManifest, sayClaim, search, verdict, DRIFT_SPAN, IDENTIFY_TIMEOUT_MS, LOOPBACK, } from './ports.js';
 export { DEFAULT_FRAME_ORIGINS, frameAncestors, frameOrigins } from './origins.js';
+/* The host that started this module, and the only doors a session is handed on it (2.95.0). */
+export { askedHosts, doorConfigProblems, doorTarget, doorUrl, isStableDoor, keptFolderName, legacyKeptFolderName, loopbackOrigin, stableDoor, stableDoors, startingHost, tokenOnDoor, HOST_DOOR_MODULE, HOST_ENV, MODULE_PATH_PREFIX, } from './host-door.js';
 /* Whether a folder is a project the host holds: a module's server asks before it reads one. */
 export { hostHasProject, hostIsProjectUrls, hostProject, forgetHostProjects, resolveDoorProject, hostPlace, hostPlaceUrls, placeTokenOf, resolveDoorPlace, PLACE_PATH, IS_PROJECT_PATH, isProjectResult, NO_HOST_ANSWERED, } from './host.js';
 export { DOOR_PROJECT_SAYS, DOOR_PLACE_SAYS, PLACE_PARAM, placeDefaults } from '../door.js';
@@ -44,7 +46,7 @@ export { askHost, hostAskUrls, mintServerPass, serverPassReply, spendServerPass,
 export { SERVER_ASK_PATH, SERVER_PASS_PATH, SERVER_METHODS } from '../server-ask.js';
 /* The message tools every module that runs agent sessions puts on its MCP door (2.41.0): a thin adapter over `askHost`. */
 export { answerMessageTool, forgetMessageHosts, hostKeepsMessages, hostOnMessages, messageToolsFor, messageWaker, messageDelivery, DELIVERY_KEEP_MS, ASLEEP_EVERY_MS, WAKE_EVERY_MS, WAKE_SETTLE_MS, placeTeller, tellDigest, TELL_EVERY_MS, callToken, } from './messages.js';
-/* 2.95.0. One key for a conversation however it started, and the delivery knock. See `adopt.ts`. */
+/* 2.96.0. One key for a conversation however it started, and the delivery knock. See `adopt.ts`. */
 export { freshPlaceToken, issuePlaceToken, deliveryReply } from './adopt.js';
 export { messageTools, isMessageTool, MESSAGE_TOOL_NAMES, ACT_ON_MESSAGES_SETTING, WAKE_ON_MESSAGES_SETTING, actsOnMessages, wakesOnMessages, typedMessages, markersNote, shortPath, pasted, deliveryFor, DELIVERY_STATES, RESUME_EVERY_MS, RESUME_MOST, } from '../agent-messages.js';
 /* The projects this module keeps something in, asked at start and on a slow clock, each handed to its own `know` (2.76.0). */

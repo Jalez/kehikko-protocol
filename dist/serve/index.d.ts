@@ -7,6 +7,7 @@
  */
 export { claim, free, identify, originFor, readManifest, sayClaim, search, verdict, DRIFT_SPAN, IDENTIFY_TIMEOUT_MS, LOOPBACK, type Claimed, type ClaimOptions, type Occupant, type Verdict, } from './ports.js';
 export { DEFAULT_FRAME_ORIGINS, frameAncestors, frameOrigins } from './origins.js';
+export { askedHosts, doorConfigProblems, doorTarget, doorUrl, isStableDoor, keptFolderName, legacyKeptFolderName, loopbackOrigin, stableDoor, stableDoors, startingHost, tokenOnDoor, HOST_DOOR_MODULE, HOST_ENV, MODULE_PATH_PREFIX, type HandedDoor, } from './host-door.js';
 export { hostHasProject, hostIsProjectUrls, hostProject, forgetHostProjects, resolveDoorProject, hostPlace, hostPlaceUrls, placeTokenOf, resolveDoorPlace, PLACE_PATH, IS_PROJECT_PATH, isProjectResult, NO_HOST_ANSWERED, type DoorProject, type HostHasProjectOptions, type HostProject, type IsProjectResult, } from './host.js';
 export { DOOR_PROJECT_SAYS, DOOR_PLACE_SAYS, PLACE_PARAM, placeDefaults, type DoorPlace } from '../door.js';
 export { neighbourPorts, portOf, readRegistration, registerAt, takesOver, registryDir, type Registered, type Registration, } from './registry.js';

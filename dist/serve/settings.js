@@ -1,27 +1,14 @@
 import { LIMITS } from '../limits.js';
 import { SETTINGS_PASS, SETTINGS_PASS_PATH, SETTINGS_PATH, doorMethodParams, settingsPassResult, settingsSetRefusal, settingsValues, } from '../settings.js';
-import { frameOrigins } from './origins.js';
 import { sameTicket } from './ticket.js';
+import { askedHosts } from './host-door.js';
 /**
  * A module's settings door (2.15.0): `settings.get` and `settings.set` at `SETTINGS_PATH`, answered
  * from the module's own store, and the question a module's server asks the host about a person's
  * pass. Node-only, like the rest of `/serve`. Design notes: docs/settings.md.
  */
-/** The origins a host may be asked on: `KEHIKOT_ORIGINS` and its fallbacks, kept to `http(s)` loopback. */
-function hostOrigins(env) {
-    const out = [];
-    for (const origin of frameOrigins(env)) {
-        try {
-            const url = new URL(origin);
-            if ((url.protocol === 'http:' || url.protocol === 'https:') && ['127.0.0.1', 'localhost', '[::1]'].includes(url.hostname))
-                out.push(url.origin);
-        }
-        catch {
-            /* Not a URL: nobody to ask there. */
-        }
-    }
-    return [...new Set(out)];
-}
+/** The hosts asked: the starting host alone, when there is one (`askedHosts`, 2.95.0). */
+const hostOrigins = askedHosts;
 /** The URLs `hostVouches` asks, in order. Pure; exported for tests. */
 export function hostVouchUrls(pass, about, env = process.env) {
     const query = new URLSearchParams({ pass, module: about.module, key: about.key });

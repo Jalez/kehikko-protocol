@@ -88,7 +88,7 @@ export function checkDoor(manifest: Declared, tools: readonly DoorTool[]): DoorC
     }
   }
 
-  /* 2.95.0. A module that messages lists the message tools to every caller: the door was asked with no place token. */
+  /* 2.96.0. A module that messages lists the message tools to every caller: the door was asked with no place token. */
   if ((manifest.declares?.uses ?? []).includes('agents:message')) {
     for (const name of MESSAGE_TOOL_NAMES) {
       if (!byName.has(name)) {

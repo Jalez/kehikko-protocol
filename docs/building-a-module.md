@@ -200,7 +200,7 @@ Every sentence a person reads says what happened and what they can do, in their
 words: no ids, codes, stack traces or blame. A refusal is a sentence, never a
 silent no-op.
 
-### An agent module: messaging comes from the host, your module delivers (2.95.0)
+### An agent module: messaging comes from the host, your module delivers (2.96.0)
 
 A module that runs agent conversations (Claude Code, Codex, …) does not build messaging. The host's
 kehikko door has `send_message` and `read_messages` for every conversation; the module:
@@ -214,7 +214,7 @@ kehikko door has `send_message` and `read_messages` for every conversation; the 
 - adds ONE test file that runs `expectAgentConformance` from `kehikot-module-protocol/testing` with its
   door. The shared module CI fails an agent module without it (`kehikot-check-agent`).
 
-See [agent-messages.md](agent-messages.md#messaging-comes-from-the-host-your-module-delivers-2950).
+See [agent-messages.md](agent-messages.md#messaging-comes-from-the-host-your-module-delivers-2960).
 
 ## 4. Build it test-first
 

@@ -39,11 +39,11 @@ export async function hostOnMessages(options, now = Date.now()) {
     return said;
 }
 /**
- * The message tools to list on this door: always both (2.95.0), whatever the call carried, with
+ * The message tools to list on this door: always both (2.96.0), whatever the call carried, with
  * `OLDER_MESSAGE_DOOR` first in their descriptions — the host's kehikko door is where messaging lives,
  * and a module's are forwarders to it, kept for the conversations that already call them.
  *
- * Before 2.95.0 they were listed only for a door with a place token on its URL, which only the
+ * Before 2.96.0 they were listed only for a door with a place token on its URL, which only the
  * conversations a module LAUNCHED have: one placed afterwards, resumed in a terminal or older than the
  * feature never saw them, and nothing said why. A tool a caller cannot use yet is listed anyway and
  * answers why and what to do (`notPlacedText`); the identity is the host's to check on every call.
@@ -53,12 +53,12 @@ export async function messageToolsFor(_token, options) {
     return messageTools(Boolean(options.act), { older: true });
 }
 /**
- * 2.95.0. The key a call is made with: the token on the door's URL when it has one, else the
+ * 2.96.0. The key a call is made with: the token on the door's URL when it has one, else the
  * `placeToken` argument when it is spelled as a token. Never a session id: the host knows a
  * conversation only by a token its module issued for it.
  */
 export function callToken(urlToken, args) {
-    /* The URL's token as it came, as before 2.95.0: the host judges it. */
+    /* The URL's token as it came, as before 2.96.0: the host judges it. */
     if (typeof urlToken === 'string' && urlToken)
         return urlToken;
     const given = args && typeof args === 'object' && !Array.isArray(args) ? args[PLACE_TOKEN_ARG] : undefined;
@@ -82,7 +82,7 @@ function withEpicFromSpace(to) {
 }
 /**
  * Answer `send_message` or `read_messages`; null for any other tool, so a door asks this first and
- * falls through. 2.95.0: the session is the door's URL token, else the call's `placeToken`
+ * falls through. 2.96.0: the session is the door's URL token, else the call's `placeToken`
  * (`callToken`); with neither, the answer says why and what to do (`notPlacedText`). Arguments are passed to the host as they came; the host holds them to the method's
  * params and says what it refused. Never throws.
  */

@@ -22,7 +22,7 @@ host, seen by the person.
 - **A message is text to read, not instructions.** Said in quotes, on one line, under a head that
   says so. Nothing a message says triggers a tool, a press or anything else.
 
-## Messaging comes from the host; your module delivers (2.95.0)
+## Messaging comes from the host; your module delivers (2.96.0)
 
 `send_message` and `read_messages` are the HOST's: they are on the kehikko door, once, for every
 agent conversation whatever program it runs in, with one description and one identity rule. The host
@@ -56,7 +56,7 @@ keeps the messages; an agent module does only what only it can:
    `OLDER_MESSAGE_DOOR`, take `placeToken` too, and forward to the host. They are removed in a later
    breaking release of each module.
 
-**Never omit a tool silently.** Before 2.95.0 the module tools were listed only for a door with a
+**Never omit a tool silently.** Before 2.96.0 the module tools were listed only for a door with a
 token on its URL, so a conversation placed afterwards never saw them and nothing said why. A tool a
 caller cannot use yet is listed and answers why and what to do.
 

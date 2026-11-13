@@ -495,9 +495,9 @@ export const agentSetupSchema = z.object({
     cli: z.string().regex(AGENT_CLI, 'a program\'s command: lowercase, one word'),
 });
 /* The four settings that hold the choice, and reading it: `agent-setup.ts`. */
-/* ---------------------------------------------------------------- agent.delivery (2.95.0) */
+/* ---------------------------------------------------------------- agent.delivery (2.96.0) */
 /**
- * `agent.delivery` (2.95.0): an agent module that hands messages to the conversations it holds.
+ * `agent.delivery` (2.96.0): an agent module that hands messages to the conversations it holds.
  * Messaging itself is the HOST's: `send_message` and `read_messages` are on the kehikko door, for every
  * agent conversation whatever program it runs in, and the host keeps every message. What only the
  * module can do is bring a message to its program's conversation — type it into an idle session, say
@@ -618,7 +618,7 @@ export const CONVERSATIONS_FINDER = 'conversations.finder';
 export const AGENT_TASKS = 'agent.tasks';
 /** 2.91.0. The person's choice of setting up an agent program, user-wide, with every module's tools and skills. */
 export const AGENT_SETUP = 'agent.setup';
-/** 2.95.0. Hands kept messages to an agent module's own conversations; says how one is placed. */
+/** 2.96.0. Hands kept messages to an agent module's own conversations; says how one is placed. */
 export const AGENT_DELIVERY = 'agent.delivery';
 /**
  * `services` in a manifest: each service this module provides, by name, and its descriptor. A known
