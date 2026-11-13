@@ -624,11 +624,64 @@ the id is the preference when it does not.
 `PORT=0` is any free port. A host that reaches its modules at stable
 addresses of its own (the module's frame and program addresses on the host's
 port) does not need to know a module's port in advance: it reads the port the
-module registers. So with `PORT=0`, `serves` asks Vite for port 0 and `run`
-binds port 0, neither claims nor drifts, and `registerBound` writes the port
-the system gave. `preferred` still reads 0 as "not a port": a module built
+module registers. So with `PORT=0`, `serves` and `run` neither claim nor drift:
+they take a port from `MODULE_PORTS` (2.96.0, below) and `registerBound` writes
+the port bound. `preferred` still reads 0 as "not a port": a module built
 before 2.65.0 that a host hands `PORT=0` takes its preference and the drift
 rules, as it always did. That is the fallback.
+
+#### Which port: `MODULE_PORTS` and `free` on every address (2.96.0)
+
+Until 2.96.0, `PORT=0` meant port 0, and the system filled it from its
+temporary range (49152–65535 on macOS). That is the same range it hands any
+other program that asks for "any port" — a test runner's server, typically
+bound to `[::]`. macOS (any BSD) does not count a wildcard bind (`[::]` or
+`0.0.0.0`) and another socket's `127.0.0.1` bind on the same number as a
+clash, and a connection to `127.0.0.1` goes to the more specific binding. So
+the other program was given the module's port, its own requests to
+`127.0.0.1:<port>` reached the module, and its tests failed with the module's
+"not here". Reproduced with two sockets:
+
+| The module holds | Then another binds | Allowed? | `127.0.0.1` reaches | `::1` reaches |
+| --- | --- | --- | --- | --- |
+| `127.0.0.1:p` | `[::]:p` | yes | the module | the other |
+| `127.0.0.1:p` | `0.0.0.0:p` | yes | the module | — |
+| `::1:p` | `[::]:p` | yes | the other | the module |
+| `[::]:p` | `[::]:p` | no | — | — |
+
+Nothing a loopback-only server binds keeps a later wildcard bind off its port
+(holding `[::]` would, but that is a server on the network). So the rule is
+about which ports, and how a port is known to be free:
+
+- **`MODULE_PORTS`** is 20000–21999: below every system's temporary range
+  (Linux starts at 32768, macOS and Windows at 49152), so no program asking the
+  system for "any port" is ever given one, and clear of the ports modules
+  prefer and the host's. `modulePort()` picks the first port of the band, from
+  a random place in it, that is free; `PORT=0` binds that (`anyPortOrLeave`).
+  A host that hands out ports itself takes them from the same band.
+- **`free(port)`** binds and releases the port on `127.0.0.1`, `::1`,
+  `0.0.0.0` and `[::]` (`ADDRESSES_A_PORT_IS_FREE_ON`), skipping an address the
+  machine does not have. Before, it asked `127.0.0.1` alone, which calls a port
+  free that another program holds on `[::]`. `claim`'s drift uses it, so a
+  preferred port is held to the same test.
+
+A program that binds `[::]` on a fixed port inside the band after a module took
+it still shares the number; that is an ordinary fixed-port clash, not a random
+one. Unix domain sockets between the host and its modules (the host proxying)
+would remove ports altogether; not done.
+
+#### `check:serving` (2.96.0)
+
+```
+bun run check:serving [<module dir> …]      # the bin is kehikot-check-serving
+```
+
+From the files alone: a module's own sources (not its tests, dev scripts or
+build) must not bind a server or probe a port (`Bun.serve`, `.listen(…)`,
+`createServer`) unless the same file takes the port from
+`kehikot-module-protocol/serve` or `/run` (`serves`, `run`, `claim`,
+`claimOrLeave`, `modulePort`, `anyPortOrLeave`, `free`), and a Vite config must
+use `serves()`. A module that binds its own way misses every rule above.
 
 #### Inside `serves.config`
 
