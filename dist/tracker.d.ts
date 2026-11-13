@@ -79,6 +79,121 @@ export declare const trackerFileSchema: z.ZodObject<{
 }>;
 export type TrackerFile = z.infer<typeof trackerFileSchema>;
 /**
+ * What a comment in a ref's `detail` is (2.98.0). `comment`: a comment on the item's conversation.
+ * `review`: a review submitted with words (GitHub's review body; GitLab has none apart from notes).
+ * `line`: a comment on a line of a change's diff, with `path` saying which file.
+ */
+export declare const COMMENT_KINDS: readonly ["comment", "review", "line"];
+export type CommentKind = (typeof COMMENT_KINDS)[number];
+/**
+ * One comment on an item, as its tracker last said (2.98.0). The text is Markdown as written,
+ * clipped at `LIMITS.TRACKER_COMMENT` (`bodyClipped` says so); a module renders it as text or as
+ * Markdown without raw HTML, never as markup the tracker sent. A tracker's own notes about the
+ * item (GitLab's system notes: "changed the description", "added 1 commit") are not comments.
+ */
+export declare const trackerCommentSchema: z.ZodObject<{
+    /** The tracker's id for it, as a string; unique within the item. */
+    id: z.ZodString;
+    kind: z.ZodDefault<z.ZodEnum<["comment", "review", "line"]>>;
+    /** Who wrote it, by login. Absent when the tracker named nobody (a deleted account). */
+    login: z.ZodOptional<z.ZodString>;
+    /** Their display name, when the tracker gave one. */
+    name: z.ZodOptional<z.ZodString>;
+    at: z.ZodString;
+    /** When it was last edited, when the tracker says it was. */
+    editedAt: z.ZodOptional<z.ZodString>;
+    body: z.ZodDefault<z.ZodString>;
+    bodyClipped: z.ZodDefault<z.ZodBoolean>;
+    /** Where a person reads it on its tracker, `https:`, when the host could spell one. */
+    url: z.ZodCatch<z.ZodOptional<z.ZodString>>;
+    /** On a `line` comment: the file of the change it is on. */
+    path: z.ZodOptional<z.ZodString>;
+    /** On a `review`: what the review said, in `REVIEWER_STATES`' words (`approved`, `changes`, `commented`). */
+    verdict: z.ZodOptional<z.ZodEnum<["approved", "changes", "commented"]>>;
+}, "strip", z.ZodTypeAny, {
+    at: string;
+    id: string;
+    body: string;
+    kind: "comment" | "line" | "review";
+    bodyClipped: boolean;
+    path?: string | undefined;
+    name?: string | undefined;
+    url?: string | undefined;
+    login?: string | undefined;
+    editedAt?: string | undefined;
+    verdict?: "approved" | "changes" | "commented" | undefined;
+}, {
+    at: string;
+    id: string;
+    path?: string | undefined;
+    name?: string | undefined;
+    body?: string | undefined;
+    kind?: "comment" | "line" | "review" | undefined;
+    url?: unknown;
+    login?: string | undefined;
+    editedAt?: string | undefined;
+    bodyClipped?: boolean | undefined;
+    verdict?: "approved" | "changes" | "commented" | undefined;
+}>;
+export type TrackerComment = z.infer<typeof trackerCommentSchema>;
+/**
+ * One check of a change's head commit (2.98.0): a GitHub check run or commit status, or a job of
+ * a GitLab merge request's head pipeline. `state` in the same words as the row's `pipeline`.
+ */
+export declare const trackerCheckSchema: z.ZodObject<{
+    name: z.ZodString;
+    state: z.ZodEnum<["success", "failed", "running", "pending", "canceled", "skipped", "manual"]>;
+    /** Where a person sees it on its tracker, `https:`, when the host could spell one. */
+    url: z.ZodCatch<z.ZodOptional<z.ZodString>>;
+    /** When its state last moved: finished, else started, else made. */
+    at: z.ZodCatch<z.ZodOptional<z.ZodString>>;
+    /** GitLab: the stage the job is in. */
+    stage: z.ZodOptional<z.ZodString>;
+}, "strip", z.ZodTypeAny, {
+    name: string;
+    state: "failed" | "running" | "success" | "pending" | "canceled" | "skipped" | "manual";
+    at?: string | undefined;
+    url?: string | undefined;
+    stage?: string | undefined;
+}, {
+    name: string;
+    state: "failed" | "running" | "success" | "pending" | "canceled" | "skipped" | "manual";
+    at?: unknown;
+    url?: unknown;
+    stage?: string | undefined;
+}>;
+export type TrackerCheck = z.infer<typeof trackerCheckSchema>;
+/** The milestone an item is in (2.98.0). `dueOn` is a calendar date, `YYYY-MM-DD`, when it has one. */
+export declare const trackerMilestoneSchema: z.ZodObject<{
+    title: z.ZodString;
+    url: z.ZodCatch<z.ZodOptional<z.ZodString>>;
+    dueOn: z.ZodCatch<z.ZodOptional<z.ZodString>>;
+}, "strip", z.ZodTypeAny, {
+    title: string;
+    url?: string | undefined;
+    dueOn?: string | undefined;
+}, {
+    title: string;
+    url?: unknown;
+    dueOn?: unknown;
+}>;
+export type TrackerMilestone = z.infer<typeof trackerMilestoneSchema>;
+/**
+ * Where a change from a fork comes from (2.98.0): the fork's repository and its branch. The row's
+ * `headBranch` is left out for such a change, since no change here can target it; this says it.
+ */
+export declare const trackerForkSchema: z.ZodObject<{
+    repo: z.ZodString;
+    branch: z.ZodString;
+}, "strip", z.ZodTypeAny, {
+    branch: string;
+    repo: string;
+}, {
+    branch: string;
+    repo: string;
+}>;
+export type TrackerFork = z.infer<typeof trackerForkSchema>;
+/**
  * What `detail: 'detail'` adds. Present on a row only when it was asked for
  * and has been read; a summary row has no `detail` at all, which is not the
  * same as a detail with an empty body.
@@ -107,6 +222,117 @@ export declare const trackerDetailSchema: z.ZodObject<{
     headSha: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     /** For a change: who approved it, by name. */
     approvedBy: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+    /**
+     * The item's milestone (2.98.0). Absent when it has none or the host did not read it; an older
+     * host never sends it. Dropped, not fatal, when it does not parse.
+     */
+    milestone: z.ZodCatch<z.ZodOptional<z.ZodObject<{
+        title: z.ZodString;
+        url: z.ZodCatch<z.ZodOptional<z.ZodString>>;
+        dueOn: z.ZodCatch<z.ZodOptional<z.ZodString>>;
+    }, "strip", z.ZodTypeAny, {
+        title: string;
+        url?: string | undefined;
+        dueOn?: string | undefined;
+    }, {
+        title: string;
+        url?: unknown;
+        dueOn?: unknown;
+    }>>>;
+    /**
+     * The newest comments on the item, oldest first, at most `LIMITS.TRACKER_COMMENTS` (2.98.0):
+     * its conversation, reviews with words, and on a change the comments on its lines. Absent when
+     * the host did not read them; empty when there are none. Dropped, not fatal, when it does not parse.
+     */
+    comments: z.ZodCatch<z.ZodOptional<z.ZodArray<z.ZodObject<{
+        /** The tracker's id for it, as a string; unique within the item. */
+        id: z.ZodString;
+        kind: z.ZodDefault<z.ZodEnum<["comment", "review", "line"]>>;
+        /** Who wrote it, by login. Absent when the tracker named nobody (a deleted account). */
+        login: z.ZodOptional<z.ZodString>;
+        /** Their display name, when the tracker gave one. */
+        name: z.ZodOptional<z.ZodString>;
+        at: z.ZodString;
+        /** When it was last edited, when the tracker says it was. */
+        editedAt: z.ZodOptional<z.ZodString>;
+        body: z.ZodDefault<z.ZodString>;
+        bodyClipped: z.ZodDefault<z.ZodBoolean>;
+        /** Where a person reads it on its tracker, `https:`, when the host could spell one. */
+        url: z.ZodCatch<z.ZodOptional<z.ZodString>>;
+        /** On a `line` comment: the file of the change it is on. */
+        path: z.ZodOptional<z.ZodString>;
+        /** On a `review`: what the review said, in `REVIEWER_STATES`' words (`approved`, `changes`, `commented`). */
+        verdict: z.ZodOptional<z.ZodEnum<["approved", "changes", "commented"]>>;
+    }, "strip", z.ZodTypeAny, {
+        at: string;
+        id: string;
+        body: string;
+        kind: "comment" | "line" | "review";
+        bodyClipped: boolean;
+        path?: string | undefined;
+        name?: string | undefined;
+        url?: string | undefined;
+        login?: string | undefined;
+        editedAt?: string | undefined;
+        verdict?: "approved" | "changes" | "commented" | undefined;
+    }, {
+        at: string;
+        id: string;
+        path?: string | undefined;
+        name?: string | undefined;
+        body?: string | undefined;
+        kind?: "comment" | "line" | "review" | undefined;
+        url?: unknown;
+        login?: string | undefined;
+        editedAt?: string | undefined;
+        bodyClipped?: boolean | undefined;
+        verdict?: "approved" | "changes" | "commented" | undefined;
+    }>, "many">>>;
+    /**
+     * How many comments the item has in all, by the tracker's count (2.98.0). More than
+     * `comments.length` when the thread is longer than what is carried; the rest is on the tracker.
+     */
+    commentCount: z.ZodCatch<z.ZodOptional<z.ZodNumber>>;
+    /**
+     * For a change: the checks of its head commit, or the jobs of its head pipeline (2.98.0), in the
+     * tracker's order. Absent when none ran or the host did not read them. Dropped, not fatal, when it
+     * does not parse.
+     */
+    checks: z.ZodCatch<z.ZodOptional<z.ZodArray<z.ZodObject<{
+        name: z.ZodString;
+        state: z.ZodEnum<["success", "failed", "running", "pending", "canceled", "skipped", "manual"]>;
+        /** Where a person sees it on its tracker, `https:`, when the host could spell one. */
+        url: z.ZodCatch<z.ZodOptional<z.ZodString>>;
+        /** When its state last moved: finished, else started, else made. */
+        at: z.ZodCatch<z.ZodOptional<z.ZodString>>;
+        /** GitLab: the stage the job is in. */
+        stage: z.ZodOptional<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        name: string;
+        state: "failed" | "running" | "success" | "pending" | "canceled" | "skipped" | "manual";
+        at?: string | undefined;
+        url?: string | undefined;
+        stage?: string | undefined;
+    }, {
+        name: string;
+        state: "failed" | "running" | "success" | "pending" | "canceled" | "skipped" | "manual";
+        at?: unknown;
+        url?: unknown;
+        stage?: string | undefined;
+    }>, "many">>>;
+    /** More checks than `TRACKER_CHECKS` ran, and the list stops there. (2.98.0) */
+    checksClipped: z.ZodCatch<z.ZodOptional<z.ZodBoolean>>;
+    /** For a change from a fork: the fork and its branch (2.98.0). Absent for a change from the row's own repository. */
+    fork: z.ZodCatch<z.ZodOptional<z.ZodObject<{
+        repo: z.ZodString;
+        branch: z.ZodString;
+    }, "strip", z.ZodTypeAny, {
+        branch: string;
+        repo: string;
+    }, {
+        branch: string;
+        repo: string;
+    }>>>;
     /** When this detail was read, which may be earlier than the row's `readAt`. */
     readAt: z.ZodString;
 }, "strip", z.ZodTypeAny, {
@@ -121,6 +347,37 @@ export declare const trackerDetailSchema: z.ZodObject<{
     readAt: string;
     headSha?: string | null | undefined;
     approvedBy?: string[] | undefined;
+    milestone?: {
+        title: string;
+        url?: string | undefined;
+        dueOn?: string | undefined;
+    } | undefined;
+    comments?: {
+        at: string;
+        id: string;
+        body: string;
+        kind: "comment" | "line" | "review";
+        bodyClipped: boolean;
+        path?: string | undefined;
+        name?: string | undefined;
+        url?: string | undefined;
+        login?: string | undefined;
+        editedAt?: string | undefined;
+        verdict?: "approved" | "changes" | "commented" | undefined;
+    }[] | undefined;
+    commentCount?: number | undefined;
+    checks?: {
+        name: string;
+        state: "failed" | "running" | "success" | "pending" | "canceled" | "skipped" | "manual";
+        at?: string | undefined;
+        url?: string | undefined;
+        stage?: string | undefined;
+    }[] | undefined;
+    checksClipped?: boolean | undefined;
+    fork?: {
+        branch: string;
+        repo: string;
+    } | undefined;
 }, {
     readAt: string;
     body?: string | undefined;
@@ -133,6 +390,12 @@ export declare const trackerDetailSchema: z.ZodObject<{
     filesClipped?: boolean | undefined;
     headSha?: string | null | undefined;
     approvedBy?: string[] | undefined;
+    milestone?: unknown;
+    comments?: unknown;
+    commentCount?: unknown;
+    checks?: unknown;
+    checksClipped?: unknown;
+    fork?: unknown;
 }>;
 export type TrackerDetailFacts = z.infer<typeof trackerDetailSchema>;
 /**
@@ -195,14 +458,14 @@ export declare const trackerReviewerSchema: z.ZodObject<{
      */
     openThreads: z.ZodCatch<z.ZodOptional<z.ZodNumber>>;
 }, "strip", z.ZodTypeAny, {
-    state: "approved" | "requested" | "changes" | "commented";
+    state: "approved" | "changes" | "commented" | "requested";
     login: string;
     name?: string | undefined;
     reviewedAt?: string | undefined;
     activeAt?: string | undefined;
     openThreads?: number | undefined;
 }, {
-    state: "approved" | "requested" | "changes" | "commented";
+    state: "approved" | "changes" | "commented" | "requested";
     login: string;
     name?: string | undefined;
     reviewedAt?: unknown;
@@ -267,18 +530,18 @@ export declare const trackerActivitySchema: z.ZodObject<{
     login: string;
     path?: string | undefined;
     line?: number | undefined;
+    verdict?: "approved" | "changes" | "commented" | undefined;
     mine?: boolean | undefined;
     commits?: number | undefined;
-    verdict?: "approved" | "changes" | "commented" | undefined;
 }, {
     at: string;
     kind: "state" | "comment" | "commit" | "review";
     login: string;
     path?: unknown;
     line?: unknown;
+    verdict?: unknown;
     mine?: boolean | undefined;
     commits?: unknown;
-    verdict?: unknown;
 }>;
 export type TrackerActivity = z.infer<typeof trackerActivitySchema>;
 /**
@@ -499,14 +762,14 @@ export declare const trackerRowSchema: z.ZodObject<{
          */
         openThreads: z.ZodCatch<z.ZodOptional<z.ZodNumber>>;
     }, "strip", z.ZodTypeAny, {
-        state: "approved" | "requested" | "changes" | "commented";
+        state: "approved" | "changes" | "commented" | "requested";
         login: string;
         name?: string | undefined;
         reviewedAt?: string | undefined;
         activeAt?: string | undefined;
         openThreads?: number | undefined;
     }, {
-        state: "approved" | "requested" | "changes" | "commented";
+        state: "approved" | "changes" | "commented" | "requested";
         login: string;
         name?: string | undefined;
         reviewedAt?: unknown;
@@ -596,18 +859,18 @@ export declare const trackerRowSchema: z.ZodObject<{
         login: string;
         path?: string | undefined;
         line?: number | undefined;
+        verdict?: "approved" | "changes" | "commented" | undefined;
         mine?: boolean | undefined;
         commits?: number | undefined;
-        verdict?: "approved" | "changes" | "commented" | undefined;
     }, {
         at: string;
         kind: "state" | "comment" | "commit" | "review";
         login: string;
         path?: unknown;
         line?: unknown;
+        verdict?: unknown;
         mine?: boolean | undefined;
         commits?: unknown;
-        verdict?: unknown;
     }>>;
     /**
      * The people the row names by login — `reviewers[].login`, `assigneeLogins`, `authorLogin`,
@@ -686,6 +949,117 @@ export declare const trackerRowSchema: z.ZodObject<{
         headSha: z.ZodOptional<z.ZodNullable<z.ZodString>>;
         /** For a change: who approved it, by name. */
         approvedBy: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        /**
+         * The item's milestone (2.98.0). Absent when it has none or the host did not read it; an older
+         * host never sends it. Dropped, not fatal, when it does not parse.
+         */
+        milestone: z.ZodCatch<z.ZodOptional<z.ZodObject<{
+            title: z.ZodString;
+            url: z.ZodCatch<z.ZodOptional<z.ZodString>>;
+            dueOn: z.ZodCatch<z.ZodOptional<z.ZodString>>;
+        }, "strip", z.ZodTypeAny, {
+            title: string;
+            url?: string | undefined;
+            dueOn?: string | undefined;
+        }, {
+            title: string;
+            url?: unknown;
+            dueOn?: unknown;
+        }>>>;
+        /**
+         * The newest comments on the item, oldest first, at most `LIMITS.TRACKER_COMMENTS` (2.98.0):
+         * its conversation, reviews with words, and on a change the comments on its lines. Absent when
+         * the host did not read them; empty when there are none. Dropped, not fatal, when it does not parse.
+         */
+        comments: z.ZodCatch<z.ZodOptional<z.ZodArray<z.ZodObject<{
+            /** The tracker's id for it, as a string; unique within the item. */
+            id: z.ZodString;
+            kind: z.ZodDefault<z.ZodEnum<["comment", "review", "line"]>>;
+            /** Who wrote it, by login. Absent when the tracker named nobody (a deleted account). */
+            login: z.ZodOptional<z.ZodString>;
+            /** Their display name, when the tracker gave one. */
+            name: z.ZodOptional<z.ZodString>;
+            at: z.ZodString;
+            /** When it was last edited, when the tracker says it was. */
+            editedAt: z.ZodOptional<z.ZodString>;
+            body: z.ZodDefault<z.ZodString>;
+            bodyClipped: z.ZodDefault<z.ZodBoolean>;
+            /** Where a person reads it on its tracker, `https:`, when the host could spell one. */
+            url: z.ZodCatch<z.ZodOptional<z.ZodString>>;
+            /** On a `line` comment: the file of the change it is on. */
+            path: z.ZodOptional<z.ZodString>;
+            /** On a `review`: what the review said, in `REVIEWER_STATES`' words (`approved`, `changes`, `commented`). */
+            verdict: z.ZodOptional<z.ZodEnum<["approved", "changes", "commented"]>>;
+        }, "strip", z.ZodTypeAny, {
+            at: string;
+            id: string;
+            body: string;
+            kind: "comment" | "line" | "review";
+            bodyClipped: boolean;
+            path?: string | undefined;
+            name?: string | undefined;
+            url?: string | undefined;
+            login?: string | undefined;
+            editedAt?: string | undefined;
+            verdict?: "approved" | "changes" | "commented" | undefined;
+        }, {
+            at: string;
+            id: string;
+            path?: string | undefined;
+            name?: string | undefined;
+            body?: string | undefined;
+            kind?: "comment" | "line" | "review" | undefined;
+            url?: unknown;
+            login?: string | undefined;
+            editedAt?: string | undefined;
+            bodyClipped?: boolean | undefined;
+            verdict?: "approved" | "changes" | "commented" | undefined;
+        }>, "many">>>;
+        /**
+         * How many comments the item has in all, by the tracker's count (2.98.0). More than
+         * `comments.length` when the thread is longer than what is carried; the rest is on the tracker.
+         */
+        commentCount: z.ZodCatch<z.ZodOptional<z.ZodNumber>>;
+        /**
+         * For a change: the checks of its head commit, or the jobs of its head pipeline (2.98.0), in the
+         * tracker's order. Absent when none ran or the host did not read them. Dropped, not fatal, when it
+         * does not parse.
+         */
+        checks: z.ZodCatch<z.ZodOptional<z.ZodArray<z.ZodObject<{
+            name: z.ZodString;
+            state: z.ZodEnum<["success", "failed", "running", "pending", "canceled", "skipped", "manual"]>;
+            /** Where a person sees it on its tracker, `https:`, when the host could spell one. */
+            url: z.ZodCatch<z.ZodOptional<z.ZodString>>;
+            /** When its state last moved: finished, else started, else made. */
+            at: z.ZodCatch<z.ZodOptional<z.ZodString>>;
+            /** GitLab: the stage the job is in. */
+            stage: z.ZodOptional<z.ZodString>;
+        }, "strip", z.ZodTypeAny, {
+            name: string;
+            state: "failed" | "running" | "success" | "pending" | "canceled" | "skipped" | "manual";
+            at?: string | undefined;
+            url?: string | undefined;
+            stage?: string | undefined;
+        }, {
+            name: string;
+            state: "failed" | "running" | "success" | "pending" | "canceled" | "skipped" | "manual";
+            at?: unknown;
+            url?: unknown;
+            stage?: string | undefined;
+        }>, "many">>>;
+        /** More checks than `TRACKER_CHECKS` ran, and the list stops there. (2.98.0) */
+        checksClipped: z.ZodCatch<z.ZodOptional<z.ZodBoolean>>;
+        /** For a change from a fork: the fork and its branch (2.98.0). Absent for a change from the row's own repository. */
+        fork: z.ZodCatch<z.ZodOptional<z.ZodObject<{
+            repo: z.ZodString;
+            branch: z.ZodString;
+        }, "strip", z.ZodTypeAny, {
+            branch: string;
+            repo: string;
+        }, {
+            branch: string;
+            repo: string;
+        }>>>;
         /** When this detail was read, which may be earlier than the row's `readAt`. */
         readAt: z.ZodString;
     }, "strip", z.ZodTypeAny, {
@@ -700,6 +1074,37 @@ export declare const trackerRowSchema: z.ZodObject<{
         readAt: string;
         headSha?: string | null | undefined;
         approvedBy?: string[] | undefined;
+        milestone?: {
+            title: string;
+            url?: string | undefined;
+            dueOn?: string | undefined;
+        } | undefined;
+        comments?: {
+            at: string;
+            id: string;
+            body: string;
+            kind: "comment" | "line" | "review";
+            bodyClipped: boolean;
+            path?: string | undefined;
+            name?: string | undefined;
+            url?: string | undefined;
+            login?: string | undefined;
+            editedAt?: string | undefined;
+            verdict?: "approved" | "changes" | "commented" | undefined;
+        }[] | undefined;
+        commentCount?: number | undefined;
+        checks?: {
+            name: string;
+            state: "failed" | "running" | "success" | "pending" | "canceled" | "skipped" | "manual";
+            at?: string | undefined;
+            url?: string | undefined;
+            stage?: string | undefined;
+        }[] | undefined;
+        checksClipped?: boolean | undefined;
+        fork?: {
+            branch: string;
+            repo: string;
+        } | undefined;
     }, {
         readAt: string;
         body?: string | undefined;
@@ -712,6 +1117,12 @@ export declare const trackerRowSchema: z.ZodObject<{
         filesClipped?: boolean | undefined;
         headSha?: string | null | undefined;
         approvedBy?: string[] | undefined;
+        milestone?: unknown;
+        comments?: unknown;
+        commentCount?: unknown;
+        checks?: unknown;
+        checksClipped?: unknown;
+        fork?: unknown;
     }>>;
 }, "strip", z.ZodTypeAny, {
     number: number;
@@ -742,6 +1153,37 @@ export declare const trackerRowSchema: z.ZodObject<{
         readAt: string;
         headSha?: string | null | undefined;
         approvedBy?: string[] | undefined;
+        milestone?: {
+            title: string;
+            url?: string | undefined;
+            dueOn?: string | undefined;
+        } | undefined;
+        comments?: {
+            at: string;
+            id: string;
+            body: string;
+            kind: "comment" | "line" | "review";
+            bodyClipped: boolean;
+            path?: string | undefined;
+            name?: string | undefined;
+            url?: string | undefined;
+            login?: string | undefined;
+            editedAt?: string | undefined;
+            verdict?: "approved" | "changes" | "commented" | undefined;
+        }[] | undefined;
+        commentCount?: number | undefined;
+        checks?: {
+            name: string;
+            state: "failed" | "running" | "success" | "pending" | "canceled" | "skipped" | "manual";
+            at?: string | undefined;
+            url?: string | undefined;
+            stage?: string | undefined;
+        }[] | undefined;
+        checksClipped?: boolean | undefined;
+        fork?: {
+            branch: string;
+            repo: string;
+        } | undefined;
     } | undefined;
     author?: string | null | undefined;
     column?: {
@@ -768,7 +1210,7 @@ export declare const trackerRowSchema: z.ZodObject<{
         boardUrl?: string | undefined;
     }[] | undefined;
     reviewers?: {
-        state: "approved" | "requested" | "changes" | "commented";
+        state: "approved" | "changes" | "commented" | "requested";
         login: string;
         name?: string | undefined;
         reviewedAt?: string | undefined;
@@ -795,9 +1237,9 @@ export declare const trackerRowSchema: z.ZodObject<{
         login: string;
         path?: string | undefined;
         line?: number | undefined;
+        verdict?: "approved" | "changes" | "commented" | undefined;
         mine?: boolean | undefined;
         commits?: number | undefined;
-        verdict?: "approved" | "changes" | "commented" | undefined;
     } | undefined;
     people?: Record<string, {
         name?: string | undefined;
@@ -831,6 +1273,12 @@ export declare const trackerRowSchema: z.ZodObject<{
         filesClipped?: boolean | undefined;
         headSha?: string | null | undefined;
         approvedBy?: string[] | undefined;
+        milestone?: unknown;
+        comments?: unknown;
+        commentCount?: unknown;
+        checks?: unknown;
+        checksClipped?: unknown;
+        fork?: unknown;
     } | undefined;
     author?: string | null | undefined;
     column?: {
@@ -863,7 +1311,7 @@ export declare const trackerRowSchema: z.ZodObject<{
         boardUrl?: string | undefined;
     }[] | undefined;
     reviewers?: {
-        state: "approved" | "requested" | "changes" | "commented";
+        state: "approved" | "changes" | "commented" | "requested";
         login: string;
         name?: string | undefined;
         reviewedAt?: unknown;
@@ -890,9 +1338,9 @@ export declare const trackerRowSchema: z.ZodObject<{
         login: string;
         path?: unknown;
         line?: unknown;
+        verdict?: unknown;
         mine?: boolean | undefined;
         commits?: unknown;
-        verdict?: unknown;
     } | undefined;
     people?: Record<string, {
         name?: string | undefined;
@@ -1160,14 +1608,14 @@ export declare const trackerReadingResult: z.ZodObject<{
              */
             openThreads: z.ZodCatch<z.ZodOptional<z.ZodNumber>>;
         }, "strip", z.ZodTypeAny, {
-            state: "approved" | "requested" | "changes" | "commented";
+            state: "approved" | "changes" | "commented" | "requested";
             login: string;
             name?: string | undefined;
             reviewedAt?: string | undefined;
             activeAt?: string | undefined;
             openThreads?: number | undefined;
         }, {
-            state: "approved" | "requested" | "changes" | "commented";
+            state: "approved" | "changes" | "commented" | "requested";
             login: string;
             name?: string | undefined;
             reviewedAt?: unknown;
@@ -1257,18 +1705,18 @@ export declare const trackerReadingResult: z.ZodObject<{
             login: string;
             path?: string | undefined;
             line?: number | undefined;
+            verdict?: "approved" | "changes" | "commented" | undefined;
             mine?: boolean | undefined;
             commits?: number | undefined;
-            verdict?: "approved" | "changes" | "commented" | undefined;
         }, {
             at: string;
             kind: "state" | "comment" | "commit" | "review";
             login: string;
             path?: unknown;
             line?: unknown;
+            verdict?: unknown;
             mine?: boolean | undefined;
             commits?: unknown;
-            verdict?: unknown;
         }>>;
         /**
          * The people the row names by login — `reviewers[].login`, `assigneeLogins`, `authorLogin`,
@@ -1347,6 +1795,117 @@ export declare const trackerReadingResult: z.ZodObject<{
             headSha: z.ZodOptional<z.ZodNullable<z.ZodString>>;
             /** For a change: who approved it, by name. */
             approvedBy: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+            /**
+             * The item's milestone (2.98.0). Absent when it has none or the host did not read it; an older
+             * host never sends it. Dropped, not fatal, when it does not parse.
+             */
+            milestone: z.ZodCatch<z.ZodOptional<z.ZodObject<{
+                title: z.ZodString;
+                url: z.ZodCatch<z.ZodOptional<z.ZodString>>;
+                dueOn: z.ZodCatch<z.ZodOptional<z.ZodString>>;
+            }, "strip", z.ZodTypeAny, {
+                title: string;
+                url?: string | undefined;
+                dueOn?: string | undefined;
+            }, {
+                title: string;
+                url?: unknown;
+                dueOn?: unknown;
+            }>>>;
+            /**
+             * The newest comments on the item, oldest first, at most `LIMITS.TRACKER_COMMENTS` (2.98.0):
+             * its conversation, reviews with words, and on a change the comments on its lines. Absent when
+             * the host did not read them; empty when there are none. Dropped, not fatal, when it does not parse.
+             */
+            comments: z.ZodCatch<z.ZodOptional<z.ZodArray<z.ZodObject<{
+                /** The tracker's id for it, as a string; unique within the item. */
+                id: z.ZodString;
+                kind: z.ZodDefault<z.ZodEnum<["comment", "review", "line"]>>;
+                /** Who wrote it, by login. Absent when the tracker named nobody (a deleted account). */
+                login: z.ZodOptional<z.ZodString>;
+                /** Their display name, when the tracker gave one. */
+                name: z.ZodOptional<z.ZodString>;
+                at: z.ZodString;
+                /** When it was last edited, when the tracker says it was. */
+                editedAt: z.ZodOptional<z.ZodString>;
+                body: z.ZodDefault<z.ZodString>;
+                bodyClipped: z.ZodDefault<z.ZodBoolean>;
+                /** Where a person reads it on its tracker, `https:`, when the host could spell one. */
+                url: z.ZodCatch<z.ZodOptional<z.ZodString>>;
+                /** On a `line` comment: the file of the change it is on. */
+                path: z.ZodOptional<z.ZodString>;
+                /** On a `review`: what the review said, in `REVIEWER_STATES`' words (`approved`, `changes`, `commented`). */
+                verdict: z.ZodOptional<z.ZodEnum<["approved", "changes", "commented"]>>;
+            }, "strip", z.ZodTypeAny, {
+                at: string;
+                id: string;
+                body: string;
+                kind: "comment" | "line" | "review";
+                bodyClipped: boolean;
+                path?: string | undefined;
+                name?: string | undefined;
+                url?: string | undefined;
+                login?: string | undefined;
+                editedAt?: string | undefined;
+                verdict?: "approved" | "changes" | "commented" | undefined;
+            }, {
+                at: string;
+                id: string;
+                path?: string | undefined;
+                name?: string | undefined;
+                body?: string | undefined;
+                kind?: "comment" | "line" | "review" | undefined;
+                url?: unknown;
+                login?: string | undefined;
+                editedAt?: string | undefined;
+                bodyClipped?: boolean | undefined;
+                verdict?: "approved" | "changes" | "commented" | undefined;
+            }>, "many">>>;
+            /**
+             * How many comments the item has in all, by the tracker's count (2.98.0). More than
+             * `comments.length` when the thread is longer than what is carried; the rest is on the tracker.
+             */
+            commentCount: z.ZodCatch<z.ZodOptional<z.ZodNumber>>;
+            /**
+             * For a change: the checks of its head commit, or the jobs of its head pipeline (2.98.0), in the
+             * tracker's order. Absent when none ran or the host did not read them. Dropped, not fatal, when it
+             * does not parse.
+             */
+            checks: z.ZodCatch<z.ZodOptional<z.ZodArray<z.ZodObject<{
+                name: z.ZodString;
+                state: z.ZodEnum<["success", "failed", "running", "pending", "canceled", "skipped", "manual"]>;
+                /** Where a person sees it on its tracker, `https:`, when the host could spell one. */
+                url: z.ZodCatch<z.ZodOptional<z.ZodString>>;
+                /** When its state last moved: finished, else started, else made. */
+                at: z.ZodCatch<z.ZodOptional<z.ZodString>>;
+                /** GitLab: the stage the job is in. */
+                stage: z.ZodOptional<z.ZodString>;
+            }, "strip", z.ZodTypeAny, {
+                name: string;
+                state: "failed" | "running" | "success" | "pending" | "canceled" | "skipped" | "manual";
+                at?: string | undefined;
+                url?: string | undefined;
+                stage?: string | undefined;
+            }, {
+                name: string;
+                state: "failed" | "running" | "success" | "pending" | "canceled" | "skipped" | "manual";
+                at?: unknown;
+                url?: unknown;
+                stage?: string | undefined;
+            }>, "many">>>;
+            /** More checks than `TRACKER_CHECKS` ran, and the list stops there. (2.98.0) */
+            checksClipped: z.ZodCatch<z.ZodOptional<z.ZodBoolean>>;
+            /** For a change from a fork: the fork and its branch (2.98.0). Absent for a change from the row's own repository. */
+            fork: z.ZodCatch<z.ZodOptional<z.ZodObject<{
+                repo: z.ZodString;
+                branch: z.ZodString;
+            }, "strip", z.ZodTypeAny, {
+                branch: string;
+                repo: string;
+            }, {
+                branch: string;
+                repo: string;
+            }>>>;
             /** When this detail was read, which may be earlier than the row's `readAt`. */
             readAt: z.ZodString;
         }, "strip", z.ZodTypeAny, {
@@ -1361,6 +1920,37 @@ export declare const trackerReadingResult: z.ZodObject<{
             readAt: string;
             headSha?: string | null | undefined;
             approvedBy?: string[] | undefined;
+            milestone?: {
+                title: string;
+                url?: string | undefined;
+                dueOn?: string | undefined;
+            } | undefined;
+            comments?: {
+                at: string;
+                id: string;
+                body: string;
+                kind: "comment" | "line" | "review";
+                bodyClipped: boolean;
+                path?: string | undefined;
+                name?: string | undefined;
+                url?: string | undefined;
+                login?: string | undefined;
+                editedAt?: string | undefined;
+                verdict?: "approved" | "changes" | "commented" | undefined;
+            }[] | undefined;
+            commentCount?: number | undefined;
+            checks?: {
+                name: string;
+                state: "failed" | "running" | "success" | "pending" | "canceled" | "skipped" | "manual";
+                at?: string | undefined;
+                url?: string | undefined;
+                stage?: string | undefined;
+            }[] | undefined;
+            checksClipped?: boolean | undefined;
+            fork?: {
+                branch: string;
+                repo: string;
+            } | undefined;
         }, {
             readAt: string;
             body?: string | undefined;
@@ -1373,6 +1963,12 @@ export declare const trackerReadingResult: z.ZodObject<{
             filesClipped?: boolean | undefined;
             headSha?: string | null | undefined;
             approvedBy?: string[] | undefined;
+            milestone?: unknown;
+            comments?: unknown;
+            commentCount?: unknown;
+            checks?: unknown;
+            checksClipped?: unknown;
+            fork?: unknown;
         }>>;
     }, "strip", z.ZodTypeAny, {
         number: number;
@@ -1403,6 +1999,37 @@ export declare const trackerReadingResult: z.ZodObject<{
             readAt: string;
             headSha?: string | null | undefined;
             approvedBy?: string[] | undefined;
+            milestone?: {
+                title: string;
+                url?: string | undefined;
+                dueOn?: string | undefined;
+            } | undefined;
+            comments?: {
+                at: string;
+                id: string;
+                body: string;
+                kind: "comment" | "line" | "review";
+                bodyClipped: boolean;
+                path?: string | undefined;
+                name?: string | undefined;
+                url?: string | undefined;
+                login?: string | undefined;
+                editedAt?: string | undefined;
+                verdict?: "approved" | "changes" | "commented" | undefined;
+            }[] | undefined;
+            commentCount?: number | undefined;
+            checks?: {
+                name: string;
+                state: "failed" | "running" | "success" | "pending" | "canceled" | "skipped" | "manual";
+                at?: string | undefined;
+                url?: string | undefined;
+                stage?: string | undefined;
+            }[] | undefined;
+            checksClipped?: boolean | undefined;
+            fork?: {
+                branch: string;
+                repo: string;
+            } | undefined;
         } | undefined;
         author?: string | null | undefined;
         column?: {
@@ -1429,7 +2056,7 @@ export declare const trackerReadingResult: z.ZodObject<{
             boardUrl?: string | undefined;
         }[] | undefined;
         reviewers?: {
-            state: "approved" | "requested" | "changes" | "commented";
+            state: "approved" | "changes" | "commented" | "requested";
             login: string;
             name?: string | undefined;
             reviewedAt?: string | undefined;
@@ -1456,9 +2083,9 @@ export declare const trackerReadingResult: z.ZodObject<{
             login: string;
             path?: string | undefined;
             line?: number | undefined;
+            verdict?: "approved" | "changes" | "commented" | undefined;
             mine?: boolean | undefined;
             commits?: number | undefined;
-            verdict?: "approved" | "changes" | "commented" | undefined;
         } | undefined;
         people?: Record<string, {
             name?: string | undefined;
@@ -1492,6 +2119,12 @@ export declare const trackerReadingResult: z.ZodObject<{
             filesClipped?: boolean | undefined;
             headSha?: string | null | undefined;
             approvedBy?: string[] | undefined;
+            milestone?: unknown;
+            comments?: unknown;
+            commentCount?: unknown;
+            checks?: unknown;
+            checksClipped?: unknown;
+            fork?: unknown;
         } | undefined;
         author?: string | null | undefined;
         column?: {
@@ -1524,7 +2157,7 @@ export declare const trackerReadingResult: z.ZodObject<{
             boardUrl?: string | undefined;
         }[] | undefined;
         reviewers?: {
-            state: "approved" | "requested" | "changes" | "commented";
+            state: "approved" | "changes" | "commented" | "requested";
             login: string;
             name?: string | undefined;
             reviewedAt?: unknown;
@@ -1551,9 +2184,9 @@ export declare const trackerReadingResult: z.ZodObject<{
             login: string;
             path?: unknown;
             line?: unknown;
+            verdict?: unknown;
             mine?: boolean | undefined;
             commits?: unknown;
-            verdict?: unknown;
         } | undefined;
         people?: Record<string, {
             name?: string | undefined;
@@ -1606,6 +2239,37 @@ export declare const trackerReadingResult: z.ZodObject<{
             readAt: string;
             headSha?: string | null | undefined;
             approvedBy?: string[] | undefined;
+            milestone?: {
+                title: string;
+                url?: string | undefined;
+                dueOn?: string | undefined;
+            } | undefined;
+            comments?: {
+                at: string;
+                id: string;
+                body: string;
+                kind: "comment" | "line" | "review";
+                bodyClipped: boolean;
+                path?: string | undefined;
+                name?: string | undefined;
+                url?: string | undefined;
+                login?: string | undefined;
+                editedAt?: string | undefined;
+                verdict?: "approved" | "changes" | "commented" | undefined;
+            }[] | undefined;
+            commentCount?: number | undefined;
+            checks?: {
+                name: string;
+                state: "failed" | "running" | "success" | "pending" | "canceled" | "skipped" | "manual";
+                at?: string | undefined;
+                url?: string | undefined;
+                stage?: string | undefined;
+            }[] | undefined;
+            checksClipped?: boolean | undefined;
+            fork?: {
+                branch: string;
+                repo: string;
+            } | undefined;
         } | undefined;
         author?: string | null | undefined;
         column?: {
@@ -1632,7 +2296,7 @@ export declare const trackerReadingResult: z.ZodObject<{
             boardUrl?: string | undefined;
         }[] | undefined;
         reviewers?: {
-            state: "approved" | "requested" | "changes" | "commented";
+            state: "approved" | "changes" | "commented" | "requested";
             login: string;
             name?: string | undefined;
             reviewedAt?: string | undefined;
@@ -1659,9 +2323,9 @@ export declare const trackerReadingResult: z.ZodObject<{
             login: string;
             path?: string | undefined;
             line?: number | undefined;
+            verdict?: "approved" | "changes" | "commented" | undefined;
             mine?: boolean | undefined;
             commits?: number | undefined;
-            verdict?: "approved" | "changes" | "commented" | undefined;
         } | undefined;
         people?: Record<string, {
             name?: string | undefined;
@@ -1713,6 +2377,12 @@ export declare const trackerReadingResult: z.ZodObject<{
             filesClipped?: boolean | undefined;
             headSha?: string | null | undefined;
             approvedBy?: string[] | undefined;
+            milestone?: unknown;
+            comments?: unknown;
+            commentCount?: unknown;
+            checks?: unknown;
+            checksClipped?: unknown;
+            fork?: unknown;
         } | undefined;
         author?: string | null | undefined;
         column?: {
@@ -1745,7 +2415,7 @@ export declare const trackerReadingResult: z.ZodObject<{
             boardUrl?: string | undefined;
         }[] | undefined;
         reviewers?: {
-            state: "approved" | "requested" | "changes" | "commented";
+            state: "approved" | "changes" | "commented" | "requested";
             login: string;
             name?: string | undefined;
             reviewedAt?: unknown;
@@ -1772,9 +2442,9 @@ export declare const trackerReadingResult: z.ZodObject<{
             login: string;
             path?: unknown;
             line?: unknown;
+            verdict?: unknown;
             mine?: boolean | undefined;
             commits?: unknown;
-            verdict?: unknown;
         } | undefined;
         people?: Record<string, {
             name?: string | undefined;

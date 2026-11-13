@@ -50,7 +50,7 @@ const hello = (source: unknown, origin = 'http://127.0.0.1:4170') => ({
 
 describe('the version', () => {
   test('is 2.59.0', () => {
-    expect(PACKAGE_VERSION).toBe('2.95.0')
+    expect(PACKAGE_VERSION).toBe('2.98.0')
   })
 })
 

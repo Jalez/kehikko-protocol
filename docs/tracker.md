@@ -318,6 +318,34 @@ change touched, who approved — which costs a call per ref, so it is asked for
 by name, a few refs at a time, by a module such as Checklist that checks
 content.
 
+#### What `detail` carries (2.98.0)
+
+Beside the description, the files, the head sha and the approvers, a detail read
+by a 2.98.0 host carries what a person reads an item FOR, so a module can show
+one item in full without loading the tracker's website:
+
+- `milestone` — `{ title, url?, dueOn? }`, `dueOn` a calendar date.
+- `comments` — the newest `LIMITS.TRACKER_COMMENTS` (50), oldest first: the
+  conversation (`kind: 'comment'`), reviews submitted with words (`review`, with
+  `verdict`), and a change's comments on its lines (`line`, with `path`). A
+  tracker's own notes about the item (GitLab's system notes) are not comments.
+  Each `body` is Markdown as written, clipped at `LIMITS.TRACKER_COMMENT`;
+  render it as text or as Markdown without raw HTML, never as markup.
+- `commentCount` — the tracker's own total. More than `comments.length` when the
+  thread is longer; the rest is on the tracker, at the row's `url`.
+- `checks` — a change's checks of its head commit (GitHub check runs and commit
+  statuses) or its head pipeline's jobs (GitLab), each `{ name, state, url?,
+  at?, stage? }` with `state` in `PIPELINE_STATES`; at most
+  `LIMITS.TRACKER_CHECKS`, `checksClipped` when there were more.
+- `fork` — `{ repo, branch }` for a change from a fork, whose row carries no
+  `headBranch`.
+
+Every one is optional and dropped, not fatal, when it does not parse; an older
+host sends none (`TRACKER_DETAIL_FIELD_SINCE`), and absence never means "none".
+A host keeps a detail with its freshness: it reads it again when the row has
+moved since (its `updatedAt`, or its pipeline), so a module asking again gets
+what was read, at once, and a newer one after the next read lands.
+
 #### `REVIEW_STATES`
 
 Where a change's review stands.
