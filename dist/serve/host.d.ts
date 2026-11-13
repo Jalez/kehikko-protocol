@@ -86,7 +86,7 @@ export declare const NO_HOST_ANSWERED = "No Kehikot host answered.";
  */
 export declare function forgetHostProjects(): void;
 /**
- * What the host says about `folder` (2.3.0). Asks each origin in `KEHIKOT_ORIGINS` (the same list
+ * What the host says about `folder` (2.3.0). Asks the host that started this module (`askedHosts`, 2.95.0), or, for a module nobody started, each origin in `KEHIKOT_ORIGINS` (the same list
  * `frameOrigins` reads; non-loopback and `tauri:` entries are skipped) until one says `project:
  * true`. A `project: false` that names `movedTo` is kept over a bare one. Fails closed: a relative
  * path, no answer, a refusal, a slow host or a reply of another shape is `project: false`. Never throws.
