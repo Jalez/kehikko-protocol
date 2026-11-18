@@ -1,6 +1,6 @@
 {
   "name": "kehikot-module-protocol",
-  "version": "2.105.0",
+  "version": "2.106.0",
   "description": "The shapes a Kehikot host and a module it frames agree on: the manifest, the wire, and the extension payloads. Shapes only — no I/O, no state, no decisions.",
   "keywords": [
     "kehikot",
@@ -97,6 +97,7 @@
     "kehikot-check-door-config": "./bin/check-door-config.ts",
     "kehikot-check-agent": "./bin/check-agent.ts",
     "kehikot-check-serving": "./bin/check-serving.ts",
+    "kehikot-check-addresses": "./bin/check-addresses.ts",
     "kehikot-bundle": "./bin/bundle.ts"
   },
   "files": [
@@ -132,6 +133,7 @@
     "check:door-config": "bun run bin/check-door-config.ts",
     "check:agent": "bun run bin/check-agent.ts",
     "check:serving": "bun run bin/check-serving.ts",
+    "check:addresses": "bun run bin/check-addresses.ts",
     "bundle": "bun run bin/bundle.ts"
   },
   "peerDependencies": {

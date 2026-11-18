@@ -90,7 +90,7 @@ function rig(given: { sessions?: DeliverySession[]; inbox?: AgentMessage[]; safe
 
 describe('2.103.0', () => {
   test('is the package version, and the docs say it', () => {
-    expect(PACKAGE_VERSION).toBe('2.105.0')
+    expect(PACKAGE_VERSION).toBe('2.106.0')
     expect(readFileSync(join(REPO, 'CHANGELOG.md'), 'utf8')).toContain('## 2.103.0')
     expect(readFileSync(join(REPO, 'docs/agent-messages.md'), 'utf8')).toContain('DELIVERY_SAFETY_MS')
   })

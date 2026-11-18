@@ -16,7 +16,7 @@ export { ask, answered, replied, probeServer, watchServer, ticket, AskFailed, on
 export { follow } from './stream.js';
 /* The page half of `events`/`publish` (2.32.0): a page never polls its own module. */
 export { subscribe } from './subscribe.js';
-export {} from './query.js';
+export { rooted } from './query.js';
 export { applyTheme, applyBackground, pageBackground, pageTheme, systemTheme } from './theme.js';
 /* What the host's revealed rows cover of a page that says `reveal: 'over'`, and how to keep the last line out from under them (2.42.0). */
 export { keepInView, NOT_COVERED } from '../reveal.js';

@@ -12,7 +12,7 @@ export { findMatches, stepMatch, type FindCount, type FindOptions, type FindDire
 export { ask, answered, replied, probeServer, watchServer, ticket, AskFailed, onServerStanding, serverStanding, resetServerStanding, reloadStalePage, reloadWhenStale, STALE_RELOAD_MS, PAGE_STALE, PAGE_OLD, NOT_A_REPLY, CANCELLED, WATCH_SERVER_MS, KEEPALIVE_BYTES, SERVER_DOWN, type AskFailure, type Asked, type AskOptions as AskServerOptions, type ServerStanding, } from './ask.js';
 export { follow, type Attachment, type FollowOptions } from './stream.js';
 export { subscribe, type SubscribeOptions } from './subscribe.js';
-export { type Query, type QueryValue } from './query.js';
+export { rooted, type Query, type QueryValue } from './query.js';
 export { applyTheme, applyBackground, pageBackground, pageTheme, systemTheme } from './theme.js';
 export { keepInView, NOT_COVERED, type Covered } from '../reveal.js';
 export { pageBuild } from './build.js';
