@@ -7,6 +7,7 @@ import { commitOf } from '../serve/build.js';
 import { cleanTree, readStamp } from '../ready/stamp.js';
 import { BUNDLE_FILE, BUNDLE_FORMAT, BUNDLE_FORMAT_VERSION, BUNDLE_PLATFORMS, BUNDLE_RUN, bundleArchiveName, checksumLine, sha256, } from './format.js';
 import { writeTarGz } from './tar.js';
+import { UNINSTALL_SCRIPT } from '../uninstall.js';
 /** The first protocol whose `run` serves a bundle's page (it reads the commit from `bundle.json`). */
 export const BUNDLES_SINCE = '2.102.0';
 /** Whether version `a` is `b` or later, both `major.minor.patch`. */
@@ -403,6 +404,11 @@ export async function buildBundle(options) {
     for (const path of keptCode) {
         if (entries.has(path))
             continue;
+        /* 2.108.0: the clean-up a host runs on Uninstall is run by path, whatever else imports it. */
+        if (path === UNINSTALL_SCRIPT) {
+            entries.add(path);
+            continue;
+        }
         if (server.loaded.has(path)) {
             if (spelled(path))
                 entries.add(path);

@@ -55,3 +55,4 @@ export { SPACE_ID, spaceStepSchema, spacePathSchema, spaceIdsSchema, spaceSchema
 export { placeSpaceDefaults } from './door.js';
 export { AGENT_SETUP_KEYS, AGENT_SETUP_CARRIED_PATH, agentSetupSettings, agentSetupChoice, agentSetupValues, type AgentSetupKind, type AgentSetupChoice, } from './agent-setup.js';
 export { FILE_DRAG_TYPE, FILE_DRAG_PROJECT_KEY, FILE_DRAG_KINDS, fileDrag, fileDragSchema, fileDragUrl, fileDragFromUrl, fileDragAbsolute, projectPathSchema, type FileDrag, type FileDragInput, type FileDragKind, type DataTransferLike, } from './file-drag.js';
+export { UNINSTALL_SCRIPT, UNINSTALL_MARK, uninstallItemSchema, uninstallLeftSchema, uninstallReportSchema, uninstallLine, readUninstallReport, type UninstallItem, type UninstallLeft, type UninstallReport, type UninstallReportInput, } from './uninstall.js';

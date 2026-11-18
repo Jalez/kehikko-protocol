@@ -25,7 +25,7 @@ const issue = {
 
 describe('the version', () => {
   test('is 2.101.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.107.0')
+    expect(PACKAGE_VERSION).toBe('2.108.0')
     expect(PROTOCOL).toBe(2)
   })
 })

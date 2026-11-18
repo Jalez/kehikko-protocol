@@ -21,6 +21,7 @@ import {
   type BundlePlatform,
 } from './format.js'
 import { writeTarGz, type TarFile } from './tar.js'
+import { UNINSTALL_SCRIPT } from '../uninstall.js'
 
 /**
  * Build a module's ready-built bundle from its checkout (2.102.0): `kehikot-bundle build`. Bun only
@@ -461,6 +462,11 @@ export async function buildBundle(options: BuildBundleOptions): Promise<BundleBu
   const entries = new Set<string>([...(config.entries ?? [])])
   for (const path of keptCode) {
     if (entries.has(path)) continue
+    /* 2.108.0: the clean-up a host runs on Uninstall is run by path, whatever else imports it. */
+    if (path === UNINSTALL_SCRIPT) {
+      entries.add(path)
+      continue
+    }
     if (server.loaded.has(path)) {
       if (spelled(path)) entries.add(path)
       continue

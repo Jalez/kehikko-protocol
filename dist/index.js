@@ -97,3 +97,5 @@ export { placeSpaceDefaults } from './door.js';
 /* 2.91.0: the choice an `agent.setup` provider holds. */
 export { AGENT_SETUP_KEYS, AGENT_SETUP_CARRIED_PATH, agentSetupSettings, agentSetupChoice, agentSetupValues, } from './agent-setup.js';
 export { FILE_DRAG_TYPE, FILE_DRAG_PROJECT_KEY, FILE_DRAG_KINDS, fileDrag, fileDragSchema, fileDragUrl, fileDragFromUrl, fileDragAbsolute, projectPathSchema, } from './file-drag.js';
+/* 2.108.0: a module's own clean-up when a person uninstalls it. See `uninstall.ts`. */
+export { UNINSTALL_SCRIPT, UNINSTALL_MARK, uninstallItemSchema, uninstallLeftSchema, uninstallReportSchema, uninstallLine, readUninstallReport, } from './uninstall.js';

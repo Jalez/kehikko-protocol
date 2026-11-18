@@ -515,4 +515,8 @@ export const LIMITS = {
     SPACE_DEPTH: 32,
     /** 2.89.0. How many spaces one tree (`spaceTreeSchema`) may hold in all, at every depth. */
     SPACES: 2000,
+    /** 2.108.0. How long a host lets a module's own clean-up (`uninstall.ts`) run before it stops it, in ms. */
+    UNINSTALL_MS: 60_000,
+    /** 2.108.0. How many items each list of a clean-up's report holds; more are cut. */
+    UNINSTALL_ITEMS: 200,
 };
