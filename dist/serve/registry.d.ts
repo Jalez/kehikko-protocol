@@ -27,6 +27,13 @@ export declare function registerAt({ id, origin, dir }: {
     dir: string;
 }): Registered;
 /**
+ * What `bun run register` in a module's own folder is told (2.107.0): that Kehikot now runs the
+ * module from this folder instead of its release — Kehikko development — and how to go back. Null
+ * when `dir` is one of Kehikot's own installed copies (`<registry>/../installed/`), which is what
+ * runs a release anyway.
+ */
+export declare function registerNotice({ id, dir }: Pick<Registered, 'id' | 'dir'>, where?: string): string | null;
+/**
  * Whether a copy of a module running from `dir` may write its registration, or whose it is.
  *
  * A registration names the ONE folder the app runs the module from: its installed copy. A copy of
