@@ -1,5 +1,5 @@
 import { probeServer } from './ask.js';
-import { withQuery } from './query.js';
+import { rooted, withQuery } from './query.js';
 /**
  * Follow a server-sent-event door. Each event's data is parsed as JSON and
  * handed over; one that is not JSON is dropped. Unnamed events are heard, and
@@ -12,7 +12,7 @@ export function follow(path, onEvent, options = {}) {
         say('detached');
         return () => { };
     }
-    const url = withQuery(path, options.query);
+    const url = withQuery(rooted(path), options.query);
     const first = options.retryMs ?? 1000;
     const most = options.maxRetryMs ?? 15_000;
     let pause = first;

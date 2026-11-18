@@ -1,5 +1,5 @@
 import { probeServer } from './ask.js'
-import { withQuery, type Query } from './query.js'
+import { rooted, withQuery, type Query } from './query.js'
 
 /**
  * A page following its own server's events. `EventSource` gives up for good when the answer is
@@ -48,7 +48,7 @@ export function follow<T = unknown>(
     return () => {}
   }
 
-  const url = withQuery(path, options.query)
+  const url = withQuery(rooted(path), options.query)
 
   const first = options.retryMs ?? 1000
   const most = options.maxRetryMs ?? 15_000

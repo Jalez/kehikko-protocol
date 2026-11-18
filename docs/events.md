@@ -83,6 +83,13 @@ useEffect(() => subscribe(`./api/events?project=${encodeURIComponent(project)}`,
   health check each time it drops, so the page learns its server stopped: a page that subscribes
   needs no `watchServer`.
 - Returns the function that stops it for good.
+- **A module-relative address is the module's origin root (2.106.0).** `./api/events` and
+  `api/events` mean `/api/events` on the module's own origin, in `subscribe`, `follow` and `ask`
+  alike (`rooted`). A relative address in the browser resolves against the path the host frames the
+  page at, so one that worked at `/app` became `/app/api/events` at `/app/` and `/app/?…` and the
+  page got no data. An address that already says where it is (`/…`, a scheme, `?…`, `#…`) is left
+  alone. A raw `fetch('./api/…')` or `new EventSource('./api/…')` is not rooted: use `ask` and
+  `subscribe`, or `bun run check:addresses` (the bin `kehikot-check-addresses`) fails it.
 
 ## Testing that nothing polls
 

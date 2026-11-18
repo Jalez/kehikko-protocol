@@ -70,7 +70,7 @@ describe('ask', () => {
     const { fetch, calls } = server(() => json(200, { ok: true, value: 7 }))
     const asked = await ask<{ value: number }>('./api/value', { query: { project: '/a b', skip: null, n: 2 }, fetch })
     expect(asked).toEqual({ ok: true, status: 200, body: { ok: true, value: 7 } as never })
-    expect(calls[0]?.url).toBe('./api/value?project=%2Fa+b&n=2')
+    expect(calls[0]?.url).toBe('/api/value?project=%2Fa+b&n=2')
     expect(calls[0]?.init.method).toBe('GET')
     expect((calls[0]?.init.headers as Record<string, string>)[TICKET_HEADER]).toBeUndefined()
   })
@@ -312,7 +312,7 @@ describe('probeServer', () => {
     expect(await probeServer('./healthz', { fetch: down })).toBe('down')
     expect(serverStanding()).toBe('down')
     expect(await probeServer('./healthz', { fetch })).toBe('up')
-    expect(calls[1]?.url).toBe('./healthz')
+    expect(calls[1]?.url).toBe('/healthz')
   })
 })
 
@@ -348,7 +348,7 @@ describe('follow', () => {
       EventSource: Source,
     })
     const source = FakeSource.made[0]
-    expect(source?.url).toBe('./api/watch?project=%2Fp')
+    expect(source?.url).toBe('/api/watch?project=%2Fp')
     source?.onopen?.()
     source?.onmessage?.({ data: '{"slug":"a"}' })
     source?.onmessage?.({ data: 'not json' })
@@ -432,7 +432,7 @@ describe('follow', () => {
       const other = follow('/api/watch', () => {}, { probe: './api/state', EventSource: Source })
       FakeSource.made[2]?.onerror?.()
       other()
-      expect(asked).toEqual(['/healthz', './api/state'])
+      expect(asked).toEqual(['/healthz', '/api/state'])
     } finally {
       globalThis.fetch = real
     }
@@ -491,7 +491,7 @@ describe('watchServer: a page that asks its server nothing else', () => {
     try {
       document.dispatchEvent(new Event('visibilitychange'))
       await new Promise((resolve) => setTimeout(resolve, 10))
-      expect(paths).toEqual(['./healthz'])
+      expect(paths).toEqual(['/healthz'])
     } finally {
       stop()
     }

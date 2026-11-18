@@ -227,6 +227,7 @@ bun test && bun run typecheck
 bun run check:door     # what the MCP door says about its tools
 bun run check:parts    # how it follows the parts of an epic
 bun run check:serving  # that it takes its port from the protocol, not its own way
+bun run check:addresses # that no raw fetch/EventSource uses a relative ./api address
 ```
 
 ### Tests that follow the place, and tests that wait

@@ -11,6 +11,18 @@ After 2.78.0, every entry's first line under its heading is its kind, and the ve
 (semver; CI checks it): `Kind: breaking` → next major, `Kind: feature` → next minor, `Kind: fix` →
 next patch.
 
+## 2.106.0 — 2026-11-18
+
+Kind: feature
+
+A module-relative address is the module's origin root. `ask`, `follow` and `subscribe` resolve `./api/…`
+and `api/…` against the module's own origin (`rooted`, exported from `/client`), never against the path the
+host frames the page at: a page that worked at `/app` silently got nothing at `/app/` or `/app/?…`, where
+`./api/health/events` became `/app/api/health/events` (Monitor, and the same spelling in Editor, Kanban, Queue,
+Review and Slides). New `check:addresses` (`kehikot-check-addresses`) fails a module's own sources that call a raw
+`fetch`, `new EventSource` or `XMLHttpRequest#open` with a relative literal, which the helpers cannot fix.
+**Additive**; `PROTOCOL` is still 2. [docs/events.md](docs/events.md), "The page: `subscribe`".
+
 ## 2.105.0 — 2026-11-18
 
 Kind: feature

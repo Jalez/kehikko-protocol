@@ -1,7 +1,7 @@
 import { BUILD_HEADER, buildStamp } from '../build.js';
 import { TICKET_ELEMENT, TICKET_HEADER, TICKET_REFUSED } from '../page.js';
 import { pageBuild } from './build.js';
-import { withQuery } from './query.js';
+import { rooted, withQuery } from './query.js';
 /**
  * A page asking its own server, with every failure as one typed result: `ask` never throws and
  * never hands back a raw response. See docs/module-plumbing.md.
@@ -77,7 +77,7 @@ function sentence(body) {
  */
 export async function ask(path, options = {}) {
     const method = (options.method ?? (options.body === undefined ? 'GET' : 'POST')).toUpperCase();
-    const url = withQuery(path, options.query);
+    const url = withQuery(rooted(path), options.query);
     const headers = {};
     if (options.body !== undefined)
         headers['content-type'] = 'application/json';
