@@ -223,6 +223,7 @@ The same list with what each version exported is in [CHANGELOG.md](CHANGELOG.md)
 
 | version | date | what it added |
 |---|---|---|
+| 2.108.1 | 2026-11-18 | Fix. `kehikot-bundle build` refuses a Bun older than 1.4.1 (1.4.0 drops exports from a bundle, which then crashes at start): `BUNDLE_MIN_BUN`, `bunTooOld`. |
 | 2.108.0 | 2026-11-18 | Additive. A module's own clean-up on Uninstall: `uninstall.ts` at its root, run by the host after the module stops, reports what it removed and left (`runUninstall`, `readUninstallReport`); bundles carry it; `check:agent` asks every agent module for one. |
 | 2.107.0 | 2026-11-18 | Additive. `bun run register` in a module's own folder says that Kehikot now runs that folder instead of the release (Kehikko development) and how to go back (`registerNotice`); never printed at a start. |
 | 2.106.0 | 2026-11-18 | Additive. A module-relative address (`./api/…`) is the module's origin root in `ask`, `follow` and `subscribe` (`rooted`), not the framed page's path; `check:addresses` fails a raw relative `fetch` / `EventSource`. |

@@ -70,6 +70,14 @@ export type BundleBuilt = {
 };
 /** The first protocol whose `run` serves a bundle's page (it reads the commit from `bundle.json`). */
 export declare const BUNDLES_SINCE = "2.102.0";
+/**
+ * The oldest Bun that bundles a module correctly (2.108.1). Bun 1.4.0's `Bun.build` silently drops
+ * code it should keep: bundling this package's own `index.js` leaves 17 KB with `export { agentSetupSettings }`
+ * and no definition, and the bundle crashes at start. 1.4.1 (bisected: 1.4.1 to 1.4.4 all give the whole 465 KB) is the floor.
+ */
+export declare const BUNDLE_MIN_BUN = "1.4.1";
+/** Why this Bun may not build a bundle, or null when it may. A version that does not read as one is let through (a canary names none). */
+export declare function bunTooOld(version: string | undefined, floor?: string): string | null;
 /** Whether a tracked path is part of the running module, by the defaults and the module's own `exclude`/`include`. */
 export declare function keptByDefault(path: string, config?: BundleConfig): boolean;
 /** package.json's `kehikot.bundle`, or `{}`. */

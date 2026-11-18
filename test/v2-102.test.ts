@@ -103,7 +103,7 @@ const rawArchive = (...entries: Uint8Array[]) => new Uint8Array(gzipSync(new Uin
 
 describe('2.102.0', () => {
   test('is the package version', () => {
-    expect(PACKAGE_VERSION).toBe('2.108.0')
+    expect(PACKAGE_VERSION).toBe('2.108.1')
   })
 
   describe('the archive', () => {

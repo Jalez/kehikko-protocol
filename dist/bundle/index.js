@@ -2,5 +2,5 @@
 export { BUNDLE_FILE, BUNDLE_FORMAT, BUNDLE_FORMAT_VERSION, BUNDLE_PLATFORMS, BUNDLE_RUN, bundleArchiveName, bundleInfoOf, checksumLine, checksumOf, platformHere, runsHere, sha256, } from './format.js';
 export { BUNDLE_LIMITS, TarRefused, readTarGz, safeRelative, writeTarGz } from './tar.js';
 export { checkBundle, readBundleInfo, sizeOf, unpackBundle, verifyUnpacked } from './unpack.js';
-export { BUNDLES_SINCE, buildBundle, bundleConfigOf, packageNameOf, bundleRunScript, keptByDefault, pinnedProtocol, spokenOf } from './build.js';
+export { BUNDLES_SINCE, BUNDLE_MIN_BUN, bunTooOld, buildBundle, bundleConfigOf, packageNameOf, bundleRunScript, keptByDefault, pinnedProtocol, spokenOf } from './build.js';
 export { smokeBundle } from './smoke.js';
