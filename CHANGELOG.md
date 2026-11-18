@@ -11,6 +11,16 @@ After 2.78.0, every entry's first line under its heading is its kind, and the ve
 (semver; CI checks it): `Kind: breaking` → next major, `Kind: feature` → next minor, `Kind: fix` →
 next patch.
 
+## 2.108.1 — 2026-11-18
+
+Kind: fix
+
+`kehikot-bundle build` refuses a Bun that builds broken bundles. Bun 1.4.0's `Bun.build` silently dropped code it
+should keep (a protocol export, `agentSetupSettings`, was exported with no definition) and the bundle crashed at start;
+1.4.1 and later are right (bisected). `BUNDLE_MIN_BUN` (`1.4.1`) and `bunTooOld(version)` in `/bundle`; the build stops
+with "Bun X is too old to bundle modules safely; use 1.4.1 or newer, e.g. the one in Kehikot.app via BUN_BE_BUN=1".
+The smoke run already fails a bundle that exits before it answers, and says what it printed. **Additive**; `PROTOCOL` is still 2.
+
 ## 2.108.0 — 2026-11-18
 
 Kind: feature

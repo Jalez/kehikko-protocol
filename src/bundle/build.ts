@@ -89,6 +89,20 @@ export type BundleBuilt =
 /** The first protocol whose `run` serves a bundle's page (it reads the commit from `bundle.json`). */
 export const BUNDLES_SINCE = '2.102.0'
 
+/**
+ * The oldest Bun that bundles a module correctly (2.108.1). Bun 1.4.0's `Bun.build` silently drops
+ * code it should keep: bundling this package's own `index.js` leaves 17 KB with `export { agentSetupSettings }`
+ * and no definition, and the bundle crashes at start. 1.4.1 (bisected: 1.4.1 to 1.4.4 all give the whole 465 KB) is the floor.
+ */
+export const BUNDLE_MIN_BUN = '1.4.1'
+
+/** Why this Bun may not build a bundle, or null when it may. A version that does not read as one is let through (a canary names none). */
+export function bunTooOld(version: string | undefined, floor = BUNDLE_MIN_BUN): string | null {
+  const numbers = version?.match(/^\d+\.\d+\.\d+/)?.[0]
+  if (!version || !numbers || atLeast(numbers, floor)) return null
+  return `Bun ${version} is too old to bundle modules safely (it silently drops exports, and the bundle then crashes at start); use ${floor} or newer, e.g. the one in Kehikot.app via BUN_BE_BUN=1.`
+}
+
 /** Whether version `a` is `b` or later, both `major.minor.patch`. */
 function atLeast(a: string, b: string): boolean {
   const pa = a.split('.').map(Number)
@@ -405,6 +419,8 @@ export async function buildBundle(options: BuildBundleOptions): Promise<BundleBu
   const config = bundleConfigOf(pkg)
   if (config.enabled === false) return { ok: false, skipped: true, why: `The module keeps the git path: ${config.why ?? 'its package.json says kehikot.bundle.enabled: false.'}` }
   if (!existsSync(join(dir, entry))) return { ok: false, why: `${dir} has no ${entry} to start a bundle from.` }
+  const tooOldBun = bunTooOld((globalThis as unknown as { Bun?: { version?: string } }).Bun?.version)
+  if (tooOldBun) return { ok: false, why: tooOldBun }
 
   /* The bundled server runs on the protocol it pins: one older than bundles cannot say which commit it is without git. */
   const installed = String((readJson(join(dir, 'node_modules', 'kehikot-module-protocol', 'package.json')) as { version?: string } | null)?.version ?? '')
