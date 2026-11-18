@@ -11,6 +11,16 @@ After 2.78.0, every entry's first line under its heading is its kind, and the ve
 (semver; CI checks it): `Kind: breaking` → next major, `Kind: feature` → next minor, `Kind: fix` →
 next patch.
 
+## 2.107.0 — 2026-11-18
+
+Kind: feature
+
+`bun run register` in a module's own folder now says what it just did (`registerNotice`, `kehikot-module-protocol/serve`):
+Kehikot runs the module from this folder instead of from its release — Kehikko development — and the module no longer
+updates by itself; to go back, turn Kehikko development off in Kehikot (Settings › Modules) or press "Use the release" on
+the module's row. Printed to stderr by `registerAt` only when it runs as the `register` script (`npm_lifecycle_event`),
+never at a start, and not for one of Kehikot's own installed copies. Nothing changes in what is written.
+
 ## 2.106.0 — 2026-11-18
 
 Kind: feature

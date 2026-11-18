@@ -78,6 +78,7 @@ export {
   portOf,
   readRegistration,
   registerAt,
+  registerNotice,
   takesOver,
   registryDir,
   type Registered,

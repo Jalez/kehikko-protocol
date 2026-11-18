@@ -223,6 +223,7 @@ The same list with what each version exported is in [CHANGELOG.md](CHANGELOG.md)
 
 | version | date | what it added |
 |---|---|---|
+| 2.107.0 | 2026-11-18 | Additive. `bun run register` in a module's own folder says that Kehikot now runs that folder instead of the release (Kehikko development) and how to go back (`registerNotice`); never printed at a start. |
 | 2.106.0 | 2026-11-18 | Additive. A module-relative address (`./api/…`) is the module's origin root in `ask`, `follow` and `subscribe` (`rooted`), not the framed page's path; `check:addresses` fails a raw relative `fetch` / `EventSource`. |
 | 2.105.0 | 2026-11-18 | Additive. Test-kit helpers: `expectFollowsPlace` (switching to an empty place shows nothing of the place before), `settled` / `trackBackground` (background work a test did not await), `waitForWrites` (the page's own writes around a press). |
 | 2.104.3 | 2026-11-18 | Fix. The agent conformance's idle check needs six quiet seconds (`IDLE_QUIET_MS`), longer than the delivery loop's five, so a module's own first look never lands in the watch and no module needs a wait of its own. |

@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs'
 import { homedir } from 'node:os'
-import { join, resolve } from 'node:path'
+import { dirname, join, resolve, sep } from 'node:path'
 
 import { MODULE_ID } from '../ids.js'
 
@@ -52,7 +52,30 @@ export function registerAt({ id, origin, dir }: { id: string; origin: string; di
   writeFileSync(file, `${JSON.stringify({ ...kept, url: origin, dir }, null, 2)}\n`)
 
   const was = before && (before.url !== origin || before.dir !== dir) ? before : null
-  return { id, url: origin, dir, file, was }
+  const registered = { id, url: origin, dir, file, was }
+  /* Only from `bun run register`, never from a start (`serves` registers too): the person is told what they just did. */
+  if (process.env.npm_lifecycle_event === 'register') {
+    const notice = registerNotice(registered)
+    if (notice) console.error(`\n${notice}\n`)
+  }
+  return registered
+}
+
+/**
+ * What `bun run register` in a module's own folder is told (2.107.0): that Kehikot now runs the
+ * module from this folder instead of its release — Kehikko development — and how to go back. Null
+ * when `dir` is one of Kehikot's own installed copies (`<registry>/../installed/`), which is what
+ * runs a release anyway.
+ */
+export function registerNotice({ id, dir }: Pick<Registered, 'id' | 'dir'>, where = registryDir()): string | null {
+  const installed = join(dirname(where), 'installed')
+  if (resolve(dir) === installed || resolve(dir).startsWith(installed + sep)) return null
+  return [
+    `Kehikot now runs ${id} from this folder (${dir}) instead of from its release.`,
+    'That is Kehikko development: your changes here run in the app, and this module no longer updates by itself.',
+    'To go back to the release, turn Kehikko development off in Kehikot (Settings › Modules), or press',
+    '"Use the release" on this module in the modules list.',
+  ].join('\n')
 }
 
 /**
