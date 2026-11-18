@@ -1,5 +1,11 @@
 import { type Build } from '../build.js';
-/** The commit checked out in `dir`, or null: not a git checkout, no git, or git said no. */
+/**
+ * The commit checked out in `dir`, or null: not a git checkout, no git, or git said no.
+ *
+ * A ready-built bundle (2.102.0, docs/bundles.md) is not a checkout: its `bundle.json` says the
+ * commit it was built from, and that is the answer — asked first, so a bundle unpacked somewhere a
+ * git repository happens to enclose (a home folder kept in git) is never taken for that repository.
+ */
 export declare function commitOf(dir: string): string | null;
 /**
  * This process's build. Call it once, at module scope, so it is one identity for the life of the
