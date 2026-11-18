@@ -90,7 +90,7 @@ function rig(given: { sessions?: DeliverySession[]; inbox?: AgentMessage[]; safe
 
 describe('2.103.0', () => {
   test('is the package version, and the docs say it', () => {
-    expect(PACKAGE_VERSION).toBe('2.104.2')
+    expect(PACKAGE_VERSION).toBe('2.104.3')
     expect(readFileSync(join(REPO, 'CHANGELOG.md'), 'utf8')).toContain('## 2.103.0')
     expect(readFileSync(join(REPO, 'docs/agent-messages.md'), 'utf8')).toContain('DELIVERY_SAFETY_MS')
   })
@@ -237,7 +237,7 @@ describe('the agent conformance holds an idle module to it', () => {
     )
     expect(said.failures).toEqual([])
     expect(said.passed).toContain('an idle module asks the host nothing on a clock')
-  }, 20_000)
+  }, 30_000)
 
   test('a module that asks the host for messages on a timer fails, and says what to do', async () => {
     const built = moduleDoor()
@@ -251,7 +251,7 @@ describe('the agent conformance holds an idle module to it', () => {
     const failed = said.failures.find((one) => one.startsWith('an idle module asks the host nothing on a clock'))
     expect(failed).toBeDefined()
     expect(failed).toContain('messageDelivery')
-  }, 20_000)
+  }, 30_000)
 
   test('a module whose own loop asks once about a session it first lists a few seconds in is steady, not polling', async () => {
     const built = moduleDoor()
@@ -266,6 +266,19 @@ describe('the agent conformance holds an idle module to it', () => {
     )
     expect(said.failures).toEqual([])
   }, 30_000)
+
+  test('a module whose own first look comes five seconds after it started needs no wait of its own (2.104.3)', async () => {
+    const built = moduleDoor()
+    const said = await agentConformance(
+      base(built, async () => {
+        const token = await built.place('conv-five')
+        const delivery = messageDelivery({ module: ID, everyMs: 5000, sessions: () => [{ key: 'conv-five', token, own: true, state: 'idle', wake: true, act: false }], type: () => true })
+        delivery.start()
+        return () => delivery.stop()
+      }),
+    )
+    expect(said.failures).toEqual([])
+  }, 40_000)
 
   test('without the hook the check is not run', async () => {
     const built = moduleDoor()

@@ -14,7 +14,7 @@ import {
 
 describe('2.102.0', () => {
   test('is the package version', () => {
-    expect(PACKAGE_VERSION).toBe('2.104.2')
+    expect(PACKAGE_VERSION).toBe('2.104.3')
   })
 
   test('tracker.image is held to trackers:read and takes a ref and an address', () => {

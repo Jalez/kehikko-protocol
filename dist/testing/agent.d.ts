@@ -130,8 +130,14 @@ export interface AgentConformanceOptions {
 }
 /** 2.103.0. How long the idle check watches: more than two of the delivery loop's 5 s looks. */
 export declare const IDLE_WINDOW_MS = 12000;
-/** 2.103.1. The most the idle check waits for the first looks to pass, in ms. */
-export declare const IDLE_SETTLE_MS = 9000;
+/** 2.103.1. The most the idle check waits for the first looks to pass, in ms (2.104.3: 16 s). */
+export declare const IDLE_SETTLE_MS = 16000;
+/**
+ * 2.104.3. How long the host must have heard nothing before the idle check counts as steady: longer than the
+ * delivery loop's 5 s between looks, so a module's own first look (five seconds after it started, whenever
+ * that was) always falls inside the wait and never inside the watch. A module needs no wait of its own.
+ */
+export declare const IDLE_QUIET_MS = 6000;
 export interface AgentConformance {
     failures: string[];
     passed: string[];

@@ -11,8 +11,14 @@ import { HOST_ENV } from '../serve/host-door.js';
 import { forgetMessageHosts } from '../serve/messages.js';
 /** 2.103.0. How long the idle check watches: more than two of the delivery loop's 5 s looks. */
 export const IDLE_WINDOW_MS = 12_000;
-/** 2.103.1. The most the idle check waits for the first looks to pass, in ms. */
-export const IDLE_SETTLE_MS = 9_000;
+/** 2.103.1. The most the idle check waits for the first looks to pass, in ms (2.104.3: 16 s). */
+export const IDLE_SETTLE_MS = 16_000;
+/**
+ * 2.104.3. How long the host must have heard nothing before the idle check counts as steady: longer than the
+ * delivery loop's 5 s between looks, so a module's own first look (five seconds after it started, whenever
+ * that was) always falls inside the wait and never inside the watch. A module needs no wait of its own.
+ */
+export const IDLE_QUIET_MS = 6_000;
 async function bodyOf(request) {
     const chunks = [];
     for await (const chunk of request)
@@ -231,8 +237,8 @@ async function idleChecks(options, host, check) {
     try {
         /*
          * Let the first looks pass: a delivery loop asks about each session once, when it first lists it (the
-         * module's own loop lists the conversations the earlier steps made, five seconds in). Quiet for two
-         * seconds is steady; a module that asks on a clock never is, and is counted below.
+         * module's own loop lists the conversations the earlier steps made, five seconds in). Quiet for longer
+         * than the loop's five seconds (`IDLE_QUIET_MS`) is steady; a module that asks on a clock never is, and is counted below.
          */
         let last = reads();
         let quietSince = Date.now();
@@ -244,7 +250,7 @@ async function idleChecks(options, host, check) {
                 last = now;
                 quietSince = Date.now();
             }
-            else if (Date.now() - quietSince >= 2_000)
+            else if (Date.now() - quietSince >= IDLE_QUIET_MS)
                 break;
         }
         const first = reads();
