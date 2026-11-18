@@ -1,6 +1,6 @@
 import { z } from 'zod';
 /** This package's own version. A test holds it to `package.json`. */
-export const PACKAGE_VERSION = '2.104.1';
+export const PACKAGE_VERSION = '2.104.2';
 /** The response header a module's doors carry the build stamp in, on every answer. */
 export const BUILD_HEADER = 'x-module-build';
 /**

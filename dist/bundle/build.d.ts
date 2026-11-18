@@ -17,7 +17,10 @@ import { type BundleInfo } from './format.js';
  *  - **Native code, carried as files**: a dependency with a `.node` addon cannot be inlined, so it is
  *    left external and copied under `node_modules/` with the prebuilt binaries of the platforms it
  *    has them for, which the bundle then names (`platforms`). So is a package the module lists in
- *    `kehikot.bundle.external` (package.json) because it reads its own files at run time.
+ *    `kehikot.bundle.external` (package.json) because it reads its own files at run time. Which
+ *    packages those are is decided by what the server's (and each script's) imports reach, in bun
+ *    build's own graph — never by walking package.json's `dependencies`, which also lists what only
+ *    the page uses (a PDF reader with native optionals) and would fail or fatten a bundle for it.
  *
  * `import.meta.dirname` (and `dir`, `url`, `path`, `filename`) in a file below the entry's folder is
  * rewritten to the folder that file sat in, so `join(import.meta.dirname, '..', 'notes')` still
@@ -78,6 +81,8 @@ export declare function pinnedProtocol(pkg: {
 }): string | null;
 /** A source without its comments and its import, export-from and require lines: what is left spells a file only to use it by path. */
 export declare function spokenOf(source: string): string;
+/** The package a bare import names (`@scope/name` or `name`, without a sub-path), or null for a relative, absolute or runtime import. */
+export declare function packageNameOf(specifier: string): string | null;
 /** The `run.sh` a bundle carries: no install, no build, no git — the entry, with the Bun the host puts first on PATH. */
 export declare function bundleRunScript(info: Pick<BundleInfo, 'id' | 'version' | 'commit' | 'entry'>): string;
 /**

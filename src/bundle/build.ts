@@ -40,7 +40,10 @@ import { writeTarGz, type TarFile } from './tar.js'
  *  - **Native code, carried as files**: a dependency with a `.node` addon cannot be inlined, so it is
  *    left external and copied under `node_modules/` with the prebuilt binaries of the platforms it
  *    has them for, which the bundle then names (`platforms`). So is a package the module lists in
- *    `kehikot.bundle.external` (package.json) because it reads its own files at run time.
+ *    `kehikot.bundle.external` (package.json) because it reads its own files at run time. Which
+ *    packages those are is decided by what the server's (and each script's) imports reach, in bun
+ *    build's own graph — never by walking package.json's `dependencies`, which also lists what only
+ *    the page uses (a PDF reader with native optionals) and would fail or fatten a bundle for it.
  *
  * `import.meta.dirname` (and `dir`, `url`, `path`, `filename`) in a file below the entry's folder is
  * rewritten to the folder that file sat in, so `join(import.meta.dirname, '..', 'notes')` still
@@ -283,22 +286,66 @@ function hereKeeper(moduleDir: string, entryDir: string, loaded: Set<string>) {
 
 type BunBuild = (config: Record<string, unknown>) => Promise<{ success: boolean; logs: { message?: string; toString(): string }[]; outputs: { path: string; kind: string }[] }>
 
-/** Bundle one script with every dependency but `external` inlined; its text, and which of the module's own files it took in. */
-async function bundleOne(moduleDir: string, entry: string, external: readonly string[]): Promise<{ ok: true; text: string; loaded: Set<string> } | { ok: false; why: string }> {
+/** The package a bare import names (`@scope/name` or `name`, without a sub-path), or null for a relative, absolute or runtime import. */
+export function packageNameOf(specifier: string): string | null {
+  if (specifier.startsWith('.') || specifier.startsWith('/') || specifier.startsWith('#') || builtin(specifier)) return null
+  const parts = specifier.split('/')
+  if (specifier.startsWith('@')) return parts.length >= 2 ? `${parts[0]}/${parts[1]}` : null
+  return parts[0] || null
+}
+
+/**
+ * What a bundle of the server finds by following its imports (bun build's own graph, not package.json):
+ * the packages that have to be carried as files instead of inlined, with where each is installed.
+ * A package only the page imports, or one nothing imports, is never reached, so a native optional it
+ * pulls in never makes a bundle fail or grow.
+ */
+class Reach {
+  readonly carried = new Map<string, string>()
+  private readonly nativeAt = new Map<string, boolean>()
+  constructor(
+    readonly moduleDir: string,
+    readonly declared: readonly string[],
+  ) {}
+  /** Whether an import is left external (and so carried): a package the module declared, or one with native code. */
+  external(specifier: string, importer: string): boolean {
+    const name = packageNameOf(specifier)
+    if (!name || name === 'kehikot-module-protocol') return false
+    const from = importer && importer !== '' ? dirname(importer) : this.moduleDir
+    const where = packageDir(name, from, this.moduleDir) ?? packageDir(name, this.moduleDir, this.moduleDir)
+    if (!where) return false
+    let native = this.nativeAt.get(where)
+    if (native === undefined) {
+      native = isNative(where)
+      this.nativeAt.set(where, native)
+    }
+    if (!this.declared.includes(name) && !native) return false
+    this.carried.set(name, where)
+    return true
+  }
+}
+
+/** Bundle one script with every dependency but the declared and native ones inlined; its text, and which of the module's own files it took in. */
+async function bundleOne(moduleDir: string, entry: string, reach: Reach): Promise<{ ok: true; text: string; loaded: Set<string> } | { ok: false; why: string }> {
   const bun = (globalThis as unknown as { Bun?: { build: BunBuild } }).Bun
   if (!bun) return { ok: false, why: 'kehikot-bundle runs under Bun: it bundles with Bun.build.' }
   const loaded = new Set<string>()
   const out = join(tmpdir(), `kehikot-bundle-${process.pid}-${Math.random().toString(36).slice(2)}`)
   const source = join(moduleDir, entry)
+  const reachKeeper = {
+    name: 'kehikot-bundle-reach',
+    setup(build: { onResolve(options: { filter: RegExp }, callback: (args: { path: string; importer: string }) => { path: string; external: true } | undefined): void }) {
+      build.onResolve({ filter: /^[^./]/ }, (args) => (reach.external(args.path, args.importer) ? { path: args.path, external: true } : undefined))
+    },
+  }
   try {
     const built = await bun.build({
       entrypoints: [source],
       outdir: out,
       target: 'bun',
       format: 'esm',
-      external: [...external],
       naming: '[name].[ext]',
-      plugins: [hereKeeper(moduleDir, dirname(source), loaded)],
+      plugins: [reachKeeper, hereKeeper(moduleDir, dirname(source), loaded)],
     })
     if (!built.success) return { ok: false, why: `${entry} did not bundle: ${built.logs.map((log) => log.message ?? String(log)).join('; ')}` }
     const main = built.outputs.find((output) => output.kind === 'entry-point')
@@ -382,29 +429,11 @@ export async function buildBundle(options: BuildBundleOptions): Promise<BundleBu
     return { ok: false, why: 'The module has a build script and no dist/index.html. Run `bun run build` first.' }
   }
 
-  /* Native packages, and the ones the module declared, are carried rather than inlined. */
-  const prod = closure(Object.keys(pkg.dependencies ?? {}), dir, dir)
-  const native: BundleNative[] = []
-  for (const [name, where] of prod) {
-    if (name === 'kehikot-module-protocol') continue
-    const declared = config.external?.includes(name) === true
-    if (declared || isNative(where)) {
-      const version = String((readJson(join(where, 'package.json')) as { version?: string } | null)?.version ?? '0.0.0')
-      native.push({ name, version, why: declared ? 'declared' : 'native' })
-    }
-  }
+  /* The packages the module declared must be installed; the native ones are found by following the imports below. */
   for (const name of config.external ?? []) {
-    if (!prod.has(name)) return { ok: false, why: `kehikot.bundle.external names ${name}, which is not installed as a dependency.` }
+    if (!packageDir(name, dir, dir)) return { ok: false, why: `kehikot.bundle.external names ${name}, which is not installed as a dependency.` }
   }
-  let platforms: BundlePlatform[] | null = null
-  for (const one of native.filter((n) => n.why === 'native')) {
-    const has = platformsOf(prod.get(one.name)!)
-    platforms = (platforms ?? [...BUNDLE_PLATFORMS]).filter((platform) => has.has(platform))
-  }
-  if (platforms && platforms.length === 0) {
-    return { ok: false, why: `${native.map((n) => n.name).join(', ')} ${native.length === 1 ? 'has' : 'have'} no prebuilt binary for one platform they all share, so no bundle could run anywhere.` }
-  }
-  const external = native.map((n) => n.name)
+  const reach = new Reach(dir, config.external ?? [])
 
   const tracked = trackedFiles(dir)
   const kept = tracked.filter((path) => keptByDefault(path, config) && existsSync(join(dir, path)) && statSync(join(dir, path)).isFile())
@@ -412,7 +441,7 @@ export async function buildBundle(options: BuildBundleOptions): Promise<BundleBu
   const add = (path: string, data: Uint8Array | string, executable = false) => files.push({ path, data: typeof data === 'string' ? new TextEncoder().encode(data) : data, executable })
 
   /* The server first: what it takes in is not copied, unless something runs that file by path. */
-  const server = await bundleOne(dir, entry, external)
+  const server = await bundleOne(dir, entry, reach)
   if (!server.ok) return server
   const keptCode = kept.filter((path) => CODE.test(path) && path !== entry)
   /* What each file says outside its imports and comments: where a file name spelled in a string means "run by path". */
@@ -446,13 +475,30 @@ export async function buildBundle(options: BuildBundleOptions): Promise<BundleBu
   }
 
   add(entry, server.text)
-  log(`bundled ${entry} (${server.loaded.size} files of the module inlined${external.length ? `; carried: ${external.join(', ')}` : ''})`)
   for (const path of [...entries].sort()) {
-    const one = await bundleOne(dir, path, external)
+    const one = await bundleOne(dir, path, reach)
     if (!one.ok) return one
     add(path, one.text, (statSync(join(dir, path)).mode & 0o111) !== 0)
     log(`bundled ${path}`)
   }
+
+  /* What the server and the scripts actually import: declared packages (always carried, they may be run by path) and the native ones they reach. */
+  for (const name of config.external ?? []) reach.carried.set(name, packageDir(name, dir, dir)!)
+  const native: BundleNative[] = []
+  for (const [name, where] of [...reach.carried].sort(([a], [b]) => (a < b ? -1 : 1))) {
+    const declared = config.external?.includes(name) === true
+    const version = String((readJson(join(where, 'package.json')) as { version?: string } | null)?.version ?? '0.0.0')
+    native.push({ name, version, why: declared ? 'declared' : 'native' })
+  }
+  let platforms: BundlePlatform[] | null = null
+  for (const one of native.filter((n) => n.why === 'native')) {
+    const has = platformsOf(reach.carried.get(one.name)!)
+    platforms = (platforms ?? [...BUNDLE_PLATFORMS]).filter((platform) => has.has(platform))
+  }
+  if (platforms && platforms.length === 0) {
+    return { ok: false, why: `${native.map((n) => n.name).join(', ')} ${native.length === 1 ? 'has' : 'have'} no prebuilt binary for one platform they all share, so no bundle could run anywhere.` }
+  }
+  log(`bundled ${entry} (${server.loaded.size} files of the module inlined${native.length ? `; carried: ${native.map((n) => n.name).join(', ')}` : ''})`)
   for (const path of kept) {
     if (path === entry || entries.has(path)) continue
     if (CODE.test(path) && server.loaded.has(path)) continue
@@ -462,7 +508,7 @@ export async function buildBundle(options: BuildBundleOptions): Promise<BundleBu
     for (const rel of walk(join(dir, 'dist'), (path, isDir) => !isDir && basename(path) === '.DS_Store')) add(`dist/${rel}`, readFileSync(join(dir, 'dist', rel)))
   }
   for (const n of native) {
-    const where = prod.get(n.name)!
+    const where = reach.carried.get(n.name)!
     const carried = closure([n.name], dirname(where), dir)
     for (const [name, from] of carried) {
       if (files.some((file) => file.path.startsWith(`node_modules/${name}/`))) continue

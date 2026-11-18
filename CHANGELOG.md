@@ -11,6 +11,19 @@ After 2.78.0, every entry's first line under its heading is its kind, and the ve
 (semver; CI checks it): `Kind: breaking` → next major, `Kind: feature` → next minor, `Kind: fix` →
 next patch.
 
+## 2.104.2 — 2026-11-18
+
+Kind: fix
+
+`kehikot-bundle build` decided which packages to carry as files by walking the whole `dependencies` closure in
+package.json, so a library only the page uses (a PDF reader with native optionals) made a bundle fail with "no
+prebuilt binary for one platform they all share", or fattened it with files no server reads. The server's
+bundle now follows what the server entry actually imports: while bun build walks the graph, an import of a
+native package or one named in `kehikot.bundle.external` is left external and recorded, and only those are
+carried (with the platforms they share). The same holds for each other script bundled in place. A package
+declared in `kehikot.bundle.external` is still always carried. `packageNameOf` names the package an import
+specifier refers to. Test: `test/bundle-reach.test.ts` builds a fixture with a page-only native dependency.
+
 ## 2.104.1 — 2026-11-18
 
 Kind: fix
