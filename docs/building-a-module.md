@@ -229,6 +229,24 @@ bun run check:parts    # how it follows the parts of an epic
 bun run check:serving  # that it takes its port from the protocol, not its own way
 ```
 
+### Tests that follow the place, and tests that wait
+
+`kehikot-module-protocol/testing` (2.105.0) carries the shared checks and waits, so a module does not write
+them again:
+
+- **`expectFollowsPlace({ render, switchTo, text, filled, empty })`**: for every module that follows the place
+  (`reacts: ['parts']`, or the space the canvas points at). It draws the module for a place that has content
+  (`filled.marker` is a string on screen only because of it), moves the same drawn module to a place with
+  nothing in it, and fails if anything of the place before is still shown. Browser, Slides and Editor each
+  shipped showing the previous space's page, deck or tab after a switch. It also checks the content comes back
+  on switching back. `text` reads what the person can see as text, so it works for a page, a server or a list
+  of tab names.
+- **`settled(pending)` / `trackBackground()`**: wait for background work a test started and nothing awaits (a
+  post from a detached script, a first look of a loop) in `afterEach`, so it never lands in the next test.
+  A bare `setTimeout` in a test is the thing to replace.
+- **`waitForWrites(writes, matches, { clear })`**: wait for a write the page makes of its own (its tabs, its
+  size) before asserting the exact list of writes a press made.
+
 ## 5. Run it
 
 **Against the stub host first.** `bun run stub` starts the module and a page

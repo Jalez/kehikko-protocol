@@ -11,6 +11,24 @@ After 2.78.0, every entry's first line under its heading is its kind, and the ve
 (semver; CI checks it): `Kind: breaking` → next major, `Kind: feature` → next minor, `Kind: fix` →
 next patch.
 
+## 2.105.0 — 2026-11-18
+
+Kind: feature
+
+Test-kit helpers for three mistakes modules kept making by hand (`kehikot-module-protocol/testing`):
+
+- `expectFollowsPlace({ render, switchTo, text, filled, empty })` (and `followsPlace`, which returns the
+  failures): for a module that follows the place. Draws the module for a place with content, moves it to a place
+  with nothing in it and fails if anything of the place before is still on screen; also checks the content comes
+  back on switching back. Browser, Slides and Editor each showed the previous space's page, deck or tab after a
+  switch. DOM- and runner-agnostic: the module says how to draw a place and how to read the screen as text.
+- `settled(pending)` and `trackBackground()`: wait for background work a test started and nothing awaits (a post
+  from a detached script), so it never lands in the next test.
+- `waitForWrites(writes, matches, { clear })`: wait for a write the page makes of its own (its tabs) before
+  asserting the exact list of writes a press made. `until` is the plain wait they share.
+
+The module guide has a section on them (docs/building-a-module.md, "Tests that follow the place, and tests that wait").
+
 ## 2.104.3 — 2026-11-18
 
 Kind: fix
