@@ -165,9 +165,18 @@ export interface MessageDeliveryOptions extends Omit<AskHostOptions, 'project'> 
      * the turn): a busy session is typed into at once. False (the default): it waits until idle.
      */
     queues?: boolean;
-    /** How often to look, in ms. Default `WAKE_EVERY_MS`. */
+    /**
+     * How often to look at the sessions, in ms. Default `WAKE_EVERY_MS`. A look is LOCAL: it asks the host
+     * nothing unless a knock (`tick`) or the safety interval says there may be news (2.103.0).
+     */
     everyMs?: number;
-    /** How often to ask the host about an asleep session, in ms: there may be many, and none is in a hurry. Default `ASLEEP_EVERY_MS`. */
+    /**
+     * 2.103.0. How long a session's messages may go unasked after the last ask, in ms, when no knock has
+     * come: the host knocks (`agent.delivery`) when a message is kept, so this only catches a knock that
+     * was lost (the module was starting). Default `DELIVERY_SAFETY_MS`.
+     */
+    safetyEveryMs?: number;
+    /** The least time between two asks about an asleep session that was not knocked for, in ms. Default `ASLEEP_EVERY_MS`. */
     asleepEveryMs?: number;
     /** A burst is one delivery (`DeliveryCase.settleMs`). Default `WAKE_SETTLE_MS`. */
     settleMs?: number;
@@ -176,13 +185,31 @@ export interface MessageDeliveryOptions extends Omit<AskHostOptions, 'project'> 
     read?: (token: string, unread: boolean) => Promise<AskedHost<'messages.read'>>;
     log?: (line: string) => void;
 }
-/** 2.48.0. How often an asleep session is asked about, at most, in ms. */
+/** 2.48.0. How often an asleep session is asked about, at most, in ms, when nobody knocked. */
 export declare const ASLEEP_EVERY_MS = 30000;
+/**
+ * 2.103.0. How long a session's messages go unasked when no knock came, in ms. Before it, every module
+ * asked the host `messages.read` for every idle session every 5 s, and got the same answer each time:
+ * a server-pass vouch and a place lookup back at the module for each. The host knocks the module when a
+ * message is kept (`agent.delivery`), so the ask is made then, once when a session is first listed or
+ * newly armed, and this often as a safety.
+ */
+export declare const DELIVERY_SAFETY_MS: number;
 /** 2.48.0. Messages read for a session (so counted delivered) and not yet typed are kept this long while it is not listed, in ms. */
 export declare const DELIVERY_KEEP_MS: number;
 export interface MessageDelivery {
-    /** Look once. Resolves to how many sessions were typed into or resumed. */
+    /**
+     * A KNOCK (2.103.0): the host says messages changed (the `agent.delivery` route calls this). Every
+     * session is asked about now, then looked at as `look` does. Resolves to how many sessions were typed
+     * into or resumed. Safe to call from the route, as every module does.
+     */
     tick(): Promise<number>;
+    /**
+     * One look of the timer: what `start` runs every `everyMs`. LOCAL — it lists the sessions and applies
+     * what is already known (`settleMs`, an idle session that a message waits for) — and asks the host
+     * only for a session it has never asked about, one that was just armed, or one past `safetyEveryMs`.
+     */
+    look(): Promise<number>;
     start(): void;
     stop(): void;
 }
@@ -197,6 +224,12 @@ export interface MessageDelivery {
  * not typed (the session moved on meanwhile) are kept and typed at the next chance, and never read
  * again. Never into a question for the person or text they have not sent; never a session running
  * elsewhere; never its own message. Never throws.
+ *
+ * 2.103.0: it does not poll the host. The timer's look is local; the host is asked about a session when
+ * knocked (`tick`, from the `agent.delivery` route), when the session is first listed or newly armed
+ * (the person turned its wake on), and past `safetyEveryMs`. What an ask found (messages waiting, the
+ * newest one's time) is kept until the messages are read, so a message waiting for a busy session is
+ * typed when it idles without another ask. An idle module makes about no asks a minute.
  */
 export declare function messageDelivery(options: MessageDeliveryOptions): MessageDelivery;
 /** 2.75.0. How long `placeTeller` holds a place after a message to it, in ms: one a minute (`LIMITS.TELLS_PER_MINUTE`). */

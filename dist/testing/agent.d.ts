@@ -28,6 +28,11 @@
  *    - with a program that boots, `tasks.report` `started` names the conversation.
  * 9. (2.99.0) Every question its server asked the host is under a capability its manifest declares
  *    (`declares.uses`): a module calling a method it did not declare is not answered by a real host.
+ * 10. (2.103.0) With `idle`: an idle module makes no `messages.read` ask on a clock. The module is brought
+ *    to its normal running state with one own, idle session and no message, and the stand-in host is
+ *    watched for `IDLE_WINDOW_MS` (longer than two of its looks): after the first ask about the session
+ *    (when it was first listed) the host is asked nothing more. The host knocks when a message arrives
+ *    (`agent.delivery`), so nothing else needs asking. It was 12 asks a minute per session.
  *
  * The stand-in host is the only host the module can reach for the run: `KEHIKOT_HOST`,
  * `KEHIKOT_ORIGINS` and `KEHIKOT_ORIGIN` all name it, and are put back after. Node-only. It writes
@@ -112,7 +117,19 @@ export interface AgentConformanceOptions {
     tasks?: AgentTasksConformance;
     /** 2.99.0. How long to wait for a `tasks.report` after a quick program, in ms (default 15 000). */
     reportWithinMs?: number;
+    /**
+     * 2.103.0. Bring the module to its normal running state with the stand-in host (`KEHIKOT_ORIGINS` names
+     * it): its message delivery running on its own timer, and ONE own session at its prompt, with its place
+     * token issued to `host`, wake on, and no message waiting. Gives back what ends it. Without it the idle
+     * check is skipped: `messageDelivery`'s own test holds the rule for the shared loop, but only this shows
+     * that the module is running that loop and asks nothing of its own.
+     */
+    idle?(host: FakeHost): Promise<() => void | Promise<void>>;
+    /** 2.103.0. How long to watch the idle module, in ms. Default `IDLE_WINDOW_MS`. */
+    idleWindowMs?: number;
 }
+/** 2.103.0. How long the idle check watches: more than two of the delivery loop's 5 s looks. */
+export declare const IDLE_WINDOW_MS = 12000;
 export interface AgentConformance {
     failures: string[];
     passed: string[];
