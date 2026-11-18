@@ -90,7 +90,7 @@ function rig(given: { sessions?: DeliverySession[]; inbox?: AgentMessage[]; safe
 
 describe('2.103.0', () => {
   test('is the package version, and the docs say it', () => {
-    expect(PACKAGE_VERSION).toBe('2.103.0')
+    expect(PACKAGE_VERSION).toBe('2.103.1')
     expect(readFileSync(join(REPO, 'CHANGELOG.md'), 'utf8')).toContain('## 2.103.0')
     expect(readFileSync(join(REPO, 'docs/agent-messages.md'), 'utf8')).toContain('DELIVERY_SAFETY_MS')
   })
@@ -252,6 +252,20 @@ describe('the agent conformance holds an idle module to it', () => {
     expect(failed).toBeDefined()
     expect(failed).toContain('messageDelivery')
   }, 20_000)
+
+  test('a module whose own loop asks once about a session it first lists a few seconds in is steady, not polling', async () => {
+    const built = moduleDoor()
+    const said = await agentConformance(
+      base(built, async () => {
+        const token = await built.place('conv-late')
+        /* Its loop's first look comes after the old fixed pause, as the real modules' (5 s) does. */
+        const delivery = messageDelivery({ module: ID, everyMs: 1700, sessions: () => [{ key: 'conv-late', token, own: true, state: 'idle', wake: true, act: false }], type: () => true })
+        delivery.start()
+        return () => delivery.stop()
+      }),
+    )
+    expect(said.failures).toEqual([])
+  }, 30_000)
 
   test('without the hook the check is not run', async () => {
     const built = moduleDoor()

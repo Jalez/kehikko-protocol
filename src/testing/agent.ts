@@ -55,8 +55,8 @@ import { forgetMessageHosts } from '../serve/messages.js'
  *    (`declares.uses`): a module calling a method it did not declare is not answered by a real host.
  * 10. (2.103.0) With `idle`: an idle module makes no `messages.read` ask on a clock. The module is brought
  *    to its normal running state with one own, idle session and no message, and the stand-in host is
- *    watched for `IDLE_WINDOW_MS` (longer than two of its looks): after the first ask about the session
- *    (when it was first listed) the host is asked nothing more. The host knocks when a message arrives
+ *    watched for `IDLE_WINDOW_MS` (longer than two of its looks), once the first looks have passed (an ask
+ *    for each session when it is first listed is steady state, 2.103.1): the host is asked nothing more. The host knocks when a message arrives
  *    (`agent.delivery`), so nothing else needs asking. It was 12 asks a minute per session.
  *
  * The stand-in host is the only host the module can reach for the run: `KEHIKOT_HOST`,
@@ -138,6 +138,9 @@ export interface AgentConformanceOptions {
 
 /** 2.103.0. How long the idle check watches: more than two of the delivery loop's 5 s looks. */
 export const IDLE_WINDOW_MS = 12_000
+
+/** 2.103.1. The most the idle check waits for the first looks to pass, in ms. */
+export const IDLE_SETTLE_MS = 9_000
 
 export interface AgentConformance {
   failures: string[]
@@ -369,8 +372,22 @@ async function idleChecks(options: AgentConformanceOptions, host: FakeHost, chec
   const reads = () => host.asked.filter((one) => one.module === manifest.id && one.method === 'messages.read').length
   const end = await options.idle(host)
   try {
-    /* The first look asks about the session once, when it is first listed. */
-    await pause(1_500)
+    /*
+     * Let the first looks pass: a delivery loop asks about each session once, when it first lists it (the
+     * module's own loop lists the conversations the earlier steps made, five seconds in). Quiet for two
+     * seconds is steady; a module that asks on a clock never is, and is counted below.
+     */
+    let last = reads()
+    let quietSince = Date.now()
+    const steadyBy = Date.now() + IDLE_SETTLE_MS
+    while (Date.now() < steadyBy) {
+      await pause(250)
+      const now = reads()
+      if (now !== last) {
+        last = now
+        quietSince = Date.now()
+      } else if (Date.now() - quietSince >= 2_000) break
+    }
     const first = reads()
     await pause(options.idleWindowMs ?? IDLE_WINDOW_MS)
     const more = reads() - first

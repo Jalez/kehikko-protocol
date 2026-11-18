@@ -11,6 +11,8 @@ import { HOST_ENV } from '../serve/host-door.js';
 import { forgetMessageHosts } from '../serve/messages.js';
 /** 2.103.0. How long the idle check watches: more than two of the delivery loop's 5 s looks. */
 export const IDLE_WINDOW_MS = 12_000;
+/** 2.103.1. The most the idle check waits for the first looks to pass, in ms. */
+export const IDLE_SETTLE_MS = 9_000;
 async function bodyOf(request) {
     const chunks = [];
     for await (const chunk of request)
@@ -227,8 +229,24 @@ async function idleChecks(options, host, check) {
     const reads = () => host.asked.filter((one) => one.module === manifest.id && one.method === 'messages.read').length;
     const end = await options.idle(host);
     try {
-        /* The first look asks about the session once, when it is first listed. */
-        await pause(1_500);
+        /*
+         * Let the first looks pass: a delivery loop asks about each session once, when it first lists it (the
+         * module's own loop lists the conversations the earlier steps made, five seconds in). Quiet for two
+         * seconds is steady; a module that asks on a clock never is, and is counted below.
+         */
+        let last = reads();
+        let quietSince = Date.now();
+        const steadyBy = Date.now() + IDLE_SETTLE_MS;
+        while (Date.now() < steadyBy) {
+            await pause(250);
+            const now = reads();
+            if (now !== last) {
+                last = now;
+                quietSince = Date.now();
+            }
+            else if (Date.now() - quietSince >= 2_000)
+                break;
+        }
         const first = reads();
         await pause(options.idleWindowMs ?? IDLE_WINDOW_MS);
         const more = reads() - first;

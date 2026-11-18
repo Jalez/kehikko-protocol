@@ -11,6 +11,17 @@ After 2.78.0, every entry's first line under its heading is its kind, and the ve
 (semver; CI checks it): `Kind: breaking` → next major, `Kind: feature` → next minor, `Kind: fix` →
 next patch.
 
+## 2.103.1 — 2026-11-18
+
+Kind: fix
+
+The agent conformance's idle check (2.103.0) waits for the first looks to pass before it counts. A module's own
+delivery loop asks about each conversation once, when it first lists it, and the conversations the earlier
+steps of the conformance had made were listed five seconds in, inside the window, so a module running the
+real loop failed the check for asking nothing on a clock. It now waits until the host has heard nothing for two
+seconds (at most `IDLE_SETTLE_MS`), then watches. A module that asks on a clock is never quiet and is still
+counted. Modules need no change.
+
 ## 2.103.0 — 2026-11-18
 
 Kind: feature

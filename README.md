@@ -223,6 +223,7 @@ The same list with what each version exported is in [CHANGELOG.md](CHANGELOG.md)
 
 | version | date | what it added |
 |---|---|---|
+| 2.103.1 | 2026-11-18 | Fix. The agent conformance's idle check waits for each conversation's first look to pass before it counts (`IDLE_SETTLE_MS`). |
 | 2.103.0 | 2026-11-18 | Additive. An idle agent module does not poll the host: `messageDelivery`'s timer looks locally and the host is asked when it knocks, when a session is first listed or newly armed, and every `DELIVERY_SAFETY_MS`; `MessageDelivery.look()`, and the agent conformance's idle check. |
 | 2.102.0 | 2026-11-18 | Additive. A module installed ready-built: `kehikot-module-protocol/bundle` (the archive format, `bundle.json`, `checkBundle`/`unpackBundle` with sha256, size caps and no links or escapes, `buildBundle`, `smokeBundle`) and the `kehikot-bundle` bin; `commitOf` reads a bundle's commit. See [bundles](docs/bundles.md). |
 | 2.100.0 | 2026-11-13 | Additive. A `closed-by` link carries where the closing change stands: `state` and `draft` on `trackerLinkSchema`, so an issue can say "closing in !56" while its change is open. |
