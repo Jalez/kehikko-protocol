@@ -55,7 +55,7 @@ const readOf = (messages: AgentMessage[], unread: number, you: WakeReader | null
 
 describe('the version', () => {
   test('is 2.48.0, PROTOCOL is still 2, and the docs say it', () => {
-    expect(PACKAGE_VERSION).toBe('2.102.0')
+    expect(PACKAGE_VERSION).toBe('2.103.0')
     expect(PROTOCOL).toBe(2)
     expect(readFileSync(join(REPO, 'CHANGELOG.md'), 'utf8')).toContain('## 2.48.0')
     const docs = readFileSync(join(REPO, 'docs/agent-messages.md'), 'utf8')
@@ -342,13 +342,14 @@ describe('messageDelivery', () => {
     expect(r.resumed.at(-1)!.key).toBe('s3')
   })
 
-  test('an asleep session is asked about at most every ASLEEP_EVERY_MS', async () => {
+  test('an asleep session is asked about when first listed and when knocked, not on the timer’s looks', async () => {
     const r = rig({ sessions: [session({ state: 'asleep' })], inbox: { [TOKEN]: [] } })
-    await r.delivery.tick()
+    await r.delivery.look()
     r.advance(5000)
-    await r.delivery.tick()
-    expect(r.asked).toHaveLength(1)
+    await r.delivery.look()
     r.advance(ASLEEP_EVERY_MS)
+    await r.delivery.look()
+    expect(r.asked).toHaveLength(1)
     await r.delivery.tick()
     expect(r.asked).toHaveLength(2)
   })

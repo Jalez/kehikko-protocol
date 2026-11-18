@@ -11,6 +11,34 @@ After 2.78.0, every entry's first line under its heading is its kind, and the ve
 (semver; CI checks it): `Kind: breaking` → next major, `Kind: feature` → next minor, `Kind: fix` →
 next patch.
 
+## 2.103.0 — 2026-11-18
+
+Kind: feature
+
+An idle agent module no longer polls the host. **Additive** in what a module calls; `PROTOCOL` is still 2.
+Every agent module ran `messageDelivery`, whose timer looked at every idle session every 5 s and asked the host
+`messages.read` for each, got the same answer, and cost a server-pass vouch and a place lookup back at the
+module each time (12 asks a minute per session, all day). The host has knocked the module when a message is
+kept since 2.96.0 (`agent.delivery`), so the module now asks when knocked.
+
+### Changed
+
+- **`messageDelivery`** (`/serve`): its timer's look is local. The host is asked about a session when the
+  host knocks (`tick()`, which the `agent.delivery` route already calls), when the session is first listed or
+  newly armed (the person turned its wake on), and past `DELIVERY_SAFETY_MS` (5 min) for a knock that was
+  lost. What an ask found is kept until the messages are read, so a message waiting for a busy session is
+  typed when it idles without another ask. A module that bumps its pin to this version stops polling with no
+  change of its own.
+
+### Added
+
+- **`MessageDelivery.look()`**: one look of the timer (what `start()` runs); `tick()` is the knock. Options
+  `safetyEveryMs`; export `DELIVERY_SAFETY_MS`.
+- **Agent conformance, item 10**: an idle module makes no `messages.read` ask on a clock. With the new
+  optional `idle` hook (`AgentConformanceOptions.idle`: bring the module to its normal running state with one
+  own, idle session that has no messages) `expectAgentConformance` watches the stand-in host for a window
+  longer than two looks and fails a module that asks again.
+
 ## 2.102.0 — 2026-11-18
 
 Kind: feature

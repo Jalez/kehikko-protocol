@@ -9,6 +9,8 @@ import { TELL_FINISHED_TOOL } from '../turns.js';
 import { freshPlaceToken } from '../serve/adopt.js';
 import { HOST_ENV } from '../serve/host-door.js';
 import { forgetMessageHosts } from '../serve/messages.js';
+/** 2.103.0. How long the idle check watches: more than two of the delivery loop's 5 s looks. */
+export const IDLE_WINDOW_MS = 12_000;
 async function bodyOf(request) {
     const chunks = [];
     for await (const chunk of request)
@@ -195,6 +197,7 @@ export async function agentConformance(options) {
             check(!sentLaunched.isError, 'a launched conversation can send', `send_message with the URL token answered ${JSON.stringify(sentLaunched.text.slice(0, 200))}`);
         }
         await tasksChecks(options, host, check);
+        await idleChecks(options, host, check);
         declaredChecks(manifest, host, check);
         return { failures, passed };
     }
@@ -216,6 +219,25 @@ export async function agentConformance(options) {
     }
 }
 const pause = (ms) => new Promise((done) => setTimeout(done, ms));
+/** 10. An idle module asks the host nothing on a clock: after the first look at its session, no `messages.read`. */
+async function idleChecks(options, host, check) {
+    if (!options.idle)
+        return;
+    const { manifest } = options;
+    const reads = () => host.asked.filter((one) => one.module === manifest.id && one.method === 'messages.read').length;
+    const end = await options.idle(host);
+    try {
+        /* The first look asks about the session once, when it is first listed. */
+        await pause(1_500);
+        const first = reads();
+        await pause(options.idleWindowMs ?? IDLE_WINDOW_MS);
+        const more = reads() - first;
+        check(more === 0, 'an idle module asks the host nothing on a clock', `${more} messages.read ask${more === 1 ? '' : 's'} in ${(options.idleWindowMs ?? IDLE_WINDOW_MS) / 1000} s with one idle session and no message. The host knocks agent.delivery when a message arrives: run messageDelivery from kehikot-module-protocol 2.103.0 or later and have nothing of your own ask on a timer.`);
+    }
+    finally {
+        await end();
+    }
+}
 /** 8. `agent.tasks`: start answers at once, and what became of the task reaches the host. */
 async function tasksChecks(options, host, check) {
     const { manifest } = options;

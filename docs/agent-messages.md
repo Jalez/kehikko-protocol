@@ -191,6 +191,8 @@ pressed, nothing is opened. The person can read every one in the host.
 
 `messageWaker` stays for modules built before 2.48.0; a module now runs `messageDelivery` (below).
 
+**It does not poll (2.103.0).** The timer's look (`look()`) is local: it lists the sessions and applies what it already knows. The host is asked `messages.read` for a session when it knocks (`tick()`; the `agent.delivery` route calls it), when the session is first listed or newly armed, and past `DELIVERY_SAFETY_MS` (5 minutes) for a lost knock. An idle module makes about no asks a minute; before, 12 a minute per session, each costing a server-pass vouch and a place lookup. The agent conformance holds it (`idle`).
+
 A message to a session idle at its prompt used to wait until the person typed something. Now the
 module that runs the session types one line into its prompt and submits it, so the session reads it.
 

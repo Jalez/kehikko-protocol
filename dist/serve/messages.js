@@ -218,8 +218,16 @@ export function messageWaker(options) {
         },
     };
 }
-/** 2.48.0. How often an asleep session is asked about, at most, in ms. */
+/** 2.48.0. How often an asleep session is asked about, at most, in ms, when nobody knocked. */
 export const ASLEEP_EVERY_MS = 30_000;
+/**
+ * 2.103.0. How long a session's messages go unasked when no knock came, in ms. Before it, every module
+ * asked the host `messages.read` for every idle session every 5 s, and got the same answer each time:
+ * a server-pass vouch and a place lookup back at the module for each. The host knocks the module when a
+ * message is kept (`agent.delivery`), so the ask is made then, once when a session is first listed or
+ * newly armed, and this often as a safety.
+ */
+export const DELIVERY_SAFETY_MS = 5 * 60_000;
 /** 2.48.0. Messages read for a session (so counted delivered) and not yet typed are kept this long while it is not listed, in ms. */
 export const DELIVERY_KEEP_MS = 10 * 60_000;
 /**
@@ -233,20 +241,30 @@ export const DELIVERY_KEEP_MS = 10 * 60_000;
  * not typed (the session moved on meanwhile) are kept and typed at the next chance, and never read
  * again. Never into a question for the person or text they have not sent; never a session running
  * elsewhere; never its own message. Never throws.
+ *
+ * 2.103.0: it does not poll the host. The timer's look is local; the host is asked about a session when
+ * knocked (`tick`, from the `agent.delivery` route), when the session is first listed or newly armed
+ * (the person turned its wake on), and past `safetyEveryMs`. What an ask found (messages waiting, the
+ * newest one's time) is kept until the messages are read, so a message waiting for a busy session is
+ * typed when it idles without another ask. An idle module makes about no asks a minute.
  */
 export function messageDelivery(options) {
-    const { sessions, type, resume, queues = false, everyMs = WAKE_EVERY_MS, asleepEveryMs = ASLEEP_EVERY_MS, settleMs = WAKE_SETTLE_MS, now = Date.now, read: readFor, log = () => { }, ...ask } = options;
+    const { sessions, type, resume, queues = false, everyMs = WAKE_EVERY_MS, asleepEveryMs = ASLEEP_EVERY_MS, safetyEveryMs = DELIVERY_SAFETY_MS, settleMs = WAKE_SETTLE_MS, now = Date.now, read: readFor, log = () => { }, ...ask } = options;
     const read = readFor ?? ((token, unread) => askHost('messages.read', unread ? { token, unread: true, limit: DELIVER_MOST } : { token, limit: LIMITS.MESSAGES_READ }, ask));
-    /* Per session: since when it is idle, what was read for it and not yet typed, when it was last resumed for a message, and when it was last listed. */
     const memory = new Map();
     let resumes = [];
     let busy = false;
+    /* A knock came while a look was running: every session is asked about in the next look. */
+    let knocked = false;
     let timer = null;
-    async function tick() {
+    async function look() {
         if (busy)
             return 0;
         busy = true;
         let done = 0;
+        /* Taken at the start: a knock arriving during this look is for the next. */
+        const knock = knocked;
+        knocked = false;
         try {
             const listed = await Promise.resolve(sessions()).catch(() => []);
             const keys = new Set(listed.map((one) => one.key));
@@ -262,36 +280,51 @@ export function messageDelivery(options) {
                 const at = now();
                 let mem = memory.get(one.key);
                 if (!mem)
-                    memory.set(one.key, (mem = { idleSince: null, held: [], you: null, resumedAt: null, seenAt: at, peekedAt: Number.NEGATIVE_INFINITY }));
+                    memory.set(one.key, (mem = { idleSince: null, held: [], you: null, resumedAt: null, seenAt: at, peekedAt: Number.NEGATIVE_INFINITY, peek: null, dirty: true, armed: false }));
                 mem.seenAt = at;
+                if (knock)
+                    mem.dirty = true;
                 if (one.state === 'idle')
                     mem.idleSince ??= at;
                 else
                     mem.idleSince = null;
-                if (!one.own || !one.token || !one.wake)
-                    continue;
-                if (one.state === 'asleep' && !resume)
+                const armed = one.own && Boolean(one.token) && one.wake && !(one.state === 'asleep' && !resume);
+                /* Newly armed (the person turned its wake on): messages may be waiting that no knock said. */
+                if (armed && !mem.armed)
+                    mem.dirty = true;
+                mem.armed = armed;
+                if (!armed)
                     continue;
                 /* What waits: what was read for it and not typed, or else the unread that may wake it. */
                 let waiting = mem.held.length;
                 let newestAt = Number.NEGATIVE_INFINITY;
                 if (!waiting) {
-                    if (one.state === 'asleep' && at - mem.peekedAt < asleepEveryMs)
+                    /* Ask the host only when something says there may be news: a knock, a new or newly armed session, the safety interval. */
+                    const due = mem.dirty || at - mem.peekedAt >= safetyEveryMs;
+                    if (due && !mem.dirty && one.state === 'asleep' && at - mem.peekedAt < asleepEveryMs)
                         continue;
-                    mem.peekedAt = at;
-                    let peeked;
-                    try {
-                        peeked = await read(one.token, false);
+                    if (due) {
+                        mem.peekedAt = at;
+                        mem.dirty = false;
+                        let peeked;
+                        try {
+                            peeked = await read(one.token, false);
+                        }
+                        catch {
+                            mem.dirty = true;
+                            continue;
+                        }
+                        if (!peeked.ok) {
+                            mem.dirty = true;
+                            continue;
+                        }
+                        const found = wakeMessages(peeked.data);
+                        const sent = Date.parse(found.at(-1)?.at ?? '');
+                        mem.peek = { waiting: found.length, newestAt: Number.isFinite(sent) ? sent : Number.NEGATIVE_INFINITY };
                     }
-                    catch {
-                        continue;
-                    }
-                    if (!peeked.ok)
-                        continue;
-                    const found = wakeMessages(peeked.data);
-                    waiting = found.length;
-                    const sent = Date.parse(found.at(-1)?.at ?? '');
-                    newestAt = Number.isFinite(sent) ? sent : Number.NEGATIVE_INFINITY;
+                    /* What the last ask found stands until the messages are read. */
+                    waiting = mem.peek?.waiting ?? 0;
+                    newestAt = mem.peek?.newestAt ?? Number.NEGATIVE_INFINITY;
                 }
                 const decided = deliveryFor({
                     own: one.own,
@@ -319,6 +352,8 @@ export function messageDelivery(options) {
                     }
                     if (!taken.ok)
                         continue;
+                    /* Read now, so what was found is spent: if nothing came of it (another reader took them), do not read again until the next news. */
+                    mem.peek = null;
                     const data = taken.data;
                     const you = data.you;
                     mem.you = you;
@@ -355,12 +390,18 @@ export function messageDelivery(options) {
         }
         return done;
     }
+    /** A knock: every session is asked about in this look (or the next, when one is running). */
+    async function knock() {
+        knocked = true;
+        return look();
+    }
     return {
-        tick,
+        tick: knock,
+        look,
         start() {
             if (timer)
                 return;
-            timer = setInterval(() => void tick(), everyMs);
+            timer = setInterval(() => void look(), everyMs);
             timer.unref?.();
         },
         stop() {

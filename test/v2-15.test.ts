@@ -43,7 +43,7 @@ const FIELDS: SettingField[] = settingsDeclarationSchema.parse([
 
 describe('the version', () => {
   test('is 2.18.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.102.0')
+    expect(PACKAGE_VERSION).toBe('2.103.0')
     expect(PROTOCOL).toBe(2)
   })
 })

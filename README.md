@@ -223,6 +223,7 @@ The same list with what each version exported is in [CHANGELOG.md](CHANGELOG.md)
 
 | version | date | what it added |
 |---|---|---|
+| 2.103.0 | 2026-11-18 | Additive. An idle agent module does not poll the host: `messageDelivery`'s timer looks locally and the host is asked when it knocks, when a session is first listed or newly armed, and every `DELIVERY_SAFETY_MS`; `MessageDelivery.look()`, and the agent conformance's idle check. |
 | 2.102.0 | 2026-11-18 | Additive. A module installed ready-built: `kehikot-module-protocol/bundle` (the archive format, `bundle.json`, `checkBundle`/`unpackBundle` with sha256, size caps and no links or escapes, `buildBundle`, `smokeBundle`) and the `kehikot-bundle` bin; `commitOf` reads a bundle's commit. See [bundles](docs/bundles.md). |
 | 2.100.0 | 2026-11-13 | Additive. A `closed-by` link carries where the closing change stands: `state` and `draft` on `trackerLinkSchema`, so an issue can say "closing in !56" while its change is open. |
 | 2.99.0 | 2026-11-13 | Additive. `agent.tasks`' `start` answers at once: `pending` on its result (an acceptance), `AGENT_TASK_ANSWER_MS`, `tasks.report` for what became of the task, `acceptTask` in `/serve`; `tell_finished` takes `placeToken`; the agent conformance holds `start` to answering within a second against a program that boots in 20 s, an adopted conversation's `tell_finished`, and every server question to a declared capability. |
