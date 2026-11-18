@@ -43,7 +43,7 @@ function transfer(only?: string[]): DataTransferLike & { data: Map<string, strin
 }
 
 describe('2.94.0 fileDrag', () => {
-  test('the version', () => expect(PACKAGE_VERSION).toBe('2.104.1'))
+  test('the version', () => expect(PACKAGE_VERSION).toBe('2.104.2'))
 
   test('set writes all three spellings and read gives the same file back', () => {
     const dt = transfer()

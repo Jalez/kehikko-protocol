@@ -19,5 +19,5 @@ export {
 } from './format.js'
 export { BUNDLE_LIMITS, TarRefused, readTarGz, safeRelative, writeTarGz, type TarFile, type TarLimits } from './tar.js'
 export { checkBundle, readBundleInfo, sizeOf, unpackBundle, verifyUnpacked, type UnpackExpect, type Unpacked } from './unpack.js'
-export { BUNDLES_SINCE, buildBundle, bundleConfigOf, bundleRunScript, keptByDefault, pinnedProtocol, spokenOf, type BuildBundleOptions, type BundleBuilt, type BundleConfig } from './build.js'
+export { BUNDLES_SINCE, buildBundle, bundleConfigOf, packageNameOf, bundleRunScript, keptByDefault, pinnedProtocol, spokenOf, type BuildBundleOptions, type BundleBuilt, type BundleConfig } from './build.js'
 export { smokeBundle, type SmokeOptions, type Smoked } from './smoke.js'

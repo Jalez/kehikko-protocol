@@ -223,6 +223,7 @@ The same list with what each version exported is in [CHANGELOG.md](CHANGELOG.md)
 
 | version | date | what it added |
 |---|---|---|
+| 2.104.2 | 2026-11-18 | Fix. `kehikot-bundle` carries only the native and declared packages the server's own imports reach (bun build's graph), not package.json's whole dependency closure, so a page-only library with native optionals no longer breaks a bundle build. |
 | 2.104.1 | 2026-11-18 | Fix. The agent conformance's idle check waits for each conversation's first look to pass before it counts (`IDLE_SETTLE_MS`). |
 | 2.104.0 | 2026-11-18 | Additive. A module's tests start without the running app's environment: `clearAppEnvironment` and the `testing/setup` preload (the module template uses it), so no test reaches `KEHIKOT_HOST` at :4170. |
 | 2.103.0 | 2026-11-18 | Additive. An idle agent module does not poll the host: `messageDelivery`'s timer looks locally and the host is asked when it knocks, when a session is first listed or newly armed, and every `DELIVERY_SAFETY_MS`; `MessageDelivery.look()`, and the agent conformance's idle check. |
