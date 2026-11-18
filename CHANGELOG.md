@@ -11,7 +11,7 @@ After 2.78.0, every entry's first line under its heading is its kind, and the ve
 (semver; CI checks it): `Kind: breaking` → next major, `Kind: feature` → next minor, `Kind: fix` →
 next patch.
 
-## 2.103.1 — 2026-11-18
+## 2.104.1 — 2026-11-18
 
 Kind: fix
 
@@ -21,6 +21,21 @@ steps of the conformance had made were listed five seconds in, inside the window
 real loop failed the check for asking nothing on a clock. It now waits until the host has heard nothing for two
 seconds (at most `IDLE_SETTLE_MS`), then watches. A module that asks on a clock is never quiet and is still
 counted. Modules need no change.
+
+## 2.104.0 — 2026-11-18
+
+Kind: feature
+
+A module's tests no longer reach the person's running app. **Additive**; `PROTOCOL` is still 2. A test run from
+inside a Kehikot session inherits `KEHIKOT_HOST` (the running app's door, :4170), `KEHIKOT_ORIGINS` and the rest, and a
+test that did not set them itself talked to the real app. `clearAppEnvironment()` drops every `KEHIKOT_*` and
+`KEHIKKO_*` variable; `kehikot-module-protocol/testing/setup` is a preload that calls it, the module template's
+`test/setup.ts` imports it, and this package's own suite starts with it.
+
+### Added
+
+- `clearAppEnvironment(env?)` and `APP_ENV_PREFIXES` in `kehikot-module-protocol/testing`.
+- The `kehikot-module-protocol/testing/setup` export: `import` it first in a module's `test/setup.ts`.
 
 ## 2.103.0 — 2026-11-18
 

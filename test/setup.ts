@@ -1,3 +1,4 @@
+import '../src/testing/setup.ts'
 import { GlobalRegistrator } from '@happy-dom/global-registrator'
 
 /**
