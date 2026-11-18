@@ -11,6 +11,18 @@ After 2.78.0, every entry's first line under its heading is its kind, and the ve
 (semver; CI checks it): `Kind: breaking` → next major, `Kind: feature` → next minor, `Kind: fix` →
 next patch.
 
+## 2.104.3 — 2026-11-18
+
+Kind: fix
+
+The agent conformance's idle check counted a module's own first look as an ask on a clock when the module's
+test did not wait for it: the check called the host steady after two quiet seconds, and a module's delivery
+loop looks at its conversations five seconds after it started, so that look fell inside the watch and five
+modules each kept a seven-second wait of their own in their `idle` hook to get past it. The check now needs
+the host to have heard nothing for six seconds (`IDLE_QUIET_MS`, longer than the loop's five) and waits at
+most `IDLE_SETTLE_MS` (16 s), so no module needs a wait. A module that really asks on a clock is never quiet
+and is still counted.
+
 ## 2.104.2 — 2026-11-18
 
 Kind: fix
