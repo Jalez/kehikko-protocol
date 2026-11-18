@@ -1,7 +1,18 @@
 import { execFileSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { PACKAGE_VERSION, START_TOKEN, startTokenOf } from '../build.js';
-/** The commit checked out in `dir`, or null: not a git checkout, no git, or git said no. */
+/**
+ * The commit checked out in `dir`, or null: not a git checkout, no git, or git said no.
+ *
+ * A ready-built bundle (2.102.0, docs/bundles.md) is not a checkout: its `bundle.json` says the
+ * commit it was built from, and that is the answer — asked first, so a bundle unpacked somewhere a
+ * git repository happens to enclose (a home folder kept in git) is never taken for that repository.
+ */
 export function commitOf(dir) {
+    const bundled = bundledCommit(dir);
+    if (bundled)
+        return bundled;
     try {
         const out = execFileSync('git', ['-C', dir, 'rev-parse', 'HEAD'], {
             encoding: 'utf8',
@@ -9,6 +20,16 @@ export function commitOf(dir) {
             stdio: ['ignore', 'pipe', 'ignore'],
         }).trim();
         return /^[0-9a-f]{7,64}$/.test(out) ? out : null;
+    }
+    catch {
+        return null;
+    }
+}
+/** The commit a bundle's `bundle.json` in `dir` names, or null when there is none. */
+function bundledCommit(dir) {
+    try {
+        const said = JSON.parse(readFileSync(join(dir, 'bundle.json'), 'utf8'));
+        return said.format === 'kehikot.bundle' && typeof said.commit === 'string' && /^[0-9a-f]{7,64}$/.test(said.commit) ? said.commit : null;
     }
     catch {
         return null;

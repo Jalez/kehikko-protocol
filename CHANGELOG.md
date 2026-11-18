@@ -11,6 +11,35 @@ After 2.78.0, every entry's first line under its heading is its kind, and the ve
 (semver; CI checks it): `Kind: breaking` → next major, `Kind: feature` → next minor, `Kind: fix` →
 next patch.
 
+## 2.102.0 — 2026-11-18
+
+Kind: feature
+
+A module installed ready-built: one archive per release that a host downloads, checks, unpacks and runs,
+with no `node_modules`, no `bun install` and no build on the person's computer. **Additive**; `PROTOCOL` is
+still 2. Design notes: [docs/bundles.md](docs/bundles.md).
+
+### Added
+
+- **`kehikot-module-protocol/bundle`**: the format (`BundleInfo`, `bundleInfoOf`, `BUNDLE_FILE`,
+  `BUNDLE_FORMAT`, `BUNDLE_FORMAT_VERSION`, `BUNDLE_RUN`, `BUNDLE_PLATFORMS`, `runsHere`, `platformHere`,
+  `bundleArchiveName`, `checksumLine`, `checksumOf`, `sha256`); a deterministic gzipped ustar of regular files
+  only (`writeTarGz`, `readTarGz`, `safeRelative`, `TarRefused`, `BUNDLE_LIMITS`); checking and unpacking
+  (`checkBundle`, `unpackBundle`, `readBundleInfo`, `verifyUnpacked`, `sizeOf`) — the published sha256, every
+  entry's path and type (no links, no escapes, no devices), the size caps while inflating, the module,
+  version and platform asked for, and exactly the files `bundle.json` lists; building (`buildBundle`,
+  `bundleRunScript`, `bundleConfigOf`, `keptByDefault`, `pinnedProtocol`, `spokenOf`, `BUNDLES_SINCE`); and
+  the smoke run (`smokeBundle`).
+- **`kehikot-bundle`** (bin): `build` writes `<id>-<version>.tar.gz` and its `.sha256` from a built, clean
+  checkout; `smoke` starts one once in scratch folders and requires its manifest and its page.
+- package.json's **`kehikot.bundle`**: `include`, `exclude`, `entries`, `external`, and `enabled: false` with
+  `why` for a module that stays on the git path.
+
+### Changed
+
+- `commitOf(dir)` reads `bundle.json`'s `commit` first when `dir` holds a bundle, so `run` serves a bundle's
+  stamped `dist/` without git.
+
 ## 2.101.0 — 2026-11-13
 
 Kind: feature
