@@ -11,6 +11,19 @@ After 2.78.0, every entry's first line under its heading is its kind, and the ve
 (semver; CI checks it): `Kind: breaking` → next major, `Kind: feature` → next minor, `Kind: fix` →
 next patch.
 
+## 2.108.0 — 2026-11-18
+
+Kind: feature
+
+A module's own clean-up when a person uninstalls it: `uninstall.ts` at the module's root (`UNINSTALL_SCRIPT`), run by
+the host after the module is stopped and before its folder is deleted, as `bun uninstall.ts` in the module's folder with
+the host's environment, for at most `LIMITS.UNINSTALL_MS`. It removes only what the module itself wrote outside its folder
+and outside projects (an agent's settings entry, skills it copied, session folders, a file beside the registry), and prints
+one line, `UNINSTALL_MARK` and the report (`uninstallReportSchema`: `removed`, `left` with why), which the host says to the
+person. `runUninstall` and `removeOwned` in `/serve`; `readUninstallReport` for a host. A ready-built bundle always carries
+`uninstall.ts`. `kehikot-check-agent` now fails an agent module with no `uninstall.ts` that calls `runUninstall`.
+**Additive**; `PROTOCOL` is still 2. [docs/uninstall.md](docs/uninstall.md).
+
 ## 2.107.0 — 2026-11-18
 
 Kind: feature

@@ -1579,3 +1579,18 @@ export {
   type FileDragKind,
   type DataTransferLike,
 } from './file-drag.js'
+
+/* 2.108.0: a module's own clean-up when a person uninstalls it. See `uninstall.ts`. */
+export {
+  UNINSTALL_SCRIPT,
+  UNINSTALL_MARK,
+  uninstallItemSchema,
+  uninstallLeftSchema,
+  uninstallReportSchema,
+  uninstallLine,
+  readUninstallReport,
+  type UninstallItem,
+  type UninstallLeft,
+  type UninstallReport,
+  type UninstallReportInput,
+} from './uninstall.js'

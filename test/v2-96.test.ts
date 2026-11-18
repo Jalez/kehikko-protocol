@@ -23,6 +23,9 @@ import { checkDoor } from '../src/check/door.js'
 const TOKEN = 'abcdefghijklmnopqrstuvwxyz012345'
 const DELIVERY = { name: 'Claude', program: 'Claude Code', deliver: '/api/deliver', adopt: 'Type /kehikot-here in it.' }
 
+/** 2.108.0: every agent module ships its clean-up; these fixtures are about other rules. */
+const CLEAN_UP = { path: 'uninstall.ts', text: "import { runUninstall } from 'kehikot-module-protocol/serve'\nawait runUninstall([])" }
+
 describe('2.96.0 — one key for a conversation however it started', () => {
   test('the message tools take placeToken; a module’s say they forward to the kehikko door', () => {
     for (const tool of messageTools()) expect((tool.inputSchema.properties as Record<string, unknown>)[PLACE_TOKEN_ARG]).toBeDefined()
@@ -145,12 +148,12 @@ describe('2.96.0 — the conformance harness, against a module door built the 2.
 
   test('check:agent fails a module with no delivery, no conformance test, or tools behind a token', () => {
     const conformance = { path: 'test/agent.test.ts', text: "import { expectAgentConformance } from 'kehikot-module-protocol/testing'\nawait expectAgentConformance({})" }
-    expect(checkAgentFiles(manifest, [], [conformance]).failures).toEqual([])
+    expect(checkAgentFiles(manifest, [CLEAN_UP], [conformance]).failures).toEqual([])
     expect(checkAgentFiles({ id: 'x', declares: { uses: [] } }, [], []).agent).toBe(false)
-    expect(checkAgentFiles({ ...manifest, services: {} }, [], [conformance]).failures).toHaveLength(1)
-    expect(checkAgentFiles(manifest, [], []).failures).toHaveLength(1)
+    expect(checkAgentFiles({ ...manifest, services: {} }, [CLEAN_UP], [conformance]).failures).toHaveLength(1)
+    expect(checkAgentFiles(manifest, [CLEAN_UP], []).failures).toHaveLength(1)
     const gated = { path: 'doors.ts', text: 'tools: [...tools(), ...(token ? await messageToolsFor(token, o) : [])]' }
-    expect(checkAgentFiles(manifest, [gated], [conformance]).failures).toHaveLength(1)
+    expect(checkAgentFiles(manifest, [gated, CLEAN_UP], [conformance]).failures).toHaveLength(1)
   })
 
   test('check:door --running fails a messaging module whose door lists no message tools to a caller with no token', () => {

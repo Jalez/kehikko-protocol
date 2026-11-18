@@ -29,6 +29,9 @@ const ID = 'kehikot.example'
 const DELIVERY = { name: 'Example', program: 'Example CLI', deliver: '/api/deliver', adopt: 'Type /here in it.' }
 const TASKS = { name: 'Example', program: 'Example CLI', start: '/api/tasks/start', view: '/app?session={session}' }
 
+/** 2.108.0: every agent module ships its clean-up; these fixtures are about other rules. */
+const CLEAN_UP = { path: 'uninstall.ts', text: "import { runUninstall } from 'kehikot-module-protocol/serve'\nawait runUninstall([])" }
+
 describe('2.99.0 — the contract', () => {
   test('an acceptance is started + pending; older answers read as before', () => {
     expect(agentTaskStartResult.parse({ outcome: 'started', session: 'h-1', pending: true })).toEqual({ outcome: 'started', session: 'h-1', why: '', pending: true })
@@ -200,10 +203,10 @@ describe('2.99.0 — the conformance holds start to answering at once', () => {
   test('check:agent: a module providing agent.tasks must give the conformance its tasks', () => {
     const plain = { path: 'test/agent.test.ts', text: "import { expectAgentConformance } from 'kehikot-module-protocol/testing'\nawait expectAgentConformance({ manifest, door })" }
     const withTasks = { path: 'test/agent.test.ts', text: "import { expectAgentConformance } from 'kehikot-module-protocol/testing'\nawait expectAgentConformance({ manifest, door, tasks: { start, program } })" }
-    expect(checkAgentFiles(manifest, [], [withTasks]).failures).toEqual([])
-    const failed = checkAgentFiles(manifest, [], [plain]).failures
+    expect(checkAgentFiles(manifest, [CLEAN_UP], [withTasks]).failures).toEqual([])
+    const failed = checkAgentFiles(manifest, [CLEAN_UP], [plain]).failures
     expect(failed).toHaveLength(1)
     expect(failed[0]).toContain('agent.tasks')
-    expect(checkAgentFiles({ ...manifest, services: { [AGENT_DELIVERY]: DELIVERY } }, [], [plain]).failures).toEqual([])
+    expect(checkAgentFiles({ ...manifest, services: { [AGENT_DELIVERY]: DELIVERY } }, [CLEAN_UP], [plain]).failures).toEqual([])
   })
 })

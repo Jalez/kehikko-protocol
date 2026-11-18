@@ -1,6 +1,7 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 import { AGENT_DELIVERY, AGENT_TASKS, serviceDescriptor } from '../services.js';
+import { UNINSTALL_SCRIPT } from '../uninstall.js';
 import { manifestOf, sourcesOf } from './parts.js';
 const CONFORMANCE = /kehikot-module-protocol\/testing['"][\s\S]*\b(?:expectAgentConformance|agentConformance)\s*\(/;
 /** 2.99.0. The conformance given `tasks` (`tasks:` or the shorthand `tasks,` / `tasks }`). */
@@ -38,6 +39,10 @@ export function checkAgentFiles(manifest, sources, tests) {
     }
     if (serviceDescriptor(AGENT_TASKS, manifest.services?.[AGENT_TASKS]) && !tests.some((one) => CONFORMANCE.test(one.text) && WITH_TASKS.test(one.text))) {
         failures.push(`${module} provides agent.tasks and its conformance test gives no tasks ({ start, program }): pass them, so that start is held to answering within a second against a program that is slow to boot.`);
+    }
+    const cleanUp = sources.find((one) => one.path === UNINSTALL_SCRIPT);
+    if (!cleanUp || !/\brunUninstall\s*\(/.test(cleanUp.text)) {
+        failures.push(`${module} has no ${UNINSTALL_SCRIPT} at its root that calls runUninstall (kehikot-module-protocol/serve): add one that removes what it writes outside its folder (session folders, agent settings or skills), so Uninstall takes it all away.`);
     }
     const gated = sources.filter((one) => /\?\s*(?:await\s*)?messageToolsFor\s*\(|messageToolsFor\s*\([^)]*\)\s*\)?\s*:\s*\[\s*\]/.test(one.text)).map((one) => one.path);
     if (gated.length)

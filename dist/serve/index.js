@@ -66,3 +66,5 @@ export { MAX_TOOL_STREAMS, TOOLS_LIST_CHANGED, TOOLS_RETRY_MS, markOfEventId, mc
 export { checkoutOf } from './checkout.js';
 /* The one call every agent module makes before any tool runs, under every guard kind (2.80.0). See `tools.ts`. */
 export { checkToolCall } from './tools.js';
+/* A module's own clean-up when a person uninstalls it (2.108.0). See `uninstall.ts`. */
+export { runUninstall, removeOwned } from './uninstall.js';
