@@ -30,8 +30,8 @@
  *    (`declares.uses`): a module calling a method it did not declare is not answered by a real host.
  * 10. (2.103.0) With `idle`: an idle module makes no `messages.read` ask on a clock. The module is brought
  *    to its normal running state with one own, idle session and no message, and the stand-in host is
- *    watched for `IDLE_WINDOW_MS` (longer than two of its looks): after the first ask about the session
- *    (when it was first listed) the host is asked nothing more. The host knocks when a message arrives
+ *    watched for `IDLE_WINDOW_MS` (longer than two of its looks), once the first looks have passed (an ask
+ *    for each session when it is first listed is steady state, 2.103.1): the host is asked nothing more. The host knocks when a message arrives
  *    (`agent.delivery`), so nothing else needs asking. It was 12 asks a minute per session.
  *
  * The stand-in host is the only host the module can reach for the run: `KEHIKOT_HOST`,
@@ -130,6 +130,8 @@ export interface AgentConformanceOptions {
 }
 /** 2.103.0. How long the idle check watches: more than two of the delivery loop's 5 s looks. */
 export declare const IDLE_WINDOW_MS = 12000;
+/** 2.103.1. The most the idle check waits for the first looks to pass, in ms. */
+export declare const IDLE_SETTLE_MS = 9000;
 export interface AgentConformance {
     failures: string[];
     passed: string[];
