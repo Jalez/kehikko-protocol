@@ -1051,6 +1051,15 @@ export {
   tasksReportParams,
   tasksReportResult,
   type TasksReportParams,
+  restartToken,
+  workHoldParams,
+  workHoldResult,
+  restartReleaseParams,
+  restartReleaseResult,
+  type WorkHoldParams,
+  type WorkHoldResult,
+  type RestartReleaseParams,
+  type RestartReleaseResult,
   type TasksReportResult,
   type ConversationsFinder,
   type ConversationsFindParams,
@@ -1596,3 +1605,17 @@ export {
   type UninstallReport,
   type UninstallReportInput,
 } from './uninstall.js'
+
+/* 2.110.0: conversations a restart cut off, and the one sentence they are woken with. See `restart.ts`. */
+export {
+  RESTART_REASON_ENV,
+  RESTART_VERSION_ENV,
+  RESTART_REASONS,
+  RESUME_WINDOW_MS,
+  cutOffByRestart,
+  isResumeLine,
+  keepsCutOffMark,
+  restartOf,
+  resumeLine,
+  type RestartReason,
+} from './restart.js'

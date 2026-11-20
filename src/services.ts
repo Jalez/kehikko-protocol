@@ -92,6 +92,10 @@ export interface WorkWant {
  *   (`workWantSchema`). A kind not listed is not wanted: a consumer does not flag it. With no `wants` at
  *   all, every kind in `run` is wanted under the defaults (`WORK_WANT_DEFAULTS`). Read it with
  *   `workWant` and judge a run with `wantsQueued`; never by your own numbers.
+ * - `hold` (2.110.0): where the host asks it to hold an app restart behind the runs ahead of it
+ *   (`workHoldParams`, POST, answered with `workHoldResult`). When the hold's turn comes it tells the host
+ *   with `restart.release` `{ token, go: true }`, or `go: false` when the person cancelled it in the queue.
+ *   With no `hold`, or no provider, the host restarts at once.
  */
 export const workQueueSchema = z.object({
   name: oneLine(LIMITS.TITLE),
@@ -103,8 +107,49 @@ export const workQueueSchema = z.object({
   direct: oneLine(80).optional(),
   marks: z.array(z.string().min(3).max(LIMITS.SERVICE_LINE)).max(LIMITS.SERVICE_MARKS).default([]),
   wants: z.object(Object.fromEntries(WORK_KINDS.map((kind) => [kind, workWantSchema.optional()])) as Record<WorkKind, z.ZodOptional<typeof workWantSchema>>).optional(),
+  hold: z.lazy(() => servicePath).optional(),
 })
 export type WorkQueue = z.infer<typeof workQueueSchema>
+
+/** 2.110.0. The host's own word for one held restart: what `restart.release` gives back. */
+export const restartToken = z.string().regex(/^[A-Za-z0-9_-]{16,128}$/, 'a restart token is 16 to 128 letters, digits, - or _')
+
+/**
+ * 2.110.0. What the host POSTs to a work queue's `hold`: hold an app restart behind the runs ahead of
+ * it. `reason` is why (an update or a plain restart, `RESTART_REASONS`' app ones), `label` what the queue
+ * shows the person ("Restart Kehikot to update to 0.7.36"), `token` the host's word for this hold.
+ */
+export const workHoldParams = z.object({
+  token: restartToken,
+  reason: z.enum(['app-update', 'app-restart']),
+  label: z.string().trim().min(1).max(LIMITS.TITLE),
+})
+export type WorkHoldParams = z.infer<typeof workHoldParams>
+
+/**
+ * 2.110.0. A work queue's answer to a hold: `held` with how many runs are `ahead` of it, or not held
+ * (nothing is running or waiting: the host restarts now) with `why` when it would not take it.
+ */
+export const workHoldResult = z.object({
+  held: z.boolean(),
+  ahead: z.number().int().min(0).max(10_000).default(0),
+  why: z.string().max(LIMITS.REASON).default(''),
+})
+export type WorkHoldResult = z.infer<typeof workHoldResult>
+
+/**
+ * 2.110.0. `restart.release`'s params, from the work queue's server: the restart held under `token` may
+ * go now (`go: true`), or the person cancelled it in the queue (`go: false`).
+ */
+export const restartReleaseParams = z.object({ token: restartToken, go: z.boolean() })
+export type RestartReleaseParams = z.infer<typeof restartReleaseParams>
+
+/** `restarting` or `cancelled` as asked; `unknown` when the host holds no restart under that token (it went another way). */
+export const restartReleaseResult = z.object({
+  outcome: z.enum(['restarting', 'cancelled', 'unknown']),
+  why: z.string().max(LIMITS.REASON).default(''),
+})
+export type RestartReleaseResult = z.infer<typeof restartReleaseResult>
 
 /* ---------------------------------------------------------------- services a consumer CALLS (2.83.0) */
 

@@ -19,6 +19,8 @@
  * - (2.99.0) provides `agent.tasks` and its conformance test gives no `tasks` (`{ start, program }`): the
  *   check that `start` answers within a second while its program takes 20 s to boot, and that what became
  *   of a task reaches the host, then never runs — and a fake provider is the only proof;
+ * - (2.110.0) provides `agent.delivery` and does not wake the conversations a restart cut off
+ *   (`keepsCutOffMark`, `cutOffByRestart`, `resumeLine` from `restart.ts`);
  * - (2.108.0) has no `uninstall.ts` at its root that reports through `runUninstall`: an agent module
  *   writes outside its folder (session folders, an agent's settings or skills), and only it can take
  *   that away when a person uninstalls it — the host never edits an agent's configuration.

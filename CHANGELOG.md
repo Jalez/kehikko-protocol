@@ -11,6 +11,25 @@ After 2.78.0, every entry's first line under its heading is its kind, and the ve
 (semver; CI checks it): `Kind: breaking` → next major, `Kind: feature` → next minor, `Kind: fix` →
 next patch.
 
+## 2.110.0 — 2026-11-20
+
+Kind: feature
+
+Conversations a restart cut off, and how they are told to carry on (`restart.ts`), so no space needs a person to say
+"continue" after an app update. An agent module keeps a mark while a conversation whose process it holds is working
+or waits on its own background work (`keepsCutOffMark`), finds the ones still marked and not running at its start
+(`cutOffByRestart`; a record from before the mark by its transcript, within `RESUME_WINDOW_MS`), and wakes each once
+with `resumeLine`, which says why when the host passed it (`restartOf`: `KEHIKOT_RESTART_REASON` app-update,
+app-restart, module-update or module-restart, and `KEHIKOT_RESTART_VERSION`). Idle, finished and waiting-for-the-person
+conversations are never woken. `isResumeLine` tells these sentences from the person's words. `kehikot-check-agent`
+fails a module that provides `agent.delivery` and does not do this.
+
+An app restart can wait for queued work: a `work.queue` descriptor may say `hold`, where the host POSTs a restart to
+hold behind the runs ahead of it (`workHoldParams` with the host's `restartToken`, answered `workHoldResult`). When its
+turn comes the queue's server asks `restart.release` (in `SERVER_METHODS`) `{ token, go: true }` under the new capability `app:restart`
+(`go: false` when the person cancelled it in the queue; `restartReleaseResult`). No `hold`, or no provider: the host
+restarts at once. **Additive**; `PROTOCOL` is still 2.
+
 ## 2.109.0 — 2026-11-20
 
 Kind: feature

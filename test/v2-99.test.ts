@@ -30,7 +30,7 @@ const DELIVERY = { name: 'Example', program: 'Example CLI', deliver: '/api/deliv
 const TASKS = { name: 'Example', program: 'Example CLI', start: '/api/tasks/start', view: '/app?session={session}' }
 
 /** 2.108.0: every agent module ships its clean-up; these fixtures are about other rules. */
-const CLEAN_UP = { path: 'uninstall.ts', text: "import { runUninstall } from 'kehikot-module-protocol/serve'\nawait runUninstall([])" }
+const CLEAN_UP = { path: 'uninstall.ts', text: "import { runUninstall } from 'kehikot-module-protocol/serve'\nawait runUninstall([])\n// as a module's resume code would: keepsCutOffMark(now); cutOffByRestart(at); resumeLine(why)" }
 
 describe('2.99.0 — the contract', () => {
   test('an acceptance is started + pending; older answers read as before', () => {

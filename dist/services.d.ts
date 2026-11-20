@@ -80,6 +80,10 @@ export interface WorkWant {
  *   (`workWantSchema`). A kind not listed is not wanted: a consumer does not flag it. With no `wants` at
  *   all, every kind in `run` is wanted under the defaults (`WORK_WANT_DEFAULTS`). Read it with
  *   `workWant` and judge a run with `wantsQueued`; never by your own numbers.
+ * - `hold` (2.110.0): where the host asks it to hold an app restart behind the runs ahead of it
+ *   (`workHoldParams`, POST, answered with `workHoldResult`). When the hold's turn comes it tells the host
+ *   with `restart.release` `{ token, go: true }`, or `go: false` when the person cancelled it in the queue.
+ *   With no `hold`, or no provider, the host restarts at once.
  */
 export declare const workQueueSchema: z.ZodObject<{
     name: z.ZodEffects<z.ZodString, string, string>;
@@ -163,6 +167,7 @@ export declare const workQueueSchema: z.ZodObject<{
             wholeSuiteOnly?: boolean | undefined;
         } | undefined;
     }>>;
+    hold: z.ZodOptional<z.ZodLazy<z.ZodEffects<z.ZodString, string, string>>>;
 }, "strip", z.ZodTypeAny, {
     name: string;
     run: {
@@ -197,6 +202,7 @@ export declare const workQueueSchema: z.ZodObject<{
             wholeSuiteOnly?: boolean | undefined;
         } | undefined;
     } | undefined;
+    hold?: string | undefined;
 }, {
     name: string;
     run: {
@@ -231,8 +237,75 @@ export declare const workQueueSchema: z.ZodObject<{
             wholeSuiteOnly?: boolean | undefined;
         } | undefined;
     } | undefined;
+    hold?: string | undefined;
 }>;
 export type WorkQueue = z.infer<typeof workQueueSchema>;
+/** 2.110.0. The host's own word for one held restart: what `restart.release` gives back. */
+export declare const restartToken: z.ZodString;
+/**
+ * 2.110.0. What the host POSTs to a work queue's `hold`: hold an app restart behind the runs ahead of
+ * it. `reason` is why (an update or a plain restart, `RESTART_REASONS`' app ones), `label` what the queue
+ * shows the person ("Restart Kehikot to update to 0.7.36"), `token` the host's word for this hold.
+ */
+export declare const workHoldParams: z.ZodObject<{
+    token: z.ZodString;
+    reason: z.ZodEnum<["app-update", "app-restart"]>;
+    label: z.ZodString;
+}, "strip", z.ZodTypeAny, {
+    token: string;
+    label: string;
+    reason: "app-update" | "app-restart";
+}, {
+    token: string;
+    label: string;
+    reason: "app-update" | "app-restart";
+}>;
+export type WorkHoldParams = z.infer<typeof workHoldParams>;
+/**
+ * 2.110.0. A work queue's answer to a hold: `held` with how many runs are `ahead` of it, or not held
+ * (nothing is running or waiting: the host restarts now) with `why` when it would not take it.
+ */
+export declare const workHoldResult: z.ZodObject<{
+    held: z.ZodBoolean;
+    ahead: z.ZodDefault<z.ZodNumber>;
+    why: z.ZodDefault<z.ZodString>;
+}, "strip", z.ZodTypeAny, {
+    why: string;
+    held: boolean;
+    ahead: number;
+}, {
+    held: boolean;
+    why?: string | undefined;
+    ahead?: number | undefined;
+}>;
+export type WorkHoldResult = z.infer<typeof workHoldResult>;
+/**
+ * 2.110.0. `restart.release`'s params, from the work queue's server: the restart held under `token` may
+ * go now (`go: true`), or the person cancelled it in the queue (`go: false`).
+ */
+export declare const restartReleaseParams: z.ZodObject<{
+    token: z.ZodString;
+    go: z.ZodBoolean;
+}, "strip", z.ZodTypeAny, {
+    token: string;
+    go: boolean;
+}, {
+    token: string;
+    go: boolean;
+}>;
+export type RestartReleaseParams = z.infer<typeof restartReleaseParams>;
+/** `restarting` or `cancelled` as asked; `unknown` when the host holds no restart under that token (it went another way). */
+export declare const restartReleaseResult: z.ZodObject<{
+    outcome: z.ZodEnum<["restarting", "cancelled", "unknown"]>;
+    why: z.ZodDefault<z.ZodString>;
+}, "strip", z.ZodTypeAny, {
+    why: string;
+    outcome: "unknown" | "restarting" | "cancelled";
+}, {
+    outcome: "unknown" | "restarting" | "cancelled";
+    why?: string | undefined;
+}>;
+export type RestartReleaseResult = z.infer<typeof restartReleaseResult>;
 /**
  * A tool on the provider's MCP door: the name only. A consumer reaches the door through the module id
  * `services.find` answered (`callServiceTool` behind `/serve`), and calls the tool by the name the
@@ -378,16 +451,16 @@ export declare const checklistHolderSchema: z.ZodObject<{
         hold: z.ZodString;
         check: z.ZodString;
     }, "strip", z.ZodTypeAny, {
+        hold: string;
         list: string;
         create: string;
         add: string;
-        hold: string;
         check: string;
     }, {
+        hold: string;
         list: string;
         create: string;
         add: string;
-        hold: string;
         check: string;
     }>;
     /**
@@ -399,20 +472,20 @@ export declare const checklistHolderSchema: z.ZodObject<{
 }, "strip", z.ZodTypeAny, {
     name: string;
     tools: {
+        hold: string;
         list: string;
         create: string;
         add: string;
-        hold: string;
         check: string;
     };
     formats?: "json"[] | undefined;
 }, {
     name: string;
     tools: {
+        hold: string;
         list: string;
         create: string;
         add: string;
-        hold: string;
         check: string;
     };
     formats?: "json"[] | undefined;
@@ -1416,6 +1489,7 @@ export declare const SERVICES: {
                     wholeSuiteOnly?: boolean | undefined;
                 } | undefined;
             }>>;
+            hold: z.ZodOptional<z.ZodLazy<z.ZodEffects<z.ZodString, string, string>>>;
         }, "strip", z.ZodTypeAny, {
             name: string;
             run: {
@@ -1450,6 +1524,7 @@ export declare const SERVICES: {
                     wholeSuiteOnly?: boolean | undefined;
                 } | undefined;
             } | undefined;
+            hold?: string | undefined;
         }, {
             name: string;
             run: {
@@ -1484,6 +1559,7 @@ export declare const SERVICES: {
                     wholeSuiteOnly?: boolean | undefined;
                 } | undefined;
             } | undefined;
+            hold?: string | undefined;
         }>;
     };
     readonly 'document.proposals': {
@@ -1577,16 +1653,16 @@ export declare const SERVICES: {
                 hold: z.ZodString;
                 check: z.ZodString;
             }, "strip", z.ZodTypeAny, {
+                hold: string;
                 list: string;
                 create: string;
                 add: string;
-                hold: string;
                 check: string;
             }, {
+                hold: string;
                 list: string;
                 create: string;
                 add: string;
-                hold: string;
                 check: string;
             }>;
             /**
@@ -1598,20 +1674,20 @@ export declare const SERVICES: {
         }, "strip", z.ZodTypeAny, {
             name: string;
             tools: {
+                hold: string;
                 list: string;
                 create: string;
                 add: string;
-                hold: string;
                 check: string;
             };
             formats?: "json"[] | undefined;
         }, {
             name: string;
             tools: {
+                hold: string;
                 list: string;
                 create: string;
                 add: string;
-                hold: string;
                 check: string;
             };
             formats?: "json"[] | undefined;
