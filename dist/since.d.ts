@@ -201,6 +201,16 @@ export declare const TRACKER_COMMENT_FIELD_SINCE: {
 };
 export type TrackerCommentField = keyof typeof TRACKER_COMMENT_FIELD_SINCE;
 /**
+ * The fields of a row's latest activity (`trackerActivitySchema`, the row's `lastActivity`) added
+ * after 2.67.0, and the version that added each. Not `ACTIVITY_FIELD_SINCE`, which is about an
+ * activity item a module sets. A host before a field leaves it out: activity with no `bot` is not
+ * said to be a person's, only not said to be a bot's.
+ */
+export declare const TRACKER_ACTIVITY_FIELD_SINCE: {
+    readonly bot: "2.111.0";
+};
+export type TrackerActivityField = keyof typeof TRACKER_ACTIVITY_FIELD_SINCE;
+/**
  * The fields of an activity item (`activityItemSchema`) added after `activity.set` first had a shape
  * (1.5.0), and the version that added each. Like `TRACKER_FIELD_SINCE`: nothing a manifest has to
  * be held to, since a host that does not know a field strips it and files the item by what it does

@@ -1374,6 +1374,8 @@ export {
   type TrackerDetailField,
   TRACKER_COMMENT_FIELD_SINCE,
   type TrackerCommentField,
+  TRACKER_ACTIVITY_FIELD_SINCE,
+  type TrackerActivityField,
   ACTIVITY_FIELD_SINCE,
   SESSION_FIELD_SINCE,
   WIRE_SINCE,

@@ -574,6 +574,14 @@ export declare const trackerActivitySchema: z.ZodObject<{
      * The same words as a reviewer's `state`. Dropped, not fatal, when it does not parse.
      */
     verdict: z.ZodCatch<z.ZodOptional<z.ZodEnum<["approved", "changes", "commented"]>>>;
+    /**
+     * 2.111.0. True when the tracker says an automated account did it (GitHub's `Bot` actor, GitLab's
+     * `bot` user or its access-token bot accounts: a CI report, a code scanner, a dependency updater), so
+     * a host can tell a bot's activity apart from what people did, as `bot` on a comment does. Absent
+     * when the tracker said nothing either way; never guessed from a name. Dropped, not fatal, when it
+     * does not parse.
+     */
+    bot: z.ZodCatch<z.ZodOptional<z.ZodBoolean>>;
 }, "strip", z.ZodTypeAny, {
     at: string;
     kind: "state" | "comment" | "commit" | "review";
@@ -581,6 +589,7 @@ export declare const trackerActivitySchema: z.ZodObject<{
     path?: string | undefined;
     line?: number | undefined;
     verdict?: "approved" | "changes" | "commented" | undefined;
+    bot?: boolean | undefined;
     mine?: boolean | undefined;
     commits?: number | undefined;
 }, {
@@ -590,6 +599,7 @@ export declare const trackerActivitySchema: z.ZodObject<{
     path?: unknown;
     line?: unknown;
     verdict?: unknown;
+    bot?: unknown;
     mine?: boolean | undefined;
     commits?: unknown;
 }>;
@@ -916,6 +926,14 @@ export declare const trackerRowSchema: z.ZodObject<{
          * The same words as a reviewer's `state`. Dropped, not fatal, when it does not parse.
          */
         verdict: z.ZodCatch<z.ZodOptional<z.ZodEnum<["approved", "changes", "commented"]>>>;
+        /**
+         * 2.111.0. True when the tracker says an automated account did it (GitHub's `Bot` actor, GitLab's
+         * `bot` user or its access-token bot accounts: a CI report, a code scanner, a dependency updater), so
+         * a host can tell a bot's activity apart from what people did, as `bot` on a comment does. Absent
+         * when the tracker said nothing either way; never guessed from a name. Dropped, not fatal, when it
+         * does not parse.
+         */
+        bot: z.ZodCatch<z.ZodOptional<z.ZodBoolean>>;
     }, "strip", z.ZodTypeAny, {
         at: string;
         kind: "state" | "comment" | "commit" | "review";
@@ -923,6 +941,7 @@ export declare const trackerRowSchema: z.ZodObject<{
         path?: string | undefined;
         line?: number | undefined;
         verdict?: "approved" | "changes" | "commented" | undefined;
+        bot?: boolean | undefined;
         mine?: boolean | undefined;
         commits?: number | undefined;
     }, {
@@ -932,6 +951,7 @@ export declare const trackerRowSchema: z.ZodObject<{
         path?: unknown;
         line?: unknown;
         verdict?: unknown;
+        bot?: unknown;
         mine?: boolean | undefined;
         commits?: unknown;
     }>>;
@@ -1337,6 +1357,7 @@ export declare const trackerRowSchema: z.ZodObject<{
         path?: string | undefined;
         line?: number | undefined;
         verdict?: "approved" | "changes" | "commented" | undefined;
+        bot?: boolean | undefined;
         mine?: boolean | undefined;
         commits?: number | undefined;
     } | undefined;
@@ -1441,6 +1462,7 @@ export declare const trackerRowSchema: z.ZodObject<{
         path?: unknown;
         line?: unknown;
         verdict?: unknown;
+        bot?: unknown;
         mine?: boolean | undefined;
         commits?: unknown;
     } | undefined;
@@ -1814,6 +1836,14 @@ export declare const trackerReadingResult: z.ZodObject<{
              * The same words as a reviewer's `state`. Dropped, not fatal, when it does not parse.
              */
             verdict: z.ZodCatch<z.ZodOptional<z.ZodEnum<["approved", "changes", "commented"]>>>;
+            /**
+             * 2.111.0. True when the tracker says an automated account did it (GitHub's `Bot` actor, GitLab's
+             * `bot` user or its access-token bot accounts: a CI report, a code scanner, a dependency updater), so
+             * a host can tell a bot's activity apart from what people did, as `bot` on a comment does. Absent
+             * when the tracker said nothing either way; never guessed from a name. Dropped, not fatal, when it
+             * does not parse.
+             */
+            bot: z.ZodCatch<z.ZodOptional<z.ZodBoolean>>;
         }, "strip", z.ZodTypeAny, {
             at: string;
             kind: "state" | "comment" | "commit" | "review";
@@ -1821,6 +1851,7 @@ export declare const trackerReadingResult: z.ZodObject<{
             path?: string | undefined;
             line?: number | undefined;
             verdict?: "approved" | "changes" | "commented" | undefined;
+            bot?: boolean | undefined;
             mine?: boolean | undefined;
             commits?: number | undefined;
         }, {
@@ -1830,6 +1861,7 @@ export declare const trackerReadingResult: z.ZodObject<{
             path?: unknown;
             line?: unknown;
             verdict?: unknown;
+            bot?: unknown;
             mine?: boolean | undefined;
             commits?: unknown;
         }>>;
@@ -2235,6 +2267,7 @@ export declare const trackerReadingResult: z.ZodObject<{
             path?: string | undefined;
             line?: number | undefined;
             verdict?: "approved" | "changes" | "commented" | undefined;
+            bot?: boolean | undefined;
             mine?: boolean | undefined;
             commits?: number | undefined;
         } | undefined;
@@ -2339,6 +2372,7 @@ export declare const trackerReadingResult: z.ZodObject<{
             path?: unknown;
             line?: unknown;
             verdict?: unknown;
+            bot?: unknown;
             mine?: boolean | undefined;
             commits?: unknown;
         } | undefined;
@@ -2485,6 +2519,7 @@ export declare const trackerReadingResult: z.ZodObject<{
             path?: string | undefined;
             line?: number | undefined;
             verdict?: "approved" | "changes" | "commented" | undefined;
+            bot?: boolean | undefined;
             mine?: boolean | undefined;
             commits?: number | undefined;
         } | undefined;
@@ -2607,6 +2642,7 @@ export declare const trackerReadingResult: z.ZodObject<{
             path?: unknown;
             line?: unknown;
             verdict?: unknown;
+            bot?: unknown;
             mine?: boolean | undefined;
             commits?: unknown;
         } | undefined;

@@ -223,6 +223,7 @@ The same list with what each version exported is in [CHANGELOG.md](CHANGELOG.md)
 
 | version | date | what it added |
 |---|---|---|
+| 2.111.0 | 2026-11-20 | Additive. `bot` on a tracker row's latest activity (`TrackerActivity`), when the tracker says an automated account did it; `TRACKER_ACTIVITY_FIELD_SINCE`. See [tracker](docs/tracker.md). |
 | 2.110.0 | 2026-11-20 | Additive. After a restart, conversations carry on: `keepsCutOffMark`, `cutOffByRestart`, `resumeLine`, `restartOf` (`KEHIKOT_RESTART_REASON`, `KEHIKOT_RESTART_VERSION`), `isResumeLine`; `check:agent` asks every agent module for it. See [after a restart](docs/restart.md). |
 | 2.109.0 | 2026-11-20 | Additive. `bot` on a tracker comment, when the tracker says an automated account wrote it; `TRACKER_COMMENT_FIELD_SINCE`. |
 | 2.108.2 | 2026-11-20 | Fix. `check:agent` passes a module that only tells sessions something (`isAgentModule`); the package version is checked in one test. |
