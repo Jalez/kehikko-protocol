@@ -331,6 +331,14 @@ export const trackerActivitySchema = z.object({
    * The same words as a reviewer's `state`. Dropped, not fatal, when it does not parse.
    */
   verdict: z.enum(['approved', 'changes', 'commented']).optional().catch(undefined),
+  /**
+   * 2.111.0. True when the tracker says an automated account did it (GitHub's `Bot` actor, GitLab's
+   * `bot` user or its access-token bot accounts: a CI report, a code scanner, a dependency updater), so
+   * a host can tell a bot's activity apart from what people did, as `bot` on a comment does. Absent
+   * when the tracker said nothing either way; never guessed from a name. Dropped, not fatal, when it
+   * does not parse.
+   */
+  bot: z.boolean().optional().catch(undefined),
 })
 export type TrackerActivity = z.infer<typeof trackerActivitySchema>
 

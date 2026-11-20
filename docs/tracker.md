@@ -147,6 +147,13 @@ the push added), `path` and `line` on a `comment` on a change's diff, and
 and dropped, not fatal, when it does not parse; a host that says none of them is
 an older host, not a contradiction.
 
+`lastActivity.bot: true` (2.111.0) when the tracker says an automated account
+did it (GitHub's `Bot` actor, GitLab's `bot` user or its own access-token bot
+accounts), so a host or a module can tell a code scanner's or a CI report's
+activity apart from what people did, as `bot` on a comment does. Absent is "not
+said", from an older host or a tracker that did not say; never guess it from a
+name (`TRACKER_ACTIVITY_FIELD_SINCE`).
+
 ### People and their pictures (2.10.0)
 
 A row names people by login in four places: `reviewers[].login`,
