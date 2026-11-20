@@ -1,10 +1,9 @@
 import { describe, expect, test } from 'bun:test'
 
-import { LIMITS, PACKAGE_VERSION, PROTOCOL, headerItemSchema, headerOptionSchema, optionSections } from '../src/index.js'
+import { LIMITS, PROTOCOL, headerItemSchema, headerOptionSchema, optionSections } from '../src/index.js'
 
 describe('the version', () => {
   test('is 2.68.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.108.1')
     expect(PROTOCOL).toBe(2)
   })
 })

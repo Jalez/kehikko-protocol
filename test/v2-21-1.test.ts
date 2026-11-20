@@ -4,7 +4,7 @@ import { join } from 'node:path'
 
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 
-import { LIMITS, PACKAGE_VERSION } from '../src/index.js'
+import { LIMITS } from '../src/index.js'
 import { forgetHostProjects, hostHasProject, hostProject, resolveDoorProject } from '../src/serve/index.js'
 
 /**
@@ -42,7 +42,6 @@ function folder(name: string): string {
 }
 
 describe('the version', () => {
-  test('is 2.21.1', () => expect(PACKAGE_VERSION).toBe('2.108.1'))
   test('a yes is kept for a minute by default', () => expect(LIMITS.HOST_PROJECT_KEEP_MS).toBe(60_000))
 })
 

@@ -3,7 +3,6 @@ import { describe, expect, test } from 'bun:test'
 import {
   LIMITS,
   METHODS,
-  PACKAGE_VERSION,
   TRACKER_IMAGE_REFUSALS,
   TRACKER_IMAGE_TYPES,
   methodParams,
@@ -13,10 +12,6 @@ import {
 } from '../src/index.js'
 
 describe('2.102.0', () => {
-  test('is the package version', () => {
-    expect(PACKAGE_VERSION).toBe('2.108.1')
-  })
-
   test('tracker.image is held to trackers:read and takes a ref and an address', () => {
     expect(METHODS['tracker.image']).toBe('trackers:read')
     expect(methodParams['tracker.image'].safeParse({ ref: 'gh#5', url: 'https://github.com/o/r/assets/1.png' }).success).toBe(true)

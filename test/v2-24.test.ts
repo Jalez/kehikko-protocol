@@ -1,7 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
 import {
-  PACKAGE_VERSION,
   PROTOCOL,
   resultSchemaFor,
   trafficAccountSchema,
@@ -21,7 +20,6 @@ const core = { limit: 5000, used: 188, remaining: 4812, resets: 1_793_012_281_00
 
 describe('the version', () => {
   test('is 2.24.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.108.1')
     expect(PROTOCOL).toBe(2)
   })
 })

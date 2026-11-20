@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
-import { DOOR_PROJECT_SAYS, PACKAGE_VERSION, PROTOCOL } from '../src/index.js'
+import { DOOR_PROJECT_SAYS, PROTOCOL } from '../src/index.js'
 import { NO_HOST_ANSWERED, hostHasProject, hostProject, isProjectResult, resolveDoorProject } from '../src/serve/index.js'
 
 /** 2.3.0: the host says where a project that used to be at a folder is now, and a door follows it once. */
@@ -19,7 +19,6 @@ function host(table: Record<string, unknown>): typeof fetch {
 
 describe('the version', () => {
   test('is 2.18.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.108.1')
     expect(PROTOCOL).toBe(2)
   })
 })

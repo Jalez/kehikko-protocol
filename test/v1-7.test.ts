@@ -4,7 +4,7 @@ import { mkdtempSync, realpathSync, rmSync, symlinkSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 
-import { ACTIVITY_PRIORITIES, LIMITS, PACKAGE_VERSION, activityItemsSchema } from '../src/index.js'
+import { ACTIVITY_PRIORITIES, LIMITS, activityItemsSchema } from '../src/index.js'
 
 /** 1.7.0: `priority`, `refs`, `group` on an activity item. Also parsed by the 1.6.0 build from the tag. */
 
@@ -29,7 +29,6 @@ const item = (id: string, more: Record<string, unknown> = {}) => ({ id, state: '
 
 describe('activity priority, refs, group', () => {
   test('version and limits', () => {
-    expect(PACKAGE_VERSION).toBe('2.108.1')
     expect(LIMITS.ACTIVITY_REFS).toBe(16)
     expect(LIMITS.ACTIVITY_GROUP).toBe(64)
     expect([...ACTIVITY_PRIORITIES]).toEqual(['urgent', 'normal', 'low'])

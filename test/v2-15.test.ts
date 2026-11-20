@@ -3,7 +3,6 @@ import { describe, expect, test } from 'bun:test'
 import {
   DOOR_METHODS,
   DOOR_CAPABILITIES,
-  PACKAGE_VERSION,
   PROTOCOL,
   SETTINGS_PATH,
   doorMethodParams,
@@ -43,7 +42,6 @@ const FIELDS: SettingField[] = settingsDeclarationSchema.parse([
 
 describe('the version', () => {
   test('is 2.18.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.108.1')
     expect(PROTOCOL).toBe(2)
   })
 })

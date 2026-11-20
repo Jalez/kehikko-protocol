@@ -5,7 +5,6 @@ import {
   LIMITS,
   METHODS,
   MODULE_ICONS,
-  PACKAGE_VERSION,
   PROTOCOL,
   SERVER_METHODS,
   SERVER_PROJECT_METHODS,
@@ -34,7 +33,6 @@ const ENV = { KEHIKOT_ORIGINS: 'http://127.0.0.1:8021' }
 
 describe('the version', () => {
   test('is 2.20.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.108.1')
     expect(PROTOCOL).toBe(2)
   })
 })

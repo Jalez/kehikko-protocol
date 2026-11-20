@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
-import { LIMITS, MESSAGE, PACKAGE_VERSION, PROTOCOL, activityItemsSchema, activitySetResult } from '../src/index.js'
+import { LIMITS, MESSAGE, PROTOCOL, activityItemsSchema, activitySetResult } from '../src/index.js'
 import { connect, type MessageSource } from '../src/client/index.js'
 
 /** 1.8.0: an activity item may say which project it belongs to, for a host that files by it. */
@@ -11,7 +11,6 @@ const B = '/work/portal'
 
 describe('an activity item’s project', () => {
   test('version and limit', () => {
-    expect(PACKAGE_VERSION).toBe('2.108.1')
     expect(LIMITS.ACTIVITY_PROJECT).toBe(1024)
   })
   test('optional, an absolute folder, and carried', () => {

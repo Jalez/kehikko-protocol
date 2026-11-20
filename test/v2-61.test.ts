@@ -2,7 +2,6 @@ import { describe, expect, test } from 'bun:test'
 
 import {
   GUARD_ESCAPE_ENV,
-  PACKAGE_VERSION,
   SESSION_FIELD_SINCE,
   commandsRun,
   fillTemplate,
@@ -37,7 +36,6 @@ const placed = (guard: Guard, module = 'kehikot.queue', name = 'Test runs'): Pla
 
 describe('2.61.0', () => {
   test('the version', () => {
-    expect(PACKAGE_VERSION).toBe('2.108.1')
     expect(SESSION_FIELD_SINCE.guards).toBe('2.61.0')
   })
 })

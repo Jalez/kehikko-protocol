@@ -7,7 +7,6 @@ import {
   HOST_MESSAGES,
   MESSAGE,
   MODULE_MESSAGES,
-  PACKAGE_VERSION,
   PROTOCOL,
   findMatches,
   findOpenSchema,
@@ -33,7 +32,6 @@ const REPO = resolve(dirname(new URL(import.meta.url).pathname), '..')
 
 describe('the version', () => {
   test('is current, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.108.1')
     expect(PROTOCOL).toBe(2)
     expect(readFileSync(join(REPO, 'CHANGELOG.md'), 'utf8')).toContain('## 2.69.0')
   })

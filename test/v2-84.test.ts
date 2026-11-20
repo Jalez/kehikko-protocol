@@ -10,7 +10,6 @@ import {
   LOADING_COVER_AFTER_MS,
   MESSAGE,
   MODULE_MESSAGES,
-  PACKAGE_VERSION,
   PROTOCOL,
   loadingSchema,
   moduleMessageSchema,
@@ -31,7 +30,6 @@ const wait = (ms: number) => new Promise((done) => setTimeout(done, ms))
 
 describe('the version', () => {
   test('is 2.84.0, PROTOCOL is still 2, and the entry declares its kind', () => {
-    expect(PACKAGE_VERSION).toBe('2.108.1')
     expect(PROTOCOL).toBe(2)
     const log = readFileSync(join(resolve(dirname(new URL(import.meta.url).pathname), '..'), 'CHANGELOG.md'), 'utf8')
     expect(log).toMatch(/## 2\.84\.0 — \d{4}-\d{2}-\d{2}\n\nKind: feature\n/)

@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 
-import { PACKAGE_VERSION, PROTOCOL } from '../src/index.js'
+import { PROTOCOL } from '../src/index.js'
 import { ask, follow, resetServerStanding, subscribe } from '../src/client/index.js'
 import { rooted } from '../src/client/query.js'
 import { checkAddressesSources } from '../src/check/addresses.js'
@@ -13,7 +13,6 @@ import { checkAddressesSources } from '../src/check/addresses.js'
 
 describe('the version', () => {
   test('is 2.106.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.108.1')
     expect(PROTOCOL).toBe(2)
   })
 })

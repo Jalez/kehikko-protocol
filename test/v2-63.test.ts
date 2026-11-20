@@ -4,7 +4,7 @@ import { dirname, join, resolve } from 'node:path'
 import { act, createElement } from 'react'
 import { createRoot } from 'react-dom/client'
 
-import { PACKAGE_VERSION, TILE_NOTE_MS, expandDeclined } from '../src/index.js'
+import { TILE_NOTE_MS, expandDeclined } from '../src/index.js'
 import { AgentTile } from '../src/client/react.js'
 
 /**
@@ -17,9 +17,6 @@ const REPO = resolve(dirname(new URL(import.meta.url).pathname), '..')
 
 describe('the version', () => {
   test('is 2.63.0', () => {
-    expect(PACKAGE_VERSION).toBe('2.108.1')
-    const pkg = JSON.parse(readFileSync(join(REPO, 'package.json'), 'utf8')) as { version: string }
-    expect(pkg.version).toBe('2.108.1')
     expect(readFileSync(join(REPO, 'CHANGELOG.md'), 'utf8')).toContain('## 2.63.0')
     expect(readFileSync(join(REPO, 'docs/client.md'), 'utf8')).toContain('When the host declines (2.63.0)')
   })

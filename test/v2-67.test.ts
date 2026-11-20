@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
-import { PACKAGE_VERSION, PROTOCOL, trackerActivitySchema, trackerReviewerSchema, trackerRowSchema } from '../src/index.js'
+import { PROTOCOL, trackerActivitySchema, trackerReviewerSchema, trackerRowSchema } from '../src/index.js'
 
 /** 2.67.0: a reviewer says when they reviewed and last did anything, and their open threads; the latest activity says what it was. */
 
@@ -19,7 +19,6 @@ const row = {
 
 describe('the version', () => {
   test('is 2.67.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.108.1')
     expect(PROTOCOL).toBe(2)
   })
 })

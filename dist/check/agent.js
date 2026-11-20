@@ -1,6 +1,6 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
-import { AGENT_DELIVERY, AGENT_TASKS, serviceDescriptor } from '../services.js';
+import { AGENT_DELIVERY, AGENT_SETUP, AGENT_TASKS, serviceDescriptor } from '../services.js';
 import { UNINSTALL_SCRIPT } from '../uninstall.js';
 import { manifestOf, sourcesOf } from './parts.js';
 const CONFORMANCE = /kehikot-module-protocol\/testing['"][\s\S]*\b(?:expectAgentConformance|agentConformance)\s*\(/;
@@ -25,10 +25,23 @@ function testsOf(dir) {
     walk(dir, false);
     return out;
 }
+const AGENT_SERVICES = [AGENT_DELIVERY, AGENT_TASKS, AGENT_SETUP];
+const LISTS_MESSAGE_TOOLS = /\bmessageToolsFor\s*\(/;
+/**
+ * 2.108.2. Does this module run conversations? It messages, and it provides an `agent.*` service or
+ * lists the message tools on its door. A module that only sends (`messages.tell`) does neither.
+ */
+export function isAgentModule(manifest, sources) {
+    if (!(manifest.declares?.uses ?? []).includes('agents:message'))
+        return false;
+    if (AGENT_SERVICES.some((name) => manifest.services?.[name] != null))
+        return true;
+    return sources.some((one) => LISTS_MESSAGE_TOOLS.test(one.text));
+}
 /** The check over a manifest and the module's files. Pure but for what it is handed. */
 export function checkAgentFiles(manifest, sources, tests) {
     const module = manifest.id ?? 'This module';
-    if (!(manifest.declares?.uses ?? []).includes('agents:message'))
+    if (!isAgentModule(manifest, sources) && !tests.some((one) => CONFORMANCE.test(one.text)))
         return { module, agent: false, failures: [] };
     const failures = [];
     if (!serviceDescriptor(AGENT_DELIVERY, manifest.services?.[AGENT_DELIVERY])) {

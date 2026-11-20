@@ -167,3 +167,19 @@ describe('2.96.0 — the conformance harness, against a module door built the 2.
     for (const word of ['2.96.0', 'agent.delivery', 'placeToken', 'expectAgentConformance', 'kehikot-check-agent']) expect(doc).toContain(word)
   })
 })
+
+describe('2.108.2: a module that only tells sessions something is not an agent module', () => {
+  const CLEAN = { path: 'uninstall.ts', text: "import { runUninstall } from 'kehikot-module-protocol/serve'\nrunUninstall(async () => [])" }
+  test('asking for agents:message to call messages.tell runs no conversation, so nothing is asked of it', () => {
+    const teller = { id: 'kehikot.worktrees', declares: { uses: ['agents:message', 'state:keep'] } }
+    const said = checkAgentFiles(teller, [{ path: 'serve.ts', text: "await ask('messages.tell', { project, text })" }], [])
+    expect(said).toEqual({ module: 'kehikot.worktrees', agent: false, failures: [] })
+  })
+  test('an agent.* service, the message tools on its door, or the conformance in a test makes it one', () => {
+    const uses = { declares: { uses: ['agents:message'] } }
+    expect(checkAgentFiles({ ...uses, services: { 'agent.setup': { name: 'X', program: 'X', cli: 'x' } } }, [CLEAN], []).agent).toBe(true)
+    expect(checkAgentFiles(uses, [CLEAN, { path: 'door.ts', text: 'tools: [...(await messageToolsFor(token, o))]' }], []).agent).toBe(true)
+    const conformance = { path: 'test/agent.test.ts', text: "import { expectAgentConformance } from 'kehikot-module-protocol/testing'\nexpectAgentConformance({})" }
+    expect(checkAgentFiles(uses, [CLEAN], [conformance]).agent).toBe(true)
+  })
+})

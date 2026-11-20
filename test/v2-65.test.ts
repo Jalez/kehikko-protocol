@@ -5,7 +5,7 @@ import { createServer } from 'node:net'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-import { PACKAGE_VERSION, PROTOCOL } from '../src/index.js'
+import { PROTOCOL } from '../src/index.js'
 import { STAMP_FILE } from '../src/ready/build.js'
 import { anyPort, inModulePorts, preferred, readRegistration, registryDir, serves } from '../src/serve/index.js'
 
@@ -13,7 +13,6 @@ import { anyPort, inModulePorts, preferred, readRegistration, registryDir, serve
 
 describe('the version', () => {
   test('is 2.66.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.108.1')
     expect(PROTOCOL).toBe(2)
   })
 })

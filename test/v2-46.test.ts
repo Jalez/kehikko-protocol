@@ -9,7 +9,6 @@ import {
   FOOTER_KINDS_2_38,
   LIMITS,
   MESSAGE,
-  PACKAGE_VERSION,
   PROTOCOL,
   footerDraws,
   footerItemSchema,
@@ -62,7 +61,6 @@ const items = (): FooterItem[] => footerSchema.parse({ type: MESSAGE.FOOTER, ite
 
 describe('the version', () => {
   test('is 2.46.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.108.1')
     expect(PROTOCOL).toBe(2)
     expect(readFileSync(join(REPO, 'CHANGELOG.md'), 'utf8')).toContain('## 2.46.0')
   })

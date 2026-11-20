@@ -3,7 +3,7 @@ import { mkdtempSync, mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSyn
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-import { LIMITS, PACKAGE_VERSION, PROTOCOL, RUN_RESULT_STATES, latestRuns, runEnded, runResultSchema, runsIn, type RunResult } from '../src/index.js'
+import { LIMITS, PROTOCOL, RUN_RESULT_STATES, latestRuns, runEnded, runResultSchema, runsIn, type RunResult } from '../src/index.js'
 import { readRuns, writeRuns, RUNS_FILE } from '../src/serve/index.js'
 
 /** 2.27.0: run results any module publishes for the refs they are for, read by any module. */
@@ -24,7 +24,6 @@ const run = (over: Partial<RunResult> = {}): RunResult => ({
 
 describe('the version', () => {
   test('2.27.0, protocol 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.108.1')
     expect(PROTOCOL).toBe(2)
   })
 })

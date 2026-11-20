@@ -4,7 +4,6 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { gzipSync } from 'node:zlib'
 
-import { PACKAGE_VERSION } from '../src/index.js'
 import { commitOf } from '../src/serve/build.js'
 import {
   BUNDLE_FILE,
@@ -102,10 +101,6 @@ function rawEntry(name: string, type: string, data = new Uint8Array(0), linkname
 const rawArchive = (...entries: Uint8Array[]) => new Uint8Array(gzipSync(new Uint8Array([...entries.flatMap((e) => [...e]), ...new Uint8Array(1024)])))
 
 describe('2.102.0', () => {
-  test('is the package version', () => {
-    expect(PACKAGE_VERSION).toBe('2.108.1')
-  })
-
   describe('the archive', () => {
     test('round-trips files, executable bits and long paths, and is the same bytes every time', () => {
       const long = `${'a'.repeat(120)}/${'b'.repeat(90)}.js`

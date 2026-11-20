@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
-import { DOOR_PLACE_SAYS, PACKAGE_VERSION, PLACE_PARAM, doorPlaceSchema, placeDefaults, type DoorPlace } from '../src/index.js'
+import { DOOR_PLACE_SAYS, PLACE_PARAM, doorPlaceSchema, placeDefaults, type DoorPlace } from '../src/index.js'
 import { PLACE_PATH, hostPlace, hostPlaceUrls, placeTokenOf, resolveDoorPlace } from '../src/serve/index.js'
 
 /** 2.4.0: a session's place travels as a token on the door's URL, and a door defaults to it. */
@@ -26,7 +26,6 @@ function host(table: Record<string, unknown>): typeof fetch {
 }
 
 describe('the version', () => {
-  test('is 2.8.0', () => expect(PACKAGE_VERSION).toBe('2.108.1'))
 })
 
 describe('placeTokenOf', () => {

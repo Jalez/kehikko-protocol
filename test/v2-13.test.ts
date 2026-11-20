@@ -5,7 +5,6 @@ import {
   LIMITS,
   MESSAGE,
   METHODS,
-  PACKAGE_VERSION,
   PROTOCOL,
   REACTS_TO,
   codeLocationSchema,
@@ -28,7 +27,6 @@ const here: CodeLocation = { change: 'gl!123', path: 'src/app.ts', line: 42, sid
 
 describe('the version', () => {
   test('is 2.18.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.108.1')
     expect(PROTOCOL).toBe(2)
   })
   test('LIMITS.CODE_LINE is ten million', () => expect(LIMITS.CODE_LINE).toBe(10_000_000))

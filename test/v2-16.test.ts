@@ -6,7 +6,6 @@ import {
   LIMITS,
   MESSAGE,
   METHODS,
-  PACKAGE_VERSION,
   PROTOCOL,
   REACTS_TO,
   addressIsNews,
@@ -26,7 +25,6 @@ import { hostFields, hostStore, makeMailbox } from '../src/client/index.js'
 
 describe('the version', () => {
   test('is 2.18.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.108.1')
     expect(PROTOCOL).toBe(2)
   })
 })

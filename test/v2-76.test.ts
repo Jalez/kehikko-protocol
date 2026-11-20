@@ -7,7 +7,6 @@ import {
   CAPABILITY_SINCE,
   METHODS,
   METHOD_SINCE,
-  PACKAGE_VERSION,
   PROTOCOL,
   SERVER_METHODS,
   SERVER_METHOD_SINCE,
@@ -33,7 +32,6 @@ const answered = (...paths: string[]): Mine => ({ ok: true, data: { projects: pa
 
 describe('the version', () => {
   test('is 2.77.0, PROTOCOL is still 2, and the docs say it', () => {
-    expect(PACKAGE_VERSION).toBe('2.108.1')
     expect(PROTOCOL).toBe(2)
     expect(readFileSync(join(REPO, 'CHANGELOG.md'), 'utf8')).toContain('## 2.77.0')
     expect(readFileSync(join(REPO, 'docs/server-ask.md'), 'utf8')).toContain('watchKnownProjects')

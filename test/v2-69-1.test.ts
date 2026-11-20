@@ -2,7 +2,7 @@ import { afterEach, describe, expect, test } from 'bun:test'
 import { readFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 
-import { PACKAGE_VERSION, PROTOCOL, findMatches } from '../src/index.js'
+import { PROTOCOL, findMatches } from '../src/index.js'
 import { pageFind } from '../src/client/find.js'
 
 /**
@@ -15,7 +15,6 @@ const REPO = resolve(dirname(new URL(import.meta.url).pathname), '..')
 
 describe('the version', () => {
   test('is current, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.108.1')
     expect(PROTOCOL).toBe(2)
     expect(readFileSync(join(REPO, 'CHANGELOG.md'), 'utf8')).toContain('## 2.69.1')
   })

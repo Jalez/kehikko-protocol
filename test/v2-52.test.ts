@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import { readFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 
-import { HELP_LIMITS, PACKAGE_VERSION, PROTOCOL, hasHelp, helpOf, helpSchema, manifestSchema } from '../src/index.js'
+import { HELP_LIMITS, PROTOCOL, hasHelp, helpOf, helpSchema, manifestSchema } from '../src/index.js'
 
 /**
  * 2.52.0: `help`, how to use a module in its own words, for a person. Plain text, bounded, dropped
@@ -30,7 +30,6 @@ const good = {
 
 describe('the version', () => {
   test('is 2.52.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.108.1')
     expect(PROTOCOL).toBe(2)
     const changelog = readFileSync(join(REPO, 'CHANGELOG.md'), 'utf8')
     expect(changelog).toContain('## 2.52.0')

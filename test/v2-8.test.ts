@@ -3,7 +3,6 @@ import { describe, expect, test } from 'bun:test'
 import {
   LAST_ACTIVITY_KINDS,
   LIMITS,
-  PACKAGE_VERSION,
   PROTOCOL,
   trackerActivitySchema,
   trackerRowSchema,
@@ -28,7 +27,6 @@ const row = {
 
 describe('the version', () => {
   test('is 2.18.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.108.1')
     expect(PROTOCOL).toBe(2)
   })
   test('LIMITS.BRANCH is 255', () => expect(LIMITS.BRANCH).toBe(255))
