@@ -123,6 +123,12 @@ export declare const trackerCommentSchema: z.ZodObject<{
     path: z.ZodOptional<z.ZodString>;
     /** On a `review`: what the review said, in `REVIEWER_STATES`' words (`approved`, `changes`, `commented`). */
     verdict: z.ZodOptional<z.ZodEnum<["approved", "changes", "commented"]>>;
+    /**
+     * 2.109.0. True when the tracker says an automated account wrote it (GitHub's `Bot` author, GitLab's
+     * `bot` user or its access-token bot accounts: a CI report, a code scanner, a dependency updater), so a module can show it apart from
+     * what people said. Absent when the tracker said nothing either way; never guessed from a name.
+     */
+    bot: z.ZodCatch<z.ZodOptional<z.ZodBoolean>>;
 }, "strip", z.ZodTypeAny, {
     at: string;
     id: string;
@@ -135,6 +141,7 @@ export declare const trackerCommentSchema: z.ZodObject<{
     login?: string | undefined;
     editedAt?: string | undefined;
     verdict?: "approved" | "changes" | "commented" | undefined;
+    bot?: boolean | undefined;
 }, {
     at: string;
     id: string;
@@ -147,6 +154,7 @@ export declare const trackerCommentSchema: z.ZodObject<{
     editedAt?: string | undefined;
     bodyClipped?: boolean | undefined;
     verdict?: "approved" | "changes" | "commented" | undefined;
+    bot?: unknown;
 }>;
 export type TrackerComment = z.infer<typeof trackerCommentSchema>;
 /**
@@ -276,6 +284,12 @@ export declare const trackerDetailSchema: z.ZodObject<{
         path: z.ZodOptional<z.ZodString>;
         /** On a `review`: what the review said, in `REVIEWER_STATES`' words (`approved`, `changes`, `commented`). */
         verdict: z.ZodOptional<z.ZodEnum<["approved", "changes", "commented"]>>;
+        /**
+         * 2.109.0. True when the tracker says an automated account wrote it (GitHub's `Bot` author, GitLab's
+         * `bot` user or its access-token bot accounts: a CI report, a code scanner, a dependency updater), so a module can show it apart from
+         * what people said. Absent when the tracker said nothing either way; never guessed from a name.
+         */
+        bot: z.ZodCatch<z.ZodOptional<z.ZodBoolean>>;
     }, "strip", z.ZodTypeAny, {
         at: string;
         id: string;
@@ -288,6 +302,7 @@ export declare const trackerDetailSchema: z.ZodObject<{
         login?: string | undefined;
         editedAt?: string | undefined;
         verdict?: "approved" | "changes" | "commented" | undefined;
+        bot?: boolean | undefined;
     }, {
         at: string;
         id: string;
@@ -300,6 +315,7 @@ export declare const trackerDetailSchema: z.ZodObject<{
         editedAt?: string | undefined;
         bodyClipped?: boolean | undefined;
         verdict?: "approved" | "changes" | "commented" | undefined;
+        bot?: unknown;
     }>, "many">>>;
     /**
      * How many comments the item has in all, by the tracker's count (2.98.0). More than
@@ -392,6 +408,7 @@ export declare const trackerDetailSchema: z.ZodObject<{
         login?: string | undefined;
         editedAt?: string | undefined;
         verdict?: "approved" | "changes" | "commented" | undefined;
+        bot?: boolean | undefined;
     }[] | undefined;
     commentCount?: number | undefined;
     checks?: {
@@ -1036,6 +1053,12 @@ export declare const trackerRowSchema: z.ZodObject<{
             path: z.ZodOptional<z.ZodString>;
             /** On a `review`: what the review said, in `REVIEWER_STATES`' words (`approved`, `changes`, `commented`). */
             verdict: z.ZodOptional<z.ZodEnum<["approved", "changes", "commented"]>>;
+            /**
+             * 2.109.0. True when the tracker says an automated account wrote it (GitHub's `Bot` author, GitLab's
+             * `bot` user or its access-token bot accounts: a CI report, a code scanner, a dependency updater), so a module can show it apart from
+             * what people said. Absent when the tracker said nothing either way; never guessed from a name.
+             */
+            bot: z.ZodCatch<z.ZodOptional<z.ZodBoolean>>;
         }, "strip", z.ZodTypeAny, {
             at: string;
             id: string;
@@ -1048,6 +1071,7 @@ export declare const trackerRowSchema: z.ZodObject<{
             login?: string | undefined;
             editedAt?: string | undefined;
             verdict?: "approved" | "changes" | "commented" | undefined;
+            bot?: boolean | undefined;
         }, {
             at: string;
             id: string;
@@ -1060,6 +1084,7 @@ export declare const trackerRowSchema: z.ZodObject<{
             editedAt?: string | undefined;
             bodyClipped?: boolean | undefined;
             verdict?: "approved" | "changes" | "commented" | undefined;
+            bot?: unknown;
         }>, "many">>>;
         /**
          * How many comments the item has in all, by the tracker's count (2.98.0). More than
@@ -1152,6 +1177,7 @@ export declare const trackerRowSchema: z.ZodObject<{
             login?: string | undefined;
             editedAt?: string | undefined;
             verdict?: "approved" | "changes" | "commented" | undefined;
+            bot?: boolean | undefined;
         }[] | undefined;
         commentCount?: number | undefined;
         checks?: {
@@ -1238,6 +1264,7 @@ export declare const trackerRowSchema: z.ZodObject<{
             login?: string | undefined;
             editedAt?: string | undefined;
             verdict?: "approved" | "changes" | "commented" | undefined;
+            bot?: boolean | undefined;
         }[] | undefined;
         commentCount?: number | undefined;
         checks?: {
@@ -1924,6 +1951,12 @@ export declare const trackerReadingResult: z.ZodObject<{
                 path: z.ZodOptional<z.ZodString>;
                 /** On a `review`: what the review said, in `REVIEWER_STATES`' words (`approved`, `changes`, `commented`). */
                 verdict: z.ZodOptional<z.ZodEnum<["approved", "changes", "commented"]>>;
+                /**
+                 * 2.109.0. True when the tracker says an automated account wrote it (GitHub's `Bot` author, GitLab's
+                 * `bot` user or its access-token bot accounts: a CI report, a code scanner, a dependency updater), so a module can show it apart from
+                 * what people said. Absent when the tracker said nothing either way; never guessed from a name.
+                 */
+                bot: z.ZodCatch<z.ZodOptional<z.ZodBoolean>>;
             }, "strip", z.ZodTypeAny, {
                 at: string;
                 id: string;
@@ -1936,6 +1969,7 @@ export declare const trackerReadingResult: z.ZodObject<{
                 login?: string | undefined;
                 editedAt?: string | undefined;
                 verdict?: "approved" | "changes" | "commented" | undefined;
+                bot?: boolean | undefined;
             }, {
                 at: string;
                 id: string;
@@ -1948,6 +1982,7 @@ export declare const trackerReadingResult: z.ZodObject<{
                 editedAt?: string | undefined;
                 bodyClipped?: boolean | undefined;
                 verdict?: "approved" | "changes" | "commented" | undefined;
+                bot?: unknown;
             }>, "many">>>;
             /**
              * How many comments the item has in all, by the tracker's count (2.98.0). More than
@@ -2040,6 +2075,7 @@ export declare const trackerReadingResult: z.ZodObject<{
                 login?: string | undefined;
                 editedAt?: string | undefined;
                 verdict?: "approved" | "changes" | "commented" | undefined;
+                bot?: boolean | undefined;
             }[] | undefined;
             commentCount?: number | undefined;
             checks?: {
@@ -2126,6 +2162,7 @@ export declare const trackerReadingResult: z.ZodObject<{
                 login?: string | undefined;
                 editedAt?: string | undefined;
                 verdict?: "approved" | "changes" | "commented" | undefined;
+                bot?: boolean | undefined;
             }[] | undefined;
             commentCount?: number | undefined;
             checks?: {
@@ -2375,6 +2412,7 @@ export declare const trackerReadingResult: z.ZodObject<{
                 login?: string | undefined;
                 editedAt?: string | undefined;
                 verdict?: "approved" | "changes" | "commented" | undefined;
+                bot?: boolean | undefined;
             }[] | undefined;
             commentCount?: number | undefined;
             checks?: {

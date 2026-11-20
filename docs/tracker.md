@@ -331,6 +331,10 @@ one item in full without loading the tracker's website:
   tracker's own notes about the item (GitLab's system notes) are not comments.
   Each `body` is Markdown as written, clipped at `LIMITS.TRACKER_COMMENT`;
   render it as text or as Markdown without raw HTML, never as markup.
+  `bot: true` (2.109.0) when the tracker says an automated account wrote it
+  (GitHub's `Bot` author, GitLab's `bot` user or its own access-token bot accounts): show it apart from what people
+  said. Absent is "not said", from an older host or a tracker that did not
+  say; never guess it from a name (`TRACKER_COMMENT_FIELD_SINCE`).
 - `commentCount` — the tracker's own total. More than `comments.length` when the
   thread is longer; the rest is on the tracker, at the row's `url`.
 - `checks` — a change's checks of its head commit (GitHub check runs and commit
