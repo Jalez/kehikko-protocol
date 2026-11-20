@@ -123,6 +123,12 @@ export const trackerCommentSchema = z.object({
   path: z.string().max(LIMITS.PATH).optional(),
   /** On a `review`: what the review said, in `REVIEWER_STATES`' words (`approved`, `changes`, `commented`). */
   verdict: z.enum(['approved', 'changes', 'commented']).optional(),
+  /**
+   * 2.109.0. True when the tracker says an automated account wrote it (GitHub's `Bot` author, GitLab's
+   * `bot` user or its access-token bot accounts: a CI report, a code scanner, a dependency updater), so a module can show it apart from
+   * what people said. Absent when the tracker said nothing either way; never guessed from a name.
+   */
+  bot: z.boolean().optional().catch(undefined),
 })
 export type TrackerComment = z.infer<typeof trackerCommentSchema>
 

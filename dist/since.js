@@ -188,6 +188,14 @@ export const TRACKER_DETAIL_FIELD_SINCE = {
     fork: '2.98.0',
 };
 /**
+ * The fields of a comment in a ref's detail (`trackerCommentSchema`) added after it first had a shape
+ * (2.98.0), and the version that added each. A host before a field leaves it out: a comment with no
+ * `bot` is not said to be a person's, only not said to be a bot's.
+ */
+export const TRACKER_COMMENT_FIELD_SINCE = {
+    bot: '2.109.0',
+};
+/**
  * The fields of an activity item (`activityItemSchema`) added after `activity.set` first had a shape
  * (1.5.0), and the version that added each. Like `TRACKER_FIELD_SINCE`: nothing a manifest has to
  * be held to, since a host that does not know a field strips it and files the item by what it does

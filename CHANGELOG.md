@@ -11,6 +11,15 @@ After 2.78.0, every entry's first line under its heading is its kind, and the ve
 (semver; CI checks it): `Kind: breaking` → next major, `Kind: feature` → next minor, `Kind: fix` →
 next patch.
 
+## 2.109.0 — 2026-11-20
+
+Kind: feature
+
+`bot` on a tracker comment (`trackerCommentSchema`): true when the tracker says an automated account wrote it
+(GitHub's `Bot` author, GitLab's `bot` user or its own access-token bot accounts), so a module can show a CI report or a code scanner's summary apart from
+what people said. Absent means not said, from an older host or a tracker that did not say; a module never guesses it
+from a name. `TRACKER_COMMENT_FIELD_SINCE` (`bot: '2.109.0'`). **Additive**; `PROTOCOL` is still 2.
+
 ## 2.108.2 — 2026-11-20
 
 Kind: fix
