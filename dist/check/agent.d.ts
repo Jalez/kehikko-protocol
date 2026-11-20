@@ -1,7 +1,13 @@
 /**
  * 2.96.0. `kehikot-check-agent <module dir>…`: is an agent module built so that every conversation can
- * message, however it started? Run by the shared module CI on every pull request. A module that does
- * not message (`agents:message` absent from `declares.uses`) passes as `not an agent module`.
+ * message, however it started? Run by the shared module CI on every pull request.
+ *
+ * An agent module runs conversations: it messages (`agents:message`) and either provides an `agent.*`
+ * service (`agent.delivery`, `agent.tasks`, `agent.setup`), lists the message tools on its door
+ * (`messageToolsFor`) or runs the shared conformance in a test. Anything else passes as `not an agent module`, including (2.108.2) a module that
+ * only tells the sessions at a place something (`messages.tell`, as Worktrees does when a worktree's
+ * pull request merges): it asks for `agents:message` and runs no conversation, so it has nothing to
+ * deliver to, no door for an agent to message through and nothing of an agent's to uninstall.
  *
  * From the files, it fails a module that:
  * - messages and provides no `agent.delivery` whose descriptor parses;
@@ -22,6 +28,19 @@ export interface AgentCheck {
     agent: boolean;
     failures: string[];
 }
+/**
+ * 2.108.2. Does this module run conversations? It messages, and it provides an `agent.*` service or
+ * lists the message tools on its door. A module that only sends (`messages.tell`) does neither.
+ */
+export declare function isAgentModule(manifest: {
+    declares?: {
+        uses?: readonly string[];
+    };
+    services?: Record<string, unknown> | null;
+}, sources: readonly {
+    path: string;
+    text: string;
+}[]): boolean;
 /** The check over a manifest and the module's files. Pure but for what it is handed. */
 export declare function checkAgentFiles(manifest: {
     id?: string;
