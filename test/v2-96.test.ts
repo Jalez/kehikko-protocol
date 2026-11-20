@@ -24,7 +24,7 @@ const TOKEN = 'abcdefghijklmnopqrstuvwxyz012345'
 const DELIVERY = { name: 'Claude', program: 'Claude Code', deliver: '/api/deliver', adopt: 'Type /kehikot-here in it.' }
 
 /** 2.108.0: every agent module ships its clean-up; these fixtures are about other rules. */
-const CLEAN_UP = { path: 'uninstall.ts', text: "import { runUninstall } from 'kehikot-module-protocol/serve'\nawait runUninstall([])" }
+const CLEAN_UP = { path: 'uninstall.ts', text: "import { runUninstall } from 'kehikot-module-protocol/serve'\nawait runUninstall([])\n// as a module's resume code would: keepsCutOffMark(now); cutOffByRestart(at); resumeLine(why)" }
 
 describe('2.96.0 — one key for a conversation however it started', () => {
   test('the message tools take placeToken; a module’s say they forward to the kehikko door', () => {

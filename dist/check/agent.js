@@ -57,6 +57,12 @@ export function checkAgentFiles(manifest, sources, tests) {
     if (!cleanUp || !/\brunUninstall\s*\(/.test(cleanUp.text)) {
         failures.push(`${module} has no ${UNINSTALL_SCRIPT} at its root that calls runUninstall (kehikot-module-protocol/serve): add one that removes what it writes outside its folder (session folders, agent settings or skills), so Uninstall takes it all away.`);
     }
+    /* 2.110.0: a conversation a restart cut off is woken to carry on (`restart.ts`). */
+    const all = sources.map((one) => one.text).join('\n');
+    const resumes = /\bresumeLine\s*\(/.test(all) && /\bcutOffByRestart\s*\(/.test(all) && /\bkeepsCutOffMark\s*\(/.test(all);
+    if (serviceDescriptor(AGENT_DELIVERY, manifest.services?.[AGENT_DELIVERY]) && !resumes) {
+        failures.push(`${module} does not wake the conversations a restart cut off: keep a mark with keepsCutOffMark, find them at start with cutOffByRestart, and wake each once with resumeLine (kehikot-module-protocol).`);
+    }
     const gated = sources.filter((one) => /\?\s*(?:await\s*)?messageToolsFor\s*\(|messageToolsFor\s*\([^)]*\)\s*\)?\s*:\s*\[\s*\]/.test(one.text)).map((one) => one.path);
     if (gated.length)
         failures.push(`${gated.join(', ')}: the message tools are listed only behind a token. List them to every caller; an unknown conversation is answered in words.`);

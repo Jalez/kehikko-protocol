@@ -223,6 +223,9 @@ The same list with what each version exported is in [CHANGELOG.md](CHANGELOG.md)
 
 | version | date | what it added |
 |---|---|---|
+| 2.110.0 | 2026-11-20 | Additive. After a restart, conversations carry on: `keepsCutOffMark`, `cutOffByRestart`, `resumeLine`, `restartOf` (`KEHIKOT_RESTART_REASON`, `KEHIKOT_RESTART_VERSION`), `isResumeLine`; `check:agent` asks every agent module for it. See [after a restart](docs/restart.md). |
+| 2.109.0 | 2026-11-20 | Additive. `bot` on a tracker comment, when the tracker says an automated account wrote it; `TRACKER_COMMENT_FIELD_SINCE`. |
+| 2.108.2 | 2026-11-20 | Fix. `check:agent` passes a module that only tells sessions something (`isAgentModule`); the package version is checked in one test. |
 | 2.108.1 | 2026-11-18 | Fix. `kehikot-bundle build` refuses a Bun older than 1.4.1 (1.4.0 drops exports from a bundle, which then crashes at start): `BUNDLE_MIN_BUN`, `bunTooOld`. |
 | 2.108.0 | 2026-11-18 | Additive. A module's own clean-up on Uninstall: `uninstall.ts` at its root, run by the host after the module stops, reports what it removed and left (`runUninstall`, `readUninstallReport`); bundles carry it; `check:agent` asks every agent module for one. |
 | 2.107.0 | 2026-11-18 | Additive. `bun run register` in a module's own folder says that Kehikot now runs that folder instead of the release (Kehikko development) and how to go back (`registerNotice`); never printed at a start. |

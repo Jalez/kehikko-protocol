@@ -17,7 +17,7 @@ import type { TrafficNoteResult, TrafficReadResult } from '../traffic.js'
 import type { DispositionsGetResult, EpicsListResult, PartsGetResult, ProjectsMineResult } from '../methods.js'
 import type { StepsListResult } from '../plan.js'
 import type { MessageReadResult, MessageSendResult } from '../agent-messages.js'
-import type { ServicesFindResult, SessionsPlaceOfResult, TasksReportResult } from '../services.js'
+import type { RestartReleaseResult, ServicesFindResult, SessionsPlaceOfResult, TasksReportResult } from '../services.js'
 import type { Reply } from './doors.js'
 import { askedHosts } from './host-door.js'
 
@@ -102,6 +102,8 @@ export interface ServerAnswers {
   'sessions.placeOf': SessionsPlaceOfResult
   /** 2.99.0. Whether the host took what became of an accepted task. */
   'tasks.report': TasksReportResult
+  /** 2.110.0. What the host did with a held restart released. */
+  'restart.release': RestartReleaseResult
 }
 
 /**

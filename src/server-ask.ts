@@ -58,6 +58,8 @@ export const SERVER_METHODS = [
   'sessions.placeOf',
   /* 2.99.0: what became of a task an agent module's `agent.tasks` start accepted. Names no project: the host knows the task. */
   'tasks.report',
+  /* 2.110.0: a restart the host asked a work queue to hold may go, or was cancelled. Names no project. */
+  'restart.release',
 ] as const
 export type ServerMethod = (typeof SERVER_METHODS)[number]
 

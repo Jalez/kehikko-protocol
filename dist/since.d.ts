@@ -50,6 +50,7 @@ export declare const METHOD_SINCE: {
     readonly 'services.find': "2.81.0";
     readonly 'sessions.placeOf': "2.85.0";
     readonly 'tasks.report': "2.99.0";
+    readonly 'restart.release': "2.110.0";
     readonly 'inbox.read': "2.79.0";
     readonly 'inbox.log': "2.79.0";
     readonly 'inbox.act': "2.79.0";
@@ -98,6 +99,7 @@ export declare const CAPABILITY_SINCE: {
     readonly 'sessions:observe': "2.81.0";
     readonly 'services:read': "2.81.0";
     readonly 'sessions:place': "2.85.0";
+    readonly 'app:restart': "2.110.0";
 };
 /** Each method a module's server may ask (`SERVER_METHODS`), and the version a server could first ask it in. */
 export declare const SERVER_METHOD_SINCE: {
@@ -119,6 +121,7 @@ export declare const SERVER_METHOD_SINCE: {
     readonly 'services.find': "2.81.0";
     readonly 'sessions.placeOf': "2.85.0";
     readonly 'tasks.report': "2.99.0";
+    readonly 'restart.release': "2.110.0";
 };
 /**
  * The manifest declarations a host has to know to do what the module asks, and the version that
@@ -311,6 +314,7 @@ export declare const SINCE: {
         readonly 'services.find': "2.81.0";
         readonly 'sessions.placeOf': "2.85.0";
         readonly 'tasks.report': "2.99.0";
+        readonly 'restart.release': "2.110.0";
         readonly 'inbox.read': "2.79.0";
         readonly 'inbox.log': "2.79.0";
         readonly 'inbox.act': "2.79.0";
@@ -358,6 +362,7 @@ export declare const SINCE: {
         readonly 'sessions:observe': "2.81.0";
         readonly 'services:read': "2.81.0";
         readonly 'sessions:place': "2.85.0";
+        readonly 'app:restart': "2.110.0";
     };
     readonly serverMethods: {
         readonly 'tracker.get': "2.19.0";
@@ -378,6 +383,7 @@ export declare const SINCE: {
         readonly 'services.find': "2.81.0";
         readonly 'sessions.placeOf': "2.85.0";
         readonly 'tasks.report': "2.99.0";
+        readonly 'restart.release': "2.110.0";
     };
     readonly declarations: {
         readonly 'mcp.subjects': "1.1.0";
@@ -506,6 +512,7 @@ export declare const PIECE_SAID: {
         readonly 'sessions:observe': "notices to agent sessions it sees working on this computer";
         readonly 'services:read': "which modules here provide a service to other modules";
         readonly 'sessions:place': "which epic, parts and kehikko an agent session is on";
+        readonly 'app:restart': "letting Kehikot restart when it may";
     };
     readonly declarations: {
         readonly 'mcp.subjects': "door subjects";

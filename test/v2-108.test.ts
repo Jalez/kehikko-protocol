@@ -85,11 +85,12 @@ describe('check:agent', () => {
   const conformance = { path: 'test/agent.test.ts', text: "import { expectAgentConformance } from 'kehikot-module-protocol/testing'\nawait expectAgentConformance({})" }
 
   test('fails an agent module with no uninstall.ts, or one that does not report through runUninstall', () => {
-    const none = checkAgentFiles(manifest, [], [conformance]).failures
+    const resumes = { path: 'resume.ts', text: 'keepsCutOffMark(now); cutOffByRestart(at); resumeLine(why)' }
+    const none = checkAgentFiles(manifest, [resumes], [conformance]).failures
     expect(none).toHaveLength(1)
     expect(none[0]).toContain(UNINSTALL_SCRIPT)
-    expect(checkAgentFiles(manifest, [{ path: 'uninstall.ts', text: 'console.log(1)' }], [conformance]).failures).toHaveLength(1)
-    expect(checkAgentFiles(manifest, [{ path: 'uninstall.ts', text: 'await runUninstall([])' }], [conformance]).failures).toEqual([])
+    expect(checkAgentFiles(manifest, [{ path: 'uninstall.ts', text: 'console.log(1)' }, resumes], [conformance]).failures).toHaveLength(1)
+    expect(checkAgentFiles(manifest, [{ path: 'uninstall.ts', text: 'await runUninstall([])' }, resumes], [conformance]).failures).toEqual([])
   })
 
   test('a module that does not message is not asked for one', () => {

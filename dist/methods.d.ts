@@ -172,6 +172,8 @@ export declare const CAPABILITIES: {
      * session and belongs where that session does. Only from a module's server.
      */
     readonly 'sessions:place': "See which epic, parts and kehikko an agent session is working on, by its session id.";
+    /** 2.110.0: a work queue lets an app restart the host asked it to hold go (`restart.release`). */
+    readonly 'app:restart': "Let Kehikot restart, when a restart it asked to have held behind other work may go.";
     readonly 'inbox:person': "Show your Inbox — what modules need, are doing and have said — and, on your press, mark it seen, dismiss, forget, answer or go to it.";
     /**
      * 2.90.0. Asks the host to open THIS module's settings (the ones it declared, `declares.settings`),
@@ -255,6 +257,8 @@ export declare const METHODS: {
      * the Inbox, which is what `activity:report` is for, and every agent module declares it.
      */
     readonly 'tasks.report': "activity:report";
+    /** A restart the host asked a work queue to hold may go, or was cancelled in the queue (2.110.0). */
+    readonly 'restart.release': "app:restart";
     /** The person's Inbox, read by a module's page (2.79.0). */
     readonly 'inbox.read': "inbox:person";
     /** Earlier: the Inbox's log, a page of it (2.79.0). */
@@ -2459,6 +2463,17 @@ export declare const methodParams: {
         outcome: "failed" | "started";
         why?: string | undefined;
         conversation?: string | null | undefined;
+    }>;
+    /** 2.110.0. From a work queue's server: the restart held under a token may go, or was cancelled; answered with `restartReleaseResult`. See `services.ts`. */
+    readonly 'restart.release': z.ZodObject<{
+        token: z.ZodString;
+        go: z.ZodBoolean;
+    }, "strip", z.ZodTypeAny, {
+        token: string;
+        go: boolean;
+    }, {
+        token: string;
+        go: boolean;
     }>;
     /** 2.79.0. From a page only: the person's Inbox; answered with `inboxReadResult`. See `inbox.ts`. */
     readonly 'inbox.read': z.ZodObject<{}, "strip", z.ZodTypeAny, {}, {}>;

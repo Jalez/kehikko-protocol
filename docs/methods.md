@@ -349,6 +349,7 @@ and a module that declares none gets none of the methods below.
 | `services.find` | `services:read` |
 | `sessions.placeOf` | `sessions:place` |
 | `tasks.report` | `activity:report` |
+| `restart.release` | `app:restart` |
 | `messages.say` | `messages:as-person` |
 | `projects.mine` | `agents:message` |
 | `inbox.read` | `inbox:person` |

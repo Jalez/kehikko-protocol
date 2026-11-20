@@ -17,7 +17,7 @@ import { stepsListResult } from './plan.js';
 import { gotoProject, showAskSchema } from './show.js';
 import { trafficNoteResult, trafficNoteSchema, trafficReadResult } from './traffic.js';
 import { inboxActParams, inboxActResult, inboxAnswerParams, inboxAnswerResult, inboxLogParams, inboxLogResult, inboxOpenParams, inboxOpenResult, inboxReadParams, inboxReadResult, inboxUseParams, inboxUseResult, inboxAdoptionParams, inboxAdoptionResult, inboxAdoptParams, inboxAdoptResult, inboxAdoptWithParams, inboxAdoptWithResult, inboxUntrackParams, inboxUntrackResult, inboxUndoParams, inboxUndoResult } from './inbox.js';
-import { servicesFindParams, servicesFindResult, sessionsPlaceOfParams, sessionsPlaceOfResult, tasksReportParams, tasksReportResult } from './services.js';
+import { restartReleaseParams, restartReleaseResult, servicesFindParams, servicesFindResult, sessionsPlaceOfParams, sessionsPlaceOfResult, tasksReportParams, tasksReportResult } from './services.js';
 import { messageMineParams, messageMineResult, messageNotifyParams, messageNotifySessionParams, messagePostParams, messageReadParams, messageReadResult, messageSayParams, messageSendParams, messageSendResult, messageTellParams } from './agent-messages.js';
 /**
  * The questions a module can ask, by name and by shape: capabilities, methods, each method's
@@ -193,6 +193,8 @@ export const CAPABILITIES = {
      * session and belongs where that session does. Only from a module's server.
      */
     'sessions:place': 'See which epic, parts and kehikko an agent session is working on, by its session id.',
+    /** 2.110.0: a work queue lets an app restart the host asked it to hold go (`restart.release`). */
+    'app:restart': 'Let Kehikot restart, when a restart it asked to have held behind other work may go.',
     'inbox:person': 'Show your Inbox — what modules need, are doing and have said — and, on your press, mark it seen, dismiss, forget, answer or go to it.',
     /**
      * 2.90.0. Asks the host to open THIS module's settings (the ones it declared, `declares.settings`),
@@ -275,6 +277,8 @@ export const METHODS = {
      * the Inbox, which is what `activity:report` is for, and every agent module declares it.
      */
     'tasks.report': 'activity:report',
+    /** A restart the host asked a work queue to hold may go, or was cancelled in the queue (2.110.0). */
+    'restart.release': 'app:restart',
     /** The person's Inbox, read by a module's page (2.79.0). */
     'inbox.read': 'inbox:person',
     /** Earlier: the Inbox's log, a page of it (2.79.0). */
@@ -656,6 +660,8 @@ export const methodParams = {
     'sessions.placeOf': sessionsPlaceOfParams,
     /** 2.99.0. From an agent module's server: what became of a task its `agent.tasks` start accepted; answered with `tasksReportResult`. */
     'tasks.report': tasksReportParams,
+    /** 2.110.0. From a work queue's server: the restart held under a token may go, or was cancelled; answered with `restartReleaseResult`. See `services.ts`. */
+    'restart.release': restartReleaseParams,
     /** 2.79.0. From a page only: the person's Inbox; answered with `inboxReadResult`. See `inbox.ts`. */
     'inbox.read': inboxReadParams,
     /** 2.79.0. From a page only: a page of Earlier; answered with `inboxLogResult`. */
@@ -890,6 +896,7 @@ export const methodResults = {
     'services.find': servicesFindResult,
     'sessions.placeOf': sessionsPlaceOfResult,
     'tasks.report': tasksReportResult,
+    'restart.release': restartReleaseResult,
     'inbox.read': inboxReadResult,
     'inbox.log': inboxLogResult,
     'inbox.act': inboxActResult,

@@ -52,6 +52,7 @@ export const METHOD_SINCE = {
     'services.find': '2.81.0',
     'sessions.placeOf': '2.85.0',
     'tasks.report': '2.99.0',
+    'restart.release': '2.110.0',
     'inbox.read': '2.79.0',
     'inbox.log': '2.79.0',
     'inbox.act': '2.79.0',
@@ -100,6 +101,7 @@ export const CAPABILITY_SINCE = {
     'sessions:observe': '2.81.0',
     'services:read': '2.81.0',
     'sessions:place': '2.85.0',
+    'app:restart': '2.110.0',
 };
 /** Each method a module's server may ask (`SERVER_METHODS`), and the version a server could first ask it in. */
 export const SERVER_METHOD_SINCE = {
@@ -121,6 +123,7 @@ export const SERVER_METHOD_SINCE = {
     'services.find': '2.81.0',
     'sessions.placeOf': '2.85.0',
     'tasks.report': '2.99.0',
+    'restart.release': '2.110.0',
 };
 /**
  * The manifest declarations a host has to know to do what the module asks, and the version that
@@ -330,6 +333,7 @@ export const PIECE_SAID = {
         'sessions:observe': 'notices to agent sessions it sees working on this computer',
         'services:read': 'which modules here provide a service to other modules',
         'sessions:place': 'which epic, parts and kehikko an agent session is on',
+        'app:restart': 'letting Kehikot restart when it may',
     },
     declarations: {
         'mcp.subjects': 'door subjects',
