@@ -7,7 +7,6 @@ import {
   CAPABILITY_SINCE,
   METHODS,
   METHOD_SINCE,
-  PACKAGE_VERSION,
   PIECE_SAID,
   SETTINGS_OPEN_OUTCOMES,
   methodParams,
@@ -20,7 +19,6 @@ const REPO = resolve(dirname(new URL(import.meta.url).pathname), '..')
 
 describe('2.90.0: a page opens its own settings at one setting', () => {
   test('the version', () => {
-    expect(PACKAGE_VERSION).toBe('2.108.1')
     expect(readFileSync(join(REPO, 'CHANGELOG.md'), 'utf8')).toContain('## 2.90.0')
     expect(readFileSync(join(REPO, 'docs/asking.md'), 'utf8')).toContain('## Opening its settings at one setting: `settings.open`')
   })

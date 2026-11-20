@@ -8,7 +8,6 @@ import { Bar, BarChart } from 'recharts'
 
 import {
   GUARDS_HEAD,
-  PACKAGE_VERSION,
   editDecision,
   editedPaths,
   guardDecision,
@@ -232,6 +231,3 @@ describe('client/ui/chart', () => {
   })
 })
 
-test('the package says 2.78.0', () => {
-  expect(PACKAGE_VERSION).toBe('2.108.1')
-})

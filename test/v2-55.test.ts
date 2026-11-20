@@ -4,7 +4,6 @@ import {
   DECISION_EVENT,
   LIMITS,
   NOTES_VERSION,
-  PACKAGE_VERSION,
   REFUSED_EVENT,
   STALLED_EVENT,
   TURN_EVENTS,
@@ -37,7 +36,6 @@ const SELF = { module: 'kehikot.claude', name: 'Claude', door: 'kehikko-claude' 
 
 describe('2.55.0', () => {
   test('is the package version, and the notes are told again', () => {
-    expect(PACKAGE_VERSION).toBe('2.108.1')
     expect(NOTES_VERSION).toBeGreaterThanOrEqual(8)
   })
 

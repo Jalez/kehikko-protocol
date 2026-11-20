@@ -3,7 +3,6 @@ import { describe, expect, test } from 'bun:test'
 import {
   COMMENT_KINDS,
   LIMITS,
-  PACKAGE_VERSION,
   PROTOCOL,
   TRACKER_DETAIL_FIELD_SINCE,
   trackerCommentSchema,
@@ -36,7 +35,6 @@ const change = {
 
 describe('the version', () => {
   test('is 2.98.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.108.1')
     expect(PROTOCOL).toBe(2)
   })
 })

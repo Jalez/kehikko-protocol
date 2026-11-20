@@ -3,7 +3,6 @@ import { describe, expect, test } from 'bun:test'
 import {
   LIMITS,
   MY_ROLES,
-  PACKAGE_VERSION,
   PROTOCOL,
   REVIEWER_STATES,
   trackerDiscussionsSchema,
@@ -33,7 +32,6 @@ const done: TrackerReviewer = { login: 'hubot', state: 'approved' }
 
 describe('the version', () => {
   test('is 2.18.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.108.1')
     expect(PROTOCOL).toBe(2)
   })
   test('LIMITS.REVIEWERS is 32', () => expect(LIMITS.REVIEWERS).toBe(32))

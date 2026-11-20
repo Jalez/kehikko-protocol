@@ -10,7 +10,6 @@ import {
   EVENT_ID,
   LIMITS,
   MANIFEST_KIND,
-  PACKAGE_VERSION,
   PROTOCOL,
   SINCE,
   activityItemSchema,
@@ -64,7 +63,6 @@ const item = (more: Record<string, unknown> = {}) => ({ id: 's1', state: 'done',
 
 describe('the version', () => {
   test('is 2.31.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.108.1')
     expect(PROTOCOL).toBe(2)
   })
 })

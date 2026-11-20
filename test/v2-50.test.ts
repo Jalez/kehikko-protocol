@@ -9,7 +9,6 @@ import {
   MESSAGE_KINDS,
   METHODS,
   METHOD_SINCE,
-  PACKAGE_VERSION,
   PERSON_MESSAGES_HEAD,
   PERSON_MESSAGES_SETTING,
   PERSON_MESSAGE_AUTHORITY,
@@ -74,7 +73,6 @@ const fromPerson = (over: Record<string, unknown> = {}): AgentMessage =>
 
 describe('the version', () => {
   test('is 2.50.0, PROTOCOL is still 2, and the docs say it', () => {
-    expect(PACKAGE_VERSION).toBe('2.108.1')
     expect(PROTOCOL).toBe(2)
     expect(readFileSync(join(REPO, 'CHANGELOG.md'), 'utf8')).toContain('## 2.50.0')
     const docs = readFileSync(join(REPO, 'docs/agent-messages.md'), 'utf8')

@@ -11,7 +11,6 @@ import {
   LIMITS,
   MANIFEST_KIND,
   OPENS,
-  PACKAGE_VERSION,
   PROTOCOL,
   canOpen,
   eventSoundOf,
@@ -69,7 +68,6 @@ const manifest = (over: Record<string, unknown> = {}) => ({
 
 describe('the version', () => {
   test('is 2.33.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.108.1')
     expect(PROTOCOL).toBe(2)
   })
 })

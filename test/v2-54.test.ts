@@ -8,7 +8,6 @@ import {
   METHOD_SINCE,
   MODULE_MESSAGES_TYPED,
   MESSAGES_TYPED_READ_ONLY,
-  PACKAGE_VERSION,
   PROTOCOL,
   SERVER_METHODS,
   SERVER_METHOD_SINCE,
@@ -59,7 +58,6 @@ const notice = (over: Record<string, unknown> = {}): AgentMessage =>
 
 describe('the version', () => {
   test('is 2.54.0, PROTOCOL is still 2, and the docs say it', () => {
-    expect(PACKAGE_VERSION).toBe('2.108.1')
     expect(PROTOCOL).toBe(2)
     expect(readFileSync(join(REPO, 'CHANGELOG.md'), 'utf8')).toContain('## 2.54.0')
     expect(readFileSync(join(REPO, 'docs/agent-messages.md'), 'utf8')).toContain('messages.notify')

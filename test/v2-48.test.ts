@@ -6,7 +6,6 @@ import {
   ACT_ON_MESSAGES,
   DELIVER_MOST,
   MESSAGES_TYPED_READ_ONLY,
-  PACKAGE_VERSION,
   PROTOCOL,
   RESUME_EVERY_MS,
   RESUME_MOST,
@@ -55,7 +54,6 @@ const readOf = (messages: AgentMessage[], unread: number, you: WakeReader | null
 
 describe('the version', () => {
   test('is 2.48.0, PROTOCOL is still 2, and the docs say it', () => {
-    expect(PACKAGE_VERSION).toBe('2.108.1')
     expect(PROTOCOL).toBe(2)
     expect(readFileSync(join(REPO, 'CHANGELOG.md'), 'utf8')).toContain('## 2.48.0')
     const docs = readFileSync(join(REPO, 'docs/agent-messages.md'), 'utf8')

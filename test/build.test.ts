@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test } from 'bun:test'
 import { EventEmitter } from 'node:events'
-import { mkdtempSync, readFileSync, rmSync } from 'node:fs'
+import { mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -49,6 +49,19 @@ describe('the package version', () => {
   test('is the one in package.json', () => {
     const pkg = JSON.parse(readFileSync(join(here, 'package.json'), 'utf8')) as { version: string }
     expect(PACKAGE_VERSION).toBe(pkg.version)
+  })
+
+  test('has a CHANGELOG entry', () => {
+    expect(readFileSync(join(here, 'CHANGELOG.md'), 'utf8')).toContain(`## ${PACKAGE_VERSION}`)
+  })
+
+  // The version is checked here and only here. Ninety tests once each pinned it as a literal,
+  // so every release edited ninety files; a test for a feature checks the feature.
+  test('is pinned by no other test', () => {
+    const pinned = readdirSync(join(here, 'test'))
+      .filter((name) => name.endsWith('.test.ts') && name !== 'build.test.ts')
+      .filter((name) => /expect\((?:PACKAGE_VERSION|pkg\.version)\)\.toBe\(['"]\d/.test(readFileSync(join(here, 'test', name), 'utf8')))
+    expect(pinned).toEqual([])
   })
 })
 

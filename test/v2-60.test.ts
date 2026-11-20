@@ -7,7 +7,6 @@ import { join } from 'node:path'
 
 import {
   BUILD_HEADER,
-  PACKAGE_VERSION,
   PROTOCOL,
   START_HEADER,
   START_TOKEN,
@@ -41,7 +40,6 @@ const MANIFEST: Manifest = manifestSchema.parse({
 
 describe('the version', () => {
   test('is 2.60.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.108.1')
     expect(PROTOCOL).toBe(2)
     expect(START_TOKEN_ENV).toBe('KEHIKOT_START_TOKEN')
     expect(START_HEADER).toBe('x-kehikot-start')

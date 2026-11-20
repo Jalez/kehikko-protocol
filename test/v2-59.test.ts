@@ -7,7 +7,6 @@ import {
   LIMITS,
   MESSAGE,
   MODULE_MESSAGES,
-  PACKAGE_VERSION,
   PAGE_ERRORS_MAX,
   hostMessageSchema,
   moduleMessageSchema,
@@ -49,9 +48,6 @@ const hello = (source: unknown, origin = 'http://127.0.0.1:4170') => ({
 })
 
 describe('the version', () => {
-  test('is 2.59.0', () => {
-    expect(PACKAGE_VERSION).toBe('2.108.1')
-  })
 })
 
 describe('kehikot.page.error on the wire', () => {

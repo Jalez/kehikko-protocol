@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import { readFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 
-import { MESSAGE, MODULE_MESSAGES, PACKAGE_VERSION, POINTER_PHASES, PROTOCOL, helloSchema, moduleMessageSchema, pointerSchema } from '../src/index.js'
+import { MESSAGE, MODULE_MESSAGES, POINTER_PHASES, PROTOCOL, helloSchema, moduleMessageSchema, pointerSchema } from '../src/index.js'
 import { connect, type PointerTarget } from '../src/client/connect.js'
 import type { MessageSource } from '../src/client/mailbox.js'
 
@@ -16,7 +16,6 @@ const REPO = resolve(dirname(new URL(import.meta.url).pathname), '..')
 
 describe('the version', () => {
   test('is current, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.108.1')
     expect(PROTOCOL).toBe(2)
     expect(readFileSync(join(REPO, 'CHANGELOG.md'), 'utf8')).toContain('## 2.49.0')
   })

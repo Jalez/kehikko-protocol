@@ -3,7 +3,7 @@ import { afterAll, afterEach, beforeAll, describe, expect, test } from 'bun:test
 import { createServer, type Server } from 'node:http'
 import type { AddressInfo } from 'node:net'
 
-import { PACKAGE_VERSION, PROTOCOL, manifestSchema, type Manifest } from '../src/index.js'
+import { PROTOCOL, manifestSchema, type Manifest } from '../src/index.js'
 import {
   attach,
   doorsFetch,
@@ -61,7 +61,6 @@ afterEach(async () => {
 
 describe('the version', () => {
   test('is 2.32.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.108.1')
     expect(PROTOCOL).toBe(2)
   })
 })

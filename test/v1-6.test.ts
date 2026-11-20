@@ -4,7 +4,7 @@ import { mkdtempSync, realpathSync, rmSync, symlinkSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 
-import { HEADER_ICONS, LIMITS, PACKAGE_VERSION, headerItemsSchema, pinnedRuns, pressRefusal } from '../src/index.js'
+import { HEADER_ICONS, LIMITS, headerItemsSchema, pinnedRuns, pressRefusal } from '../src/index.js'
 
 /** 1.6.0: `pinned` on a run. Also parsed by the 1.5.0 build from the tag (skipped loudly if absent). */
 
@@ -28,7 +28,6 @@ afterAll(() => {
 const run = (id: string, more: Record<string, unknown> = {}) => ({ kind: 'run', id, label: id, ...more })
 
 describe('pinned runs', () => {
-  test('version', () => expect(PACKAGE_VERSION).toBe('2.108.1'))
   test('optional, boolean, only drawn on runs', () => {
     const parsed = headerItemsSchema.parse([run('a'), run('b', { pinned: true, icon: 'check' })]) as any[]
     expect(parsed[0].pinned).toBeUndefined()

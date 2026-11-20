@@ -6,7 +6,6 @@ import { z } from 'zod'
 import {
   LIMITS,
   LINK_RELATIONS,
-  PACKAGE_VERSION,
   PROTOCOL,
   SINCE,
   SINCE_FLOOR,
@@ -39,7 +38,6 @@ const issue = { ...base, ref: '#3912', number: 3912, kind: 'issue' as const, sta
 
 describe('the version', () => {
   test('is 2.26.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.108.1')
     expect(PROTOCOL).toBe(2)
   })
 })

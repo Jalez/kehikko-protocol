@@ -6,7 +6,6 @@ import {
   LIMITS,
   MESSAGE,
   MODULE_MESSAGES,
-  PACKAGE_VERSION,
   PROTOCOL,
   dragSchema,
   dropSchema,
@@ -43,7 +42,6 @@ function transfer(only?: string[]): DataTransferLike & { data: Map<string, strin
 }
 
 describe('2.94.0 fileDrag', () => {
-  test('the version', () => expect(PACKAGE_VERSION).toBe('2.108.1'))
 
   test('set writes all three spellings and read gives the same file back', () => {
     const dt = transfer()

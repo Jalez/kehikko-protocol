@@ -3,7 +3,6 @@ import { describe, expect, test } from 'bun:test'
 import {
   KEHIKOT_IGNORE,
   MESSAGE,
-  PACKAGE_VERSION,
   PROJECT_FILE,
   PROJECT_FILE_IGNORE,
   PROJECT_ID,
@@ -33,7 +32,6 @@ const OTHER = 'a1b2c3d4-0000-4000-8000-000000000000'
 
 describe('the version', () => {
   test('is 2.3.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.108.1')
     expect(PROTOCOL).toBe(2)
   })
 })

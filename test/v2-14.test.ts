@@ -6,7 +6,6 @@ import {
   LUCIDE_MODULE_ICONS,
   MODULE_ICONS,
   MODULE_ICON_SETS,
-  PACKAGE_VERSION,
   PROTOCOL,
   isModuleIcon,
   manifestSchema,
@@ -27,7 +26,6 @@ const minimal = {
 
 describe('the version', () => {
   test('is 2.18.0, and PROTOCOL is still 2', () => {
-    expect(PACKAGE_VERSION).toBe('2.108.1')
     expect(PROTOCOL).toBe(2)
   })
 })

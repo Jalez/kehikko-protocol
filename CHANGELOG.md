@@ -11,6 +11,18 @@ After 2.78.0, every entry's first line under its heading is its kind, and the ve
 (semver; CI checks it): `Kind: breaking` → next major, `Kind: feature` → next minor, `Kind: fix` →
 next patch.
 
+## 2.108.2 — 2026-11-20
+
+Kind: fix
+
+`kehikot-check-agent` no longer fails a module that only tells sessions something. It took every module asking for
+`agents:message` to be an agent module, so Worktrees (which calls `messages.tell` when a worktree's pull request merges)
+was told to provide `agent.delivery`, a conformance test and an `uninstall.ts` for conversations it never runs. An agent
+module is now one that messages and provides an `agent.*` service, lists the message tools on its door
+(`messageToolsFor`) or runs the shared conformance in a test (`isAgentModule`, `src/check/agent.ts`). Claude, Codex, Antigravity
+and Vibe are agent modules as before. The package version is checked in one test (`test/build.test.ts`, against
+`package.json` and this file) instead of being pinned as a literal in ninety. **Additive**; `PROTOCOL` is still 2.
+
 ## 2.108.1 — 2026-11-18
 
 Kind: fix
